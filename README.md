@@ -1,4 +1,4 @@
 adcomp
 ======
-
-AD computation with RcppAD
+* Development of RcppAD package.
+* AD computation with RcppAD.
