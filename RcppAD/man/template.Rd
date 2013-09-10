@@ -1,0 +1,61 @@
+\name{template}
+\alias{template}
+\title{Create cpp template to get started.}
+\usage{
+  template(file = NULL)
+}
+\arguments{
+  \item{file}{Optional name of cpp file.}
+}
+\description{
+  Create a cpp template to get started.
+}
+\details{
+  This function generates a c++ template with a header and
+  include statement. Here is a brief overview of the c++
+  syntax used to code the objective function.
+
+  Macros to read data and declare parameters:
+  \tabular{lll}{ \bold{Template Syntax} \tab \bold{C++
+  type} \tab \bold{R type} \cr DATA_VECTOR(name) \tab
+  vector<Type> \tab vector \cr DATA_MATRIX(name) \tab
+  matrix<Type> \tab matrix \cr DATA_SCALAR(name) \tab Type
+  \tab numeric(1) \cr DATA_INTEGER(name) \tab int \tab
+  integer(1) \cr DATA_FACTOR(name) \tab vector<int> \tab
+  factor \cr DATA_SPARSE_MATRIX(name) \tab
+  Eigen::SparseMatrix<Type> \tab dgTMatrix \cr
+  DATA_ARRAY(name) \tab array<Type> \tab array \cr
+  PARAMETER_MATRIX(name) \tab matrix<Type> \tab matrix \cr
+  PARAMETER_VECTOR(name) \tab vector<Type> \tab vector \cr
+  PARAMETER_ARRAY(name) \tab array<Type> \tab array \cr
+  PARAMETER(name) \tab Type \tab numeric(1) \cr }
+
+  Basic calculations: \tabular{ll}{ \bold{Template Syntax}
+  \tab \bold{Explanation} \cr REPORT(x) \tab Report x back
+  to R \cr ADREPORT(x) \tab Report x back to R with
+  derivatives \cr vector<Type> v(n1); \tab R equivalent of
+  v=numeric(n1) \cr matrix<Type> m(n1,n2); \tab R
+  equivalent of m=matrix(0,n1,n2) \cr array<Type>
+  a(n1,n2,n3); \tab R equivalent of a=array(0,c(n3,n2,n1))
+  \cr v+v,v-v,v*v,v/v \tab Pointwise binary operations \cr
+  m*v \tab Matrix-vector multiply \cr a(i) \tab R
+  equivalent of a[,,i] \cr a(i)(j) \tab R equivalent of
+  a[,j,i] \cr a(i)(j)[k] \tab R equivalent of a[k,j,i] \cr
+  exp(v) \tab Pointwise math \cr m(i,j) \tab R equivalent
+  of m[i,j] \cr v.sum() \tab R equivalent of sum(v) \cr
+  m.transpose() \tab R equivalent of t(m) \cr }
+
+  Some distributions are avaliable as c++ templates with
+  syntax close to R's distributions: \tabular{ll}{
+  \bold{Function header} \tab \bold{Distribution} \cr
+  dnbinom(x,mu,var,int give_log=0) \tab Negative binomial
+  with mean and variance \cr dpois(x,lambda,int give_log=0)
+  \tab Poisson distribution as in R \cr
+  dlgamma(y,shape,scale,int give_log=0) \tab log-gamma
+  distribution \cr dnorm(x,mean,sd,int give_log=0) \tab
+  Normal distribution as in R \cr }
+}
+\examples{
+template()
+}
+

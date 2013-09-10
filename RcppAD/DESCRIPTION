@@ -1,0 +1,24 @@
+Package: RcppAD
+Type: Package
+Title: General random effect model builder tool inspired by ADMB.
+Version: 1.0
+Date: 2013-09-03
+Author: Kasper Kristensen
+Maintainer: Kasper Kristensen <kaskr@imm.dtu.dk>
+Description: With this tool, a user should be able to quickly implement complex
+    random effect models through simple c++ templates. The package combines
+    CppAD (c++ automatic differentiation), Eigen (templated matrix-vector
+    library) and CHOLMOD (sparse matrix routines available from R) to obtain an
+    efficient implementation of the applied Laplace approximation with exact
+    derivatives. Key features are: Automatic sparseness detection, parallelism
+    through BLAS and parallel user templates.
+License: GPL
+Depends:
+    Matrix(>= 1.0-1)
+LinkingTo: Matrix
+Collate:
+    'asmle.R'
+    'examples.R'
+    'options.R'
+    'RcppAD.R'
+    'zzz.R'

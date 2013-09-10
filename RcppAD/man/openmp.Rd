@@ -1,0 +1,17 @@
+\name{openmp}
+\alias{openmp}
+\title{Control number of openmp threads.}
+\usage{
+  openmp(n = NULL)
+}
+\arguments{
+  \item{n}{Requested number of threads, or \code{NULL} to
+  just read the current value.}
+}
+\value{
+  Number of threads.
+}
+\description{
+  Control number of openmp threads.
+}
+

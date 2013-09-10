@@ -1,0 +1,87 @@
+/* Matrix vector templates using inheritance  */
+using namespace Eigen;
+template <class Type>
+struct vector : Array<Type,Dynamic,1>
+{
+  typedef Type value_type;
+  typedef Array<Type,Dynamic,1> Base;
+  vector(void):Base() {}
+
+  template<class T1>
+  vector(T1 x):Base(x) {}
+
+  template<class T1, class T2>
+  vector(T1 x, T2 y):Base(x,y) {}
+  
+  
+  template<class T1>
+  vector & operator= (const T1 & other)
+  {
+    this->Base::operator=(other);
+    return *this;
+  }
+
+  // /* index-vector subset */
+  // template <class T>
+  // Type & operator()(T ind){
+  //   return this->Base::operator()(ind);
+  // }
+  using Base::operator();
+
+  // kasper: would be better with references, i.e. allow x(indvec)=y;
+  vector<Type> operator()(vector<int> ind){
+    vector<Type> ans(ind.size());
+    for(int i=0;i<ind.size();i++)ans[i]=this->operator[](ind[i]);
+    return ans;
+  }
+
+  /* Convert to _other_ vector class
+     Examples
+     1. vector<Type> to CppAD::vector<Type>
+     2. vector<int> to CppAD::vector<double>
+   */
+  // kasper: maybe not needed now
+  template<template<class> class Vector, class T>
+  operator Vector<T>(){
+    Vector<T> x(this->size());
+    for(int i=0;i<this->size();i++)x[i]=T(this->operator[](i));
+    return x;
+  }
+  /* Convert to _this_ vector class
+     Examples:
+     1. vector<int> to vector<double>
+     2. CppAD::vector<Type> to vector<Type> 
+     3. CppAD::vector<int> to vector<double> 
+  */
+  // kasper: maybe not needed now
+  template<template<class> class Vector, class T>
+  vector(Vector<T> x):Base(){
+    this->resize(x.size());
+    for(int i=0;i<x.size();i++)this->operator[](i)=Type(x[i]);
+  }
+};
+
+
+template <class Type>
+struct matrix : Matrix<Type,Dynamic,Dynamic>
+{
+  typedef Matrix<Type,Dynamic,Dynamic> Base;
+  matrix(void):Base() {}
+  template<class T1>
+  matrix(T1 x):Base(x) {}
+  template<class T1, class T2>
+  matrix(T1 x, T2 y):Base(x,y) {}
+  
+  template<class T1>
+  matrix & operator= (const T1 & other)
+  {
+    this->Base::operator=(other);
+    return *this;
+  }
+
+  vector<Type> vec(){
+    vector<Type> x(this->size());
+    for(int i=0;i<x.size();i++)x[i]=this->operator()(i);
+    return x;
+  }
+};

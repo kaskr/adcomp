@@ -1,0 +1,32 @@
+require(RcppAD)
+dyn.load("simple.so")
+
+## Test data
+set.seed(123)
+y <- rep(1900:2010,each=2)
+year <- factor(y)
+quarter <- factor(rep(1:4,length.out=length(year)))
+period <- factor((y > mean(y))+1)
+## Random year+quarter effect, fixed period effect:
+B <- model.matrix(~year+quarter-1)
+A <- model.matrix(~period-1)
+B <- as(B,"dgTMatrix")
+A <- as(A,"dgTMatrix")
+u <- rnorm(ncol(B)) ## logsdu=0
+beta <- rnorm(ncol(A))*100
+eps <- rnorm(nrow(B),sd=1) ## logsd0=0
+x <- as.numeric(A%*%beta+B%*%u+eps)
+
+## Fit model
+map <- NULL
+obj <- MakeADFun(data=list(x=x,B=B,A=A),
+                 parameters=list(u=u*0+.1,beta=beta*0+.1,logsdu=.1,logsd0=0.1),
+                 random="^u"
+                 )
+newtonOption(smartsearch=FALSE)
+obj$fn(obj$par)
+obj$gr(obj$par)
+obj$control <- list(parscale=obj$par*0+1e-1,trace=10)
+obj$hessian <- TRUE
+opt <- do.call("optim",obj)
+summary(as.mle2(opt))
