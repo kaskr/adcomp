@@ -200,7 +200,11 @@ MakeADFun <- function(data,parameters,map=list(),
     nonemp <- sapply(ans,function(x)length(x)>0) ## Workaround utils::relist bug for empty list items
     nonempindex <- which(nonemp)
     skeleton <- as.relistable(ans[nonemp])
-    if(any(random))par[-random] <- x
+    if(any(random)){
+      par[-random] <- x
+    } else {
+      par[] <- x
+    }
     li <- relist(par,skeleton)
     reshape <- function(x){
       if(is.null(attr(x,"map")))return(x)
