@@ -242,6 +242,10 @@ MakeADFun <- function(data,parameters,map=list(),
   retape <- function(){
     if(is.character(random)){
       random <<- grepRandomParameters(parameters,random)
+      if(length(random)==0){
+        cat("Selected random effects did not match any model parameters.\n")
+        random <<- NULL
+      }
       par <<- unlist(parameters)
     }
     if("ADFun"%in%type){
@@ -533,16 +537,24 @@ MakeADFun <- function(data,parameters,map=list(),
   validpar <- function(x)TRUE
   tracemgc <- TRUE
   env <- environment()
-  if(is.null(random)){
+  if(is.null(random)){  ## Output if pure fixed effect model
     return(list(par=par,
-                fn=function(x=last.par,...)f(x,order=0),
-                gr=function(x=last.par,...)f(x,order=1),
+                fn=function(x=last.par,...){
+                  if(tracepar){cat("par:\n");print(x)}
+                  if(!validpar(x))return(NaN)
+                  f(x,order=0)
+                },
+                gr=function(x=last.par,...){
+                  ans <- f(x,order=1)
+                  if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
+                  ans
+                },
                 he=function(x=last.par)f(x,order=2),
                 hessian=hessian,method=method,
                 retape=retape,env=env,
                 report=report,...))
   }
-  if(!is.null(random)){
+  if(!is.null(random)){  ## Output if random effect model
     return(list(par=par[-random],
                 fn=function(x=last.par[-random],...){
                   if(tracepar){cat("par:\n");print(x)}
