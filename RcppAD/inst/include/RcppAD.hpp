@@ -24,6 +24,16 @@ bool _openmp=true;
 bool _openmp=false;
 #endif
 
+/* Utility: Compile time test for Type=double */
+template<class Type>
+struct isDouble{
+  enum{value=false};
+};
+template<>
+struct isDouble<double>{
+  enum{value=true};
+};
+
 /* Macros to obtain data and parameters from R */
 #define PARAMETER_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
         getListElement(objective_function::parameters,#name)));		\
@@ -43,8 +53,9 @@ bool _openmp=false;
 #define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
 #define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(my::asSparseMatrix<Type>( \
         getListElement(objective_function::data,#name)));
-#define REPORT(name) defineVar(install(#name),asSEXP(name),	\
-			       objective_function::report)
+// REPORT() construct new SEXP so never report in parallel!
+#define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
+                        defineVar(install(#name),asSEXP(name),objective_function::report);}
 #define ADREPORT(name) objective_function::reportvector=name;
 #define PARALLEL_REGION if(this->parallel_region())
 #define DATA_ARRAY(name) my::array<Type> name(my::asArray<Type>(	\
