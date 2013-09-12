@@ -10,13 +10,13 @@
 #include "my/my.cpp"
 using my::matrix;
 using my::vector;
-#include "asMatrix.hpp"
-#include "dnorm.hpp"   // harmless
-#include "lgamma.hpp"  // harmless
 using CppAD::AD;
 using CppAD::ADFun;
+#include "convert.hpp" // asSEXP, asMatrix, asVector
+#include "dnorm.hpp"   // harmless
+#include "lgamma.hpp"  // harmless
 #include "Vectorize.hpp"
-#include "start_parallel.hpp"  
+#include "start_parallel.hpp"
 
 #ifdef _OPENMP
 bool _openmp=true;
@@ -61,121 +61,6 @@ struct isDouble<double>{
 #define DATA_ARRAY(name) my::array<Type> name(my::asArray<Type>(	\
         getListElement(objective_function::data,#name)));	
 #define PARAMETER_ARRAY(name) my::array<Type> name(objective_function::fillShape(my::asArray<Type>(objective_function::getShape(#name)),#name));
-
-
-// kasper: MOVE TO asMatrix.hpp ?
-/* Construct c++-matrix from SEXP object */
-template <class Type>
-matrix<Type> asMatrix(SEXP x)
-{
-   if(!isMatrix(x))error("NOT A MATRIX!");
-   int nr=nrows(x);
-   int nc=ncols(x);
-   matrix<Type> y(nr,nc);
-   for(int i=0;i<nr;i++)
-     for(int j=0;j<nc;j++)
-       y(i,j)=Type(REAL(x)[i+nr*j]);
-   return y;
-}
-
-/* Construct c++-vector from SEXP object */
-template <class Type>
-vector<Type> asVector(SEXP x)
-{
-   if(!isReal(x))error("NOT A VECTOR!");
-   int n=length(x);
-   vector<Type> y(n);
-   for(int i=0;i<n;i++) y[i]=Type(REAL(x)[i]);
-   return y;
-}
-
-// kasper: MOVE ALL "asSEXP" to new file e.g. convert.hpp
-// kasper: MOVE ALL "asDouble" to new file e.g. convert.hpp
-/* FIXME: "Value" should be "var2par" I guess */
-/* Convert vector/matrix-Types to double SEXP types */
-double asDouble(int x){return double(x);}
-double asDouble(double x){return x;}
-double asDouble(AD<double> x){return CppAD::Value(x);}
-double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
-double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
-template<class Type>
-SEXP asSEXP(const matrix<Type> &a) 
-{
-   int nr=a.rows();
-   int nc=a.cols();
-   int size = nr * nc;
-   SEXP val;
-   PROTECT(val = NEW_NUMERIC(size));
-   double *p = NUMERIC_POINTER(val);
-   for(int i=0;i<nr;i++)
-     for(int j=0;j<nc;j++)
-       p[i+j*nr]=asDouble(a(i,j));
-   //  SET_CLASS(val, ScalarString(mkChar("matrix")));
-   SEXP dim;
-   PROTECT(dim = NEW_INTEGER(2));
-   INTEGER(dim)[0] = nr; INTEGER(dim)[1] = nc;
-   SET_DIM(val, dim);
-   UNPROTECT(2);
-   return val;
-}
-template<class Type>
-SEXP asSEXP(const vector<Type> &a) 
-{
-  int size = a.size();
-  SEXP val;
-  PROTECT(val = NEW_NUMERIC(size));
-  double *p = NUMERIC_POINTER(val);
-  for (int i = 0; i < size; i++) p[i] = asDouble(a[i]);
-  //  SET_CLASS(val, ScalarString(mkChar("vector")));
-  SEXP len;
-  PROTECT(len = NEW_INTEGER(1));
-  INTEGER(len)[0] = size;
-  SET_LENGTH(val, size);
-  UNPROTECT(2); 
-  return val;
-}
-template<class Type>
-SEXP asSEXP(const Type &a)
-{
-   SEXP val;
-   PROTECT(val=NEW_NUMERIC(1));
-   REAL(val)[0]=asDouble(a);
-   UNPROTECT(1);
-   return val;
-}
-SEXP asSEXP(const int &a)
-{
-   SEXP val;
-   PROTECT(val=NEW_INTEGER(1));
-   INTEGER(val)[0]=a;
-   UNPROTECT(1);
-   return val;
-}
-// EXPERIMENT
-template<class Type>
-SEXP asSEXP(const AD<Type> &a){
-  return asSEXP(CppAD::Value(a));
-}
-template<template<class> class Vector, class Type>
-SEXP asSEXP(const Vector<Type> &a)
-{
-   // SEXP val;
-   // PROTECT(val=NEW_NUMERIC(1));
-   // REAL(val)[0]=asDouble(a[0]);
-   // UNPROTECT(1);
-   // return val;
-   int size = a.size();
-   SEXP val;
-   PROTECT(val = NEW_NUMERIC(size));
-   double *p = NUMERIC_POINTER(val);
-   for (int i = 0; i < size; i++) p[i] = asDouble(a[i]);
-   SEXP len;
-   PROTECT(len = NEW_INTEGER(1));
-   INTEGER(len)[0] = size;
-   SET_LENGTH(val, size);
-   UNPROTECT(2); 
-   return val;
-}
 
 
 // kasper: Not sure used anywhere
