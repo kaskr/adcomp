@@ -214,9 +214,10 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
 
   /* optimize ADFun object */
   void optimize(){
-    //#pragma omp parallel for
+    if(config.trace.optimize)std::cout << "Optimizing parallel tape... ";
+#pragma omp parallel for if (config.optimize.parallel)
     for(int i=0;i<ntapes;i++)vecpf(i)->optimize();
+    if(config.trace.optimize)std::cout << "Done\n";
   }
-
 };
 

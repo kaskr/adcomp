@@ -10,11 +10,16 @@ static struct config_struct{
   */
   struct {
     bool all;        /* Print tracing information */
+    bool parallel;   /* Trace info from parallel for loops */
+    bool optimize;
   } trace;
   struct {
     bool instantly;  /* Always optimize just after tape creation */
     bool parallel;   /* Allow optimize in parallel (memory consuming) */
   } optimize;
+  struct {
+    bool parallel;   /* Parallel tape creation */
+  } tape;
   struct {
     bool all;        /* Print debug info */
     bool getListElement;
@@ -33,10 +38,13 @@ static struct config_struct{
 #define SET(name,value)set(#name,name,value);
   void set(){
     SET(trace.all,true);
-    SET(debug.all,true);
-    SET(debug.getListElement,true);
+    SET(trace.parallel,true);
+    SET(trace.optimize,true);
+    SET(debug.all,false);
+    SET(debug.getListElement,false);
     SET(optimize.instantly,true);
     SET(optimize.parallel,true);
+    SET(tape.parallel,true);
   }
 #undef SET
   config_struct(){

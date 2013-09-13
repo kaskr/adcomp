@@ -947,9 +947,11 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
                     PACKAGE=obj$env$DLL
                     )
   ptr <- ptr.list[[1]]
-  .Call("InfoADFunObject",ptr,PACKAGE=obj$env$DLL)
-  .Call("optimizeADFunObject",ptr,PACKAGE=obj$env$DLL)
-  .Call("InfoADFunObject",ptr,PACKAGE=obj$env$DLL)
+  ##.Call("InfoADFunObject",ptr,PACKAGE=obj$env$DLL)
+  if(!config(DLL=obj$env$DLL)$optimize.instantly){ ## If not already optimized (because twice optimize gives fault):
+    .Call("optimizeADFunObject",ptr,PACKAGE=obj$env$DLL)
+  }
+  ##.Call("InfoADFunObject",ptr,PACKAGE=obj$env$DLL)
   ev <- function(par=obj$env$par).Call("EvalADFunObject", ptr, par,
                    control = list(
                      order = as.integer(0),

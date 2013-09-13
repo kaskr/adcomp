@@ -21,7 +21,7 @@ runExample <- function(name=NULL,all=FALSE,thisR=FALSE){
   info <- strwrap(info, width = 60, exdent = M+4)
   info <- gsub("@"," ",info)
   if(all){
-    lapply(exnames,runExample)
+    lapply(exnames,runExample,thisR=thisR)
     return(NULL)
   }
   if(is.null(name)){

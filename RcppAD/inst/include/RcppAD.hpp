@@ -83,10 +83,9 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
 
 
 /* get the list element named str, or return NULL */ 
-bool debug_getListElement=false;
 SEXP getListElement(SEXP list, const char *str) 
 {
-  if(debug_getListElement)std::cout << "getListElement: " << str << " ";
+  if(config.debug.getListElement)std::cout << "getListElement: " << str << " ";
   SEXP elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol); 
   int i; 
   for (i = 0; i < length(list); i++) 
@@ -95,8 +94,8 @@ SEXP getListElement(SEXP list, const char *str)
 	elmt = VECTOR_ELT(list, i); 
 	break; 
       }
-  if(debug_getListElement)std::cout << "Length: " << LENGTH(elmt) << " ";
-  if(debug_getListElement)std::cout << "\n";
+  if(config.debug.getListElement)std::cout << "Length: " << LENGTH(elmt) << " ";
+  if(config.debug.getListElement)std::cout << "\n";
   return elmt; 
 }
 
@@ -496,8 +495,11 @@ extern "C"
       std::cout << n << " regions found.\n";
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
-#pragma omp parallel for
-      for(int i=0;i<n;i++)pfvec[i]=MakeADFunObject(data, parameters, report, control, i);
+#pragma omp parallel for if (config.tape.parallel)
+      for(int i=0;i<n;i++){
+	pfvec[i]=MakeADFunObject(data, parameters, report, control, i);
+	if(config.optimize.instantly)pfvec[i]->optimize();
+      }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) ppf,mkChar("parallelADFun"),R_NilValue));
@@ -872,6 +874,11 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   ADFun< double >* pf = new ADFun< double >;
   pf->Dependent(xxx,yyy);
 
+  if(config.optimize.instantly){
+    if(config.trace.optimize)std::cout << "Optimizing tape... ";
+    pf->optimize();
+    if(config.trace.optimize)std::cout << "Done\n";
+  }
   /* ========================================================= */    
   
   /* Calculate row and col index vectors.
@@ -947,7 +954,7 @@ extern "C"
 
     /* parallel test */
     vector<sphess*> Hvec(n);
-#pragma omp parallel for
+#pragma omp parallel for if (config.tape.parallel)
     //for(int i=0;i<n;i++)Hvec[i]=&MakeADHessObject2(data, parameters, report, skip, i);
     for(int i=0;i<n;i++)Hvec[i]=new sphess(MakeADHessObject2(data, parameters, report, skip, i));
 
