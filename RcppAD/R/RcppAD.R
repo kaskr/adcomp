@@ -350,7 +350,7 @@ MakeADFun <- function(data,parameters,map=list(),
       ## is subset of pattern of B[r,r].
       lookup <- function(A,B,r=NULL){
         A <- tril(A);B <- tril(B)
-        B@x[] <- seq.int(length.out=length(B@x)) ## Pointers to full B matrix
+        B@x[] <- seq.int(length.out=length(B@x)) ## Pointers to full B matrix (FIXME: what if length(B@x)>2^32 ? )
         if(!is.null(r))B <- B[r,r] ## Reduce to have same dim as A
         m <- .Call("match_pattern",A,B,PACKAGE="RcppAD") ## Same length as A@x with pointers to B@x
         B@x[m]
@@ -358,13 +358,13 @@ MakeADFun <- function(data,parameters,map=list(),
       if(is.null(e$ind1)){
         ## hessian: Hessian of random effect part only.
         ## ihessian: Inverse subset of hessian (same dim but larger pattern!).
-        ## Htemp: Pattern of full hessian including fixed effects.
+        ## Hfull: Pattern of full hessian including fixed effects.
         cat("Matching hessian patterns... ")
         e$ind1 <- lookup(hessian,ihessian) ## Same dimensions
-        e$ind2 <- lookup(hessian,e$Htemp,random)  ## Note: dim(Htemp)>dim(hessian) !
+        e$ind2 <- lookup(hessian,e$Hfull,random)  ## Note: dim(Hfull)>dim(hessian) !
         cat("Done\n")
       }
-      w <- rep(0,length=length(e$Htemp@x))
+      w <- rep(0,length=length(e$Hfull@x))
       w[e$ind2] <- ihessian@x[e$ind1]
       ## Reverse mode evaluate ptr in rangedirection w
       ## now gives .5*tr(Hdot*Hinv) !!
@@ -397,7 +397,8 @@ MakeADFun <- function(data,parameters,map=list(),
     H0 <- function(par.random){
       par[random] <- par.random
       par[-random] <- par.fixed
-      spHess(par)[random,random,drop=FALSE]
+      #spHess(par)[random,random,drop=FALSE]
+      spHess(par,random=TRUE)
     }
     if(inner.method=="newton"){
       #opt <- newton(eval(random.start),fn=f0,gr=function(x)f0(x,order=1),
@@ -419,8 +420,12 @@ MakeADFun <- function(data,parameters,map=list(),
     par[-random] <- par.fixed
 
     ## HERE! - update hessian and cholesky
-    hess <- spHess(par) ## Full hessian
-    hessian <- hess[random,random] ## Subset
+    if(!skipFixedEffects){ ## old way
+      hess <- spHess(par) ## Full hessian
+      hessian <- hess[random,random] ## Subset
+    } else {
+      hessian <- spHess(par,random=TRUE)
+    }
     if(inherits(env$L.created.by.newton,"dCHMsuper")){
       L <- env$L.created.by.newton
       ##.Call("destructive_CHM_update",L,hessian,as.double(0),PACKAGE="Matrix")
@@ -934,10 +939,11 @@ newton <- function (par,fn,gr,he,
 
 
 sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
+  r <- obj$env$random
   if(skipFixedEffects){
     ## Assuming that random effects comes first in parameter list, we can set
-    ## skip <- as.integer(length(obj$env$par)-length(obj$env$random)) ## ==number of fixed effects
-    skip <- seq.int(length.out=length(obj$env$par))[-obj$env$random]
+    ## skip <- as.integer(length(obj$env$par)-length(r)) ## ==number of fixed effects
+    skip <- seq.int(length.out=length(obj$env$par))[-r]
   } else {
     skip <- as.integer(0)
   }
@@ -964,8 +970,22 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
   require(Matrix)##;M <- spMatrix(n,n,i=i+1,j=j+1,x=ev())
   n <- length(obj$env$par)
   M <- new("dsTMatrix",i=i,j=j,x=ev(),Dim=as.integer(c(n,n)),uplo="L")
-  Htemp <- as(M,"dsCMatrix")
-  function(par=obj$env$par){Htemp@x[] <- ev(par);Htemp}
+  Hfull <- as(M,"dsCMatrix")
+  Hrandom <- Hfull[r,r,drop=FALSE]
+  function(par=obj$env$par,random=FALSE){
+    if(!random){
+      Hfull@x[] <- ev(par)
+      return(Hfull)
+    } else {
+      if(skipFixedEffects){
+        return( .Call("setxslot",Hrandom,ev(par),PACKAGE="RcppAD") )
+      }
+      else {
+        Hfull@x[] <- ev(par)
+        return(Hfull[r,r])
+      }
+    }
+  }
 }
 
 ## ==== Least squares polynomial fit

@@ -336,3 +336,11 @@ SEXP omp_num_threads(SEXP x) {
   error("Openmp not supported.")
 #endif
 }
+
+/* Avoid S4 overhead when changing x-slot:
+   Set xslot to SEXP pointer i.e. x@x <- y
+ */
+SEXP setxslot(SEXP x, SEXP y){
+  setAttrib(x,install("x"),y);
+  return x;
+}
