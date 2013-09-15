@@ -24,7 +24,7 @@ Type objective_function<Type>::operator() ()
       cov(i,j)=pow(rho,Type(abs(i-j)))*sds[i]*sds[j];
   using namespace density;
   MVNORM_t<Type> neg_log_density(cov);
-  Type ans=0;
+  parallel_accumulator<Type> ans(this);
   ans-=dnorm(vector<Type>(u(0)),Type(0),Type(1),1).sum();
   for(int i=1;i<timeSteps;i++)
     ans+=neg_log_density(u(i)-u(i-1));
