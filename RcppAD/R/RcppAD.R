@@ -111,6 +111,7 @@ MakeADFun <- function(data,parameters,map=list(),
                       DLL=getUserDLL(),
                       checkParameterOrder=TRUE, ## Optional check
                       ...){
+  env <- environment() ## This environment
   if(!is.list(data))
     stop("data must be a list")
   ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&is.numeric(x)
@@ -235,15 +236,16 @@ MakeADFun <- function(data,parameters,map=list(),
   ptrLaplaceFun <- NULL
   reparam <- NULL
 
-  if(atomic){
-    ## User template contains atomic functions ==>
-    ## Have to call "double-template" to trigger tape generation
-    ptrFun <- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
-    ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
-    .Call("EvalDoubleFunObject",ptrFun,unlist(parameters),control=list(order=as.integer(0)),PACKAGE=DLL)
-  }
-  
+  ## All external pointers are created in function "retape" and can be re-created
+  ## by running retape() if e.g. the number of openmp threads is changed.
   retape <- function(){
+    if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
+      ## User template contains atomic functions ==>
+      ## Have to call "double-template" to trigger tape generation
+      ptrFun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
+      .Call("EvalDoubleFunObject",ptrFun,unlist(parameters),control=list(order=as.integer(0)),PACKAGE=DLL)
+    }
     if(is.character(random)){
       random <<- grepRandomParameters(parameters,random)
       if(length(random)==0){
@@ -266,15 +268,15 @@ MakeADFun <- function(data,parameters,map=list(),
       ptrFun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
     if("ADGrad"%in%type)
       ptrADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)[[1]]
+
+    ## Skip fixed effects from the full hessian ?
+    ## * Probably more efficient - especially in terms of memory.
+    ## * Only possible if a taped gradient is available - see function "ff" below.
+    env$skipFixedEffects <- !is.null(ptrADGrad)
+    delayedAssign("spHess",sparseHessianFun(env, skipFixedEffects=skipFixedEffects ), assign.env = env )
   }
 
   retape()
-
-  ## Skip fixed effects from the full hessian ?
-  ## * Probably more efficient - especially in terms of memory.
-  ## * Only possible if a taped gradient is available - see function "ff" below.
-  skipFixedEffects <- !is.null(ptrADGrad)
-  delayedAssign("spHess",sparseHessianFun(environment(), skipFixedEffects=skipFixedEffects ))
   
   f <- function(theta=par,order=0,type=c("ADdouble","double","ADGrad"),
                 cols=NULL,rows=NULL,
@@ -545,7 +547,6 @@ MakeADFun <- function(data,parameters,map=list(),
   tracepar <- FALSE
   validpar <- function(x)TRUE
   tracemgc <- TRUE
-  env <- environment()
   if(is.null(random)){  ## Output if pure fixed effect model
     return(list(par=par,
                 fn=function(x=last.par,...){
