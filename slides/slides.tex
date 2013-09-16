@@ -45,18 +45,71 @@
   \titlepage
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Multvariate Random Walk with Observation Noise}
-  \begin{columns}
-    \begin{column}{0.5\textwidth}
-\begin{verbatim}
+\begin{frame}
+\frametitle{RcppAD Intro Bullet List}
 
-\end{verbatim}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \includegraphics[width=.7\linewidth]{example-image-a}
-    \end{column}
-  \end{columns}
+\begin{itemize}
+  \item ADMB inspired R-package
+  \item Implements Laplace approximation for random effects
+  \item C++ Template based
+  \item Combines extern libraries: cppAD, Eigen, CHOLMOD
+  \item Automatic sparseness detection
+  \item Parallelism through BLAS
+  \item Parallel user templates
+\end{itemize}
+
+
 \end{frame}
+
+\begin{frame}
+  \frametitle{Linear regression code comparison example}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Example 2: formulae and plot}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example 2: Code}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example 2: Results (timings)}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel user templates intro}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel Code}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results: benchmark plot}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Parallel Code with multicore package}
+\end{frame}
+
+
+\begin{frame}
+  \begin{itemize}
+    \item[+] Can handle very high dimensional problems (~$10^6$ random effects)
+    \item[+] No \texttt{SEPARABLE\_FUNCTION} construct needed, fully automatic sparseness detection.
+    \item[+] Full R integration -- no need for data+results import/export.
+    \item[-] Standalone applications not possible.
+    \item[+] Fast run times
+    \item[-] Slow compile times.
+    \item[+] Template based -- no code duplication for \texttt{df1b2variable}s etc.
+    \item[-] Fewer built-in specialized functionalities (e.g. profile-likelihood, \texttt{sd\_report\_number} etc.)
+    \item[+] Analytical Hessian for fixed effects.
+    \item[+] High-level parallelization with \texttt{multicore} package. 
+  \end{itemize}
+\end{frame}
+
 
 \end{document}
