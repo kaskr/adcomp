@@ -1,1 +1,62 @@
-%% bla bla
+\documentclass[compress]{beamer}
+
+\setlength{\unitlength}{\paperwidth}
+
+\usepackage{graphicx, subfigure}
+\usepackage{multimedia}
+\usepackage{hyperref}
+%\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{caption} % For linebreaks in captions
+
+
+\mode<presentation>
+{
+  \useoutertheme{split}
+  \setbeamercolor{separation line}{use=structure,bg=structure.fg!50!bg}
+  \usefonttheme{structurebold}
+  
+  \setbeamertemplate{navigation symbols}{}
+  % or ...
+
+  % \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+
+%%\usepackage[danish]{babel}
+%%\usepackage[utf-8]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+
+\title[RcppAD]
+{A comparison between ADMD \& RcppAD}
+
+\author[K. Kristensen, A. Nielsen, C.W. Berg ]% [Author, Another] % (optional, use only with lots of authors)
+{Kasper Kristensen, Anders Nielsen, Casper W. Berg}
+
+\date[September 2013] % (optional, should be abbreviation of conference name)
+{September, 2013}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Multvariate Random Walk with Observation Noise}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\begin{verbatim}
+
+\end{verbatim}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \includegraphics[width=.7\linewidth]{example-image-a}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\end{document}
