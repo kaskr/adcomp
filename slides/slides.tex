@@ -177,8 +177,36 @@ return nll;
   \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Parallel Code}
+\begin{columns}
+    \begin{column}{0.5\textwidth}
+\tiny{
+\begin{verbatim}
+...
+Type ans=0;
+...
+\end{verbatim}
+}
+    \end{column}
+\hspace{-50pt}
+\vrule{}
+    \begin{column}{0.5\textwidth} 
+   \tiny{
+    \begin{verbatim}
+...
+parallel_accumulator<Type> ans(this);
+...
+    \end{verbatim}
+}
+\end{column}
+\end{columns}
+\begin{itemize}
+\item Parallel accumulator initialized to zero and has only methods
+  "$+=$" and "$-=$".
+\item When modified code is compiled from R the template is detected
+  to be parallel and the openmp flag is set.
+\end{itemize}
 \end{frame}
 
 \begin{frame}
