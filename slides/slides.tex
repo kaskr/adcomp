@@ -120,6 +120,17 @@
 
 \begin{frame}
   \frametitle{Parallel user templates intro}
+  \begin{itemize}
+  \item Most objective functions are a result of commutative
+    accumulation ($\theta=$ random and fixed effects):
+    \[l(\theta) = \sum_{i=1}^n l_i(\theta)\]
+  \item If e.g. two cores then let core 1 do AD of the ``even terms'' and
+    core 2 do AD of the ``odd terms''.
+  \item The book keeping is handled by template class
+    \texttt{parallel\_accumulator<Type>}.
+  \item From user perspective: change one line of template to get
+    parallel version.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -133,6 +144,21 @@
 
 \begin{frame}
   \frametitle{Parallel Code with multicore package}
+  \begin{itemize}
+  \item High level parallelization gives best performance.
+  \item Easy with \texttt{multicore} package \footnote{Note: Before
+      calling \texttt{mclapply} do \texttt{openmp(1)} to avoid forking a
+      multithreaded process}.
+  \end{itemize}
+  Examples:
+  \begin{itemize}
+  \item Parallel likelihood evaluations \texttt{
+      mclapply(1:10,function(x)obj\$fn(obj\$par))}
+  \item Parallel gradient evaluations \texttt{
+      mclapply(1:10,function(x)obj\$gr(obj\$par))}
+  \item Parallel optimization \texttt{
+      mclapply(1:10,function(x)do.call("optim",obj))}
+  \end{itemize}
 \end{frame}
 
 
