@@ -91,7 +91,18 @@ nll=0.5*(N*log(2*M_PI*sigmasq)
     \begin{column}{0.5\textwidth} 
    \tiny{
     \begin{verbatim}
-RcppAD code here...    
+#include <RcppAD.hpp>
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+DATA_VECTOR(Y);
+DATA_VECTOR(x);
+PARAMETER(a);
+PARAMETER(b);
+PARAMETER(logSigma);
+Type nll=dnorm(Y,a+b*x,exp(logSigma),true).sum();
+return nll;
+}
     \end{verbatim}
 }
 
@@ -171,6 +182,10 @@ RcppAD code here...
 
 \begin{frame}
   \frametitle{Results: benchmark plot}
+    \begin{figure}[!htb]
+      \centering
+      \includegraphics[width=0.7\textwidth]{results/scalability.pdf}
+    \end{figure}
 \end{frame}
 
 
