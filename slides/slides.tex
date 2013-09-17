@@ -63,8 +63,40 @@
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Example 1: Linear regression}
+\begin{columns}
+    \begin{column}{0.5\textwidth}
+\tiny{
+\begin{verbatim}
+DATA_SECTION
+init_int N
+init_vector Y(1,N)
+init_vector x(1,N)
+PARAMETER_SECTION
+init_number a
+init_number b
+init_number logSigma
+sdreport_number sigmasq
+objective_function_value nll
+PROCEDURE_SECTION
+sigmasq=exp(2*logSigma);
+nll=0.5*(N*log(2*M_PI*sigmasq)
+    +sum(square(Y-(a+b*x)))/sigmasq);
+\end{verbatim}
+}
+    \end{column}
+\hspace{-50pt}
+\vrule{}
+    \begin{column}{0.5\textwidth} 
+   \tiny{
+    \begin{verbatim}
+RcppAD code here...    
+    \end{verbatim}
+}
+
+\end{column}
+\end{columns}
 \end{frame}
 
 
