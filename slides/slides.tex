@@ -9,6 +9,7 @@
 \usepackage{listings}
 \usepackage{caption} % For linebreaks in captions
 
+\newcommand{\mb}[1]{\mathbf{#1}}
 
 \mode<presentation>
 {
@@ -31,7 +32,7 @@
 
 
 \title[RcppAD]
-{A comparison between ADMD \& RcppAD}
+{A comparison between ADMB \& RcppAD}
 
 \author[K. Kristensen, A. Nielsen, C.W. Berg ]% [Author, Another] % (optional, use only with lots of authors)
 {Kasper Kristensen, Anders Nielsen, Casper W. Berg}
@@ -46,13 +47,14 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{RcppAD Intro Bullet List}
+\frametitle{RcppAD Intro}
 
 \begin{itemize}
   \item ADMB inspired R-package
+  \item Combines external libraries: cppAD, Eigen, CHOLMOD
+  \item Continuously developed since YYYY, $\sim 1000$ lines of code
   \item Implements Laplace approximation for random effects
   \item C++ Template based
-  \item Combines extern libraries: cppAD, Eigen, CHOLMOD
   \item Automatic sparseness detection
   \item Parallelism through BLAS
   \item Parallel user templates
@@ -62,20 +64,58 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Linear regression code comparison example}
+  \frametitle{Example 1: Linear regression}
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{Example 2: formulae and plot}
+  \frametitle{Example 2: Multivariate random walk}
+\begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{align*}
+        \mb{X}_{t+1} &= \mb{X}_t + \mb{\varepsilon_t} \quad , \mb{\varepsilon_t} \sim N(\mb{0},\Sigma) \\
+        \mb{Y}_t &= \mb{X}_t + \mb{\eta_t} \quad , \mb{\eta_t} \sim N(\mb{0},\mb{\sigma}_Y^2 \mb{I}) \\
+           \Sigma_{i,j} & = \rho^{|i-j|}\sigma_{i}\sigma_{j}  
+      \end{align*} 
+     States (random effects) $\mb{X}$, Observations $\mb{Y}$.  
+     Parameters: $\mb{\sigma}, \mb{\sigma_Y}, \rho$.
+      
+    \end{column}
+    
+    \begin{column}{0.5\textwidth} 
+    \begin{figure}[!htb]
+      \centering
+      \includegraphics[width=1.0\textwidth]{results/rwplot.pdf}
+    \end{figure}
+
+  \end{column}
+\end{columns}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Example 2: Code}
+{
+\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{results/rw.png}}
+\begin{frame}[plain]
 \end{frame}
+}
 
 \begin{frame}
   \frametitle{Example 2: Results (timings)}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \small{
+      \input{results/timings}
+      }
+    \end{column}
+    
+    \begin{column}{0.5\textwidth} 
+    \begin{figure}[!htb]
+      \centering
+      \includegraphics[width=1.0\textwidth]{results/timings.pdf}
+    \end{figure}
+
+  \end{column}
+\end{columns}
+ 
 \end{frame}
 
 \begin{frame}
@@ -98,14 +138,23 @@
 
 \begin{frame}
   \begin{itemize}
-    \item[+] Can handle very high dimensional problems (~$10^6$ random effects)
-    \item[+] No \texttt{SEPARABLE\_FUNCTION} construct needed, fully automatic sparseness detection.
-    \item[+] Full R integration -- no need for data+results import/export.
-    \item[-] Standalone applications not possible.
-    \item[+] Fast run times
-    \item[-] Slow compile times.
-    \item[+] Template based -- no code duplication for \texttt{df1b2variable}s etc.
+    \item[-] Slow compile times
+    \item[-] Standalone applications not possible
     \item[-] Fewer built-in specialized functionalities (e.g. profile-likelihood, \texttt{sd\_report\_number} etc.)
+    \item[-] Sparse documentation
+    \item[-] Depends on external libraries
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{itemize}
+    \item[+] Fast run times
+    \item[+] The use of external libraries means a compact code base that is highly optimized
+    \item[+] Can handle very high dimensional problems ($\sim 10^6$ random effects)
+    \item[+] No \texttt{SEPARABLE\_FUNCTION} construct needed, fully automatic sparseness detection
+    \item[+] Full R integration -- no need for data+results import/export
+    \item[+] No use of temporary files on the disc
+    \item[+] Template based -- no code duplication needed as for \texttt{df1b2variable}s etc.
     \item[+] Analytical Hessian for fixed effects.
     \item[+] High-level parallelization with \texttt{multicore} package. 
   \end{itemize}
