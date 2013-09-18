@@ -333,7 +333,7 @@ SEXP omp_num_threads(SEXP x) {
   UNPROTECT(1);
   return ans;
 #else
-  error("Openmp not supported.")
+  error("Openmp not supported.");
 #endif
 }
 
