@@ -5,5 +5,9 @@ adcomp
 
 To install package
 ==================
-* install.packages("roxygen2")
-* make all
+* make install
+
+To build manual
+===============
+* make pdf
+
