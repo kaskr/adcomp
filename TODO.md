@@ -15,3 +15,4 @@ TODO
   - Eliminate need to restart R.
   - Give better message if PARAMETER(name) evaluates to NULL.
   - Improve compile times by either precompiling or allow incomplete compilations.
+  - Array bounds checking option
