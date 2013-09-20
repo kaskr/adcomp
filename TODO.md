@@ -16,3 +16,9 @@ TODO
   - Give better message if PARAMETER(name) evaluates to NULL.
   - Improve compile times by either precompiling or allow incomplete compilations.
   - Array bounds checking option
+- template() should never overwrite existing file.
+- Review kaspers class extensions of Eigen classes, in particular array<Type>, matrix<Type> and vector<Type>
+  - Consistency between matrix and array fastest running dimensions.
+  - Desired behaviour of overloaded operations e.g. pointwise multiply vs matrix multiply.
+  - Automatic cast from array to vector.
+
