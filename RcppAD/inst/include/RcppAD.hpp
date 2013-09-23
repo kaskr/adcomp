@@ -1,12 +1,22 @@
-#define NDEBUG 1
-#define RCPPAD_DEBUG 0
-#define RCPPAD_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
-
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
-#include "cppad/cppad.hpp"
 #include <R.h>
 #include <Rdefines.h>
+#undef eigen_assert
+#define eigen_assert(x) if (!(x)) { Rprintf("RcppAD has received an error from Eigen. "); \
+                                  Rprintf("The following condition was not met:\n");          \
+                                  Rprintf(#x);                                                \
+                                  Rprintf("\nPlease check your matrix-vector bounds etc., "); \
+                                  Rprintf("or run your program through a debugger.\n");       \
+				  abort();}
+#define RCPPAD_DEBUG 0
+#define RCPPAD_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
+/* Turn on debug for Eigen */
+#undef NDEBUG
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+/* Turn off debug for cppad */
+#define NDEBUG 1
+#include "cppad/cppad.hpp"
+#undef NDEBUG
 #include "my/my.cpp"
 using my::matrix;
 using my::vector;
