@@ -55,13 +55,13 @@ struct array:Map< Array<Type,Dynamic,1> >{
 
   /* Default construction: always deep copy ! */
   template<class T>
-  array(T &x, vector<int> dim_):vectorcopy(x),MapBase(&vectorcopy[0],x.size()){
+  array(T &x, vector<int> dim_):vectorcopy(x),MapBase(NULL,0){
     new (this) MapBase(&vectorcopy[0],x.size()); /* Eigen manual: Despite appearances, this does not invoke the memory allocator... */
     setdim(dim_);
   }
   /* Deep copy existing array - as above with dim_=x.dim  */
   template<class T>
-  array(array<T> &x):vectorcopy(x),MapBase(&vectorcopy[0],x.size()){
+  array(array<T> &x):vectorcopy(x),MapBase(NULL,0){
     new (this) MapBase(&vectorcopy[0],x.size()); /* Eigen manual: Despite appearances, this does not invoke the memory allocator... */
     setdim(x.dim);
   }
