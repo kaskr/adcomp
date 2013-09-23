@@ -632,10 +632,15 @@ openmp <- function(n=NULL){
 ##' @title Compile a c++ template to DLL suitable for MakeADFun.
 ##' @param file c++ file.
 ##' @param flags Character with compile flags.
-compile <- function(file,flags=cxxflags(file)){
+##' @param safebounds Turn on preprocessor flag for bound checking?
+compile <- function(file,flags=cxxflags(file),safebounds=TRUE){
   if(!is.null(flags))flags = paste("CXXFLAGS=\"",flags,"\"")
-  cmd <- paste("R CMD COMPILE CPPFLAGS=-I",
-               system.file("include",package="RcppAD"),
+  safeboundsflag <- if(safebounds)"-DRCPPAD_SAFEBOUNDS " else ""
+  cmd <- paste("R CMD COMPILE CPPFLAGS=",
+               "\"",
+               safeboundsflag,
+               "-I",system.file("include",package="RcppAD"),
+               "\"",
                " ",
                flags,
                " ",

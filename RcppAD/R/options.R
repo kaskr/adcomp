@@ -5,7 +5,7 @@
 setDefaults <- function(){
   .optionEnv$newton <- newtonDefaults()
   .optionEnv$flags <- flagsDefaults()
-  .optionEnv$debug <- TRUE
+  .optionEnv$debug <- FALSE
 }
 newtonDefaults <- function(){
   list(
@@ -47,3 +47,4 @@ newtonOption <- function(...){
   .optionEnv$newton <- y
   NULL
 }
+

@@ -1,5 +1,13 @@
 #include <R.h>
 #include <Rdefines.h>
+
+/* To be removed */
+#define RCPPAD_DEBUG 0
+#define RCPPAD_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
+
+/* Turn on debug for Eigen ? */
+#ifdef RCPPAD_SAFEBOUNDS
+#undef NDEBUG
 #undef eigen_assert
 #define eigen_assert(x) if (!(x)) { Rprintf("RcppAD has received an error from Eigen. "); \
                                   Rprintf("The following condition was not met:\n");          \
@@ -7,13 +15,14 @@
                                   Rprintf("\nPlease check your matrix-vector bounds etc., "); \
                                   Rprintf("or run your program through a debugger.\n");       \
 				  abort();}
-#define RCPPAD_DEBUG 0
-#define RCPPAD_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
-/* Turn on debug for Eigen */
+#else
 #undef NDEBUG
+#define NDEBUG 1
+#endif
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-/* Turn off debug for cppad */
+/* Always turn off debug for cppad */
+#undef NDEBUG
 #define NDEBUG 1
 #include "cppad/cppad.hpp"
 #undef NDEBUG
