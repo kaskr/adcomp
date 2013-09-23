@@ -611,6 +611,7 @@ isParallelTemplate <- function(file){
 }
 cxxflags <- function(file){
   flags <- system("R CMD config CXXFLAGS",TRUE)
+  if(rcppadOption("debug"))flags <- "-O0 -g"
   ## No portable way to get SHLIB_OPENMP_CXXFLAGS ?
   if(isParallelTemplate(file))flags <- paste(flags,"-fopenmp")
   flags
@@ -946,7 +947,8 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
     ## skip <- as.integer(length(obj$env$par)-length(r)) ## ==number of fixed effects
     skip <- seq.int(length.out=length(obj$env$par))[-r]
   } else {
-    skip <- as.integer(0)
+    ##skip <- as.integer(0)
+    skip <- integer(0) ## <-- Empty integer vector
   }
   ptr.list <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters, 
                     obj$env$reportenv,
