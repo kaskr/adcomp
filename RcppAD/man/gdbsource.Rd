@@ -2,10 +2,12 @@
 \alias{gdbsource}
 \title{Source R-script through gdb to get backtrace.}
 \usage{
-  gdbsource(file)
+  gdbsource(file, interactive = FALSE)
 }
 \arguments{
   \item{file}{Your R script}
+
+  \item{interactive}{Run interactive gdb session?}
 }
 \value{
   Object of class \code{backtrace}
@@ -17,6 +19,10 @@
   This function is useful for debugging templates. If a
   script aborts e.g. due to an out-of-bound index operation
   it should be fast to locate the line that caused the
-  problem by running \code{gdbsource(file)}.
+  problem by running \code{gdbsource(file)}. Alternatively,
+  If more detailed debugging is required, then
+  \code{gdbsource(file,TRUE)} will provide the full
+  backtrace followed by an interactive gdb session where
+  the individual frames can be inspected.
 }
 
