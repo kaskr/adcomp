@@ -7,7 +7,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER(a);
   PARAMETER(b);
   PARAMETER(logSigma);
-  Type nll=-dnorm(Y,a+b*x,exp(logSigma),true).sum();
+  Type nll=-sum(dnorm(Y,a+b*x,exp(logSigma),true));
   return nll;
 }
 

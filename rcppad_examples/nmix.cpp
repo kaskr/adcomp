@@ -1,26 +1,5 @@
 #include <RcppAD.hpp>
 
-/*
-  General utility similar to R's split function.
-*/
-template<class Type>
-vector<vector<Type> > split(vector<Type> x,vector<int> fac){
-  if(x.size()!=fac.size())error("x and fac must have equal length.");
-  int nlevels=0;
-  for(int i=0;i<fac.size();i++)if(fac[i]>=nlevels)nlevels++;
-  vector<vector<Type> > ans(nlevels);
-  vector<int> lngt(nlevels);
-  lngt.setZero();
-  for(int i=0;i<fac.size();i++)lngt[fac[i]]++;
-  for(int i=0;i<nlevels;i++)ans[i].resize(lngt[i]);
-  lngt.setZero();
-  for(int i=0;i<fac.size();i++){
-    ans[fac[i]][lngt[fac[i]]]=x[i];
-    lngt[fac[i]]++;
-  }
-  return ans;
-}
-
 template<class Type>
 Type nll_group(int i, Type p0,Type p1,Type log_lambda, Type log_sigma, 
 	       vector<Type> u,matrix<Type> y,vector<Type> N, vector<Type> x, 

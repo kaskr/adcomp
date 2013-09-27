@@ -37,6 +37,7 @@ using CppAD::ADFun;
 #include "lgamma.hpp"  // harmless
 #include "Vectorize.hpp"
 #include "start_parallel.hpp"
+#include "convenience.hpp"
 
 #ifdef _OPENMP
 bool _openmp=true;
