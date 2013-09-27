@@ -17,7 +17,7 @@ Type objective_function<Type>::operator() ()
   ans-=dnorm(u, Type(0) /*mean*/, exp(logsdu) /*sd*/, 1 /*log?*/).sum();
 
   // Distribution of obs given random effects (x|u):
-  vector<Type> y=(A*beta.matrix()).array()+(B*u.matrix()).array();
+  vector<Type> y=A*beta+B*u;
   ans-=dnorm(x,y,exp(logsd0),1).sum();
 
   return ans;

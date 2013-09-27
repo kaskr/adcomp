@@ -23,3 +23,11 @@ vector<vector<Type> > split(vector<Type> x,vector<int> fac){
 /* Sum of vector, matrix or array */
 template<template<class> class Vector, class Type>
 Type sum(Vector<Type> x){return x.sum();}
+
+/* Matrix * vector */
+template<class Type>
+vector<Type> operator*(matrix<Type> A, vector<Type> x){return A*x.matrix();}
+
+/* SparseMatrix * vector */
+template<class Type>
+vector<Type> operator*(Eigen::SparseMatrix<Type> A, vector<Type> x){return (A*x.matrix()).array();}

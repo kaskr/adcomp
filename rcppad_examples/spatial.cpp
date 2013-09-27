@@ -23,7 +23,7 @@ Type objective_function<Type>::operator() ()
   Type res=0;
 
   vector<Type> eta(n); 
-  eta  =   X*b.matrix() + u.matrix();
+  eta  =   X*b + u;
 
   // 
   matrix<Type> cov(n,n); 
