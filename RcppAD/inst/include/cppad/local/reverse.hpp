@@ -333,8 +333,21 @@ void ADFun<Base>::myReverse(size_t p, const VectorBase &w, size_t dep_var_index,
     tape_point tp;
     for(it=op_mark_index_.begin();it!=op_mark_index_.end();it++){
       tp=tp_[*it];
-      for(int i=0;i<CppAD::NumRes(tp.op);i++)Partial[tp.var_index+i]=0;
+      for(int i=0;i<CppAD::NumRes(tp.op);i++)
+	for(j = 0; j < p; j++)
+	  Partial[tp.var_index-i*p+j]=0;
     }
+
+#ifdef DEBUG_KASPER
+    int countnnz=0;
+    for(i = 0; i < total_num_var_; i++)
+      for(j = 0; j < p; j++)
+	countnnz+=(Partial[i * p + j] != zero);
+    if(countnnz>0){
+      std::cout << "Partials not correctly cleared. Nonzeros: " << countnnz << "\n";
+    }
+#endif
+
 	// EXPERIMENT
 	/*
 	for(j = 0; j < n; j++)
