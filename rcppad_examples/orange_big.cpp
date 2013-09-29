@@ -18,6 +18,9 @@ Type objective_function<Type>::operator() ()
   Type sigma=exp(log_sigma);
   Type sigma_u=exp(log_sigma_u);
 
+  ADREPORT(sigma);
+  ADREPORT(sigma_u);
+
   using namespace density;
   int i,j,k,ii;
 

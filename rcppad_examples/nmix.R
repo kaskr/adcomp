@@ -24,6 +24,5 @@ pl <- obj$env$parList(opt$par) ## Parameter estimate after phase 1
 ## Phase 2
 obj <- MakeADFun(data,pl,random="^u",DLL="nmix")
 system.time( opt <- nlminb(obj$par,obj$fn,obj$gr) )
-names(opt)[2] <- "value"
-opt$hessian <- optimHess(opt$par,obj$fn,obj$gr)
-print(summary(as.mle(opt)))
+rep <- sdreport(obj)
+rep

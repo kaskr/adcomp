@@ -17,8 +17,8 @@ Type objective_function<Type>::operator() ()
   for(int s=1;s<tmpk.size();s++)
     alpha(s) = alpha(s-1) + exp(tmpk(s));
   Type ans=0;
-  ans -= dnorm(u,Type(0),Type(1),true).sum();
-  vector<Type> eta = X*b.matrix();
+  ans -= sum(dnorm(u,Type(0),Type(1),true));
+  vector<Type> eta = X*b;
   for(int i=0; i<y.size(); i++){
     eta(i) += sigma*u(group(i));
     Type P;

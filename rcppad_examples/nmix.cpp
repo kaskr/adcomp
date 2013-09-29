@@ -37,7 +37,7 @@ Type nll_group(int i, Type p0,Type p1,Type log_lambda, Type log_sigma,
     }
   }
   fg=exp(logf+logg);
-  nll -= log(e + (fg).sum());
+  nll -= log(e + sum(fg));
   return nll;
 }
 

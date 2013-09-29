@@ -1,10 +1,6 @@
 // Spatial poisson GLMM on a grid, with exponentially decaying correlation function
 #include <RcppAD.hpp>
 
-/* Parameter transform */
-template <class Type>
-Type Exp(Type x){return exp( x);}
-
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
@@ -16,14 +12,14 @@ Type objective_function<Type>::operator() ()
   PARAMETER(a);
   PARAMETER(log_sigma);
   PARAMETER_VECTOR(u);
-  Type sigma2=Exp(2.0*log_sigma);
+  Type sigma2=exp(2.0*log_sigma);
 
   using namespace density;
   int i,j;
   Type res=0;
 
   vector<Type> eta(n); 
-  eta  =   X*b + u;
+  eta = X*b + u;
 
   // 
   matrix<Type> cov(n,n); 
@@ -39,7 +35,6 @@ Type objective_function<Type>::operator() ()
 
   MVNORM_t<Type> neg_log_density(cov);
   res+=neg_log_density(u);
-  
 
   // logdpois = N log lam - lam
   for(i=0;i<n;i++) res -= y[i]*eta[i]-exp(eta[i]);

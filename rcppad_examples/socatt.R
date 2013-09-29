@@ -22,12 +22,10 @@ parameters <- list(
   logsigma=1,
   tmpk=rep(0,d$S-1)
   )
-newtonOption(smartsearch=TRUE)
 obj <- MakeADFun(data,parameters,random="^u",DLL="socatt")
-obj$hessian <- TRUE
-
 obj$fn()
 obj$gr()
 system.time(opt <- do.call("optim",obj))
 pl <- obj$env$parList() ## <-- List of predicted random effects
-summary(as.mle(opt))
+rep <- sdreport(obj)
+rep
