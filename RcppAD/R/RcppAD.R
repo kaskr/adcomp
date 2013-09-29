@@ -566,7 +566,15 @@ MakeADFun <- function(data,parameters,map=list(),
                 fn=function(x=last.par,...){
                   if(tracepar){cat("par:\n");print(x)}
                   if(!validpar(x))return(NaN)
-                  f(x,order=0)
+                  res <- f(x,order=0)
+                  if(!ADreport){
+                    if(is.finite(res)){
+                      if(res<value.best){
+                        last.par.best <<- par; value.best <<- res
+                      }
+                    }
+                  }
+                  res
                 },
                 gr=function(x=last.par,...){
                   ans <- f(x,order=1)
