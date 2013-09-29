@@ -25,3 +25,4 @@ Collate:
     'config.R'
     'benchmark.R'
     'gdbsource.R'
+    'sdreport.R'

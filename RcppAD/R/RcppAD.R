@@ -116,18 +116,26 @@ MakeADFun <- function(data,parameters,map=list(),
     stop("data must be a list")
   ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&is.numeric(x)
   ok.data <- function(x)ok(x)|is.factor(x)|is(x,"sparseMatrix")
-  if(!all(sapply(data,ok.data))){
-    cat("Problem with these data entries:\n")
-    print(which(!sapply(data,ok.data)))
-    stop("Only numeric matrices, vectors, arrays ",
-         "or factors ",
-         "can be interfaced")
+  check.passed <- function(x){
+    y <- attr(x,"check.passed")
+    if(is.null(y)) FALSE else y
   }
-  if(!all(sapply(parameters,ok))){
-    cat("Problem with these parameter entries:\n")
-    print(which(!sapply(parameters,ok)))
-    stop("Only numeric matrices, vectors and arrays ",
-         "can be interfaced")
+  if(!check.passed(data)){
+    if(!all(sapply(data,ok.data))){
+      cat("Problem with these data entries:\n")
+      print(which(!sapply(data,ok.data)))
+      stop("Only numeric matrices, vectors, arrays ",
+           "or factors ",
+           "can be interfaced")
+    }
+  }
+  if(!check.passed(parameters)){
+    if(!all(sapply(parameters,ok))){
+      cat("Problem with these parameter entries:\n")
+      print(which(!sapply(parameters,ok)))
+      stop("Only numeric matrices, vectors and arrays ",
+           "can be interfaced")
+    }
   }
   if(length(data)){
     dataSanitize <- function(x){
@@ -139,14 +147,20 @@ MakeADFun <- function(data,parameters,map=list(),
       }
       x
     }
-    data <- lapply(data,dataSanitize)
+    if(!check.passed(data)){
+      data <- lapply(data,dataSanitize)
+    }
+    attr(data,"check.passed") <- TRUE
   }
   if(length(parameters)){
     parameterSanitize <- function(x){
       storage.mode(x) <- "double"
       x
     }
-    parameters <- lapply(parameters,parameterSanitize)
+    if(!check.passed(parameters)){
+      parameters <- lapply(parameters,parameterSanitize)
+    }
+    attr(parameters,"check.passed") <- TRUE
   }
 
   if(checkParameterOrder){
