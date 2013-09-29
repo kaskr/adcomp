@@ -77,7 +77,7 @@ struct isDouble<double>{
 // REPORT() construct new SEXP so never report in parallel!
 #define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
                         defineVar(install(#name),asSEXP(name),objective_function::report);}
-#define ADREPORT(name) objective_function::reportvector=name;
+#define ADREPORT(name) objective_function::reportvector.push(name,#name);
 #define PARALLEL_REGION if(this->parallel_region())
 #define DATA_ARRAY(name) my::array<Type> name(my::asArray<Type>(	\
         getListElement(objective_function::data,#name)));	
@@ -123,6 +123,59 @@ SEXP getListElement(SEXP list, const char *str)
 /* Do nothing if we are trying to tape non AD-types */
 void Independent(vector<double> x){}
 
+/* Used by ADREPORT */
+template <class Type>
+struct report_stack{
+  vector<const char*> names;
+  vector<int> namelength;
+  vector<Type> result;
+  void clear(){
+    names.resize(0);
+    namelength.resize(0);
+    result.resize(0);
+  }
+  /* Make space for n new items of given name */
+  void increase(int n, const char* name){
+    names.conservativeResize(names.size()+1);
+    names[names.size()-1]=name;
+    namelength.conservativeResize(namelength.size()+1);
+    namelength[namelength.size()-1]=n;
+    result.conservativeResize(result.size()+n);
+  }
+  // push scalar
+  void push(Type x, const char* name){
+    increase(1,name);
+    result[result.size()-1]=x;
+  }
+  // push vector, matrix or array
+  template<class VectorType>
+  void push(VectorType x, const char* name){
+    int n=x.size();
+    int oldsize=result.size();
+    increase(n,name);
+    for(int i=0;i<n;i++)result[oldsize+i]=x[i];
+  }
+  // Cast to vector
+  operator vector<Type>(){
+    return result;
+  }
+  /* Get names (with replicates) to R */
+  SEXP reportnames()
+  {
+    int n=result.size();
+    SEXP nam;
+    PROTECT(nam=allocVector(STRSXP,n));
+    int k=0;
+    for(int i=0;i<names.size();i++){
+      for(int j=0;j<namelength[i];j++){
+	SET_STRING_ELT(nam,k,mkChar(names[i]));
+	k++;
+      }
+    }
+    UNPROTECT(1);
+    return nam;
+  }
+};
 
 template <class Type>
 class objective_function
@@ -136,7 +189,7 @@ public:
   int index;
   vector<Type> theta;
   vector<const char*> thetanames;
-  vector<Type> reportvector; //Used by "ADREPORT"
+  report_stack<Type> reportvector; //Used by "ADREPORT"
   bool reversefill; // used to find the parameter order in user template (not anymore - use pushParname instead)
   vector<const char*> parnames; // One name for each PARAMETER_ in user template
   void pushParname(const char* x){
@@ -424,7 +477,13 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     pf->ForTwo(x,rows,cols); /* Compute forward directions */
     PROTECT(res=asSEXP(asMatrix(pf->Reverse(3,w),n,3)));
   }
-  if(order==0)PROTECT(res=asSEXP(pf->Forward(rangecomponent,x)));
+  if(order==0){
+    PROTECT(res=asSEXP(pf->Forward(rangecomponent,x)));
+    SEXP rangenames=getAttrib(f,install("range.names"));
+    if(LENGTH(res)==LENGTH(rangenames)){
+      setAttrib(res,R_NamesSymbol,rangenames);
+    }
+  }
   if(order==1)PROTECT(res=asSEXP(asMatrix(pf->Jacobian(x),m,n)));
   //if(order==2)res=asSEXP(pf->Hessian(x,0),1);
   if(order==2){
@@ -455,7 +514,8 @@ void finalize(SEXP x)
 
 
 ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
-			       SEXP report, SEXP control, int parallel_region=-1)
+			       SEXP report, SEXP control, int parallel_region=-1,
+			       SEXP &info=R_NilValue)
 {
   int returnReport = INTEGER(getListElement(control,"report"))[0];
   /* Create objective_function "dummy"-object */
@@ -465,11 +525,17 @@ ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
      We have the option to tape either the value returned by the
      objective_function template or the vector reported using the
      macro "ADREPORT" */
-  Independent(F.theta);
-  vector< AD<double> > y(1);
-  y[0]=F();
-  if(!returnReport)F.reportvector=y;
-  ADFun< double >* pf = new ADFun< double >(F.theta,F.reportvector);
+  Independent(F.theta);  // In both cases theta is the independent variable
+  ADFun< double >* pf;
+  if(!returnReport){ // Default case: no ad report - parallel run allowed
+    vector< AD<double> > y(1);
+    y[0]=F();
+    pf = new ADFun< double >(F.theta,y);
+  } else { // ad report case
+    F(); // Run through user template (modifies reportvector)
+    pf = new ADFun< double >(F.theta,F.reportvector.result);
+    info=F.reportvector.reportnames(); // parallel run *not* allowed
+  }
   return pf;
 }
 
@@ -506,6 +572,8 @@ extern "C"
     SEXP par;
     PROTECT(par=F.defaultpar());
     SEXP res;
+    SEXP info;
+    PROTECT(info=R_NilValue); // Important
 
     if(_openmp && !returnReport){ // Parallel mode
 #ifdef _OPENMP
@@ -517,7 +585,7 @@ extern "C"
       vector< ADFun<double>* > pfvec(n);
 #pragma omp parallel for if (config.tape.parallel)
       for(int i=0;i<n;i++){
-	pfvec[i]=MakeADFunObject(data, parameters, report, control, i);
+	pfvec[i]=MakeADFunObject(data, parameters, report, control, i, info);
 	if(config.optimize.instantly)pfvec[i]->optimize();
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
@@ -527,9 +595,10 @@ extern "C"
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
-      ADFun<double>* pf=MakeADFunObject(data, parameters, report, control, -1);
+      ADFun<double>* pf=MakeADFunObject(data, parameters, report, control, -1, info);
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
+      setAttrib(res,install("range.names"),info);
       R_RegisterCFinalizer(res,finalizeADFun);
     }
 
@@ -538,7 +607,7 @@ extern "C"
     PROTECT(ans=allocVector(VECSXP,2));
     SET_VECTOR_ELT(ans,0,res);
     SET_VECTOR_ELT(ans,1,par);
-    UNPROTECT(3);
+    UNPROTECT(4);
 
     return ans;
   }
@@ -644,6 +713,7 @@ extern "C"
        an ADFun object) we should remember to initialize parameter-index. */
     pf->index=0;
     pf->parnames.resize(0); // To avoid mem leak.
+    pf->reportvector.clear();
     SEXP res;
     res=asSEXP(pf->operator()());
     UNPROTECT(1);
