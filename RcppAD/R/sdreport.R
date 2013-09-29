@@ -30,6 +30,11 @@
 ##' @param par.fixed Optional. Fixed effect parameter estimate (will be known to \code{obj} when an optimization has been carried out).
 ##' @param hessian.fixed Optional. Hessian wrt. fixed effects (will be calculated from \code{obj} if missing).
 ##' @return Object of class \code{sdreport}
+##' @examples
+##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
+##' sdreport(obj)
+##' runExample("rw",thisR=TRUE) ## Random effect example
+##' sdreport(obj)
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   ## Make object to calculate ADREPORT vector
   obj2 <- MakeADFun(obj$env$data,obj$env$parameters,type="ADFun",ADreport=TRUE,DLL=obj$env$DLL)
@@ -54,8 +59,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   simpleCase <- is.null(r)  
   ## Get ADreport vector (phi)
   phi <- try(obj2$fn(par),silent=TRUE)
-  if(length(phi)==0){ ## Nothing to report
+  if(is.character(phi) | length(phi)==0){ ## Nothing to report
     simpleCase <- TRUE
+    phi <- numeric(0)
   } else { ## Something to report - get derivatives
     Dphi <- obj2$gr(par)
     if(!is.null(r)){
@@ -70,7 +76,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   ## ======== Do delta method
   ## Get covariance (cov)
   if(simpleCase){
-    cov <- Dphi %*% solve(hessian.fixed) %*% t(Dphi)
+    if(length(phi)>0){
+      cov <- Dphi %*% solve(hessian.fixed) %*% t(Dphi)
+    } else cov <- matrix(,0,0)
   } else {
     hessian.random <- obj$env$spHess(par,random=TRUE)   ## Conditional prec. of u|theta
     L <- obj$env$L.created.by.newton

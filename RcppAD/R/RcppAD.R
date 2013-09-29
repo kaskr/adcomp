@@ -570,7 +570,7 @@ MakeADFun <- function(data,parameters,map=list(),
                   if(!ADreport){
                     if(is.finite(res)){
                       if(res<value.best){
-                        last.par.best <<- par; value.best <<- res
+                        last.par.best <<- x; value.best <<- res
                       }
                     }
                   }

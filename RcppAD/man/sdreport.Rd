@@ -55,4 +55,10 @@
   u,\hat\theta))\approx \nabla\phi V \pmatrix{ \hat u \cr
   \hat\theta }\nabla\phi'}
 }
+\examples{
+runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
+sdreport(obj)
+runExample("rw",thisR=TRUE) ## Random effect example
+sdreport(obj)
+}
 

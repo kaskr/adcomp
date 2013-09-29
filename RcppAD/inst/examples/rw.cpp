@@ -30,5 +30,6 @@ Type objective_function<Type>::operator() ()
     ans+=neg_log_density(u(i)-u(i-1));
     ans-=dnorm(vector<Type>(obs(i)),vector<Type>(u(i)),sdObs,1).sum();
   }
+  ADREPORT(rho*exp(u(1)));
   return ans;
 }
