@@ -54,6 +54,17 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
     hessian.fixed <- optimHess(par.fixed,obj$fn,obj$gr) ## Marginal precision of theta.
   }
   pdHess <- !is.character(try(chol(hessian.fixed),silent=TRUE))
+  Vtheta <- solve(hessian.fixed)
+  ## Get random effect block of the full joint Hessian (hessian.random) and its
+  ## Cholesky factor (L)
+  if(!is.null(r)){
+    hessian.random <- obj$env$spHess(par,random=TRUE)   ## Conditional prec. of u|theta
+    L <- obj$env$L.created.by.newton
+    if(!is.null(L)){ ## Re-use symbolic factorization if exists
+      updateCholesky(L,hessian.random)
+      hessian.random@factors <- list(SPdCholesky=L)
+    }
+  }
   ## ======== Determine case
   ## If no random effects use standard delta method
   simpleCase <- is.null(r)  
@@ -77,15 +88,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   ## Get covariance (cov)
   if(simpleCase){
     if(length(phi)>0){
-      cov <- Dphi %*% solve(hessian.fixed) %*% t(Dphi)
+      cov <- Dphi %*% Vtheta %*% t(Dphi)
     } else cov <- matrix(,0,0)
   } else {
-    hessian.random <- obj$env$spHess(par,random=TRUE)   ## Conditional prec. of u|theta
-    L <- obj$env$L.created.by.newton
-    if(!is.null(L)){ ## Re-use symbolic factorization if exists
-      updateCholesky(L,hessian.random)
-      hessian.random@factors <- list(SPdCholesky=L)
-    }
     tmp <- solve(hessian.random,t(Dphi.random))
     term1 <- Dphi.random%*%tmp ## first term.
     ## Use columns of tmp as direction for reverse mode sweep
@@ -96,20 +101,43 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
       -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
     }
     A <- t(sapply(seq(length=length(phi)),reverse.sweep)) + Dphi.fixed
-    term2 <- A%*%solve(hessian.fixed,t(A)) ## second term
+    term2 <- A%*%(Vtheta%*%t(A)) ## second term
     cov <- term1 + term2
   }
+  ## Output
   sd <- sqrt(diag(cov))
   ans <- list(value=phi,sd=sd,cov=cov,par.fixed=par.fixed,
               hessian.fixed=hessian.fixed,pdHess=pdHess,
               gradient.fixed=gradient.fixed)
+  ## ======== Find marginal variances of all random effects i.e. phi(u)=u
+  if(!is.null(r)){
+    if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
+      ihessian.random <- .Call("lgc_invQ", L, PACKAGE = "RcppAD")
+      diag.term1 <- diag(ihessian.random)
+      f <- obj$env$f
+      w <- rep(0, length(par))
+      reverse.sweep <- function(i){
+        w[i] <- 1
+        f(par, order = 1, type = "ADGrad",rangeweight = w)[r]
+      }
+      nonr <- setdiff(seq(length=length(par)),r)
+      tmp <- sapply(nonr,reverse.sweep)
+      A <- solve(hessian.random,tmp)
+      diag.term2 <- rowSums((A %*% Vtheta)*A)
+      ans$par.random <- par[r]
+      ans$diag.cov.random <- diag.term1 + diag.term2
+    } else {
+      warning("Could not report sd's of full randomeffect vector.")
+    }
+  }
   class(ans) <- "sdreport"
   ans
 }
 summary.sdreport <- function(x,...){
   ans1 <- cbind(x$par.fixed,sqrt(diag(solve(x$hessian.fixed))))
-  ans2 <- cbind(x$value,x$sd)
-  ans <- rbind(ans1,ans2)
+  ans2 <- cbind(x$par.random,sqrt(x$diag.cov.random))
+  ans3 <- cbind(x$value,x$sd)
+  ans <- rbind(ans1,ans2,ans3)
   colnames(ans) <- c("Estimate","Std. Error")
   ans
 }
