@@ -4,8 +4,8 @@
 ##'
 ##' First, the Hessian wrt. the fixed effect parameter vector (\eqn{\theta}) is calculated.
 ##' The fixed effects covariance matrix is approximated by
-##' \deqn{V(\hat\theta)=\nabla^2 l(\hat\theta)^{-1}}
-##' where \eqn{l} denotes the likelihood function (i.e. \code{obj$fn}).
+##' \deqn{V(\hat\theta)=-\nabla^2 l(\hat\theta)^{-1}}
+##' where \eqn{l} denotes the likelihood function (i.e. \code{-obj$fn}).
 ##' 
 ##' For non-random effect models the standard delta-method is used to calculate the covariance
 ##' matrix. Let \eqn{\phi(\theta)} denote some non-linear function of \eqn{\theta}. Then
@@ -17,7 +17,7 @@
 ##' \pmatrix{ H_{uu}^{-1} & 0 \cr 0 & 0 } +
 ##' J V(\hat\theta) J'
 ##' }
-##' where \eqn{H_{uu}} denotes random effect block of the full joint Hessian and \eqn{J}
+##' where \eqn{H_{uu}} denotes random effect block of the full joint Hessian of \code{obj$fn} and \eqn{J}
 ##' denotes the Jacobian of \eqn{\pmatrix{\hat u(\theta) \cr \theta}} wrt. \eqn{\theta}.
 ##' Here, the first term represents the expected conditional variance given the fixed effects
 ##' and the second term represents the variance of the conditional mean wrt. the fixed effects.

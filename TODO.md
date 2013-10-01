@@ -21,4 +21,5 @@ TODO
   - Consistency between matrix and array fastest running dimensions.
   - Desired behaviour of overloaded operations e.g. pointwise multiply vs matrix multiply.
   - Automatic cast from array to vector.
-
+- Make simple example of how to include "adjoint code". pexp(x,lambda) is a good example (cum. dist. function exp. distr)
+- Think about general features for calculating residuals, along the line of Kasper's ideas. 
