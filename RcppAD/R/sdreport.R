@@ -33,8 +33,11 @@
 ##' @examples
 ##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
 ##' sdreport(obj)
-##' runExample("rw",thisR=TRUE) ## Random effect example
-##' sdreport(obj)
+##' runExample("rw",thisR=TRUE)              ## Random effect example
+##' rep <- sdreport(obj)
+##' summary(rep,"random")                    ## Only random effects
+##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
+##' summary(rep,"report")                    ## Only report
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   ## Make object to calculate ADREPORT vector
   obj2 <- MakeADFun(obj$env$data,obj$env$parameters,type="ADFun",ADreport=TRUE,DLL=obj$env$DLL)
@@ -107,9 +110,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   ## Output
   sd <- sqrt(diag(cov))
   ans <- list(value=phi,sd=sd,cov=cov,par.fixed=par.fixed,
-              hessian.fixed=hessian.fixed,pdHess=pdHess,
+              cov.fixed=Vtheta,pdHess=pdHess,
               gradient.fixed=gradient.fixed)
-  ## ======== Find marginal variances of all random effects i.e. phi(u)=u
+  ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
       ihessian.random <- .Call("lgc_invQ", L, PACKAGE = "RcppAD")
@@ -133,12 +136,25 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   class(ans) <- "sdreport"
   ans
 }
-summary.sdreport <- function(x,...){
-  ans1 <- cbind(x$par.fixed,sqrt(diag(solve(x$hessian.fixed))))
-  ans2 <- cbind(x$par.random,sqrt(x$diag.cov.random))
-  ans3 <- cbind(x$value,x$sd)
+summary.sdreport <- function(x,select=c("all","fixed","random","report"),p.value=FALSE,...){
+  select <- match.arg(select)
+  if(select=="all"){
+    fixed <- random <- report <- TRUE
+    all <- TRUE
+  } else {
+    fixed <- random <- report <- FALSE
+    assign(select,TRUE)
+    all <- FALSE
+  }
+  ans1 <- ans2 <- ans3 <- NULL
+  if(fixed)ans1 <- cbind(x$par.fixed,sqrt(diag(x$cov.fixed)))
+  if(random)ans2 <- cbind(x$par.random,sqrt(as.numeric(x$diag.cov.random)))
+  if(report)ans3 <- cbind(x$value,x$sd)
   ans <- rbind(ans1,ans2,ans3)
   colnames(ans) <- c("Estimate","Std. Error")
+  if(p.value){
+    ans <- cbind(ans,p.value=pchisq((ans[,"Estimate"]/ans[,"Std. Error"])^2,df=1,lower=FALSE))
+  }
   ans
 }
 print.sdreport <- function(x,...){

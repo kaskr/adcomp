@@ -58,7 +58,10 @@
 \examples{
 runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
 sdreport(obj)
-runExample("rw",thisR=TRUE) ## Random effect example
-sdreport(obj)
+runExample("rw",thisR=TRUE)              ## Random effect example
+rep <- sdreport(obj)
+summary(rep,"random")                    ## Only random effects
+summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
+summary(rep,"report")                    ## Only report
 }
 
