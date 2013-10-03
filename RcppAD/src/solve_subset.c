@@ -215,20 +215,6 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
 
 }
 
-/* Not exported by Matrix package */
-cholmod_sparse *cholmod_ptranspose
-(
-    /* ---- input ---- */
-    cholmod_sparse *A, /* matrix to transpose */
-    int values,         /* 0: pattern, 1: array transpose, 2: conj. transpose */
-    int *Perm,          /* if non-NULL, F = A(p,f) or A(p,p) */
-    int *fset,          /* subset of 0:(A->ncol)-1 */
-    size_t fsize,       /* size of fset */
-    /* --------------- */
-    cholmod_common *Common
-) ;
-
-
 CHM_SP lgc_inv_super(CHM_FR Lfac, cholmod_common *c){
 
   /* Convert factor to sparse without modifying factor */
@@ -236,22 +222,12 @@ CHM_SP lgc_inv_super(CHM_FR Lfac, cholmod_common *c){
   CHM_SP L = M_cholmod_factor_to_sparse(Ltmp,c);
   M_cholmod_free_factor(&Ltmp,c);
 
-  /* inverse permutation */
-  int n = L->ncol;
-  int *iperm = Alloca(n,int);
-  int *perm = Lfac->Perm;
-  for(int i=0;i<n;i++)iperm[perm[i]]=i;
-
   /* Loop over supernodes */
   int nsuper=Lfac->nsuper;
   for(int k=nsuper-1;k>=0;k--)lgc_recursion_super(L,k,Lfac,c);
 
-  /* Apply inverse permutation on inverse subset */
-  L->stype=-1; /* Change to symm lower */
-  CHM_SP U=cholmod_ptranspose(L,1,iperm,NULL,0,c);
-  M_cholmod_free_sparse(&L,c);
-  L=cholmod_ptranspose(U,1,NULL,NULL,0,c);
-  M_cholmod_free_sparse(&U,c);
+  /* Change to symm lower */
+  L->stype=-1; 
   return L;
 }
 

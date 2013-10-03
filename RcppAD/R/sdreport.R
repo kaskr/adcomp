@@ -116,7 +116,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
       ihessian.random <- .Call("lgc_invQ", L, PACKAGE = "RcppAD")
-      diag.term1 <- diag(ihessian.random)
+      iperm <- Matrix::invPerm(L@perm+1L)
+      diag.term1 <- diag(ihessian.random)[iperm]
       f <- obj$env$f
       w <- rep(0, length(par))
       reverse.sweep <- function(i){
