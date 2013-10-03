@@ -658,7 +658,7 @@ openmp <- function(n=NULL){
 ##' @param flags Character with compile flags.
 ##' @param safebounds Turn on preprocessor flag for bound checking?
 compile <- function(file,flags=cxxflags(file),safebounds=TRUE){
-  if(!is.null(flags))flags = paste("CXXFLAGS=\"",flags,"\"")
+  if(!is.null(flags))flags0 = paste("CXXFLAGS=\"",flags,"\"")
   safeboundsflag <- if(safebounds)"-DRCPPAD_SAFEBOUNDS " else ""
   cmd <- paste("R CMD COMPILE CPPFLAGS=",
                "\"",
@@ -666,13 +666,30 @@ compile <- function(file,flags=cxxflags(file),safebounds=TRUE){
                "-I",system.file("include",package="RcppAD"),
                "\"",
                " ",
-               flags,
+               flags0,
                " ",
-               file,sep="")  
+               file,sep="")
+  if ( .Platform$OS.type == "windows" ) { ## No R CMD COMPILE on windows (why?)
+    cmd <- paste(system("R CMD config CXX",TRUE),
+                 paste0("-I",Sys.getenv("R_HOME"),"/include"),
+                 "-DNDEBUG",
+                 safeboundsflag,
+                 paste0("-I",system.file("include",package="RcppAD")),
+                 system("R CMD config CXXPICFLAGS",TRUE),
+                 flags,
+                 "-c",
+                 file,
+                 "-o",
+                 gsub(".cpp",".o",file)
+                 )
+    cat(cmd,"\n")
+  }
   system(cmd)
   cmd <- paste("R CMD SHLIB",file)
   system(cmd)
 }
+## Add dynlib extension
+dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 
 ##' Create a cpp template to get started.
 ##'

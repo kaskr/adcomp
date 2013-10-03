@@ -39,7 +39,7 @@ matpoints(obs);
 ## cat(stateDim,"\n",file="mvrw.dat",append=TRUE);
 ## write.table(obs,file="mvrw.dat",append=TRUE,row.names=FALSE,col.names=FALSE)
 library(RcppAD)
-dyn.load("rw.so")
+dyn.load(dynlib("rw"))
 data <- list(obs=t(obs))
 parameters <- list(
   u=data$obs*0,
