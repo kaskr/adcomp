@@ -43,7 +43,6 @@
 
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
-#include <malloc.h>
 #ifdef __GNUC__
 # undef alloca
 # define alloca(x) __builtin_alloca((x))
@@ -142,7 +141,7 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   double *xx=x->x;
   double *Lss=xx, *Lps=xx+ns, *Ssp=xx+(nq*ns), *Spp=xx+(nq*ns+ns);
   /* Workspace to hold output from dsymm */
-  double *wrk=malloc((nq*ns)*sizeof(double));
+  double *wrk=Calloc(nq*ns,double);
   double *wrkps=wrk+ns;
   if(!EXPERIMENTAL){
     /* ------------ ORIGINAL VERSION: S(p,p)*M */
@@ -212,7 +211,7 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
 
   /* Clean up */
   M_cholmod_free_dense(&x,c);
-  free(wrk);
+  Free(wrk);
 
 }
 
