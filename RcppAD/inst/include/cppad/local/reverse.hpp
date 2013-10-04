@@ -226,13 +226,13 @@ void ADFun<Base>::myReverse(size_t p, const VectorBase &w, size_t dep_var_index,
 	const Base zero(0);
 
 	// temporary indices
-	size_t i, j, k;
+	size_t j, k;
 
 	// number of independent variables
 	size_t n = ind_taddr_.size();
 
 	// number of dependent variables
-	size_t m = dep_taddr_.size();
+	// size_t m = dep_taddr_.size();
 
 	if(false){
 	  pod_vector<Base> Partial;
