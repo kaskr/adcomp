@@ -129,7 +129,7 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   /* s contains row-indices of diagonal - setdiff(q,p) */
   int* q=Ls+Lpi[k];    /* Pointer to L->s [L->pi [k]] */
   int nq=nrow;         /* length of q */
-  int* p=q+ncol;       /* Exclude triangle in diagonal */
+  // int* p=q+ncol;       /* Exclude triangle in diagonal */
   int np=nq-ncol;      /* length of p */
   int* s=q;
   int ns=ncol;         /* length of s */
