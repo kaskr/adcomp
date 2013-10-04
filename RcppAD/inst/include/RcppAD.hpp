@@ -439,7 +439,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
     error("Wrong range component.");
   int order = INTEGER(getListElement(control,"order"))[0];
-  if(order!=0 & order!=1 & order!=2 & order!=3)
+  if((order!=0) & (order!=1) & (order!=2) & (order!=3))
     error("order can be 0, 1, 2 or 3");
   int sparsitypattern=INTEGER(getListElement(control,"sparsitypattern"))[0];
   SEXP hessiancols; // Hessian columns
@@ -912,7 +912,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   m=0;
   //for(int i=0;i<tmp2.colpattern.size();i++)m+=tmp2.colpattern[i].size();
   int colisize;
-  for(int i=0;i<tmp2.colpattern.size();i++){
+  for(int i=0;i<int(tmp2.colpattern.size());i++){
     colisize=tmp2.colpattern[i].size();
     if(KEEP_COL(i)){
       for(int j=0;j<colisize;j++){
@@ -951,7 +951,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
     if(KEEP_COL(i)){
       tmp2.myReverse(1, v, i /*range comp*/, u /*domain*/);
       icol=&tmp2.colpattern[i];
-      for(int j=0;j<icol->size();j++){
+      for(int j=0;j<int(icol->size());j++){
 	if(KEEP_ROW( icol->operator[](j), i ))yyy[k++]=u[icol->operator[](j)];
       }
     }
@@ -986,7 +986,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   for(int i = 0; i < n; i++){
     if(KEEP_COL(i)){
       icol=&tmp2.colpattern[i];
-      for(int j=0;j<icol->size();j++){
+      for(int j=0;j<int(icol->size());j++){
 	if(KEEP_ROW( icol->operator[](j), i )){
 	  // rowindex[k]=colproj[icol->operator[](j)];
 	  // colindex[k]=colproj[i];
