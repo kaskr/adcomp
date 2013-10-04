@@ -461,7 +461,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   }
   vector<double> x(n);
   for(int i=0;i<n;i++)x[i]=REAL(theta)[i];
-  SEXP res;
+  SEXP res=R_NilValue;
   SEXP rangeweight=getListElement(control,"rangeweight");
   if(rangeweight!=R_NilValue){
     if(LENGTH(rangeweight)!=m)error("rangeweight must have length equal to range dimension");
