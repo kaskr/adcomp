@@ -182,7 +182,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
 #endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Forward(p,x);
     VectorBase out(range);
-    for(int i=0;i<range;i++)out(i)=0;
+    for(size_t i=0;i<range;i++)out(i)=0;
     for(int i=0;i<ntapes;i++)addinsert(out,ans(i),i);
     return out;
   }
@@ -198,7 +198,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
 #endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Reverse(p,subset(v,i));
     VectorBase out(p*domain); 
-    for(int i=0;i<p*domain;i++)out(i)=0;
+    for(size_t i=0;i<p*domain;i++)out(i)=0;
     for(int i=0;i<ntapes;i++)out=out+ans(i);
     return out;
   };

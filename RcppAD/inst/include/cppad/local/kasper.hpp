@@ -56,8 +56,8 @@ void markArgs(tape_point &tp)
   
   size_t i;
 
-  void *os,*Rec,*i_var,*nfz,*fz,*nrz,*rz;
-
+  void *os; //,*Rec,*i_var,*nfz,*fz,*nrz,*rz;
+  os=NULL;
 	
 	CPPAD_ASSERT_KNOWN(
 		! thread_alloc::in_parallel() ,
@@ -438,16 +438,16 @@ void prepare_reverse_sweep(int col){ /* input: range component */
 }
 
 void my_pattern(int col){
-  OpCode op; 
-  const addr_t* op_arg;
-  size_t op_index;
-  size_t var_index;
+  //OpCode op;
+  //const addr_t* op_arg;
+  //size_t op_index;
+  //size_t var_index;
   // size_t dep_var_taddr=dep_taddr_[col];
   // size_t mark=dep_var_taddr;
   // op_mark_[var2op_[dep_var_taddr]]=mark;
   prepare_reverse_sweep(col);
   // We always have ind_taddr_[i]=i+1
-  int n=Domain();
+  size_t n=Domain();
   int sum=0;
   std::vector<size_t>::iterator it;
   for(it=op_mark_index_.begin();*it<=n;it++)sum++;
