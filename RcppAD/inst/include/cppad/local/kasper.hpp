@@ -481,16 +481,16 @@ pod_vector<Base> Partial;
 void my_init(){
   Partial.extend(total_num_var_ * 1);
   arg_mark_.resize(play_.rec_op_arg_.size());
-  for(int i=0;i<arg_mark_.size();i++)arg_mark_[i]=false;
+  for(size_t i=0;i<arg_mark_.size();i++)arg_mark_[i]=false;
   /* Run a reverse test-sweep to store pointers once */
   tape_point tp;
   play_.start_reverse(tp.op, tp.op_arg, tp.op_index, tp.var_index);
   tp_.resize(tp.op_index+1);
   var2op_.resize(tp.var_index+1);
   op_mark_.resize(tp.op_index+1);
-  for(int i=0;i<op_mark_.size();i++)op_mark_[i]=0;
+  for(size_t i=0;i<op_mark_.size();i++)op_mark_[i]=0;
   user_region_mark_.resize(tp.op_index+1);
-  for(int i=0;i<user_region_mark_.size();i++)user_region_mark_[i]=0;
+  for(size_t i=0;i<user_region_mark_.size();i++)user_region_mark_[i]=0;
   tp_[tp.op_index]=tp;
   /* 1. We need to be able to find out, for a given variable, what operator created 
      the variable. This is easiest done by looping through the _operators_ because for a 
@@ -503,14 +503,14 @@ void my_init(){
     play_.next_reverse(tp.op, tp.op_arg, tp.op_index, tp.var_index);
     /* Csum is special case - see remarks in player.hpp and reverse_sweep.hpp */
     if(tp.op == CSumOp)play_.reverse_csum(tp.op, tp.op_arg, tp.op_index, tp.var_index);
-    for(int i=0;i<NumRes(tp.op);i++)var2op_[tp.var_index-i]=tp.op_index;
+    for(size_t i=0;i<NumRes(tp.op);i++)var2op_[tp.var_index-i]=tp.op_index;
     tp_[tp.op_index]=tp;
     markArgs(tp);
   }
   /* Lookup table: is tape_point within a UserOp region? */
   bool user_within=false;
   user_region_.resize(tp_.size());
-  for(int i=0;i<tp_.size();i++){
+  for(size_t i=0;i<tp_.size();i++){
     if(tp_[i].op==UserOp){
       user_region_[i]=true;
       user_within=!user_within;	
@@ -523,6 +523,6 @@ void my_init(){
   int m=Range();
   colpattern.resize(m);
   for(int i=0;i<m;i++)my_pattern(i);
-  for(int i=0;i<op_mark_.size();i++)op_mark_[i]=0; /* remember to reset marks */
-  for(int i=0;i<user_region_mark_.size();i++)user_region_mark_[i]=0; /* remember to reset marks */
+  for(size_t i=0;i<op_mark_.size();i++)op_mark_[i]=0; /* remember to reset marks */
+  for(size_t i=0;i<user_region_mark_.size();i++)user_region_mark_[i]=0; /* remember to reset marks */
 }
