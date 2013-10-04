@@ -177,7 +177,9 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   template <typename VectorBase>
   VectorBase Forward(size_t p, const VectorBase& x, std::ostream& s = std::cout){
     vector<VectorBase> ans(ntapes);
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Forward(p,x);
     VectorBase out(range);
     for(int i=0;i<range;i++)out(i)=0;
@@ -191,7 +193,9 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   template <typename VectorBase>
   VectorBase Reverse(size_t p, const VectorBase &v){
     vector<VectorBase> ans(ntapes);
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Reverse(p,subset(v,i));
     VectorBase out(p*domain); 
     for(int i=0;i<p*domain;i++)out(i)=0;
@@ -204,7 +208,9 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   template <typename VectorBase>
   VectorBase Jacobian(const VectorBase &x){
     vector<VectorBase> ans(ntapes);
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Jacobian(x);
     VectorBase out( domain * range ); // domain fastest running
     out.setZero();
@@ -215,7 +221,9 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   /* optimize ADFun object */
   void optimize(){
     if(config.trace.optimize)std::cout << "Optimizing parallel tape... ";
+#ifdef _OPENMP
 #pragma omp parallel for if (config.optimize.parallel)
+#endif
     for(int i=0;i<ntapes;i++)vecpf(i)->optimize();
     if(config.trace.optimize)std::cout << "Done\n";
   }
