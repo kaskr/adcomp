@@ -4,7 +4,10 @@
 ##' @param name Character name of example.
 ##' @param all Run all the test examples?
 ##' @param thisR Run inside this R?
-runExample <- function(name=NULL,all=FALSE,thisR=FALSE){
+##' @param clean Cleanup before compile?
+##' @param ... Passed to \code{compile}.
+runExample <- function(name=NULL,all=FALSE,thisR=FALSE,
+                       clean=FALSE,...){
   cwd <- getwd()
   on.exit(setwd(cwd))
   exfolder <- system.file("examples",package="RcppAD")
@@ -30,8 +33,13 @@ runExample <- function(name=NULL,all=FALSE,thisR=FALSE){
     writeLines(info)
     return(invisible(exnames))
   }
+  if(clean){
+    cat("Cleanup:\n")
+    file.remove(dynlib(name))
+    file.remove(paste0(name,".o"))
+  }
   cat("Building example",name,"\n")
-  time <- system.time(compile(paste(name,".cpp",sep="")))
+  time <- system.time(compile(paste0(name,".cpp"),...))
   cat("Build time",time["elapsed"],"seconds\n\n")
   cat("Running example",name,"\n")
   if(!thisR){
