@@ -1,5 +1,5 @@
 require(RcppAD)
-dyn.load("atomic_parallel.so")
+dyn.load(dynlib("atomic_parallel"))
 n <- 2;N <- 100
 obj <- MakeADFun(type=c("ADFun","Fun"),
                  data=list(),

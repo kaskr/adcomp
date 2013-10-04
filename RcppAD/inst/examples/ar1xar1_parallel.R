@@ -31,7 +31,7 @@ f <- function(x) 2/(1 + exp(-2 * x)) - 1
 invf <- function(y) -0.5 * log(2/(y + 1) - 1)
 
 ## ======================= Fit model
-dyn.load("ar1xar1_parallel.so")
+dyn.load(dynlib("ar1xar1_parallel"))
 obj <- MakeADFun(data=list(N=N),
                  parameters=list(
                    eta=matrix(0,n,n),

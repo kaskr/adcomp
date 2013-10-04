@@ -11,7 +11,7 @@ if(FALSE){
   library(lattice);xyplot(x~t,group=f,type="l")
 }
 require(RcppAD)
-dyn.load("randomregression.so")
+dyn.load(dynlib("randomregression"))
 
 ## Construct AD function object
 data <- list(group=f,x=x,t=t)

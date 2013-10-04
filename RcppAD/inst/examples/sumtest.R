@@ -1,5 +1,5 @@
 library(RcppAD)
-dyn.load("sumtest.so")
+dyn.load(dynlib("sumtest"))
 parameters=list(x=numeric(5)+0.1 )
 df <- list()
 

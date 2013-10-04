@@ -1,5 +1,5 @@
 require(RcppAD)
-dyn.load("simple.so")
+dyn.load(dynlib("simple"))
 
 ## Test data
 set.seed(123)
