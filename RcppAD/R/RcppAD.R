@@ -690,6 +690,30 @@ compile <- function(file,flags=cxxflags(file),safebounds=TRUE){
 }
 ## Add dynlib extension
 dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
+## Overload dyn.load
+dyn.load <- function (x, local = TRUE, now = TRUE, ...){
+  tab <- getLoadedDLLs()
+  name <- sub(.Platform$dynlib.ext,"",basename(x))
+  if(name %in% names(tab)){ ## DLL of same name already loaded
+    isUserTemplateDLL <- ## We assume no one else has this symbol...
+      !is.character(try(getNativeSymbolInfo("get_number_of_external_pointers_alive",PACKAGE=name)))
+    if(isUserTemplateDLL){
+      gc() ## Try to cleanup
+      n <- .Call("get_number_of_external_pointers_alive",PACKAGE=name)
+      if(n<0)stop("This may not happen. Please post a bug report for package RcppAD.")
+      if(n>0){
+        cat("There are",n,"referenced external pointers.\n")
+        cat("Library cannot be loaded before workspace have been cleaned up.\n")
+        cat("Use 'rm(obj)' to remove all ADFun objects and try again.\n")
+        stop()
+      }
+      ## Now safe to unload
+      file <- unclass(tab[[name]])$path
+      base::dyn.unload(file)
+    }
+  }
+  base::dyn.load(x, local = local, now = now, ...)
+}
 
 ##' Create a cpp template to get started.
 ##'

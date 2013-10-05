@@ -39,6 +39,33 @@ using CppAD::ADFun;
 #include "start_parallel.hpp"
 #include "convenience.hpp"
 
+/* Memory manager:
+   Count the number of external pointers alive.
+   When total number is zero it is safe to dyn.unload
+   the library.
+*/
+static struct memory_manager_struct{
+  int counter;
+  void RegisterCFinalizer(){
+    counter++;
+  }
+  void CallCFinalizer(){
+    counter--;
+  }
+  memory_manager_struct(){
+    counter=0;
+  }
+} memory_manager;
+extern "C"{
+  SEXP get_number_of_external_pointers_alive(){
+    SEXP ans;
+    PROTECT(ans = NEW_INTEGER(1));
+    INTEGER(ans)[0]=memory_manager.counter;
+    UNPROTECT(1);
+    return ans;
+  }
+}
+
 #ifdef _OPENMP
 bool _openmp=true;
 #else
@@ -510,6 +537,7 @@ void finalize(SEXP x)
 {
   ADFunType* ptr=(ADFunType*)R_ExternalPtrAddr(x);
   if(ptr!=NULL)delete ptr;
+  memory_manager.CallCFinalizer();
 }
 
 
@@ -548,11 +576,13 @@ extern "C"
   {
     ADFun<double>* ptr=(ADFun<double>*)R_ExternalPtrAddr(x);
     if(ptr!=NULL)delete ptr;
+    memory_manager.CallCFinalizer();
   }
   void finalizeparallelADFun(SEXP x)
   {
     parallelADFun<double>* ptr=(parallelADFun<double>*)R_ExternalPtrAddr(x);
     if(ptr!=NULL)delete ptr;
+    memory_manager.CallCFinalizer();
   }
 
   /* Construct ADFun object */
@@ -592,6 +622,7 @@ extern "C"
       /* Convert parallel ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) ppf,mkChar("parallelADFun"),R_NilValue));
       R_RegisterCFinalizer(res,finalizeparallelADFun);
+      memory_manager.RegisterCFinalizer();
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
@@ -600,6 +631,7 @@ extern "C"
       PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
       setAttrib(res,install("range.names"),info);
       R_RegisterCFinalizer(res,finalizeADFun);
+      memory_manager.RegisterCFinalizer();
     }
 
     /* Return list of external pointer and default-parameter */
@@ -674,6 +706,7 @@ extern "C"
   {
     objective_function<double>* ptr=(objective_function<double>*)R_ExternalPtrAddr(x);
     if(ptr!=NULL)delete ptr;
+    memory_manager.CallCFinalizer();
   }
   
   SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report)
@@ -691,6 +724,7 @@ extern "C"
     SEXP res;
     PROTECT(res=R_MakeExternalPtr((void*) pF,mkChar("DoubleFun"),R_NilValue));
     R_RegisterCFinalizer(res,finalizeDoubleFun);
+    memory_manager.RegisterCFinalizer();
     UNPROTECT(1);
 
     return res;
@@ -772,6 +806,7 @@ extern "C"
     SEXP res;
     PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
     R_RegisterCFinalizer(res,finalizeADFun);
+    memory_manager.RegisterCFinalizer();
 
     /* Return list */
     SEXP ans;
@@ -837,6 +872,7 @@ extern "C"
     SEXP res;
     PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
     R_RegisterCFinalizer(res,finalizeADFun);
+    memory_manager.RegisterCFinalizer();
 
     /* Return list */
     SEXP ans;
@@ -1015,6 +1051,7 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
 
     //R_RegisterCFinalizer(res,finalizeADFun);
     R_RegisterCFinalizer(res,finalize<ADFunType>);
+    memory_manager.RegisterCFinalizer();
 
     /* Return list */
     SEXP ans;
