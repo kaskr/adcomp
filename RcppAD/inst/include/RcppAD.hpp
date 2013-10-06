@@ -1,6 +1,3 @@
-#include <R.h>
-#include <Rdefines.h>
-
 /* To be removed */
 #define RCPPAD_DEBUG 0
 #define RCPPAD_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
@@ -9,11 +6,12 @@
 #ifdef RCPPAD_SAFEBOUNDS
 #undef NDEBUG
 #undef eigen_assert
-#define eigen_assert(x) if (!(x)) { Rprintf("RcppAD has received an error from Eigen. "); \
-                                  Rprintf("The following condition was not met:\n");          \
-                                  Rprintf(#x);                                                \
-                                  Rprintf("\nPlease check your matrix-vector bounds etc., "); \
-                                  Rprintf("or run your program through a debugger.\n");       \
+void eigen_Rprintf(const char* x);
+#define eigen_assert(x) if (!(x)) { eigen_Rprintf("RcppAD has received an error from Eigen. "); \
+                                  eigen_Rprintf("The following condition was not met:\n");          \
+                                  eigen_Rprintf(#x);                                                \
+                                  eigen_Rprintf("\nPlease check your matrix-vector bounds etc., "); \
+                                  eigen_Rprintf("or run your program through a debugger.\n");       \
 				  abort();}
 #else
 #undef NDEBUG
@@ -21,6 +19,10 @@
 #endif
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+/* R must come after Eigen because conflict with length macro on mac os x */
+#include <R.h>
+#include <Rdefines.h>
+void eigen_Rprintf(const char* x){Rprintf(x);}
 /* Always turn off debug for cppad */
 #undef NDEBUG
 #define NDEBUG 1
