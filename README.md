@@ -21,4 +21,4 @@ Currently only the non-parallel examples run.
 
 Mac OS X
 --------
-Not yet fully tested. Main difference from linux builds is that the mac toolset lacks Fortran libraries (used to link to BLAS) and use the older gcc-4.2.
+Tested to work with both llvm-gcc-4.2 and clang. Fortran compiler [libraries](http://cran.r-project.org/bin/macosx/tools) must be installed. According to [R admin manual](http://www.cran.r-project.org/doc/manuals/R-admin.html#OS-X) "the OpenMP support in this version of gcc is problematic, and the alternative, clang, has no OpenMP support". So, parallel templates with OS X will require some work.
