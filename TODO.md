@@ -1,5 +1,6 @@
 TODO
 ====
+- **DONE** Make it work on common platforms (Linux, Windows, Mac OS X).
 - Clean up R-code: newton, options, MakeADFun: class(output).
 - Roxygen documentation
 - MakeADFun: Call dyn.load if DLL not loaded (?)
@@ -8,14 +9,14 @@ TODO
 - Metis symbolic analysis with 3d example.
 - Move methods, such as "parList", out of the object.
 - Rinterface should remember to set DLL="..."
-- sdreport() on R-side to get sd of ADREPORT().
-- solveSubset to get sd's of all random effects.
+- **DONE** sdreport() on R-side to get sd of ADREPORT().
+- **DONE** solveSubset to get sd's of all random effects.
 - Make importence sampler work in high dim - need a GMRFsample.
 - Compile and testing workflow:
-  - Eliminate need to restart R.
+  - **DONE** Eliminate need to restart R.
   - Give better message if PARAMETER(name) evaluates to NULL.
   - Improve compile times by either precompiling or allow incomplete compilations.
-  - Array bounds checking option
+  - **DONE** Array bounds checking option
 - template() should never overwrite existing file.
 - Review kaspers class extensions of Eigen classes, in particular array<Type>, matrix<Type> and vector<Type>
   - Consistency between matrix and array fastest running dimensions.
