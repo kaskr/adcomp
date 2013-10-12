@@ -5,15 +5,21 @@
 ##' @param all Run all the test examples?
 ##' @param thisR Run inside this R?
 ##' @param clean Cleanup before compile?
+##' @param exfolder Alternative folder with examples.
 ##' @param ... Passed to \code{compile}.
 runExample <- function(name=NULL,all=FALSE,thisR=FALSE,
-                       clean=FALSE,...){
+                       clean=FALSE,exfolder=NULL,...){
   cwd <- getwd()
   on.exit(setwd(cwd))
-  exfolder <- system.file("examples",package="RcppAD")
+  if(is.null(exfolder))exfolder <- system.file("examples",package="RcppAD")
   setwd(exfolder)
-  cppnames <- dir(exfolder,pattern=".cpp$")
-  exnames <- sub(".cpp","",cppnames)
+  validExamples <- function(){
+    f1 <- sub("\\.[^\\.]*$","",dir(pattern=".R$"))
+    f2 <- sub("\\.[^\\.]*$","",dir(pattern=".cpp$"))
+    intersect(f1,f2)
+  }
+  exnames <- validExamples()
+  cppnames <- paste0(exnames,".cpp")
   ## Format info as text
   M <- max(nchar(exnames))
   info <- sapply(cppnames,function(x){readLines(x)[[1]]})

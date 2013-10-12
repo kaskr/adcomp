@@ -21,4 +21,4 @@ obj$control <- list(trace=1,parscale=c(1,1,1,1,1)*1e-2,REPORT=1,reltol=1e-12,max
 obj$hessian <- F
 newtonOption(smartsearch=TRUE)
 tid = system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=c(-10.0,-10,-10,-5,-5),upper=c(10.0,10,10,5.0,5.0)))
-sdreport(obj)
+rep <- sdreport(obj)
