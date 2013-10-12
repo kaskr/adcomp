@@ -8,50 +8,50 @@ Perform a full test by running
 * make clean
 * make
 
-A file "report.txt" will be generated with test results and timings. 
+A file "REPORT.md" will be generated with test results and timings. 
 If the column "Max." is small (say <1e-6) the example is considered as passed.
 Column "timeindex" is the totaltime relative to the totaltime on the reference test machine. 
 Thus "timeindex" should be fairly constant.
 
-report.txt
-==========
+report.md
+=========
 
 Example overview:
 -----------------
-Examples in '.':
-
-"linreg_parallel": 
-"linreg":          
-"nmix":            
-"orange_big":      Scaled up version of the Orange Tree
-                   example (50,000 latent random variables)
-"rw":              Random walk with multivariate correlated
-                   increments and measurement noise.
-"socatt":          
-"spatial":         Spatial poisson GLMM on a grid, with
-                   exponentially decaying correlation
-                   function
-
-
+    Examples in '.':
+    
+    "linreg_parallel": 
+    "linreg":          
+    "nmix":            
+    "orange_big":      Scaled up version of the Orange Tree
+                       example (50,000 latent random variables)
+    "rw":              Random walk with multivariate correlated
+                       increments and measurement noise.
+    "socatt":          
+    "spatial":         Spatial poisson GLMM on a grid, with
+                       exponentially decaying correlation
+                       function
+    
+    
 Results and timings:
 --------------------
-                Min. Median Max. totaltime timeindex
-linreg_parallel    0      0    0     0.656         1
-linreg             0      0    0     0.022         1
-nmix               0      0    0     3.660         1
-orange_big         0      0    0    55.747         1
-rw                 0      0    0     0.291         1
-socatt             0      0    0     2.140         1
-spatial            0      0    0    18.995         1
-
+                    Min. Median Max. totaltime timeindex
+    linreg_parallel    0      0    0     0.656         1
+    linreg             0      0    0     0.022         1
+    nmix               0      0    0     3.660         1
+    orange_big         0      0    0    55.747         1
+    rw                 0      0    0     0.291         1
+    socatt             0      0    0     2.140         1
+    spatial            0      0    0    18.995         1
+    
 Timing details:
 ---------------
-                 Function
-Example           MakeADFun nlminb  optim sdreport
-  linreg              0.007  0.000  0.010    0.005
-  linreg_parallel     0.302  0.000  0.354    0.000
-  nmix                0.293  2.656  0.000    0.711
-  orange_big          2.338 40.041  0.000   13.368
-  rw                  0.008  0.000  0.200    0.083
-  socatt              0.021  0.000  1.627    0.492
-  spatial             0.161 17.400  0.000    1.434
+                    MakeADFun nlminb  optim sdreport
+    linreg              0.007  0.000  0.010    0.005
+    linreg_parallel     0.302  0.000  0.354    0.000
+    nmix                0.293  2.656  0.000    0.711
+    orange_big          2.338 40.041  0.000   13.368
+    rw                  0.008  0.000  0.200    0.083
+    socatt              0.021  0.000  1.627    0.492
+    spatial             0.161 17.400  0.000    1.434
+

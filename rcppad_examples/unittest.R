@@ -61,8 +61,8 @@ if(example!=""){
     t2 <- totaltime(e2$.timings)
     c(summary(d)[c("Min.","Median","Max.")],totaltime=t2,timeindex=t2/t1)
   }
-  sink("report.txt")
-  cat("\nExample overview:\n-----------------\n")
+  sink("REPORT.md")
+  cat("Example overview:\n-----------------\n")
   runExample(exfolder=".")
   cat("\n")
   mat <- do.call("rbind",Map(report,f1,f2))
@@ -74,6 +74,16 @@ if(example!=""){
   Example <- sub(".expected.RData","",rep(names(res),sapply(res,length)))
   Function <- sub(".*::(.*).elapsed","\\1",unlist(lapply(res,names)))
   tab <- xtabs(unlist(res)~Example+Function)
+  names(dimnames(tab)) <- NULL
   print(tab)
   sink()
+  ## Markdown
+  md <- function(file){
+    li <- readLines(file)
+    i <- grep("^---",li)
+    i <- c(i-1,i)
+    li[-i] <- paste0("    ",li[-i])
+    writeLines(li,file)
+  }
+  md("REPORT.md")
 }
