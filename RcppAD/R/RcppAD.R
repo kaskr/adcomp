@@ -657,12 +657,16 @@ openmp <- function(n=NULL){
 ##' @param file c++ file.
 ##' @param flags Character with compile flags.
 ##' @param safebounds Turn on preprocessor flag for bound checking?
-compile <- function(file,flags=cxxflags(file),safebounds=TRUE){
+##' @param safeunload Turn on preprocessor flag for safe DLL unloading?
+compile <- function(file,flags=cxxflags(file),safebounds=TRUE,safeunload=TRUE){
   if(!is.null(flags))flags0 = paste("CXXFLAGS=\"",flags,"\"")
   safeboundsflag <- if(safebounds)"-DRCPPAD_SAFEBOUNDS " else ""
+  libname <- sub("\\.[^\\.]*$","",file)
+  unloadflag <- if(safeunload)paste0("-DLIB_UNLOAD=R_unload_",libname) else ""
+  ppflags <- paste(safeboundsflag,unloadflag," ")
   cmd <- paste("R CMD COMPILE CPPFLAGS=",
                "\"",
-               safeboundsflag,
+               ppflags,
                "-I",system.file("include",package="RcppAD"),
                "\"",
                " ",
@@ -673,7 +677,7 @@ compile <- function(file,flags=cxxflags(file),safebounds=TRUE){
     cmd <- paste(system("R CMD config CXX",TRUE),
                  paste0("-I",Sys.getenv("R_HOME"),"/include"),
                  "-DNDEBUG",
-                 safeboundsflag,
+                 ppflags,
                  paste0("-I",system.file("include",package="RcppAD")),
                  system("R CMD config CXXPICFLAGS",TRUE),
                  flags,

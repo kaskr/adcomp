@@ -66,6 +66,16 @@ extern "C"{
     UNPROTECT(1);
     return ans;
   }
+#ifdef LIB_UNLOAD
+#include <R_ext/Rdynload.h>
+  void LIB_UNLOAD(DllInfo *dll)
+  {
+    for(int i=0;i<100;i++){
+      if(memory_manager.counter>0)R_gc();
+    }
+    if(memory_manager.counter>0)error("Please clean up before unloading\n");
+  }
+#endif
 }
 
 #ifdef _OPENMP
