@@ -97,7 +97,7 @@ public:
     return (u*u).sum();
   }
   scalartype operator()(vectortype x){
-    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x);
+    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
   arraytype jacobian(arraytype x){
     return lltsolve(L,x);
