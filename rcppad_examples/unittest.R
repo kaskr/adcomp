@@ -44,7 +44,7 @@ if(example!=""){
   ## Report of diffs
   f1 <- dir(pattern = ".expected.RData$")
   f2 <- sub("\\.expected\\.","\\.output\\.",f1)
-  report <- function(f1,f2,full.timings=FALSE){
+  report <- function(f1,f2,full.timings=FALSE,full.diff=FALSE){
     diff <- function(x,y){
       if(is.list(x)&is.list(y))Map(diff,x,y)
       else if((!is.integer(x))&(is.numeric(x)|is.matrix(y))&length(x)>0)max(abs(x-y))
@@ -53,6 +53,9 @@ if(example!=""){
     e1 <- local({load(f1);environment()})
     e2 <- local({load(f2);environment()})
     d <- unlist(diff(e1$.results,e2$.results))
+    if(full.diff){
+      return( d )
+    }
     if(full.timings){
       return( sapply(e2$.timings,function(x)x["elapsed"]) )
     }
@@ -73,6 +76,14 @@ if(example!=""){
   res <- Map(report,f1,f2,full.timings=TRUE)
   Example <- sub(".expected.RData","",rep(names(res),sapply(res,length)))
   Function <- sub(".*::(.*).elapsed","\\1",unlist(lapply(res,names)))
+  tab <- xtabs(unlist(res)~Example+Function)
+  names(dimnames(tab)) <- NULL
+  print(tab)
+  cat("\nResult details:\n---------------\n")
+  res <- Map(report,f1,f2,full.diff=TRUE)
+  Example <- sub(".expected.RData","",rep(names(res),sapply(res,length)))
+  Function <- sub(".*::(.*)","\\1",unlist(lapply(res,names)))
+  Function <- formatC(Function,width=max(nchar(Function)))
   tab <- xtabs(unlist(res)~Example+Function)
   names(dimnames(tab)) <- NULL
   print(tab)
