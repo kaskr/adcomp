@@ -4,7 +4,7 @@ intersection= $(filter $(rfiles), $(cppfiles))
 outputfiles = $(intersection:=.output.RData)
 
 %.output.RData : %.R
-	example=$(basename $<) R --vanilla < unittest.R
+	unset MAKEFLAGS; example=$(basename $<) R --vanilla < unittest.R
 
 report: $(outputfiles)
 	R --vanilla < unittest.R
