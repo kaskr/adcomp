@@ -3,7 +3,7 @@ cppfiles = $(basename $(wildcard *.cpp))
 intersection= $(filter $(rfiles), $(cppfiles)) 
 outputfiles = $(intersection:=.output.RData)
 
-%.output.RData : %.R
+%.output.RData : %.R %.cpp
 	unset MAKEFLAGS; example=$(basename $<) R --vanilla < unittest.R
 
 report: $(outputfiles)
