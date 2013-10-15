@@ -244,10 +244,9 @@ MakeADFun <- function(data,parameters,map=list(),
   par <- NULL
   last.par.ok <- last.par <- last.par1 <- last.par2 <- last.par.best <- NULL
   value.best <- Inf
-  ptrADFun <- NULL
-  ptrFun <- NULL
-  ptrADGrad <- NULL
-  ptrLaplaceFun <- NULL
+  ADFun <- NULL
+  Fun <- NULL
+  ADGrad <- NULL
   reparam <- NULL
 
   ## All external pointers are created in function "retape" and can be re-created
@@ -256,9 +255,9 @@ MakeADFun <- function(data,parameters,map=list(),
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
-      ptrFun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
-      .Call("EvalDoubleFunObject",ptrFun,unlist(parameters),control=list(order=as.integer(0)),PACKAGE=DLL)
+      .Call("EvalDoubleFunObject",Fun$ptr,unlist(parameters),control=list(order=as.integer(0)),PACKAGE=DLL)
     }
     if(is.character(random)){
       random <<- grepRandomParameters(parameters,random)
@@ -269,24 +268,22 @@ MakeADFun <- function(data,parameters,map=list(),
       par <<- unlist(parameters)
     }
     if("ADFun"%in%type){
-      tmp <- .Call("MakeADFunObject",data,parameters,reportenv,
-                   control=list(report=as.integer(ADreport)),PACKAGE=DLL)
-      ptrADFun <<- tmp[[1]]
-      par <<- tmp[[2]]
+      ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
+                     control=list(report=as.integer(ADreport)),PACKAGE=DLL)
+      par <<- attr(ADFun$ptr,"par")
       last.par <<- par
       last.par1 <<- par
       last.par2 <<- par
       last.par.best <<- par
     }
     if("Fun"%in%type)
-      ptrFun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
     if("ADGrad"%in%type)
-      ptrADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)[[1]]
-
+      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
     ## Skip fixed effects from the full hessian ?
     ## * Probably more efficient - especially in terms of memory.
     ## * Only possible if a taped gradient is available - see function "ff" below.
-    env$skipFixedEffects <- !is.null(ptrADGrad)
+    env$skipFixedEffects <- !is.null(ADGrad)
     delayedAssign("spHess",sparseHessianFun(env, skipFixedEffects=skipFixedEffects ), assign.env = env )
   }
 
@@ -297,7 +294,7 @@ MakeADFun <- function(data,parameters,map=list(),
                 sparsitypattern=0,rangecomponent=1,rangeweight=NULL){
     type <- match.arg(type)
     if(type=="ADdouble"){
-      res <- .Call("EvalADFunObject",ptrADFun,theta,
+      res <- .Call("EvalADFunObject",ADFun$ptr,theta,
                    control=list(
                      order=as.integer(order),
                      hessiancols=as.integer(cols),
@@ -313,11 +310,11 @@ MakeADFun <- function(data,parameters,map=list(),
       if(order==2)last.par2 <<- theta
     } else
     if(type=="double"){
-      res <- .Call("EvalDoubleFunObject",ptrFun,theta,
+      res <- .Call("EvalDoubleFunObject",Fun$ptr,theta,
                    control=list(order=as.integer(order)),PACKAGE=DLL)
     }
     if(type=="ADGrad"){
-      res <- .Call("EvalADFunObject",ptrADGrad,
+      res <- .Call("EvalADFunObject",ADGrad$ptr,
                    theta,control=list(order=as.integer(order),
                            hessiancols=as.integer(cols),
                            hessianrows=as.integer(rows),
@@ -387,7 +384,7 @@ MakeADFun <- function(data,parameters,map=list(),
       ## Reverse mode evaluate ptr in rangedirection w
       ## now gives .5*tr(Hdot*Hinv) !!
       ans <- as.vector(f(theta,order=1))+
-        .Call("EvalADFunObject",e$ptr,theta,
+        .Call("EvalADFunObject",e$ADHess$ptr,theta,
                    control=list(
                      order=as.integer(1),
                      hessiancols=as.integer(0),
@@ -694,30 +691,6 @@ compile <- function(file,flags=cxxflags(file),safebounds=TRUE,safeunload=TRUE){
 }
 ## Add dynlib extension
 dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
-## Overload dyn.load
-dyn.load <- function (x, local = TRUE, now = TRUE, ...){
-  tab <- getLoadedDLLs()
-  name <- sub(.Platform$dynlib.ext,"",basename(x))
-  if(name %in% names(tab)){ ## DLL of same name already loaded
-    isUserTemplateDLL <- ## We assume no one else has this symbol...
-      !is.character(try(getNativeSymbolInfo("get_number_of_external_pointers_alive",PACKAGE=name)))
-    if(isUserTemplateDLL){
-      gc() ## Try to cleanup
-      n <- .Call("get_number_of_external_pointers_alive",PACKAGE=name)
-      if(n<0)stop("This may not happen. Please post a bug report for package RcppAD.")
-      if(n>0){
-        cat("There are",n,"referenced external pointers.\n")
-        cat("Library cannot be loaded before workspace have been cleaned up.\n")
-        cat("Use 'rm(obj)' to remove all ADFun objects and try again.\n")
-        stop()
-      }
-      ## Now safe to unload
-      file <- unclass(tab[[name]])$path
-      base::dyn.unload(file)
-    }
-  }
-  base::dyn.load(x, local = local, now = now, ...)
-}
 
 ##' Create a cpp template to get started.
 ##'
@@ -807,10 +780,9 @@ optimize <- function(obj){
   env <- obj$env
   fun <- function(name){
     if(is.null(get(name,env)))return(NA)
-    unlist(.Call("optimizeADFunObject",get(name,env),PACKAGE=obj$env$DLL))
+    unlist(.Call("optimizeADFunObject",get(name,env)$ptr,PACKAGE=obj$env$DLL))
   }
-  names <- ls(env,pattern="ptr")
-  names <- setdiff(names,"ptrFun") ## <-- avoid crash
+  names <- c("ADFun","ADGrad")
   sapply(names,fun)
 }
 
@@ -1024,27 +996,25 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
     ##skip <- as.integer(0)
     skip <- integer(0) ## <-- Empty integer vector
   }
-  ptr.list <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters, 
-                    obj$env$reportenv,
-                    skip, ##as.integer(0) ## <-- Skip this vector of parameters
-                    PACKAGE=obj$env$DLL
-                    )
-  ptr <- ptr.list[[1]]
-  ##.Call("InfoADFunObject",ptr,PACKAGE=obj$env$DLL)
+  ## ptr.list
+  ADHess <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters, 
+                  obj$env$reportenv,
+                  skip, ## <-- Skip this index vector of parameters
+                  PACKAGE=obj$env$DLL
+                  )
   if(!config(DLL=obj$env$DLL)$optimize.instantly){ ## If not already optimized (because twice optimize gives fault):
-    .Call("optimizeADFunObject",ptr,PACKAGE=obj$env$DLL)
+    .Call("optimizeADFunObject",ADHess$ptr,PACKAGE=obj$env$DLL)
   }
-  ##.Call("InfoADFunObject",ptr,PACKAGE=obj$env$DLL)
-  ev <- function(par=obj$env$par).Call("EvalADFunObject", ptr, par,
+  ev <- function(par=obj$env$par).Call("EvalADFunObject", ADHess$ptr, par,
                    control = list(
                      order = as.integer(0),
                      hessiancols = integer(0),
                      hessianrows = integer(0),
                      sparsitypattern = as.integer(0),
                      rangecomponent = as.integer(1)),PACKAGE=obj$env$DLL)
-  i=as.integer(ptr.list[[3]])
-  j=as.integer(ptr.list[[4]])
-  require(Matrix)##;M <- spMatrix(n,n,i=i+1,j=j+1,x=ev())
+  i=as.integer(attr(ADHess$ptr,"i"))
+  j=as.integer(attr(ADHess$ptr,"j"))
+  require(Matrix)
   n <- length(obj$env$par)
   M <- new("dsTMatrix",i=i,j=j,x=ev(),Dim=as.integer(c(n,n)),uplo="L")
   Hfull <- as(M,"dsCMatrix")

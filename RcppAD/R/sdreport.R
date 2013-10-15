@@ -39,8 +39,8 @@
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
-  if(is.null(obj$env$ptrADGrad))
-    stop("Cannot calculate sd's without type ADGrad available in object.")
+  if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
+    stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
   obj2 <- MakeADFun(obj$env$data,obj$env$parameters,type="ADFun",ADreport=TRUE,DLL=obj$env$DLL)
   r <- obj$env$random

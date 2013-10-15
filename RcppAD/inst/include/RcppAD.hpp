@@ -46,18 +46,58 @@ using CppAD::ADFun;
    When total number is zero it is safe to dyn.unload
    the library.
 */
+struct SEXP_t{
+  SEXP value;
+  SEXP_t(SEXP x){value=x;}
+  SEXP_t(){value=R_NilValue;}
+  operator SEXP(){return value;}
+};
+bool operator<(SEXP_t x, SEXP_t y){return (size_t(x.value)<size_t(y.value));}
 static struct memory_manager_struct{
   int counter;
-  void RegisterCFinalizer(){
+  std::map<SEXP_t,SEXP_t> alive;
+  void RegisterCFinalizer(SEXP list){
     counter++;
+    SEXP x=VECTOR_ELT(list,0);
+    alive[x]=list;
   }
-  void CallCFinalizer(){
+  void CallCFinalizer(SEXP x){
     counter--;
+    alive.erase(x);
+  }
+  void clear(){
+    std::map<SEXP_t,SEXP_t>::iterator it;
+    SEXP list;
+    for(it = alive.begin(); it != alive.end(); it++){
+      list=(*it).second;
+      SET_VECTOR_ELT(list,0,R_NilValue);
+    }
   }
   memory_manager_struct(){
     counter=0;
   }
 } memory_manager;
+
+/* All external pointers returned from RcppAD should be placed in a 
+   list container of length one. Additional information should be set
+   as attributes to the pointer. The memory_manager_struct above knows
+   how to look up the list container given the external pointer. By 
+   setting the list element to NULL the memory_manager can trigger the
+   garbage collector (and thereby the finalizers) when the library is
+   unloaded.
+ */
+SEXP ptrList(SEXP x){
+  SEXP ans,names;
+  PROTECT(ans=allocVector(VECSXP,1));
+  PROTECT(names=allocVector(STRSXP,1));
+  SET_VECTOR_ELT(ans,0,x);
+  SET_STRING_ELT(names,0,mkChar("ptr"));
+  setAttrib(ans,R_NamesSymbol,names);
+  memory_manager.RegisterCFinalizer(ans);
+  UNPROTECT(2);
+  return ans;
+}
+
 extern "C"{
   SEXP get_number_of_external_pointers_alive(){
     SEXP ans;
@@ -70,10 +110,14 @@ extern "C"{
 #include <R_ext/Rdynload.h>
   void LIB_UNLOAD(DllInfo *dll)
   {
-    for(int i=0;i<100;i++){
-      if(memory_manager.counter>0)R_gc();
+    if(memory_manager.counter>0)Rprintf("Warning: %d external pointers will be removed\n",memory_manager.counter);
+    memory_manager.clear();
+    for(int i=0;i<1000;i++){ // 122 seems to be sufficient.
+      if(memory_manager.counter>0){
+	R_gc();
+      }
     }
-    if(memory_manager.counter>0)error("Please clean up before unloading\n");
+    if(memory_manager.counter>0)error("Failed to clean. Please manually clean up before unloading\n");
   }
 #endif
 }
@@ -549,7 +593,7 @@ void finalize(SEXP x)
 {
   ADFunType* ptr=(ADFunType*)R_ExternalPtrAddr(x);
   if(ptr!=NULL)delete ptr;
-  memory_manager.CallCFinalizer();
+  memory_manager.CallCFinalizer(x);
 }
 
 
@@ -588,13 +632,13 @@ extern "C"
   {
     ADFun<double>* ptr=(ADFun<double>*)R_ExternalPtrAddr(x);
     if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer();
+    memory_manager.CallCFinalizer(x);
   }
   void finalizeparallelADFun(SEXP x)
   {
     parallelADFun<double>* ptr=(parallelADFun<double>*)R_ExternalPtrAddr(x);
     if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer();
+    memory_manager.CallCFinalizer(x);
   }
 
   /* Construct ADFun object */
@@ -634,7 +678,6 @@ extern "C"
       /* Convert parallel ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) ppf,mkChar("parallelADFun"),R_NilValue));
       R_RegisterCFinalizer(res,finalizeparallelADFun);
-      memory_manager.RegisterCFinalizer();
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
@@ -643,14 +686,12 @@ extern "C"
       PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
       setAttrib(res,install("range.names"),info);
       R_RegisterCFinalizer(res,finalizeADFun);
-      memory_manager.RegisterCFinalizer();
     }
 
     /* Return list of external pointer and default-parameter */
     SEXP ans;
-    PROTECT(ans=allocVector(VECSXP,2));
-    SET_VECTOR_ELT(ans,0,res);
-    SET_VECTOR_ELT(ans,1,par);
+    setAttrib(res,install("par"),par);
+    PROTECT(ans=ptrList(res));
     UNPROTECT(4);
 
     return ans;
@@ -718,7 +759,7 @@ extern "C"
   {
     objective_function<double>* ptr=(objective_function<double>*)R_ExternalPtrAddr(x);
     if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer();
+    memory_manager.CallCFinalizer(x);
   }
   
   SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report)
@@ -733,13 +774,12 @@ extern "C"
       new objective_function<double>(data,parameters,report);
     
     /* Convert DoubleFun pointer to R_ExternalPtr */
-    SEXP res;
+    SEXP res,ans;
     PROTECT(res=R_MakeExternalPtr((void*) pF,mkChar("DoubleFun"),R_NilValue));
     R_RegisterCFinalizer(res,finalizeDoubleFun);
-    memory_manager.RegisterCFinalizer();
-    UNPROTECT(1);
-
-    return res;
+    PROTECT(ans=ptrList(res));
+    UNPROTECT(2);
+    return ans;
   }
 
   
@@ -818,15 +858,12 @@ extern "C"
     SEXP res;
     PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
     R_RegisterCFinalizer(res,finalizeADFun);
-    memory_manager.RegisterCFinalizer();
 
-    /* Return list */
+    /* Return ptrList */
     SEXP ans;
-    PROTECT(ans=allocVector(VECSXP,2));
-    SET_VECTOR_ELT(ans,0,res);
-    SET_VECTOR_ELT(ans,1,par);
+    setAttrib(res,install("par"),par);
+    PROTECT(ans=ptrList(res));
     UNPROTECT(3);
-
     return ans;
   }
 }
@@ -884,15 +921,12 @@ extern "C"
     SEXP res;
     PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
     R_RegisterCFinalizer(res,finalizeADFun);
-    memory_manager.RegisterCFinalizer();
 
-    /* Return list */
+    /* Return ptrList */
     SEXP ans;
-    PROTECT(ans=allocVector(VECSXP,2));
-    SET_VECTOR_ELT(ans,0,res);
-    SET_VECTOR_ELT(ans,1,par);
+    setAttrib(res,install("par"),par);
+    PROTECT(ans=ptrList(res));
     UNPROTECT(3);
-
     return ans;
   }
 
@@ -1060,23 +1094,18 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
     //PROTECT(res=R_MakeExternalPtr((void*) H.pf,mkChar("ADFun"),R_NilValue));
     PROTECT(res=R_MakeExternalPtr((void*) H.pf,mkChar(tag),R_NilValue));
 
-
     //R_RegisterCFinalizer(res,finalizeADFun);
     R_RegisterCFinalizer(res,finalize<ADFunType>);
-    memory_manager.RegisterCFinalizer();
 
     /* Return list */
     SEXP ans;
-    PROTECT(ans=allocVector(VECSXP,4));
-    SET_VECTOR_ELT(ans,0,res);
-    SET_VECTOR_ELT(ans,1,par);
-    SET_VECTOR_ELT(ans,2,asSEXP(H.i));
-    SET_VECTOR_ELT(ans,3,asSEXP(H.j));
+    setAttrib(res,install("par"),par);
+    setAttrib(res,install("i"),asSEXP(H.i));
+    setAttrib(res,install("j"),asSEXP(H.j));
+    PROTECT(ans=ptrList(res));
     UNPROTECT(2);
     return ans;
 }
-
-
 
 
 extern "C"
