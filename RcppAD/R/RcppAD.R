@@ -62,8 +62,7 @@ updateCholesky <- function(L,H,t=0){
 ##'   \item \code{"Fun"} Run through the template with ordinary double-types.
 ##'   \item \code{"ADGrad"} Run through the template with nested AD-types and produce a stack of operations representing the objective function gradient.
 ##' }
-##' Each of these are represented by external pointers to c++ structures available in the environment \code{env} (those
-##' starting with ptr).
+##' Each of these are represented by external pointers to c++ structures available in the environment \code{env}.
 ##'
 ##' Further objects in the environment \code{env}:
 ##' \itemize{

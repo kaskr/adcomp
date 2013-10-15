@@ -145,7 +145,7 @@
   stack of operations representing the objective function
   gradient. } Each of these are represented by external
   pointers to c++ structures available in the environment
-  \code{env} (those starting with ptr).
+  \code{env}.
 
   Further objects in the environment \code{env}: \itemize{
   \item \code{validpar} Function defining the valid
