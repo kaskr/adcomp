@@ -14,7 +14,8 @@ Description: With this tool, a user should be able to quickly implement complex
     through BLAS and parallel user templates.
 License: GPL
 Depends:
-    Matrix(>= 1.0-1)
+    R (>= 3.0.0),
+    Matrix(>= 1.0-12)
 LinkingTo: Matrix
 Collate:
     'asmle.R'
