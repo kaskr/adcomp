@@ -657,9 +657,21 @@ openmp <- function(n=NULL){
 compile <- function(file,flags=cxxflags(file),safebounds=TRUE,safeunload=TRUE){
   if(!is.null(flags))flags0 = paste("CXXFLAGS=\"",flags,"\"")
   safeboundsflag <- if(safebounds)"-DRCPPAD_SAFEBOUNDS " else ""
-  libname <- sub("\\.[^\\.]*$","",file)
+  libname <- sub("\\.[^\\.]*$","",basename(file))
   unloadflag <- if(safeunload)paste0("-DLIB_UNLOAD=R_unload_",libname) else ""
   ppflags <- paste(safeboundsflag,unloadflag," ")
+  if(safeunload){
+    ## Check that libname is valid C entry.
+    valid <- c(letters[1:26],LETTERS[1:26],0:9,"_")
+    invalid <- setdiff(unique(strsplit(libname,"")[[1]]),valid)
+    if(length(invalid)>0){
+      cat("Your library name has invalid characters:\n")
+      print(invalid)
+      cat("It is recommended to replace invalid characters by underscore.\n")
+      cat("Alternatively compile with safeunload=FALSE (not recommended).\n")
+      stop()
+    }
+  }
   cmd <- paste("R CMD COMPILE CPPFLAGS=",
                "\"",
                ppflags,
