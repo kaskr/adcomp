@@ -630,7 +630,7 @@ isParallelTemplate <- function(file){
   length(grep("^[ ]*parallel_accumulator",code))>0
 }
 cxxflags <- function(file){
-  flags <- system("R CMD config CXXFLAGS",TRUE)
+  flags <- system("R CMD config CXXFLAGS",TRUE,FALSE,TRUE)
   if(rcppadOption("debug"))flags <- "-O0 -g"
   ## No portable way to get SHLIB_OPENMP_CXXFLAGS ?
   if(isParallelTemplate(file))flags <- paste(flags,"-fopenmp")
