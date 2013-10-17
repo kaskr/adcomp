@@ -682,12 +682,12 @@ compile <- function(file,flags=cxxflags(file),safebounds=TRUE,safeunload=TRUE){
                " ",
                file,sep="")
   if ( .Platform$OS.type == "windows" ) { ## No R CMD COMPILE on windows (why?)
-    cmd <- paste(system("R CMD config CXX",TRUE),
+    cmd <- paste(system("R CMD config CXX",TRUE,FALSE,TRUE),
                  paste0("-I",Sys.getenv("R_HOME"),"/include"),
                  "-DNDEBUG",
                  ppflags,
                  paste0("-I",system.file("include",package="RcppAD")),
-                 system("R CMD config CXXPICFLAGS",TRUE),
+                 system("R CMD config CXXPICFLAGS",TRUE,FALSE,TRUE),
                  flags,
                  "-c",
                  file,
