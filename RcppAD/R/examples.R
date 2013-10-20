@@ -7,7 +7,7 @@
 ##' @param clean Cleanup before compile?
 ##' @param exfolder Alternative folder with examples.
 ##' @param ... Passed to \code{compile}.
-runExample <- function(name=NULL,all=FALSE,thisR=FALSE,
+runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
                        clean=FALSE,exfolder=NULL,...){
   cwd <- getwd()
   on.exit(setwd(cwd))
@@ -30,7 +30,7 @@ runExample <- function(name=NULL,all=FALSE,thisR=FALSE,
   info <- strwrap(info, width = 60, exdent = M+4)
   info <- gsub("@"," ",info)
   if(all){
-    lapply(exnames,runExample,thisR=thisR)
+    lapply(exnames,runExample,thisR=thisR,clean=clean,...)
     return(NULL)
   }
   if(is.null(name)){

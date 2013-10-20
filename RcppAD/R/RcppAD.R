@@ -300,9 +300,9 @@ MakeADFun <- function(data,parameters,map=list(),
                      hessianrows=as.integer(rows),
                      sparsitypattern=as.integer(sparsitypattern),
                      rangecomponent=as.integer(rangecomponent),
-                     rangeweight=rangeweight,
-                     PACKAGE=DLL
-                     )
+                     rangeweight=rangeweight
+                     ),
+                   PACKAGE=DLL
                    )
       last.par <<- theta
       if(order==1)last.par1 <<- theta
@@ -629,13 +629,6 @@ isParallelTemplate <- function(file){
   length(grep("^[ ]*PARALLEL_",code))>0  ||
   length(grep("^[ ]*parallel_accumulator",code))>0
 }
-cxxflags <- function(file){
-  flags <- system("R CMD config CXXFLAGS",TRUE,FALSE,TRUE)
-  if(rcppadOption("debug"))flags <- "-O0 -g"
-  ## No portable way to get SHLIB_OPENMP_CXXFLAGS ?
-  if(isParallelTemplate(file))flags <- paste(flags,"-fopenmp")
-  flags
-}
 
 ##' Control number of openmp threads.
 ##'
@@ -649,19 +642,37 @@ openmp <- function(n=NULL){
 
 ##' Compile a c++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
 ##'
+##' RcppAD relies on R's built in functionality to create shared libraries independent on the platform.
+##' A template is compiled by \code{compile("template.cpp")}, which will call R's makefile with appropriate
+##' preprocessor flags.
 ##' @title Compile a c++ template to DLL suitable for MakeADFun.
 ##' @param file c++ file.
 ##' @param flags Character with compile flags.
 ##' @param safebounds Turn on preprocessor flag for bound checking?
 ##' @param safeunload Turn on preprocessor flag for safe DLL unloading?
-compile <- function(file,flags=cxxflags(file),safebounds=TRUE,safeunload=TRUE){
-  if(!is.null(flags))flags0 = paste("CXXFLAGS=\"",flags,"\"")
-  safeboundsflag <- if(safebounds)"-DRCPPAD_SAFEBOUNDS " else ""
+##' @param openmp Turn on openmp flag? Auto detected for parallel templates.
+##' @param ... Passed as Makeconf variables.
+compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
+                    openmp=isParallelTemplate(file),...){
+  ## Function to create temporary makevars
+  mvuser <- Sys.getenv("R_MAKEVARS_USER",NA)
+  if(!is.na(mvuser))on.exit(Sys.setenv(R_MAKEVARS_USER=mvuser))
+  makevars <- function(...){
+    file <- tempfile()
+    args <- unlist(list(...))
+    txt <- paste(names(args),args,sep="=")
+    if(!is.na(mvuser)){
+      if(file.exists(mvuser)){
+        txt <- c(readLines(mvuser),txt)
+      }
+    }
+    writeLines(txt,file)
+    Sys.setenv(R_MAKEVARS_USER=file)
+    file
+  }
+  ## Check that libname is valid C entry.
   libname <- sub("\\.[^\\.]*$","",basename(file))
-  unloadflag <- if(safeunload)paste0("-DLIB_UNLOAD=R_unload_",libname) else ""
-  ppflags <- paste(safeboundsflag,unloadflag," ")
   if(safeunload){
-    ## Check that libname is valid C entry.
     valid <- c(letters[1:26],LETTERS[1:26],0:9,"_")
     invalid <- setdiff(unique(strsplit(libname,"")[[1]]),valid)
     if(length(invalid)>0){
@@ -672,34 +683,22 @@ compile <- function(file,flags=cxxflags(file),safebounds=TRUE,safeunload=TRUE){
       stop()
     }
   }
-  cmd <- paste("R CMD COMPILE CPPFLAGS=",
-               "\"",
-               ppflags,
-               "-I",system.file("include",package="RcppAD"),
-               "\"",
-               " ",
-               flags0,
-               " ",
-               file,sep="")
-  if ( .Platform$OS.type == "windows" ) { ## No R CMD COMPILE on windows (why?)
-    cmd <- paste(system("R CMD config CXX",TRUE,FALSE,TRUE),
-                 paste0("-I",Sys.getenv("R_HOME"),"/include"),
-                 "-DNDEBUG",
-                 ppflags,
-                 paste0("-I",system.file("include",package="RcppAD")),
-                 system("R CMD config CXXPICFLAGS",TRUE,FALSE,TRUE),
-                 flags,
-                 "-c",
-                 file,
-                 "-o",
-                 gsub(".cpp",".o",file)
-                 )
-    cat(cmd,"\n")
-  }
-  system(cmd)
-  cmd <- paste("R CMD SHLIB",file)
-  system(cmd)
+  ## Includes and preprocessor flags specific for the template
+  ppflags <- paste(paste0("-I",system.file("include",package="RcppAD")),
+                   "-DRCPPAD_SAFEBOUNDS"[safebounds],
+                   paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload]
+                   )
+  ## Makevars specific for template
+  mvfile <- makevars(PKG_CPPFLAGS=ppflags,
+                     PKG_LIBS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
+                     PKG_CXXFLAGS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
+                     CXXFLAGS=flags[flags!=""], ## Optionally overwrite cxxflags
+                     ...
+                     )
+  on.exit(file.remove(mvfile))
+  tools:::.shlib_internal(file)
 }
+
 ## Add dynlib extension
 dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 

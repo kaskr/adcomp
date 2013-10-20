@@ -2,7 +2,7 @@
 \alias{runExample}
 \title{Run one of the test examples.}
 \usage{
-  runExample(name = NULL, all = FALSE, thisR = FALSE,
+  runExample(name = NULL, all = FALSE, thisR = TRUE,
     clean = FALSE, exfolder = NULL, ...)
 }
 \arguments{
