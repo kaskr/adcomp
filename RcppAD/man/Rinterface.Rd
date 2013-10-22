@@ -12,7 +12,7 @@
   template is ready.
 }
 \examples{
-file <- system.file("examples/simple.cpp", package = "RcppAD")
+file <- system.file("examples/simple.cpp", package = "TMB")
 Rinterface(file)
 }
 

@@ -1,5 +1,5 @@
 // Identical with random walk example. Utilizing sparse block structure so efficient when the number of states is high.
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 
 /* Parameter transform */
 template <class Type>

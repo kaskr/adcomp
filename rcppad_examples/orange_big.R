@@ -1,6 +1,6 @@
 # Scaled up version of the Orange Tree example (50,000 latent random variables)
 
-require(RcppAD)
+require(TMB)
 
 # Read data
 source("data_orange.R")

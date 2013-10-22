@@ -1,5 +1,5 @@
 // Random walk with multivariate correlated increments and measurement noise.
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 
 /* Parameter transform */
 template <class Type>

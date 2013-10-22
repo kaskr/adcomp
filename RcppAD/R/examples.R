@@ -11,7 +11,7 @@ runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
                        clean=FALSE,exfolder=NULL,...){
   cwd <- getwd()
   on.exit(setwd(cwd))
-  if(is.null(exfolder))exfolder <- system.file("examples",package="RcppAD")
+  if(is.null(exfolder))exfolder <- system.file("examples",package="TMB")
   setwd(exfolder)
   validExamples <- function(){
     f1 <- sub("\\.[^\\.]*$","",dir(pattern=".R$"))

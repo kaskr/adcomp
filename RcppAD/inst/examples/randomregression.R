@@ -10,7 +10,7 @@ x <- a[f]*t+b[f]+rnorm(n,mean=0,sd=1)
 if(FALSE){
   library(lattice);xyplot(x~t,group=f,type="l")
 }
-require(RcppAD)
+require(TMB)
 dyn.load(dynlib("randomregression"))
 
 ## Construct AD function object

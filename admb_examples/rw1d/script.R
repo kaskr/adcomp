@@ -33,8 +33,8 @@ t3=system.time(system("./rw -noinit -nohess -ilmn 5"))
 t4=system.time(system("./rw -noinit -nohess -lmn2 5"))
 
 
-library(RcppAD)
-setwd("../../rcppad_examples/")
+library(TMB)
+setwd("../../tmb_examples/")
 
 compile("rw1d.cpp")
 

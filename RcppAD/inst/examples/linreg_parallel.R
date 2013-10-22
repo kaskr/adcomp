@@ -1,4 +1,4 @@
-library(RcppAD)
+library(TMB)
 x <- seq(0,10,length=50001)
 data <- list(Y=rnorm(length(x))+x,x=x)
 parameters <- list(a=0,b=0,logSigma=0)

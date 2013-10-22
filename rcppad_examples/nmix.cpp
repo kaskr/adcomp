@@ -1,4 +1,4 @@
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 
 template<class Type>
 Type nll_group(int i, Type p0,Type p1,Type log_lambda, Type log_sigma, 

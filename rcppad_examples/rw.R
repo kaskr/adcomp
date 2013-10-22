@@ -30,7 +30,7 @@ simdata <- function(){
 stateDim=3
 timeSteps=100
 simdata()
-library(RcppAD)
+library(TMB)
 dyn.load("rw.so")
 data <- list(obs=t(obs))
 parameters <- list(

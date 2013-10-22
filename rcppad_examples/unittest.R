@@ -5,7 +5,7 @@
 ## for all examples.
 example <- Sys.getenv("example")
 ## ===============================================================
-library(RcppAD)
+library(TMB)
 
 if(example!=""){
   .timings <- list()
@@ -26,8 +26,8 @@ if(example!=""){
     }
     g
   }
-  MakeADFun <- addHook(RcppAD::MakeADFun,timer=TRUE)
-  sdreport <- addHook(RcppAD::sdreport,timer=TRUE,result=TRUE)
+  MakeADFun <- addHook(TMB::MakeADFun,timer=TRUE)
+  sdreport <- addHook(TMB::sdreport,timer=TRUE,result=TRUE)
   optim <- addHook(stats::optim,timer=TRUE,result=TRUE)
   nlminb <- addHook(stats::nlminb,timer=TRUE,result=TRUE)
   

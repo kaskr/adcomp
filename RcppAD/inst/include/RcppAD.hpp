@@ -1,13 +1,13 @@
 /* To be removed */
-#define RCPPAD_DEBUG 0
-#define RCPPAD_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
+#define TMB_DEBUG 0
+#define TMB_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
 
 /* Turn on debug for Eigen ? */
-#ifdef RCPPAD_SAFEBOUNDS
+#ifdef TMB_SAFEBOUNDS
 #undef NDEBUG
 #undef eigen_assert
 void eigen_Rprintf(const char* x);
-#define eigen_assert(x) if (!(x)) { eigen_Rprintf("RcppAD has received an error from Eigen. "); \
+#define eigen_assert(x) if (!(x)) { eigen_Rprintf("TMB has received an error from Eigen. "); \
                                   eigen_Rprintf("The following condition was not met:\n");          \
                                   eigen_Rprintf(#x);                                                \
                                   eigen_Rprintf("\nPlease check your matrix-vector bounds etc., "); \
@@ -78,7 +78,7 @@ static struct memory_manager_struct{
   }
 } memory_manager;
 
-/* All external pointers returned from RcppAD should be placed in a 
+/* All external pointers returned from TMB should be placed in a 
    list container of length one. Additional information should be set
    as attributes to the pointer. The memory_manager_struct above knows
    how to look up the list container given the external pointer. By 
@@ -1023,7 +1023,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   // point at which we are evaluating the Jacobian
   tmp2.Forward(0, xxx);
   for(int i = 0; i < n; i++){
-    // RCPPAD_PRINT(i);
+    // TMB_PRINT(i);
     /* ========== ORIGINAL
        v[i] = 1.0;
        u = tmp2.Reverse(1, v);
@@ -1138,7 +1138,7 @@ extern "C"
     //MakeADHessObject2_parallel(data, parameters, report, skip);
     //sphess H=MakeADHessObject2(data, parameters, report, skip, 10000/* -1*/);
     sphess H=MakeADHessObject2(data, parameters, report, skip, -1);
-    //RCPPAD_PRINT(H.pf->Range());
+    //TMB_PRINT(H.pf->Range());
     /* Get the default parameter vector */
     return asSEXP(H,"ADFun");
   }

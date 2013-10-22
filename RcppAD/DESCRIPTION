@@ -1,4 +1,4 @@
-Package: RcppAD
+Package: TMB
 Type: Package
 Title: General random effect model builder tool inspired by ADMB.
 Version: 1.0
@@ -21,7 +21,7 @@ Collate:
     'asmle.R'
     'examples.R'
     'options.R'
-    'RcppAD.R'
+    'TMB.R'
     'zzz.R'
     'config.R'
     'benchmark.R'

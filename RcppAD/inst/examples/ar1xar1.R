@@ -1,4 +1,4 @@
-require(RcppAD)
+require(TMB)
 set.seed(123)
 n <- 50 ## Size of problem = n*n
 

@@ -55,7 +55,7 @@ static struct config_struct{
 
 extern "C"
 {
-  SEXP RcppADconfig(SEXP envir, SEXP cmd){
+  SEXP TMBconfig(SEXP envir, SEXP cmd){
     config.cmd=INTEGER(cmd)[0];
     config.envir=envir;
     config.set();

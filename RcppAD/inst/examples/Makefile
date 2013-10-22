@@ -5,7 +5,7 @@ rfiles = $(basename $(wildcard *.R))
 cppfiles = $(basename $(wildcard *.cpp))
 
 .cpp:
-	echo "library(RcppAD);compile(\"$@.cpp\")" | R --vanilla
+	echo "library(TMB);compile(\"$@.cpp\")" | R --vanilla
 
 $(foreach doc,$(cppfiles),$(eval $(doc):$(doc).cpp))
 

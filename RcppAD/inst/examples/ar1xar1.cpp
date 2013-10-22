@@ -1,5 +1,5 @@
 // Separable covariance on lattice with AR1 structure in each direction.
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 
 /* Parameter transform */
 template <class Type>

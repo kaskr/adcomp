@@ -10,7 +10,7 @@ d$X=matrix(d$X,ncol=d$p,byrow=TRUE)
 
 group = as.factor(rep(1:d$M,each=4))
 
-library(RcppAD)
+library(TMB)
 
 compile("socatt.cpp")
 dyn.load("socatt.so")

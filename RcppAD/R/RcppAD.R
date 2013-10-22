@@ -340,8 +340,8 @@ MakeADFun <- function(data,parameters,map=list(),
       ##browser()
       e <- environment(spHess)
       ##require(lgc) ## solveSubset
-      solveSubset <- function(L).Call("lgc_invQ",L,PACKAGE="RcppAD")
-      solveSubset2 <- function(L).Call("lgc_invQ_tril_halfdiag",L,PACKAGE="RcppAD")
+      solveSubset <- function(L).Call("lgc_invQ",L,PACKAGE="TMB")
+      solveSubset2 <- function(L).Call("lgc_invQ_tril_halfdiag",L,PACKAGE="TMB")
       ## FIXME: The following two lines are not efficient:
       ## 1. ihessian <- tril(solveSubset(L))
       ## 2. diag(ihessian) <- .5*diag(ihessian)
@@ -365,7 +365,7 @@ MakeADFun <- function(data,parameters,map=list(),
         B@x[] <- seq.int(length.out=length(B@x)) ## Pointers to full B matrix (FIXME: what if length(B@x)>2^32 ? )
         B <- forceSymmetric(B)
         if(!is.null(r))B <- B[r,r] ## Reduce to have same dim as A
-        m <- .Call("match_pattern",A,B,PACKAGE="RcppAD") ## Same length as A@x with pointers to B@x
+        m <- .Call("match_pattern",A,B,PACKAGE="TMB") ## Same length as A@x with pointers to B@x
         B@x[m]
       }
       if(is.null(e$ind1)){
@@ -637,12 +637,12 @@ isParallelTemplate <- function(file){
 ##' @return Number of threads.
 openmp <- function(n=NULL){
   if(!is.null(n))n <- as.integer(n)
-  .Call("omp_num_threads",n,PACKAGE="RcppAD")
+  .Call("omp_num_threads",n,PACKAGE="TMB")
 }
 
 ##' Compile a c++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
 ##'
-##' RcppAD relies on R's built in functionality to create shared libraries independent on the platform.
+##' TMB relies on R's built in functionality to create shared libraries independent on the platform.
 ##' A template is compiled by \code{compile("template.cpp")}, which will call R's makefile with appropriate
 ##' preprocessor flags.
 ##' @title Compile a c++ template to DLL suitable for MakeADFun.
@@ -684,8 +684,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
     }
   }
   ## Includes and preprocessor flags specific for the template
-  ppflags <- paste(paste0("-I",system.file("include",package="RcppAD")),
-                   "-DRCPPAD_SAFEBOUNDS"[safebounds],
+  ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
+                   "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload]
                    )
   ## Makevars specific for template
@@ -755,7 +755,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##' @examples
 ##' template()
 template <- function(file=NULL){
-  x <- readLines(system.file("template.cpp",package="RcppAD"))
+  x <- readLines(system.file("template.cpp",package="TMB"))
   if(!is.null(file))writeLines(x,file)
   else cat(paste(x,collapse="\n"))
 }
@@ -765,10 +765,10 @@ template <- function(file=NULL){
 ##' @title Create minimal R-code corresponding to a cpp template.
 ##' @param file cpp template file.
 ##' @examples
-##' file <- system.file("examples/simple.cpp", package = "RcppAD")
+##' file <- system.file("examples/simple.cpp", package = "TMB")
 ##' Rinterface(file)
 Rinterface <- function(file){
-  cmd <- paste(system.file("Rinterface.sh",package="RcppAD"),file)
+  cmd <- paste(system.file("Rinterface.sh",package="TMB"),file)
   system(cmd)
 }
 
@@ -1035,7 +1035,7 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
       return(Hfull)
     } else {
       if(skipFixedEffects){
-        return( .Call("setxslot",Hrandom,ev(par),PACKAGE="RcppAD") )
+        return( .Call("setxslot",Hrandom,ev(par),PACKAGE="TMB") )
       }
       else {
         Hfull@x[] <- ev(par)

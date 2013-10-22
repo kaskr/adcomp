@@ -1,4 +1,4 @@
-require(RcppAD)
+require(TMB)
 dyn.load(dynlib("simple"))
 
 ## Test data

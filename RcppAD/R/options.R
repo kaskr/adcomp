@@ -1,4 +1,4 @@
-## Global options specific for RcppAD
+## Global options specific for TMB
 .optionEnv <- new.env()
 
 ## ========================== Option defaults
@@ -29,21 +29,21 @@ newtonDefaults <- function(){
 }
 flagsDefaults <- function(){
   function(file){
-    if(RcppADisParallel(file)) "-O2 -fopenmp" else NULL
+    if(TMBisParallel(file)) "-O2 -fopenmp" else NULL
   }
 }
 
 ## =========================== Options extract + modify
-rcppadOption <- function(x).optionEnv[[x]]
-## rcppadOption <- function().GlobalEnv$.rcppadOption
+tmbOption <- function(x).optionEnv[[x]]
+## tmbOption <- function().GlobalEnv$.tmbOption
 newtonOption <- function(...){
   x <- list(...)
   y <- .optionEnv$newton
-  ##y <- .GlobalEnv$.rcppadOption$newton
+  ##y <- .GlobalEnv$.tmbOption$newton
   if(length(x)==0)return(y)
   if(length(x)==1 & is.character(x[[1]]))return(y[[x[[1]]]])
   y[names(x)] <- x
-  ##.GlobalEnv$.rcppadOption$newton <<- y
+  ##.GlobalEnv$.tmbOption$newton <<- y
   .optionEnv$newton <- y
   NULL
 }

@@ -107,8 +107,8 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     veci.resize(kmax);vecj.resize(kmax);
     vector<int> pos(n); /* keep track of positions in individual index vectors */
     for(int i=0;i<n;i++){pos(i)=0;};
-    RCPPAD_PRINT(pos);
-    for(int i=0;i<n;i++){RCPPAD_PRINT(vecind(i).size());};
+    TMB_PRINT(pos);
+    for(int i=0;i<n;i++){TMB_PRINT(vecind(i).size());};
     vector<size_t> value(n); /* value corresponding to pos */
     int k=0; /* Incremented for each unique value */
     size_t m; /* Hold current minimum value */

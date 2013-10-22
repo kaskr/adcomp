@@ -1,4 +1,4 @@
-echo "library(RcppAD)"
+echo "library(TMB)"
 echo "dyn.load(\"$1\")" | sed s/\.cpp/\.so/g
 echo "MakeADFun("
 echo " data=list("

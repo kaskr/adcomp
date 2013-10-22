@@ -38,7 +38,7 @@ matpoints(obs);
 ## cat(timeSteps,"\n",file="mvrw.dat");
 ## cat(stateDim,"\n",file="mvrw.dat",append=TRUE);
 ## write.table(obs,file="mvrw.dat",append=TRUE,row.names=FALSE,col.names=FALSE)
-library(RcppAD)
+library(TMB)
 dyn.load(dynlib("rw"))
 data <- list(obs=t(obs))
 parameters <- list(

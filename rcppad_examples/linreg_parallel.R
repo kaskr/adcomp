@@ -1,4 +1,4 @@
-library(RcppAD)
+library(TMB)
 set.seed(123)
 x <- seq(0,10,length=50001)
 data <- list(Y=rnorm(length(x))+x,x=x)

@@ -1,4 +1,4 @@
-require(RcppAD)
+require(TMB)
 
 #Modified to read files that I can run with ADMB
 
@@ -7,7 +7,7 @@ source("spatial_data.R")
 
 dd = sqrt(outer(Z[,1],Z[,1],"-")^2 + outer(Z[,2],Z[,2],"-")^2)	
 
-library(RcppAD)
+library(TMB)
 compile("spatial.cpp")
 dyn.load("spatial.so")
 obj <- MakeADFun(data=list(n=100,y=y,X=X,dd=dd),

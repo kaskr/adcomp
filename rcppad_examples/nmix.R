@@ -6,7 +6,7 @@ data$IDind <- matrix(data$IDind,data$R,data$T,byrow=TRUE)
 data$y <- matrix(data$y,data$R,data$T,byrow=TRUE)
 data$IDind <- data$IDind-1
 data$ID <- factor(data$ID)
-library(RcppAD)
+library(TMB)
 compile("nmix.cpp")
 parameters <- list(
                    log_lambda=4,

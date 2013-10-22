@@ -29,7 +29,7 @@ simdata <- function(){
 }
 
 ## Performance analysis in case 1000 timesteps and 10 states
-library(RcppAD)
+library(TMB)
 stateDim=10
 timeSteps=1000
 simdata()

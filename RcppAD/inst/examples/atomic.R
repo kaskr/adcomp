@@ -1,4 +1,4 @@
-require(RcppAD)
+require(TMB)
 dyn.load(dynlib("atomic"))
 n <- 2;N <- 100
 obj <- MakeADFun(type=c("ADFun","Fun"),

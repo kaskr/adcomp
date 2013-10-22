@@ -1,5 +1,5 @@
 // Scaled up version of the Orange Tree example (50,000 latent random variables)
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 
 template<class Type>
 Type objective_function<Type>::operator() ()

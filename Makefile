@@ -1,4 +1,4 @@
-PACKAGE=RcppAD
+PACKAGE=TMB
 VERSION=1.0
 TARBALL=${PACKAGE}_${VERSION}.tar.gz
 ZIPFILE=${PACKAGE}_${VERSION}.zip
@@ -28,4 +28,4 @@ check:
 	R CMD check $(PACKAGE)
 
 unlock:
-	rm -rf ${R_LIBS}/00LOCK-RcppAD
+	rm -rf ${R_LIBS}/00LOCK-TMB

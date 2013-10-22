@@ -1,5 +1,5 @@
 // Demonstrate user specified atomic functions (parallel version).
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 #include <atomic_macro.hpp>
 
 template<class Type>

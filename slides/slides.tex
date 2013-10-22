@@ -31,8 +31,8 @@
 \usepackage[T1]{fontenc}
 
 
-\title[RcppAD]
-{A comparison between ADMB \& RcppAD}
+\title[TMB]
+{A comparison between ADMB \& TMB}
 
 \author[K. Kristensen, A. Nielsen, C.W. Berg ]% [Author, Another] % (optional, use only with lots of authors)
 {Kasper Kristensen, Anders Nielsen, Casper W. Berg}
@@ -47,7 +47,7 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{RcppAD Intro}
+\frametitle{TMB Intro}
 
 \begin{itemize}
   \item ADMB inspired R-package
@@ -92,7 +92,7 @@ nll=0.5*(N*log(2*M_PI*sigmasq)
     \begin{column}{0.5\textwidth} 
    \tiny{
     \begin{verbatim}
-#include <RcppAD.hpp>
+#include <TMB.hpp>
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
