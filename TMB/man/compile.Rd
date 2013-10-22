@@ -27,9 +27,9 @@
   flag is set if the template is detected to be parallel.
 }
 \details{
-  TMB relies on R's built in functionality to create
-  shared libraries independent on the platform. A template
-  is compiled by \code{compile("template.cpp")}, which will
+  TMB relies on R's built in functionality to create shared
+  libraries independent on the platform. A template is
+  compiled by \code{compile("template.cpp")}, which will
   call R's makefile with appropriate preprocessor flags.
 }
 
