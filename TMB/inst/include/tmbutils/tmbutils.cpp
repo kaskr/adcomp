@@ -1,4 +1,4 @@
-namespace my{
+namespace tmbutils{
 //#include <Eigen/Dense>
 using namespace Eigen;
 #include "vector.cpp"
@@ -43,7 +43,7 @@ array<Type> asArray(SEXP x)
    sparse precision matrices.
 */
 namespace density{
-  using namespace my;
+  using namespace tmbutils;
 #include "kronecker.cpp"
 #include "matexp.cpp"
   //#include "spmat.cpp"

@@ -358,7 +358,7 @@ namespace ns_name{							\
 // }									
 
 
-/* Frontend + wrapper my::vector->CppAD::vector*/
+/* Frontend + wrapper tmbutils::vector->CppAD::vector*/
 #define ATOMIC_FRONTEND(function_name,Base,ns_name)	\
   CppAD::vector<CppAD::AD<Base > > function_name	\
   (CppAD::vector<CppAD::AD<Base > > x){			\
@@ -366,15 +366,15 @@ namespace ns_name{							\
   ns_name::fun(0,x,y);					\
   return y;						\
 }							\
-my::vector<CppAD::AD<Base > > function_name		\
-  (my::vector<CppAD::AD<Base > > x){			\
-    return my::vector<CppAD::AD<Base > >(function_name(	\
+tmbutils::vector<CppAD::AD<Base > > function_name		\
+  (tmbutils::vector<CppAD::AD<Base > > x){			\
+    return tmbutils::vector<CppAD::AD<Base > >(function_name(	\
     CppAD::vector<CppAD::AD<Base > >(x)));		\
 }									
 
 
 
-/* Trigger tape-generation + wrapper my::vector->CppAD::vector*/
+/* Trigger tape-generation + wrapper tmbutils::vector->CppAD::vector*/
 #define AD1 CppAD::AD<double>
 #define AD2 CppAD::AD<CppAD::AD<double> >
 #define ATOMIC_TRIGGER(function_name,ns_name,ns2,ns3)			\
@@ -395,9 +395,9 @@ CppAD::vector<double> function_name(CppAD::vector<double> x){		\
   }									\
   return y;								\
 }									\
-my::vector<double > function_name					\
-(my::vector<double > x){						\
-  return my::vector<double >(function_name(CppAD::vector<double >(x))); \
+tmbutils::vector<double > function_name					\
+(tmbutils::vector<double > x){						\
+  return tmbutils::vector<double >(function_name(CppAD::vector<double >(x))); \
 }									
 
 
@@ -464,6 +464,6 @@ ATOMIC_TRIGGER(function_name,atomic,atomic2,atomic3)
 ATOMIC_FUNCTION(function_name,					\
 template<class Type>						\
 CppAD::vector<Type> function_name(CppAD::vector<Type> x){	\
-  return ::function_name(my::vector<Type>(x));			\
+  return ::function_name(tmbutils::vector<Type>(x));			\
 })
 

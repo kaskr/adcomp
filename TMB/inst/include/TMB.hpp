@@ -28,9 +28,9 @@ void eigen_Rprintf(const char* x){Rprintf(x);}
 #define NDEBUG 1
 #include "cppad/cppad.hpp"
 #undef NDEBUG
-#include "my/my.cpp"
-using my::matrix;
-using my::vector;
+#include "tmbutils/tmbutils.cpp"
+using tmbutils::matrix;
+using tmbutils::vector;
 using CppAD::AD;
 using CppAD::ADFun;
 #include "convert.hpp" // asSEXP, asMatrix, asVector
@@ -155,16 +155,16 @@ struct isDouble<double>{
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
         getListElement(objective_function::data,#name)));
 #define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
-#define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(my::asSparseMatrix<Type>( \
+#define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>( \
         getListElement(objective_function::data,#name)));
 // REPORT() construct new SEXP so never report in parallel!
 #define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
                         defineVar(install(#name),asSEXP(name),objective_function::report);}
 #define ADREPORT(name) objective_function::reportvector.push(name,#name);
 #define PARALLEL_REGION if(this->parallel_region())
-#define DATA_ARRAY(name) my::array<Type> name(my::asArray<Type>(	\
+#define DATA_ARRAY(name) tmbutils::array<Type> name(tmbutils::asArray<Type>(	\
         getListElement(objective_function::data,#name)));	
-#define PARAMETER_ARRAY(name) my::array<Type> name(objective_function::fillShape(my::asArray<Type>(objective_function::getShape(#name)),#name));
+#define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name)),#name));
 
 
 // kasper: Not sure used anywhere
