@@ -119,7 +119,7 @@ private:
 	// Hessian information
 	// ----------------------------------------------------------------------
 	/// Sparsity pattern for Hessian of Lagragian
-	/// \f[ L(x) = \sigma \sum_i f_i (x) + \sum_i \lambad_i  g_i (x) \f]
+	/// \f[ L(x) = \sigma \sum_i f_i (x) + \sum_i \lambda_i  g_i (x) \f]
 	/// If sparse is true, this pattern set by constructor and does not change.
 	/// Otherwise this vector has size zero.
 	CppAD::vector< std::set<size_t> > pattern_hes_;

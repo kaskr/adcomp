@@ -1,3 +1,9 @@
+/**
+   \file density.cpp
+   Classes to construct multivariate Gaussian density objects.
+*/
+
+
 #define TYPEDEFS(scalartype_)			\
 public:						\
 typedef scalartype_ scalartype;			\
@@ -7,25 +13,18 @@ typedef array<scalartype> arraytype;
 
 #define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){};
 
-#define PRINT(x)std::cout << #x << ": \n" << x << "\n"; std::cout.flush();
-#define PRINT2x2(A) PRINT(A(0,0)) PRINT(A(0,1)) PRINT(A(1,0)) PRINT(A(1,1))
+/** \brief Multivariate normal distribution with unstructered covariance matrix
 
-// #define PRINT(x)PRINTT(#x, x);
-// template <class Ty>
-// void PRINTT(const char* c, Ty x){};
-// //template <>
-// void PRINTT(const char* c, AD<double> &x){CppAD::PrintFor(c, x);};
-
-/* ============================ MVNORM CLASS ============================
-   Class to evaluate the negative log density of a multivariate 
-   Gaussian variable with general covariance matrix Sigma.
-   Intended for small dense covariance matrices.
-*/   
+    Class to evaluate the negative log density of a mean zero
+    multivariate Gaussian variable with general covariance matrix Sigma.
+    Intended for small dense covariance matrices.
+*/
 template <class scalartype_>
 class MVNORM_t{
   TYPEDEFS(scalartype_);
   scalartype logdetQ;
-  matrixtype L; /* Lower cholesky of _covariance_ */
+  /** Lower cholesky of _covariance_ */
+  matrixtype L; 
   matrixtype Sigma; /* Keep for convenience - not used */
 public:
   MVNORM_t(){}
@@ -33,7 +32,7 @@ public:
     setSigma(Sigma_);
   }
 
-  /* Covariance extractor */
+  /** \brief Covariance extractor */
   matrixtype cov(){return Sigma;}
 
   /* Lower triangular L: A=LL' */
@@ -96,6 +95,7 @@ public:
     vectortype u=lsolve(L,x);
     return (u*u).sum();
   }
+  /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
@@ -110,9 +110,12 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> x){
   return MVNORM_t<scalartype>(x);
 }
 
-/* ============================ UNSTRUCTURED_CORR CLASS ==================
+/** \brief Multivariate normal distribution with unstructered correlation matrix
+
    Class to evaluate the negative log density of a multivariate Gaussian 
    variable with unstructured symmetric positive definite correlation matrix.
+
+   \verbatim
    NOTE:
    o Parameterized via lower triangular matrix i.e. (n*n-n)/2 parameters 
      where n is the dimension of the covariance matrix. Example
@@ -121,6 +124,7 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> x){
         [x1 x2 1]
 
    o The correlation matrix is available through member "Sigma".
+   \endverbatim
 */   
 template <class scalartype_>
 class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
@@ -154,15 +158,19 @@ UNSTRUCTURED_CORR_t<scalartype> UNSTRUCTURED_CORR(vector<scalartype> x){
   return UNSTRUCTURED_CORR_t<scalartype>(x);
 }
 
-/* ============================ N01 CLASS ============================
-   Class to evaluate the negative log density of a (multivariate)
-   standard normal distribution.
-   Examples: N01()
+/** \brief Standardized normal distribution
+
+    Class to evaluate the negative log density of a (multivariate)
+    standard normal distribution.
+    \verbatim
+    Examples: N01()
+    \endverbatim
 */   
 template<class scalartype_> 
 class N01{
   TYPEDEFS(scalartype_);
 public:
+  /** \brief Evaluate the negative log density */
   scalartype operator()(array<scalartype> x){
     return (x*x*.5 + log(sqrt(2.0*M_PI)) ).sum() ;
   }
@@ -171,15 +179,19 @@ public:
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
 
-/* ============================ AR1 CLASS ============================
-   Class to evaluate the negative log density of a (multivariate) AR1
-   process with parameter phi and given marginal distribution.
-   phi:      Scalar -1<phi<1
-   MARGINAL: The desired (multivariate) marginal mean-zero normal 
-   distribution. The increment distribution is automatically adapted
-   to obtain the desired marginal.
-   Examples: AR1(phi)  <-- simple mean zero variance 1 ar1 process.
-             AR1(phi1,AR1(phi2)) <-- ar1 with ar1 increments
+/** \brief Stationary AR1 process
+
+    Class to evaluate the negative log density of a (multivariate) AR1
+    process with parameter phi and given marginal distribution.
+    @param phi       Scalar -1<phi<1
+    @tparam MARGINAL The desired (multivariate) marginal mean-zero normal 
+    distribution. The increment distribution is automatically adapted
+    to obtain the desired marginal.
+    \verbatim
+    Examples: 
+    AR1(phi)  <-- simple mean zero variance 1 ar1 process.
+    AR1(phi1,AR1(phi2)) <-- ar1 with ar1 increments
+    \endverbatim
 */   
 template <class distribution>
 class AR1_t{
@@ -190,8 +202,7 @@ private:
 public:
   AR1_t(){/*phi=phi_;MARGINAL=f_;*/}
   AR1_t(scalartype phi_, distribution f_){phi=phi_;MARGINAL=f_;}
-  /* Calculate density */
-  //template<class arraytype>
+  /** \brief Evaluate the negative log density */
   scalartype operator()(arraytype x){
     scalartype value;
     value=scalartype(0);
@@ -229,24 +240,28 @@ AR1_t<N01<scalartype> > AR1(scalartype phi_){
 }
 
 
-/* ============================ ARk CLASS ============================
-   Class to evaluate the negative log density of a stationary 
-   AR(k)-process with parameter vector phi=[phi_1,...,phi_k]:
-      
-          x[t]=phi_1*x[t-1]+...+phi_k*x[t-k]+eps[t]
+/** \brief Stationary AR(k) process.
 
-   where eps[t]~N(0,sigma^2). The parameter sigma^2 is chosen to 
-   obtain V(x[t])=1 so that the class actually specifies a correlation
-   model.
+    @param phi_ Vector of length k with parameters.
 
-   Examples: ARk(phi)  <-- simple mean zero variance 1 AR(k) process.
+    \verbatim
+    Class to evaluate the negative log density of a stationary 
+    AR(k)-process with parameter vector phi=[phi_1,...,phi_k]:
+    
+    x[t]=phi_1*x[t-1]+...+phi_k*x[t-k]+eps[t]
 
-   Steady state initial distribution is found by (e.g. k=3)
+    where eps[t]~N(0,sigma^2). The parameter sigma^2 is chosen to 
+    obtain V(x[t])=1 so that the class actually specifies a correlation
+    model.
 
-   [gamma(1)]    [gamma(0) gamma(1) gamma(2)]     [phi1]
-   [ ....   ] =  [gamma(1) gamma(0) gamma(1)]  *  [phi2]
-   [gamma(3)]    [gamma(2) gamma(1) gamma(0)]     [phi3]
+    Examples: ARk(phi)  <-- simple mean zero variance 1 AR(k) process.
 
+    Steady state initial distribution is found by (e.g. k=3)
+
+    [gamma(1)]    [gamma(0) gamma(1) gamma(2)]     [phi1]
+    [ ....   ] =  [gamma(1) gamma(0) gamma(1)]  *  [phi2]
+    [gamma(3)]    [gamma(2) gamma(1) gamma(0)]     [phi3]
+    \endverbatim
 
 */   
 template <class scalartype_>
@@ -303,7 +318,10 @@ public:
     logdetQ0=scalartype(0);
     for(int i=0;i<k;i++)logdetQ0+=scalartype(2)*log(L(i,i));
   }
-  /* Covariance extractor */
+  /** \brief Covariance extractor. 
+      Run Youle-Walker recursions and return a vector of length n representing
+      the auto-covariance function.
+  */
   vectortype cov(int n){
     vectortype rho(n);
     for(int i=0;i<n;i++){
@@ -318,6 +336,7 @@ public:
     return rho;
   }
 
+  /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
     if(x.size()<k)std::cout << "AR(k) density requires vector length at least k\n";
     scalartype value=0;
@@ -359,11 +378,22 @@ public:
 };
 
 
-/* ======================== contAR2 CLASS ============================
-   Process with covariance satisfying the 2nd order ode 
-   rho''=c1*rho'-rho on an arbitrary irregular grid. 
-   (shape=c1/2, -1<shape<1). Initial condition rho(0)=1, rho'(0)=0,
-   rho''(0)=-1. 
+/** \brief Continuous AR(2) process
+
+    \verbatim
+    Process with covariance satisfying the 2nd order ode 
+    rho''=c1*rho'-rho on an arbitrary irregular grid. 
+    (shape=c1/2, -1<shape<1). Initial condition rho(0)=1, rho'(0)=0,
+    rho''(0)=-1.
+    \endverbatim
+    
+    Process is augmented with derivatives in order to obtain exact sparseness
+    of the full precision. That is, if a model is desired on a grid of size n,
+    then additional n extra nuisance parameters must be supplied.
+    
+    @param grid_ Possibly irregular grid of length n
+    @param shape_ Parameter defining the shape of the correlation function.
+    @param scale_ Parameter defining the correlation range.  
 */
 template <class scalartype_>
 class contAR2_t{
@@ -416,7 +446,8 @@ public:
     for(int i=0;i<4;i++)ans(i)=tmp(i);
     return ans;
   }
-  /* Calculate density */
+  /** \brief Evaluate the negative log density of the process x with 
+      nuisance parameters dx */
   scalartype operator()(vectortype x,vectortype dx){
     matrix2x1 y, y0;
     scalartype ans;
@@ -611,8 +642,12 @@ GMRF1_t<scalartype> GMRF1(arraytype x, scalartype delta, int order=1){
   return GMRF1_t<scalartype>(x, d, order);
 }
 
-/* ======================== SCALE CLASS ============================
-   Apply scale transformation on a density
+/** \brief Apply scale transformation on a density
+
+    Assume x has density f. Construct the density of y=scale*x where scale is a scalar.
+
+    @param f_ distribution
+    @param scale_ scalar
 */ 
 template <class distribution>
 class SCALE_t{
@@ -623,8 +658,7 @@ private:
 public:
   SCALE_t(){}
   SCALE_t(distribution f_, scalartype scale_){scale=scale_;f=f_;}
-  /* Calculate density */
-  //template<class arraytype>
+  /** \brief Evaluate the negative log density */
   scalartype operator()(arraytype x){
     scalartype ans=f(x/scale);
     ans+=x.size()*log(scale);
@@ -643,8 +677,12 @@ SCALE_t<distribution> SCALE(distribution f_, scalartype scale_){
   return SCALE_t<distribution>(f_,scale_);
 }
 
-/* ======================== VECTOR SCALE CLASS ======================
-   Apply vector scale transformation on a density
+/** \brief Apply a vector scale transformation on a density
+
+    Assume x has density f. Construct the density of y=scale*x where scale is a vector.
+
+    @param f_ distribution
+    @param scale_ vector
 */ 
 template <class distribution>
 class VECSCALE_t{
@@ -655,7 +693,7 @@ private:
 public:
   VECSCALE_t(){}
   VECSCALE_t(distribution f_, vectortype scale_){scale=scale_;f=f_;}
-  /* Calculate density */
+  /** \brief Evaluate the negative log density */
   scalartype operator()(arraytype x){
     // assert that x.size()==scale.size()
     scalartype ans=f(x/scale);

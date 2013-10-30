@@ -1,5 +1,16 @@
-/* Matrix vector templates using inheritance  */
+/**
+   \file vector.cpp
+   Matrix vector templates using inheritance.
+*/
+
 using namespace Eigen;
+
+/** \brief Vector class used by TMB.
+
+    The TMB vector class is implemented as an Eigen Array of
+    dynamic length. In particular, vectorized operations are inherited
+    from the Eigen library.
+*/
 template <class Type>
 struct vector : Array<Type,Dynamic,1>
 {
@@ -61,7 +72,12 @@ struct vector : Array<Type,Dynamic,1>
   }
 };
 
+/** \brief Matrix class used by TMB.
 
+    The TMB matrix class is implemented as an Eigen Matrix of
+    dynamic dimension. In particular, linear algebra methods are inherited
+    from the Eigen library.
+*/
 template <class Type>
 struct matrix : Matrix<Type,Dynamic,Dynamic>
 {
@@ -79,6 +95,9 @@ struct matrix : Matrix<Type,Dynamic,Dynamic>
     return *this;
   }
 
+  /**
+     The vec operator stacks the matrix columns into a single vector.
+  */
   vector<Type> vec(){
     vector<Type> x(this->size());
     for(int i=0;i<x.size();i++)x[i]=this->operator()(i);

@@ -38,6 +38,10 @@ array<Type> asArray(SEXP x)
 
 } // End namespace
 
+/** 
+   \brief Namespace to construct multivariate gaussian density objects with 
+   sparse precision matrices.
+*/
 namespace density{
   using namespace my;
 #include "kronecker.cpp"
