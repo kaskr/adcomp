@@ -1,9 +1,17 @@
+/** 
+   \brief Namespace of utility functions for TMB
+*/
 namespace tmbutils{
 //#include <Eigen/Dense>
 using namespace Eigen;
 #include "vector.cpp"
 #include "array.cpp"
 #include "spmat.cpp"
+
+#include "kronecker.cpp"
+#include "matexp.cpp"
+#include "splines.cpp"
+#include "order.cpp"
 
 template<class Type, class T1, class T2>
 vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
@@ -44,10 +52,5 @@ array<Type> asArray(SEXP x)
 */
 namespace density{
   using namespace tmbutils;
-#include "kronecker.cpp"
-#include "matexp.cpp"
-  //#include "spmat.cpp"
 #include "density.cpp"
-#include "splines.cpp"
-#include "order.cpp"
 } // End namespace
