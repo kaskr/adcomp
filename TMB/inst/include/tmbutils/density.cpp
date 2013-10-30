@@ -204,14 +204,40 @@ public:
     Class to evaluate the negative log density of a (multivariate) AR1
     process with parameter phi and given marginal distribution.
     @param phi       Scalar -1<phi<1
-    @tparam MARGINAL The desired (multivariate) marginal mean-zero normal 
-    distribution. The increment distribution is automatically adapted
-    to obtain the desired marginal.
-    \verbatim
-    Examples: 
-    AR1(phi)  <-- simple mean zero variance 1 ar1 process.
-    AR1(phi1,AR1(phi2)) <-- ar1 with ar1 increments
-    \endverbatim
+    @tparam MARGINAL The desired (multivariate) marginal distribution.
+
+    Let \f$f(x)\f$ denote a multivariate Gaussian mean-zero negative log density
+    represented by its covariance matrix \f$\Sigma\f$. Define recursively the vectors
+    \f[x_0\sim N(0,\Sigma)\f]
+    \f[x_1 = \phi x_0 + \varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\sigma\Sigma)\f]
+    \f[x_i = \phi x_{i-1} + \varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\sigma\Sigma)\f]
+    where \f$\sigma=\sqrt{1-\phi^2}\f$. Then \f$E(x_i)=0\f$, \f$V(x_i)=\Sigma\f$ and the covariance
+    is \f$E(x_ix_j')=\phi^{|i-j|}\Sigma\f$. We refer to this process as a stationary 1st order
+    autoregressive process with multivariate increments with parameter phi and marginal distribution f.
+    Compactly denoted AR1(phi,f).
+
+    Note that the construction can be carried out recursively, as "AR1(phi,f)" is itself a distribution
+    that can be used as input to AR1(). See example below:
+    \code
+    \\ Construct negative log density of standard AR1 process on a line:
+    Type phi1=0.8;
+    AR1_t<N01<Type> > f1(phi1);
+    \\ Can be evaluated on a vector:
+    vector<Type> x(10);
+    Type ans=f1(x);
+    \endcode
+
+    Now use f1 as marginal in a new AR1 process with parameter phi2:
+
+    \code
+    \\ Construct negative log density of standard AR1 process on a line:
+    Type phi2=0.5;
+    AR1_t<AR1_t<N01<Type> > > f2(phi1,f1);
+    \\ Can be evaluated on a 2-dimensional array:
+    vector<Type> x(10,20);
+    Type ans=f2(x);
+    \endcode
+
 */   
 template <class distribution>
 class AR1_t{
