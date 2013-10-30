@@ -763,25 +763,44 @@ VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
 }
 
 
-/* ======================== SEPARABLE EXTENSION CLASS =============
-   Take two densities and construct the density of their separable 
-   extension.
-   More precisely: evaluate density 
-   h(x)=|S/(2*pi)|^.5*exp(-.5*x'*S*x) 
-   where S=kronecker(Q,R)=Q%x%R assuming we have access to densities
-   f(x)=|Q/(2*pi)|^.5*exp(-.5*x'*Q*x)
-   g(x)=|R/(2*pi)|^.5*exp(-.5*x'*R*x)
-   Let nq=nrow(Q) and nr=nrow(R),
-   using rules of the kronecker product we have that
-   * Quadratic form = .5*x'*S*x = .5*x'*(Q%x%I)*(I%x%R)*x 
-   * Normalizing constant = 
-     |S/(2*pi)|^.5 = 
-     |(Q/sqrt(2*pi))%x%(R/sqrt(2*pi))|^.5 =
-     |(Q/sqrt(2*pi))|^(nr*.5) |(R/sqrt(2*pi))|^(nq*.5) =
-     ... something that can be expressed through the normalizing
-     constants f(0) and g(0) ...
-     f(0)^nr * g(0)^nq * sqrt(2*pi)^(nq*nr)
-     
+/** \brief Separable extension of two densitites
+
+    Take two densities and construct the density of their separable
+    extension, defined as the multivariate Gaussian distribution
+    with covariance matrix equal to the kronecker product between
+    the covariance matrices of the two distributions.
+
+    \verbatim
+    More precisely: evaluate density 
+    h(x)=|S/(2*pi)|^.5*exp(-.5*x'*S*x) 
+    where S=kronecker(Q,R)=Q%x%R assuming we have access to densities
+    f(x)=|Q/(2*pi)|^.5*exp(-.5*x'*Q*x)
+    g(x)=|R/(2*pi)|^.5*exp(-.5*x'*R*x)
+    Let nq=nrow(Q) and nr=nrow(R),
+    using rules of the kronecker product we have that
+    * Quadratic form = .5*x'*S*x = .5*x'*(Q%x%I)*(I%x%R)*x 
+    * Normalizing constant = 
+    |S/(2*pi)|^.5 = 
+    |(Q/sqrt(2*pi))%x%(R/sqrt(2*pi))|^.5 =
+    |(Q/sqrt(2*pi))|^(nr*.5) |(R/sqrt(2*pi))|^(nq*.5) =
+    ... something that can be expressed through the normalizing
+    constants f(0) and g(0) ...
+    f(0)^nr * g(0)^nq * sqrt(2*pi)^(nq*nr)
+    \endverbatim
+
+    Example:
+    \code
+    // Separable extension of two AR1 processes
+    Type phi1=0.8;
+    AR1_t<N01<Type> > f(phi1);
+    Type phi2=0.8;
+    AR1_t<N01<Type> > g(phi2);
+    SEPARABLE_t<AR1_t<N01<Type> > , AR1_t<N01<Type> > > h(f,g);
+    // Can be evaluated on an array:
+    array<Type> x(10,20);
+    Type ans=h(x);
+    \endcode
+
 */ 
 //template <class scalartype, class vectortype, class arraytype, class distribution1, class distribution2>
 template <class distribution1, class distribution2>
