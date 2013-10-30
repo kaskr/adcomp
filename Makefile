@@ -29,3 +29,11 @@ check:
 
 unlock:
 	rm -rf ${R_LIBS}/00LOCK-TMB
+
+.PHONY: dox
+dox:
+	cd dox; doxygen
+
+dox-clean:
+	cd dox; rm -rf html latex
+
