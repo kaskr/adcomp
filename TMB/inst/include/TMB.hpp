@@ -139,31 +139,46 @@ struct isDouble<double>{
 };
 
 /* Macros to obtain data and parameters from R */
+
+/** \brief Get parameter matrix from R and declare it as matrix<Type> */
 #define PARAMETER_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
         getListElement(objective_function::parameters,#name)));		\
         objective_function::fill(name,#name);
+/** \brief Get parameter vector from R and declare it as vector<Type> */
 #define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name)),#name));
+/** \brief Get parameter scalar from R and declare it as Type */
 #define PARAMETER(name) Type name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name)),#name)[0]);
+/** \brief Get data vector from R and declare it as vector<Type> */
 #define DATA_VECTOR(name) vector<Type> name(asVector<Type>(	\
         getListElement(objective_function::data,#name)));
+/** \brief Get data matrix from R and declare it as matrix<Type> */
 #define DATA_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
         getListElement(objective_function::data,#name)));
+/** \brief Get data scalar from R and declare it as Type */
 #define DATA_SCALAR(name) Type name(asVector<Type>(		\
         getListElement(objective_function::data,#name))[0]);
+/** \brief Get data scalar from R and declare it as int */
 #define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(	\
 	getListElement(objective_function::data,#name))[0]));
+/** \brief Get data factor from R and declare it as zero-based integer vector */
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
         getListElement(objective_function::data,#name)));
+/** \brief Get the number of levels of a data factor from R */
 #define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
+/** \brief Get sparse matrix from R and declare it as Eigen::SparseMatrix<Type> */
 #define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>( \
         getListElement(objective_function::data,#name)));
-// REPORT() construct new SEXP so never report in parallel!
+// NOTE: REPORT() constructs new SEXP so never report in parallel!
+/** \brief Report scalar, vector or array back to R without derivative information */
 #define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
                         defineVar(install(#name),asSEXP(name),objective_function::report);}
+/** \brief Report scalar, vector or array back to R with derivative information */
 #define ADREPORT(name) objective_function::reportvector.push(name,#name);
 #define PARALLEL_REGION if(this->parallel_region())
+/** \brief Get data array from R and declare it as array<Type> */
 #define DATA_ARRAY(name) tmbutils::array<Type> name(tmbutils::asArray<Type>(	\
-        getListElement(objective_function::data,#name)));	
+        getListElement(objective_function::data,#name)));
+/** \brief Get parameter array from R and declare it as array<Type> */
 #define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name)),#name));
 
 
