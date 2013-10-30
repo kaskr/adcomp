@@ -115,16 +115,36 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> x){
    Class to evaluate the negative log density of a multivariate Gaussian 
    variable with unstructured symmetric positive definite correlation matrix.
 
-   \verbatim
-   NOTE:
-   o Parameterized via lower triangular matrix i.e. (n*n-n)/2 parameters 
-     where n is the dimension of the covariance matrix. Example
-        [1      ]
-     L= [x0 1   ]     Sigma=cov2cor(L*L')
-        [x1 x2 1]
+   The unstructured correlation matrix is parameterized via a lower triangular matrix
+   with unit diagonal i.e. (n*n-n)/2 parameters to describe an n dimensional correlation matrix.
 
-   o The correlation matrix is available through member "Sigma".
-   \endverbatim
+   For instance in the case n=4 the correlation matrix is given by
+   \f[\Sigma = D^{-\frac{1}{2}}LL'D^{-\frac{1}{2}}\f]
+   where
+   \f[
+   L=\begin{pmatrix}
+   1 \\
+   x_0 & 1 \\
+   x_1 & x_3 & 1 \\
+   x_2 & x_4 & x_5 & 1
+   \end{pmatrix}
+   \f]
+   and
+   \f[
+   D=diag(LL')
+   \f]
+
+   Example:
+   \code
+   // Construct density object of dimension 4
+   vector<Type> Lx(6);
+   UNSTRUCTURED_CORR_t<Type> neg_log_density(Lx);
+   // Evaluate density
+   vector<Type> x(4);
+   Type ans=neg_log_density(x);
+   \endcode
+
+   \remark The correlation matrix is available through member "Sigma".
 */   
 template <class scalartype_>
 class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
