@@ -170,7 +170,7 @@ class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
 	Sigma(i,j)/=sqrt(llt(i,i)*llt(j,j));
       }
     }    
-    setSigma(Sigma); /* Call MVNORM_t initializer */
+    this->setSigma(Sigma); /* Call MVNORM_t initializer */
   }
 };
 template <class scalartype>
