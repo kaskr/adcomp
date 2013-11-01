@@ -79,8 +79,9 @@ array<Type> asArray(SEXP x)
     \code
      MVNORM_t<Type> Gauss1(Sigma1);	// First normal distribution (with covariance Sigma1)
      MVNORM_t<Type> Gauss2(Sigma2);	// Second normal distribution (with covariance Sigma2)
-    SEPARABLE_t<MVNORM_t<Type>, MVNORM_t<Type>> Gauss3(Gauss1,Gauss2);
-    Type ans = Gauss3(u);		// Evaluate neg. log-likelihood
+     SEPARABLE_t<MVNORM_t<Type> , MVNORM_t<Type> > Gauss3(Gauss1,Gauss2);
+     SEPARABLE_t<MVNORM_t<Type>, MVNORM_t<Type>> Gauss3(Gauss1,Gauss2);
+     Type ans = Gauss3(u);		// Evaluate neg. log-likelihood
     \endcode
     where <tt>u</tt> must be of appropriate dimension.
 */
