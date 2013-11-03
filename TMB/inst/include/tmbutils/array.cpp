@@ -44,7 +44,7 @@ struct array:Map< Array<Type,Dynamic,1> >{
 
   /* Utility function */
   vector<int> c(int n1){
-    vector<int> ans();
+    vector<int> ans(1);
     ans << n1;
     return ans;
   }
