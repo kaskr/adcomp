@@ -24,15 +24,15 @@ Type objective_function<Type>::operator() ()
   vector<Type> tmp(p);
   for(j=0;j<p;j++)
     tmp(j) = sigma(j)/sqrt(Type(1.0)-phi(j)*phi(j)); 
-  g -= sum(dnorm(vector<Type>(h(0)),Type(0),tmp,1));
+  g -= sum(dnorm(vector<Type>(h.col(0)),Type(0),tmp,1));
 
   // Likelihood contribution: State transitions
   for(i=1;i<n;i++)
   {
     vector<Type> tmp2(p);
     for(j=0;j<p;j++)
-      tmp2(j) = phi(j)*h(i-1,j)[0]; 
-    g -= sum(dnorm(vector<Type>(h(i)),tmp2,sigma,1));
+      tmp2(j) = phi(j)*h(j,i-1);
+    g -= sum(dnorm(vector<Type>(h.col(i)),tmp2,sigma,1));
   }
 
   // Cholesky factor of Sigma
@@ -59,7 +59,7 @@ Type objective_function<Type>::operator() ()
   // Likelihood contribution: observations
   for(i=0;i<n;i++)
   {
-    vector<Type> sigma_y = exp(Type(0.5)*(mu_x + vector<Type>(h(i))));
+    vector<Type> sigma_y = exp(Type(0.5)*(mu_x + vector<Type>(h.col(i))));
 
     // Scale up correlation matrix
     matrix<Type> Sigma_y(p,p);
@@ -68,7 +68,7 @@ Type objective_function<Type>::operator() ()
         Sigma_y(i2,j) = Sigma(i2,j)*sigma_y(i2)*sigma_y(j);
 
     MVNORM_t<Type> neg_log_density(Sigma_y);
-    g += neg_log_density(vector<Type>(y(i)));
+    g += neg_log_density(vector<Type>(y.col(i)));
   }
 
   return g;

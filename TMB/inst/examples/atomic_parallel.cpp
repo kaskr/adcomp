@@ -19,12 +19,12 @@ template<class Type>
 Type objective_function<Type>::operator() ()
 {
   PARAMETER_ARRAY(x);
-  int m=x.rows();
+  int m=x.cols();
   Type res=0;
   int n=400;
   vector<Type> tmp(n);
   tmp.setZero();
-  for(int i=0;i<m;i++)PARALLEL_REGION{ tmp+=dowork(vector<Type>(x(i))); }
+  for(int i=0;i<m;i++)PARALLEL_REGION{ tmp+=dowork(vector<Type>(x.col(i))); }
   res=tmp.sum();
   return res;
 }

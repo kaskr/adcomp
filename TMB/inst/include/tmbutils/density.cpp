@@ -68,18 +68,18 @@ public:
 		     arraytype y){
     int n=l.rows();
     arraytype x(y);
-    arraytype tmp(y(0));
+    arraytype tmp(y.col(0).dim);
     for(int i=0;i<n;i++){
-      tmp=y(i);
-      for(int k=0;k<i;k++)tmp=tmp-x(k)*l(i,k);
-      x.row(i)=tmp/l(i,i);
+      tmp=y.col(i);
+      for(int k=0;k<i;k++)tmp=tmp-x.col(k)*l(i,k);
+      x.col(i)=tmp/l(i,i);
     }
     /* Find x:=solve(t(L),x) */
     y=x;
     for(int i=n-1;i>=0;i--){
-      tmp=y(i);
-      for(int k=n-1;k>i;k--)tmp=tmp-x(k)*l(k,i);
-      x.row(i)=tmp/l(i,i);
+      tmp=y.col(i);
+      for(int k=n-1;k>i;k--)tmp=tmp-x.col(k)*l(k,i);
+      x.col(i)=tmp/l(i,i);
     }
     return x;
   }
@@ -249,7 +249,7 @@ public:
   AR1_t(){/*phi=phi_;MARGINAL=f_;*/}
   AR1_t(scalartype phi_, distribution f_){phi=phi_;MARGINAL=f_;}
   /** \brief Evaluate the negative log density */
-  scalartype operator()(arraytype x){
+  scalartype operator()(vectortype x){
     scalartype value;
     value=scalartype(0);
     int n=x.rows();
@@ -260,16 +260,31 @@ public:
     value+=scalartype((n-1)*m)*log(sigma);
     return value;
   }
+
+  /* Copied vector version - apply over outermost dimension */
+  scalartype operator()(arraytype x){
+    scalartype value;
+    value=scalartype(0);
+    int n=x.cols();
+    int m=x.size()/n;
+    scalartype sigma=sqrt(scalartype(1)-phi*phi); /* Steady-state standard deviation */
+    value+=MARGINAL(x.col(0));                                  /* E.g. x0 ~ N(0,1)  */
+    for(int i=1;i<n;i++)value+=MARGINAL((x.col(i)-x.col(i-1)*phi)/sigma);/* x(i)-phi*x(i-1) ~ N(0,sigma^2) */
+    value+=scalartype((n-1)*m)*log(sigma);
+    return value;
+  }
+
+
   arraytype jacobian(arraytype x){
     scalartype sigma=sqrt(scalartype(1)-phi*phi); /* Steady-state standard deviation */
-    int n=x.rows();
-    arraytype y(x);
+    int n=x.cols();
+    arraytype y(x.dim);
     y.setZero();
-    y.row(0) = y(0) + MARGINAL.jacobian(x(0));
+    y.col(0) = y.col(0) + MARGINAL.jacobian(x.col(0));
     for(int i=1;i<n;i++){
       //MARGINAL((x(i)-x(i-1)*phi)/sigma);
-      y.row(i-1) = y(i-1) - (phi/sigma) * MARGINAL.jacobian((x(i)-x(i-1)*phi)/sigma);
-      y.row(i) = y(i) +  MARGINAL.jacobian((x(i)-x(i-1)*phi)/sigma)/sigma;
+      y.col(i-1) = y.col(i-1) - (phi/sigma) * MARGINAL.jacobian((x.col(i)-x.col(i-1)*phi)/sigma);
+      y.col(i) = y.col(i) +  MARGINAL.jacobian((x.col(i)-x.col(i-1)*phi)/sigma)/sigma;
     }
     return y;
   }
@@ -401,19 +416,19 @@ public:
     return value;
   }
   arraytype jacobian(arraytype x){
-    arraytype y(x);
+    arraytype y(x.dim);
     y.setZero();
     for(int i=0;i<k;i++)
       for(int j=0;j<k;j++)
-	y.row(i)=y(i)+Q0(i,j)*x(j);
+	y.col(i)=y.col(i)+Q0(i,j)*x.col(j);
     vectortype v(k+1);
     v(0)=scalartype(1);
     for(int i=1;i<=k;i++)v[i]=-phi[i-1];
     v=v/sigma;
-    for(int i=k;i<x.rows();i++){
+    for(int i=k;i<x.cols();i++){
       for(int j1=0;j1<=k;j1++){
 	for(int j2=0;j2<=k;j2++){
-	  y.row(i-j1)=y(i-j1)+v[j1]*v[j2]*x(i-j2);
+	  y.col(i-j1)=y.col(i-j1)+v[j1]*v[j2]*x.col(i-j2);
 	}
       }
     }
@@ -508,35 +523,35 @@ public:
   }
   /* Experiment: Implementing matrix-vector multiply - Q*x.
      To be used when creating separable extensions... 
-     think best to assume that input array has dimension (ntime,2,...) 
+     think best to assume that input array has dimension (2,ntime,...) 
      so that we can easily extract x(t) and multiply Q*x(t) with a 2x2 matrix */
-  scalartype operator()(vectortype x){ /* x.dim=[n,2] */
+  scalartype operator()(vectortype x){ /* x.dim=[2,n] */
     vector<int> dim(2);
-    dim << x.size()/2 , 2;
+    dim << 2 , x.size()/2 ;
     array<scalartype> y(x,dim);
     y=y.transpose();
-    return this->operator()(y(0),y(1));
+    return this->operator()(y.col(0),y.col(1));
   }
   arraytype matmult(matrix2x2 Q,arraytype x){
-    arraytype y(x);
-    y.row(0) = Q(0,0)*x(0)+Q(0,1)*x(1); /* TODO: can we subassign like this in array class? Hack: we use "y.row" for that */
-    y.row(1) = Q(1,0)*x(0)+Q(1,1)*x(1);
+    arraytype y(x.dim);
+    y.col(0) = Q(0,0)*x.col(0)+Q(0,1)*x.col(1); /* TODO: can we subassign like this in array class? Hack: we use "y.row" for that */
+    y.col(1) = Q(1,0)*x.col(0)+Q(1,1)*x.col(1);
     return y;
   }
   arraytype jacobian(arraytype x){
-    arraytype y(x);
+    arraytype y(x.dim);
     y.setZero();
-    arraytype tmp(y(0));
-    y.row(0) = neglogdmvnorm[0].jacobian(x(0)); /* Time zero contrib */
+    arraytype tmp(y(0).dim);
+    y.col(0) = neglogdmvnorm[0].jacobian(x.col(0)); /* Time zero contrib */
     for(int i=1;i<grid.size();i++){
       /* When taking derivative of .5*(x(i)-G*x(i-1))'*Q*(x(i)-G*x(i-1)) [where G=expAdt]
 	 we get contributions like: 
 	 x(i-1): -G'*Q*(x(i)-G*x(i-1))
 	 x(i):   Q*(x(i)-G*x(i-1))
       */
-      tmp=neglogdmvnorm[i].jacobian( x(i) - matmult(expAdt[i],x(i-1)) );
-      y.row(i)=y(i)+tmp;
-      y.row(i-1)=y(i-1)-matmult(expAdt[i].transpose(), tmp );
+      tmp=neglogdmvnorm[i].jacobian( x.col(i) - matmult(expAdt[i],x.col(i-1)) );
+      y.col(i)=y.col(i)+tmp;
+      y.col(i-1)=y.col(i-1)-matmult(expAdt[i].transpose(), tmp );
     }
     return y;
   } 
@@ -552,19 +567,21 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
   return contAR2_t<scalartype>(shape_, scale_);
 }
 
-/* ======================== GMRF1 CLASS ============================
-   First order Gaussian Markov Random Field on (subset of) d-dim grid.
-   Grid is specified through the first array argument to constructor, 
-   e.g. x= 1 1
-           1 2
-	   2 1
-	   2 2
+/** \brief GMRF on d-dimensional lattice.
 
-   Example of precision in 2D:
+    \verbatim
+    First order Gaussian Markov Random Field on (subset of) d-dim grid.
+    Grid is specified through the first array argument to constructor, 
+    with individual nodes determined by the outdermost dimension 
+    e.g. x= 1 1 2 2
+         1 2 1 2
+    corresponding to a 2x2 lattice with 4 nodes and d=2.
 
-      -1
-   -1 4+c -1
-      -1
+    Example of precision in 2D:
+
+       -1
+    -1 4+c -1
+       -1
 
    The precision Q is convolved with it self "order" times. This way
    more smoothness can be obtained. The quadratic form contribution 
@@ -578,10 +595,11 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
    The model may be thought of as an arbitrary scaled correlation 
    model and is thus not really meaningful without an additional scale
    parameter (see SCALE_t and VECSCALE_t classes).
+   \endverbatim
 */
 //template <class scalartype, class vectortype, class arraytype>
 template <class scalartype_>
-class GMRF1_t{
+class GMRF_t{
   TYPEDEFS(scalartype_);
 private:
   std::vector<int> row;
@@ -600,9 +618,9 @@ private:
     return ans;
   }
 public:
-  GMRF1_t(){};
-  GMRF1_t(arraytype x, vectortype delta, int order_=1){
-    int n=x.rows();
+  GMRF_t(){};
+  GMRF_t(arraytype x, vectortype delta, int order_=1){
+    int n=x.cols();
     Q.resize(n,n);
     for(int i=0;i<n;i++)
       for(int j=0;j<n;j++){
@@ -640,18 +658,18 @@ public:
   scalartype operator()(vectortype x){
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x);
   }
-  /* In the array case we let the outer dim be gmrf and inner dim iid N01 */
-  scalartype operator()(arraytype x){    
-    vector<int> newdim(2);
-    newdim << x.size()/x.dim[0], x.dim[0];
-    arraytype y=x.transpose(); /* dim becomes e.g. (dim[2],dim[1],dim[0])  */
-    y.setdim(newdim);          /* dim becomes e.g. (dim[2]*dim[1],dim[0])  */
-    scalartype ans=0;
-    for(int i=0;i<y.rows();i++){
-      ans+=-scalartype(.5)*logdetQ + scalartype(.5)*Quadform(y(i)); /* copied from previous */
-    }
-    return ans;
-  }
+  /* WHY THIS METHOD? :In the array case we let the outer dim be gmrf and inner dim iid N01 */
+  // scalartype operator()(arraytype x){    
+  //   vector<int> newdim(2);
+  //   newdim << x.size()/x.dim[0], x.dim[0];
+  //   arraytype y=x.transpose(); /* dim becomes e.g. (dim[2],dim[1],dim[0])  */
+  //   y.setdim(newdim);          /* dim becomes e.g. (dim[2]*dim[1],dim[0])  */
+  //   scalartype ans=0;
+  //   for(int i=0;i<y.rows();i++){
+  //     ans+=-scalartype(.5)*logdetQ + scalartype(.5)*Quadform(y(i)); /* copied from previous */
+  //   }
+  //   return ans;
+  // }
 
   /* jacobian along the lines of Quadform */
   arraytype jacobian(arraytype x){
@@ -663,7 +681,7 @@ public:
       //for(int i=0;i<z.size();i++)z[i]=scalartype(0);
       for(int i=0;i<nnz;i++){
 	//z[row[i]]+=Q(row[i],col[i])*y[col[i]];
-	z.row(row[i]) = z(row[i]) + Q(row[i],col[i])*y(col[i]);
+	z.col(row[i]) = z.col(row[i]) + Q(row[i],col[i])*y.col(col[i]);
       }
     }
     return z;
@@ -678,14 +696,14 @@ public:
   }
 };
 template <class scalartype, class arraytype >
-GMRF1_t<scalartype> GMRF1(arraytype x, vector<scalartype> delta, int order=1){
-  return GMRF1_t<scalartype>(x, delta, order);
+GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1){
+  return GMRF_t<scalartype>(x, delta, order);
 }
 template <class scalartype, class arraytype >
-GMRF1_t<scalartype> GMRF1(arraytype x, scalartype delta, int order=1){
+GMRF_t<scalartype> GMRF(arraytype x, scalartype delta, int order=1){
   vector<scalartype> d(x.rows());
   for(int i=0;i<d.size();i++)d[i]=delta;
-  return GMRF1_t<scalartype>(x, d, order);
+  return GMRF_t<scalartype>(x, d, order);
 }
 
 /** \brief Apply scale transformation on a density
@@ -749,9 +767,9 @@ public:
   arraytype jacobian(arraytype x){
     // assert that x.rows()==scale.size()
     arraytype y(x);
-    for(int i=0;i<y.rows();i++)y.row(i)=y(i)/scale[i];
+    for(int i=0;i<y.cols();i++)y.col(i)=y.col(i)/scale[i];
     y=f.jacobian(y);
-    for(int i=0;i<y.rows();i++)y.row(i)=y(i)/scale[i];
+    for(int i=0;i<y.cols();i++)y.col(i)=y.col(i)/scale[i];
     return y;
   }
   int ndim(){return f.ndim();}
@@ -832,8 +850,7 @@ public:
   scalartype operator()(arraytype x){
     if(this->ndim() != x.dim.size())std::cout << "Wrong dimension in SEPARABLE_t\n";
     /* Calculate quadform */
-    //arraytype y(x.dim); <========== TODO: ALLOW THIS CONSTRUCTOR!
-    arraytype y(x);
+    arraytype y(x.dim);
     y=jacobian(x);
     y=x*y; /* pointwise */
     scalartype q=scalartype(.5)*(y.sum()); 
@@ -864,11 +881,10 @@ public:
   scalartype operator()(arraytype x, int i){
     if(this->ndim() != x.dim.size())std::cout << "Wrong dimension in SEPARABLE_t\n";
     /* Calculate quadform */
-    //arraytype y(x.dim); <========== TODO: ALLOW THIS CONSTRUCTOR!
-    arraytype y(x);
+    arraytype y(x.dim);
     y=jacobian(x);
     y=x*y; /* pointwise */
-    scalartype q=scalartype(.5)*(y(i).sum()); 
+    scalartype q=scalartype(.5)*(y.col(i).sum()); 
     /* Add normalizing constant */
     if(i==0){
       int n=f.ndim();
@@ -892,47 +908,51 @@ SEPARABLE_t<distribution1,distribution2> SEPARABLE(distribution1 f_, distributio
   return SEPARABLE_t<distribution1,distribution2>(f_,g_);
 }
 
-/* ======================== PROJECTION CLASS =============
-   Given a gaussian density f:R^n -> R.
-   Given an integer vector "proj" with elements in 1,...,n.
-   Construct the mariginal density of "x[proj]".
+/** \brief Projection of multivariate gaussian variable.
+
+    Preserves sparseness if possible. Generally it is not.
+
+    \verbatim
+    Given a gaussian density f:R^n -> R.
+    Given an integer vector "proj" with elements in 1,...,n.
+    Construct the mariginal density of "x[proj]".
    
-   Details:
-   --------
-   Let x=[x_A]
-         [x_B]
-   with precision
-       Q=[Q_AA  Q_AB]
-         [Q_BA  Q_BB]
-   and assume that proj=A.
-   The marginal density is (with notation 0:=0*x_B )
-   p_A(x_A)=p(x_A,x_B)/p(x_B|x_A)=p(x_A,0)/p(0|x_A)
-   Now see that
-   1. p(x_A,0) is easy because full precision is sparse.
-   2. p(0|x_A) is N(-Q_BB^-1 * Q_BA x_A,  Q_BB^-1) so
-      p(0|x_A) = |Q_BB|^.5 * exp(-.5*x_A Q_AB * Q_BB^-1 * Q_BA x_A)
+    Details:
+    --------
+    Let x=[x_A]
+          [x_B]
+    with precision
+        Q=[Q_AA  Q_AB]
+          [Q_BA  Q_BB]
+    and assume that proj=A.
+    The marginal density is (with notation 0:=0*x_B )
+    p_A(x_A)=p(x_A,x_B)/p(x_B|x_A)=p(x_A,0)/p(0|x_A)
+    Now see that
+    1. p(x_A,0) is easy because full precision is sparse.
+    2. p(0|x_A) is N(-Q_BB^-1 * Q_BA x_A,  Q_BB^-1) so
+       p(0|x_A) = |Q_BB|^.5 * exp(-.5*x_A Q_AB * Q_BB^-1 * Q_BA x_A)
 
-      Trick to evaluate this with what we have available:
-      Note 1: Q_BA x_A = [0 I_BB] * full_jacobian([ x_A  ]  
-                                                  [ 0    ] )
+       Trick to evaluate this with what we have available:
+       Note 1: Q_BA x_A = [0 I_BB] * full_jacobian([ x_A  ]  
+                                                   [ 0    ] )
 
 
-	      Call this quantity "y_B" we have
-	      p(0|x_A) = |Q_BB|^.5 * exp(-.5*y_B' * Q_BB^-1 * y_B)
+	       Call this quantity "y_B" we have
+	       p(0|x_A) = |Q_BB|^.5 * exp(-.5*y_B' * Q_BB^-1 * y_B)
 
-      Note 2: Consider now a density with _covariance_ Q_BB 
-              phi(y)=|Q_BB|^-.5 * exp(-.5*y' * Q_BB^-1 * y)
-	      Then 
-	      phi(y)/phi(0)^2=|Q_BB|^.5 * exp(-.5*y' * Q_BB^-1 * y)
-	      which is actually the desired expression of p(0|x_A).
+       Note 2: Consider now a density with _covariance_ Q_BB 
+               phi(y)=|Q_BB|^-.5 * exp(-.5*y' * Q_BB^-1 * y)
+	       Then 
+	       phi(y)/phi(0)^2=|Q_BB|^.5 * exp(-.5*y' * Q_BB^-1 * y)
+	       which is actually the desired expression of p(0|x_A).
 
-   Summary:
-   -------
-   Negative log-density of A-marginal is
-   -log p(x_A,0) + log phi(y) - 2*log(phi(0))
-   = f(x_A,0) - dmvnorm(y_B) + 2*dmvnorm(0)
-
-*/ 
+    Summary:
+    -------
+    Negative log-density of A-marginal is
+    -log p(x_A,0) + log phi(y) - 2*log(phi(0))
+    = f(x_A,0) - dmvnorm(y_B) + 2*dmvnorm(0)
+    \endverbatim
+*/
 template <class distribution>
 class PROJ_t{
   TYPEDEFS(typename distribution::scalartype);
@@ -1011,17 +1031,17 @@ public:
   arraytype projB(arraytype x){
     vectortype z((x.size()/n)*nB);
     vector<int> dim(x.dim);
-    dim[0]=nB;
+    dim[dim.size()-1]=nB;
     arraytype y(z,dim);
-    for(int i=0;i<nB;i++)y.row(i)=x(cproj[i]);
+    for(int i=0;i<nB;i++)y.col(i)=x.col(cproj[i]);
     return y;
   }
   arraytype setZeroB(arraytype x){
-    for(int i=0;i<nB;i++)x.row(cproj[i])=x(0)*scalartype(0);
+    for(int i=0;i<nB;i++)x.col(cproj[i])=x.col(0)*scalartype(0);
     return x;    
   }
   arraytype jacobian(arraytype x){
-    initialize(x.dim[0]);
+    initialize(x.dim[x.dim.size()-1]);
     arraytype xa=setZeroB(x);
     arraytype y=projB(f.jacobian(xa));
     // WRONG: ----> return f.jacobian(xa) - dmvnorm.jacobian(y);
@@ -1032,7 +1052,7 @@ public:
     arraytype tmp2=dmvnorm.jacobian(y);
     // apply P'
     for(int i=0;i<nB;i++){ 
-      tmp0.row(cproj[i])=tmp2(i);
+      tmp0.col(cproj[i])=tmp2.col(i);
     }
     // apply Q'(=Q)
     tmp0=f.jacobian(tmp0);

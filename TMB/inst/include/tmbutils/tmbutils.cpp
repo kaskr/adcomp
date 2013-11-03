@@ -37,7 +37,7 @@ array<Type> asArray(SEXP x)
   SEXP dim=getAttrib(x,R_DimSymbol);
   vector<int> d=asVector<int,int>(INTEGER(dim), LENGTH(dim));
   vector<Type> y=asVector<Type,double>(REAL(x), LENGTH(x));
-  return array<Type>(y,d.reverse());
+  return array<Type>(y,d);
 }
 
 
