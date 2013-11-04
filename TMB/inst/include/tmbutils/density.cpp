@@ -13,7 +13,7 @@ typedef array<scalartype> arraytype;
 
 #define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){};
 
-/** \brief Multivariate normal distribution with unstructered covariance matrix
+/** \brief Multivariate normal distribution with user supplied covariance matrix
 
     Class to evaluate the negative log density of a mean zero
     multivariate Gaussian variable with general covariance matrix Sigma.

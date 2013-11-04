@@ -1,7 +1,9 @@
 /* Templates to get convenient R-like syntax. */
 
-
-/* General utility similar to R's split function. */
+/** \brief  Similar to R's split function: split(x,fac) devides x into groups defined by fac 
+* \details
+Returns a "vector of vectors". See nmix.cpp for an example
+*/
 template<class Type>
 vector<vector<Type> > split(vector<Type> x,vector<int> fac){
   if(x.size()!=fac.size())error("x and fac must have equal length.");
@@ -20,14 +22,14 @@ vector<vector<Type> > split(vector<Type> x,vector<int> fac){
   return ans;
 }
 
-/* Sum of vector, matrix or array */
+/** Sum of vector, matrix or array */
 template<template<class> class Vector, class Type>
 Type sum(Vector<Type> x){return x.sum();}
 
-/* Matrix * vector */
+/** Matrix * vector */
 template<class Type>
 vector<Type> operator*(matrix<Type> A, vector<Type> x){return A*x.matrix();}
 
-/* SparseMatrix * vector */
+/** SparseMatrix * vector */
 template<class Type>
 vector<Type> operator*(Eigen::SparseMatrix<Type> A, vector<Type> x){return (A*x.matrix()).array();}

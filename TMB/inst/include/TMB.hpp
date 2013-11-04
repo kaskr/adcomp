@@ -1,3 +1,6 @@
+/** \file 
+* \brief Main TMB file containing interfaces to R and CppAD
+*/
 /* To be removed */
 #define TMB_DEBUG 0
 #define TMB_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
