@@ -1,6 +1,4 @@
 // Multivatiate SV model from Skaug and Yu 2013, Comp. Stat & data Analysis (to appear)
-// "A flexible and automated likelihood based framework for inference in stochastic volatility models"
-
 #include <TMB.hpp>
 
 template<class Type>
@@ -73,3 +71,22 @@ Type objective_function<Type>::operator() ()
 
   return g;
 }
+
+/** \file
+\ingroup Examples
+\brief Multivariate SV model
+
+\details 
+Multivariate <a href="http://en.wikipedia.org/wiki/Stochastic_volatility">stochastic volatility</a> (SV) 
+models from Skaug and Yu (2013, Computational Statistics & Data Analysis).
+- Data: 3 time series of exchange rates (01/10/1981 - 28/06/1985): Pound/Dollar, Deutschmark/Dollar and Yen/Dollar. 
+- Model:
+  -# The 3 volatility processes <em>h = (h1,h2,h3)</em> taken to be independent AR1 processes.
+  -# At each time point the response <em>y = (y1,y2,y3)</em> is zero-mean multivariate normal 
+    variances <em>exp(0.5*(h+mu))</em> and unrestricted correlation structure.
+
+\section Comments
+The code could have been considerably shortened by using the built in distributions AR1_t for <em>h</em> and MVNORM_t for <em>y</e
+m>.
+*/
+

@@ -1,0 +1,23 @@
+/** \defgroup Examples Example collection
+*/
+/** \defgroup matrix_arrays Matrices and arrays
+
+\section Relation_R Relationship to R
+In R you can apply both matrix multiplication ("%*%")
+and elementwise multiplication ("*") to objects of
+type "matrix", i.e. it is the operator that determines the operation.
+In TMB we instead have two different types of objects, while
+the multiplication operator "*" is the same:
+- matrix: linear algebra
+- array: elementwise operations
+
+In addition, arrays in TMB behaves like R arrayes, in that more than two dimensions are allowed.
+
+
+
+\section Relation_Eigen Relationship to Eigen
+The TMB types "matrix" and "array" inherits from the the Eigen
+types Matrix and Array. Users of TMB should be familiar with
+the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen documentation</a>.
+
+*/

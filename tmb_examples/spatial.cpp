@@ -42,3 +42,8 @@ Type objective_function<Type>::operator() ()
   return res;
 
 }
+
+/** \file
+\ingroup Examples
+\brief Spatial poisson GLMM on a grid, with exponentially decaying correlation function
+*/
