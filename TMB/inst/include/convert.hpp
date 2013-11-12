@@ -127,3 +127,17 @@ vector<Type> asVector(matrix<Type> x)
   return res;
 }
 
+template<class Type>
+SEXP asSEXP(const tmbutils::array<Type> &a)
+{
+   SEXP val;
+   PROTECT(val = NEW_NUMERIC(a.size()));
+   double *p = REAL(val);
+   for(int i=0;i<a.size();i++)p[i]=asDouble(a[i]);
+   SEXP dim;
+   PROTECT(dim = NEW_INTEGER(a.dim.size()));
+   for(int i=0;i<a.dim.size();i++)INTEGER(dim)[i]=a.dim[i];
+   SET_DIM(val, dim);
+   UNPROTECT(2);
+   return val;
+}
