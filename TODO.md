@@ -5,7 +5,7 @@ TODO
 - Roxygen documentation
 - MakeADFun: Call dyn.load if DLL not loaded (?)
 - parList: use last.par.best as default (?)
-- parallel_start.hpp does not yet have parallel Hessian member.
+- **DONE** parallel_start.hpp does not yet have parallel Hessian member.
 - Metis symbolic analysis with 3d example.
 - Move methods, such as "parList", out of the object.
 - Rinterface should remember to set DLL="..."
@@ -19,7 +19,7 @@ TODO
   - **DONE** Array bounds checking option
 - template() should never overwrite existing file.
 - Review kaspers class extensions of Eigen classes, in particular array<Type>, matrix<Type> and vector<Type>
-  - Consistency between matrix and array fastest running dimensions.
+  - **DONE** Consistency between matrix and array fastest running dimensions.
   - Desired behaviour of overloaded operations e.g. pointwise multiply vs matrix multiply.
   - Automatic cast from array to vector.
 - Make simple example of how to include "adjoint code". pexp(x,lambda) is a good example (cum. dist. function exp. distr)
