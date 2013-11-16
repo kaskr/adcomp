@@ -202,9 +202,6 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     for(int i=0;i<ntapes;i++)out=out+ans(i);
     return out;
   };
-  /*
-    Experimental/Untested!
-  */
   template <typename VectorBase>
   VectorBase Jacobian(const VectorBase &x){
     vector<VectorBase> ans(ntapes);
@@ -217,7 +214,18 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     for(int i=0;i<ntapes;i++)addinsert(out,ans(i),i,domain);
     return out;
   }
-
+  template <typename VectorBase>
+  VectorBase Hessian(const VectorBase &x, size_t rangecomponent){
+    vector<VectorBase> ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Hessian(x,rangecomponent);
+    VectorBase out( domain * domain );
+    out.setZero();
+    for(int i=0;i<ntapes;i++)addinsert(out,ans(i),i,domain*domain);
+    return out;
+  }
   /* optimize ADFun object */
   void optimize(){
     if(config.trace.optimize)std::cout << "Optimizing parallel tape... ";
