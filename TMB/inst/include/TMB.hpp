@@ -163,8 +163,25 @@ struct isDouble<double>{
 /** \brief Get data scalar from R and declare it as int */
 #define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(	\
 	getListElement(objective_function::data,#name))[0]));
-/** \brief Get data factor from R and declare it as zero-based integer vector */
+/** \brief Get data vector of type "factor" from R and declare it as a zero-based integer vector.
+
+The following example (R code) shows what you have on the R side and what is
+being received by the C++ template:
+   \verbatim
+> x=factor(letters[4:10])
+> x
+[1] d e f g h i j
+Levels: d e f g h i j
+
+# The zero-based integer vector that the C++ template sees
+> unclass(factor(letters[3+1:10])) - 1
+ [1] 0 1 2 3 4 5 6 7 8 9
+   \endverbatim
+*/
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
+        getListElement(objective_function::data,#name)));
+/** \brief Get data vector of type "integer" from R. (DATA_INTEGER is for a scalar integer)*/
+#define DATA_IVECTOR(name) vector<int> name(asVector<int>(	\
         getListElement(objective_function::data,#name)));
 /** \brief Get the number of levels of a data factor from R */
 #define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
