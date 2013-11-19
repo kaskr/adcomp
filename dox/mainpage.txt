@@ -4,6 +4,7 @@ This tutorial describes how to write the C++ part of a TMB "project". The
 tutorial assumes familiarity with C++ and to some extent with R.
 TMB projects typically consist of a *.R file and a *.cpp (C++) file (see example collection).
 The *.R file does pre- and post processing of data in addition to calling the *.cpp program. 
+All R functions are documented within the standard help system i R.
 
 The purpose of the C++ program is to evaluate the objective function, i.e. the negative log-likelihood
 of the model. This program is compiled and called from R, where
@@ -22,26 +23,26 @@ the data type of both the input values and the return value of the objective fun
 The reason for the allowing different data types is that the same chunk of C++ code
 can evaluate the both the objective function and its derivatives, by calling 
 it with different values for "Type".  The technical aspects 
-of this is hidden from the user. There is one aspect of this
+of this are hidden from the user. There is however one aspect 
 that surprises the new TMB user. When a constant like "1.2" is used
 in a calculation that affects the return value it must be "cast" to Type:
    \code
-   Type res;		// Define variable that holds the return value (neg. log. lik)
-   res = Type(1.2);	// Assign value 1.2; a cast is needed.
+   Type nll;		// Define variable that holds the return value (neg. log. lik)
+   nll = Type(1.2);	// Assign value 1.2; a cast is needed.
    \endcode
 
 <h2>Obtaining data and parameter values from R</h2>
 Obviously, we will need to pass both data and parameter values to the objective function.
 This is done through a set of macros that TMB defines for us. To see
 which macros are available start typing <tt>DATA_</tt> or <tt>PARAMETER_</tt> 
-in the search field of your browser (you may need to refresh the browser window between
+in the Doxygen search field of your browser (you may need to refresh the browser window between
 each time you make a new search). A simple example if you want to read a vector
 of numbers (doubles) is the following
    \code
   DATA_INTEGER(n);              // Length of "x"
   DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1)        
    \endcode
-Note that all vectors and matrices in TMB have a zero based indexing scheme.
+Note that all vectors and matrices in TMB uses a \b zero-based indexing scheme.
 It is not necessary to explicitely pass the dimension of "x", but is often convenient.
 The dimension of x is set on the R side when the C++ program is called, and
 there are ways of retrieving the dimenson of x inside the C++ program.
@@ -55,24 +56,24 @@ likelihood functions. You have three toolboxes available:
 
 In addition to the variables defined through the <tt>DATA_</tt> or <tt>PARAMETER_</tt>
 macros there can be "local" variables, for which ordinary C++ scoping rules apply.
-There must also be a varialbe that holds the return value (neg. log. likelihood).
+There must also be a variable that holds the return value (neg. log. likelihood).
    \code
   DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1)
   Type tmp = x(1);
   Type nll=tmp*tmp; 
    \endcode
-As in ordinary C++ local varialbe tmp must be assign a value before it can enter into
+As in ordinary C++ local variable tmp must be assign a value before it can enter into
 a calculation.
 
 <h2>Statistical modelling</h2>
 TMB can handle complex statistical problems with hierarchical structure (latent
-random variables) and multiple data sources.  Latent random varialbes must be continuous 
+random variables) and multiple data sources.  Latent random variables must be continuous 
 (discrete distributions are not handled).  The <tt>PARAMETER_</tt> macros are used to pass 
 two types of parameters.
 - \b Parameters: to be estimated by maximum likelihood. These include fixed effects and variance
   components in the mixed model litterature. They will also correspond to hyper parameters
   with non-informative priors in the Bayesian literature.
-- \b Latent \b random \b varialbes: to be integrated out of the likelihood using a Laplace approximaiton. 
+- \b Latent \b random \b variables: to be integrated out of the likelihood using a Laplace approximation. 
 
 Which of these are chosen is controlled from R, and is not specified in C++. However,
 for a latent random variable it is usually necessary to assign a probablity distribution,
@@ -88,16 +89,16 @@ familiar with software in the BUGS family.
   nll -= dnorm(u(0),0,1)	// Distributional assignment: u(0) ~ N(0,1) 
    \endcode
 The following rules apply:
-- Distribution assignments does not need to take place before the latent variable
+- Distribution assignments do not need to take place before the latent variable
   is used in a calculation.
-- More complicated distributionional assigments are allowed, say that u(0)-u(1) ~ N(0,1),
-  but this requires a deeper understanding of probability from the user.
+- More complicated distributionional assigments are allowed, say u(0)-u(1) ~ N(0,1),
+  but this requires the user to have a deeper understanding of the probabilistic aspects of the model.
 - For latent variables only normal distributions should be used (otherwise
-  the Laplace approximation will perform poorly.
+  the Laplace approximation will perform poorly).
 - The library \ref Distributions contains many probability distributions, especially
   multivariate normal distributions. For probability distributions not contained
-  in the library, the user can use raw C++ code. Due to the above rule this
-  is only relevant for data. 
+  in the library, the user can use raw C++ code. Due to the above rule that 
+  latent variables shold be normally distributed this is only relevant for the response distribution.
    \code
   DATA_VECTOR(y);          	// Data vector
   Type nll = Type(0);		// Return value
