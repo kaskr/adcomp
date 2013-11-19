@@ -174,8 +174,8 @@ being received by the C++ template:
 Levels: d e f g h i j
 
 # The zero-based integer vector that the C++ template sees
-> unclass(factor(letters[3+1:10])) - 1
- [1] 0 1 2 3 4 5 6 7 8 9
+> unclass(x) - 1
+[1] 0 1 2 3 4 5 6
    \endverbatim
 */
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\

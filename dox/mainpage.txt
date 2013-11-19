@@ -1,3 +1,114 @@
+/** \defgroup Tutorial Tutorial: how to write the objective function in C++ 
+
+This tutorial describes how to write the C++ part of a TMB "project". The
+tutorial assumes familiarity with C++ and to some extent with R.
+TMB projects typically consist of a *.R file and a *.cpp (C++) file (see example collection).
+The *.R file does pre- and post processing of data in addition to calling the *.cpp program. 
+
+The purpose of the C++ program is to evaluate the objective function, i.e. the negative log-likelihood
+of the model. This program is compiled and called from R, where
+it can be fed to a function minimizer like nlminb().
+
+The objective function should be of the following C++ type:
+   \code
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+.... Here goes your C++ code ..... 
+}
+   \endcode
+Note that the objective function is a templated class where <tt><Type></tt> is
+the data type of both the input values and the return value of the objective function.
+The reason for the allowing different data types is that the same chunk of C++ code
+can evaluate the both the objective function and its derivatives, by calling 
+it with different values for "Type".  The technical aspects 
+of this is hidden from the user. There is one aspect of this
+that surprises the new TMB user. When a constant like "1.2" is used
+in a calculation that affects the return value it must be "cast" to Type:
+   \code
+   Type res;		// Define variable that holds the return value (neg. log. lik)
+   res = Type(1.2);	// Assign value 1.2; a cast is needed.
+   \endcode
+
+<h2>Obtaining data and parameter values from R</h2>
+Obviously, we will need to pass both data and parameter values to the objective function.
+This is done through a set of macros that TMB defines for us. To see
+which macros are available start typing <tt>DATA_</tt> or <tt>PARAMETER_</tt> 
+in the search field of your browser (you may need to refresh the browser window between
+each time you make a new search). A simple example if you want to read a vector
+of numbers (doubles) is the following
+   \code
+  DATA_INTEGER(n);              // Length of "x"
+  DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1)        
+   \endcode
+Note that all vectors and matrices in TMB have a zero based indexing scheme.
+It is not necessary to explicitely pass the dimension of "x", but is often convenient.
+The dimension of x is set on the R side when the C++ program is called, and
+there are ways of retrieving the dimenson of x inside the C++ program.
+
+<h2>An extended C++ language</h2>
+TMB extends C++ with functionality that is important for formulating
+likelihood functions. You have three toolboxes available:
+- Standard C++ used for infrastructure like loops etc.
+- Vector, matrix and array library (see \ref matrix_arrays)
+- Probability distributions (see \ref Distributions)
+
+In addition to the variables defined through the <tt>DATA_</tt> or <tt>PARAMETER_</tt>
+macros there can be "local" variables, for which ordinary C++ scoping rules apply.
+There must also be a varialbe that holds the return value (neg. log. likelihood).
+   \code
+  DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1)
+  Type tmp = x(1);
+  Type nll=tmp*tmp; 
+   \endcode
+As in ordinary C++ local varialbe tmp must be assign a value before it can enter into
+a calculation.
+
+<h2>Statistical modelling</h2>
+TMB can handle complex statistical problems with hierarchical structure (latent
+random variables) and multiple data sources.  Latent random varialbes must be continuous 
+(discrete distributions are not handled).  The <tt>PARAMETER_</tt> macros are used to pass 
+two types of parameters.
+- \b Parameters: to be estimated by maximum likelihood. These include fixed effects and variance
+  components in the mixed model litterature. They will also correspond to hyper parameters
+  with non-informative priors in the Bayesian literature.
+- \b Latent \b random \b varialbes: to be integrated out of the likelihood using a Laplace approximaiton. 
+
+Which of these are chosen is controlled from R, and is not specified in C++. However,
+for a latent random variable it is usually necessary to assign a probablity distribution,
+which is done in C++ file.
+
+The purpose of the C++ program is to calculate the (negative) joint density of data and latent
+random variables. Each datum and individual latent random gives a contribution
+to log likelihood, which may be though of as a "distribution allignment" by users
+familiar with software in the BUGS family.
+   \code
+  PARAMETER_VECTOR(u);          // Latent random variable 
+  Type nll = Type(0);		// Return value
+  nll -= dnorm(u(0),0,1)	// Distributional assignment: u(0) ~ N(0,1) 
+   \endcode
+The following rules apply:
+- Distribution assignments does not need to take place before the latent variable
+  is used in a calculation.
+- More complicated distributionional assigments are allowed, say that u(0)-u(1) ~ N(0,1),
+  but this requires a deeper understanding of probability from the user.
+- For latent variables only normal distributions should be used (otherwise
+  the Laplace approximation will perform poorly.
+- The library \ref Distributions contains many probability distributions, especially
+  multivariate normal distributions. For probability distributions not contained
+  in the library, the user can use raw C++ code. Due to the above rule this
+  is only relevant for data. 
+   \code
+  DATA_VECTOR(y);          	// Data vector
+  Type nll = Type(0);		// Return value
+  nll -= log(Type(0.5)) - abs(y(0));	// y(0) has a Laplace distribution
+   \endcode
+
+See \ref Examples for more examples
+
+
+
+*/
 /** \defgroup Examples Example collection
 */
 /** \defgroup matrix_arrays Matrices and arrays
@@ -20,4 +131,10 @@ The TMB types "matrix" and "array" inherits from the the Eigen
 types Matrix and Array. Users of TMB should be familiar with
 the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen documentation</a>.
 
+*/
+
+/** \defgroup Distributions Probability distributions
+
+\brief TMB contains several classes of probability distributions. These are organized into C++ name spaces
+       as shown below.
 */
