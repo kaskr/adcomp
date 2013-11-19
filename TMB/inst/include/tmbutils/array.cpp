@@ -109,6 +109,7 @@ struct array:Map< Array<Type,Dynamic,1> >{
   array & operator= (const array & other)
   {
     this->MapBase::operator=(other);
+    this->setdim(other.dim);
     return *this;
   }
 
