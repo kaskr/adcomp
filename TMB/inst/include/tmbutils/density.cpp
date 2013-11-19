@@ -670,7 +670,7 @@ public:
     return (x*(Q*x)).sum();
   }
   scalartype operator()(vectortype x){
-    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x);
+    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
   /* jacobian */
   arraytype jacobian(arraytype x){
