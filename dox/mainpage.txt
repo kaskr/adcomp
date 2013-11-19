@@ -114,22 +114,24 @@ See \ref Examples for more examples
 */
 /** \defgroup matrix_arrays Matrices and arrays
 
+
 \section Relation_R Relationship to R
 In R you can apply both matrix multiplication ("%*%")
 and elementwise multiplication ("*") to objects of
 type "matrix", i.e. it is the operator that determines the operation.
 In TMB we instead have two different types of objects, while
-the multiplication operator "*" is the same:
-- matrix: linear algebra
-- array: elementwise operations
+the multiplication operator "*" is the same: 
+- \c matrix: linear algebra
+- \c array: elementwise operations; () and [] style indexing.
+- \c vector: can be used in linear algebra with \c matrix, but at the same
+time admits R style element-wise operations.
 
-In addition, arrays in TMB behaves like R arrayes, in that more than two dimensions are allowed.
-
+See matrix_arrays.cpp for examples of use.
 
 
 \section Relation_Eigen Relationship to Eigen
-The TMB types "matrix" and "array" inherits from the the Eigen
-types Matrix and Array. Users of TMB should be familiar with
+The TMB types \c matrix and \c array inherits from the the Eigen
+types Matrix and Array. The advanced user of TMB will befinit from familiarity with
 the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen documentation</a>.
 
 */

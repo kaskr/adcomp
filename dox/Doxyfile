@@ -578,6 +578,7 @@ INPUT                  =  mainpage.txt \
   			  ../TMB/inst/include \
   			  ../tmb_examples/spatial.cpp \
   			  ../tmb_examples/nmix.cpp \
+  			  ../tmb_examples/matrix_arrays.cpp \
   			  ../tmb_examples/sdv_multi.cpp
 
 
