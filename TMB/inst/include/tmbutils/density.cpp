@@ -782,10 +782,12 @@ VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
 
 /** \brief Separable extension of two densitites
 
-    Take two densities and construct the density of their separable
+    Take two densities f and g, and construct the density of their separable
     extension, defined as the multivariate Gaussian distribution
     with covariance matrix equal to the kronecker product between
     the covariance matrices of the two distributions.
+    Note that f acts on the outermost array dimension and g acts on the fastest
+    running array dimension.
 
     \verbatim
     More precisely: evaluate density 
@@ -793,6 +795,7 @@ VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
     where S=kronecker(Q,R)=Q%x%R assuming we have access to densities
     f(x)=|Q/(2*pi)|^.5*exp(-.5*x'*Q*x)
     g(x)=|R/(2*pi)|^.5*exp(-.5*x'*R*x)
+    (Note: R corresponds to fastest running array dimension in Q%x%R ...)
     Let nq=nrow(Q) and nr=nrow(R),
     using rules of the kronecker product we have that
     * Quadratic form = .5*x'*S*x = .5*x'*(Q%x%I)*(I%x%R)*x 
@@ -829,22 +832,30 @@ private:
 public:
   SEPARABLE_t(){}
   SEPARABLE_t(distribution1 f_, distribution2 g_){f=f_;g=g_;}
+  /*
+    Example: x.dim=[n1,n2,n3].
+    Apply f on outer dimension (n3) and rotate:
+    [n3,n1,n2]
+    Apply g on new outer dimension (n2) and rotate back:
+    [n1,n2,n3]
+   */
   arraytype jacobian(arraytype x){
     int n=f.ndim();
     x=f.jacobian(x);
-    x=x.rotate(-n);
-    x=g.jacobian(x);
     x=x.rotate(n);
+    x=g.jacobian(x);
+    x=x.rotate(-n);
     return x;
   }
-  /* Create zero vector corresponding to the first n dimensions of dimension-vector d */
+  /* Create zero vector corresponding to the last n dimensions of dimension-vector d */
   arraytype zeroVector(vector<int> d, int n){
     int m=1;
-    vector<int> newdim(n);
-    for(int i=0;i<n;i++){m=m*d[i];newdim[i]=d[i];}
+    vector<int> revd=d.reverse();
+    vector<int> revnewdim(n);
+    for(int i=0;i<n;i++){m=m*revd[i];revnewdim[i]=revd[i];}
     vectortype x(m);
     x.setZero();
-    return arraytype(x,newdim);
+    return arraytype(x,revnewdim.reverse());
   }
   scalartype operator()(arraytype x){
     if(this->ndim() != x.dim.size())std::cout << "Wrong dimension in SEPARABLE_t\n";
@@ -857,7 +868,7 @@ public:
     int n=f.ndim();
     arraytype zf=zeroVector(x.dim,n);
     q+=f(zf)*(scalartype(x.size())/scalartype(zf.size()));
-    x=x.rotate(-n);
+    x=x.rotate(n);
     int m=g.ndim();
     arraytype zg=zeroVector(x.dim,m);
     q+=g(zg)*(scalartype(x.size())/scalartype(zg.size()));
@@ -889,7 +900,7 @@ public:
       int n=f.ndim();
       arraytype zf=zeroVector(x.dim,n);
       q+=f(zf)*(scalartype(x.size())/scalartype(zf.size()));
-      x=x.rotate(-n);
+      x=x.rotate(n);
       int m=g.ndim();
       arraytype zg=zeroVector(x.dim,m);
       q+=g(zg)*(scalartype(x.size())/scalartype(zg.size()));
