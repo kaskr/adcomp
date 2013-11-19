@@ -620,7 +620,6 @@ class GMRF_t{
 private:
   Eigen::SparseMatrix<scalartype> Q;
   scalartype logdetQ;
-  int order;
   int sqdist(vectortype x, vectortype x_){
     int ans=0;
     int tmp;
@@ -641,9 +640,9 @@ public:
     std::vector<T> tripletList;
     for(int i=0;i<n;i++){
       for(int j=0;j<n;j++){
-	if(sqdist(x(i),x(j))==1){
+	if(sqdist(x.col(i),x.col(j))==1){
 	  tripletList.push_back(T(i,j,scalartype(-1)));
-	  tripletList.push_back(T(i,j,scalartype(1)));
+	  tripletList.push_back(T(i,i,scalartype(1)));
 	}
       }
     }
@@ -652,7 +651,7 @@ public:
     }
     Eigen::SparseMatrix<scalartype> Q_(n,n);
     Q_.setFromTriplets(tripletList.begin(), tripletList.end());
-    setQ(Q_,order);
+    setQ(Q_,order_);
   }
   void setQ(Eigen::SparseMatrix<scalartype> Q_, int order=1){
     Q=Q_;
