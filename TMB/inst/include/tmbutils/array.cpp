@@ -109,6 +109,7 @@ struct array:Map< Array<Type,Dynamic,1> >{
   array & operator= (const array & other)
   {
     this->MapBase::operator=(other);
+    this->setdim(other.dim);
     return *this;
   }
 
@@ -186,7 +187,11 @@ struct array:Map< Array<Type,Dynamic,1> >{
     }
     return ans;
   }
-  /** \brief Array transpose (Special case of array permutation) */
+  /** \brief Array transpose (Special case of array permutation) 
+
+      If e.g. x has dimension [3,4,5,6] then x.transpose() has
+      dimension [6,5,4,3].
+   */
   array<Type> transpose(){
     vector<int> p(dim.size());
     for(int i=0;i<p.size();i++)p[i]=i;
@@ -194,7 +199,13 @@ struct array:Map< Array<Type,Dynamic,1> >{
   }
 
   int mod(int i,int n){return ((i%n)+n)%n;}
-  /** \brief Array rotate (Special case of array permutation) */
+  /** \brief Array rotate (Special case of array permutation) 
+
+      Rotates array dimension with n steps where n can be any
+      (positive or negative) integer.
+      If e.g. x has dimension [3,4,5,6] then x.rotate(1) has
+      dimension [6,3,4,5].
+   */
   array<Type> rotate(int n){
     vector<int> p(dim.size());
     for(int i=0;i<p.size();i++)p[i]=mod(i-n,p.size());

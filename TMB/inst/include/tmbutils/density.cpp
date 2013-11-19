@@ -567,14 +567,29 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
   return contAR2_t<scalartype>(shape_, scale_);
 }
 
-/** \brief GMRF on d-dimensional lattice.
+/** \brief Gaussian Markov Random Field
 
     \verbatim
+    Class to evaluate the negative log density of a mean zero multivariate 
+    normal distribution with a sparse precision matrix. Let Q denote the 
+    precision matrix. Then the density is proportional to
+    |Q|^.5*exp(-.5*x'*Q*x)
+    
+    Three constructors are available:
+
+    1. General case
+    ===============
+    The user supplies the precision matrix Q of class Eigen::SparseMatrix<Type> 
+    
+    2. Special case: GMRF on d-dimensional lattice.
+    ===============================================
+    The user supplies a d-dim lattice for which Q is automatically 
+    constructed like this:
     First order Gaussian Markov Random Field on (subset of) d-dim grid.
     Grid is specified through the first array argument to constructor, 
     with individual nodes determined by the outdermost dimension 
     e.g. x= 1 1 2 2
-         1 2 1 2
+            1 2 1 2
     corresponding to a 2x2 lattice with 4 nodes and d=2.
 
     Example of precision in 2D:
@@ -587,6 +602,8 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
    more smoothness can be obtained. The quadratic form contribution 
    is .5*x'*Q^order*x
 
+   3. Vector of deltas
+   ===================
    The parameter "delta" describes the (inverse) correlation. It is
    allowed to specify a vector of deltas so that different spatial 
    regions can have different spatial correlation.
@@ -597,17 +614,12 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
    parameter (see SCALE_t and VECSCALE_t classes).
    \endverbatim
 */
-//template <class scalartype, class vectortype, class arraytype>
 template <class scalartype_>
 class GMRF_t{
   TYPEDEFS(scalartype_);
 private:
-  std::vector<int> row;
-  std::vector<int> col;
-  int nnz;
-  matrix<scalartype> Q;
+  Eigen::SparseMatrix<scalartype> Q;
   scalartype logdetQ;
-  int order;
   int sqdist(vectortype x, vectortype x_){
     int ans=0;
     int tmp;
@@ -619,72 +631,54 @@ private:
   }
 public:
   GMRF_t(){};
+  GMRF_t(Eigen::SparseMatrix<scalartype> Q_, int order_=1){
+    setQ(Q_,order_);
+  }
   GMRF_t(arraytype x, vectortype delta, int order_=1){
     int n=x.cols();
-    Q.resize(n,n);
-    for(int i=0;i<n;i++)
+    typedef Eigen::Triplet<scalartype> T;
+    std::vector<T> tripletList;
+    for(int i=0;i<n;i++){
       for(int j=0;j<n;j++){
-	if(sqdist(x(i),x(j))==1){
-	  Q(i,j)=scalartype(-1);
-	  Q(i,i)+=scalartype(1);
-	  row.push_back(i);
-	  col.push_back(j);
+	if(sqdist(x.col(i),x.col(j))==1){
+	  tripletList.push_back(T(i,j,scalartype(-1)));
+	  tripletList.push_back(T(i,i,scalartype(1)));
 	}
       }
-    for(int i=0;i<n;i++){Q(i,i)+=delta[i];row.push_back(i);col.push_back(i);}
-    matrix<scalartype> L=Q.llt().matrixL(); /*L L' = Q*/
-    logdetQ=scalartype(0);
-    for(int i=0;i<n;i++)logdetQ += scalartype(2)*log(L(i,i));
-    nnz=row.size();
-    order=order_;
-    /* logdet(Q^order) */
+    }
+    for(int i=0;i<n;i++){
+      tripletList.push_back(T(i,i,delta[i]));
+    }
+    Eigen::SparseMatrix<scalartype> Q_(n,n);
+    Q_.setFromTriplets(tripletList.begin(), tripletList.end());
+    setQ(Q_,order_);
+  }
+  void setQ(Eigen::SparseMatrix<scalartype> Q_, int order=1){
+    Q=Q_;
+    Eigen::SimplicialLDLT< Eigen::SparseMatrix<scalartype> > ldl(Q);
+    vectortype D=ldl.vectorD();
+    logdetQ=(log(D)).sum();
+    /* Q^order */
+    for(int i=1;i<order;i++){
+      Q=Q*Q_;
+    }
     logdetQ=scalartype(order)*logdetQ;
   }
   /* Quadratic form: x'*Q^order*x */
   scalartype Quadform(vectortype x){
-    scalartype ans=0;
-    vectortype y(x.size());
-    vectortype z(x);
-    for(int k=0;k<order;k++){
-      y=z;
-      for(int i=0;i<z.size();i++)z[i]=scalartype(0);
-      for(int i=0;i<nnz;i++){
-	z[row[i]]+=Q(row[i],col[i])*y[col[i]];
-      }
-    }
-    for(int i=0;i<z.size();i++)ans+=x[i]*z[i];
-    return ans;
+    return (x*(Q*x)).sum();
   }
   scalartype operator()(vectortype x){
-    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x);
+    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
-  /* WHY THIS METHOD? :In the array case we let the outer dim be gmrf and inner dim iid N01 */
-  // scalartype operator()(arraytype x){    
-  //   vector<int> newdim(2);
-  //   newdim << x.size()/x.dim[0], x.dim[0];
-  //   arraytype y=x.transpose(); /* dim becomes e.g. (dim[2],dim[1],dim[0])  */
-  //   y.setdim(newdim);          /* dim becomes e.g. (dim[2]*dim[1],dim[0])  */
-  //   scalartype ans=0;
-  //   for(int i=0;i<y.rows();i++){
-  //     ans+=-scalartype(.5)*logdetQ + scalartype(.5)*Quadform(y(i)); /* copied from previous */
-  //   }
-  //   return ans;
-  // }
-
-  /* jacobian along the lines of Quadform */
+  /* jacobian */
   arraytype jacobian(arraytype x){
-    arraytype y(x);
-    arraytype z(x);
-    for(int k=0;k<order;k++){
-      y=z;
-      z.setZero();
-      //for(int i=0;i<z.size();i++)z[i]=scalartype(0);
-      for(int i=0;i<nnz;i++){
-	//z[row[i]]+=Q(row[i],col[i])*y[col[i]];
-	z.col(row[i]) = z.col(row[i]) + Q(row[i],col[i])*y.col(col[i]);
-      }
-    }
-    return z;
+    arraytype y(x.dim);
+    matrixtype m(x.size()/x.cols(),x.cols());
+    for(int i=0;i<x.size();i++)m(i)=x[i];
+    matrixtype mQ=m*Q;
+    for(int i=0;i<x.size();i++)y[i]=mQ(i);
+    return y;
   }
   int ndim(){return 1;}
   vectortype variance(){
@@ -695,6 +689,10 @@ public:
     return ans;
   }
 };
+template <class scalartype>
+GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order=1){
+  return GMRF_t<scalartype>(Q, order);
+}
 template <class scalartype, class arraytype >
 GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1){
   return GMRF_t<scalartype>(x, delta, order);
@@ -783,10 +781,12 @@ VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
 
 /** \brief Separable extension of two densitites
 
-    Take two densities and construct the density of their separable
+    Take two densities f and g, and construct the density of their separable
     extension, defined as the multivariate Gaussian distribution
     with covariance matrix equal to the kronecker product between
     the covariance matrices of the two distributions.
+    Note that f acts on the outermost array dimension and g acts on the fastest
+    running array dimension.
 
     \verbatim
     More precisely: evaluate density 
@@ -794,6 +794,7 @@ VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
     where S=kronecker(Q,R)=Q%x%R assuming we have access to densities
     f(x)=|Q/(2*pi)|^.5*exp(-.5*x'*Q*x)
     g(x)=|R/(2*pi)|^.5*exp(-.5*x'*R*x)
+    (Note: R corresponds to fastest running array dimension in Q%x%R ...)
     Let nq=nrow(Q) and nr=nrow(R),
     using rules of the kronecker product we have that
     * Quadratic form = .5*x'*S*x = .5*x'*(Q%x%I)*(I%x%R)*x 
@@ -830,22 +831,30 @@ private:
 public:
   SEPARABLE_t(){}
   SEPARABLE_t(distribution1 f_, distribution2 g_){f=f_;g=g_;}
+  /*
+    Example: x.dim=[n1,n2,n3].
+    Apply f on outer dimension (n3) and rotate:
+    [n3,n1,n2]
+    Apply g on new outer dimension (n2) and rotate back:
+    [n1,n2,n3]
+   */
   arraytype jacobian(arraytype x){
     int n=f.ndim();
     x=f.jacobian(x);
-    x=x.rotate(-n);
-    x=g.jacobian(x);
     x=x.rotate(n);
+    x=g.jacobian(x);
+    x=x.rotate(-n);
     return x;
   }
-  /* Create zero vector corresponding to the first n dimensions of dimension-vector d */
+  /* Create zero vector corresponding to the last n dimensions of dimension-vector d */
   arraytype zeroVector(vector<int> d, int n){
     int m=1;
-    vector<int> newdim(n);
-    for(int i=0;i<n;i++){m=m*d[i];newdim[i]=d[i];}
+    vector<int> revd=d.reverse();
+    vector<int> revnewdim(n);
+    for(int i=0;i<n;i++){m=m*revd[i];revnewdim[i]=revd[i];}
     vectortype x(m);
     x.setZero();
-    return arraytype(x,newdim);
+    return arraytype(x,revnewdim.reverse());
   }
   scalartype operator()(arraytype x){
     if(this->ndim() != x.dim.size())std::cout << "Wrong dimension in SEPARABLE_t\n";
@@ -858,7 +867,7 @@ public:
     int n=f.ndim();
     arraytype zf=zeroVector(x.dim,n);
     q+=f(zf)*(scalartype(x.size())/scalartype(zf.size()));
-    x=x.rotate(-n);
+    x=x.rotate(n);
     int m=g.ndim();
     arraytype zg=zeroVector(x.dim,m);
     q+=g(zg)*(scalartype(x.size())/scalartype(zg.size()));
@@ -890,7 +899,7 @@ public:
       int n=f.ndim();
       arraytype zf=zeroVector(x.dim,n);
       q+=f(zf)*(scalartype(x.size())/scalartype(zf.size()));
-      x=x.rotate(-n);
+      x=x.rotate(n);
       int m=g.ndim();
       arraytype zg=zeroVector(x.dim,m);
       q+=g(zg)*(scalartype(x.size())/scalartype(zg.size()));
