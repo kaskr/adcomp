@@ -45,3 +45,5 @@ using CppAD::ADFun;
 #include "tmb_core.hpp"
 #include "convenience.hpp"
 using tmbutils::array;
+using Eigen::Matrix;
+using Eigen::Array;
