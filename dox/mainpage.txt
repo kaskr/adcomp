@@ -1,4 +1,4 @@
-/** \defgroup Tutorial Tutorial: how to write the objective function in C++ 
+/** \defgroup Tutorial Introduction: how to write the C++ part of the model 
 
 This tutorial describes how to write the C++ part of a TMB "project". The
 tutorial assumes familiarity with C++ and to some extent with R.
@@ -106,7 +106,6 @@ The following rules apply:
    \endcode
 
 See \ref Examples for more examples
-
 
 
 */
