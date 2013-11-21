@@ -1,3 +1,8 @@
+/** \file
+    \brief Kronecker product of two matrices
+*/
+
+/** \brief Kronecker product of two matrices */
 template <class scalartype, int n1, int n2, int n3, int n4>
 Matrix<scalartype,n1*n3,n2*n4> kronecker(Matrix<scalartype,n1,n2> x, Matrix<scalartype,n3,n4> y){
   Matrix<scalartype,n1*n3,n2*n4> ans;

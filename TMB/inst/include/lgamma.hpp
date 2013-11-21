@@ -1,3 +1,6 @@
+/** \file
+    \brief Gamma function and gamma probability densities
+*/
 template <class Type>
 inline Type lgamma(const Type &y)
 {
@@ -28,11 +31,12 @@ inline Type lgamma(const Type &y)
   return term1 + (term2 - Type(7.0));
 }
 
-/* Negative binomial probability function.
- * Considering the return value we need to make sure that:
- * (1) n>0   (2) 0<p   (3) p<1
- * This is obtained by adding small constants appropriate places.
- */
+/** \brief Negative binomial probability function.
+
+  Considering the return value we need to make sure that:
+  (1) n>0   (2) 0<p   (3) p<1
+  This is obtained by adding small constants appropriate places.
+*/
 template<class Type>
 inline Type dnbinom(const Type &x, const Type &mu0, const Type &var0,
 		    int give_log=0)
@@ -46,7 +50,7 @@ inline Type dnbinom(const Type &x, const Type &mu0, const Type &var0,
   if (give_log) return logres; else return exp(logres);
 }
 
-/* Poisson probability function. */
+/** \brief Poisson probability function. */
 template<class Type>
 inline Type dpois(const Type &x, const Type &lambda, int give_log=0)
 {
@@ -54,7 +58,7 @@ inline Type dpois(const Type &x, const Type &lambda, int give_log=0)
   if (give_log) return logres; else return exp(logres);
 }
 
-/* Density of X where X~gamma distributed */
+/** \brief Density of X where X~gamma distributed */
 template<class Type>
 Type dgamma(Type y, Type shape, Type scale, int give_log=0)
 {
@@ -62,7 +66,7 @@ Type dgamma(Type y, Type shape, Type scale, int give_log=0)
   if(give_log)return logres; else return exp(logres);
 }
 
-/* Density of log(X) where X~gamma distributed */
+/** \brief Density of log(X) where X~gamma distributed */
 template<class Type>
 inline Type dlgamma(Type y, Type shape, Type scale, int give_log=0)
 {

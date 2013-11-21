@@ -1,5 +1,5 @@
 /** \file 
-* \brief Main TMB file containing interfaces to R and CppAD
+* \brief Includes and sets all stuff needed to compile the user defined objective function.
 */
 /* To be removed */
 #define TMB_DEBUG 0

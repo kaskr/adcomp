@@ -575,11 +575,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  =  mainpage.txt \
-  			  ../TMB/inst/include \
-  			  ../tmb_examples/spatial.cpp \
-  			  ../tmb_examples/nmix.cpp \
-  			  ../tmb_examples/matrix_arrays.cpp \
-  			  ../tmb_examples/sdv_multi.cpp
+  			  ../TMB/inst/include 
 
 
 # This tag can be used to specify the character encoding of the source files
@@ -637,7 +633,8 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           =	../tmb_examples \
+				../TMB/inst/examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp

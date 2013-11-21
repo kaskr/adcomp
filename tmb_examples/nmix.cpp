@@ -72,9 +72,3 @@ Type objective_function<Type>::operator() ()
   }
   return nll;
 }
-
-/** \file
-\ingroup Examples
-\brief nmix example from https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix
-*/
-

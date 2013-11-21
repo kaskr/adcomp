@@ -1,6 +1,5 @@
-/**
-   \file vector.cpp
-   Matrix vector templates using inheritance.
+/** \file 
+   \brief Defines TMB vectors 
 */
 
 using namespace Eigen;

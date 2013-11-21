@@ -1,3 +1,7 @@
+/** \file 
+* \brief Interfaces to R and CppAD
+*/
+
 /* Memory manager:
    Count the number of external pointers alive.
    When total number is zero it is safe to dyn.unload

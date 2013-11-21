@@ -1,4 +1,4 @@
-/** 
+/** \file 
    \brief Namespace of utility functions for TMB
 */
 namespace tmbutils{

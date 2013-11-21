@@ -1,6 +1,5 @@
-/**
-   \file density.cpp
-   Classes to construct multivariate Gaussian density objects.
+/** \file 
+   \brief Classes to construct multivariate Gaussian density objects.
 */
 
 

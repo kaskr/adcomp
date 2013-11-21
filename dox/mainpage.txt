@@ -1,13 +1,14 @@
-/** \defgroup Tutorial Introduction: how to write the C++ part of the model 
+/** \defgroup Tutorial Getting started
 
-This tutorial describes how to write the C++ part of a TMB "project". The
-tutorial assumes familiarity with C++ and to some extent with R.
-TMB projects typically consist of a *.R file and a *.cpp (C++) file (see example collection).
-The *.R file does pre- and post processing of data in addition to calling the *.cpp program. 
+
+A TMB projects consists of an R file (*.R) and a C++ file (*.cpp). 
+The R file does pre- and post processing of data in addition to maximizing
+the log-likelihood contained in *.cpp. See \ref Examples for more details.
 All R functions are documented within the standard help system i R.
+This tutorial describes how to write the C++ file, and assumes familiarity with C++ and to some extent with R.
 
 The purpose of the C++ program is to evaluate the objective function, i.e. the negative log-likelihood
-of the model. This program is compiled and called from R, where
+of the model. The program is compiled and called from R, where
 it can be fed to a function minimizer like nlminb().
 
 The objective function should be of the following C++ type:
@@ -109,8 +110,6 @@ See \ref Examples for more examples
 
 
 */
-/** \defgroup Examples Example collection
-*/
 /** \defgroup matrix_arrays Matrices and arrays
 
 
@@ -125,7 +124,7 @@ the multiplication operator "*" is the same:
 - \c vector: can be used in linear algebra with \c matrix, but at the same
 time admits R style element-wise operations.
 
-See matrix_arrays.cpp for examples of use.
+See \ref matrix_arrays.cpp "matrix_arrays.cpp" for examples of use.
 
 
 \section Relation_Eigen Relationship to Eigen
@@ -140,3 +139,31 @@ the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eig
 \brief TMB contains several classes of probability distributions. These are organized into C++ name spaces
        as shown below.
 */
+
+*/
+/** \defgroup Examples 
+For a list of all examples please click on the "Examples" tab on
+the top of the page. 
+
+Simple example:
+\include simple.cpp
+
+\example linreg.cpp 
+\example matrix_arrays.cpp
+\example nmix.cpp
+\example orange_big.cpp
+\example rw.cpp
+\example rw_sparse.cpp
+\example sdv_multi.cpp
+\example socatt.cpp
+\example spatial.cpp
+\example ar1xar1.cpp
+\example atomic.cpp
+\example randomregression.cpp
+\example rw.cpp
+\example simple.cpp
+\example sumtest.cpp
+
+*/
+
+
