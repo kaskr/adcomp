@@ -13,18 +13,19 @@ it can be fed to a function minimizer like nlminb().
 
 The objective function should be of the following C++ type:
    \code
+#include <TMB.hpp>
+
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
 .... Here goes your C++ code ..... 
 }
    \endcode
-Note that the objective function is a templated class where <tt><Type></tt> is
+The first line includes the source code for the whole TMB package (and all its dependencies).
+The objective function is a templated class where <tt><Type></tt> is
 the data type of both the input values and the return value of the objective function.
-The reason for the allowing different data types is that the same chunk of C++ code
-can evaluate the both the objective function and its derivatives, by calling 
-it with different values for "Type".  The technical aspects 
-of this are hidden from the user. There is however one aspect 
+This allows us to evaluate both the objective function and its derivatives using the same chunk of C++ code
+(and the AD package CppAD). The technical aspects of this are hidden from the user. There is however one aspect 
 that surprises the new TMB user. When a constant like "1.2" is used
 in a calculation that affects the return value it must be "cast" to Type:
    \code

@@ -30,7 +30,7 @@ Type sum(Vector<Type> x){return x.sum();}
 
 /** Matrix * vector 
 
-  Simplifies syntax in that \ref .matrix() can be avoided. Recall: TMB type \c vector is of Eigen type \ref Array.
+  Simplifies syntax in that .matrix() can be avoided. Recall: TMB type vector is of Eigen type Array.
 */
 template<class Type>
 vector<Type> operator*(matrix<Type> A, vector<Type> x){return A*x.matrix();}
