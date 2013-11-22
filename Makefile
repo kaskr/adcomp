@@ -19,6 +19,11 @@ install:
 	make build-package
 	R CMD INSTALL --preclean $(TARBALL)
 
+install-metis:
+	make build-package
+	LIBCHOLMOD=/usr/lib/libcholmod.so.3.1.0 R CMD INSTALL --preclean $(TARBALL)
+
+
 unexport TEXINPUTS
 pdf:
 	rm -f $(PACKAGE).pdf
