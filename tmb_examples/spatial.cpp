@@ -1,5 +1,4 @@
 // Spatial poisson GLMM on a grid, with exponentially decaying correlation function
-/** teksten */
 #include <TMB.hpp>
 
 template<class Type>
@@ -43,5 +42,3 @@ Type objective_function<Type>::operator() ()
   return res;
 
 }
-
-/** \brief En test */

@@ -1,8 +1,11 @@
-/* Class to do "differentiable" sorting of a vector.
+/** \file 
+   \brief "Differentiable" sorting of a vector.
 
    Example:
+   \code
    order<Type> perm(x);
    vector<Type> xsort=perm(x);
+   \endcode
 
  */
 template <class Type>

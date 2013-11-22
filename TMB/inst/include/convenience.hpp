@@ -1,8 +1,10 @@
-/* Templates to get convenient R-like syntax. */
+/** \file
+  \brief Templates to get convenient R-like syntax. 
+*/
 
-/** \brief  Similar to R's split function: split(x,fac) devides x into groups defined by fac 
+/** \brief  Similar to R's split function:  split(x,fac) devides  x  into groups defined by  fac . 
 * \details
-Returns a "vector of vectors". See nmix.cpp for an example
+Returns a "vector of vectors". 
 */
 template<class Type>
 vector<vector<Type> > split(vector<Type> x,vector<int> fac){
@@ -26,7 +28,10 @@ vector<vector<Type> > split(vector<Type> x,vector<int> fac){
 template<template<class> class Vector, class Type>
 Type sum(Vector<Type> x){return x.sum();}
 
-/** Matrix * vector */
+/** Matrix * vector 
+
+  Simplifies syntax in that \ref .matrix() can be avoided. Recall: TMB type \c vector is of Eigen type \ref Array.
+*/
 template<class Type>
 vector<Type> operator*(matrix<Type> A, vector<Type> x){return A*x.matrix();}
 

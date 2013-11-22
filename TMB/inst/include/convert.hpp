@@ -1,4 +1,7 @@
-/* Convert vector/matrix-Types to double SEXP types */
+/** \file
+  \brief  Convert vector/matrix-Types to double SEXP types 
+*/
+
 double asDouble(int x){return double(x);}
 double asDouble(double x){return x;}
 double asDouble(AD<double> x){return CppAD::Value(x);}
@@ -76,7 +79,7 @@ SEXP asSEXP(const Vector<Type> &a)
    return val;
 }
 
-/* Construct c++-vector from SEXP object */
+/** \brief Construct c++-vector from SEXP object */
 template <class Type>
 vector<Type> asVector(SEXP x)
 {
@@ -87,7 +90,7 @@ vector<Type> asVector(SEXP x)
    return y;
 }
 
-/* Vector <-> Matrix conversion (for row-major matrices) */
+/** \brief Vector <-> Matrix conversion (for row-major matrices) */
 template<class Type>
 matrix<Type> asMatrix(const vector<Type> &x, int nr, int nc)
 {
@@ -100,7 +103,7 @@ matrix<Type> asMatrix(const vector<Type> &x, int nr, int nc)
 }
 
 // kasper: MOVE TO asMatrix.hpp ?
-/* Construct c++-matrix from SEXP object */
+/** \brief Construct c++-matrix from SEXP object */
 template <class Type>
 matrix<Type> asMatrix(SEXP x)
 {

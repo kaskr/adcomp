@@ -1,3 +1,9 @@
+/** \file 
+   \brief Matrix exponential.
+
+*/
+
+/** \brief Matrix exponential: matrix of arbitrary dimension. */
 template <class scalartype, int dim>
 struct matexp{
   typedef Matrix<scalartype,dim,dim> matrix;
@@ -30,7 +36,7 @@ struct matexp{
   }
 };
 
-/* 2x2 case */
+/** \brief Matrix exponential: 2x2 case which can be handled efficiently */
 template <class scalartype>
 struct matexp<scalartype,2>{
   typedef std::complex<scalartype> complex;

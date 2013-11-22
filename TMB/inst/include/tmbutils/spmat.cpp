@@ -1,4 +1,8 @@
-/* Create sparse matrix from R-triplet sparse matrix */
+/** \file
+  \brief Extends Eigen::SparseMatrix class
+*/
+
+/** Create sparse matrix from R-triplet sparse matrix */
 template<class Type>
 Eigen::SparseMatrix<Type> asSparseMatrix(SEXP M){
   int *i=INTEGER(GET_SLOT(M,install("i")));
@@ -16,7 +20,7 @@ Eigen::SparseMatrix<Type> asSparseMatrix(SEXP M){
   return mat;
 }
 
-/* Create sparse matrix from dense matrix */
+/** Create sparse matrix from dense matrix */
 template<class Type>
 Eigen::SparseMatrix<Type> asSparseMatrix(matrix<Type> x){
   typedef Eigen::Triplet<Type> T;
@@ -29,7 +33,7 @@ Eigen::SparseMatrix<Type> asSparseMatrix(matrix<Type> x){
   return mat;  
 }
 
-/* Create sparse vector from dense vector */
+/** Create sparse vector from dense vector */
 template<class Type>
 Eigen::SparseVector<Type> asSparseVector(vector<Type> x){
   typedef Eigen::Triplet<Type> T;
@@ -40,6 +44,7 @@ Eigen::SparseVector<Type> asSparseVector(vector<Type> x){
   return mat;  
 }
 
+/** Kronecker product of two sparse matrices */
 template <class Type>
 Eigen::SparseMatrix<Type> kronecker(Eigen::SparseMatrix<Type> x,
 				    Eigen::SparseMatrix<Type> y){
@@ -66,7 +71,7 @@ Eigen::SparseMatrix<Type> kronecker(Eigen::SparseMatrix<Type> x,
   return mat;
 }
 
-/* Solve discrete Lyapunov equation V=AVA'+I */
+/** Solve discrete Lyapunov equation V=AVA'+I */
 template <class Type>
 matrix<Type> discrLyap(matrix<Type> A_){
   matrix<Type> I_(A_.rows(),A_.cols());
@@ -91,7 +96,7 @@ matrix<Type> discrLyap(matrix<Type> A_){
   return V;
 }
 
-/* Inverse of PD sparse matrix */
+/** Inverse of PD sparse matrix */
 template <class Type>
 matrix<Type> invertSparseMatrix(matrix<Type> A_){
   matrix<Type> I(A_.rows(),A_.cols());
