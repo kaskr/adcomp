@@ -1,5 +1,3 @@
-#ifdef _USE_EXTERNAL_CHOLMOD_LIB_
-
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 #include <malloc.h>
@@ -12,6 +10,7 @@
 #endif
 #include "Matrix.h"
 
+#ifdef _USE_EXTERNAL_CHOLMOD_LIB_
 /* ========================================================================== */
 /* Error handler */
 /* ========================================================================== */
@@ -31,6 +30,13 @@ cholmod_factor *cholmod_analyze
     /* --------------- */
     cholmod_common *Common
 ) ;
+int cholmod_free_factor
+(
+    /* ---- in/out --- */
+    cholmod_factor **LHandle,	/* factor to free, NULL on output */
+    /* --------------- */
+    cholmod_common *Common
+) ;
 
 /* ========================================================================== */
 /* Run the symbolic analysis and prepare workspace - only run once !!! */
@@ -41,8 +47,7 @@ SEXP tmb_symbolic(SEXP Qp){
   /* TODO: More control from R */
   c.nmethods=9; 
   c.supernodal = CHOLMOD_SUPERNODAL;
-  c.final_ll = TRUE; /* Important (LDL=FALSE): otherwise tmb_inv_up gives wrong answer.
-		        Alternative is to fix "cholmod_factor_to_sparse" */
+  c.final_ll = TRUE;
   /*  Return quickly if not positive definite */
   c.quick_return_if_not_posdef=TRUE;
   c.error_handler=tmb_cholmod_error;
@@ -90,3 +95,15 @@ SEXP tmb_symbolic(SEXP Qp){
 }
 
 #endif
+
+SEXP have_tmb_symbolic() {
+  SEXP ans;
+  PROTECT(ans = NEW_INTEGER(1));
+#ifdef _USE_EXTERNAL_CHOLMOD_LIB_
+  INTEGER(ans)[0]=1;
+#else
+  INTEGER(ans)[0]=0;
+#endif
+  UNPROTECT(1);
+  return ans;
+}

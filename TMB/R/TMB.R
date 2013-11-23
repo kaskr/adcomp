@@ -1080,3 +1080,17 @@ checkSparseHessian <- function(obj,par=obj$env$last.par,
   }
   invisible(res)
 }
+
+runSymbolicAnalysis <- function(obj){
+  ok <- .Call("have_tmb_symbolic",PACKAGE="TMB")
+  if(!ok){
+    cat("note: tmb_symbolic not installed\n")
+    return(NULL)
+  }
+  h <- obj$env$spHess(random=TRUE)
+  h@x[] <- 0
+  diag(h) <- 1
+  L <- .Call("tmb_symbolic",h,PACKAGE="TMB")
+  obj$env$L.created.by.newton <- L
+  NULL
+}

@@ -38,6 +38,7 @@ obj <- MakeADFun(data=list(N=N),
                    transf_phi1=invf(0.5),
                    transf_phi2=invf(0.5)),
                  random=c("eta"))
+runSymbolicAnalysis(obj)
 obj$control <- list(trace=1,parscale=c(1,1)*1e-2,REPORT=1,reltol=1e-12)
 obj$hessian <- TRUE
 ##Rprof();opt <- do.call("optim",obj);Rprof(NULL)
