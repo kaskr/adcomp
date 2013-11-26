@@ -161,9 +161,9 @@ Simple example:
 \example ar1xar1.cpp
 \example atomic.cpp
 \example randomregression.cpp
-\example rw.cpp
 \example simple.cpp
 \example sumtest.cpp
+\example called_from_R.cpp
 
 */
 

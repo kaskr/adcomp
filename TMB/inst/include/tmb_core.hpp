@@ -161,7 +161,7 @@ Levels: d e f g h i j
 
 
 // kasper: Not sure used anywhere
-/* Get the hessian sparsity pattern of ADFun object pointer */
+/** \brief Get the hessian sparsity pattern of ADFun object pointer */
 template<class Type>
 matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
   int n=pf->Domain();
@@ -178,7 +178,7 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
 }
 
 
-/* get the list element named str, or return NULL */ 
+/** \brief Get list element named "str", or return NULL */ 
 SEXP getListElement(SEXP list, const char *str) 
 {
   if(config.debug.getListElement)std::cout << "getListElement: " << str << " ";
@@ -196,10 +196,10 @@ SEXP getListElement(SEXP list, const char *str)
 }
 
 
-/* Do nothing if we are trying to tape non AD-types */
+/** \brief Do nothing if we are trying to tape non AD-types */
 void Independent(vector<double> x){}
 
-/* Used by ADREPORT */
+/** \brief Used by ADREPORT */
 template <class Type>
 struct report_stack{
   vector<const char*> names;
@@ -251,8 +251,9 @@ struct report_stack{
     UNPROTECT(1);
     return nam;
   }
-};
+};  // report_stack
 
+/** \brief Type definition of user-provided objective function (i.e. neg. log. like) */
 template <class Type>
 class objective_function
 {
@@ -263,11 +264,12 @@ public:
   SEXP report;
   
   int index;
-  vector<Type> theta;
-  vector<const char*> thetanames;
-  report_stack<Type> reportvector; //Used by "ADREPORT"
+  vector<Type> theta; /**< \brief Consists of unlist(parameters_)*/ 
+  vector<const char*> thetanames; /**< \brief Names of theta */ 
+  report_stack<Type> reportvector; /**< \brief Used by "ADREPORT" */
   bool reversefill; // used to find the parameter order in user template (not anymore - use pushParname instead)
-  vector<const char*> parnames; // One name for each PARAMETER_ in user template
+  vector<const char*> parnames; /**< \brief One name for each PARAMETER_ in user template */
+
   void pushParname(const char* x){
     parnames.conservativeResize(parnames.size()+1);
     parnames[parnames.size()-1]=x;
@@ -495,7 +497,8 @@ struct parallel_accumulator{
   }
 };
 
-/* Template to evaluate an ADFun object from R:
+/** \brief Evaluates an ADFun object from R
+
    Template argument can be
    - ADFun or
    - parallelADFun
@@ -578,9 +581,9 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   }
   UNPROTECT(4);
   return res;
-}
+} // EvalADFunObjectTemplate
 
-/* How to garbage collect an ADFun or parallelADFun object pointer */
+/** \brief Garbage collect an ADFun or parallelADFun object pointer */
 template <class ADFunType>
 void finalize(SEXP x)
 {
@@ -590,6 +593,7 @@ void finalize(SEXP x)
 }
 
 
+/** \brief Construct ADFun object */
 ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
@@ -620,7 +624,7 @@ ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
 extern "C"
 {
 
-  /* How to garbage collect an ADFun object pointer */
+  /** \brief Garbage collect an ADFun object pointer */
   void finalizeADFun(SEXP x)
   {
     ADFun<double>* ptr=(ADFun<double>*)R_ExternalPtrAddr(x);
@@ -634,7 +638,7 @@ extern "C"
     memory_manager.CallCFinalizer(x);
   }
 
-  /* Construct ADFun object */
+  /** \brief Construct ADFun object */
   SEXP MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
   {
@@ -688,7 +692,7 @@ extern "C"
     UNPROTECT(4);
 
     return ans;
-  }
+  } // MakeADFunObject
   
   SEXP InfoADFunObject(SEXP f)
   {
@@ -799,7 +803,9 @@ extern "C"
     return res;
   }
 
-  /* We spend a function evaluation on getting the parameter order (!) */
+  /** \brief Gets parameter order 
+
+   We spend a function evaluation on getting the parameter order (!) */
   SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report)
   {
     /* Some type checking */
@@ -820,7 +826,7 @@ extern "C"
 extern "C"
 {
 
-  /* Tape the gradient using nested AD types */
+  /** \brief Tape the gradient using nested AD types */
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
     /* Some type checking */
@@ -858,7 +864,7 @@ extern "C"
     PROTECT(ans=ptrList(res));
     UNPROTECT(3);
     return ans;
-  }
+  } // MakeADGradObject
 }
 
 
@@ -867,7 +873,7 @@ extern "C"
 extern "C"
 {
 
-  /* Tape the hessian[cbind(i,j)] using nested AD types */
+  /** \brief Tape the hessian[cbind(i,j)] using nested AD types */
   SEXP MakeADHessObject(SEXP data, SEXP parameters, SEXP report, SEXP hessianrows, SEXP hessiancols)
   {
     /* Some type checking */
@@ -921,7 +927,7 @@ extern "C"
     PROTECT(ans=ptrList(res));
     UNPROTECT(3);
     return ans;
-  }
+  } //MakeADHessObject
 
 
 
@@ -932,7 +938,7 @@ extern "C"
    Tape gradient on AD<AD<double>> and run optimize method. 
    Then tape the sparse hessian as the gradient of each component.
  */
-  /* Tape the hessian[cbind(i,j)] using nested AD types 
+  /** \brief Tape the hessian[cbind(i,j)] using nested AD types 
 
      skip: integer vector of columns to skip from the hessian (will not change dimension
             - only treat h[:,skip] and h[skip,:] as zero). Negative subscripts are not allowed.
@@ -1074,7 +1080,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   }
   sphess ans(pf,rowindex,colindex);
   return ans;
-}
+} // MakeADHessObject2
 
 // kasper: Move to new file e.g. "convert.hpp"
 template <class ADFunType>
