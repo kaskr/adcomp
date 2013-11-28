@@ -17,7 +17,7 @@ struct SEXP_t{
 };
 bool operator<(SEXP_t x, SEXP_t y){return (size_t(x.value)<size_t(y.value));}
 /** \brief Controls the life span of objects created in the C++ template (jointly R/C++)*/
-static struct memory_manager_struct{
+struct memory_manager_struct{
   int counter;				/**< \brief Number of objects alive that "memory_manager_struct" has allocated */
   std::map<SEXP_t,SEXP_t> alive;
   /** \brief Register "list" in memory_manager_struct */
