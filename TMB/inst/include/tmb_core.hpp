@@ -393,7 +393,8 @@ public:
   double value(double x){return x;}
   double value(AD<double> x){return CppAD::Value(x);}
   double value(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
-  
+  double value(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+
   int nparms(SEXP obj)
   {
     int count=0;
@@ -504,6 +505,9 @@ struct parallel_accumulator{
     return result;
   }
 };
+
+
+#ifndef WITH_LIBTMB
 
 /** \brief Evaluates an ADFun object from R
 
@@ -1152,4 +1156,34 @@ extern "C"
   } // MakeADHessObject2
 #endif
   
+}
+
+#endif /* #ifndef WITH_LIBTMB */
+
+
+#ifdef WITH_LIBTMB
+
+template class objective_function<double>;
+template class objective_function<AD<double> >;
+template class objective_function<AD<AD<double> > >;
+template class objective_function<AD<AD<AD<double> > > >;
+extern "C"
+{
+  SEXP MakeADFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
+  SEXP InfoADFunObject(SEXP f);
+  SEXP optimizeADFunObject(SEXP f);
+  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control);
+  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report);
+  SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control);
+  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report);
+  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
+  SEXP MakeADHessObject(SEXP data, SEXP parameters, SEXP report, SEXP hessianrows, SEXP hessiancols);
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip);
+}
+
+#endif /* #ifdef WITH_LIBTMB */
+
+// Trigger inclusion of above symbols (TODO: find better way)
+SEXP dummy_getParameterOrder(SEXP data, SEXP parameters, SEXP report){
+  return getParameterOrder(data, parameters, report);
 }

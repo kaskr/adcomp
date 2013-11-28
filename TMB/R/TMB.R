@@ -651,9 +651,17 @@ openmp <- function(n=NULL){
 ##' @param safebounds Turn on preprocessor flag for bound checking?
 ##' @param safeunload Turn on preprocessor flag for safe DLL unloading?
 ##' @param openmp Turn on openmp flag? Auto detected for parallel templates.
+##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
 ##' @param ... Passed as Makeconf variables.
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
-                    openmp=isParallelTemplate(file),...){
+                    openmp=isParallelTemplate(file),libtmb=TRUE,...){
+  ## libtmb existence
+  if(!openmp){
+    libtmb <- libtmb && file.exists(system.file(dynlib("libs/libTMB"),package="TMB"))
+  }
+  if(openmp){
+    libtmb <- libtmb && file.exists(system.file(dynlib("libs/libTMBomp"),package="TMB"))
+  }
   ## Function to create temporary makevars
   mvuser <- Sys.getenv("R_MAKEVARS_USER",NA)
   if(!is.na(mvuser))on.exit(Sys.setenv(R_MAKEVARS_USER=mvuser))
@@ -686,17 +694,44 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   ## Includes and preprocessor flags specific for the template
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
                    "-DTMB_SAFEBOUNDS"[safebounds],
-                   paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload]
+                   paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
+                   "-DWITH_LIBTMB"[libtmb]
                    )
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
-                     PKG_LIBS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
+                     PKG_LIBS=paste(
+                       "$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
+                       system.file(dynlib("libs/libTMB"),package="TMB")[libtmb && !openmp],
+                       system.file(dynlib("libs/libTMBomp"),package="TMB")[libtmb && openmp] ),
                      PKG_CXXFLAGS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
                      CXXFLAGS=flags[flags!=""], ## Optionally overwrite cxxflags
                      ...
                      )
   on.exit(file.remove(mvfile))
   tools:::.shlib_internal(file)
+}
+
+##' Precompile the TMB library
+##'
+##' The precompilation should only be run once, typically right after installaion of TMB.
+##' Note that the precompilation requires write access to the TMB package folder.
+##' Two versions of the library - with/without the openmp flag - will be generated. After this,
+##' compilation times of templates should be reduced.
+##' @title Precompile the TMB library in order to speed up compilation of templates.
+##' @param ... Passed to \code{compile}.
+precompile <- function(...){
+  owdir <- getwd()
+  on.exit(setwd(owdir))
+  folder <- system.file("libs",package="TMB")
+  setwd(folder)
+  writeLines("#include <TMB.hpp>","libTMB.cpp")
+  cat("Compiling serial version\n")
+  compile("libTMB.cpp",safeunload=FALSE,libtmb=FALSE,...)
+  file.remove("libTMB.cpp")
+  writeLines("#include <TMB.hpp>","libTMBomp.cpp")
+  cat("Compiling parallel version\n")
+  compile("libTMBomp.cpp",openmp=TRUE,safeunload=FALSE,libtmb=FALSE,...)
+  file.remove("libTMBomp.cpp")
 }
 
 ## Add dynlib extension
