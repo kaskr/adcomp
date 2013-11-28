@@ -512,7 +512,7 @@ FILE_VERSION_FILTER    =
 # file name after the option, if omitted DoxygenLayout.xml will be used as the name
 # of the layout file.
 
-LAYOUT_FILE            =  #DoxygenLayout.xml
+LAYOUT_FILE            =  
 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
@@ -576,8 +576,7 @@ WARN_LOGFILE           =
 
 INPUT                  =  mainpage.txt \
                          ../TMB/inst/include \
-                          Rinternals.h \                # Hook to link in R documentation
-                          Rdefines.h                   # Hook to link in R documentation
+                          Rinternals.h               # Hook to link in R documentation
 
 
 # This tag can be used to specify the character encoding of the source files

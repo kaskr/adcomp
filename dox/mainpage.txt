@@ -142,7 +142,7 @@ the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eig
 */
 
 */
-/** \defgroup Examples 
+/** \defgroup Examples TMB examples
 For a list of all examples please click on the "Examples" tab on
 the top of the page. 
 

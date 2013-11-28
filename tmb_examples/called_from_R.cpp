@@ -1,4 +1,4 @@
-// Collection of .Call() calls in R which shows the C++ functions called from "TMB.R"
+// Collection of .Call()'s in "TMB.R". The purpose of this file is to show which C++ functions are called from R.
 // Each function call is proceeded by the corresponding line from TMB.R
 // Warning: this file may be outdated. 
 #include <TMB.hpp>

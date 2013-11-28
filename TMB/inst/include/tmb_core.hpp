@@ -7,21 +7,26 @@
    When total number is zero it is safe to dyn.unload
    the library.
 */
+
+/** \brief TMB: SEXP type */
 struct SEXP_t{
-  SEXP value;
-  SEXP_t(SEXP x){value=x;}
-  SEXP_t(){value=R_NilValue;}
-  operator SEXP(){return value;}
+  SEXP value;				/**< \brief SEXP_t: data entry*/
+  SEXP_t(SEXP x){value=x;}		/**< \brief SEXP_t: assignment*/
+  SEXP_t(){value=R_NilValue;}		/**< \brief SEXP_t: default constructor*/
+  operator SEXP(){return value;}	/**< \brief SEXP_t:*/
 };
 bool operator<(SEXP_t x, SEXP_t y){return (size_t(x.value)<size_t(y.value));}
+/** \brief Controls the life span of objects created in the C++ template (jointly R/C++)*/
 static struct memory_manager_struct{
-  int counter;
+  int counter;				/**< \brief Number of objects alive that "memory_manager_struct" has allocated */
   std::map<SEXP_t,SEXP_t> alive;
+  /** \brief Register "list" in memory_manager_struct */
   void RegisterCFinalizer(SEXP list){
     counter++;
     SEXP x=VECTOR_ELT(list,0);
     alive[x]=list;
   }
+  /** \brief Revmoves "x" from memory_manager_struct */
   void CallCFinalizer(SEXP x){
     counter--;
     alive.erase(x);
@@ -39,14 +44,16 @@ static struct memory_manager_struct{
   }
 } memory_manager;
 
-/* All external pointers returned from TMB should be placed in a 
+/** \brief Convert x to TMB-format for R/C++ communication
+
+   All external pointers returned from TMB should be placed in a 
    list container of length one. Additional information should be set
    as attributes to the pointer. The memory_manager_struct above knows
    how to look up the list container given the external pointer. By 
    setting the list element to NULL the memory_manager can trigger the
    garbage collector (and thereby the finalizers) when the library is
    unloaded.
- */
+*/
 SEXP ptrList(SEXP x){
   SEXP ans,names;
   PROTECT(ans=allocVector(VECSXP,1));
@@ -265,11 +272,12 @@ public:
   
   int index;
   vector<Type> theta; /**< \brief Consists of unlist(parameters_)*/ 
-  vector<const char*> thetanames; /**< \brief Names of theta */ 
+  vector<const char*> thetanames; /**< \brief In R notation: names(theta). Contains repeated values*/ 
   report_stack<Type> reportvector; /**< \brief Used by "ADREPORT" */
   bool reversefill; // used to find the parameter order in user template (not anymore - use pushParname instead)
   vector<const char*> parnames; /**< \brief One name for each PARAMETER_ in user template */
 
+/** \brief Called once for each occurance of PARAMETER_ */
   void pushParname(const char* x){
     parnames.conservativeResize(parnames.size()+1);
     parnames[parnames.size()-1]=x;
@@ -467,7 +475,7 @@ public:
   }
    
    Type operator() ();
-};
+}; // objective_function
 
 /* Experiment: Help manage the parallel accumulation.
    Usage:
@@ -982,7 +990,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   Independent(xx);
   yy=tmp.Jacobian(xx);
   ADFun<AD<double > > tmp2(xx,yy);
-  
+ 
   /* Optimize tape */
   tmp2.optimize();  // ================== WARNING!!!
   
@@ -1084,6 +1092,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
 
 // kasper: Move to new file e.g. "convert.hpp"
 template <class ADFunType>
+/** \brief Convert sparse matrix H to SEXP format that can be returned to R */
 SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
 {
     SEXP par;
@@ -1131,7 +1140,7 @@ extern "C"
     
     return asSEXP(tmp->convert(),"parallelADFun");
 
-  }
+  } // MakeADHessObject2
 #else
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     //MakeADHessObject2_parallel(data, parameters, report, skip);
@@ -1140,7 +1149,7 @@ extern "C"
     //TMB_PRINT(H.pf->Range());
     /* Get the default parameter vector */
     return asSEXP(H,"ADFun");
-  }
+  } // MakeADHessObject2
 #endif
   
 }
