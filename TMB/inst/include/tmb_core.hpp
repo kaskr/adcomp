@@ -337,6 +337,7 @@ public:
      from "MakeADFunObject" which tapes the operations and creates the final
      ADFun-object.
   */
+  /** \brief Constructor which among other things gives a value to "theta" */
   objective_function(SEXP data_, SEXP parameters_, SEXP report_)
   {
     report=report_;
@@ -360,6 +361,8 @@ public:
     max_parallel_regions=-1;
     reversefill=false;
   }
+
+  /** \brief Extract theta vector from objetive function object */
   SEXP defaultpar()
   {
     int n=theta.size();
@@ -376,6 +379,8 @@ public:
     UNPROTECT(2);
     return res;
   }
+
+  /** \brief Extract parnames vector from objetive function object */
   SEXP parNames()
   {
     int n=parnames.size();
@@ -395,6 +400,7 @@ public:
   double value(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
   double value(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
 
+  /** \brief Find the length of theta, i.e. in application obj=parameters */
   int nparms(SEXP obj)
   {
     int count=0;
@@ -663,7 +669,7 @@ extern "C"
 
     /* Get the default parameter vector (tiny overhead) */
     objective_function< AD<double> > F(data,parameters,report);
-    F();
+    F();      // Evaluates user template
     SEXP par;
     PROTECT(par=F.defaultpar());
     SEXP res;
@@ -726,6 +732,7 @@ extern "C"
     return ans;
   }
 
+  /** \brief Call tape optimization function in CppAD */
   SEXP optimizeADFunObject(SEXP f)
   {
     SEXP tag=R_ExternalPtrTag(f);
@@ -742,7 +749,7 @@ extern "C"
     return R_NilValue;
   }
 
-  /* Get tag of external pointer */
+  /** \brief Get tag of external pointer */
   SEXP getTag(SEXP f){
     return R_ExternalPtrTag(f);
   }
@@ -815,7 +822,7 @@ extern "C"
     return res;
   }
 
-  /** \brief Gets parameter order 
+  /** \brief Gets parameter order by running the user template
 
    We spend a function evaluation on getting the parameter order (!) */
   SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report)
@@ -831,7 +838,7 @@ extern "C"
     return F.parNames();
   }
 
-}
+} /* Double interface */
 
 
 

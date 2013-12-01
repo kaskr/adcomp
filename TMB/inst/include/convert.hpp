@@ -7,6 +7,8 @@ double asDouble(double x){return x;}
 double asDouble(AD<double> x){return CppAD::Value(x);}
 double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
 double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+
+/** \brief Convert TMB matrix, vector, scalar or int to R style */
 template<class Type>
 SEXP asSEXP(const matrix<Type> &a) 
 {
@@ -26,6 +28,7 @@ SEXP asSEXP(const matrix<Type> &a)
    UNPROTECT(2);
    return val;
 }
+
 template<class Type>
 SEXP asSEXP(const vector<Type> &a) 
 {

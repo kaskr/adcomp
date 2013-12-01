@@ -36,7 +36,7 @@ struct sphess_t{
   vector<int> j;
 };
 
-/** \brief R: sphess_t<ADFun<double> > sphess */
+/** \brief sphess_t<ADFun<double> > sphess */
 typedef sphess_t<ADFun<double> > sphess;
 
 
