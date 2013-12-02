@@ -517,9 +517,35 @@ struct parallel_accumulator{
 
 /** \brief Evaluates an ADFun object from R
 
-   Template argument can be
-   - ADFun or
-   - parallelADFun
+   Template argument can be "ADFun" or an object extending
+   "ADFun" such as "parallelADFun".
+   @param f R external pointer to ADFunType
+   @param theta R vector of parameters
+   @param control R list controlling what to be returned
+
+   It is assumed that \f$f:R^n \rightarrow R^m\f$ where n and m are found from f.
+   The list "control" can contain the following components:
+
+   * order: mandatory integer 0,1,2, or 3 with order of derivatives to be calculated.\n
+   * hessiancols, hessianrows: Optional one-based integer vectors of the same length.
+     Used only in the case where order=2 to extract specific entries of hessian.\n
+   * sparsitypattern: Integer flag. Return sparsity pattern instead of numerical values?\n
+   * rangeweight: Optional R vector of doubles of length m. If supplied, a 1st order reverse
+     mode sweep is performed in this range direction.\n
+   * rangecomponent: Optional one-based integer (scalar) between 1 and m. Used to select a
+     given component of the vector f(x).
+
+   Possible output depends on "order".
+
+   * order==0: Calculate f(x) output as vector of length m.\n
+   * order==1: If "rangeweight" is supplied, calculate the gradient of the function
+   x -> inner_prod(f(x),w) from R^n->R.
+   Otherwise, calculate the full jacobian (of dimension m*n).\n
+   * order==2: If nothing further is specified, calculate the full hessian of the function
+   x->f(x)[rangecomponent] from R^n->R
+
+   All other usage is considered deprecated/experimental and may be removed in the future.
+
 */
 template<class ADFunType>
 SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
@@ -575,7 +601,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     PROTECT(res=asSEXP(asMatrix(pf->Reverse(3,w),n,3)));
   }
   if(order==0){
-    PROTECT(res=asSEXP(pf->Forward(rangecomponent,x)));
+    PROTECT(res=asSEXP(pf->Forward(0,x)));
     SEXP rangenames=getAttrib(f,install("range.names"));
     if(LENGTH(res)==LENGTH(rangenames)){
       setAttrib(res,R_NamesSymbol,rangenames);
