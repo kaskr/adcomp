@@ -1033,7 +1033,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   
   /* ========================================================== NOT DONE YET */
   /* Tape hessian  */
-  tmp2.my_init();
+  tmp2.my_init(keepcol);
   //std::cout << tmp2.colpattern << "\n";
   m=0;
   //for(int i=0;i<tmp2.colpattern.size();i++)m+=tmp2.colpattern[i].size();

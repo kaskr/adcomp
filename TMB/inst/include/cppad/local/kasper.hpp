@@ -18,6 +18,9 @@ CppAD::vector<bool> user_region_; /* Vector of same length as tp_ (tape_points) 
 				  */
 CppAD::vector<size_t> user_region_mark_;  /* user_region_mark_[i] is marked if the i'th tape
 					   point belongs to an already marked user region. */
+CppAD::vector<bool> constant_tape_point_; /* Vector of same length as tp_ (tape_points) that 
+					     marks all tape_points that only depend on fixed 
+					     effects. */
 
 
 /* Helper function for markArgs */
@@ -425,14 +428,16 @@ void prepare_reverse_sweep(int col){ /* input: range component */
   play_.start_reverse(op, op_arg, op_index, var_index);
   for(size_t i=0;i<op_mark_index_.size();i++){ /* Note - op_mark_index_.size() change 
 						  when loop runs ...*/
-    // If op is within user atomic region, then mark entire region. 
-    if(user_region_[op_mark_index_[i]]){ /* FIXME: only do once per region !!! - Fixed! */
-      mark_user_tape_point_index(op_mark_index_[i],mark); /* Appends elements to 
+    if(!constant_tape_point_[op_mark_index_[i]]){
+      // If op is within user atomic region, then mark entire region. 
+      if(user_region_[op_mark_index_[i]]){ /* FIXME: only do once per region !!! - Fixed! */
+	mark_user_tape_point_index(op_mark_index_[i],mark); /* Appends elements to 
+							       op_mark_index_ */
+      }
+      // op is marked - update dependencies
+      mark_tape_point_args_index(op_mark_index_[i],mark); /* Appends elements to 
 							     op_mark_index_ */
     }
-    // op is marked - update dependencies
-    mark_tape_point_args_index(op_mark_index_[i],mark); /* Appends elements to 
-							   op_mark_index_ */
   }
   std::sort(op_mark_index_.begin(),op_mark_index_.end());
 }
@@ -477,8 +482,25 @@ void printTP(tape_point tp){
 	  );
 }
 
+bool is_tape_point_constant(size_t index){
+  bool ok_index= (0<=index) && (index<=tp_.size()-2);
+  if(!ok_index) return false;
+  tape_point tp1=tp_[index];
+  tape_point tp2=tp_[index+1];
+  const addr_t* op_arg;
+  op_arg=tp1.op_arg;
+  int numarg=tp2.op_arg - op_arg;
+  if(numarg==0)return false; // E.g. begin or end operators
+  bool ans=true;
+  for(int i=0;i<numarg;i++){
+    //ans = ans && constant_tape_point_[var2op_[op_arg[i]]];
+    ans = ans && ( constant_tape_point_[var2op_[op_arg[i]]] || (!isDepArg(&op_arg[i])) )   ;
+  }
+  return ans;
+}
+
 pod_vector<Base> Partial;
-void my_init(){
+void my_init(vector<bool> keepcol){
   Partial.extend(total_num_var_ * 1);
   arg_mark_.resize(play_.rec_op_arg_.size());
   for(size_t i=0;i<arg_mark_.size();i++)arg_mark_[i]=false;
@@ -518,7 +540,27 @@ void my_init(){
       user_region_[i]=user_within;
     }
   }
-  
+
+  /* Lookup table: is tape_point a constant (=only fixed effect dependent) ? */
+  constant_tape_point_.resize(tp_.size());
+  int indep_var_number=0;
+  for(size_t i=0;i<tp_.size();i++){
+    if(tp_[i].op==InvOp){ /* All independent variables are marked according to being
+			     random or fixed effect */
+      constant_tape_point_[i]=!keepcol[indep_var_number];
+      indep_var_number++;
+    } else { /* Mark operator as constant if _all_ arguments are constant */
+      constant_tape_point_[i] = is_tape_point_constant(i);
+    }
+
+    //std::cout << constant_tape_point_[i] << " "; printTP(tp_[i]);
+
+  }
+  std::cout << "Total:   " << constant_tape_point_.size() << "\n";
+  int sum=0; for(int i=0;i<constant_tape_point_.size();i++)sum+=constant_tape_point_[i];
+  std::cout << "Constant:" << sum << "\n";
+
+
   // Calculate pattern
   int m=Range();
   colpattern.resize(m);
