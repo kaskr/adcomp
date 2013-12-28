@@ -493,7 +493,6 @@ bool is_tape_point_constant(size_t index){
   if(numarg==0)return false; // E.g. begin or end operators
   bool ans=true;
   for(int i=0;i<numarg;i++){
-    //ans = ans && constant_tape_point_[var2op_[op_arg[i]]];
     ans = ans && ( constant_tape_point_[var2op_[op_arg[i]]] || (!isDepArg(&op_arg[i])) )   ;
   }
   return ans;
@@ -556,9 +555,9 @@ void my_init(vector<bool> keepcol){
     //std::cout << constant_tape_point_[i] << " "; printTP(tp_[i]);
 
   }
-  std::cout << "Total:   " << constant_tape_point_.size() << "\n";
-  int sum=0; for(int i=0;i<constant_tape_point_.size();i++)sum+=constant_tape_point_[i];
-  std::cout << "Constant:" << sum << "\n";
+  // std::cout << "Total:   " << constant_tape_point_.size() << "\n";
+  // int sum=0; for(int i=0;i<constant_tape_point_.size();i++)sum+=constant_tape_point_[i];
+  // std::cout << "Constant:" << sum << "\n";
 
 
   // Calculate pattern
