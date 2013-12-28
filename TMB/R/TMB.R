@@ -290,7 +290,8 @@ MakeADFun <- function(data,parameters,map=list(),
   
   f <- function(theta=par,order=0,type=c("ADdouble","double","ADGrad"),
                 cols=NULL,rows=NULL,
-                sparsitypattern=0,rangecomponent=1,rangeweight=NULL){
+                sparsitypattern=0,rangecomponent=1,rangeweight=NULL,
+                dumpstack=0){
     type <- match.arg(type)
     if(type=="ADdouble"){
       res <- .Call("EvalADFunObject",ADFun$ptr,theta,
@@ -300,7 +301,8 @@ MakeADFun <- function(data,parameters,map=list(),
                      hessianrows=as.integer(rows),
                      sparsitypattern=as.integer(sparsitypattern),
                      rangecomponent=as.integer(rangecomponent),
-                     rangeweight=rangeweight
+                     rangeweight=rangeweight,
+                     dumpstack=as.integer(dumpstack)
                      ),
                    PACKAGE=DLL
                    )
@@ -319,7 +321,8 @@ MakeADFun <- function(data,parameters,map=list(),
                            hessianrows=as.integer(rows),
                            sparsitypattern=as.integer(sparsitypattern),
                            rangecomponent=as.integer(rangecomponent),
-                           rangeweight=rangeweight),PACKAGE=DLL)
+                           rangeweight=rangeweight,
+                           dumpstack=as.integer(dumpstack)),PACKAGE=DLL)
     }
     res
   }
@@ -390,7 +393,8 @@ MakeADFun <- function(data,parameters,map=list(),
                      hessianrows=as.integer(0),
                      sparsitypattern=as.integer(0),
                      rangecomponent=as.integer(1),
-                     rangeweight=as.double(w)
+                     rangeweight=as.double(w),
+                     dumpstack=as.integer(0)
                      ),PACKAGE=DLL
                    )
 
@@ -1056,7 +1060,8 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
                      hessiancols = integer(0),
                      hessianrows = integer(0),
                      sparsitypattern = as.integer(0),
-                     rangecomponent = as.integer(1)),PACKAGE=obj$env$DLL)
+                     rangecomponent = as.integer(1),
+                     dumpstack=as.integer(0)),PACKAGE=obj$env$DLL)
   i=as.integer(attr(ADHess$ptr,"i"))
   j=as.integer(attr(ADHess$ptr,"j"))
   require(Matrix)

@@ -29,6 +29,9 @@ If it is one, a trace of every forward0sweep computation is printed.
 (Note that forward0sweep is not used if CPPAD_USE_FORWARD0SWEEP is zero).
 */
 int CPPAD_FORWARD0SWEEP_TRACE = 0;
+void traceforward0sweep(int trace){
+  CPPAD_FORWARD0SWEEP_TRACE=trace;
+}
 
 /*!
 Compute zero order forward mode Taylor coefficients.

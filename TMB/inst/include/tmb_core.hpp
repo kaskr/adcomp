@@ -534,6 +534,8 @@ struct parallel_accumulator{
      mode sweep is performed in this range direction.\n
    * rangecomponent: Optional one-based integer (scalar) between 1 and m. Used to select a
      given component of the vector f(x).
+   * dumpstack: Integer flag. If non zero the entire operation stack is dumped as text output
+     during 0-order forward sweep.
 
    Possible output depends on "order".
 
@@ -565,6 +567,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   if((order!=0) & (order!=1) & (order!=2) & (order!=3))
     error("order can be 0, 1, 2 or 3");
   int sparsitypattern=INTEGER(getListElement(control,"sparsitypattern"))[0];
+  int dumpstack=INTEGER(getListElement(control,"dumpstack"))[0];
   SEXP hessiancols; // Hessian columns
   PROTECT(hessiancols=getListElement(control,"hessiancols"));
   int ncols=length(hessiancols);
@@ -601,7 +604,9 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     PROTECT(res=asSEXP(asMatrix(pf->Reverse(3,w),n,3)));
   }
   if(order==0){
+    if(dumpstack)CppAD::traceforward0sweep(1);
     PROTECT(res=asSEXP(pf->Forward(0,x)));
+    if(dumpstack)CppAD::traceforward0sweep(0);
     SEXP rangenames=getAttrib(f,install("range.names"));
     if(LENGTH(res)==LENGTH(rangenames)){
       setAttrib(res,R_NamesSymbol,rangenames);
