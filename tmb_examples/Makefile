@@ -10,4 +10,4 @@ report: $(outputfiles)
 	R --vanilla < unittest.R
 
 clean :
-	rm -f *.o *.so *~ core *.output.RData
+	rm -f *.o *.so *~ core *.output.RData Rplots.pdf

@@ -62,7 +62,7 @@ if(example!=""){
     totaltime <- function(x)sum(sapply(x,function(x)x["elapsed"]))
     t1 <- totaltime(e1$.timings)
     t2 <- totaltime(e2$.timings)
-    c(summary(d)[c("Min.","Median","Max.")],totaltime=t2,timeindex=t2/t1)
+    c(summary(as.numeric(d))[c("Min.","Median","Max.")],totaltime=t2,timeindex=t2/t1)
   }
   sink("REPORT.md")
   cat("Example overview:\n-----------------\n")
