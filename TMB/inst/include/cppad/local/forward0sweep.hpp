@@ -28,7 +28,7 @@ Zero is the normal operational value.
 If it is one, a trace of every forward0sweep computation is printed.
 (Note that forward0sweep is not used if CPPAD_USE_FORWARD0SWEEP is zero).
 */
-# define CPPAD_FORWARD0SWEEP_TRACE 0
+int CPPAD_FORWARD0SWEEP_TRACE = 0;
 
 /*!
 Compute zero order forward mode Taylor coefficients.
@@ -174,9 +174,6 @@ size_t forward0sweep(
 	// skip the BeginOp at the beginning of the recording
 	Rec->start_forward(op, arg, i_op, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == BeginOp );
-# if CPPAD_FORWARD0SWEEP_TRACE
-	std::cout << std::endl;
-# endif
 	while(op != EndOp)
 	{
 		// this op
@@ -579,37 +576,29 @@ size_t forward0sweep(
 			default:
 			CPPAD_ASSERT_UNKNOWN(0);
 		}
-# if CPPAD_FORWARD0SWEEP_TRACE
-		size_t       d      = 0;
-		size_t       i_tmp  = i_var;
-		Base*        Z_tmp  = Taylor + i_var * J;
-
-		printOp(
-			std::cout, 
-			Rec,
-			i_tmp,
-			op, 
-			arg,
-			d + 1, 
-			Z_tmp, 
-			0, 
-			(Base *) CPPAD_NULL
-		);
+		if(CPPAD_FORWARD0SWEEP_TRACE){
+		  size_t       d      = 0;
+		  size_t       i_tmp  = i_var;
+		  Base*        Z_tmp  = Taylor + i_var * J;
+		  printOp(
+			  std::cout, 
+			  Rec,
+			  i_tmp,
+			  op, 
+			  arg,
+			  d + 1, 
+			  Z_tmp, 
+			  0, 
+			  (Base *) CPPAD_NULL
+			  );
+		}
 	}
-	std::cout << std::endl;
-# else
-	}
-# endif
 	CPPAD_ASSERT_UNKNOWN( user_state == user_start );
 	CPPAD_ASSERT_UNKNOWN( i_var + 1 == Rec->num_rec_var() );
-
 	return compareCount;
 }
 
 /*! \} */
 CPPAD_END_NAMESPACE
-
-// preprocessor symbols that are local to this file
-# undef CPPAD_FORWARD0SWEEP_TRACE
 
 # endif
