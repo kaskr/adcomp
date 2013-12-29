@@ -193,6 +193,9 @@ public:
   scalartype operator()(array<scalartype> x){
     return (x*x*.5 + log(sqrt(2.0*M_PI)) ).sum() ;
   }
+  scalartype operator()(scalartype x){
+    return x*x*.5 + log(sqrt(2.0*M_PI));
+  }
   arraytype jacobian(arraytype x){return x;}
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED;
