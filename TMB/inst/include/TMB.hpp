@@ -25,6 +25,7 @@ void eigen_Rprintf(const char* x);
 /* R must come after Eigen because conflict with length macro on mac os x */
 #include <R.h>
 #include <Rdefines.h>
+#include "Rstream.hpp"
 void eigen_Rprintf(const char* x){Rprintf(x);}
 /* Always turn off debug for cppad */
 #undef NDEBUG
