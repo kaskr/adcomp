@@ -584,7 +584,7 @@ size_t forward0sweep(
 		  size_t       i_tmp  = i_var;
 		  Base*        Z_tmp  = Taylor + i_var * J;
 		  printOp(
-			  std::cout, 
+			  Rcout,
 			  Rec,
 			  i_tmp,
 			  op, 

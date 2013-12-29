@@ -670,11 +670,11 @@ void printOp(
 	if( NumRes(op) > 0 && (op != BeginOp) )
 	{ 
 		for(k = 0; k < nfz; k++)
-			std::cout << "| fz[" << k << "]=" << fz[k];
+			Rcout << "| fz[" << k << "]=" << fz[k];
 		for(k = 0; k < nrz; k++)
-			std::cout << "| rz[" << k << "]=" << rz[k];
+			Rcout << "| rz[" << k << "]=" << rz[k];
 	}
-	std::cout << std::endl;
+	Rcout << std::endl;
 }
 
 /*! \} */
