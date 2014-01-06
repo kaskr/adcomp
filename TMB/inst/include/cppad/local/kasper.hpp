@@ -388,7 +388,7 @@ void mark_user_tape_point_index(size_t index, size_t mark){
       for(int k=i;k<=j;k++){
 	user_region_mark_[k]=mark;
 	if(op_mark_[k]!=mark){ /* FIXME: Many calls with FALSE for *all* k - why? */
-	  op_mark_[k]=mark;
+	  //op_mark_[k]=mark;
 	  op_mark_index_.push_back(k);
 	}
       }
@@ -405,12 +405,14 @@ void mark_tape_point_args_index(size_t index, size_t mark){
   for(int i=0;i<numarg;i++){
     if(isDepArg(&op_arg[i])){
       if(op_mark_[var2op_[op_arg[i]]]!=mark){ // Not already marked
-	op_mark_[var2op_[op_arg[i]]]=mark;
+	//op_mark_[var2op_[op_arg[i]]]=mark;
 	op_mark_index_.push_back(var2op_[op_arg[i]]);
       }
     }
   }
 }
+std::vector<size_t> stack;   /* Temporary stack with (reverse) topological order */
+std::vector<size_t> op_inv_index_;  /* Marked independent variables (unsorted) */
 void prepare_reverse_sweep(int col){ /* input: range component */
   //std::cout << "col: " << col << " "; std::cout.flush();
   OpCode op; 
@@ -420,45 +422,57 @@ void prepare_reverse_sweep(int col){ /* input: range component */
   size_t dep_var_taddr=dep_taddr_[col];
   size_t mark=col+1; /*OLD: mark=dep_var_taddr; not unique! */
   op_index=var2op_[dep_var_taddr];
-  op_mark_[op_index]=mark;
+  //op_mark_[op_index]=mark;
   /* prepare list of integers */ 
   op_mark_index_.clear();
   op_mark_index_.push_back(op_index);
+  stack.clear();
+  op_inv_index_.clear();
   /* depth first search of operator indices */
   play_.start_reverse(op, op_arg, op_index, var_index);
-  for(size_t i=0;i<op_mark_index_.size();i++){ /* Note - op_mark_index_.size() change 
-						  when loop runs ...*/
-    if(!constant_tape_point_[op_mark_index_[i]]){
+  size_t before;
+  while(op_mark_index_.size()>0){ // While stack is non empty
+    // 1. Take top of stack
+    op_index = op_mark_index_[op_mark_index_.size()-1];
+    // 2. Add dependencies on top of stack
+    before=op_mark_index_.size();
+    if(!constant_tape_point_[op_index]){
       // If op is within user atomic region, then mark entire region. 
-      if(user_region_[op_mark_index_[i]]){ /* FIXME: only do once per region !!! - Fixed! */
-	mark_user_tape_point_index(op_mark_index_[i],mark); /* Appends elements to 
-							       op_mark_index_ */
+      if(user_region_[op_index]){ /* FIXME: only do once per region !!! - Fixed! */
+	mark_user_tape_point_index(op_index,mark); /* Appends elements to
+						      op_mark_index_ */
       }
       // op is marked - update dependencies
-      mark_tape_point_args_index(op_mark_index_[i],mark); /* Appends elements to 
-							     op_mark_index_ */
+      mark_tape_point_args_index(op_index,mark); /* Appends elements to
+						    op_mark_index_ */
+    }
+    // 3. No _unmarked_ dependencies? Then remove from stack and place in other stack
+    if(before==op_mark_index_.size()){
+      if(op_mark_[op_index]!=mark){
+	stack.push_back(op_index);
+	op_mark_[op_index]=mark;
+	if(tp_[op_index].op==InvOp)op_inv_index_.push_back(op_index);
+      }
+      op_mark_index_.pop_back();
     }
   }
-  std::sort(op_mark_index_.begin(),op_mark_index_.end());
+  // std::cout << "size: " << op_mark_index_.size() << " "; std::cout.flush();
+  op_mark_index_ = stack;
+  //std::sort(op_mark_index_.begin(),op_mark_index_.end());
+  // std::cout << "\n"; std::cout.flush();
+  // for(int i=0;i<op_mark_index_.size();i++)std::cout << op_mark_index_[i] << " ";
+  // std::cout << "\n"; std::cout.flush();
 }
 
 void my_pattern(int col){
-  //OpCode op;
-  //const addr_t* op_arg;
-  //size_t op_index;
-  //size_t var_index;
-  // size_t dep_var_taddr=dep_taddr_[col];
-  // size_t mark=dep_var_taddr;
-  // op_mark_[var2op_[dep_var_taddr]]=mark;
   prepare_reverse_sweep(col);
-  // We always have ind_taddr_[i]=i+1
-  size_t n=Domain();
-  int sum=0;
   std::vector<size_t>::iterator it;
-  for(it=op_mark_index_.begin();*it<=n;it++)sum++;
-  colpattern[col].resize(sum);
-  sum=0;
-  for(it=op_mark_index_.begin();*it<=n;it++){colpattern[col][sum]=*it-1;sum++;}
+  std::sort(op_inv_index_.begin(),op_inv_index_.end());
+  colpattern[col].resize(op_inv_index_.size());
+  int k=0;
+  for(it=op_inv_index_.begin();it!=op_inv_index_.end();it++){
+    colpattern[col][k++]=*it-1;
+  }
 }
 
 void printTP(tape_point tp){

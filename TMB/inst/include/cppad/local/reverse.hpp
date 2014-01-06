@@ -307,7 +307,7 @@ void ADFun<Base>::myReverse(size_t p, const VectorBase &w, size_t dep_var_index,
 	// return the derivative values
 	// VectorBase value(n * p);
     std::vector<size_t>::iterator it;
-    for(it=op_mark_index_.begin();*it<=n;it++){
+    for(it=op_inv_index_.begin();it!=op_inv_index_.end();it++){
       //colpattern[col][j]=*it-1;
       j=*it-1;
 	    for(k = 0; k < p; k++)
