@@ -99,28 +99,46 @@ struct isDouble<double>{
   enum{value=true};
 };
 
+/* Helpers, to check that data and parameters are of the right types.
+   "RObjectTester" denotes the type of a pointer to a test function.
+   Examples of test functions are "isMatrix", "isArray", "isNumeric",
+   etc (see Rinternals.h).
+*/
+typedef Rboolean (*RObjectTester)(SEXP);
+Rboolean isValidSparseMatrix(SEXP x){
+  if(!inherits(x,"dgTMatrix"))warning("Expected sparse matrix of class 'dgTMatrix'.");
+  return inherits(x,"dgTMatrix");
+}
+Rboolean isNumericScalar(SEXP x){
+  if(LENGTH(x)!=1){
+    warning("Expected scalar. Got length=%i",LENGTH(x));
+    return FALSE;
+  }
+  return isNumeric(x);
+}
+
 /* Macros to obtain data and parameters from R */
 
 /** \brief Get parameter matrix from R and declare it as matrix<Type> */
-#define PARAMETER_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
-        getListElement(objective_function::parameters,#name)));		\
+#define PARAMETER_MATRIX(name) matrix<Type> name(asMatrix<Type>(	 \
+        getListElement(objective_function::parameters,#name,&isMatrix))); \
         objective_function::fill(name,#name);
 /** \brief Get parameter vector from R and declare it as vector<Type> */
-#define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name)),#name));
+#define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumeric)),#name));
 /** \brief Get parameter scalar from R and declare it as Type */
-#define PARAMETER(name) Type name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name)),#name)[0]);
+#define PARAMETER(name) Type name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumericScalar)),#name)[0]);
 /** \brief Get data vector from R and declare it as vector<Type> */
 #define DATA_VECTOR(name) vector<Type> name(asVector<Type>(	\
-        getListElement(objective_function::data,#name)));
+	getListElement(objective_function::data,#name,&isNumeric)));
 /** \brief Get data matrix from R and declare it as matrix<Type> */
 #define DATA_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
-        getListElement(objective_function::data,#name)));
+	getListElement(objective_function::data,#name,&isMatrix)));
 /** \brief Get data scalar from R and declare it as Type */
 #define DATA_SCALAR(name) Type name(asVector<Type>(		\
-        getListElement(objective_function::data,#name))[0]);
+	getListElement(objective_function::data,#name,&isNumericScalar))[0]);
 /** \brief Get data scalar from R and declare it as int */
 #define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(	\
-	getListElement(objective_function::data,#name))[0]));
+	getListElement(objective_function::data,#name,&isNumericScalar))[0]));
 /** \brief Get data vector of type "factor" from R and declare it as a zero-based integer vector.
 
 The following example (R code) shows what you have on the R side and what is
@@ -137,15 +155,15 @@ Levels: d e f g h i j
    \endverbatim
 */
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
-        getListElement(objective_function::data,#name)));
+	getListElement(objective_function::data,#name,&isNumeric)));
 /** \brief Get data vector of type "integer" from R. (DATA_INTEGER is for a scalar integer)*/
 #define DATA_IVECTOR(name) vector<int> name(asVector<int>(	\
-        getListElement(objective_function::data,#name)));
+	getListElement(objective_function::data,#name,&isNumeric)));
 /** \brief Get the number of levels of a data factor from R */
 #define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
 /** \brief Get sparse matrix from R and declare it as Eigen::SparseMatrix<Type> */
 #define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>( \
-        getListElement(objective_function::data,#name)));
+	getListElement(objective_function::data,#name,&isValidSparseMatrix)));
 // NOTE: REPORT() constructs new SEXP so never report in parallel!
 /** \brief Report scalar, vector or array back to R without derivative information */
 #define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
@@ -155,9 +173,9 @@ Levels: d e f g h i j
 #define PARALLEL_REGION if(this->parallel_region())
 /** \brief Get data array from R and declare it as array<Type> */
 #define DATA_ARRAY(name) tmbutils::array<Type> name(tmbutils::asArray<Type>(	\
-        getListElement(objective_function::data,#name)));
+	getListElement(objective_function::data,#name,&isArray)));
 /** \brief Get parameter array from R and declare it as array<Type> */
-#define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name)),#name));
+#define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name,&isArray)),#name));
 
 
 // kasper: Not sure used anywhere
@@ -179,7 +197,7 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
 
 
 /** \brief Get list element named "str", or return NULL */ 
-SEXP getListElement(SEXP list, const char *str) 
+SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
 {
   if(config.debug.getListElement)std::cout << "getListElement: " << str << " ";
   SEXP elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol); 
@@ -192,6 +210,14 @@ SEXP getListElement(SEXP list, const char *str)
       }
   if(config.debug.getListElement)std::cout << "Length: " << LENGTH(elmt) << " ";
   if(config.debug.getListElement)std::cout << "\n";
+  if(expectedtype != NULL){
+    if(!expectedtype(elmt)){
+      if(isNull(elmt)){
+	warning("Expected object. Got NULL.");
+      }
+      error("Error when reading the variable: '%s'. Please check data and parameters.",str);
+    }
+  }
   return elmt; 
 }
 
@@ -451,8 +477,8 @@ public:
     index+=nlevels;
   }
   // Auto detect whether we are in "map-mode"
-  SEXP getShape(const char *nam){
-    SEXP elm=getListElement(parameters,nam);
+  SEXP getShape(const char *nam, RObjectTester expectedtype=NULL){
+    SEXP elm=getListElement(parameters,nam,expectedtype);
     SEXP shape=getAttrib(elm,install("shape"));
     if(shape==R_NilValue)return elm;
     else return shape;
