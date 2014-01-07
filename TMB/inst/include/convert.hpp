@@ -16,15 +16,15 @@ SEXP asSEXP(const matrix<Type> &a)
    int nc=a.cols();
    int size = nr * nc;
    SEXP val;
-   PROTECT(val = NEW_NUMERIC(size));
-   double *p = NUMERIC_POINTER(val);
+   PROTECT(val = allocVector(REALSXP,size));
+   double *p = REAL(val);
    for(int i=0;i<nr;i++)
      for(int j=0;j<nc;j++)
        p[i+j*nr]=asDouble(a(i,j));
    SEXP dim;
-   PROTECT(dim = NEW_INTEGER(2));
+   PROTECT(dim = allocVector(INTSXP,2));
    INTEGER(dim)[0] = nr; INTEGER(dim)[1] = nc;
-   SET_DIM(val, dim);
+   setAttrib(val, R_DimSymbol, dim);
    UNPROTECT(2);
    return val;
 }
@@ -34,21 +34,17 @@ SEXP asSEXP(const vector<Type> &a)
 {
   int size = a.size();
   SEXP val;
-  PROTECT(val = NEW_NUMERIC(size));
-  double *p = NUMERIC_POINTER(val);
+  PROTECT(val = allocVector(REALSXP,size));
+  double *p = REAL(val);
   for (int i = 0; i < size; i++) p[i] = asDouble(a[i]);
-  SEXP len;
-  PROTECT(len = NEW_INTEGER(1));
-  INTEGER(len)[0] = size;
-  SET_LENGTH(val, size);
-  UNPROTECT(2); 
+  UNPROTECT(1);
   return val;
 }
 template<class Type>
 SEXP asSEXP(const Type &a)
 {
    SEXP val;
-   PROTECT(val=NEW_NUMERIC(1));
+   PROTECT(val=allocVector(REALSXP,1));
    REAL(val)[0]=asDouble(a);
    UNPROTECT(1);
    return val;
@@ -56,7 +52,7 @@ SEXP asSEXP(const Type &a)
 SEXP asSEXP(const int &a)
 {
    SEXP val;
-   PROTECT(val=NEW_INTEGER(1));
+   PROTECT(val=allocVector(INTSXP,1));
    INTEGER(val)[0]=a;
    UNPROTECT(1);
    return val;
@@ -71,14 +67,10 @@ SEXP asSEXP(const Vector<Type> &a)
 {
    int size = a.size();
    SEXP val;
-   PROTECT(val = NEW_NUMERIC(size));
-   double *p = NUMERIC_POINTER(val);
+   PROTECT(val = allocVector(REALSXP,size));
+   double *p = REAL(val);
    for (int i = 0; i < size; i++) p[i] = asDouble(a[i]);
-   SEXP len;
-   PROTECT(len = NEW_INTEGER(1));
-   INTEGER(len)[0] = size;
-   SET_LENGTH(val, size);
-   UNPROTECT(2); 
+   UNPROTECT(1);
    return val;
 }
 
@@ -137,13 +129,13 @@ template<class Type>
 SEXP asSEXP(const tmbutils::array<Type> &a)
 {
    SEXP val;
-   PROTECT(val = NEW_NUMERIC(a.size()));
+   PROTECT(val = allocVector(REALSXP,a.size()));
    double *p = REAL(val);
    for(int i=0;i<a.size();i++)p[i]=asDouble(a[i]);
    SEXP dim;
-   PROTECT(dim = NEW_INTEGER(a.dim.size()));
+   PROTECT(dim = allocVector(INTSXP,a.dim.size()));
    for(int i=0;i<a.dim.size();i++)INTEGER(dim)[i]=a.dim[i];
-   SET_DIM(val, dim);
+   setAttrib(val, R_DimSymbol, dim);
    UNPROTECT(2);
    return val;
 }

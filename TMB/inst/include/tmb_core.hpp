@@ -67,13 +67,6 @@ SEXP ptrList(SEXP x){
 }
 
 extern "C"{
-  SEXP get_number_of_external_pointers_alive(){
-    SEXP ans;
-    PROTECT(ans = NEW_INTEGER(1));
-    INTEGER(ans)[0]=memory_manager.counter;
-    UNPROTECT(1);
-    return ans;
-  }
 #ifdef LIB_UNLOAD
 #include <R_ext/Rdynload.h>
   void LIB_UNLOAD(DllInfo *dll)
@@ -555,7 +548,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   if(!isNewList(control))error("'control' must be a list");
   ADFunType* pf;
   pf=(ADFunType*)R_ExternalPtrAddr(f);
-  PROTECT(theta=AS_NUMERIC(theta));
+  PROTECT(theta=coerceVector(theta,REALSXP));
   int n=pf->Domain();
   int m=pf->Range();
   if(LENGTH(theta)!=n)error("Wrong parameter length.");
@@ -834,7 +827,7 @@ extern "C"
   {
     objective_function<double>* pf;
     pf=(objective_function<double>*)R_ExternalPtrAddr(f);
-    PROTECT(theta=AS_NUMERIC(theta));
+    PROTECT(theta=coerceVector(theta,REALSXP));
     int n=pf->theta.size();
     if(LENGTH(theta)!=n)error("Wrong parameter length.");
 

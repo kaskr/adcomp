@@ -5,11 +5,11 @@
 /** Create sparse matrix from R-triplet sparse matrix */
 template<class Type>
 Eigen::SparseMatrix<Type> asSparseMatrix(SEXP M){
-  int *i=INTEGER(GET_SLOT(M,install("i")));
-  int *j=INTEGER(GET_SLOT(M,install("j")));
-  double *x=REAL(GET_SLOT(M,install("x")));
-  int n=LENGTH(GET_SLOT(M,install("x")));
-  int *dim=INTEGER(GET_SLOT(M,install("Dim")));
+  int *i=INTEGER(R_do_slot(M,install("i")));
+  int *j=INTEGER(R_do_slot(M,install("j")));
+  double *x=REAL(R_do_slot(M,install("x")));
+  int n=LENGTH(R_do_slot(M,install("x")));
+  int *dim=INTEGER(R_do_slot(M,install("Dim")));
   typedef Eigen::Triplet<Type> T;
   std::vector<T> tripletList;
   for(int k=0;k<n;k++){
