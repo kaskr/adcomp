@@ -105,6 +105,16 @@ struct isDouble<double>{
    etc (see Rinternals.h).
 */
 typedef Rboolean (*RObjectTester)(SEXP);
+void RObjectTestExpectedType(SEXP x, RObjectTester expectedtype, const char *nam){
+  if(expectedtype != NULL){
+    if(!expectedtype(x)){
+      if(isNull(x)){
+	warning("Expected object. Got NULL.");
+      }
+      error("Error when reading the variable: '%s'. Please check data and parameters.",nam);
+    }
+  }
+}
 Rboolean isValidSparseMatrix(SEXP x){
   if(!inherits(x,"dgTMatrix"))warning("Expected sparse matrix of class 'dgTMatrix'.");
   return inherits(x,"dgTMatrix");
@@ -210,14 +220,7 @@ SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
       }
   if(config.debug.getListElement)std::cout << "Length: " << LENGTH(elmt) << " ";
   if(config.debug.getListElement)std::cout << "\n";
-  if(expectedtype != NULL){
-    if(!expectedtype(elmt)){
-      if(isNull(elmt)){
-	warning("Expected object. Got NULL.");
-      }
-      error("Error when reading the variable: '%s'. Please check data and parameters.",str);
-    }
-  }
+  RObjectTestExpectedType(elmt, expectedtype, str);
   return elmt; 
 }
 
@@ -478,10 +481,12 @@ public:
   }
   // Auto detect whether we are in "map-mode"
   SEXP getShape(const char *nam, RObjectTester expectedtype=NULL){
-    SEXP elm=getListElement(parameters,nam,expectedtype);
+    SEXP elm=getListElement(parameters,nam);
     SEXP shape=getAttrib(elm,install("shape"));
-    if(shape==R_NilValue)return elm;
-    else return shape;
+    SEXP ans;
+    if(shape==R_NilValue)ans=elm; else ans=shape;
+    RObjectTestExpectedType(ans, expectedtype, nam);
+    return ans;
   }
   template<class ArrayType>
   //ArrayType fillShape(ArrayType &x, const char *nam){
