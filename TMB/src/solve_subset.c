@@ -43,6 +43,7 @@
 
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
+/* Alloca is required by CHM_DN, CHM_SP, CHM_FR from Matrix package */
 #ifdef __GNUC__
 # undef alloca
 # define alloca(x) __builtin_alloca((x))
@@ -51,12 +52,6 @@
 # include <alloca.h>
 #endif
 #include "Matrix.h"
-# ifdef _OPENMP
-#include <omp.h>
-# endif
-/* allocate n elements of type t */
-#define Alloca(n, t)   (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
-
 
 // Notes about the CHOLMOD super-nodal storage. 
 // According to the documentation of CHOLMOD we have:
@@ -79,16 +74,10 @@
 //        *      in this factor type.
 
 					    
-/*
-  Dense subset x[p,q] of sparse matrix x
-  If the nz-pattern of x[p,q] is completely dense use "reset=FALSE"
-  Otherwise use "reset=TRUE"
-  If p==q and x is symmetric with lower triangle storage
-  use "symm=TRUE" to get symmetric output.
-*/
-CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, int reset, int symm, cholmod_common *c){
+/* Extract dense block x[p,q] of sparse matrix x */
+CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, cholmod_common *c){
   CHM_DN ans = M_cholmod_allocate_dense(np,nq,np,CHOLMOD_REAL,c);
-  double *w = Alloca(x->nrow,double);
+  double *w = Calloc(x->nrow,double);
   int *xi=x->i;
   int *xp=x->p;
   double *xx=x->x;
@@ -96,10 +85,6 @@ CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, int reset, int s
   int col, row;
   for(int j=0;j<nq;j++){
     col=q[j];
-    /* reset workspace w[p] on request */
-    if(reset){
-      for(int i=0;i<np;i++)w[p[i]]=0;
-    }
     /* scatter x[:,col] over w */
     for(int i=xp[col];i<xp[col+1];i++){
       w[xi[i]]=xx[i];
@@ -108,17 +93,14 @@ CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, int reset, int s
     for(int i=j;i<np;i++){
       row=p[i];
       ansx[i+j*np]=w[row];
-      if(symm)ansx[j+i*np]=w[row];
     }
   }
+  Free(w);
   return ans;
 }
 
-
-
 /* Perform recursions for k'th supernode */
 void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
-  int EXPERIMENTAL = 0;
   int* super=L->super;
   int* Ls=L->s;
   int* Lpi=L->pi;
@@ -137,62 +119,33 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   int info; /* For lapack */
   int i,j;
   double ONE=1.0, ZERO=0.0, MONE=-1.0;
-  CHM_DN x = densesubmatrix(Lsparse,q,nq,q,nq,FALSE,EXPERIMENTAL,c);
+  CHM_DN x = densesubmatrix(Lsparse,q,nq,q,nq,c);
   double *xx=x->x;
   double *Lss=xx, *Lps=xx+ns, *Ssp=xx+(nq*ns), *Spp=xx+(nq*ns+ns);
   /* Workspace to hold output from dsymm */
   double *wrk=Calloc(nq*ns,double);
   double *wrkps=wrk+ns;
-  if(!EXPERIMENTAL){
-    /* ------------ ORIGINAL VERSION: S(p,p)*M */
-    if(np>0){
-      F77_CALL(dtrsm)("Right","Lower","No transpose","Not unit",
-		      &np,&ns,&MONE,Lss,&nq,Lps,&nq);
-      for(i=ns;i<nq;i++){for(j=0;j<ns;j++)Lss[j+nq*i] = Lss[i+nq*j];} /* Copy Transpose*/
-      memcpy(wrk,Lss,nq*ns*sizeof(double));    
-      F77_CALL(dsymm)("Left","Lower",&np,&ns,&ONE,Spp,&nq,Lps,&nq,&ZERO,wrkps,&nq);
-      memcpy(Lss,wrk,nq*ns*sizeof(double));
-      F77_CALL(dpotri)("L",&ns,Lss,&nq,&info);
-      F77_CALL(dgemm)("N","N",&ns,&ns,&np,&ONE,Ssp,&nq,Lps,&nq,&ONE,Lss,&nq);
-    } else {
-      F77_CALL(dpotri)("L",&ns,Lss,&nq,&info);
-    }
-    /* ----------- Fill results into L(q,s) -------*/
-    double *Lx=Lsparse->x;
-    int *Lp=Lsparse->p;
-    int m=Lp[s[0]];
-    for(j=0;j<ns;j++){
-      for(i=j;i<nq;i++){
-	Lx[m]=Lss[i+j*nq];
-	m++;
-      }
-    }
-    /* ------------ END: ORIGINAL VERSION: S(p,p)*M */
+  if(np>0){
+    F77_CALL(dtrsm)("Right","Lower","No transpose","Not unit",
+		    &np,&ns,&MONE,Lss,&nq,Lps,&nq);
+    for(i=ns;i<nq;i++){for(j=0;j<ns;j++)Lss[j+nq*i] = Lss[i+nq*j];} /* Copy Transpose*/
+    memcpy(wrk,Lss,nq*ns*sizeof(double));    
+    F77_CALL(dsymm)("Left","Lower",&np,&ns,&ONE,Spp,&nq,Lps,&nq,&ZERO,wrkps,&nq);
+    memcpy(Lss,wrk,nq*ns*sizeof(double));
+    F77_CALL(dpotri)("L",&ns,Lss,&nq,&info);
+    F77_CALL(dgemm)("N","N",&ns,&ns,&np,&ONE,Ssp,&nq,Lps,&nq,&ONE,Lss,&nq);
+  } else {
+    F77_CALL(dpotri)("L",&ns,Lss,&nq,&info);
   }
-
-  if(EXPERIMENTAL){
-    /* ------------ EXPERIMENTAL VERSION: M^t * S(p,p) */
-    /* NB: REQUIRES "symm=TRUE" in densesubmatrix */
-    if(np>0){
-      F77_CALL(dtrsm)("Right","Lower","No transpose","Not unit",
-		      &np,&ns,&MONE,Lss,&nq,Lps,&nq);
-      F77_CALL(dgemm)("T","N",&ns,&np,&np,&ONE,Lps,&nq,Spp,&nq,&ZERO,Ssp,&nq);
-      F77_CALL(dpotri)("U",&ns,Lss,&nq,&info);
-      F77_CALL(dgemm)("N","N",&ns,&ns,&np,&ONE,Ssp,&nq,Lps,&nq,&ONE,Lss,&nq);
-    } else {
-      F77_CALL(dpotri)("U",&ns,Lss,&nq,&info);
+  /* ----------- Fill results into L(q,s) -------*/
+  double *Lx=Lsparse->x;
+  int *Lp=Lsparse->p;
+  int m=Lp[s[0]];
+  for(j=0;j<ns;j++){
+    for(i=j;i<nq;i++){
+      Lx[m]=Lss[i+j*nq];
+      m++;
     }
-    /* ----------- Fill results into L(q,s) -------*/
-    double *Lx=Lsparse->x;
-    int *Lp=Lsparse->p;
-    int m=Lp[s[0]];
-    for(i=0;i<ns;i++){
-      for(j=i;j<nq;j++){ 
-	Lx[m]=Lss[i+j*nq];
-	m++;
-      }
-    }
-    /* ------------ END: EXPERIMENTAL VERSION: M^t * S(p,p) */
   }
 
   /* Count flops */
@@ -212,7 +165,6 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   /* Clean up */
   M_cholmod_free_dense(&x,c);
   Free(wrk);
-
 }
 
 CHM_SP lgc_inv_super(CHM_FR Lfac, cholmod_common *c){
@@ -295,27 +247,3 @@ SEXP match_pattern(SEXP A_, SEXP B_){
   return ans;
 }
 
-/* openmp controller */
-SEXP omp_num_threads(SEXP x) {
-#ifdef SUPPORT_OPENMP
-  if(!isNull(x)){
-    int n=INTEGER(x)[0];
-    omp_set_num_threads(n);
-  }
-  SEXP ans;
-  PROTECT(ans = NEW_INTEGER(1));
-  INTEGER(ans)[0]=omp_get_max_threads();
-  UNPROTECT(1);
-  return ans;
-#else
-  error("Openmp not supported.");
-#endif
-}
-
-/* Avoid S4 overhead when changing x-slot:
-   Set xslot to SEXP pointer i.e. x@x <- y
- */
-SEXP setxslot(SEXP x, SEXP y){
-  setAttrib(x,install("x"),y);
-  return x;
-}
