@@ -1,13 +1,6 @@
+#include <R.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
-#include <malloc.h>
-#ifdef __GNUC__
-# undef alloca
-# define alloca(x) __builtin_alloca((x))
-#elif defined(__sun) || defined(_AIX)
-/* this is necessary (and sufficient) for Solaris 10 and AIX 6: */
-# include <alloca.h>
-#endif
 #include "Matrix.h"
 
 #ifdef _USE_EXTERNAL_CHOLMOD_LIB_
