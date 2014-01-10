@@ -41,16 +41,9 @@
    ========================================================== 
 */
 
+#include <R.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
-/* Alloca is required by CHM_DN, CHM_SP, CHM_FR from Matrix package */
-#ifdef __GNUC__
-# undef alloca
-# define alloca(x) __builtin_alloca((x))
-#elif defined(__sun) || defined(_AIX)
-/* this is necessary (and sufficient) for Solaris 10 and AIX 6: */
-# include <alloca.h>
-#endif
 #include "Matrix.h"
 
 // Notes about the CHOLMOD super-nodal storage. 
@@ -77,7 +70,7 @@
 /* Extract dense block x[p,q] of sparse matrix x */
 CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, cholmod_common *c){
   CHM_DN ans = M_cholmod_allocate_dense(np,nq,np,CHOLMOD_REAL,c);
-  double *w = Calloc(x->nrow,double);
+  double *w = malloc(x->nrow*sizeof(double));
   int *xi=x->i;
   int *xp=x->p;
   double *xx=x->x;
@@ -95,7 +88,7 @@ CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, cholmod_common *
       ansx[i+j*np]=w[row];
     }
   }
-  Free(w);
+  free(w);
   return ans;
 }
 
@@ -123,7 +116,7 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   double *xx=x->x;
   double *Lss=xx, *Lps=xx+ns, *Ssp=xx+(nq*ns), *Spp=xx+(nq*ns+ns);
   /* Workspace to hold output from dsymm */
-  double *wrk=Calloc(nq*ns,double);
+  double *wrk=malloc(nq*ns*sizeof(double));
   double *wrkps=wrk+ns;
   if(np>0){
     F77_CALL(dtrsm)("Right","Lower","No transpose","Not unit",
@@ -164,7 +157,7 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
 
   /* Clean up */
   M_cholmod_free_dense(&x,c);
-  Free(wrk);
+  free(wrk);
 }
 
 CHM_SP lgc_inv_super(CHM_FR Lfac, cholmod_common *c){
