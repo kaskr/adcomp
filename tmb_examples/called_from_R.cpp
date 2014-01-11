@@ -29,11 +29,11 @@ EvalADFunObject();
 //      res <- .Call("EvalDoubleFunObject",Fun$ptr,theta,
 EvalDoubleFunObject();
 
-//      solveSubset <- function(L).Call("lgc_invQ",L,PACKAGE="TMB")
-lgc_invQ();
+//      solveSubset <- function(L).Call("tmb_invQ",L,PACKAGE="TMB")
+tmb_invQ();
 
-//      solveSubset2 <- function(L).Call("lgc_invQ_tril_halfdiag",L,PACKAGE="TMB")
-lgc_invQ_tril_halfdiag();
+//      solveSubset2 <- function(L).Call("tmb_invQ_tril_halfdiag",L,PACKAGE="TMB")
+tmb_invQ_tril_halfdiag();
 
 //        m <- .Call("match_pattern",A,B,PACKAGE="TMB") ## Same length as A@x with pointers to B@x
 match_pattern();

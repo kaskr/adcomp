@@ -93,7 +93,7 @@ CHM_DN densesubmatrix(CHM_SP x, int *p, int np, int *q, int nq, cholmod_common *
 }
 
 /* Perform recursions for k'th supernode */
-void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
+void tmb_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   int* super=L->super;
   int* Ls=L->s;
   int* Lpi=L->pi;
@@ -160,7 +160,7 @@ void lgc_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   free(wrk);
 }
 
-CHM_SP lgc_inv_super(CHM_FR Lfac, cholmod_common *c){
+CHM_SP tmb_inv_super(CHM_FR Lfac, cholmod_common *c){
 
   /* Convert factor to sparse without modifying factor */
   CHM_FR Ltmp = M_cholmod_copy_factor(Lfac,c);
@@ -169,18 +169,18 @@ CHM_SP lgc_inv_super(CHM_FR Lfac, cholmod_common *c){
 
   /* Loop over supernodes */
   int nsuper=Lfac->nsuper;
-  for(int k=nsuper-1;k>=0;k--)lgc_recursion_super(L,k,Lfac,c);
+  for(int k=nsuper-1;k>=0;k--)tmb_recursion_super(L,k,Lfac,c);
 
   /* Change to symm lower */
   L->stype=-1; 
   return L;
 }
 
-SEXP lgc_invQ(SEXP Lfac){
+SEXP tmb_invQ(SEXP Lfac){
   CHM_FR L=AS_CHM_FR(Lfac);
   cholmod_common c;
   M_R_cholmod_start(&c);
-  CHM_SP iQ = lgc_inv_super(L, &c);
+  CHM_SP iQ = tmb_inv_super(L, &c);
   return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "", R_NilValue);
 }
 
@@ -197,11 +197,11 @@ void half_diag(CHM_SP A){
   }
 }
 
-SEXP lgc_invQ_tril_halfdiag(SEXP Lfac){
+SEXP tmb_invQ_tril_halfdiag(SEXP Lfac){
   CHM_FR L=AS_CHM_FR(Lfac);
   cholmod_common c;
   M_R_cholmod_start(&c);
-  CHM_SP iQ = lgc_inv_super(L, &c);
+  CHM_SP iQ = tmb_inv_super(L, &c);
   half_diag(iQ);
   iQ->stype=0; /* Change to non-sym */
   return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "", R_NilValue);

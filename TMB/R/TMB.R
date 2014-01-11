@@ -342,9 +342,8 @@ MakeADFun <- function(data,parameters,map=list(),
       if(LaplaceNonZeroGradient)stop("Not correct for LaplaceNonZeroGradient=TRUE")
       ##browser()
       e <- environment(spHess)
-      ##require(lgc) ## solveSubset
-      solveSubset <- function(L).Call("lgc_invQ",L,PACKAGE="TMB")
-      solveSubset2 <- function(L).Call("lgc_invQ_tril_halfdiag",L,PACKAGE="TMB")
+      solveSubset <- function(L).Call("tmb_invQ",L,PACKAGE="TMB")
+      solveSubset2 <- function(L).Call("tmb_invQ_tril_halfdiag",L,PACKAGE="TMB")
       ## FIXME: The following two lines are not efficient:
       ## 1. ihessian <- tril(solveSubset(L))
       ## 2. diag(ihessian) <- .5*diag(ihessian)

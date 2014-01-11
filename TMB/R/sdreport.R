@@ -117,7 +117,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
-      ihessian.random <- .Call("lgc_invQ", L, PACKAGE = "TMB")
+      ihessian.random <- .Call("tmb_invQ", L, PACKAGE = "TMB")
       iperm <- Matrix::invPerm(L@perm+1L)
       diag.term1 <- diag(ihessian.random)[iperm]
       f <- obj$env$f
