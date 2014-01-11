@@ -483,7 +483,7 @@ void printTP(tape_point tp){
 }
 
 bool is_tape_point_constant(size_t index){
-  bool ok_index= (0<=index) && (index<=tp_.size()-2);
+  bool ok_index= (index<=tp_.size()-2);
   if(!ok_index) return false;
   tape_point tp1=tp_[index];
   tape_point tp2=tp_[index+1];
