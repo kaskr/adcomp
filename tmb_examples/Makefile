@@ -10,4 +10,7 @@ report: $(outputfiles)
 	R --vanilla < unittest.R
 
 clean :
-	rm -f *.o *.so *~ core *.output.RData Rplots.pdf
+	rm -rf *.o *.so *~ core *.output.RData Rplots.pdf *.profile
+
+%.profile : %.R %.cpp
+	example=$(basename $<) R --vanilla < profiler.R

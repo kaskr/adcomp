@@ -127,3 +127,10 @@ Result details:
     rw_sparse                   1.993961e-13
     socatt                      0.000000e+00
     spatial                     0.000000e+00
+
+Profiling:
+----------
+Examples can be profiled using intel vtune. To profile e.g. example "spatial" run
+* make spatial.profile
+This requires "amplxe-cl" on your path. Then view the profile with
+* amplxe-gui spatial.profile/spatial.profile.amplxe
