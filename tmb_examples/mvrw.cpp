@@ -9,10 +9,10 @@ template<class Type>
 Type objective_function<Type>::operator() ()
 {
   DATA_ARRAY(obs); /* timeSteps x stateDim */
-  PARAMETER_ARRAY(u); /* State */
   PARAMETER(transf_rho);
   PARAMETER_VECTOR(logsds);
   PARAMETER_VECTOR(logsdObs);
+  PARAMETER_ARRAY(u); /* State */
   int timeSteps=obs.dim[1];
   int stateDim=obs.dim[0];
   Type rho=f(transf_rho);
@@ -27,10 +27,10 @@ Type objective_function<Type>::operator() ()
   MVNORM_t<Type> neg_log_density(cov);
   /* Define likelihood */
   Type ans=0;
-  ans-=dnorm(vector<Type>(u.col(0)),Type(0),Type(1),1).sum();
+  //  ans-=dnorm(vector<Type>(u.col(0)),Type(0),Type(1),1).sum();
   for(int i=1;i<timeSteps;i++)    
     ans+=neg_log_density(u.col(i)-u.col(i-1)); // Process likelihood 
-  for(int i=1;i<timeSteps;i++)
+  for(int i=0;i<timeSteps;i++)
     ans-=dnorm(vector<Type>(obs.col(i)),vector<Type>(u.col(i)),sdObs,1).sum(); // Data likelihood
   return ans;
 }

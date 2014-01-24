@@ -19,16 +19,16 @@ Type objective_function<Type>::operator() ()
   Type res=0;
 
   vector<Type> eta(n); 
-  eta = X*b + u;
+  eta = X*b + exp(log_sigma)*u;
 
   // 
   matrix<Type> cov(n,n); 
   for (i=0;i<n;i++)
   {
-    cov(i,i)=sigma2;
+    cov(i,i)=Type(1);
     for ( j=0;j<i;j++)
     {
-      cov(i,j)=sigma2*exp(-a*dd(i,j));			// Exponentially decaying correlation
+      cov(i,j)=exp(-a*dd(i,j));			// Exponentially decaying correlation
       cov(j,i)=cov(i,j);
     }
   }

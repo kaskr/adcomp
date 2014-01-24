@@ -31,7 +31,7 @@ stateDim=3
 timeSteps=100
 simdata()
 library(TMB)
-dyn.load("rw.so")
+dyn.load("mvrw_sparse.so")
 data <- list(obs=t(obs))
 parameters <- list(
   u=data$obs*0,
@@ -40,7 +40,7 @@ parameters <- list(
   logsdObs=sdObs*0
   )
 newtonOption(smartsearch=FALSE)
-obj <- MakeADFun(data,parameters,random="^u",DLL="rw")
+obj <- MakeADFun(data,parameters,random="^u",DLL="mvrw_sparse")
 
 obj$fn()
 obj$gr()

@@ -31,3 +31,4 @@ ttt=system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,
 ##obj$gr()
 #c(phi1,phi2)
 #f(opt$par)
+rep <- sdreport(obj)

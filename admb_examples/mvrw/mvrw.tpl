@@ -4,31 +4,34 @@ GLOBALS_SECTION
 DATA_SECTION
   init_int N
   init_int stateDim
-  init_matrix obss(1,N,1,stateDim)
+  init_matrix obs(1,N,1,stateDim)
 PARAMETER_SECTION
-  objective_function_value jnll; 
-  init_bounded_number rho(0.001,0.999,1);
-  init_vector logSdObs(1,stateDim);
-  init_vector logSd(1,stateDim);
-  random_effects_vector U(1,stateDim*N);
+  objective_function_value jnll;
+  init_number transf_rho;
+  init_vector logsds(1,stateDim);
+  init_vector logsdObs(1,stateDim);
+  random_effects_vector u(1,stateDim*N);
 PROCEDURE_SECTION
-  
-  for(int t=1; t<=(N-1); t++)
-     step(t,U((t-1)*stateDim+1,t*stateDim),U(t*stateDim+1,(t+1)*stateDim),logSd,rho);
 
   for(int t=1; t<=(N-1); t++)
-    obs(t,U((t-1)*stateDim+1,t*stateDim),logSdObs);
+     step(t,u((t-1)*stateDim+1,t*stateDim),u(t*stateDim+1,(t+1)*stateDim),logsds,transf_rho);
 
-SEPARABLE_FUNCTION void step(const int t, const dvar_vector& u1,const dvar_vector& u2, const dvar_vector& logSd, const dvariable& rho)
+  for(int t=1; t<=(N); t++)
+    obsfun(t,u((t-1)*stateDim+1,t*stateDim),logsdObs);
+
+SEPARABLE_FUNCTION void step(const int t, const dvar_vector& u1,const dvar_vector& u2, const dvar_vector& logsds, const dvariable& transf_rho)
   dvar_matrix fvar(1,stateDim,1,stateDim);
   dvar_matrix fcor(1,stateDim,1,stateDim);
   dvar_vector fsd(1,stateDim);
+  dvariable rho=2.0/(1.0+exp(-2.0*transf_rho))-1.0;
 
   fvar.initialize();
-  fsd = exp(logSd);
+  fsd = exp(logsds);
   
-  dvar_vector a=u1.shift(1);
-  dvar_vector b=u2.shift(1);
+  dvar_vector a=u1;
+  dvar_vector b=u2;
+  a=a.shift(1);
+  b=b.shift(1);
 
   for(int i=1; i<=stateDim; ++i){
         for(int j=1; j<=stateDim; ++j){
@@ -40,12 +43,13 @@ SEPARABLE_FUNCTION void step(const int t, const dvar_vector& u1,const dvar_vecto
   jnll+=nLogNormal(a,b,fvar);
 
 
-SEPARABLE_FUNCTION void obs(const int t, const dvar_vector& u, const dvar_vector& logSdObs)
-  dvar_vector var = exp(2.0*logSdObs);
-  dvar_vector pred = u.shift(1);		   
+SEPARABLE_FUNCTION void obsfun(const int t, const dvar_vector& u, const dvar_vector& logsdObs)
+  dvar_vector var = exp(2.0*logsdObs);
+  dvar_vector pred = u;
+  pred=pred.shift(1);
   for(int i=1; i<=stateDim; i++){
       //cout << i << endl;
-      jnll+=0.5*(log(2.0*M_PI*var(i))+square(obss(t,i)-pred(i))/var(i));
+      jnll+=0.5*(log(2.0*M_PI*var(i))+square(obs(t,i)-pred(i))/var(i));
   } 
 
 TOP_OF_MAIN_SECTION
