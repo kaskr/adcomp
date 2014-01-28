@@ -3,7 +3,7 @@ README
 
 For this model to run you need the following command line options:
 
-./orange_big -est -gbs 1000000000 -cbs 1000000000
+./orange_big -est -gbs 100000000 -cbs 10000000 -nl1 10000000
 
 The options are related to memory manangement in ADMB. For further details
 see:
