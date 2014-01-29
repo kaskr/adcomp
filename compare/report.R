@@ -1,5 +1,5 @@
 require(TMB)
-f1 <- dir("../tmb_examples",".expected.RData")
+f1 <- dir("../tmb_examples",".output.RData")
 f2 <- dir("../admb_examples",".output.RData")
 examples <- intersect(sub("\\..*","",f1),sub("\\..*","",f2))
 compare <- function(example){
@@ -10,7 +10,10 @@ compare <- function(example){
   setwd("../tmb_examples")
   load(paste0(example,".output.RData"))
   sum <- summary(.results$`TMB::sdreport`)
-  rep <- rep[1:nrow(sum),] ## In case admb example has sdreport - we don't compare that yet
+  M <- min(nrow(sum),nrow(rep))
+  if(M<1)stop("No output")
+  rep <- rep[1:M,] ## In case admb example has sdreport - we don't compare that yet
+  sum <- sum[1:M,]
   ok <- all(as.character(rep$name)==rownames(sum))
   if(!ok){
     cat("Example:",example,"\n")

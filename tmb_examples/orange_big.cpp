@@ -33,10 +33,11 @@ Type objective_function<Type>::operator() ()
     {
       // Random effects contribution
       Type u1 = u[i+k*M];
-      g -= -.5*u1*u1;
+      g -= -(log_sigma_u);
+      g -= -.5*pow(u1/sigma_u,2);
 
       vector<Type> a(3); 
-      a[0] = 192.0 + beta[0] + sigma_u*u1;			
+      a[0] = 192.0 + beta[0] + u1;
       a[1] = 726.0 + beta[1];
       a[2] = 356.0 + beta[2];
 
