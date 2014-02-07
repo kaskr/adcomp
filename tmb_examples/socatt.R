@@ -17,7 +17,7 @@ dyn.load("socatt.so")
 
 data <- list(y=d$y,S=d$S,X=d$X,group=group)
 parameters <- list(
-  u=rep(0,length(group)),
+  u=rep(0,nlevels(group)),
   b=rep(0,d$p),
   logsigma=1,
   tmpk=rep(0,d$S-1)
