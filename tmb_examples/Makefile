@@ -2,6 +2,7 @@ rfiles = $(basename $(wildcard *.R))
 cppfiles = $(basename $(wildcard *.cpp))
 intersection= $(filter $(rfiles), $(cppfiles)) 
 outputfiles = $(intersection:=.output.RData)
+profiletargets = $(intersection:=.profile)
 
 %.output.RData : %.R %.cpp
 	unset MAKEFLAGS; example=$(basename $<) R --vanilla < unittest.R
@@ -14,3 +15,6 @@ clean :
 
 %.profile : %.R %.cpp
 	example=$(basename $<) R --vanilla < profiler.R
+
+profile_all: $(outputfiles) $(profiletargets)
+
