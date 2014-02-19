@@ -280,6 +280,7 @@ struct report_stack{
     UNPROTECT(1);
     return nam;
   }
+  size_t size(){return result.size();}
 };  // report_stack
 
 /** \brief Type definition of user-provided objective function (i.e. neg. log. like) */
@@ -334,6 +335,7 @@ public:
     if(max_parallel_regions>0)current_parallel_region=current_parallel_region % max_parallel_regions;
     return ans;
   }
+  /* Note: Some other functions rely on "count_parallel_regions" to run through the users code (!) */
   int count_parallel_regions(){
     current_parallel_region=0;       /* reset counter */
     selected_parallel_region=0;
@@ -723,19 +725,18 @@ extern "C"
     int returnReport = INTEGER(getListElement(control,"report"))[0];
 
     /* Get the default parameter vector (tiny overhead) */
-    objective_function< AD<double> > F(data,parameters,report);
-    F();      // Evaluates user template
-    SEXP par;
+    SEXP par,res,info;
+    objective_function< double > F(data,parameters,report);
+    int n=F.count_parallel_regions(); // Evaluates user template
+    if(returnReport && F.reportvector.size()==0){
+      /* Told to report, but no ADREPORT in template: Get out quickly */
+      return R_NilValue;
+    }
     PROTECT(par=F.defaultpar());
-    SEXP res;
-    SEXP info;
     PROTECT(info=R_NilValue); // Important
 
     if(_openmp && !returnReport){ // Parallel mode
 #ifdef _OPENMP
-      std::cout << "Count num parallel regions\n";
-      objective_function< double > FF(data,parameters,report);
-      int n=FF.count_parallel_regions(); // overhead: This could be taken from F instead
       std::cout << n << " regions found.\n";
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
@@ -752,6 +753,7 @@ extern "C"
     } else { // Serial mode
       /* Actual work: tape creation */
       ADFun<double>* pf=MakeADFunObject(data, parameters, report, control, -1, info);
+      if(config.optimize.instantly)pf->optimize();
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
       setAttrib(res,install("range.names"),info);
@@ -811,6 +813,7 @@ extern "C"
 
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
+    if(isNull(f))error("Expected external pointer - got NULL");
     SEXP tag=R_ExternalPtrTag(f);
     if(!strcmp(CHAR(tag), "ADFun"))
       return EvalADFunObjectTemplate<ADFun<double> >(f,theta,control);
@@ -896,6 +899,24 @@ extern "C"
 } /* Double interface */
 
 
+ADFun< double >* MakeADGradObject(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
+{
+  /* Create ADFun pointer */
+  objective_function< AD<AD<double> > > F(data,parameters,report);
+  F.set_parallel_region(parallel_region);
+  int n=F.theta.size();
+  Independent(F.theta);
+  vector< AD<AD<double> > > y(1);
+  y[0]=F();
+  ADFun<AD<double> > tmp(F.theta,y);
+  vector<AD<double> > x(n);
+  for(int i=0;i<n;i++)x[i]=CppAD::Value(F.theta[i]);
+  vector<AD<double> > yy(n);
+  Independent(x);
+  yy=tmp.Jacobian(x);
+  ADFun< double >* pf = new ADFun< double >(x,yy);
+  return pf;
+}
 
 extern "C"
 {
@@ -908,29 +929,35 @@ extern "C"
     if(!isNewList(parameters))error("'parameters' must be a list");
     if(!isEnvironment(report))error("'report' must be an environment");
 
-    /* Create ADFun pointer */
-    objective_function< AD<AD<double> > > F(data,parameters,report);
-    int n=F.theta.size();
-    Independent(F.theta);
-    vector< AD<AD<double> > > y(1);
-    y[0]=F();
-    ADFun<AD<double> > tmp(F.theta,y);
-
-    vector<AD<double> > x(n);
-    for(int i=0;i<n;i++)x[i]=CppAD::Value(F.theta[i]);
-    vector<AD<double> > yy(n);
-    Independent(x);
-    yy=tmp.Jacobian(x);
-    ADFun< double >* pf = new ADFun< double >(x,yy);
-    
-    /* Get the default parameter vector */
-    SEXP par;
+    /* Get the default parameter vector (tiny overhead) */
+    SEXP par,res;
+    objective_function< double > F(data,parameters,report);
+    int n=F.count_parallel_regions(); // Evaluates user template
     PROTECT(par=F.defaultpar());
 
-    /* Convert ADFun pointer to R_ExternalPtr */
-    SEXP res;
-    PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
-    R_RegisterCFinalizer(res,finalizeADFun);
+    if(_openmp){ // Parallel mode
+#ifdef _OPENMP
+      std::cout << n << " regions found.\n";
+      start_parallel(); /* Start threads */
+      vector< ADFun<double>* > pfvec(n);
+#pragma omp parallel for if (config.tape.parallel)
+      for(int i=0;i<n;i++){
+	pfvec[i]=MakeADGradObject(data, parameters, report, i);
+	if(config.optimize.instantly)pfvec[i]->optimize();
+      }
+      parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+      /* Convert parallel ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) ppf,mkChar("parallelADFun"),R_NilValue));
+      R_RegisterCFinalizer(res,finalizeparallelADFun);
+#endif
+    } else { // Serial mode
+      /* Actual work: tape creation */
+      ADFun<double>* pf=MakeADGradObject(data, parameters, report, -1);
+      if(config.optimize.instantly)pf->optimize();
+      /* Convert ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
+      R_RegisterCFinalizer(res,finalizeADFun);
+    }
 
     /* Return ptrList */
     SEXP ans;
