@@ -24,7 +24,7 @@ Type objective_function<Type>::operator() ()
   using namespace density;
   int i,j,k,ii;
 
-  parallel_accumulator<Type> g(this);
+  Type g=0;
 
   for(k=0;k< multiply;k++)
   {
