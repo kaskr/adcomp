@@ -252,13 +252,17 @@ struct report_stack{
     increase(1,name);
     result[result.size()-1]=x;
   }
-  // push vector, matrix or array
+  // push vector or array
   template<class VectorType>
   void push(VectorType x, const char* name){
     int n=x.size();
     int oldsize=result.size();
     increase(n,name);
     for(int i=0;i<n;i++)result[oldsize+i]=x[i];
+  }
+  // push matrix
+  void push(matrix<Type> x, const char* name){
+    push(x.vec(),name);
   }
   // Cast to vector
   operator vector<Type>(){
