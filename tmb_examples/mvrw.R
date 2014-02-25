@@ -40,7 +40,7 @@ parameters <- list(
   logsdObs=sdObs*0
   )
 newtonOption(smartsearch=FALSE)
-obj <- MakeADFun(data,parameters,random="^u",DLL="mvrw")
+obj <- MakeADFun(data,parameters,random="u",DLL="mvrw")
 
 obj$fn()
 obj$gr()

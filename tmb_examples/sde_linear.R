@@ -71,7 +71,7 @@ parameters <- list(
 # The inner problem is quadratic
 newtonOption(smartsearch=FALSE)
 
-obj <- MakeADFun(data,parameters,random=c("^X"),DLL="sde_linear")
+obj <- MakeADFun(data,parameters,random=c("X"),DLL="sde_linear")
 
 # Estimate parameters and latent variables
 system.time(opt <- nlminb(obj$par,obj$fn,obj$gr))

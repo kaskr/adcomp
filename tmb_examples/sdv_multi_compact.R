@@ -15,7 +15,7 @@ obj <- MakeADFun(data=
 		   off_diag_x=rep(0.0,p),
     		   h=t(matrix(0.0,nrow=n,ncol=p))
                    ),
-                 random=c("^h")
+                 random=c("h")
 #		   map=list(off_diag_x=factor(rep(NA,3)))
 		 )
 #obj$control <- list(trace=1,parscale=rep(1,12)*1e-2,REPORT=1,reltol=1e-12,maxit=100)

@@ -13,7 +13,7 @@ parameters <- list(
   logR=0
   )
 newtonOption(smartsearch=FALSE)
-obj <- MakeADFun(data,parameters,random="^X",DLL="thetalog")
+obj <- MakeADFun(data,parameters,random="X",DLL="thetalog")
 obj$hessian <- TRUE
 #obj$control$reltol<-1e-12
 

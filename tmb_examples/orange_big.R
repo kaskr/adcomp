@@ -15,7 +15,7 @@ obj <- MakeADFun(data=data_orange,
 		   log_sigma=1,
 		   log_sigma_u=2,
                    u = rep(0,Mmultiply)),	
-                 random=c("^u")
+                 random=c("u")
 		 )
 obj$control <- list(trace=1,parscale=c(1,1,1,1,1)*1e-2,REPORT=1,reltol=1e-12,maxit=100)
 obj$hessian <- F

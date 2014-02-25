@@ -22,7 +22,7 @@ parameters <- list(
   logsigma=1,
   tmpk=rep(0,d$S-1)
   )
-obj <- MakeADFun(data,parameters,random="^u",DLL="socatt")
+obj <- MakeADFun(data,parameters,random="u",DLL="socatt")
 obj$fn()
 obj$gr()
 system.time(opt <- do.call("optim",obj))

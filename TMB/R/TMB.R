@@ -39,7 +39,8 @@ updateCholesky <- function(L,H,t=0){
 ##' More advanced parameter mapping, such as collecting parameters between different vectors etc., must be implemented from the template.
 ##' 
 ##' Random effects are specified via the argument \code{random}: A component of the parameter list is marked as random if its name is matched
-##' by any of the regular expressions of the character vector \code{random}. If some parameters are specified as random effects, these will
+##' by any of the characters of the vector \code{random} (Regular expression match is performed if \code{regexp=TRUE}).
+##' If some parameters are specified as random effects, these will
 ##' be integrated out of the objective function via the Laplace approximation. In this situation all of the functions \code{fn} and \code{gr}
 ##' automatically performs an optimization of random effects for each function evaluation. This is referred to as
 ##' the 'inner optimization'. Strategies for choosing initial values of the inner optimization can be controlled
@@ -82,7 +83,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
 ##' @param map List defining how to optionally collect and fix parameters - see details.
 ##' @param type Character vector defining which operation stacks are generated from the users template - see details.
-##' @param random Character vector of regular expression defining the random effect parameters.
+##' @param random Character vector defining the random effect parameters. See also \code{regexp}.
 ##' @param random.start Expression defining the strategy for choosing random effect initial values as function of previous function evaluations - see details.
 ##' @param hessian Calculate Hessian at optimum?
 ##' @param method Outer optimization method.
@@ -94,6 +95,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param LaplaceNonZeroGradient Allow taylor expansion around non-stationary point?
 ##' @param DLL Name of shared object file compiled by user.
 ##' @param checkParameterOrder Optional check for correct parameter order.
+##' @param regexp Match random effects by regular expressions?
 ##' @param ... 
 ##' @return List with components (fn,gr, etc) suitable for an optim call.
 MakeADFun <- function(data,parameters,map=list(),
@@ -109,6 +111,7 @@ MakeADFun <- function(data,parameters,map=list(),
                       LaplaceNonZeroGradient=FALSE, ## Experimental feature: Allow expansion around non-stationary point
                       DLL=getUserDLL(),
                       checkParameterOrder=TRUE, ## Optional check
+                      regexp=FALSE,
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
@@ -259,10 +262,27 @@ MakeADFun <- function(data,parameters,map=list(),
       .Call("EvalDoubleFunObject",Fun$ptr,unlist(parameters),control=list(order=as.integer(0)),PACKAGE=DLL)
     }
     if(is.character(random)){
-      random <<- grepRandomParameters(parameters,random)
-      if(length(random)==0){
-        cat("Selected random effects did not match any model parameters.\n")
-        random <<- NULL
+      if(!regexp){ ## Default: do exact match
+        if(!all(random %in% names(parameters))){
+          cat("Some 'random' effect names does not match 'parameter' list:\n")
+          print(setdiff(random,names(parameters)))
+          cat("(Note that regular expression match is disabled by default)\n")
+          stop()
+        }
+        if(any(duplicated(random))){
+          cat("Duplicates in 'random' - will be removed\n")
+          random <- unique(random)
+        }
+        tmp <- lapply(parameters,function(x)x*0)
+        tmp[random] <- lapply(tmp[random],function(x)x*0+1)
+        random <<- which(as.logical(unlist(tmp)))
+      }
+      if(regexp){ ## Original regular expression match
+        random <<- grepRandomParameters(parameters,random)
+        if(length(random)==0){
+          cat("Selected random effects did not match any model parameters.\n")
+          random <<- NULL
+        }
       }
       par <<- unlist(parameters)
     }

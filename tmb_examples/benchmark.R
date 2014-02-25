@@ -43,7 +43,7 @@ parameters <- list(
 newtonOption(smartsearch=FALSE)
 ##compile("rw_parallel.cpp")
 dyn.load("rw_parallel.so")
-obj <- MakeADFun(data,parameters,random="^u",DLL="rw_parallel")
+obj <- MakeADFun(data,parameters,random="u",DLL="rw_parallel")
 ben <- benchmarkParallel(obj,n=1000,cores=1:8)
 ben
 pdf("../slides/results/scalability.pdf")

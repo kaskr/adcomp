@@ -24,15 +24,12 @@ parameters <- list(
                    )
 obj <- MakeADFun(data=data,
                  parameters=parameters,
-                 random=c("^a","^b"),
+                 random=c("a","b"),
                  type = c("ADFun", "Fun")
                  )
 
 obj$fn()
 obj$gr()
-
-## Optimize
-system.time(optimize(obj))
 
 ## Estimate
 obj$control <- list(trace=1)

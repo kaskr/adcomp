@@ -22,7 +22,7 @@ obj <- MakeADFun(data,parameters,map=map,DLL="nmix")
 opt <- nlminb(obj$par,obj$fn,obj$gr)
 pl <- obj$env$parList(opt$par) ## Parameter estimate after phase 1
 ## Phase 2
-obj <- MakeADFun(data,pl,random="^u",DLL="nmix")
+obj <- MakeADFun(data,pl,random="u",DLL="nmix")
 system.time( opt <- nlminb(obj$par,obj$fn,obj$gr) )
 rep <- sdreport(obj)
 rep
