@@ -20,8 +20,21 @@ Alternative platforms
 
 Windows
 -------
-Tested to work on 64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/).
-All examples run (including the parallel), however it may be needed to manually edit the PKG_LIBS of the Makevars file in order to correctly link to the OpenMP runtime library. Otherwise it will not be possible to change the number of threads from within R. Note that the folder where the package is installed is not allowed to contain spaces.
+Tested to work on 64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/). Currently not working with 32 bit R.
+
+_Install instructions_
+
+1. Start 64 bit R and change working directory to the (cloned or unzipped) ```adcomb``` folder.
+
+2. From R run: ```source("install_windows.R")```
+
+The required Rtools will be downloaded and installed. Note that the PATH variable need not be changed by the installer or otherwise edited. The PATH will be automatically set for each TMB session.
+
+_Status_
+
+- Parallel user templates work, including changing the number of threads from R.
+- Filenames and folders with spaces should be ok.
+- -Wall flag disabled by default.
 
 Mac OS X
 --------
