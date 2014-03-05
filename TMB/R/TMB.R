@@ -668,6 +668,10 @@ openmp <- function(n=NULL){
 ##' TMB relies on R's built in functionality to create shared libraries independent on the platform.
 ##' A template is compiled by \code{compile("template.cpp")}, which will call R's makefile with appropriate
 ##' preprocessor flags.
+##' Compiler and compiler flags can be stored in a configuration file. In order of precedence either via
+##' the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
+##' Additional configuration variables can be set with \code{...} argument, which will overwrite any
+##' previous selections.
 ##' @title Compile a c++ template to DLL suitable for MakeADFun.
 ##' @param file c++ file.
 ##' @param flags Character with compile flags.
@@ -678,6 +682,14 @@ openmp <- function(n=NULL){
 ##' @param ... Passed as Makeconf variables.
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file),libtmb=TRUE,...){
+  if(.Platform$OS.type=="windows"){
+    ## Overload system.file
+    system.file <- function(...){
+      ans <- base::system.file(...)
+      ans <- chartr("\\", "/", shortPathName(ans))
+      ans
+    }
+  }
   ## libtmb existence
   if(!openmp){
     libtmb <- libtmb && file.exists(system.file(dynlib("libs/libTMB"),package="TMB"))
@@ -685,9 +697,18 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   if(openmp){
     libtmb <- libtmb && file.exists(system.file(dynlib("libs/libTMBomp"),package="TMB"))
   }
-  ## Function to create temporary makevars
-  mvuser <- Sys.getenv("R_MAKEVARS_USER",NA)
-  if(!is.na(mvuser))on.exit(Sys.setenv(R_MAKEVARS_USER=mvuser))
+  ## Function to create temporary makevars, Note:
+  ## * R_MAKEVARS_USER overrules all other Makevars in tools:::.shlib_internal
+  oldmvuser <- mvuser <- Sys.getenv("R_MAKEVARS_USER",NA)
+  if(is.na(oldmvuser)){
+    on.exit(Sys.unsetenv("R_MAKEVARS_USER"))
+  } else {
+    on.exit(Sys.setenv(R_MAKEVARS_USER=oldmvuser))
+  }
+  if(is.na(mvuser) && (file.exists(f <- path.expand("~/.R/Makevars"))))mvuser <- f
+  if(!is.na(mvuser)){
+    cat("Note: Using Makevars in",mvuser,"\n")
+  }
   makevars <- function(...){
     file <- tempfile()
     args <- unlist(list(...))
@@ -730,7 +751,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                      CXXFLAGS=flags[flags!=""], ## Optionally overwrite cxxflags
                      ...
                      )
-  on.exit(file.remove(mvfile))
+  on.exit(file.remove(mvfile),add=TRUE)
   tools:::.shlib_internal(file)
 }
 
