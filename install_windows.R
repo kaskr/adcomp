@@ -56,7 +56,7 @@ createMakevars <- function(){
   x <- grep("-Wall",readLines(p),val=TRUE)
   print(x)
   x <- sub("-Wall ","",x)
-  x <- c(x,"PKG_LIBS += -DSUPPORT_OPENMP")
+  x <- c(x,"PKG_CPPFLAGS += -DSUPPORT_OPENMP")
   cat("to\n")
   print(x)
   writeLines(x,file)

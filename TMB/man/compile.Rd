@@ -4,7 +4,7 @@
 \usage{
   compile(file, flags = "", safebounds = TRUE,
     safeunload = TRUE, openmp = isParallelTemplate(file),
-    ...)
+    libtmb = TRUE, ...)
 }
 \arguments{
   \item{file}{c++ file.}
@@ -20,6 +20,9 @@
   \item{openmp}{Turn on openmp flag? Auto detected for
   parallel templates.}
 
+  \item{libtmb}{Use precompiled TMB library if available
+  (to speed up compilation)?}
+
   \item{...}{Passed as Makeconf variables.}
 }
 \description{
@@ -31,5 +34,11 @@
   libraries independent on the platform. A template is
   compiled by \code{compile("template.cpp")}, which will
   call R's makefile with appropriate preprocessor flags.
+  Compiler and compiler flags can be stored in a
+  configuration file. In order of precedence either via the
+  file pointed at by R_MAKEVARS_USER or the file
+  ~/.R/Makevars if it exists. Additional configuration
+  variables can be set with \code{...} argument, which will
+  overwrite any previous selections.
 }
 

@@ -11,7 +11,7 @@
     MCcontrol = list(doMC = FALSE, seed = 123, n = 100),
     ADreport = FALSE, atomic = TRUE,
     LaplaceNonZeroGradient = FALSE, DLL = getUserDLL(),
-    checkParameterOrder = TRUE, ...)
+    checkParameterOrder = TRUE, regexp = FALSE, ...)
 }
 \arguments{
   \item{data}{List of data objects
@@ -29,8 +29,8 @@
   stacks are generated from the users template - see
   details.}
 
-  \item{random}{Character vector of regular expression
-  defining the random effect parameters.}
+  \item{random}{Character vector defining the random effect
+  parameters. See also \code{regexp}.}
 
   \item{random.start}{Expression defining the strategy for
   choosing random effect initial values as function of
@@ -61,6 +61,9 @@
 
   \item{checkParameterOrder}{Optional check for correct
   parameter order.}
+
+  \item{regexp}{Match random effects by regular
+  expressions?}
 
   \item{...}{}
 }
@@ -107,16 +110,17 @@
   Random effects are specified via the argument
   \code{random}: A component of the parameter list is
   marked as random if its name is matched by any of the
-  regular expressions of the character vector
-  \code{random}. If some parameters are specified as random
-  effects, these will be integrated out of the objective
-  function via the Laplace approximation. In this situation
-  all of the functions \code{fn} and \code{gr}
-  automatically performs an optimization of random effects
-  for each function evaluation. This is referred to as the
-  'inner optimization'. Strategies for choosing initial
-  values of the inner optimization can be controlled via
-  the argument \code{random.start}. By default, we use
+  characters of the vector \code{random} (Regular
+  expression match is performed if \code{regexp=TRUE}). If
+  some parameters are specified as random effects, these
+  will be integrated out of the objective function via the
+  Laplace approximation. In this situation all of the
+  functions \code{fn} and \code{gr} automatically performs
+  an optimization of random effects for each function
+  evaluation. This is referred to as the 'inner
+  optimization'. Strategies for choosing initial values of
+  the inner optimization can be controlled via the argument
+  \code{random.start}. By default, we use
   \code{expression(last.par.best[random])} where
   \code{last.par.best} is an internal full parameter vector
   corresponding to the currently best likelihood. An

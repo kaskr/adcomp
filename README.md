@@ -24,7 +24,7 @@ Tested to work on 64 bit R with latest [Rtools](http://cran.r-project.org/bin/wi
 
 _Install instructions_
 
-1. Start 64 bit R and change working directory to the (cloned or unzipped) ```adcomb``` folder.
+1. Start 64 bit R and change working directory to the (cloned or unzipped) ```adcomp``` folder.
 
 2. From R run: ```source("install_windows.R")```
 
