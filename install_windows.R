@@ -10,7 +10,7 @@ fileLocations <- function(){
               paste0(rhome,"/../Rtools") )
   gccbin <- paste0(rtools,"/gcc-4.6.3/bin")
   ans <- list(rhome=rhome,rbin=rbin,rtools=rtools,gccbin=gccbin)
-  lapply(ans,function(x)x[Vectorize(file.exists)(x)][1])
+  lapply(ans,function(x)x[file.exists(x)][1])
 }
 
 installRtools <-function(){
