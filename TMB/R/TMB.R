@@ -647,8 +647,17 @@ MakeADFun <- function(data,parameters,map=list(),
   return(env)
 }
 
+.removeComments <- function(x){
+  x <- paste(x,collapse="\n")
+  remlong <- function(x)gsub("/\\*.*?\\*/","",x)
+  remshort <- function(x)gsub("//[^\n]*\n","\n",x)
+  x <- remshort(remlong(x))
+  strsplit(x,"\n")[[1]]
+}
+
 isParallelTemplate <- function(file){
   code <- readLines(file)
+  code <- .removeComments(code)
   length(grep("^[ ]*PARALLEL_",code))>0  ||
   length(grep("^[ ]*parallel_accumulator",code))>0
 }
@@ -847,8 +856,31 @@ template <- function(file=NULL){
 ##' file <- system.file("examples/simple.cpp", package = "TMB")
 ##' Rinterface(file)
 Rinterface <- function(file){
-  cmd <- paste(system.file("Rinterface.sh",package="TMB"),file)
-  system(cmd)
+  libname <- sub("\\.[^\\.]*$", "", basename(file))
+  x <- readLines(file)
+  x <- .removeComments(x)
+  items2list <- function(items){
+    if(length(items)==0)return("list(),")
+    paste0("list(\n",paste(paste0("  ",items,"=  "),collapse=",\n"),"\n ),")
+  }
+  ## Data
+  dataregexp <- "^[ ]*DATA_.*?\\((.*?)\\).*"
+  datalines <- grep(dataregexp,x,value=TRUE)
+  dataitems <- sub(dataregexp,"\\1",datalines)
+  ## Parameters
+  parameterregexp <- "^[ ]*PARAMETER.*?\\((.*?)\\).*"
+  parameterlines <- grep(parameterregexp,x,value=TRUE)
+  parameteritems <- sub(parameterregexp,"\\1",parameterlines)
+  libname <- paste0("\"",libname,"\"")
+  txt <- c("library(TMB)",
+           paste0("dyn.load(dynlib(",libname,"))"),
+           "MakeADFun(",
+           paste0(" data=",items2list(dataitems)),
+           paste0(" parameters=",items2list(parameteritems)),
+           paste0(" DLL=",libname),
+           ")\n"
+           )
+  cat(paste(txt,collapse="\n"))
 }
 
 ## Get som info about the ADFun pointers
