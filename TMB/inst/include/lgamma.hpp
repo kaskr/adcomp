@@ -62,7 +62,7 @@ inline Type dpois(const Type &x, const Type &lambda, int give_log=0)
 template<class Type>
 Type dgamma(Type y, Type shape, Type scale, int give_log=0)
 {
-  Type logres=-lgamma(shape)+(shape-Type(1.0))*log(y)-y;
+  Type logres=-lgamma(shape)+(shape-Type(1.0))*log(y)-y/scale-shape*log(scale);
   if(give_log)return logres; else return exp(logres);
 }
 
