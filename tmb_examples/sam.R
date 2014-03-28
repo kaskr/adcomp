@@ -1,8 +1,8 @@
-source("samtmb_data.R")
+source("sam_data.R")
 
 library(TMB)
-compile("samtmb.cpp")
-dyn.load("samtmb.so")
+compile("sam.cpp")
+dyn.load("sam.so")
 
 parameters <- list(
   logFpar=c(-11, -10, -10, -9, -9),
@@ -21,7 +21,7 @@ parameters <- list(
   logN=matrix(0, nrow=data$maxAge-data$minAge+1, ncol=data$noYears)
 )
 
-obj <- MakeADFun(data,parameters,random=c("logN","logF"),DLL="samtmb")
+obj <- MakeADFun(data,parameters,random=c("logN","logF"),DLL="sam")
 system.time(opt<-nlminb(obj$par,obj$fn,obj$gr))
 rep<-sdreport(obj)
 rep

@@ -1,3 +1,4 @@
+// socatt from ADMB example collection.
 #include <TMB.hpp>
 
 template<class Type>

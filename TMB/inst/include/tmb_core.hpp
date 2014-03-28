@@ -186,7 +186,12 @@ Levels: d e f g h i j
 	getListElement(objective_function::data,#name,&isArray)));
 /** \brief Get parameter array from R and declare it as array<Type> */
 #define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name,&isArray)),#name));
-
+/** \brief Get data matrix from R and declare it as matrix<int> */
+#define DATA_IMATRIX(name) matrix<int> name(asMatrix<int>(	\
+	getListElement(objective_function::data,#name,&isMatrix)));
+/** \brief Get data array from R and declare it as array<int> */
+#define DATA_IARRAY(name) tmbutils::array<int> name(tmbutils::asArray<int>(	\
+	getListElement(objective_function::data,#name,&isArray)));
 
 // kasper: Not sure used anywhere
 /** \brief Get the hessian sparsity pattern of ADFun object pointer */

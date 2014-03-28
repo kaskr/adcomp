@@ -1,3 +1,4 @@
+// State space assessment model from Nielsen and Berg 2014, Fisheries Research.
 //  --------------------------------------------------------------------------
 // Copyright (c) 2014, Anders Nielsen <an@aqua.dtu.dk>, 
 // Casper Berg <cbe@aqua.dtu.dk>, and Kasper Kristensen <kkr@aqua.dtu.dk>.
@@ -63,7 +64,7 @@ Type objective_function<Type>::operator() ()
   DATA_INTEGER(minAge);
   DATA_INTEGER(maxAge);
   DATA_INTEGER(maxAgePlusGroup);
-  DATA_ARRAY(keyLogFsta);
+  DATA_IARRAY(keyLogFsta);
   DATA_INTEGER(corFlag);
   DATA_ARRAY(keyLogFpar);
   DATA_ARRAY(keyQpow);
@@ -125,7 +126,7 @@ Type objective_function<Type>::operator() ()
   for(int i=0;i<timeSteps;i++){ // calc ssb
     ssb(i)=0.0;    
     for(int j=0; j<stateDimN; ++j){
-      ssb(i)+=exp(logN(j,i))*exp(-exp(logF(CppAD::Integer(keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight(i,j);
+      ssb(i)+=exp(logN(j,i))*exp(-exp(logF((keyLogFsta(0,j)),i))*propF(i,j)-natMor(i,j)*propM(i,j))*propMat(i,j)*stockMeanWeight(i,j);
     }
     logssb(i)=log(ssb(i));
   }
@@ -155,11 +156,11 @@ Type objective_function<Type>::operator() ()
     }
 
     for(int j=1; j<stateDimN; ++j){
-      predN(j)=logN(j-1,i-1)-exp(logF(CppAD::Integer(keyLogFsta(0,j-1)),i-1))-natMor(i-1,j-1); 
+      predN(j)=logN(j-1,i-1)-exp(logF((keyLogFsta(0,j-1)),i-1))-natMor(i-1,j-1); 
     }  
     if(maxAgePlusGroup==1){
-      predN(stateDimN-1)=log(exp(logN(stateDimN-2,i-1)-exp(logF(CppAD::Integer(keyLogFsta(0,stateDimN-2)),i-1))-natMor(i-1,stateDimN-2))+
-                             exp(logN(stateDimN-1,i-1)-exp(logF(CppAD::Integer(keyLogFsta(0,stateDimN-1)),i-1))-natMor(i-1,stateDimN-1))); 
+      predN(stateDimN-1)=log(exp(logN(stateDimN-2,i-1)-exp(logF((keyLogFsta(0,stateDimN-2)),i-1))-natMor(i-1,stateDimN-2))+
+                             exp(logN(stateDimN-1,i-1)-exp(logF((keyLogFsta(0,stateDimN-1)),i-1))-natMor(i-1,stateDimN-1))); 
     }
     ans+=neg_log_densityN(logN.col(i)-predN); // N-Process likelihood 
   }
@@ -174,12 +175,12 @@ Type objective_function<Type>::operator() ()
     f=CppAD::Integer(obs(i,1));
     ft=CppAD::Integer(fleetTypes(f-1));
     a=CppAD::Integer(obs(i,2))-minAge;
-    zz=exp(logF(CppAD::Integer(keyLogFsta(0,a)),y))+natMor(y,a);
+    zz=exp(logF((keyLogFsta(0,a)),y))+natMor(y,a);
     
     if(ft==0){// residual fleet
       predObs=logN(a,y)-log(zz)+log(1-exp(-zz));
-      if(CppAD::Integer(keyLogFsta(f-1,a))>(-1)){
-        predObs+=logF(CppAD::Integer(keyLogFsta(0,a)),y);
+      if((keyLogFsta(f-1,a))>(-1)){
+        predObs+=logF((keyLogFsta(0,a)),y);
       }
     }else{
       if(ft==1){// comm fleet

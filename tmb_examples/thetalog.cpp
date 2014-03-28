@@ -1,4 +1,4 @@
-// Random walk with multivariate correlated increments and measurement noise.
+// Theta logistic population model from Pedersen et al 2012, Ecol. Modelling.
 #include <TMB.hpp>
  
 /* Parameter transform */
