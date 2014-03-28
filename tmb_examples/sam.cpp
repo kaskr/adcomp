@@ -82,18 +82,32 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(logSdLogObs); 
   PARAMETER(rec_loga); 
   PARAMETER(rec_logb); 
-  PARAMETER(logit_rho); 
+  //PARAMETER(logit_rho); 
+  PARAMETER(rho); 
   PARAMETER_VECTOR(logScale); 
   PARAMETER_VECTOR(logScaleSSB); 
   PARAMETER_VECTOR(logPowSSB); 
   PARAMETER_VECTOR(logSdSSB); 
-  PARAMETER_ARRAY(logF); 
-  PARAMETER_ARRAY(logN);
+  // PARAMETER_ARRAY(logF); 
+  // PARAMETER_ARRAY(logN);
+  PARAMETER_ARRAY(U);
+  DATA_INTEGER(nlogF);
+  DATA_INTEGER(nlogN);
+
+  array<Type> logF(nlogF,U.cols());
+  array<Type> logN(nlogN,U.cols());
+  for(int i=0;i<nlogN;i++)
+    for(int j=0;j<U.cols();j++)
+      logN(i,j)=U(i,j);
+  for(int i=0;i<nlogF;i++)
+    for(int j=0;j<U.cols();j++)
+      logF(i,j)=U(i+nlogN,j);
+
 
   int timeSteps=logF.dim[1];
   int stateDimF=logF.dim[0];
   int stateDimN=logN.dim[0];
-  Type rho=f(logit_rho);
+  //Type rho=f(logit_rho);
   vector<Type> sdLogFsta=exp(logSdLogFsta);
   vector<Type> varLogN=exp(logSdLogN*Type(2.0));
   vector<Type> varLogObs=exp(logSdLogObs*Type(2.0));
@@ -208,7 +222,7 @@ Type objective_function<Type>::operator() ()
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
     ans+=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
   }
-  ADREPORT(logN);
-  ADREPORT(logF);
+  // ADREPORT(logN);
+  // ADREPORT(logF);
   return ans;
 }

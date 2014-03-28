@@ -367,9 +367,12 @@ PARAMETER_SECTION
   !! if(corFlag==0){cor_phase=-1;}
   init_bounded_number rho(0.01,0.99,cor_phase);
   init_vector logScale(1,noScaledPar); 
-  init_number logScaleSSB(ssbPhase);
-  init_number logPowSSB(ssbPowPhase);
-  init_number logSdSSB(ssbPhase);  
+  number logScaleSSB;
+  !! logScaleSSB=0.0;
+  number logPowSSB;
+  !! logPowSSB=0.0;
+  number logSdSSB;
+  !! logSdSSB=0.0;
   vector scaledLogObs(1,noObs);
   matrix X(1,noYears,1,stateDim);  
 
@@ -377,13 +380,13 @@ PARAMETER_SECTION
 
   objective_function_value jnll;
   
-  sdreport_vector ssb(1,noYears);
-  sdreport_vector logssb(1,noYears);
-  sdreport_vector logCatch(minYearResFleet,maxYearResFleet);
-  sdreport_vector fbar(1,noYears);
-  sdreport_vector logfbar(1,noYears);
-  sdreport_vector tsb(1,noYears);
-  sdreport_vector logtsb(1,noYears);
+  // sdreport_vector ssb(1,noYears);
+  // sdreport_vector logssb(1,noYears);
+  // sdreport_vector logCatch(minYearResFleet,maxYearResFleet);
+  // sdreport_vector fbar(1,noYears);
+  // sdreport_vector logfbar(1,noYears);
+  // sdreport_vector tsb(1,noYears);
+  // sdreport_vector logtsb(1,noYears);
   !! cout<<"  ---  Done."<<endl; cout.flush(); 
 PRELIMINARY_CALCS_SECTION
   cout<<"PRELIMINARYSECTION"; cout.flush(); 
@@ -609,24 +612,24 @@ PROCEDURE_SECTION
   }
 
   if(sd_phase()){
-    for(int y=1; y<=noYears; ++y){
-      for(int i=1; i<=stateDim; ++i){
-        X(y,i)=U((y-1)*stateDim+i);
-      }
-      ssb(y)=SSB(X(y),propMature(y),stockMeanWeight(y),Fprop(y),Mprop(y),natMor(y));
-      logssb(y)=log(ssb(y));
-      tsb(y)=TSB(X(y),stockMeanWeight(y));
-      logtsb(y)=log(tsb(y));
-      fbar(y)=FBAR(X(y),fbarRange(1),fbarRange(2));
-      logfbar(y)=log(fbar(y));
-      int idxlow=idx1(y);
-      int idxhigh=idx2(y);
-      dmatrix subData=getSubMat(data,idxlow,idxhigh);     
-      dvar_vector subObs=getSubVec(scaledLogObs,idxlow,idxhigh);
-      if((y>=minYearResFleet)&&(y<=maxYearResFleet)){
-        logCatch(y)=log(CATCH(X(y),natMor(y),catchMeanWeight(y)));
-      }
-    }    
+    // for(int y=1; y<=noYears; ++y){
+    //   for(int i=1; i<=stateDim; ++i){
+    //     X(y,i)=U((y-1)*stateDim+i);
+    //   }
+    //   ssb(y)=SSB(X(y),propMature(y),stockMeanWeight(y),Fprop(y),Mprop(y),natMor(y));
+    //   logssb(y)=log(ssb(y));
+    //   tsb(y)=TSB(X(y),stockMeanWeight(y));
+    //   logtsb(y)=log(tsb(y));
+    //   fbar(y)=FBAR(X(y),fbarRange(1),fbarRange(2));
+    //   logfbar(y)=log(fbar(y));
+    //   int idxlow=idx1(y);
+    //   int idxhigh=idx2(y);
+    //   dmatrix subData=getSubMat(data,idxlow,idxhigh);     
+    //   dvar_vector subObs=getSubVec(scaledLogObs,idxlow,idxhigh);
+    //   if((y>=minYearResFleet)&&(y<=maxYearResFleet)){
+    //     logCatch(y)=log(CATCH(X(y),natMor(y),catchMeanWeight(y)));
+    //   }
+    // }    
 
   }
 
