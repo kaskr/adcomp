@@ -24,11 +24,18 @@
 ##' Now the delta method can be applied on a general non-linear function \eqn{\phi(u,\theta)}
 ##' of random effects \eqn{u} and fixed effects \eqn{\theta}:
 ##' \deqn{V(\phi(\hat u,\hat\theta))\approx \nabla\phi V \pmatrix{ \hat u \cr \hat\theta }\nabla\phi'}
+##'
+##' The full joint covariance is not returned by default, because it may require large amounts of memory.
+##' It may be obtained by specifying \code{getJointPrecision=TRUE}, in which case
+##' \eqn{V \pmatrix{ \hat u \cr \hat\theta } ^{-1} } will be part of the output. This matrix must be manually
+##' inverted using \code{solve(jointPrecision)} in order to get the joint covariance matrix. Note, that the
+##' parameter order will follow the original order (i.e. \code{obj$env$par}).
 ##' 
 ##' @title General sdreport function.
 ##' @param obj Object returned by \code{MakeADFun}
 ##' @param par.fixed Optional. Fixed effect parameter estimate (will be known to \code{obj} when an optimization has been carried out).
 ##' @param hessian.fixed Optional. Hessian wrt. fixed effects (will be calculated from \code{obj} if missing).
+##' @param getJointPrecision Optional. Return full joint precision matrix of random and fixed effects?
 ##' @return Object of class \code{sdreport}
 ##' @examples
 ##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
