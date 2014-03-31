@@ -38,7 +38,7 @@
 ##' summary(rep,"random")                    ## Only random effects
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
-sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
+sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -133,6 +133,17 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL){
       diag.term2 <- rowSums((A %*% Vtheta)*A)
       ans$par.random <- par[r]
       ans$diag.cov.random <- diag.term1 + diag.term2
+      if(getJointPrecision){ ## Get V(u,theta)^-1
+        G <- hessian.random %*% A
+        M1 <- cbind2(hessian.random,G)
+        M2 <- cbind2(t(G), as.matrix(t(A)%*%G)+hessian.fixed )
+        M <- rbind2(M1,M2)
+        M <- as(M,"symmetricMatrix")
+        dn <- c(names(par)[r],names(par[-r]))
+        dimnames(M) <- list(dn,dn)
+        p <- Matrix::invPerm(c(r,(1:length(par))[-r]))
+        ans$jointPrecision <- M[p,p]
+      }
     } else {
       warning("Could not report sd's of full randomeffect vector.")
     }
