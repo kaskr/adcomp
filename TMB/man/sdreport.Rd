@@ -2,7 +2,8 @@
 \alias{sdreport}
 \title{General sdreport function.}
 \usage{
-  sdreport(obj, par.fixed = NULL, hessian.fixed = NULL)
+  sdreport(obj, par.fixed = NULL, hessian.fixed = NULL,
+    getJointPrecision = FALSE)
 }
 \arguments{
   \item{obj}{Object returned by \code{MakeADFun}}
@@ -13,6 +14,9 @@
 
   \item{hessian.fixed}{Optional. Hessian wrt. fixed effects
   (will be calculated from \code{obj} if missing).}
+
+  \item{getJointPrecision}{Optional. Return full joint
+  precision matrix of random and fixed effects?}
 }
 \value{
   Object of class \code{sdreport}
@@ -29,7 +33,7 @@
   (\eqn{\theta}) is calculated. The fixed effects
   covariance matrix is approximated by
   \deqn{V(\hat\theta)=-\nabla^2 l(\hat\theta)^{-1}} where
-  \eqn{l} denotes the likelihood function (i.e.
+  \eqn{l} denotes the log likelihood function (i.e.
   \code{-obj$fn}).
 
   For non-random effect models the standard delta-method is
@@ -44,7 +48,7 @@
   \hat\theta } \approx \pmatrix{ H_{uu}^{-1} & 0 \cr 0 & 0
   } + J V(\hat\theta) J' } where \eqn{H_{uu}} denotes
   random effect block of the full joint Hessian of
-  \code{obj$fn} and \eqn{J} denotes the Jacobian of
+  \code{obj$env$f} and \eqn{J} denotes the Jacobian of
   \eqn{\pmatrix{\hat u(\theta) \cr \theta}} wrt.
   \eqn{\theta}. Here, the first term represents the
   expected conditional variance given the fixed effects and
@@ -55,6 +59,16 @@
   effects \eqn{\theta}: \deqn{V(\phi(\hat
   u,\hat\theta))\approx \nabla\phi V \pmatrix{ \hat u \cr
   \hat\theta }\nabla\phi'}
+
+  The full joint covariance is not returned by default,
+  because it may require large amounts of memory. It may be
+  obtained by specifying \code{getJointPrecision=TRUE}, in
+  which case \eqn{V \pmatrix{ \hat u \cr \hat\theta } ^{-1}
+  } will be part of the output. This matrix must be
+  manually inverted using \code{solve(jointPrecision)} in
+  order to get the joint covariance matrix. Note, that the
+  parameter order will follow the original order (i.e.
+  \code{obj$env$par}).
 }
 \examples{
 runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example

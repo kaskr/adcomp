@@ -1,0 +1,21 @@
+\name{precompile}
+\alias{precompile}
+\title{Precompile the TMB library in order to speed up compilation of templates.}
+\usage{
+  precompile(...)
+}
+\arguments{
+  \item{...}{Passed to \code{compile}.}
+}
+\description{
+  Precompile the TMB library
+}
+\details{
+  The precompilation should only be run once, typically
+  right after installaion of TMB. Note that the
+  precompilation requires write access to the TMB package
+  folder. Two versions of the library - with/without the
+  openmp flag - will be generated. After this, compilation
+  times of templates should be reduced.
+}
+
