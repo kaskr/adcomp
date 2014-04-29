@@ -895,19 +895,6 @@ info <- function(obj){
   lapply(names,fun)
 }
 
-## Optimize ADFun
-optimize <- function(obj){
-  if(!is.environment(obj$env))stop("Wrong object")
-  env <- obj$env
-  fun <- function(name){
-    if(is.null(get(name,env)))return(NA)
-    unlist(.Call("optimizeADFunObject",get(name,env)$ptr,PACKAGE=obj$env$DLL))
-  }
-  names <- c("ADFun","ADGrad")
-  sapply(names,fun)
-}
-
-
 ## Recommended settings:
 ## * General non-convex case: smartsearch=TRUE
 ## * Strictly convex case:    smartsearch=FALSE and maxit=20
