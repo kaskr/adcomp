@@ -2,7 +2,7 @@ Y<-scan('thetalog.dat', skip=3, quiet=TRUE)
 
 library(TMB)
 compile("thetalog.cpp")
-dyn.load("thetalog.so")
+dyn.load(dynlib("thetalog"))
 data <- list(Y=Y)
 parameters <- list(
   X=data$Y*0,
@@ -14,13 +14,9 @@ parameters <- list(
   )
 newtonOption(smartsearch=FALSE)
 obj <- MakeADFun(data,parameters,random="X",DLL="thetalog")
-obj$hessian <- TRUE
-#obj$control$reltol<-1e-12
-
 obj$fn()
 obj$gr()
 system.time(opt <- nlminb(obj$par,obj$fn,obj$gr))
-
 rep <- sdreport(obj)
 rep
 
