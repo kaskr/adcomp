@@ -25,12 +25,16 @@ compare <- function(example){
     stop()
   }
   nfixed <- nrow(summary(.results$`TMB::sdreport`,"fixed")) ## number of fixed effects
+  nrandom <- nrow(summary(.results$`TMB::sdreport`,"random"))
   ##diff <- sum-rep[,3:4]
   i <- 1:nfixed
   diff <- sum[i,]-rep[i,3:4] ## Only compare fixed effects
   res <- apply(abs(diff),2,max)
   names(res) <- c("Max norm est-diff","Max norm sd-diff")
   diff <- sum[-i,]-rep[-i,3:4] ## Only compare random effects
+  if(nrandom==0){ ## No random effects
+    diff <- matrix(NA,1,2)
+  }
   resrf <- apply(abs(diff),2,max)
   names(resrf) <- c("Max norm rfest-diff","Max norm rfsd-diff")
   tim <- as.numeric(.timings$`TMB::sdreport`["elapsed"])

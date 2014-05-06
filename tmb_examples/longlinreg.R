@@ -7,10 +7,7 @@ x<-seq(0,10, length=nobs)
 data <- list(Y=2*x+1+rnorm(nobs),x=x)
 parameters <- list(a=0,b=0,logSigma=0)
 obj <- MakeADFun(data,parameters,DLL="longlinreg")
-obj$hessian <- TRUE
-#system.time(opt <- do.call("optim",obj))
 system.time(opt <- nlminb(obj$par, obj$fn, obj$gr))
 opt
-opt$hessian ## <-- FD hessian from optim
 obj$he()    ## <-- Analytical hessian
 sdreport(obj)
