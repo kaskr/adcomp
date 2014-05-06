@@ -99,7 +99,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param ... 
 ##' @return List with components (fn,gr, etc) suitable for an optim call.
 MakeADFun <- function(data,parameters,map=list(),
-                      type=c("ADFun","Fun","ADGrad"),
+                      type=c("ADFun","Fun","ADGrad"[!is.null(random)]),
                       random=NULL,
                       random.start=expression(last.par.best[random]),
                       hessian=FALSE,method="BFGS",
