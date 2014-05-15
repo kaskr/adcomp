@@ -83,7 +83,8 @@ SEXP tmb_symbolic(SEXP Qp){
   
   // Cleanup
   M_cholmod_free_sparse(&Q,&c);
-  
+  M_cholmod_finish(&c);
+
   return M_chm_factor_to_SEXP(LQ2, 1 /* Free */);
 }
 
