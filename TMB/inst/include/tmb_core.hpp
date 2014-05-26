@@ -130,9 +130,7 @@ Rboolean isNumericScalar(SEXP x){
 /* Macros to obtain data and parameters from R */
 
 /** \brief Get parameter matrix from R and declare it as matrix<Type> */
-#define PARAMETER_MATRIX(name) matrix<Type> name(asMatrix<Type>(	 \
-        getListElement(objective_function::parameters,#name,&isMatrix))); \
-        objective_function::fill(name,#name);
+#define PARAMETER_MATRIX(name) tmbutils::matrix<Type> name(objective_function::fillShape(asMatrix<Type>(objective_function::getShape(#name,&isMatrix)),#name));
 /** \brief Get parameter vector from R and declare it as vector<Type> */
 #define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumeric)),#name));
 /** \brief Get parameter scalar from R and declare it as Type */
@@ -485,7 +483,7 @@ public:
     for(int i=0;i<x.size();i++){
       if(map[i]>=0){
 	thetanames[index+map[i]]=nam;
-	if(reversefill)theta[index+map[i]]=x[i];else x[i]=theta[index+map[i]];
+	if(reversefill)theta[index+map[i]]=x(i);else x(i)=theta[index+map[i]];
       }
     }
     index+=nlevels;
