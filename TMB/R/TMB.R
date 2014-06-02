@@ -658,8 +658,8 @@ MakeADFun <- function(data,parameters,map=list(),
 isParallelTemplate <- function(file){
   code <- readLines(file)
   code <- .removeComments(code)
-  length(grep("^[ ]*PARALLEL_",code))>0  ||
-  length(grep("^[ ]*parallel_accumulator",code))>0
+  length(grep("^[ \t]*PARALLEL_",code))>0  ||
+  length(grep("^[ \t]*parallel_accumulator",code))>0
 }
 
 ##' Control number of openmp threads.
