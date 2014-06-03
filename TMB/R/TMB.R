@@ -844,7 +844,10 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##' template()
 template <- function(file=NULL){
   x <- readLines(system.file("template.cpp",package="TMB"))
-  if(!is.null(file))writeLines(x,file)
+  if(!is.null(file)){
+    if(file.exists(file))stop("File '",file,"' exists")
+    writeLines(x,file)
+  }
   else cat(paste(x,collapse="\n"))
 }
 
