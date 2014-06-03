@@ -1,26 +1,32 @@
 TODO
 ====
+- Upgrade to recent cppad, to get the abs/sign bugfix of version 2013-11-27.
+- Eliminate Wall warnings.
+- Make instructions how to disable Wall compiler flag, and more generally how to locate global Makeconf and create local Makevars.
+- Roxygen documentation:
+  - The use of dyn.load is confusing (add 'seealso' to ?compile)
+  - The summary method of sdreport is undocumented.
 - **DONE** Make it work on common platforms (Linux, Windows, Mac OS X).
 - Clean up R-code: newton, options, MakeADFun: class(output).
-- Roxygen documentation
 - MakeADFun: Call dyn.load if DLL not loaded (?)
 - parList: use last.par.best as default (?)
 - **DONE** parallel_start.hpp does not yet have parallel Hessian member.
-- Metis symbolic analysis with 3d example.
+- **DONE** Metis symbolic analysis with 3d example.
 - Move methods, such as "parList", out of the object.
-- Rinterface should remember to set DLL="..."
+- **DONE** Rinterface should remember to set DLL="..."
 - **DONE** sdreport() on R-side to get sd of ADREPORT().
 - **DONE** solveSubset to get sd's of all random effects.
 - Make importence sampler work in high dim - need a GMRFsample.
 - Compile and testing workflow:
   - **DONE** Eliminate need to restart R.
-  - Give better message if PARAMETER(name) evaluates to NULL.
-  - Improve compile times by either precompiling or allow incomplete compilations.
+  - **DONE** Give better message if PARAMETER(name) evaluates to NULL.
+  - **DONE** Improve compile times by either precompiling or allow incomplete compilations.
   - **DONE** Array bounds checking option
 - **DONE** template() should never overwrite existing file.
-- Review kaspers class extensions of Eigen classes, in particular array<Type>, matrix<Type> and vector<Type>
+- **DONE** Review kaspers class extensions of Eigen classes, in particular array<Type>, matrix<Type> and vector<Type>
   - **DONE** Consistency between matrix and array fastest running dimensions.
-  - Desired behaviour of overloaded operations e.g. pointwise multiply vs matrix multiply.
+  - **DONE** Desired behaviour of overloaded operations e.g. pointwise multiply vs matrix multiply.
   - Automatic cast from array to vector.
 - Make simple example of how to include "adjoint code". pexp(x,lambda) is a good example (cum. dist. function exp. distr)
 - Think about general features for calculating residuals, along the line of Kasper's ideas. 
+- New feature 'exportRpackage()' to wrap user template into a self contained R-package, optionally as standalone (independent of TMB package). By default linking to the TMB installation for smaller package size.
