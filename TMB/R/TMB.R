@@ -96,7 +96,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param DLL Name of shared object file compiled by user.
 ##' @param checkParameterOrder Optional check for correct parameter order.
 ##' @param regexp Match random effects by regular expressions?
-##' @param ... 
+##' @param ... Currently unused.
 ##' @return List with components (fn,gr, etc) suitable for an optim call.
 MakeADFun <- function(data,parameters,map=list(),
                       type=c("ADFun","Fun","ADGrad"[!is.null(random)]),
@@ -939,7 +939,8 @@ info <- function(obj){
 ##' @param grad.tol Gradient convergence tolerance. 
 ##' @param step.tol Stepsize convergence tolerance.
 ##' @param tol10 Try to exit if last 10 iterations not improved more than this.
-##' @param ... 
+##' @param env Environment for cached Cholesky factor.
+##' @param ... Currently unused.
 ##' @return List with solution similar to \code{optim} output.
 newton <- function (par,fn,gr,he,
                     trace = newtonOption("trace"),

@@ -46,7 +46,7 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 
 \item{regexp}{Match random effects by regular expressions?}
 
-\item{...}{}
+\item{...}{Currently unused.}
 }
 \value{
 List with components (fn,gr, etc) suitable for an optim call.

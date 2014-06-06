@@ -47,7 +47,9 @@ newton(par, fn, gr, he, trace = newtonOption("trace"),
 
 \item{tol10}{Try to exit if last 10 iterations not improved more than this.}
 
-\item{...}{}
+\item{env}{Environment for cached Cholesky factor.}
+
+\item{...}{Currently unused.}
 }
 \value{
 List with solution similar to \code{optim} output.
