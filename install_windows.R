@@ -67,11 +67,6 @@ modifyPathOnAttach <- function(){
                "setPath<-",deparse(setPath),
                ".onAttach<-function(libname, pkgname){setPath()}")
   writeLines(winpath,"TMB/R/winpath.R")
-  rl <- readLines("TMB/DESCRIPTION")
-  if(length(grep("winpath.R",rl))==0){
-    rl <- c(rl,"    'winpath.R'")
-  }
-  writeLines(rl,"TMB/DESCRIPTION")
 }
 
 if(!("TMB" %in% installed.packages())){
