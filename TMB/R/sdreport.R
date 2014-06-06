@@ -175,7 +175,7 @@ summary.sdreport <- function(x,select=c("all","fixed","random","report"),p.value
   ans <- rbind(ans1,ans2,ans3)
   colnames(ans) <- c("Estimate","Std. Error")
   if(p.value){
-    ans <- cbind(ans,p.value=pchisq((ans[,"Estimate"]/ans[,"Std. Error"])^2,df=1,lower=FALSE))
+    ans <- cbind(ans,p.value=pchisq((ans[,"Estimate"]/ans[,"Std. Error"])^2,df=1,lower.tail=FALSE))
   }
   ans
 }

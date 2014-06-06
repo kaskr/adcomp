@@ -33,3 +33,4 @@ TODO
 - Implement atomic AD operators of entire Rmath special function library. Example: D_x(psigamma(x,n))=psigamma(x,n+1)
 - Implement atomic AD operators of certain matrix operations (linking to BLAS) to e.g. better handle templates using multivariate normal distribution with dense covariance matrices.
 - Implement atomic AD operator of matrix exponential.
+- Package should pass "make check"/"R CMD check" without warnings.
