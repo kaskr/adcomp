@@ -158,7 +158,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   class(ans) <- "sdreport"
   ans
 }
-summary.sdreport <- function(x,select=c("all","fixed","random","report"),p.value=FALSE,...){
+summary.sdreport <- function(object,select=c("all","fixed","random","report"),p.value=FALSE,...){
   select <- match.arg(select)
   if(select=="all"){
     fixed <- random <- report <- TRUE
@@ -169,9 +169,9 @@ summary.sdreport <- function(x,select=c("all","fixed","random","report"),p.value
     all <- FALSE
   }
   ans1 <- ans2 <- ans3 <- NULL
-  if(fixed)ans1 <- cbind(x$par.fixed,sqrt(diag(x$cov.fixed)))
-  if(random)ans2 <- cbind(x$par.random,sqrt(as.numeric(x$diag.cov.random)))
-  if(report)ans3 <- cbind(x$value,x$sd)
+  if(fixed)ans1 <- cbind(object$par.fixed,sqrt(diag(object$cov.fixed)))
+  if(random)ans2 <- cbind(object$par.random,sqrt(as.numeric(object$diag.cov.random)))
+  if(report)ans3 <- cbind(object$value,object$sd)
   ans <- rbind(ans1,ans2,ans3)
   colnames(ans) <- c("Estimate","Std. Error")
   if(p.value){
