@@ -17,13 +17,3 @@ Depends:
     R (>= 3.0.0),
     Matrix(>= 1.0-12)
 LinkingTo: Matrix
-Collate:
-    'asmle.R'
-    'examples.R'
-    'options.R'
-    'TMB.R'
-    'zzz.R'
-    'config.R'
-    'benchmark.R'
-    'gdbsource.R'
-    'sdreport.R'
