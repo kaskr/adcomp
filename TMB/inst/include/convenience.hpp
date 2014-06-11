@@ -38,3 +38,35 @@ vector<Type> operator*(matrix<Type> A, vector<Type> x){return A*x.matrix();}
 /** SparseMatrix * vector */
 template<class Type>
 vector<Type> operator*(Eigen::SparseMatrix<Type> A, vector<Type> x){return (A*x.matrix()).array();}
+
+
+/** \brief  Approximate normal cumulative distribution function, similar to R's pnorm (one-argument case only).
+* \details
+To be replaced by more accurate version based on Rmath library.
+*/
+template<class Type>
+Type pnorm_approx(Type x){
+  Type a=993./880.;
+  Type b=89./880.;
+  x = x/sqrt(Type(2));
+  return Type(.5) * tanh( (a + b * x * x) * x ) + Type(.5);
+}
+VECTORIZE1(pnorm_approx);
+
+/** \brief  Approximate inverse normal cumulative distribution function, similar to R's qnorm (one-argument case only).
+* \details
+To be replaced by more accurate version based on Rmath library.
+*/
+template<class Type>
+Type qnorm_approx(Type x){
+  Type a=993./880.;
+  Type b=89./880.;
+  Type y = .5*(log(x)-log(1-x));
+  Type p = a/b;
+  Type q = -y/b;
+  Type Delta0 = -3*p;
+  Type Delta1 = 27*q;
+  Type C = pow( .5 * Delta1 + .5 * sqrt( pow(Delta1,2) - 4 * pow(Delta0,3) ), Type(1)/Type(3) );
+  return -(C + Delta0 / C) * sqrt(Type(2)) / Type(3);
+}
+VECTORIZE1(qnorm_approx);
