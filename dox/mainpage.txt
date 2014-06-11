@@ -41,11 +41,10 @@ in the Doxygen search field of your browser (you may need to refresh the browser
 each time you make a new search). A simple example if you want to read a vector
 of numbers (doubles) is the following
    \code
-  DATA_INTEGER(n);              // Length of "x"
-  DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1)        
+  DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1), where n is the length of x
    \endcode
 Note that all vectors and matrices in TMB uses a \b zero-based indexing scheme.
-It is not necessary to explicitely pass the dimension of "x", but is often convenient.
+It is not necessary to explicitely pass the dimension of "x", but it is often convenient.
 The dimension of x is set on the R side when the C++ program is called, and
 there are ways of retrieving the dimenson of x inside the C++ program.
 
@@ -77,13 +76,12 @@ two types of parameters.
   with non-informative priors in the Bayesian literature.
 - \b Latent \b random \b variables: to be integrated out of the likelihood using a Laplace approximation. 
 
-Which of these are chosen is controlled from R, and is not specified in C++. However,
-for a latent random variable it is usually necessary to assign a probablity distribution,
-which is done in C++ file.
+Which of these are chosen is controlled from R, via the <tt>random</tt> argument to the function <tt>MakeADFun</tt>. However,
+on the C++ side it is usually necessary to assign a probablity distribution to the parameter.
 
 The purpose of the C++ program is to calculate the (negative) joint density of data and latent
 random variables. Each datum and individual latent random gives a contribution
-to log likelihood, which may be though of as a "distribution allignment" by users
+to log likelihood, which may be though of as a "distribution assignment" by users
 familiar with software in the BUGS family.
    \code
   PARAMETER_VECTOR(u);          // Latent random variable 
@@ -96,11 +94,12 @@ The following rules apply:
 - More complicated distributionional assigments are allowed, say u(0)-u(1) ~ N(0,1),
   but this requires the user to have a deeper understanding of the probabilistic aspects of the model.
 - For latent variables only normal distributions should be used (otherwise
-  the Laplace approximation will perform poorly).
+  the Laplace approximation will perform poorly). For response variables
+  all probability distributions (discrete or continuous) are allowed.
+  If a non-gaussian latent is needed the "transformation trick" can be used.
 - The library \ref Distributions contains many probability distributions, especially
   multivariate normal distributions. For probability distributions not contained
-  in the library, the user can use raw C++ code. Due to the above rule that 
-  latent variables shold be normally distributed this is only relevant for the response distribution.
+  in the library, the user can use raw C++ code. 
    \code
   DATA_VECTOR(y);          	// Data vector
   Type nll = Type(0);		// Return value

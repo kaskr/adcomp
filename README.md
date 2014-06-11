@@ -7,7 +7,7 @@ The package is installed from the command line by entering the adcomb folder and
 
 * make install
 
-To build the manual type
+To build the user manual type
 
 * make pdf
 
@@ -15,6 +15,14 @@ Once the package is successfully installed it can be tested by starting R and ru
 
     library(TMB)
     runExample(all=TRUE)
+
+To build API-Function reference (requires that you have "doxygen" installed) type
+
+* make dox
+
+Once the documentation is buildt open dox\html\index.html in your web browser. 
+Use the search field to find functions and their documentation.
+
 
 Alternative platforms
 =====================
