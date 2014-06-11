@@ -33,21 +33,30 @@ inline Type lgamma(const Type &y)
 
 /** \brief Negative binomial probability function.
 
-  Considering the return value we need to make sure that:
-  (1) n>0   (2) 0<p   (3) p<1
-  This is obtained by adding small constants appropriate places.
+    Parameterized through size and prob parameters, following R-convention.
 */
 template<class Type>
-inline Type dnbinom(const Type &x, const Type &mu0, const Type &var0,
+inline Type dnbinom(const Type &x, const Type &size, const Type &prob,
 		    int give_log=0)
 {
-  Type mu=mu0+Type(1e-15);
-  Type var=var0+Type(2e-15);
-  Type p=mu/var;
-  Type n=mu*p/(1-p)+Type(1e-15);
+  Type n=size;
+  Type p=prob;
   Type logres = lgamma(x+n)-lgamma(n)-lgamma(x+Type(1))+
     n*log(p)+x*log(Type(1)-p);
   if (give_log) return logres; else return exp(logres);
+}
+
+/** \brief Negative binomial probability function.
+
+    Alternative parameterization through mean and variance parameters.
+*/
+template<class Type>
+inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
+		    int give_log=0)
+{
+  Type p=mu/var;
+  Type n=mu*p/(1-p);
+  return dnbinom(x,n,p,give_log);
 }
 
 /** \brief Poisson probability function. */
