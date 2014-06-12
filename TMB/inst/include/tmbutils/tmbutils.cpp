@@ -48,7 +48,7 @@ array<Type> asArray(SEXP x)
 
 /** 
    \brief Namespace to construct multivariate Gaussian distributions via C++ templates
-   \ingroup Distributions
+   \ingroup Densities
 
    A particular multivariate normal distribution is implemented as a templated C++ class. 
    Let us take the generic zero-mean multivariate normal distribution <tt>MVNORM_t</tt> with covariance matrix 

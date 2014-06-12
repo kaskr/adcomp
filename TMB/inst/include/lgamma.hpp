@@ -32,6 +32,7 @@ inline Type lgamma(const Type &y)
 }
 
 /** \brief Negative binomial probability function.
+  \ingroup R_style_distribution
 
     Parameterized through size and prob parameters, following R-convention.
 */
@@ -47,6 +48,7 @@ inline Type dnbinom(const Type &x, const Type &size, const Type &prob,
 }
 
 /** \brief Negative binomial probability function.
+  \ingroup R_style_distribution
 
     Alternative parameterization through mean and variance parameters.
 */
@@ -59,7 +61,10 @@ inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
   return dnbinom(x,n,p,give_log);
 }
 
-/** \brief Poisson probability function. */
+/** \brief Poisson probability function. 
+  \ingroup R_style_distribution
+*/
+
 template<class Type>
 inline Type dpois(const Type &x, const Type &lambda, int give_log=0)
 {
@@ -67,7 +72,9 @@ inline Type dpois(const Type &x, const Type &lambda, int give_log=0)
   if (give_log) return logres; else return exp(logres);
 }
 
-/** \brief Density of X where X~gamma distributed */
+/** \brief Density of X where X~gamma distributed 
+  \ingroup R_style_distribution
+*/
 template<class Type>
 Type dgamma(Type y, Type shape, Type scale, int give_log=0)
 {
@@ -75,7 +82,9 @@ Type dgamma(Type y, Type shape, Type scale, int give_log=0)
   if(give_log)return logres; else return exp(logres);
 }
 
-/** \brief Density of log(X) where X~gamma distributed */
+/** \brief Density of log(X) where X~gamma distributed 
+  \ingroup R_style_distribution
+*/
 template<class Type>
 inline Type dlgamma(Type y, Type shape, Type scale, int give_log=0)
 {

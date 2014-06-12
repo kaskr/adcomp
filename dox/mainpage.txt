@@ -1,3 +1,14 @@
+/**
+\mainpage Comprehensive Documentation of Functions and Classes (API)
+
+<ul>
+  <li> \b Modules: Introduction and summary of TMB (start here if you are new).</li>
+</ul>
+
+
+
+*/
+
 /** \defgroup Tutorial Getting started
 
 
@@ -110,6 +121,7 @@ See \ref Examples for more examples
 
 
 */
+
 /** \defgroup matrix_arrays Matrices and arrays
 
 
@@ -134,13 +146,23 @@ the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eig
 
 */
 
-/** \defgroup Distributions Probability distributions
+/** \defgroup R_style_distribution R style probability distributions
 
-\brief TMB contains several classes of probability distributions. These are organized into C++ name spaces
-       as shown below.
+\brief Probability distributions (discrete and continuous) for use in the likelihood function. 
+
+Attempts have been made to make the interface (function name and arguments) as close as possible 
+to that of R. The densities (\c d...) are provided for both
+in the discrete and continuous case, cumulative distributions (\c p...) and inverse 
+cumulative distributions (\c q...) are provided only for continuous distributions.
+
 */
 
+/** \defgroup Densities Multivariate normal densities (distributions)
+
+\brief To come..
+
 */
+
 /** \defgroup Examples TMB examples
 For a list of all examples please click on the "Examples" tab on
 the top of the page. 

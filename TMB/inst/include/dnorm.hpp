@@ -1,4 +1,7 @@
-/* One dimensional normal density */
+/** \file
+    \brief Univariate normal density
+    \ingroup R_style_distribution
+*/
 template<class Type>
 Type dnorm(Type x, Type mean, Type sd, int give_log=0)
 {
