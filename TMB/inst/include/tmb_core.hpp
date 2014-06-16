@@ -164,7 +164,7 @@ Levels: d e f g h i j
 */
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
 	getListElement(objective_function::data,#name,&isNumeric)));
-/** \brief Get data vector of type "integer" from R. (DATA_INTEGER is for a scalar integer)*/
+/** \brief Get data vector of type "integer" from R and declare it vector<int>. (DATA_INTEGER is for a scalar integer)*/
 #define DATA_IVECTOR(name) vector<int> name(asVector<int>(	\
 	getListElement(objective_function::data,#name,&isNumeric)));
 /** \brief Get the number of levels of a data factor from R */
