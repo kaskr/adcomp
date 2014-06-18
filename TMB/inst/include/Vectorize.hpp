@@ -1,5 +1,7 @@
+/** 	\file
+	\brief Macros to do vectorization.
+	*/
 
-/* Macros to do vectorization */
 #define VECTORIZE1(FUN)				\
 template <class Type>				\
 vector<Type> FUN(const vector<Type> &x)		\
