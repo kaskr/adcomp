@@ -1,5 +1,3 @@
-#include <cmath>
-
 /**	\file
 	\brief Probability distribution functions.
 	*/
