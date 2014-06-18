@@ -67,7 +67,7 @@ template <class Type>								\
 vector<Type> FUN(const vector<Type> &arg1, Type arg2, int arg3)			\
 {										\
 	vector<Type> res(arg1.size());						\
-	for(int i=0;i<arg1.size();i++) res[i] = pexp(arg1[i],arg2,arg3);	\
+	for(int i=0;i<arg1.size();i++) res[i] = FUN(arg1[i],arg2,arg3);	\
 	return res;								\
 }
 
@@ -80,7 +80,7 @@ template <class Type>								\
 vector<Type> FUN(Type arg1, const vector<Type> &arg2, int arg3)			\
 {										\
 	vector<Type> res(arg2.size());						\
-	for(int i=0;i<arg2.size();i++) res[i] = pexp(arg1,arg2[i],arg3);	\
+	for(int i=0;i<arg2.size();i++) res[i] = FUN(arg1,arg2[i],arg3);	\
 	return res;								\
 }
 
@@ -96,9 +96,18 @@ vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, int arg3)		
 	int n2 = arg2.size();								\
 	int n = fmax(n1,n2);								\
 	vector<Type> res(n);								\
-	for(int i=0;i<n;i++) res[i] = pexp(arg1[i],arg2[i],arg3);			\
+	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3);			\
 	return res;									\
 }
+
+/**	\brief Vectorization macros 3.tti summary
+
+	For three-arguments functions (Type, Type, int). Call all concerned vectorization macros.
+	*/
+#define VECTORIZE3_tti(FUN)	\
+VECTORIZE3_Tti(FUN);		\
+VECTORIZE3_tTi(FUN);		\
+VECTORIZE3_TTi(FUN);
 
 /**	\brief Vectorization macro 4.Iiti
 	
@@ -204,6 +213,19 @@ vector<Type> FUN(const vector<int> &arg1, const vector<int> &arg2, const vector<
 	return res;											\
 }
 
+/**	\brief Vectorization macros 4.iiti summary
+
+	For four-arguments functions (int, int, Type, int). Call all concerned vectorization macros.
+	*/
+#define VECTORIZE4_iiti(FUN)	\
+VECTORIZE4_Iiti(FUN);		\
+VECTORIZE4_iIti(FUN);		\
+VECTORIZE4_iiTi(FUN);		\
+VECTORIZE4_IIti(FUN);		\
+VECTORIZE4_IiTi(FUN);		\
+VECTORIZE4_iITi(FUN);		\
+VECTORIZE4_IITi(FUN);
+
 /**	\brief Vectorization macro 4.Ttti
 	
 	For four-arguments functions (Type, Type, Type, int). Vectorize first argument.
@@ -306,6 +328,19 @@ vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, const vecto
 	vector<Type> res(n);for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3[i],arg4);			\
 	return res;												\
 }
+
+/**	\brief Vectorization macros 4.ttti summary
+
+	For four-arguments functions (Type, Type, Type, int). Call all concerned vectorization macros.
+	*/
+#define VECTORIZE4_ttti(FUN)	\
+VECTORIZE4_Ttti(FUN);		\
+VECTORIZE4_tTti(FUN);		\
+VECTORIZE4_ttTi(FUN);		\
+VECTORIZE4_TTti(FUN);		\
+VECTORIZE4_TtTi(FUN);		\
+VECTORIZE4_tTTi(FUN);		\
+VECTORIZE4_TTTi(FUN);
 
 using CppAD::abs;
 VECTORIZE1(abs);
