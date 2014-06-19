@@ -45,7 +45,7 @@ VECTORIZE4_ttti(pweibull);
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type dbinom(int k, int size, Type prob, int give_log)
+Type dbinom(Type k, Type size, Type prob, int give_log)
 {
 	Type logres = lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1)+k*log(prob)+(size-k)*log(1-prob);
 	if(!give_log) return exp(logres);
@@ -53,7 +53,7 @@ Type dbinom(int k, int size, Type prob, int give_log)
 }
 
 // Vectorize dbinom
-VECTORIZE4_iiti(dbinom);
+VECTORIZE4_ttti(dbinom);
 
 /**	\brief Probability density function of the exponential distribution.
 	\ingroup R_style_distribution
