@@ -47,7 +47,7 @@ VECTORIZE4_ttti(pweibull);
 template<class Type> 
 Type dbinom(int k, int size, Type prob, int give_log)
 {
-	if(!give_log) return Type(exp(lgamma(size+1)))/Type(exp(lgamma(k+1))*exp(lgamma(size-k+1)))*pow(prob,k)*pow(1-prob,size-k);
+	if(!give_log) return exp(lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1))*pow(prob,k)*pow(1-prob,size-k);
 	else return lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1)+k*log(prob)+(size-k)*log(1-prob);
 }
 
