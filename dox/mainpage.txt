@@ -156,18 +156,22 @@ to that of R.
 - The densities (\c d...) are provided both in the discrete and continuous case, 
 	cumulative distributions (\c p...) and inverse cumulative distributions (\c q...) 
 	are provided only for continuous distributions.
-- Arguments of the \c vector are supported, but not \c array or \c matrix.
+- Scalar and \c vector arguments (in combinaiton) are supported, but not \c array or \c matrix.
+- The last argument (of type \c int) corresponds to the \c log argument in R: 1=logaritm, 0=ordinary scale.
+- Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
+  used an "out of range" error will occur, and can be picked up by the debugger.
+- \c DATA_IVECTOR() and \c DATA_INTEGER() cannot be used with probability distributions, except possibly for the last (log) argument.
+- Some example:
   \code 
+  DATA_SCALAR(y);
   DATA_VECTOR(x);
   vector<Type> rate(10);
   matrix<Type> rate_matrix(10,10);
-  dexp(x,rate);                      // OK
-  dexp(x,rate_matrix);               // Not allowed
+  dexp(y,rate,1);                      // OK, returns vector of length 10 of log-densities
+  dexp(x,rate,1);                      // OK if x is length 10 
+  dexp(x,rate_matrix,1);               // Error, matrix arguments not allowed
   \endcode 
   See ... for how to deal with \c array or \c matrix objects. 
-- Note that \c DATA_SCALAR(), \c DATA_IVECTOR() and \c DATA_INTEGER() can also directly be used as arguments.
-- Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
-  used an "out of range" error will occur, and can be picked up by the debugger.
 - To sum over elements in the vector returned use \code dexp(x,rate).sum();\endcode 
 */
 
