@@ -225,6 +225,20 @@ VECTORIZE4_TtTi(FUN);		\
 VECTORIZE4_tTTi(FUN);		\
 VECTORIZE4_TTTi(FUN);
 
+/**	\brief Vectorization macro 6.Ttttti.
+
+	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize first argument.
+	*/
+#define VECTORIZE6_Ttttti(FUN)										\
+template <class Type>											\
+vector<Type> FUN(const vector<Type> &arg1, Type arg2, Type arg3, Type arg4, Type arg5, int arg6)	\
+{													\
+	int n = arg1.size();										\
+	vector<Type> res(n);										\
+	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2,arg3,arg4,arg5,arg6);				\
+	return res;											\
+}
+
 using CppAD::abs;
 VECTORIZE1(abs);
 VECTORIZE1(acos);
