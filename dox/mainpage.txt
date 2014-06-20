@@ -156,18 +156,22 @@ to that of R.
 - The densities (\c d...) are provided both in the discrete and continuous case, 
 	cumulative distributions (\c p...) and inverse cumulative distributions (\c q...) 
 	are provided only for continuous distributions.
-- Arguments of the \c vector are supported, but not \c array or \c matrix.
+- Scalar and \c vector arguments (in combinaiton) are supported, but not \c array or \c matrix.
+- The last argument (of type \c int) corresponds to the \c log argument in R: 1=logaritm, 0=ordinary scale.
+- Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
+  used an "out of range" error will occur, and can be picked up by the debugger.
+- \c DATA_IVECTOR() and \c DATA_INTEGER() cannot be used with probability distributions, except possibly for the last (log) argument.
+- Some example:
   \code 
+  DATA_SCALAR(y);
   DATA_VECTOR(x);
   vector<Type> rate(10);
   matrix<Type> rate_matrix(10,10);
-  dexp(x,rate);                      // OK
-  dexp(x,rate_matrix);               // Not allowed
+  dexp(y,rate,1);                      // OK, returns vector of length 10 of log-densities
+  dexp(x,rate,1);                      // OK if x is length 10 
+  dexp(x,rate_matrix,1);               // Error, matrix arguments not allowed
   \endcode 
   See ... for how to deal with \c array or \c matrix objects. 
-- Note that \c DATA_SCALAR(), \c DATA_IVECTOR() and \c DATA_INTEGER() can also directly be used as arguments.
-- Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
-  used an "out of range" error will occur, and can be picked up by the debugger.
 - To sum over elements in the vector returned use \code dexp(x,rate).sum();\endcode 
 */
 
@@ -194,6 +198,7 @@ Simple example:
 \example matrix_arrays.cpp
 \example mvrw.cpp
 \example mvrw_sparse.cpp
+\example nan_error_ex.cpp
 \example nmix.cpp
 \example orange_big.cpp
 \example rw_parallel.cpp
@@ -211,16 +216,70 @@ Simple example:
 
 <h2>Compilation errors</h2>
 It may be hard to understand the compilation errors for the following reasons
-- ???
+- The Eigen libraries use templated C++ which generate non-intuitive error messages.
 
 <h2>Run time errors</h2>
-If you get run time errors you should use the C++ debugger. The R package TMB
-contains an R-interface to the debugger:
-   \code
-   help(gdbsource)
-   gdbsource("simple.R", interactive = FALSE)
-   \endcode
-   
-*/
+Run time errors are broadly speaking of two types:
+-  Out-of-bounds (you are "walking out of an array")
+-  Floating point execptions 
 
+You can use the debugger to locate both types of errors, but the procedure is
+a little bit different in the two cases. The following assumes
+that you have the GNU debugger \c gdb installed.
+
+<h3>Out-of-bounds error</h3>
+An example is:
+   \code
+        vector<Type> y(4);
+        y(5);                // 5 is not a valid index value here
+   \endcode
+This will cause TMB and R to crash with the following error message:
+   \code
+TMB has received an error from Eigen. The following condition was not met:
+index >= 0 && index < size()
+Please check your matrix-vector bounds etc., or run your program through a debugger.
+Aborted (core dumped)
+   \endcode
+So, you must restart R and give the commands
+\code
+> library(TMB)
+> gdbsource("nan_error_ex.R")
+#5  objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:11 
+\endcode
+and you can see that the debugger points to line number 11 in the .cpp file.
+\c gdbsource() is an R function that is part of TMB.
+
+<h3>Floating point execption</h3>
+If you on the other hand perform an illegal mathematical operation, such as
+   \code
+        Type f = sqrt(-1.);
+   \endcode
+R will not crash, but the objective function will return a NaN value.
+However, you will not know in which part of your C++ code the error occurs.
+B	y including the \c fenv.h library (which is part of
+ many C++ compilers, but can otherwise be downloaded from http://www.scs.stanford.edu/histar/src/uinc/fenv.h)
+
+\include nan_error_ex.cpp
+
+a floating point exception will be turn in to an actual error that can be picked up by the debugger.
+There are only two extra lines that need to be included ("//Extra line needed" in the above example).
+ 
+
+When we try to run this program in the usual way, the program crashes:
+\code
+> source("nan_error_ex.R")
+Floating point exception (core dumped)
+tmp3>   
+\endcode
+
+At this stage you should run the debugger to find out that the floating point exception occurs at line number 14:
+\code
+> library(TMB)
+Loading required package: Matrix
+> gdbsource("nan_error_ex.R")
+#1  0x00007ffff0e7eb09 in objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:14
+\endcode
+
+
+*/
 
