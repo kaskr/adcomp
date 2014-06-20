@@ -1,7 +1,11 @@
 /**	\file
 	\brief Probability distribution functions.
 	*/
-	
+
+/** 	@name Exponential distribution.
+	Functions relative to the exponential distribution.
+	*/
+/**@{*/
 /**	\brief Cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
@@ -19,6 +23,29 @@ Type pexp(Type x, Type rate, int give_log=0)
 // Vectorize pexp
 VECTORIZE3_tti(pexp);
 
+/**	\brief Probability density function of the exponential distribution.
+	\ingroup R_style_distribution
+	\param rate Rate parameter. Must be strictly positive.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template<class Type> 
+Type dexp(Type x, Type rate, int give_log=0)
+{
+	if(!give_log)
+		return CppAD::CondExpGe(x,Type(0),rate*exp(-rate*x),Type(0));
+	else
+		return CppAD::CondExpGe(x,Type(0),log(rate)-rate*x,Type(-INFINITY));
+}
+
+// Vectorize dexp
+VECTORIZE3_tti(dexp);
+/**@}*/
+
+
+/**	@name Weibull distribution.
+	Functions relative to the Weibull distribution.
+	*/
+/**@{*/
 /** 	\brief Cumulative distribution function of the Weibull distribution.
 	\ingroup R_style_distribution
 	\param shape Shape parameter. Must be strictly positive.
@@ -36,41 +63,6 @@ Type pweibull(Type x, Type shape, Type scale, int give_log=0)
 
 // Vectorize pweibull
 VECTORIZE4_ttti(pweibull);
-
-/**	\brief Probability mass function of the binomial distribution.
-	\ingroup R_style_distribution
-	\param k Number of successes.
-	\param size Number of trials.
-	\param prob Probability of success.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
-	*/
-template<class Type> 
-Type dbinom(Type k, Type size, Type prob, int give_log=0)
-{
-	Type logres = lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1)+k*log(prob)+(size-k)*log(1-prob);
-	if(!give_log) return exp(logres);
-	else return logres;
-}
-
-// Vectorize dbinom
-VECTORIZE4_ttti(dbinom);
-
-/**	\brief Probability density function of the exponential distribution.
-	\ingroup R_style_distribution
-	\param rate Rate parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
-	*/
-template<class Type> 
-Type dexp(Type x, Type rate, int give_log=0)
-{
-	if(!give_log)
-		return CppAD::CondExpGe(x,Type(0),rate*exp(-rate*x),Type(0));
-	else
-		return CppAD::CondExpGe(x,Type(0),log(rate)-rate*x,Type(-INFINITY));
-}
-
-// Vectorize dexp
-VECTORIZE3_tti(dexp);
 
 /** 	\brief Probability density function of the Weibull distribution.
 	\ingroup R_style_distribution
@@ -112,6 +104,25 @@ Type qweibull(Type p, Type shape, Type scale, int give_log=0)
 
 // Vectorize qweibull
 VECTORIZE4_ttti(qweibull);
+/**@}*/
+
+/**	\brief Probability mass function of the binomial distribution.
+	\ingroup R_style_distribution
+	\param k Number of successes.
+	\param size Number of trials.
+	\param prob Probability of success.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template<class Type> 
+Type dbinom(Type k, Type size, Type prob, int give_log=0)
+{
+	Type logres = lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1)+k*log(prob)+(size-k)*log(1-prob);
+	if(!give_log) return exp(logres);
+	else return logres;
+}
+
+// Vectorize dbinom
+VECTORIZE4_ttti(dbinom);
 
 /**	\brief Probability density function of the beta distribution.
 	\ingroup R_style_distribution
