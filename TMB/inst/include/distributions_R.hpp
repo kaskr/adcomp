@@ -8,7 +8,7 @@
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type pexp(Type x, Type rate, int give_log)
+Type pexp(Type x, Type rate, int give_log=0)
 {
 	if(!give_log)
 		return CppAD::CondExpGe(x,Type(0),1-exp(-rate*x),Type(0));
@@ -26,7 +26,7 @@ VECTORIZE3_tti(pexp);
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type pweibull(Type x, Type shape, Type scale, int give_log)
+Type pweibull(Type x, Type shape, Type scale, int give_log=0)
 {
 	if(!give_log)
 		return CppAD::CondExpGe(x,Type(0),1-exp(-pow(x/scale,shape)),Type(0));
@@ -45,7 +45,7 @@ VECTORIZE4_ttti(pweibull);
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type dbinom(Type k, Type size, Type prob, int give_log)
+Type dbinom(Type k, Type size, Type prob, int give_log=0)
 {
 	Type logres = lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1)+k*log(prob)+(size-k)*log(1-prob);
 	if(!give_log) return exp(logres);
@@ -61,7 +61,7 @@ VECTORIZE4_ttti(dbinom);
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type dexp(Type x, Type rate, int give_log)
+Type dexp(Type x, Type rate, int give_log=0)
 {
 	if(!give_log)
 		return CppAD::CondExpGe(x,Type(0),rate*exp(-rate*x),Type(0));
@@ -79,7 +79,7 @@ VECTORIZE3_tti(dexp);
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type dweibull(Type x, Type shape, Type scale, int give_log)
+Type dweibull(Type x, Type shape, Type scale, int give_log=0)
 {
 	if(!give_log)
 		return CppAD::CondExpGe(x,Type(0),shape/scale * pow(x/scale,shape-1) * exp(-pow(x/scale,shape)),Type(0));
@@ -98,7 +98,7 @@ VECTORIZE4_ttti(dweibull);
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
 	*/
 template<class Type> 
-Type qweibull(Type p, Type shape, Type scale, int give_log)
+Type qweibull(Type p, Type shape, Type scale, int give_log=0)
 {
 	Type res;	
 	
