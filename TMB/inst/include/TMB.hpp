@@ -45,6 +45,7 @@ using CppAD::ADFun;
 #include "start_parallel.hpp"
 #include "tmb_core.hpp"
 #include "convenience.hpp"
+#include "distributions_R.hpp"
 using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;
