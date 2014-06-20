@@ -113,4 +113,102 @@ Type qweibull(Type p, Type shape, Type scale, int give_log=0)
 // Vectorize qweibull
 VECTORIZE4_ttti(qweibull);
 
+/**	\brief Probability density function of the beta distribution.
+	\ingroup R_style_distribution
+	\param shape1 First shape parameter. Must be strictly positive.
+	\param shape2 Second shape parameter. Must be strictly positive.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template <class Type>
+Type dbeta(Type x, Type shape1, Type shape2, int give_log)
+{
+	Type res = exp(lgamma(shape1+shape2) - lgamma(shape1) - lgamma(shape2)) * pow(x,shape1-1) * pow(1-x,shape2-1);
+	if(!give_log) 
+		return res;
+	else 
+		return CppAD::CondExpEq(x,Type(0),log(res),lgamma(shape1+shape2) - lgamma(shape1) - lgamma(shape2) + (shape1-1)*log(x) + (shape2-1)*log(1-x));
+}
+
+// Vectorize dbeta
+VECTORIZE4_ttti(dbeta);
+
+/**	\brief Probability density function of the Fisher distribution.
+	\ingroup R_style_distribution
+	\param df1 Degrees of freedom 1.
+	\param df2 Degrees of freedom 2.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template <class Type>
+Type df(Type x, Type df1, Type df2, int give_log)
+{
+	Type logres = lgamma((df1+df2)/2.) - lgamma(df1/2.) - lgamma(df2/2.) + df1/2.*log(Type(df1)/df2) + (df1/2.-1)*log(x) - (df1+df2)/2.*log(1+Type(df1)/df2*x);
+	if(!give_log) return exp(logres);
+	else return logres;
+}
+
+//Vectorize df
+VECTORIZE4_ttti(df);
+
+/**	\brief Probability density function of the logistic distribution.
+	\ingroup R_style_distribution
+	\param location Location parameter.
+	\param scale Scale parameter. Must be strictly positive.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template <class Type>
+Type dlogis(Type x, Type location, Type scale, int give_log)
+{
+	Type logres = -(x-location)/scale - log(scale) - 2*log(1+exp(-(x-location)/scale));
+	if(!give_log) return exp(logres);
+	else return logres;
+}
+
+// Vectorize dlogis
+VECTORIZE4_ttti(dlogis);
+
+/**	\brief Cumulative distribution function of the standard normal distribution.
+	\ingroup R_style_distribution
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template<class Type>
+Type pnorm_standard(Type x, int give_log)
+{
+	return Type(0.5)+0.5*erf(x/sqrt(2));
+}
+
+/**	\brief Cumulative distribution function of the normal distribution.
+	\ingroup R_style_distribution
+	\param mean Mean of the normal distribution.
+	\param sd Standard deviation of the normal distribution.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template<class Type>
+Type pnorm(Type x, Type mean, Type sd, int give_log)
+{
+	Type p = (x-mean)/sd;
+
+	Type tmp = CppAD::CondExpLt(x,mean,Type(0),Type(1));
+	return CppAD::CondExpLe(sd,Type(0),tmp,pnorm_standard(p,give_log));
+}
+
+// Vectorize pnorm
+VECTORIZE4_ttti(pnorm);
+
+/**	\brief Probability density function of the skew-normal distribution.
+	\ingroup R_style_distribution
+	\param alpha Slant parameter.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template <class Type>
+Type dsn(Type x, Type alpha, int give_log=0)
+{
+	if(!give_log) return 2 * dnorm<Type>(x,Type(0),Type(1),0) * pnorm<Type>(alpha*x,Type(0),Type(1),0);
+	else return log(2) + log(dnorm<Type>(x,Type(0),Type(1),0)) + log(pnorm<Type>(alpha*x,Type(0),Type(1),0));
+}
+
+// Vectorize dsn
+VECTORIZE3_tti(dsn);
+
+
+
 
