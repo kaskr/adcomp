@@ -177,6 +177,10 @@ Type dlogis(Type x, Type location, Type scale, int give_log)
 // Vectorize dlogis
 VECTORIZE4_ttti(dlogis);
 
+/**	@name Normal distribution.
+	Functions relative to the normal distribution.
+	*/
+/**@{*/
 /**	\brief Cumulative distribution function of the standard normal distribution.
 	\ingroup R_style_distribution
 	\param give_log 1 if one wants the log-probability, 0 otherwise.
@@ -204,6 +208,7 @@ Type pnorm(Type x, Type mean, Type sd, int give_log)
 
 // Vectorize pnorm
 VECTORIZE4_ttti(pnorm);
+/**@}*/
 
 /**	\brief Probability density function of the skew-normal distribution.
 	\ingroup R_style_distribution
@@ -225,6 +230,7 @@ VECTORIZE3_tti(dsn);
 	*/
 /**@{*/
 /**	\brief Deviance function for the Tweedie distribution.
+	\ingroup R_style_distribution
 	\param mu Mean.
 	\param power Value of p such that the variance is \f$ var[Y] = \phi*\mu^p \f$.
 	*/
@@ -248,7 +254,8 @@ Type tweedie_dev(Type y, Type mu, Type power)
 }
 
 /**	\brief Saddlepoint density for the Tweedie distribution.
- 	\param xi Value of p such that the variance is \f$ var[Y] = \phi*\mu^p \p$.
+	\ingroup R_style_distribution
+ 	\param xi Value of p such that the variance is \f$ var[Y] = \phi*\mu^p \f$.
 	\param mu Mean.
 	\param phi Dispersion.
 	\param eps Offset in computing the variance function. Default value : 1/6.
@@ -278,5 +285,7 @@ Type dtweedie_saddle(Type y, Type xi, Type mu, Type phi, Type eps=Type(1)/6, int
 
 // Vectorize dtweedie_saddle
 VECTORIZE6_Ttttti(dtweedie_saddle);
+
+
 /**@}*/
 
