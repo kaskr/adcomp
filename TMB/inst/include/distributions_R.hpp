@@ -39,6 +39,21 @@ Type dexp(Type x, Type rate, int give_log=0)
 
 // Vectorize dexp
 VECTORIZE3_tti(dexp);
+
+/**	\brief Inverse cumulative distribution function of the exponential distribution.
+	\ingroup R_style_distribution
+	\param rate Rate parameter. Must be strictly positive.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template <class Type>
+Type qexp(Type p, Type rate, int give_log)
+{
+	if(!give_log) return -log(1-p)/rate;
+	else return log(-log(1-p)/rate);
+}
+
+// Vectorize qexp.
+VECTORIZE3_tti(qexp);
 /**@}*/
 
 
@@ -224,6 +239,19 @@ Type dsn(Type x, Type alpha, int give_log=0)
 
 // Vectorize dsn
 VECTORIZE3_tti(dsn);
+
+/** 	\brief Probability density function of the Student t-distribution.
+	\ingroup R_style_distribution
+	\param df Degree of freedom.
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/	
+template <class Type>
+Type dt(Type x, Type df, int give_log)
+{
+	Type logres = lgamma((df+1)/2) - Type(1)/2*log(df*M_PI) -lgamma(df/2) - (df+1)/2*log(1+x*x/df);
+	if(!give_log) return exp(logres);
+	else return logres;
+}
 
 /**	@name Tweedie distribution.
 	Functions relative to the Tweedie distribution.
