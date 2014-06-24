@@ -200,8 +200,10 @@ VECTORIZE4_ttti(dlogis);
 template <class Type>
 Type dsn(Type x, Type alpha, int give_log=0)
 {
-	if(!give_log) return 2 * dnorm<Type>(x,Type(0),Type(1),0) * pnorm<Type>(alpha*x,Type(0),Type(1),0);
-	else return log(2) + log(dnorm<Type>(x,Type(0),Type(1),0)) + log(pnorm<Type>(alpha*x,Type(0),Type(1),0));
+	// TODO : change pnorm_approx to pnorm when pnorm is written	
+	
+	if(!give_log) return 2 * dnorm(x,Type(0),Type(1),0) * pnorm_approx(alpha*x);
+	else return log(2) + log(dnorm(x,Type(0),Type(1),0)) + log(pnorm_approx(alpha*x));
 }
 
 // Vectorize dsn
