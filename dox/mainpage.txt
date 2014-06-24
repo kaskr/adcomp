@@ -1,15 +1,26 @@
 /**
-\mainpage Comprehensive Documentation of Functions and Classes (API)
+\mainpage Comprehensive Documentation of C++ Functions and Classes (API)
+
+TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. 
+It is inspired by [ADMB](http://www.admb-project.org). Unlike most other R packages the model is formulated in C++. This
+provides great flexibility, but requires some familiarity with the C/C++ programming language.
+
+These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.
+
 
 <ul>
   <li> \b Modules: Introduction and summary of TMB (start here if you are new).</li>
+  <li> \b Namespaces: TMB's package system</li>
+  <li> \b Classes: The C++ classes used in TMB</li>
+  <li> \b Files: The C++ files that constitute TMB</li>
+  <li> \b Examples: List of pre built models that comes with TMB</li>
+  <li> \b Search \b field: Start typing a keyword, and all matching keywords will be listed. Very useful!</li>
 </ul>
-
-
 
 */
 
 /** \defgroup Tutorial Getting started
+\brief A general introduction to TMB
 
 
 A TMB projects consists of an R file (*.R) and a C++ file (*.cpp). 
@@ -20,7 +31,7 @@ This tutorial describes how to write the C++ file, and assumes familiarity with 
 
 The purpose of the C++ program is to evaluate the objective function, i.e. the negative log-likelihood
 of the model. The program is compiled and called from R, where
-it can be fed to a function minimizer like nlminb().
+it can be fed to a function minimizer like \c nlminb().
 
 The objective function should be of the following C++ type:
    \code
@@ -36,7 +47,7 @@ The first line includes the source code for the whole TMB package (and all its d
 The objective function is a templated class where <tt><Type></tt> is
 the data type of both the input values and the return value of the objective function.
 This allows us to evaluate both the objective function and its derivatives using the same chunk of C++ code
-(and the AD package CppAD). The technical aspects of this are hidden from the user. There is however one aspect 
+(via the AD package [CppAD](http://www.coin-or.org/CppAD/Doc/doxydoc/html/index.html)). The technical aspects of this are hidden from the user. There is however one aspect 
 that surprises the new TMB user. When a constant like "1.2" is used
 in a calculation that affects the return value it must be "cast" to Type:
    \code
@@ -122,7 +133,23 @@ See \ref Examples for more examples
 
 */
 
+/** \defgroup Structure_TMB The structure of TMB
+\brief An overview of the components that constitute TMB
+
+This documentation only covers the "native" TMB code, not
+[CppAD](http://www.coin-or.org/CppAD/Doc/doxydoc/html/index.html)
+or 
+[Eigen](http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html)
+These packages have their own documentation, which may be relevant.
+In particular, some of the standard functions like \c sin() and \cos()
+are part of CppAD, and are hence not documented through TMB.
+
+
+![test](TMB_components.png)
+*/
+
 /** \defgroup matrix_arrays Matrices and arrays
+\brief Matrices, vectors and arrays in TMB versus R
 
 
 \section Relation_R Relationship to R
@@ -182,6 +209,7 @@ to that of R.
 */
 
 /** \defgroup Examples TMB examples
+
 For a list of all examples please click on the "Examples" tab on
 the top of the page. 
 - For each \c .cpp file in the Example Collection there is a \c .R file that will
@@ -213,6 +241,7 @@ Simple example:
 */
 
 /** \defgroup Errors Compilation and run time errors
+\brief How to debug TMB programs
 
 <h2>Compilation errors</h2>
 It may be hard to understand the compilation errors for the following reasons
@@ -243,7 +272,7 @@ Aborted (core dumped)
 So, you must restart R and give the commands
 \code
 > library(TMB)
-> gdbsource("nan_error_ex.R")
+> gdbsource("my_project.R")
 #5  objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:11 
 \endcode
 and you can see that the debugger points to line number 11 in the .cpp file.
@@ -255,10 +284,11 @@ If you on the other hand perform an illegal mathematical operation, such as
         Type f = sqrt(-1.);
    \endcode
 R will not crash, but the objective function will return a NaN value.
-However, you will not know in which part of your C++ code the error occurs.
-B	y including the \c fenv.h library (which is part of
- many C++ compilers, but can otherwise be downloaded from http://www.scs.stanford.edu/histar/src/uinc/fenv.h)
-
+However, you will not know in which part of your C++ code the error occured.
+By including the \c fenv.h library (part of many C++ compilers, 
+but can otherwise be downloaded from http://www.scs.stanford.edu/histar/src/uinc/fenv.h)
+ 
+\c nan_error_ex.cpp:
 \include nan_error_ex.cpp
 
 a floating point exception will be turn in to an actual error that can be picked up by the debugger.
