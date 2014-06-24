@@ -222,3 +222,7 @@ Type dt(Type x, Type df, int give_log)
 	else return logres;
 }
 
+// Vectorize dt
+VECTORIZE3_tti(dt);
+
+
