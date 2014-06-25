@@ -225,4 +225,24 @@ Type dt(Type x, Type df, int give_log)
 // Vectorize dt
 VECTORIZE3_tti(dt);
 
+/**	\brief Probability density function of the sinh-asinh distribution.
+	\ingroup R_style_distribution
+	\param mu Location.
+	\param sigma Scale.
+	\param nu Skewness.
+	\param tau Kurtosis.
+	\param give_log TRUE if one wants the log-probability, FALSE otherwise.
+	*/
+template <class Type>
+Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log)
+{
+	Type z = (x-mu)/sigma;
+   	Type c = cosh(tau*asinh(z)-nu);
+   	Type r = sinh(tau*asinh(z)-nu);
+   	Type logres = -log(sigma) + log(tau) -0.5*log(2*M_PI) -0.5*log(1+(z*z)) +log(c) -0.5*(r*r);
+   	
+   	if(!give_log) return exp(logres);
+   	else return logres;
+}
+
 
