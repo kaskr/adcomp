@@ -14,8 +14,8 @@ updateCholesky <- function(L,H,t=0){
 
 ##' Construct objective functions with derivatives based on the users c++ template.
 ##'
-##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contain functions to calculate the objective function
-##' and its gradient. The object contain the following components:
+##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
+##' and its gradient. The object contains the following components:
 ##' \itemize{
 ##'   \item \code{par} A default parameter.
 ##'   \item \code{fn} The likelihood function.
@@ -41,10 +41,10 @@ updateCholesky <- function(L,H,t=0){
 ##' Random effects are specified via the argument \code{random}: A component of the parameter list is marked as random if its name is matched
 ##' by any of the characters of the vector \code{random} (Regular expression match is performed if \code{regexp=TRUE}).
 ##' If some parameters are specified as random effects, these will
-##' be integrated out of the objective function via the Laplace approximation. In this situation all of the functions \code{fn} and \code{gr}
-##' automatically performs an optimization of random effects for each function evaluation. This is referred to as
+##' be integrated out of the objective function via the Laplace approximation. In this situation the functions \code{fn} and \code{gr}
+##' automatically perform an optimization of random effects for each function evaluation. This is referred to as
 ##' the 'inner optimization'. Strategies for choosing initial values of the inner optimization can be controlled
-##' via the argument \code{random.start}. By default, we use \code{expression(last.par.best[random])}
+##' via the argument \code{random.start}. The default is \code{expression(last.par.best[random])}
 ##' where \code{last.par.best} is an internal full parameter vector corresponding to the currently best
 ##' likelihood. An alternative choice could be \code{expression(last.par[random])} i.e. the random effect optimum of
 ##' the most recent - not necessarily best - likelihood evaluation. Further control of the inner optimization can
@@ -59,7 +59,7 @@ updateCholesky <- function(L,H,t=0){
 ##' Technically, the user template is processed several times by inserting
 ##' different types as template parameter, selected by argument \code{type}:
 ##' \itemize{
-##'   \item \code{"ADfun"} Run through the template with AD-types and produce a stack of operations representing the objective function.
+##'   \item \code{"ADFun"} Run through the template with AD-types and produce a stack of operations representing the objective function.
 ##'   \item \code{"Fun"} Run through the template with ordinary double-types.
 ##'   \item \code{"ADGrad"} Run through the template with nested AD-types and produce a stack of operations representing the objective function gradient.
 ##' }
@@ -89,10 +89,10 @@ updateCholesky <- function(L,H,t=0){
 ##' @param method Outer optimization method.
 ##' @param inner.method Inner optimization method (see function "newton")
 ##' @param inner.control List controlling inner optimization
-##' @param MCcontrol List ontrolling importance sampler (turned off by default) 
+##' @param MCcontrol List controlling importance sampler (turned off by default) 
 ##' @param ADreport Calculate derivatives of macro ADREPORT(vector) instead of objective_function return value?
 ##' @param atomic Allow tape to contain atomic functions?
-##' @param LaplaceNonZeroGradient Allow taylor expansion around non-stationary point?
+##' @param LaplaceNonZeroGradient Allow Taylor expansion around non-stationary point?
 ##' @param DLL Name of shared object file compiled by user.
 ##' @param checkParameterOrder Optional check for correct parameter order.
 ##' @param regexp Match random effects by regular expressions?
