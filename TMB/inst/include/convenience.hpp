@@ -70,3 +70,104 @@ Type qnorm_approx(Type x){
   return -(C + Delta0 / C) * sqrt(Type(2)) / Type(3);
 }
 VECTORIZE1(qnorm_approx);
+
+/**	\brief Polynomial evaluation.
+
+	Evaluates the given polynomial of degree N at x.
+	*/
+template <class Type>
+Type polevl(Type x, Type *coef, int N)
+{
+	Type *p = coef;
+	Type ans = *p;
+ 
+	p = p+1;
+
+	for(int i=1;i<=N;i++)
+	{
+		ans = ans * x + *p;
+		p = p+1;
+	}
+	
+	return( ans );
+}
+
+/**	\brief Polynomial evaluation.
+
+	Evaluates the given polynomial of degree N at x, assuming coefficient of N is 1.0.
+	*/
+template <class Type> 
+Type p1evl(Type x, Type *coef, int N)
+{
+	Type *p = coef;
+	Type ans = x + *p;
+	
+	p = p+1;
+
+	for(int i=1;i<=N-1;i++)
+	{
+		ans = ans * x + *p;
+		p = p+1;
+	}
+
+	return( ans );
+}
+
+#define LOG2E 1.4426950408889634073599 // 1/log(2)
+
+/**	\brief Inverse hyperbolic sine function.
+	*/
+template <class Type>
+Type asinh(Type x)
+{
+	Type P[] = {
+		-4.33231683752342103572E-3,
+		-5.91750212056387121207E-1,
+		-4.37390226194356683570E0,
+		-9.09030533308377316566E0,
+		-5.56682227230859640450E0
+	};
+	Type Q[] = {
+		1.28757002067426453537E1,
+		4.86042483805291788324E1,
+		6.95722521337257608734E1,
+		3.34009336338516356383E1
+	};
+
+	Type a,z,y;
+	int sign;
+
+	if(isnan(x)) return x;
+	if(x==Type(0)) return x;
+	
+	if(x<Type(0))
+	{
+		sign = -1;
+		y = -x;
+	}
+	else
+	{
+		sign = 1;
+		y = x;
+	}
+	
+	if(x>Type(10e8))
+	{
+		if(y==INFINITY) return x;
+		return sign*(log(x)+LOG2E);
+	}
+	
+	z = y*y;
+	
+	if(y<Type(0.5))
+	{
+		a = (polevl(z,P,4)/p1evl(z,Q,4))*z;
+		a = a*x+x;
+		if(sign<0) a = -a;
+		return a;
+	}
+	
+	a = sqrt(z+1.);
+	return sign*log(x+a);
+}
+
