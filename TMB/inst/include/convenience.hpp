@@ -76,41 +76,14 @@ VECTORIZE1(qnorm_approx);
 	Evaluates the given polynomial of degree N at x.
 	*/
 template <class Type>
-Type polevl(Type x, Type *coef, int N)
+Type polevl(Type x, const vector<Type> &coef, int N)
 {
-	Type *p = coef;
-	Type ans = *p;
- 
-	p = p+1;
+	Type res = coef[0];
 
 	for(int i=1;i<=N;i++)
-	{
-		ans = ans * x + *p;
-		p = p+1;
-	}
+		res = res * x + coef[i];
 	
-	return( ans );
-}
-
-/**	\brief Polynomial evaluation.
-
-	Evaluates the given polynomial of degree N at x, assuming coefficient of N is 1.0.
-	*/
-template <class Type> 
-Type p1evl(Type x, Type *coef, int N)
-{
-	Type *p = coef;
-	Type ans = x + *p;
-	
-	p = p+1;
-
-	for(int i=1;i<=N-1;i++)
-	{
-		ans = ans * x + *p;
-		p = p+1;
-	}
-
-	return( ans );
+	return(res);
 }
 
 #define LOG2E 1.4426950408889634073599 // 1/log(2)
@@ -120,54 +93,41 @@ Type p1evl(Type x, Type *coef, int N)
 template <class Type>
 Type asinh(Type x)
 {
-	Type P[] = {
-		-4.33231683752342103572E-3,
-		-5.91750212056387121207E-1,
-		-4.37390226194356683570E0,
-		-9.09030533308377316566E0,
-		-5.56682227230859640450E0
-	};
-	Type Q[] = {
-		1.28757002067426453537E1,
-		4.86042483805291788324E1,
-		6.95722521337257608734E1,
-		3.34009336338516356383E1
-	};
+	vector<Type> P(5);
+	P[0] = Type(-4.33231683752342103572E-3);
+	P[1] = Type(-5.91750212056387121207E-1);
+	P[2] = Type(-4.37390226194356683570E0);
+	P[3] = Type(-9.09030533308377316566E0);
+	P[4] = Type(-5.56682227230859640450E0);
 
-	Type a,z,y;
-	int sign;
+	vector<Type> Q(5);
+	Q[0] = Type(1);
+	Q[1] = Type(1.28757002067426453537E1);
+	Q[2] = Type(4.86042483805291788324E1);
+	Q[3] = Type(6.95722521337257608734E1);
+	Q[4] = Type(3.34009336338516356383E1);
+
+	Type a,z,y,res0,res;
+	Type sign;
 
 	if(isnan(x)) return x;
-	if(x==Type(0)) return x;
 	
-	if(x<Type(0))
-	{
-		sign = -1;
-		y = -x;
-	}
-	else
-	{
-		sign = 1;
-		y = x;
-	}
+	sign = CppAD::CondExpLt(x,Type(0),Type(-1),Type(1));
+	y = sign*x;
 	
-	if(x>Type(10e8))
-	{
-		if(y==INFINITY) return x;
-		return sign*(log(x)+LOG2E);
-	}
+	res0 = CppAD::CondExpEq(y,Type(INFINITY),x,sign*(log(y)+LOG2E));
+	res = CppAD::CondExpGt(x,Type(10e8),res0,res);
 	
 	z = y*y;
 	
-	if(y<Type(0.5))
-	{
-		a = (polevl(z,P,4)/p1evl(z,Q,4))*z;
-		a = a*x+x;
-		if(sign<0) a = -a;
-		return a;
-	}
+	a = (polevl(z,P,4)/polevl(z,Q,4))*z;
+	a = sign*(a*x+x);
+	a = CppAD::CondExpLt(y,Type(0.5),a,sqrt(z+1));
 	
-	a = sqrt(z+1.);
-	return sign*log(x+a);
+	res = CppAD::CondExpLe(x,Type(10e8),sign*log(x+a),res);
+	res = CppAD::CondExpLt(y,Type(0.5),a,res);
+	res = CppAD::CondExpEq(x,Type(0),x,res);
+	
+	return sign*res;
 }
 
