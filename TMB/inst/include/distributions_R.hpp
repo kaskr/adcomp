@@ -43,13 +43,13 @@ VECTORIZE3_tti(dexp);
 /**	\brief Inverse cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
-	\param give_log true if one wants the log-probability, false otherwise.
+	\param log_p true if p is log-probability, false otherwise.
 	*/
 template <class Type>
-Type qexp(Type p, Type rate, int give_log)
+Type qexp(Type p, Type rate, int log_p)
 {
-	if(!give_log) return -log(1-p)/rate;
-	else return log(-log(1-p)/rate);
+	if(!log_p) return -log(1-p)/rate;
+	else return -log(1-exp(p))/rate;
 }
 
 // Vectorize qexp.
@@ -102,16 +102,15 @@ VECTORIZE4_ttti(dweibull);
 	\param p Probability ; must be between 0 and 1.
 	\param shape Shape parameter. Must be strictly positive.
 	\param scale Scale parameter. Must be strictly positive.
-	\param give_log true if one wants the log-probability, false otherwise.
+	\param log_p true if p is log-probability, false otherwise.
 	*/
 template<class Type> 
-Type qweibull(Type p, Type shape, Type scale, int give_log=0)
+Type qweibull(Type p, Type shape, Type scale, int log_p=0)
 {
-	Type res;	
+	Type res;
 	
-	if(!give_log) res = scale * pow( (-log(1-p)) , 1/shape );
-	else res = log(scale) + 1/shape * log(-log(1-p));
-	
+	if(!log_p) res = scale * pow( (-log(1-p)) , 1/shape );
+	else res = scale * pow( (-log(1-exp(p))) , 1/shape );
 	res = CppAD::CondExpLt(p,Type(0),Type(0),res);
 	res = CppAD::CondExpGt(p,Type(1),Type(0),res);
 	return res;
@@ -253,4 +252,19 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log)
    	else return logres;
 }
 
+/**	\brief Quantile function of the sinh-asinh distribution.
+	\param mu Location.
+	\param sigma Scale.
+	\param nu Skewness.
+	\param tau Kurtosis.
+	\param log_p true if p is log-probability, false otherwise.
+	*/
+template <class Type>
+Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
+{
+	// TODO. Replace qnorm_approx by qnorm when it is written.
+
+   	if(!log_p) return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(p))+(nu/tau));
+   	else return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(exp(p)))+(nu/tau));
+}
 
