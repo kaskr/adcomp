@@ -273,5 +273,18 @@ Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
    	if(!log_p) return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(p))+(nu/tau));
    	else return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(exp(p)))+(nu/tau));
 }
+
+/**	\brief Transforms a normal varibale into a sinh-asinh variable.
+	\param mu Location parameter of the result sinh-asinh distribution.
+	\param sigma Scale parameter of the result sinh-asinh distribution.
+	\param nu Skewness parameter of the result sinh-asinh distribution.
+	\param tau Kurtosis parameter of the result sinh-asinh distribution.
+	\param log_p true if p is log-probability, false otherwise.
+	*/
+template <class Type>
+Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
+{
+	return qSHASHo(pnorm_approx(x),mu,sigma,nu,tau,log_p);
+}
 /**@}*/
 
