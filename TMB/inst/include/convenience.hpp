@@ -89,6 +89,9 @@ Type polevl(Type x, const vector<Type> &coef, int N)
 #define LOG2E 1.4426950408889634073599 // 1/log(2)
 
 /**	\brief Inverse hyperbolic sine function.
+
+	Based on __Cephes Math Library__ Release 2.8:  June, 2000.
+	Copyright 1984, 1995, 2000 by Stephen L. Moshier ; according to http://www.netlib.org/cephes/readme.
 	*/
 template <class Type>
 Type asinh(Type x)

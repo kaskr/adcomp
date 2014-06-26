@@ -228,6 +228,10 @@ Type dt(Type x, Type df, int give_log = 0)
 // Vectorize dt
 VECTORIZE3_tti(dt);
 
+/** 	@name Sinh-asinh distribution.
+	Functions relative to the sinh-asinh distribution.
+	*/
+/**@{*/
 /**	\brief Probability density function of the sinh-asinh distribution.
 	\ingroup R_style_distribution
 	\param mu Location.
@@ -239,6 +243,7 @@ VECTORIZE3_tti(dt);
 	Notation adopted from R package "gamlss.dist".
 	
 	Probability density given in (2) in __Jones and Pewsey (2009) Biometrika (2009) 96 (4): 761-780__.
+	
 	*/
 template <class Type>
 Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
@@ -253,6 +258,7 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
 }
 
 /**	\brief Quantile function of the sinh-asinh distribution.
+	\ingroup R_style_distribution
 	\param mu Location.
 	\param sigma Scale.
 	\param nu Skewness.
@@ -262,9 +268,10 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
 template <class Type>
 Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 {
-	// TODO. Replace qnorm_approx by qnorm when it is written.
+	// TODO : Replace qnorm_approx by qnorm when it is written.
 
    	if(!log_p) return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(p))+(nu/tau));
    	else return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(exp(p)))+(nu/tau));
 }
+/**@}*/
 
