@@ -244,6 +244,7 @@ VECTORIZE3_tti(dt);
 	
 	Probability density given in (2) in __Jones and Pewsey (2009) Biometrika (2009) 96 (4): 761-780__.
 	
+	It is not possible to call this function with nu a vector or tau a vector.
 	*/
 template <class Type>
 Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
@@ -257,6 +258,9 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
    	else return logres;
 }
 
+// Vectorize dSHASHo
+VECTORIZE6_ttttti(dSHASHo);
+
 /**	\brief Quantile function of the sinh-asinh distribution.
 	\ingroup R_style_distribution
 	\param mu Location.
@@ -264,6 +268,8 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
 	\param nu Skewness.
 	\param tau Kurtosis.
 	\param log_p true if p is log-probability, false otherwise.
+	
+	It is not possible to call this function with nu a vector or tau a vector.
 	*/
 template <class Type>
 Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
@@ -274,17 +280,25 @@ Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
    	else return mu + sigma*sinh((1/tau)*asinh(qnorm_approx(exp(p)))+(nu/tau));
 }
 
+// Vectorize qSHASHo
+VECTORIZE6_ttttti(qSHASHo);
+
 /**	\brief Transforms a normal varibale into a sinh-asinh variable.
 	\param mu Location parameter of the result sinh-asinh distribution.
 	\param sigma Scale parameter of the result sinh-asinh distribution.
 	\param nu Skewness parameter of the result sinh-asinh distribution.
 	\param tau Kurtosis parameter of the result sinh-asinh distribution.
 	\param log_p true if p is log-probability, false otherwise.
+	
+	It is not possible to call this function with nu a vector or tau a vector.
 	*/
 template <class Type>
 Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 {
 	return qSHASHo(pnorm_approx(x),mu,sigma,nu,tau,log_p);
 }
+
+// Vectorize norm2SHASHo
+VECTORIZE6_ttttti(norm2SHASHo);
 /**@}*/
 
