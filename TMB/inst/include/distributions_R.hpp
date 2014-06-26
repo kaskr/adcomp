@@ -9,7 +9,7 @@
 /**	\brief Cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
 Type pexp(Type x, Type rate, int give_log=0)
@@ -26,7 +26,7 @@ VECTORIZE3_tti(pexp);
 /**	\brief Probability density function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
 Type dexp(Type x, Type rate, int give_log=0)
@@ -43,7 +43,7 @@ VECTORIZE3_tti(dexp);
 /**	\brief Inverse cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
 Type qexp(Type p, Type rate, int give_log)
@@ -65,7 +65,7 @@ VECTORIZE3_tti(qexp);
 	\ingroup R_style_distribution
 	\param shape Shape parameter. Must be strictly positive.
 	\param scale Scale parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
 Type pweibull(Type x, Type shape, Type scale, int give_log=0)
@@ -83,7 +83,7 @@ VECTORIZE4_ttti(pweibull);
 	\ingroup R_style_distribution
 	\param shape Shape parameter. Must be strictly positive.
 	\param scale Scale parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
 Type dweibull(Type x, Type shape, Type scale, int give_log=0)
@@ -102,7 +102,7 @@ VECTORIZE4_ttti(dweibull);
 	\param p Probability ; must be between 0 and 1.
 	\param shape Shape parameter. Must be strictly positive.
 	\param scale Scale parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
 Type qweibull(Type p, Type shape, Type scale, int give_log=0)
@@ -126,7 +126,7 @@ VECTORIZE4_ttti(qweibull);
 	\param k Number of successes.
 	\param size Number of trials.
 	\param prob Probability of success.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
 Type dbinom(Type k, Type size, Type prob, int give_log=0)
@@ -143,7 +143,7 @@ VECTORIZE4_ttti(dbinom);
 	\ingroup R_style_distribution
 	\param shape1 First shape parameter. Must be strictly positive.
 	\param shape2 Second shape parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
 Type dbeta(Type x, Type shape1, Type shape2, int give_log)
@@ -162,7 +162,7 @@ VECTORIZE4_ttti(dbeta);
 	\ingroup R_style_distribution
 	\param df1 Degrees of freedom 1.
 	\param df2 Degrees of freedom 2.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
 Type df(Type x, Type df1, Type df2, int give_log)
@@ -179,7 +179,7 @@ VECTORIZE4_ttti(df);
 	\ingroup R_style_distribution
 	\param location Location parameter.
 	\param scale Scale parameter. Must be strictly positive.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
 Type dlogis(Type x, Type location, Type scale, int give_log)
@@ -195,7 +195,11 @@ VECTORIZE4_ttti(dlogis);
 /**	\brief Probability density function of the skew-normal distribution.
 	\ingroup R_style_distribution
 	\param alpha Slant parameter.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
+	
+	Notation adopted from R package "sn".
+
+	The skew normal distribution generalises the normal distribution to allow for non-zero skewness.
 	*/
 template <class Type>
 Type dsn(Type x, Type alpha, int give_log=0)
@@ -212,7 +216,7 @@ VECTORIZE3_tti(dsn);
 /** 	\brief Probability density function of the Student t-distribution.
 	\ingroup R_style_distribution
 	\param df Degree of freedom.
-	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
 	*/	
 template <class Type>
 Type dt(Type x, Type df, int give_log)
@@ -231,7 +235,11 @@ VECTORIZE3_tti(dt);
 	\param sigma Scale.
 	\param nu Skewness.
 	\param tau Kurtosis.
-	\param give_log TRUE if one wants the log-probability, FALSE otherwise.
+	\param give_log true if one wants the log-probability, false otherwise.
+	
+	Notation adopted from R package "gamlss.dist".
+	
+	Probability density given in (2) in __Jones and Pewsey (2009) Biometrika (2009) 96 (4): 761-780__.
 	*/
 template <class Type>
 Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log)
