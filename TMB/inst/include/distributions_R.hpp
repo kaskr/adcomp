@@ -46,7 +46,7 @@ VECTORIZE3_tti(dexp);
 	\param log_p true if p is log-probability, false otherwise.
 	*/
 template <class Type>
-Type qexp(Type p, Type rate, int log_p)
+Type qexp(Type p, Type rate, int log_p=0)
 {
 	if(!log_p) return -log(1-p)/rate;
 	else return -log(1-exp(p))/rate;
@@ -145,7 +145,7 @@ VECTORIZE4_ttti(dbinom);
 	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
-Type dbeta(Type x, Type shape1, Type shape2, int give_log)
+Type dbeta(Type x, Type shape1, Type shape2, int give_log=0)
 {
 	Type res = exp(lgamma(shape1+shape2) - lgamma(shape1) - lgamma(shape2)) * pow(x,shape1-1) * pow(1-x,shape2-1);
 	if(!give_log) 
@@ -164,7 +164,7 @@ VECTORIZE4_ttti(dbeta);
 	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
-Type df(Type x, Type df1, Type df2, int give_log)
+Type df(Type x, Type df1, Type df2, int give_log=0)
 {
 	Type logres = lgamma((df1+df2)/2.) - lgamma(df1/2.) - lgamma(df2/2.) + df1/2.*log(Type(df1)/df2) + (df1/2.-1)*log(x) - (df1+df2)/2.*log(1+Type(df1)/df2*x);
 	if(!give_log) return exp(logres);
@@ -181,7 +181,7 @@ VECTORIZE4_ttti(df);
 	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template <class Type>
-Type dlogis(Type x, Type location, Type scale, int give_log)
+Type dlogis(Type x, Type location, Type scale, int give_log=0)
 {
 	Type logres = -(x-location)/scale - log(scale) - 2*log(1+exp(-(x-location)/scale));
 	if(!give_log) return exp(logres);
@@ -218,7 +218,7 @@ VECTORIZE3_tti(dsn);
 	\param give_log true if one wants the log-probability, false otherwise.
 	*/	
 template <class Type>
-Type dt(Type x, Type df, int give_log)
+Type dt(Type x, Type df, int give_log = 0)
 {
 	Type logres = lgamma((df+1)/2) - Type(1)/2*log(df*M_PI) -lgamma(df/2) - (df+1)/2*log(1+x*x/df);
 	if(!give_log) return exp(logres);
@@ -241,7 +241,7 @@ VECTORIZE3_tti(dt);
 	Probability density given in (2) in __Jones and Pewsey (2009) Biometrika (2009) 96 (4): 761-780__.
 	*/
 template <class Type>
-Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log)
+Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
 {
 	Type z = (x-mu)/sigma;
    	Type c = cosh(tau*asinh(z)-nu);
