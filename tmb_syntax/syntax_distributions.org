@@ -19,6 +19,10 @@
 | dt(x,df=p1,log=TRUE)                    | dt(x,p1,true)           |
 | df(x,p1,p2,log=FALSE)                   | df(x,p1,p2,false)       |
 | df(x,p1,p2,log=TRUE)                    | df(x,p1,p2,true)        |
+| dsn(x,alpha=p1,log=FALSE)               | dsn(x,p1,false)         |
+| dsn(x,alpha=p1,log=TRUE)                | dsn(x,p1,true)          |
+| dSHASHo(x,mu=p1,sigma=p2,nu=p3,tau=p4,log=FALSE) | dSHASHo(x,p1,p2,p3,p4,false)  |
+| dSHASHo(x,mu=p1,sigma=p2,nu=p3,tau=p4,log=TRUE)  | dSHASHo(x,p1,p2,p3,p4,true)   |
 # | dnbinom(k,n,prob,log=TRUE)              | dnbinom(k,n,prob,true)  |
 # | dgamma(x,shape=p1,scale=p2)             | dgamma(x,p1,p2)         |
 # | dgamma(x,shape=p1,scale=p2,log=TRUE)    | dgamma(x,p1,p2,true)    |
