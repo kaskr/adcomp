@@ -261,6 +261,36 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
 // Vectorize dSHASHo
 VECTORIZE6_ttttti(dSHASHo);
 
+/**	\brief Cumulative distribution function of the sinh-asinh distribution.
+	\ingroup R_style_distribution
+	\param mu Location.
+	\param sigma Scale.
+	\param nu Skewness.
+	\param tau Kurtosis.
+	\param give_log true if one wants the log-probability, false otherwise.
+	
+	Notation adopted from R package "gamlss.dist".
+	
+	It is not possible to call this function with nu a vector or tau a vector.
+	*/
+template <class Type>
+Type pSHASHo(Type q,Type mu,Type sigma,Type nu,Type tau,int give_log=0)
+{
+	// TODO : Replace pnorm_approx by pnorm when it is written.
+
+  	Type z = (q-mu)/sigma;
+  	Type r = sinh(tau * asinh(z) - nu);
+  	Type p = pnorm_approx(r);
+  	
+  	if (!give_log) 
+        	return p;
+  	else 
+  		return log(p);
+}
+
+// Vectorize pSHASHo
+VECTORIZE6_ttttti(pSHASHo);
+
 /**	\brief Quantile function of the sinh-asinh distribution.
 	\ingroup R_style_distribution
 	\param mu Location.
@@ -268,6 +298,8 @@ VECTORIZE6_ttttti(dSHASHo);
 	\param nu Skewness.
 	\param tau Kurtosis.
 	\param log_p true if p is log-probability, false otherwise.
+	
+	Notation adopted from R package "gamlss.dist".
 	
 	It is not possible to call this function with nu a vector or tau a vector.
 	*/
@@ -283,7 +315,7 @@ Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 // Vectorize qSHASHo
 VECTORIZE6_ttttti(qSHASHo);
 
-/**	\brief Transforms a normal varibale into a sinh-asinh variable.
+/**	\brief Transforms a normal variable into a sinh-asinh variable.
 	\param mu Location parameter of the result sinh-asinh distribution.
 	\param sigma Scale parameter of the result sinh-asinh distribution.
 	\param nu Skewness parameter of the result sinh-asinh distribution.
@@ -295,6 +327,8 @@ VECTORIZE6_ttttti(qSHASHo);
 template <class Type>
 Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 {
+	// TODO : Replace pnorm_approx by pnorm when it is written.
+
 	return qSHASHo(pnorm_approx(x),mu,sigma,nu,tau,log_p);
 }
 
