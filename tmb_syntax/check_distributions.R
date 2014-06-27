@@ -13,7 +13,7 @@ require(gamlss.dist)
 data <- list(x=seq(-5,5,length=101),
              k=1:101,
              n=11:111,
-             u=seq(0,1,length=101)
+             u=seq(0.01,0.99,length=99)
              )
 parameters <- list(p1=1,p2=2,p3=0.5,p4=0.5,prob=0.5)
 

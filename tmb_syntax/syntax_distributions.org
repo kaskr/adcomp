@@ -23,6 +23,10 @@
 | dsn(x,alpha=p1,log=TRUE)                | dsn(x,p1,true)          |
 | dSHASHo(x,mu=p1,sigma=p2,nu=p3,tau=p4,log=FALSE) | dSHASHo(x,p1,p2,p3,p4,false)  |
 | dSHASHo(x,mu=p1,sigma=p2,nu=p3,tau=p4,log=TRUE)  | dSHASHo(x,p1,p2,p3,p4,true)   |
+| pSHASHo(x,mu=p1,sigma=p2,nu=p3,tau=p4,log=FALSE) | pSHASHo(x,p1,p2,p3,p4,false)  |
+| pSHASHo(x,mu=p1,sigma=p2,nu=p3,tau=p4,log=TRUE)  | pSHASHo(x,p1,p2,p3,p4,true)   |
+# | qSHASHo(p=u,mu=p1,sigma=p2,nu=p3,tau=p4,log=FALSE) | qSHASHo(u,p1,p2,p3,p4,false)  |
+# | qSHASHo(p=u,mu=p1,sigma=p2,nu=p3,tau=p4,log=TRUE)  | qSHASHo(u,p1,p2,p3,p4,true)   |
 # | dnbinom(k,n,prob,log=TRUE)              | dnbinom(k,n,prob,true)  |
 # | dgamma(x,shape=p1,scale=p2)             | dgamma(x,p1,p2)         |
 # | dgamma(x,shape=p1,scale=p2,log=TRUE)    | dgamma(x,p1,p2,true)    |
