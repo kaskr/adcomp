@@ -145,7 +145,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
         M1 <- cbind2(hessian.random,G)
         M2 <- cbind2(t(G), as.matrix(t(A)%*%G)+hessian.fixed )
         M <- rbind2(M1,M2)
-        M <- as(M,"symmetricMatrix")
+        M <- forceSymmetric(M,uplo="L")
         dn <- c(names(par)[r],names(par[-r]))
         dimnames(M) <- list(dn,dn)
         p <- Matrix::invPerm(c(r,(1:length(par))[-r]))

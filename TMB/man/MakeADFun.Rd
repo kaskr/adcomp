@@ -32,13 +32,13 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 
 \item{inner.control}{List controlling inner optimization}
 
-\item{MCcontrol}{List ontrolling importance sampler (turned off by default)}
+\item{MCcontrol}{List controlling importance sampler (turned off by default)}
 
 \item{ADreport}{Calculate derivatives of macro ADREPORT(vector) instead of objective_function return value?}
 
 \item{atomic}{Allow tape to contain atomic functions?}
 
-\item{LaplaceNonZeroGradient}{Allow taylor expansion around non-stationary point?}
+\item{LaplaceNonZeroGradient}{Allow Taylor expansion around non-stationary point?}
 
 \item{DLL}{Name of shared object file compiled by user.}
 
@@ -55,8 +55,8 @@ List with components (fn,gr, etc) suitable for an optim call.
 Construct objective functions with derivatives based on the users c++ template.
 }
 \details{
-A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contain functions to calculate the objective function
-and its gradient. The object contain the following components:
+A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
+and its gradient. The object contains the following components:
 \itemize{
   \item \code{par} A default parameter.
   \item \code{fn} The likelihood function.
@@ -82,10 +82,10 @@ More advanced parameter mapping, such as collecting parameters between different
 Random effects are specified via the argument \code{random}: A component of the parameter list is marked as random if its name is matched
 by any of the characters of the vector \code{random} (Regular expression match is performed if \code{regexp=TRUE}).
 If some parameters are specified as random effects, these will
-be integrated out of the objective function via the Laplace approximation. In this situation all of the functions \code{fn} and \code{gr}
-automatically performs an optimization of random effects for each function evaluation. This is referred to as
+be integrated out of the objective function via the Laplace approximation. In this situation the functions \code{fn} and \code{gr}
+automatically perform an optimization of random effects for each function evaluation. This is referred to as
 the 'inner optimization'. Strategies for choosing initial values of the inner optimization can be controlled
-via the argument \code{random.start}. By default, we use \code{expression(last.par.best[random])}
+via the argument \code{random.start}. The default is \code{expression(last.par.best[random])}
 where \code{last.par.best} is an internal full parameter vector corresponding to the currently best
 likelihood. An alternative choice could be \code{expression(last.par[random])} i.e. the random effect optimum of
 the most recent - not necessarily best - likelihood evaluation. Further control of the inner optimization can
@@ -100,7 +100,7 @@ be obtained by the argument \code{inner.control} which is a list of control para
 Technically, the user template is processed several times by inserting
 different types as template parameter, selected by argument \code{type}:
 \itemize{
-  \item \code{"ADfun"} Run through the template with AD-types and produce a stack of operations representing the objective function.
+  \item \code{"ADFun"} Run through the template with AD-types and produce a stack of operations representing the objective function.
   \item \code{"Fun"} Run through the template with ordinary double-types.
   \item \code{"ADGrad"} Run through the template with nested AD-types and produce a stack of operations representing the objective function gradient.
 }

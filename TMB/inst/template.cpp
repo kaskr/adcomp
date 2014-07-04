@@ -42,9 +42,9 @@ Type objective_function<Type>::operator() ()
 
      v+v,v-v,v*v,v/v                Pointwise binary operations
      m*v                            Matrix-vector multiply
-     a(i)                           R equivalent of a[,,i]
-     a(i)(j)                        R equivalent of a[,j,i]
-     a(i)(j)[k]                     R equivalent of a[k,j,i]
+     a.col(i)                       R equivalent of a[,,i]
+     a.col(i).col(j)                R equivalent of a[,j,i]
+     a(i,j,k)                       R equivalent of a[i,j,k]
      exp(v)                         Pointwise math
      m(i,j)                         R equivalent of m[i,j]
      v.sum()                        R equivalent of sum(v)
@@ -52,7 +52,7 @@ Type objective_function<Type>::operator() ()
 
      ** Distributions:
 
-     Type dnbinom(const Type &x, const Type &mu, const Type &var, int give_log=0)
+     Type dnbinom2(const Type &x, const Type &mu, const Type &var, int give_log=0)
      Type dpois(const Type &x, const Type &lambda, int give_log=0)
      Type dlgamma(Type y, Type shape, Type scale, int give_log=0)
      Type dnorm(Type x, Type mean, Type sd, int give_log=0)

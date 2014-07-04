@@ -38,12 +38,12 @@ Basic calculations:
     ADREPORT(x)               \tab   Report x back to R with derivatives    \cr
     vector<Type> v(n1);       \tab   R equivalent of v=numeric(n1)          \cr
     matrix<Type> m(n1,n2);    \tab   R equivalent of m=matrix(0,n1,n2)      \cr
-    array<Type> a(n1,n2,n3);  \tab   R equivalent of a=array(0,c(n3,n2,n1)) \cr
+    array<Type> a(n1,n2,n3);  \tab   R equivalent of a=array(0,c(n1,n2,n3)) \cr
     v+v,v-v,v*v,v/v           \tab   Pointwise binary operations            \cr
     m*v                       \tab   Matrix-vector multiply                 \cr
-    a(i)                      \tab   R equivalent of a[,,i]                 \cr
-    a(i)(j)                   \tab   R equivalent of a[,j,i]                \cr
-    a(i)(j)[k]                \tab   R equivalent of a[k,j,i]               \cr
+    a.col(i)                  \tab   R equivalent of a[,,i]                 \cr
+    a.col(i).col(j)           \tab   R equivalent of a[,j,i]                \cr
+    a(i,j,k)                  \tab   R equivalent of a[i,j,k]               \cr
     exp(v)                    \tab   Pointwise math                         \cr
     m(i,j)                    \tab   R equivalent of m[i,j]                 \cr
     v.sum()                   \tab   R equivalent of sum(v)                 \cr
@@ -53,7 +53,7 @@ Basic calculations:
 Some distributions are avaliable as c++ templates with syntax close to R's distributions:
 \tabular{ll}{
    \bold{Function header}                \tab \bold{Distribution}                      \cr
-   dnbinom(x,mu,var,int give_log=0)      \tab Negative binomial with mean and variance \cr
+   dnbinom2(x,mu,var,int give_log=0)     \tab Negative binomial with mean and variance \cr
    dpois(x,lambda,int give_log=0)        \tab Poisson distribution as in R             \cr
    dlgamma(y,shape,scale,int give_log=0) \tab log-gamma distribution                   \cr
    dnorm(x,mean,sd,int give_log=0)       \tab Normal distribution as in R              \cr
