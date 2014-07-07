@@ -88,8 +88,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   } else { ## Something to report - get derivatives
     Dphi <- obj2$gr(par)
     if(!is.null(r)){
-      Dphi.random <- Dphi[,r]
-      Dphi.fixed <- Dphi[,-r]
+      Dphi.random <- Dphi[,r,drop=FALSE]
+      Dphi.fixed <- Dphi[,-r,drop=FALSE]
       if(all(Dphi.random==0)){ ## Fall back to simple case
         simpleCase <- TRUE
         Dphi <- Dphi.fixed
