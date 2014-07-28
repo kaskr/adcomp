@@ -76,6 +76,7 @@ extern "C"{
     for(int i=0;i<1000;i++){ // 122 seems to be sufficient.
       if(memory_manager.counter>0){
 	R_gc();
+	R_RunExitFinalizers();
       }
     }
     if(memory_manager.counter>0)error("Failed to clean. Please manually clean up before unloading\n");

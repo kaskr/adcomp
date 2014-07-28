@@ -744,6 +744,11 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
       stop()
     }
   }
+  ## On windows the DLL must be unloaded before compiling
+  if(.Platform$OS.type=="windows"){
+    tr <- try(dyn.unload(dynlib(libname)),silent=TRUE)
+    if(!is(tr,"try-error"))cat("Note: Library",paste0("'",dynlib(libname),"'"),"was unloaded.\n")
+  }
   ## Includes and preprocessor flags specific for the template
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
                    "-DTMB_SAFEBOUNDS"[safebounds],
