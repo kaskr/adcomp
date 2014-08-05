@@ -31,6 +31,15 @@ It is recommended to test that models can be changed, re-compiled and re-loaded 
 If everything works as intended this script should display "TRUE".
 The script has only been observed to fail for certain combinations of Linux and the gcc compiler, see below.
 
+Compiler warnings
+-----------------
+Some R configurations have the '-Wall' compiler flag enabled by default resulting in a large number of useless warnings. You can list your C++ compiler flags from the terminal with ```R CMD config CXXFLAGS```.
+It is recommended to remove '-Wall' from this list, e.g. by running the following in a terminal:
+
+    mkdir -p ~/.R
+    echo CXXFLAGS=`R CMD config CXXFLAGS | sed s/-Wall//g` >> ~/.R/Makevars
+
+
 Alternative platforms
 =====================
 
