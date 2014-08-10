@@ -668,7 +668,7 @@ public:
   }
   /* Quadratic form: x'*Q^order*x */
   scalartype Quadform(vectortype x){
-    return (x*(Q*x)).sum();
+    return (x*(Q*x.matrix()).array()).sum();
   }
   scalartype operator()(vectortype x){
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
