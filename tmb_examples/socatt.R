@@ -13,7 +13,7 @@ group = as.factor(rep(1:d$M,each=4))
 library(TMB)
 
 compile("socatt.cpp")
-dyn.load("socatt.so")
+dyn.load(dynlib("socatt"))
 
 data <- list(y=d$y,S=d$S,X=d$X,group=group)
 parameters <- list(

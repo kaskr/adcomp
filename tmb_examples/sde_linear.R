@@ -52,7 +52,7 @@ iobs <- seq(1,length(tsim),round(Tobs/Tsim))
 # Generate random measurements
 Y <- rnorm(length(iobs),mean=(Xsim[iobs]),sd = sigmaY)
 
-dyn.load("sde_linear.so")
+dyn.load(dynlib("sde_linear"))
 
 # Data for TMB
 data <- list(tsim=tsim,iobs=iobs-1,Y=Y)

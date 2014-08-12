@@ -31,7 +31,7 @@ stateDim=3
 timeSteps=100
 simdata()
 library(TMB)
-dyn.load("mvrw.so")
+dyn.load(dynlib("mvrw"))
 data <- list(obs=t(obs))
 parameters <- list(
   u=data$obs*0,

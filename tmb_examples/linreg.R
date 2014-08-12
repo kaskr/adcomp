@@ -1,5 +1,5 @@
 library(TMB)
-dyn.load("linreg.so")
+dyn.load(dynlib("linreg"))
 set.seed(123)
 data <- list(Y=rnorm(10)+1:10,x=1:10)
 parameters <- list(a=0,b=0,logSigma=0)

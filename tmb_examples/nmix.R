@@ -15,7 +15,7 @@ parameters <- list(
                    log_sigma=0,
                    u=rep(0,data$nG)
 )
-dyn.load("nmix.so")
+dyn.load(dynlib("nmix"))
 ## Phase 1
 map <- list(u=factor(rep(NA,data$nG)),log_sigma=factor(NA))
 obj <- MakeADFun(data,parameters,map=map,DLL="nmix")

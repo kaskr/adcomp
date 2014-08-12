@@ -2,7 +2,7 @@ source("sam_data.R")
 
 library(TMB)
 compile("sam.cpp")
-dyn.load("sam.so")
+dyn.load(dynlib("sam"))
 
 parameters <- list(
   logFpar=c(-11, -10, -10, -9, -9),

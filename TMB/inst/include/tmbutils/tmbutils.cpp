@@ -48,6 +48,7 @@ array<Type> asArray(SEXP x)
 
 /** 
    \brief Collection of multivariate Gaussian distributions (members listed in \ref density.cpp)
+
    \ingroup Densities
 
    A particular multivariate normal distribution is implemented as a templated C++ class. 
