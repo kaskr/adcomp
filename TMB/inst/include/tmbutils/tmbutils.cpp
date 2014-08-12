@@ -51,41 +51,43 @@ array<Type> asArray(SEXP x)
 
    \ingroup Densities
 
-   A particular multivariate normal distribution is implemented as a templated C++ class. 
-   Let us take the generic zero-mean multivariate normal distribution <tt>MVNORM_t</tt> with covariance matrix 
-   <tt>Sigma</tt> as an example. The <tt>_t</tt> symbol attached to the class name reminds us that we are dealing with a class
-   (of a particular C++ type). There are two operations that we can do on objects from the <tt>MVNORM_t</tt> class:
-   <list>
-   <item> Declare and initialize in terms of one or more parameters (e.g. <tt>Sigma</tt>)     </item>
-   <item> Evaluate the negative log-likelihood density at specified point (e.g. a vector <tt>u</tt>)   </item>   
-   </list>
-   An example is
+   The purpose of the name space is to provide multivariate normal distributions
+   useful for classical multivariate analysis, time series, spatial model, and space-time models.
+   Let us take the generic zero-mean multivariate normal distribution <tt>MVNORM</tt> 
+   with covariance matrix \c Sigma as an example. To evaluate the negative log-likelihood
+   at the point <tt>u</tt> you simply write
    \code
-     // Sigma and u are objects that have allready been defined
-     MVNORM_t<Type> neg_log_density(Sigma);	// Create object from covariance matrix Sigma
-     Type ans = neg_log_density(u);		// Evaluate neg. log-likelihood
+     PARAMETER_VECTOR(u);				// Random vector
+     PARAMETER_MATRIX(Sigma)			// Covariance matrix
+     Type ans = MVNORM(Sigma)(u);		// Evaluate neg. log-likelihood
    \endcode
-   Comments:
-   <list> 
-   <item> The template argument <tt><Type></tt> must always be included (as in many other places in TMB) but can be ignored
-	   from a user perspective.</item>
-   <item> The object vi define here is called <tt>neg_log_density</tt>. You can choose whatever name you like,
-	  but <tt>neg_log_density</tt> reminds you that the only thing you will do with it is to 
-	  evaluate the negative log-likelihood. </item>
-   <item> The dimensions of <tt>Sigma</tt> and <tt>u</tt> must match. </item>   
-   </list>
-
-   New classes of distributions can be built recursively from existing distributions. The behaviour of the different
-   distributions differ in this respect. A very useful example is the
-   Kronecker product (http://en.wikipedia.org/wiki/Kronecker_product) of two multivariate normal distributions (see detailed description of <tt>SEPARABLE_t</tt>):
+   
+   You will also see <tt>MVNORM_t</tt> (note the <tt>_t</tt> extention) which is a C++ class 
+   that implements the distribution. You will use <tt>MVNORM_t</tt> to build more complicated
+   distributions, for instance via the Kronecker product (http://en.wikipedia.org/wiki/Kronecker_product).
+   Now, let us define two distributions:
+	
     \code
-     MVNORM_t<Type> Gauss1(Sigma1);	// First normal distribution (with covariance Sigma1)
-     MVNORM_t<Type> Gauss2(Sigma2);	// Second normal distribution (with covariance Sigma2)
-     SEPARABLE_t<MVNORM_t<Type> , MVNORM_t<Type> > Gauss3(Gauss1,Gauss2);
-     SEPARABLE_t<MVNORM_t<Type>, MVNORM_t<Type>> Gauss3(Gauss1,Gauss2);
-     Type ans = Gauss3(u);		// Evaluate neg. log-likelihood
+     MVNORM_t<Type> Gauss1(Sigma1);	     // Define a MVNORM called "Gauss1"
+     MVNORM_t<Type> Gauss2(Sigma2);	     // Define a MVNORM called "Gauss2"
     \endcode
-    where <tt>u</tt> must be of appropriate dimension.
+  i.e. we have got two multivariate normal distributions called \c Gauss1 and \c Gauss2. If we want
+  to evaluate these we can use
+   \code
+     PARAMETER_VECTOR(u);
+     Type ans = Gauss1(Sigma)(u);		// Evaluate neg. log-likelihood
+     ans += Gauss2(Sigma)(u);		// Evaluate neg. log-likelihood
+   \endcode
+  but that is not our purpose here. We want to create a new distribution <tt>Gauss3</tt>
+  which is the Kronecker product of <tt>Gauss1</tt> and <tt>Gauss2</tt>
+    \code  
+     PARAMETER_VECTOR(v);		// dim(v) = dim(u)^2
+     SEPARABLE_t<MVNORM_t<Type>, MVNORM_t<Type>> Gauss3(Gauss1,Gauss2);
+     Type ans = Gauss3(u2);		// Evaluate neg. log-likelihood
+    \endcode
+    This is complicated stuff, but shows the power of TMB!
+    
+   For more details about Kronecker products in TMB see <tt>SEPARABLE_t</tt>.
 */
 namespace density{
   using namespace tmbutils;
