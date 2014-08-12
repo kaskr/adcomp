@@ -691,6 +691,13 @@ public:
     return ans;
   }
 };
+/** \brief Evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
+
+  For detailed explanation of GMRFs see the class definition @ref GMRF_t
+  \param Q precission matrix
+  \param order Convolution order, i.e. the precission matrix is Q^order (matrix product)
+
+*/
 template <class scalartype>
 GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order=1){
   return GMRF_t<scalartype>(Q, order);
