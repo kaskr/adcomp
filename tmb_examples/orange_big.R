@@ -6,7 +6,7 @@ require(TMB)
 source("data_orange.R")
 
 compile("orange_big.cpp")
-dyn.load("orange_big.so")
+dyn.load(dynlib("orange_big"))
 Mmultiply = data_orange$M*data_orange$multiply
 
 obj <- MakeADFun(data=data_orange,
