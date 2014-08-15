@@ -47,5 +47,4 @@ obj$gr()
 system.time(opt <- do.call("optim",obj))
 pl <- obj$env$parList() ## <-- List of predicted random effects
 matpoints(t(pl$u),type="l",col="blue",lwd=2)
-summary(as.mle(opt))
 sdreport(obj)
