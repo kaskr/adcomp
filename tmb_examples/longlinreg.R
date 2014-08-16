@@ -1,6 +1,6 @@
 library(TMB)
 #compile("longlinreg.cpp")
-dyn.load("longlinreg.so")
+dyn.load(dynlib("longlinreg"))
 set.seed(123)
 nobs<-1000000
 x<-seq(0,10, length=nobs)
