@@ -222,5 +222,8 @@ struct array:Map< Array<Type,Dynamic,1> >{
   INHERIT(operator=)
 #undef INHERIT
 
+  /* Methods this class should *not* inherit (generate compile time error if used) */
+  private:
+  using MapBase::row;
 };
 
