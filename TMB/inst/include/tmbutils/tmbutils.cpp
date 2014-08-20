@@ -86,7 +86,13 @@ array<Type> asArray(SEXP x)
      Type ans = Gauss3(u2);		// Evaluate neg. log-likelihood
     \endcode
     This is complicated stuff, but shows the power of TMB!
-    
+
+    To be precise, \c Gauss 3 is a zero-mean multivariate normal distribution with
+    covariance matrix \c Sigma3 given by the pseudo-code
+    \code
+     Sigma3 = inv(kronecker(inv(Sigma1),inv(Sigma2)))
+    \endcode
+       
    For more details about Kronecker products in TMB see <tt>SEPARABLE_t</tt>.
 */
 namespace density{

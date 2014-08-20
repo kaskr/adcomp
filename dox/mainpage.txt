@@ -243,6 +243,10 @@ Simple example:
 /** \defgroup Errors Compilation and run time errors
 \brief How to debug TMB programs
 
+The R interface to the debugger (gdb) is documented as part of the R help system,
+i.e. you can type \c "?gdbsource" in R to get info. The current document
+only adresses isses that the relate to C++.
+
 <h2>Compilation errors</h2>
 It may be hard to understand the compilation errors for the following reasons
 - The Eigen libraries use templated C++ which generate non-intuitive error messages.
