@@ -1,24 +1,25 @@
 # Edit with emacs: Use tab key and alt+arrows.
-| R-syntax                                | TMB-syntax              |
-| dnorm(x,mean=p1,sd=p2)                  | dnorm(x,p1,p2)          |
-| dnorm(x,mean=p1,sd=p2,log=TRUE)         | dnorm(x,p1,p2,true)     |
-| pnorm(x)                                | pnorm_approx(x)         |
-| qnorm(u)                                | qnorm_approx(u)         |
-| dexp(x,rate=p1,log=FALSE)               | dexp(x,p1,false)        |
-| dexp(x,rate=p1,log=TRUE)                | dexp(x,p1,true)         |
-| pexp(x,rate=p1,log=FALSE)               | pexp(x,p1,false)        |
-| qexp(u,rate=p1,log=FALSE)               | qexp(u,p1,false)        |
-| dweibull(x,shape=p1,scale=p2,log=FALSE) | dweibull(x,p1,p2,false) |
-| dweibull(x,shape=p1,scale=p2,log=TRUE)  | dweibull(x,p1,p2,true)  |
-| qweibull(u,shape=p1,scale=p2,log=FALSE) | qweibull(u,p1,p2,false) |
-| dbeta(u,shape1=p1,shape2=p2,log=FALSE)  | dbeta(u,p1,p2,false)    |
-| dbeta(u,shape1=p1,shape2=p2,log=TRUE)   | dbeta(u,p1,p2,true)     |
-| dbinom(k,n,prob,log=FALSE)              | dbinom(k,n,prob,false)  |
-| dbinom(k,n,prob,log=TRUE)               | dbinom(k,n,prob,true)   |
-| dt(x,df=p1,log=FALSE)                   | dt(x,p1,false)          |
-| dt(x,df=p1,log=TRUE)                    | dt(x,p1,true)           |
-| df(x,p1,p2,log=FALSE)                   | df(x,p1,p2,false)       |
-| df(x,p1,p2,log=TRUE)                    | df(x,p1,p2,true)        |
+| R-syntax                                | TMB-syntax                 |
+| dnorm(x,mean=p1,sd=p2)                  | dnorm(x,p1,p2)             |
+| dnorm(x,mean=p1,sd=p2,log=TRUE)         | dnorm(x,p1,p2,true)        |
+| pnorm(x)                                | pnorm_approx(x)            |
+| qnorm(u)                                | qnorm_approx(u)            |
+| dexp(x,rate=p1,log=FALSE)               | dexp(x,p1,false)           |
+| dexp(x,rate=p1,log=TRUE)                | dexp(x,p1,true)            |
+| pexp(x,rate=p1,log=FALSE)               | pexp(x,p1,false)           |
+| qexp(u,rate=p1,log=FALSE)               | qexp(u,p1,false)           |
+| dweibull(x,shape=p1,scale=p2,log=FALSE) | dweibull(x,p1,p2,false)    |
+| dweibull(x,shape=p1,scale=p2,log=TRUE)  | dweibull(x,p1,p2,true)     |
+| qweibull(u,shape=p1,scale=p2,log=FALSE) | qweibull(u,p1,p2,false)    |
+| dbeta(u,shape1=p1,shape2=p2,log=FALSE)  | dbeta(u,p1,p2,false)       |
+| dbeta(u,shape1=p1,shape2=p2,log=TRUE)   | dbeta(u,p1,p2,true)        |
+| dbinom(k,n,prob,log=FALSE)              | dbinom(k,n,prob,false)     |
+| dbinom(k,n,prob,log=TRUE)               | dbinom(k,n,prob,true)      |
+| dt(x,df=p1,log=FALSE)                   | dt(x,p1,false)             |
+| dt(x,df=p1,log=TRUE)                    | dt(x,p1,true)              |
+| df(x,p1,p2,log=FALSE)                   | df(x,p1,p2,false)          |
+| df(x,p1,p2,log=TRUE)                    | df(x,p1,p2,true)           |
+| dmultinom(k,prob=p,log=TRUE)            | dmultinom(k,p,true)        |
 # | dnbinom(k,n,prob,log=TRUE)              | dnbinom(k,n,prob,true)  |
 # | dgamma(x,shape=p1,scale=p2)             | dgamma(x,p1,p2)         |
 # | dgamma(x,shape=p1,scale=p2,log=TRUE)    | dgamma(x,p1,p2,true)    |

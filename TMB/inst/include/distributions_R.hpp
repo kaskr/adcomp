@@ -225,4 +225,17 @@ Type dt(Type x, Type df, int give_log)
 // Vectorize dt
 VECTORIZE3_tti(dt);
 
-
+/** 	\brief Probability mass function of the multinomial distribution.
+	\ingroup R_style_distribution
+	\param x Vector of length K of integers.
+        \param p Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1).
+	\param give_log 1 if one wants the log-probability, 0 otherwise.
+	*/
+template <class Type>
+Type dmultinom(vector<Type> x, vector<Type> p, int give_log=0)
+{
+	vector<Type> xp1 = x+Type(1);
+	Type logres = lgamma(x.sum() + Type(1)) - lgamma(xp1).sum() + (x*log(p)).sum();
+	if(give_log) return logres;
+	else return exp(logres);
+}

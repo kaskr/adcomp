@@ -65,6 +65,13 @@ Mac OS X
 --------
 Tested to work with both llvm-gcc-4.2 and clang. Fortran compiler [libraries](http://cran.r-project.org/bin/macosx/tools) must be installed. According to [R admin manual](http://www.cran.r-project.org/doc/manuals/R-admin.html#OS-X) "the OpenMP support in this version of gcc is problematic, and the alternative, clang, has no OpenMP support". So, parallel templates with OS X will require a different compiler installed.
 
+On Mavericks (Mac OS 10.9) the Fortran compiler on the CRAN website does not work. More information and the solution can be found [here](http://www.thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error). The easiest solution is to install the appropriate fortran libraries from r.research.att via the command line in Terminal:
+
+```
+curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
+sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
+```
+
 Linux specific notes
 ====================
 

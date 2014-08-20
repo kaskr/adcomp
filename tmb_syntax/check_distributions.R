@@ -11,7 +11,8 @@ library(TMB)
 data <- list(x=seq(-5,5,length=101),
              k=1:101,
              n=11:111,
-             u=seq(0,1,length=101)
+             u=seq(0,1,length=101),
+             p=(1:101)/sum(1:101)
              )
 parameters <- list(p1=1,p2=2,prob=0.5)
 
