@@ -46,7 +46,7 @@ Type objective_function<Type>::operator() ()
   std::cout << "2nd row of matrix m1= \n" 		<< m1.row(1) 				<< "\n";
   std::cout << "2nd col of matrix m1= \n" 		<< m1.col(1) 				<< "\n";
   std::cout << "Element (1,1) of array a1= " 		<< a1(1,1) 				<< "\n";
-  std::cout << "2nd row of array a1= \n"		<< a1.row(1) 				<< "\n";
+  std::cout << "2nd row of array a1= \n"		<< a1.transpose().col(1)		<< "\n";
   std::cout << "2nd col of array a1= \n" 		<< a1.col(1) 				<< "\n";
   std::cout << "2nd element of vector v1= "		<< v1(1) 				<< "\n";
 
