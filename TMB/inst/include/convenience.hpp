@@ -70,3 +70,15 @@ Type qnorm_approx(Type x){
   return -(C + Delta0 / C) * sqrt(Type(2)) / Type(3);
 }
 VECTORIZE1_t(qnorm_approx);
+
+/** Diff of vector
+
+  Difference of vector elements just like diff in R, but only for vectors.
+*/
+template<class Type>
+vector<Type> diff(vector<Type> x){
+  int n=x.size();
+  vector<Type> ans(n-1);
+  for(int i=0; i<n-1; i++) ans[i]=x[i+1]-x[i];
+  return(ans);
+}
