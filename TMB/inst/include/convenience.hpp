@@ -80,5 +80,5 @@ vector<Type> diff(vector<Type> x){
   int n=x.size();
   vector<Type> ans(n-1);
   for(int i=0; i<n-1; i++) ans[i]=x[i+1]-x[i];
-  return(ans);
+  return ans;
 }
