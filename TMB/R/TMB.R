@@ -458,7 +458,7 @@ MakeADFun <- function(data,parameters,map=list(),
                                       ##he=function(x)f0(x,order=2)),
                                       he=H0,env=env),
                                  inner.control)
-                          )
+                          ), silent=silent
                  )
       if(is.character(opt))return(NaN)
     } else{  
