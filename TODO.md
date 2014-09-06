@@ -34,3 +34,4 @@ TODO
 - Implement atomic AD operators of certain matrix operations (linking to BLAS) to e.g. better handle templates using multivariate normal distribution with dense covariance matrices.
 - Implement atomic AD operator of matrix exponential.
 - Package should pass "make check"/"R CMD check" without warnings.
+- Make unary functions work on arrays and preserve dimension.

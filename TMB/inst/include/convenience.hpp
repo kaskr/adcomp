@@ -70,3 +70,33 @@ Type qnorm_approx(Type x){
   return -(C + Delta0 / C) * sqrt(Type(2)) / Type(3);
 }
 VECTORIZE1_t(qnorm_approx);
+
+/** Diff of vector
+
+  Difference of vector elements just like diff in R, but only for vectors.
+*/
+template<class Type>
+vector<Type> diff(vector<Type> x){
+  int n=x.size();
+  vector<Type> ans(n-1);
+  for(int i=0; i<n-1; i++) ans[i]=x[i+1]-x[i];
+  return ans;
+}
+/** Logit
+
+  Calculates the logit transformation; the same as qlogis in base or logit in the boot package in R.
+*/
+template<class Type>
+Type logit(Type x){
+  return log(x/(Type(1.0)-x));
+}
+VECTORIZE1_t(logit);
+/** Inverse Logit
+
+  Calculates the inverse of the logit transformation; the same as plogis in base or inv.logit in the boot package in R.
+*/
+template<class Type>
+Type invlogit(Type x){
+  return Type(1.0)/(Type(1.0)+exp(-x));
+}
+VECTORIZE1_t(invlogit);
