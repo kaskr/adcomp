@@ -100,7 +100,7 @@ template<class Type>
 inline Type dzipois(const Type &x, const Type &lambda, const Type &zip, int give_log=0)
 {
   Type logres;
-  if (x==0) logres=log(zip + dpois(x, lambda, false)); 
+  if (x==0) logres=log(zip + (1-zip)*dpois(x, lambda, false)); 
   else logres=log(1-zip) + dpois(x, lambda, true);
   if (give_log) return logres; else return exp(logres);
 }
@@ -116,7 +116,7 @@ inline Type dzinbinom(const Type &x, const Type &size, const Type &prob, const T
 		    int give_log=0)
 {
   Type logres;
-  if (x==0) logres=log(zip + dnbinom(x, size, prob, false)); 
+  if (x==0) logres=log(zip + (1-zip)*dnbinom(x, size, prob, false)); 
   else logres=log(1-zip) + dnbinom(x, size, prob, true);
   if (give_log) return logres; else return exp(logres);
 }
@@ -124,7 +124,7 @@ inline Type dzinbinom(const Type &x, const Type &size, const Type &prob, const T
 /** \brief Zero-Inflated negative binomial probability function. 
   \ingroup R_style_distribution
 * \details
-    Alternative parameterization through conditional mean and variance parameters.
+    Alternative parameterization through mean and variance parameters (conditional on not being an extra zero).
     No vectorized version is currently available.
     \param zip is the probaility of having extra zeros 
 */
