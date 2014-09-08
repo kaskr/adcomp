@@ -233,7 +233,6 @@ public:
   /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
     scalartype p = x.size();
-    //Lange et al. 1989 http://www.jstor.org/stable/2290063
     return -lgamma(scalartype(0.5)*(df+p))+lgamma(scalartype(0.5)*df)+p*scalartype(0.5)*log(df)+p*lgamma(scalartype(0.5))-scalartype(0.5)*this->logdetQ + scalartype(0.5)*(df+p)*log(scalartype(1.0)+this->Quadform(x)/df);
 
   }
