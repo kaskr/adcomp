@@ -66,16 +66,18 @@ of numbers (doubles) is the following
   DATA_VECTOR(x);               // Vector x(0),x(1),...,x(n-1), where n is the length of x
    \endcode
 Note that all vectors and matrices in TMB uses a \b zero-based indexing scheme.
-It is not necessary to explicitely pass the dimension of "x", but it is often convenient.
-The dimension of x is set on the R side when the C++ program is called, and
-there are ways of retrieving the dimenson of x inside the C++ program.
+It is not necessary to explicitely pass the dimension of \c x, as it can
+be retrieved inside the C++ program:
+   \code
+  int n = x.size(); 
+   \endcode
 
 <h2>An extended C++ language</h2>
 TMB extends C++ with functionality that is important for formulating
-likelihood functions. You have three toolboxes available:
+likelihood functions. You have different toolboxes available:
 - Standard C++ used for infrastructure like loops etc.
 - Vector, matrix and array library (see \ref matrix_arrays)
-- Probability distributions (see \ref Distributions)
+- Probability distributions (see \ref Densities and \ref R_style_distribution)
 
 In addition to the variables defined through the <tt>DATA_</tt> or <tt>PARAMETER_</tt>
 macros there can be "local" variables, for which ordinary C++ scoping rules apply.
@@ -119,16 +121,17 @@ The following rules apply:
   the Laplace approximation will perform poorly). For response variables
   all probability distributions (discrete or continuous) are allowed.
   If a non-gaussian latent is needed the "transformation trick" can be used.
-- The library \ref Distributions contains many probability distributions, especially
-  multivariate normal distributions. For probability distributions not contained
-  in the library, the user can use raw C++ code. 
+- The namespaces \ref R_style_distribution and \ref Densities contain many probability 
+  distributions, including
+  multivariate normal distributions. For probability distributions not available
+  from these libraries, the user can use raw C++ code:
    \code
   DATA_VECTOR(y);          	// Data vector
   Type nll = Type(0);		// Return value
-  nll -= log(Type(0.5)) - abs(y(0));	// y(0) has a Laplace distribution
+  nll -= sum(-log(Type(1.0)+y*y));	// y are i.i.d. Cauchy distributed
    \endcode
 
-See \ref Examples for more examples
+See \ref Toolbox for more about statistical modelling.
 
 
 */
@@ -141,7 +144,7 @@ This documentation only covers the "native" TMB code, not
 or 
 [Eigen](http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html)
 These packages have their own documentation, which may be relevant.
-In particular, some of the standard functions like \c sin() and \cos()
+In particular, some of the standard functions like \c sin() and \c cos()
 are part of CppAD, and are hence not documented through TMB.
 
 
@@ -184,7 +187,9 @@ to that of R.
 	cumulative distributions (\c p...) and inverse cumulative distributions (\c q...) 
 	are provided only for continuous distributions.
 - Scalar and \c vector arguments (in combinaiton) are supported, but not \c array or \c matrix.
-- The last argument (of type \c int) corresponds to the \c log argument in R: 1=logaritm, 0=ordinary scale.
+- The last argument (of type \c int) corresponds to the \c log argument 
+  in R: 1=logaritm, 0=ordinary scale. \c true (logaritm) and \c false (ordinary scale) can 
+  also be used.
 - Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
   used an "out of range" error will occur, and can be picked up by the debugger.
 - \c DATA_IVECTOR() and \c DATA_INTEGER() cannot be used with probability distributions, except possibly for the last (log) argument.
@@ -194,12 +199,12 @@ to that of R.
   DATA_VECTOR(x);
   vector<Type> rate(10);
   matrix<Type> rate_matrix(10,10);
-  dexp(y,rate,1);                      // OK, returns vector of length 10 of log-densities
-  dexp(x,rate,1);                      // OK if x is length 10 
-  dexp(x,rate_matrix,1);               // Error, matrix arguments not allowed
+  dexp(y,rate,true);                      // OK, returns vector of length 10 of log-densities
+  dexp(x,rate,true);                      // OK if x is length 10 
+  dexp(x,rate_matrix,true);               // Error, matrix arguments not allowed
   \endcode 
   See ... for how to deal with \c array or \c matrix objects. 
-- To sum over elements in the vector returned use \code dexp(x,rate).sum();\endcode 
+- To sum over elements in the vector returned use \code sum(dexp(x,rate));\endcode 
 */
 
 /** \defgroup Densities Multivariate distributions
@@ -381,15 +386,13 @@ opposite order to the dimensions of \c x.
 
 */
 
-/** \defgroup Examples TMB examples
+/** \defgroup Examples Example collection
+\brief Overview of available examples.
 
-For a list of all examples please click on the "Examples" tab on
-the top of the page. 
-- For each \c .cpp file in the Example Collection there is a \c .R file that will
-  build an run the example from R.
-
-Simple example:
-\include simple.cpp
+- A list of all examples is found on the "Examples" tab on the top of the page. 
+- Locations of example files: \c adcomp/tmb_examples and \c adcomp/TMB/inst/examples.
+- For each example there is both a \c .cpp is a \c .R
+- To run an example, e.g. \c ar1_4D, use the R command \code source("ar1_4D.R") \endcode.
 
 \example ar1_4D.cpp
 \example called_from_R.cpp
@@ -412,6 +415,8 @@ Simple example:
 \example thetalog.cpp
 
 */
+
+
 
 /** \defgroup Errors Compilation and run time errors
 \brief How to debug TMB programs
@@ -490,3 +495,64 @@ Loading required package: Matrix
 
 */
 
+/** \defgroup Toolbox Statistical toolbox
+\brief Collection of useful statistical techniques
+
+
+First read the *Statistical Modelling* section of \ref Tutorial.
+
+
+
+<h3>Non-normal lantent variables (random effects)</h3>
+
+The underlying latent random variables in TMB must be Gaussian for the Laplace
+approximation to be accurate. To obtain other distributions,
+say a gamma distribution, the "transformation trick" can be used. We start
+out with normally distributed variables \c u and transform these into
+new variables \c w via the \c pnorm and \c qgamma functions as follows:
+\code
+  PARAMETER_VECTOR(u);                             // Underlying latent random variables 
+  Type nll=Type(0.0);
+  nll -= sum(dnorm(u,Type(0),Type(1),true));       // Assign N(0,1) distribution u 
+  vector<Type> v = pnorm(u,Type(0),Type(1),true);  // Uniformly distributed variables (on [0,1])
+  vector<Type> w = qgamma(v,shape,scale,true);
+\endcode
+\c w now has a gamma distribution.
+
+\b NOTE: at the time of writing \c pnorm and \c qgamma are yet not implemented.
+
+<h3>Discrete latent variables</h3>
+
+The Laplace approximation can not be applied to discrete latent variables that
+occur in mixture models and HMMs (Hidden Markov models). However,
+such likelihoods have analytic expressions, and may be coded up in TMB.
+TMB would still calculate the exact gradient of the HMM likelihood.
+
+<h3>Mixture models </h3>
+
+Althought mixture mode are a special case of discrete latent variable models,
+they do diserve special attention. Consider the case that we want a mixture
+of two zero-mean normal distributions (with different standard deviations). 
+This can be implemented as:
+\code
+  DATA_VECTOR(x);              			
+  PARAMETER_VECTOR(sigma);      // sigma0 og sigma1
+  PARAMETER(p);                 // Mixture proportion of model 0
+  Type nll=Type(0.0);
+  nll -= sum(log(p*dnorm(x,Type(0),sigma(0),false)
+  					+(Type(1)-p)*dnorm(x,Type(0),sigma(1),false)));
+\endcode
+
+<h3>Time series</h3>
+Autoregressive (AR) processes may be implemented using the compact notation
+of section \ref  Densities. The resulting AR process may be applied
+both in the observational part and in the distribution of a latent variable.
+
+Nonlinear time must be implemented from scratch, as in the example \ref thetalog.cpp
+
+<h3>Spatial models</h3>
+TMB has strong support for spatial model and space-time models via the \ref GMRF
+and \ref SEPARABLE functions, and the notion of a \c distribution. The reader
+is referred to section \ref  Densities for details and examples.
+
+*/
