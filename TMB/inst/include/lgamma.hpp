@@ -57,7 +57,7 @@ inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
 		    int give_log=0)
 {
   Type p=mu/var;
-  Type n=mu*p/(1-p);
+  Type n=mu*p/(Type(1)-p);
   return dnbinom(x,n,p,give_log);
 }
 
@@ -90,4 +90,49 @@ inline Type dlgamma(Type y, Type shape, Type scale, int give_log=0)
 {
   Type logres=-lgamma(shape)-shape*log(scale)-exp(y)/scale+shape*y;
   if(give_log)return logres; else return exp(logres);
+}
+/** \brief Zero-Inflated Poisson probability function. 
+  \ingroup R_style_distribution
+* \details
+    \param zip is the probaility of having extra zeros 
+*/
+template<class Type>
+inline Type dzipois(const Type &x, const Type &lambda, const Type &zip, int give_log=0)
+{
+  Type logres;
+  if (x==Type(0)) logres=log(zip + (Type(1)-zip)*dpois(x, lambda, false)); 
+  else logres=log(Type(1)-zip) + dpois(x, lambda, true);
+  if (give_log) return logres; else return exp(logres);
+}
+/** \brief Zero-Inflated negative binomial probability function. 
+  \ingroup R_style_distribution
+* \details
+    Parameterized through size and prob parameters, following R-convention.
+    No vectorized version is currently available.
+    \param zip is the probaility of having extra zeros 
+*/
+template<class Type>
+inline Type dzinbinom(const Type &x, const Type &size, const Type &p, const Type & zip,
+		    int give_log=0)
+{
+  Type logres;
+  if (x==Type(0)) logres=log(zip + (Type(1)-zip)*dnbinom(x, size, p, false)); 
+  else logres=log(Type(1)-zip) + dnbinom(x, size, p, true);
+  if (give_log) return logres; else return exp(logres);
+}
+
+/** \brief Zero-Inflated negative binomial probability function. 
+  \ingroup R_style_distribution
+* \details
+    Alternative parameterization through mean and variance parameters (conditional on not being an extra zero).
+    No vectorized version is currently available.
+    \param zip is the probaility of having extra zeros 
+*/
+template<class Type>
+inline Type dzinbinom2(const Type &x, const Type &mu, const Type &var, const Type & zip,
+		    int give_log=0)
+{
+  Type p=mu/var;
+  Type n=mu*p/(Type(1)-p);
+  return dzinbinom(x,n,p,zip,give_log);
 }

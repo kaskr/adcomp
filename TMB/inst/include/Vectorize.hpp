@@ -129,7 +129,7 @@ VECTORIZE4_ttti(dnbinom);
 VECTORIZE4_ttti(dgamma);
 VECTORIZE4_ttti(dlgamma);
 VECTORIZE3_tti(dpois);
-
+VECTORIZE4_ttti(dzipois);
 
 /* max and min of vector */
 double max(const vector<double> &x)
