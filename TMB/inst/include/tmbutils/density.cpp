@@ -201,6 +201,46 @@ public:
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
 
+
+
+/** \brief Multivariate t distribution with user supplied scale matrix
+
+Class to evaluate the negative log density of a multivariate t distributed variable with general scale matrix Sigma and location vector 0 and df degrees of freedom.
+*/
+template <class scalartype_>
+class MVT_t: public MVNORM_t<scalartype_>
+{
+  TYPEDEFS(scalartype_);
+  #include "lgamma.hpp"
+  scalartype df;
+
+public:
+  MVT_t(scalartype df_)
+    : MVNORM_t<scalartype>()
+  {
+    df = df_;
+  }
+  MVT_t(matrixtype Sigma_, scalartype df_)
+    : MVNORM_t<scalartype>(Sigma_)
+  {
+    df = df_;
+  }
+
+  void setdf(scalartype df_){
+    df = df_;
+  }
+
+  /** \brief Evaluate the negative log density */
+  scalartype operator()(vectortype x){
+    scalartype p = x.size();
+    //Lange et al. 1989 http://www.jstor.org/stable/2290063
+    return -lgamma(scalartype(0.5)*(df+p))+lgamma(scalartype(0.5)*df)+p*scalartype(0.5)*log(df)+p*lgamma(scalartype(0.5))-scalartype(0.5)*this->logdetQ + scalartype(0.5)*(df+p)*log(scalartype(1.0)+this->Quadform(x)/df);
+
+  }
+};
+
+
+
 /** \brief Stationary AR1 process
 
     Class to evaluate the negative log density of a (multivariate) AR1
