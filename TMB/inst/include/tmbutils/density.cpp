@@ -11,7 +11,7 @@ typedef matrix<scalartype> matrixtype;		\
 typedef array<scalartype> arraytype;
 
 #define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){};
-#define JACOBIAN_NOT_YET_IMPLEMENTED arraytype jacobian(){};
+#define JACOBIAN_NOT_YET_IMPLEMENTED arraytype jacobian(arraytype x){};
 
 /** \brief Multivariate normal distribution with user supplied covariance matrix
 
@@ -207,7 +207,7 @@ public:
 /** \brief Multivariate t distribution with user supplied scale matrix
 
     Class to evaluate the negative log density of a multivariate t distributed variable with general scale matrix Sigma and location vector 0 and df degrees of freedom. 
-    This class should not be used as input distribution for other classes. 
+    This class should not be used as input distribution for SEPARABLE_t or PROJ_t. 
 */
 template <class scalartype_>
 class MVT_t: public MVNORM_t<scalartype_>
@@ -217,6 +217,10 @@ class MVT_t: public MVNORM_t<scalartype_>
   scalartype df;
 
 public:
+  MVT_t()
+    : MVNORM_t<scalartype>()
+  {}
+
   MVT_t(scalartype df_)
     : MVNORM_t<scalartype>()
   {
@@ -235,10 +239,8 @@ public:
   /** \brief Covariance extractor */
   matrixtype cov(){
     if(df > 2){
-      return Sigma*df/(df-scalartype(2.0));
-    }else{
-      return Sigma*scalartype(0.0);
-    }     
+      return this->Sigma*df/(df-scalartype(2.0));
+    }   
   }
 
   /** \brief Evaluate the negative log density */
