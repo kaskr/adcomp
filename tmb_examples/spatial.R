@@ -9,7 +9,7 @@ dd = sqrt(outer(Z[,1],Z[,1],"-")^2 + outer(Z[,2],Z[,2],"-")^2)
 
 library(TMB)
 compile("spatial.cpp")
-dyn.load("spatial.so")
+dyn.load(dynlib("spatial"))
 obj <- MakeADFun(data=list(n=100,y=y,X=X,dd=dd),
                  parameters=list(
 		   b=c(0,0),

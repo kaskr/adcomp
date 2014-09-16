@@ -6,4 +6,3 @@ dyn.load(dynlib("linreg_parallel"))
 obj <- MakeADFun(data,parameters,DLL="linreg_parallel")
 obj$hessian <- TRUE
 opt <- do.call("optim",obj)
-summary(as.mle(opt))

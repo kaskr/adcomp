@@ -145,9 +145,10 @@ struct array:Map< Array<Type,Dynamic,1> >{
     return array(p,newdim);
   }
 
-  /** \brief Elementwise subsetting 1D array */
+  /** \brief Elementwise subsetting 1D array.
+      Also allowed in general to access the underlying vector of n-dim array. */
   Type& operator()(int i1){
-    return this->MapBase::operator[](index(c(i1)));
+    return this->MapBase::operator[](i1);
   }
   /** \brief Elementwise subsetting 2D array */
   Type& operator()(int i1, int i2){
@@ -222,5 +223,8 @@ struct array:Map< Array<Type,Dynamic,1> >{
   INHERIT(operator=)
 #undef INHERIT
 
+  /* Methods this class should *not* inherit (generate compile time error if used) */
+  private:
+  using MapBase::row;
 };
 

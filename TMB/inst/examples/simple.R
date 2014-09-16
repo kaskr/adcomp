@@ -29,5 +29,3 @@ obj$gr(obj$par)
 obj$control <- list(parscale=obj$par*0+1e-1,trace=10)
 obj$hessian <- TRUE
 opt <- do.call("optim",obj)
-##summary(as.mle2(opt))
-summary(as.mle(opt))

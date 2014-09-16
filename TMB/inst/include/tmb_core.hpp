@@ -76,6 +76,7 @@ extern "C"{
     for(int i=0;i<1000;i++){ // 122 seems to be sufficient.
       if(memory_manager.counter>0){
 	R_gc();
+	R_RunExitFinalizers();
       }
     }
     if(memory_manager.counter>0)error("Failed to clean. Please manually clean up before unloading\n");
@@ -173,10 +174,12 @@ Levels: d e f g h i j
 #define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>( \
 	getListElement(objective_function::data,#name,&isValidSparseMatrix)));
 // NOTE: REPORT() constructs new SEXP so never report in parallel!
-/** \brief Report scalar, vector or array back to R without derivative information */
+/** \brief Report scalar, vector or array back to R without derivative information. Important: \c REPORT(name) must not be used before \c name has been assigned a value */
 #define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
                         defineVar(install(#name),asSEXP(name),objective_function::report);}
-/** \brief Report scalar, vector or array back to R with derivative information */
+/** \brief Report scalar, vector or array back to R with derivative information. 
+ The result is retrieved in R via the R function \c sdreport().
+ Important: \c ADREPORT(name) must not be used before \c name has been assigned a value*/
 #define ADREPORT(name) objective_function::reportvector.push(name,#name);
 #define PARALLEL_REGION if(this->parallel_region())
 /** \brief Get data array from R and declare it as array<Type> */

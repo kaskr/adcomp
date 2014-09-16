@@ -668,7 +668,7 @@ public:
   }
   /* Quadratic form: x'*Q^order*x */
   scalartype Quadform(vectortype x){
-    return (x*(Q*x)).sum();
+    return (x*(Q*x.matrix()).array()).sum();
   }
   scalartype operator()(vectortype x){
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
@@ -691,6 +691,13 @@ public:
     return ans;
   }
 };
+/** \brief Evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
+
+  For detailed explanation of GMRFs see the class definition @ref GMRF_t
+  \param Q precission matrix
+  \param order Convolution order, i.e. the precission matrix is Q^order (matrix product)
+
+*/
 template <class scalartype>
 GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order=1){
   return GMRF_t<scalartype>(Q, order);

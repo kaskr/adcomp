@@ -51,7 +51,7 @@ Type pnorm_approx(Type x){
   x = x/sqrt(Type(2));
   return Type(.5) * tanh( (a + b * x * x) * x ) + Type(.5);
 }
-VECTORIZE1(pnorm_approx);
+VECTORIZE1_t(pnorm_approx);
 
 /** \brief  Approximate inverse normal cumulative distribution function, similar to R's qnorm (one-argument case only).
 * \details
@@ -69,7 +69,38 @@ Type qnorm_approx(Type x){
   Type C = pow( .5 * Delta1 + .5 * sqrt( pow(Delta1,2) - 4 * pow(Delta0,3) ), Type(1)/Type(3) );
   return -(C + Delta0 / C) * sqrt(Type(2)) / Type(3);
 }
-VECTORIZE1(qnorm_approx);
+
+VECTORIZE1_t(qnorm_approx);
+
+/** Diff of vector
+
+  Difference of vector elements just like diff in R, but only for vectors.
+*/
+template<class Type>
+vector<Type> diff(vector<Type> x){
+  int n=x.size();
+  vector<Type> ans(n-1);
+  for(int i=0; i<n-1; i++) ans[i]=x[i+1]-x[i];
+  return ans;
+}
+/** Logit
+
+  Calculates the logit transformation; the same as qlogis in base or logit in the boot package in R.
+*/
+template<class Type>
+Type logit(Type x){
+  return log(x/(Type(1.0)-x));
+}
+VECTORIZE1_t(logit);
+/** Inverse Logit
+
+  Calculates the inverse of the logit transformation; the same as plogis in base or inv.logit in the boot package in R.
+*/
+template<class Type>
+Type invlogit(Type x){
+  return Type(1.0)/(Type(1.0)+exp(-x));
+}
+VECTORIZE1_t(invlogit);
 
 /**	\brief Polynomial evaluation.
 

@@ -117,6 +117,16 @@ list format.
   \item \code{last.par.best} Full parameter of the best likelihood evaluation.
   \item \code{tracepar} Trace every likelihood evaluation ?
   \item \code{tracemgc} Trace mgc of every gradient evaluation ?
+  \item \code{silent} Pass 'silent=TRUE' to all try-calls ?
+}
+
+A high level of tracing information will be output by default when evaluating the objective function and gradient.
+This is useful while developing a model, but may eventually become annoying.
+The following will disable all tracing from an object 'obj' returned by 'MakeADFun':
+\itemize{
+\item \code{obj$env$tracemgc <- FALSE}
+\item \code{obj$env$inner.control$trace <- FALSE}
+\item \code{obj$env$silent <- TRUE}
 }
 }
 

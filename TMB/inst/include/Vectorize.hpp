@@ -2,367 +2,133 @@
 	\brief Macros to do vectorization.
 	*/
 
-#define VECTORIZE1(FUN)				\
-template <class Type>				\
-vector<Type> FUN(const vector<Type> &x)		\
-{						\
-  vector<Type> res(x.size());			\
-  for(int i=0;i<x.size();i++)res[i]=FUN(x[i]);	\
-  return res;					\
-}						\
-template <class Type>				\
-matrix<Type> FUN(const matrix<Type> &x)		\
-{						\
-  matrix<Type> res(x.rows(),x.cols());	\
-  for(int i=0;i<x.rows();i++)  		\
-    for(int j=0;j<x.cols();j++)		\
-      res(i,j)=FUN(x(i,j));			\
-  return res;					\
-}
-#define VECTORIZE32(FUN)						\
-template <class T,class T4,class T5>					\
-vector<T> FUN(const vector<T> &x1, const vector<T> &x2, 		\
-	      const vector<T> &x3, T4 x4, T5 x5){			\
-  int n1=x1.size();int n2=x2.size();int n3=x3.size();			\
-  int n=fmax(fmax(n1,n2),n3);						\
-  vector<T> res(n);							\
-  for(int i=0;i<n;i++)res[i]=FUN(x1[i%n1],x2[i%n2],x3[i%n3],x4,x5);	\
+// Function body type declarations
+// V=vector, T=scalar, I=integer, N=none
+#define declareV(arg) const vector<Type> &arg
+#define declareT(arg) Type arg
+#define declareI(arg) int arg
+#define declareN(arg)
+// How to extract elementwise subset of the four types
+#define elementV(arg,i) arg[i]
+#define elementT(arg,i) arg
+#define elementI(arg,i) arg
+#define elementN(arg,i)
+// How to place comma in front of the types
+#define commaV ,
+#define commaT ,
+#define commaI ,
+#define commaN
+// Update output vector size
+#define outputsizeV(n,arg) n = (arg.size()>n ? arg.size() : n)
+#define outputsizeT(n,arg)
+#define outputsizeI(n,arg)
+#define outputsizeN(n,arg)
+/** \brief General vectorize macro up to 6 arguments
+
+    Applied type abbreviations: V=vector, T=scalar, I=integer, N=none.
+    The longest vector input determines the length of the output.
+    Arguments are not re-cycled; unequal vector lengths should result
+    in a crash.
+*/
+#define GVECTORIZE(FUN,Type1,Type2,Type3,Type4,Type5,Type6)		\
+template <class Type>							\
+vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
+		  declare##Type2(arg2) comma##Type3			\
+		  declare##Type3(arg3) comma##Type4			\
+		  declare##Type4(arg4) comma##Type5			\
+		  declare##Type5(arg5) comma##Type6			\
+		  declare##Type6(arg6) )				\
+{									\
+  int n = 1;								\
+  outputsize##Type1(n,arg1);						\
+  outputsize##Type2(n,arg2);						\
+  outputsize##Type3(n,arg3);						\
+  outputsize##Type4(n,arg4);						\
+  outputsize##Type5(n,arg5);						\
+  outputsize##Type6(n,arg6);						\
+  vector<Type> res(n);							\
+  for(int i=0;i<n;i++) res[i] = FUN( element##Type1(arg1,i) comma##Type2 \
+				     element##Type2(arg2,i) comma##Type3 \
+				     element##Type3(arg3,i) comma##Type4 \
+				     element##Type4(arg4,i) comma##Type5 \
+				     element##Type5(arg5,i) comma##Type6 \
+				     element##Type6(arg6,i) );		\
   return res;								\
 }
-#define VECTORIZE31(FUN)						\
-template <class T>							\
-vector<T> FUN(const vector<T> &x1, const vector<T> &x2,			\
-	      const vector<T> &x3, int x4){				\
-  int n1=x1.size();int n2=x2.size();int n3=x3.size();			\
-  int n=int(fmax(fmax(n1,n2),n3));					\
-  vector<T> res(n);							\
-  for(int i=0;i<n;i++)res[i]=FUN(x1[i%n1],x2[i%n2],x3[i%n3],x4);	\
-  return res;								\
-}
-#define VECTORIZE21(FUN)						\
-template <class T>							\
-vector<T> FUN(const vector<T> &x1, const vector<T> &x2, int x4){	\
-  int n1=x1.size();int n2=x2.size();					\
-  int n=int(fmax(n1,n2));						\
-  vector<T> res(n);							\
-  for(int i=0;i<n;i++)res[i]=FUN(x1[i%n1],x2[i%n2],x4);			\
-  return res;								\
-}
 
-#define VECTORIZE2(FUN)					\
-template <class T>					\
-vector<T> FUN(const vector<T> &x1, const T &x2){	\
-  int n=x1.size();					\
-  vector<T> res(n);					\
-  for(int i=0;i<n;i++)res[i]=FUN(x1[i],x2);		\
-  return res;						\
-}
+/** \brief Vectorize 1-argument functions. */
+#define VECTORIZE1_t(FUN)			\
+  GVECTORIZE(FUN,V,N,N,N,N,N)
 
-/**	\brief Vectorization macro 3.Tti
-	
-	For three-arguments functions (Type, Type, int). Vectorize first argument.
-	*/
-#define VECTORIZE3_Tti(FUN)							\
-template <class Type>								\
-vector<Type> FUN(const vector<Type> &arg1, Type arg2, int arg3)			\
-{										\
-	vector<Type> res(arg1.size());						\
-	for(int i=0;i<arg1.size();i++) res[i] = FUN(arg1[i],arg2,arg3);	\
-	return res;								\
-}
+/** \brief Vectorize 2-argument functions.
 
-/**	\brief Vectorization macro 3.tTi
-	
-	For three-arguments functions (Type, Type, int). Vectorize second argument.
-	*/
-#define VECTORIZE3_tTi(FUN)							\
-template <class Type>								\
-vector<Type> FUN(Type arg1, const vector<Type> &arg2, int arg3)			\
-{										\
-	vector<Type> res(arg2.size());						\
-	for(int i=0;i<arg2.size();i++) res[i] = FUN(arg1,arg2[i],arg3);	\
-	return res;								\
-}
+    For two-arguments functions (Type, Type),
+    vectorize both arguments.
+*/
+#define VECTORIZE2_tt(FUN)			\
+  GVECTORIZE(FUN,V,T,N,N,N,N);			\
+  GVECTORIZE(FUN,T,V,N,N,N,N);			\
+  GVECTORIZE(FUN,V,V,N,N,N,N);
 
-/**	\brief Vectorization macro 3.TTi
-	
-	For three-arguments functions (Type, Type, int). Vectorize first and second arguments.
-	*/
-#define VECTORIZE3_TTi(FUN)								\
-template <class Type>									\
-vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, int arg3)		\
-{											\
-	int n1 = arg1.size();								\
-	int n2 = arg2.size();								\
-	int n = fmax(n1,n2);								\
-	vector<Type> res(n);								\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3);			\
-	return res;									\
-}
+/** \brief Vectorize 3-argument functions.
 
-/**	\brief Vectorization macros 3.tti summary
+    For three-arguments functions (Type, Type, int),
+    vectorize first two arguments.
+*/
+#define VECTORIZE3_tti(FUN)			\
+  GVECTORIZE(FUN,V,T,I,N,N,N);			\
+  GVECTORIZE(FUN,T,V,I,N,N,N);			\
+  GVECTORIZE(FUN,V,V,I,N,N,N);
 
-	For three-arguments functions (Type, Type, int). Call all concerned vectorization macros.
-	*/
-#define VECTORIZE3_tti(FUN)	\
-VECTORIZE3_Tti(FUN);		\
-VECTORIZE3_tTi(FUN);		\
-VECTORIZE3_TTi(FUN);
+/** \brief Vectorize 4-argument functions.
 
-/**	\brief Vectorization macro 4.Ttti
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize first argument.
-	*/
-#define VECTORIZE4_Ttti(FUN)							\
-template <class Type>								\
-vector<Type> FUN(const vector<Type> &arg1, Type arg2, Type arg3, int arg4)	\
-{										\
-	  vector<Type> res(arg1.size());					\
-	  for(int i=0;i<arg1.size();i++) res[i]=FUN(arg1[i],arg2,arg3,arg4);	\
-	  return res;								\
-}
+    For Four-arguments functions (Type, Type, Type, int),
+    vectorize first three arguments.
+*/
+#define VECTORIZE4_ttti(FUN)			\
+  GVECTORIZE(FUN,V,T,T,I,N,N);			\
+  GVECTORIZE(FUN,T,V,T,I,N,N);			\
+  GVECTORIZE(FUN,T,T,V,I,N,N);			\
+  GVECTORIZE(FUN,V,V,T,I,N,N);			\
+  GVECTORIZE(FUN,T,V,V,I,N,N);			\
+  GVECTORIZE(FUN,V,T,V,I,N,N);			\
+  GVECTORIZE(FUN,V,V,V,I,N,N);
 
-/**	\brief Vectorization macro 4.tTti
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize second argument.
-	*/
-#define VECTORIZE4_tTti(FUN)							\
-template <class Type>								\
-vector<Type> FUN(Type arg1, const vector<Type> &arg2, Type arg3, int arg4)	\
-{										\
-	vector<Type> res(arg2.size());						\
-	for(int i=0;i<arg2.size();i++) res[i] = FUN(arg1,arg2[i],arg3,arg4);	\
-	return res;								\
-}											
+/** \brief Vectorize 6-argument functions.
 
-/**	\brief Vectorization macro 4.ttTi
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize third argument.
-	*/						\
-#define VECTORIZE4_ttTi(FUN)							\
-template <class Type>								\
-vector<Type> FUN(Type arg1, Type arg2, const vector<Type> &arg3, int arg4)	\
-{										\
-	vector<Type> res(arg3.size());						\
-	for(int i=0;i<arg3.size();i++) res[i] = FUN(arg1,arg2,arg3[i],arg4);	\
-	return res;								\
-}
-
-/**	\brief Vectorization macro 4.tTTi
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize second and third arguments.
-	*/
-#define VECTORIZE4_tTTi(FUN)									\
-template <class Type>										\
-vector<Type> FUN(Type arg1, const vector<Type> &arg2, const vector<Type> &arg3, int arg4)	\
-{												\
-	int n2 = arg2.size();									\
-	int n3 = arg3.size();									\
-	int n = fmax(n2,n3);									\
-	vector<Type> res(n);									\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1,arg2[i],arg3[i],arg4);				\
-	return res;										\
-}
-
-/**	\brief Vectorization macro 4.TtTi
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize first and third arguments.
-	*/
-#define VECTORIZE4_TtTi(FUN)									\
-template <class Type>										\
-vector<Type> FUN(const vector<Type> &arg1, Type arg2, const vector<Type> &arg3, int arg4)	\
-{												\
-	int n1 = arg1.size();									\
-	int n3 = arg3.size();									\
-	int n = fmax(n1,n3);									\
-	vector<Type> res(n);									\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2,arg3[i],arg4);				\
-	return res;										\
-}
-
-/**	\brief Vectorization macro 4.TTti
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize first and second arguments.
-	*/
-#define VECTORIZE4_TTti(FUN)									\
-template <class Type>										\
-vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, Type arg3, int arg4)	\
-{												\
-	int n1 = arg1.size();									\
-	int n2 = arg2.size();									\
-	int n = fmax(n1,n2);									\
-	vector<Type> res(n);									\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3,arg4);				\
-	return res;										\
-}
-
-/**	\brief Vectorization macro 4.TTTi
-	
-	For four-arguments functions (Type, Type, Type, int). Vectorize first, second and third arguments.
-	*/
-#define VECTORIZE4_TTTi(FUN)											\
-template <class Type>												\
-vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, const vector<Type> &arg3, int arg4)	\
-{														\
-	int n1 = arg1.size();											\
-	int n2 = arg2.size();											\
-	int n3 = arg3.size();											\
-	int n = fmax(fmax(n1,n2),n3);										\
-	vector<Type> res(n);for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3[i],arg4);			\
-	return res;												\
-}
-
-/**	\brief Vectorization macros 4.ttti summary
-
-	For four-arguments functions (Type, Type, Type, int). Call all concerned vectorization macros.
-	*/
-#define VECTORIZE4_ttti(FUN)	\
-VECTORIZE4_Ttti(FUN);		\
-VECTORIZE4_tTti(FUN);		\
-VECTORIZE4_ttTi(FUN);		\
-VECTORIZE4_TTti(FUN);		\
-VECTORIZE4_TtTi(FUN);		\
-VECTORIZE4_tTTi(FUN);		\
-VECTORIZE4_TTTi(FUN);
-
-/**	\brief Vectorization macro 6.Ttttti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize first argument.
-	*/
-#define VECTORIZE6_Ttttti(FUN)									\
-template <class Type>										\
-vector<Type> FUN(const vector<Type> &arg1, Type arg2, Type arg3, Type arg4, Type arg5, int arg6)\
-{												\
-	  vector<Type> res(arg1.size());							\
-	  for(int i=0;i<arg1.size();i++) res[i]=FUN(arg1[i],arg2,arg3,arg4,arg5,arg6);		\
-	  return res;										\
-}
-
-/**	\brief Vectorization macro 6.tTttti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize second argument.
-	*/
-#define VECTORIZE6_tTttti(FUN)									\
-template <class Type>										\
-vector<Type> FUN(Type arg1, const vector<Type> &arg2, Type arg3, Type arg4, Type arg5, int arg6)\
-{												\
-	vector<Type> res(arg2.size());								\
-	for(int i=0;i<arg2.size();i++) res[i] = FUN(arg1,arg2[i],arg3,arg4,arg5,arg6);		\
-	return res;										\
-}											
-
-/**	\brief Vectorization macro 6.ttTtti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize third argument.
-	*/						
-#define VECTORIZE6_ttTtti(FUN)									\
-template <class Type>										\
-vector<Type> FUN(Type arg1, Type arg2, const vector<Type> &arg3, Type arg4, Type arg5, int arg6)\
-{												\
-	vector<Type> res(arg3.size());								\
-	for(int i=0;i<arg3.size();i++) res[i] = FUN(arg1,arg2,arg3[i],arg4,arg5,arg6);		\
-	return res;										\
-}
-
-/**	\brief Vectorization macro 6.tTTtti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize second and third arguments.
-	*/
-#define VECTORIZE6_tTTtti(FUN)											\
-template <class Type>												\
-vector<Type> FUN(Type arg1, const vector<Type> &arg2, const vector<Type> &arg3, Type arg4, Type arg5, int arg6)	\
-{														\
-	int n2 = arg2.size();											\
-	int n3 = arg3.size();											\
-	int n = fmax(n2,n3);											\
-	vector<Type> res(n);											\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1,arg2[i],arg3[i],arg4,arg5,arg6);					\
-	return res;												\
-}
-
-/**	\brief Vectorization macro 6.TtTtti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize first and third arguments.
-	*/
-#define VECTORIZE6_TtTtti(FUN)											\
-template <class Type>												\
-vector<Type> FUN(const vector<Type> &arg1, Type arg2, const vector<Type> &arg3, Type arg4, Type arg5, int arg6)	\
-{														\
-	int n1 = arg1.size();											\
-	int n3 = arg3.size();											\
-	int n = fmax(n1,n3);											\
-	vector<Type> res(n);											\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2,arg3[i],arg4,arg5,arg6);					\
-	return res;												\
-}
-
-/**	\brief Vectorization macro 6.TTttti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize first and second arguments.
-	*/
-#define VECTORIZE6_TTttti(FUN)											\
-template <class Type>												\
-vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, Type arg3, Type arg4, Type arg5, int arg6)	\
-{														\
-	int n1 = arg1.size();											\
-	int n2 = arg2.size();											\
-	int n = fmax(n1,n2);											\
-	vector<Type> res(n);											\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3,arg4,arg5,arg6);					\
-	return res;												\
-}
-
-/**	\brief Vectorization macro 6.TTTtti.
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Vectorize first, second and third arguments.
-	*/
-#define VECTORIZE6_TTTtti(FUN)													\
-template <class Type>														\
-vector<Type> FUN(const vector<Type> &arg1, const vector<Type> &arg2, const vector<Type> &arg3, Type arg4, Type arg5, int arg6)	\
-{																\
-	int n1 = arg1.size();													\
-	int n2 = arg2.size();													\
-	int n3 = arg3.size();													\
-	int n = fmax(fmax(n1,n2),n3);												\
-	vector<Type> res(n);													\
-	for(int i=0;i<n;i++) res[i] = FUN(arg1[i],arg2[i],arg3[i],arg4,arg5,arg6);						\
-	return res;														\
-}
-
-/**	\brief Vectorization macros 6.ttttti summary
-
-	For six arguments functions (Type, Type, Type, Type, Type, int). Call all concerned vectorization macros.
-	*/
-#define VECTORIZE6_ttttti(FUN)	\
-VECTORIZE6_Ttttti(FUN);		\
-VECTORIZE6_tTttti(FUN);		\
-VECTORIZE6_ttTtti(FUN);		\
-VECTORIZE6_TTttti(FUN);		\
-VECTORIZE6_TtTtti(FUN);		\
-VECTORIZE6_tTTtti(FUN);		\
-VECTORIZE6_TTTtti(FUN);
+    For Six-arguments functions (Type, Type, Type, Type, Type, int),
+    vectorize first three arguments.
+*/
+#define VECTORIZE6_ttttti(FUN)			\
+  GVECTORIZE(FUN,V,T,T,T,T,I);			\
+  GVECTORIZE(FUN,T,V,T,T,T,I);			\
+  GVECTORIZE(FUN,T,T,V,T,T,I);			\
+  GVECTORIZE(FUN,V,V,T,T,T,I);			\
+  GVECTORIZE(FUN,T,V,V,T,T,I);			\
+  GVECTORIZE(FUN,V,T,V,T,T,I);			\
+  GVECTORIZE(FUN,V,V,V,T,T,I);
 
 using CppAD::abs;
-VECTORIZE1(abs);
-VECTORIZE1(acos);
-VECTORIZE1(asin);
-VECTORIZE1(atan);
-VECTORIZE1(cos);
-VECTORIZE1(erf);
-VECTORIZE1(exp);
-VECTORIZE1(lgamma);
-VECTORIZE1(log);
-VECTORIZE1(log10);
-VECTORIZE1(sin);
-VECTORIZE1(sqrt);   //mangler atan2, pow
-VECTORIZE2(pow);
+VECTORIZE1_t(abs);
+VECTORIZE1_t(acos);
+VECTORIZE1_t(asin);
+VECTORIZE1_t(atan);
+VECTORIZE1_t(cos);
+VECTORIZE1_t(erf);
+VECTORIZE1_t(exp);
+VECTORIZE1_t(lgamma);
+VECTORIZE1_t(log);
+VECTORIZE1_t(log10);
+VECTORIZE1_t(sin);
+VECTORIZE1_t(sqrt);   //mangler atan2, pow
+VECTORIZE2_tt(pow);
 
-VECTORIZE31(dnorm);
-VECTORIZE31(dnbinom);
-VECTORIZE31(dgamma);
-VECTORIZE31(dlgamma);
-VECTORIZE21(dpois);
-
+VECTORIZE4_ttti(dnorm);
+VECTORIZE4_ttti(dnbinom);
+VECTORIZE4_ttti(dgamma);
+VECTORIZE4_ttti(dlgamma);
+VECTORIZE3_tti(dpois);
+VECTORIZE4_ttti(dzipois);
 
 /* max and min of vector */
 double max(const vector<double> &x)

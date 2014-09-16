@@ -5,7 +5,8 @@ source("sdv_multi_data.R")
 
 library(TMB)
 compile("sdv_multi_compact.cpp")
-dyn.load("sdv_multi_compact.so")
+dyn.load(dynlib("sdv_multi_compact"))
+
 obj <- MakeADFun(data=
                  list(n=n,p=p,y=t(y)),
                  parameters=list(

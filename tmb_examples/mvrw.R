@@ -31,7 +31,7 @@ stateDim=3
 timeSteps=100
 simdata()
 library(TMB)
-dyn.load("mvrw.so")
+dyn.load(dynlib("mvrw"))
 data <- list(obs=t(obs))
 parameters <- list(
   u=data$obs*0,
@@ -47,5 +47,4 @@ obj$gr()
 system.time(opt <- do.call("optim",obj))
 pl <- obj$env$parList() ## <-- List of predicted random effects
 matpoints(t(pl$u),type="l",col="blue",lwd=2)
-summary(as.mle(opt))
 sdreport(obj)

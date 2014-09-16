@@ -1,3 +1,15 @@
+##' Internal TMB Functions
+##'
+##' Internal TMB functions
+##'
+##' These are not to be called by the user (or in some cases are just
+##' waiting for proper documentation to be written :).
+##'
+##' @name TMB-internal
+##' @aliases checkSparseHessian config dynlib flagsDefaults getUserDLL grepRandomParameters info isParallelTemplate newtonDefaults newtonOption parallelBenchmark plot.parallelBenchmark print.backtrace print.sdreport runSymbolicAnalysis setDefaults sparseHessianFun summary.sdreport tmbOption updateCholesky
+##' @rdname TMB-internal
+NULL
+
 ## Utilities
 grepRandomParameters <- function(parameters,random){
   r <- sort(unique(unlist(lapply(random,function(regexp)grep(regexp,names(parameters))))))
@@ -76,6 +88,16 @@ updateCholesky <- function(L,H,t=0){
 ##'   \item \code{last.par.best} Full parameter of the best likelihood evaluation.
 ##'   \item \code{tracepar} Trace every likelihood evaluation ?
 ##'   \item \code{tracemgc} Trace mgc of every gradient evaluation ?
+##'   \item \code{silent} Pass 'silent=TRUE' to all try-calls ?
+##' }
+##'
+##' A high level of tracing information will be output by default when evaluating the objective function and gradient.
+##' This is useful while developing a model, but may eventually become annoying.
+##' The following will disable all tracing from an object 'obj' returned by 'MakeADFun':
+##' \itemize{
+##' \item \code{obj$env$tracemgc <- FALSE}
+##' \item \code{obj$env$inner.control$trace <- FALSE}
+##' \item \code{obj$env$silent <- TRUE}
 ##' }
 ##' 
 ##' @title Construct objective functions with derivatives based on a compiled c++ template.
@@ -446,7 +468,7 @@ MakeADFun <- function(data,parameters,map=list(),
                                       ##he=function(x)f0(x,order=2)),
                                       he=H0,env=env),
                                  inner.control)
-                          )
+                          ), silent=silent
                  )
       if(is.character(opt))return(NaN)
     } else{  
@@ -542,35 +564,72 @@ MakeADFun <- function(data,parameters,map=list(),
   }
 
   ## Monte Carlo improvement of Laplace approximation
-  ## - Serious need for re-implementation
-  MC <- function(par=last.par,n=100,order=0,seed=NULL,
-                 output=c("value","points"),...){
-    output <- match.arg(output)
-    require(mvtnorm)
+  ## Importance sampling from *fixed* reference measure determined
+  ## by parameter "par0". Assumptions:
+  ## * We know how to sample from the measure - see rmvnorm.
+  ## * We know how to evaluate the density of the samples - see logdmvnorm.
+  ## * Eventually "par0" will stabilize and become independent of the fixed
+  ##   effects "par", so that derivatives of the sample density and the samples
+  ##   are zero wrt. the fixed effects.
+  MC <- function(par=last.par,       ## Point in which we are evaluating the likelihood
+                 par0=last.par.best, ## Parameter for proposal distribution
+                 n=100,              ## Number of samples
+                 order=0,            ## Derivative order
+                 seed=NULL,          ## Random seed
+                 antithetic=TRUE,    ## Reduce variance
+                 keep=FALSE,         ## Keep samples and fct evals
+                 ...){
     if(is.numeric(seed))set.seed(seed)
-    h <- f(par,order=2)
-    myf <- function(th,order=0){
-      par[random] <- th
+    ## Clean up on exit
+    last.par.old <- last.par
+    last.par.best.old <- last.par.best
+    on.exit({last.par <<- last.par.old;
+             last.par.best <<- last.par.best.old})
+    ## Update Cholesky needed by reference measure
+    h <- spHess(par0,random=TRUE)
+    L <- L.created.by.newton
+    updateCholesky(L,h)             ## P %*% h %*% Pt = L %*% Lt
+    rmvnorm <- function(n){
+        u <- matrix(rnorm(ncol(L)*n),ncol(L),n)
+        u <- solve(L,u,system="Lt") ## Solve Lt^-1 %*% u
+        u <- solve(L,u,system="Pt") ## Multiply Pt %*% u
+        as.matrix(u)
+    }
+    logdmvnorm <- function(u){
+        logdetH <- 2*determinant(L,logarithm=TRUE)$modulus
+        ans <- nrow(h)*log(1/sqrt(2*pi))+.5*logdetH-.5*colSums(u*as.matrix(h%*%u))
+        ans
+    }
+    eval.target <- function(u,order=0){
+      par[random] <- u
       f(par,order=order)
     }
-    mat <- rmvnorm(n,par[random],solve(h[random,random]))
-    d <- dmvnorm(mat,par[random],solve(h[random,random]),log=TRUE)
-    I <- -apply(mat,1,myf)-d
+    samples <- rmvnorm(n)
+    if(antithetic)samples <- cbind(samples,-samples) ## Antithetic variates
+    log.density.propose <- logdmvnorm(samples)
+    samples <- samples+par0[random]
+    log.density.target <- -apply(samples,2,eval.target)
+    I <- log.density.target - log.density.propose
     M <- max(I)
     if(order>=1){
-      I1 <- t(apply(mat,1,myf,order=1))[,-random]
+      I1 <- apply(samples,2,eval.target,order=1)[-random,,drop=FALSE]
       vec <- exp(I-M)
-      gr <- colMeans(vec*I1)/mean(vec)
+      p <- vec/sum(vec)
+      gr <- as.vector(I1 %*% p)
       if(order==1)return(gr)
-      I1I1 <- t(apply(I1,1,function(x)x%*%t(x)))
-      I2 <- t(apply(mat,1,function(x)myf(x,order=2)[-random,-random]))
-      h <- colMeans(vec*(-I1I1+I2))/mean(vec)+as.vector(gr)%*%t(as.vector(gr))
-      if(order==2)return(h)
+      ## I1I1 <- t(apply(I1,1,function(x)x%*%t(x)))
+      ## I2 <- t(apply(samples,1,function(x)eval.target(x,order=2)[-random,-random]))
+      ## h <- colMeans(vec*(-I1I1+I2))/mean(vec)+as.vector(gr)%*%t(as.vector(gr))
+      ## if(order==2)return(h)
     }
-    switch(output,
-           "value"=-log(mean(exp(I-M)))-M,
-           "points"=list(mat=mat,f=I+d,w=exp(I-M),
-             keep=as.logical(rbinom(n,size=1,prob=exp(I-M)))))
+    value <- -log(mean(exp(I-M)))-M
+    ci <- 1.96*sd(exp(I-M))/sqrt(n)
+    attr(value,"confint") <- -log(mean(exp(I-M))+c(lower=ci,upper=-ci))-M
+    if(keep){
+        attr(value,"samples") <- samples
+        attr(value,"nlratio") <- -I
+    }
+    value
   }
 
   report <- function(par=last.par){
@@ -578,7 +637,7 @@ MakeADFun <- function(data,parameters,map=list(),
     as.list(reportenv)
   }
 
-  silent <- TRUE
+  silent <- FALSE
   tracepar <- FALSE
   validpar <- function(x)TRUE
   tracemgc <- TRUE
@@ -744,6 +803,11 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
       stop()
     }
   }
+  ## On windows the DLL must be unloaded before compiling
+  if(.Platform$OS.type=="windows"){
+    tr <- try(dyn.unload(dynlib(libname)),silent=TRUE)
+    if(!is(tr,"try-error"))cat("Note: Library",paste0("'",dynlib(libname),"'"),"was unloaded.\n")
+  }
   ## Includes and preprocessor flags specific for the template
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
                    "-DTMB_SAFEBOUNDS"[safebounds],
@@ -803,6 +867,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##'     DATA_SCALAR(name)         \tab     Type                       \tab    numeric(1)    \cr
 ##'     DATA_INTEGER(name)        \tab     int                        \tab    integer(1)    \cr
 ##'     DATA_FACTOR(name)         \tab     vector<int>                \tab    factor        \cr
+##'     DATA_IVECTOR(name)        \tab     vector<int>                \tab    integer       \cr
 ##'     DATA_SPARSE_MATRIX(name)  \tab     Eigen::SparseMatrix<Type>  \tab    dgTMatrix     \cr
 ##'     DATA_ARRAY(name)          \tab     array<Type>                \tab    array         \cr
 ##'     PARAMETER_MATRIX(name)    \tab     matrix<Type>               \tab    matrix        \cr
@@ -1127,7 +1192,6 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
                      dumpstack=as.integer(0)),PACKAGE=obj$env$DLL)
   i=as.integer(attr(ADHess$ptr,"i"))
   j=as.integer(attr(ADHess$ptr,"j"))
-  require(Matrix)
   n <- length(obj$env$par)
   M <- new("dsTMatrix",i=i,j=j,x=ev(),Dim=as.integer(c(n,n)),uplo="L")
   Hfull <- as(M,"dsCMatrix")
@@ -1146,25 +1210,6 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
       }
     }
   }
-}
-
-## ==== Least squares polynomial fit
-fitpoly <- function(x,y,dy,order=max.order,max.order=sum(is.finite(c(y,dy)))-1){
-  require(polynom)
-  i <- is.finite(y)
-  j <- is.finite(dy)
-  n <- 0:order
-  pow <- function(n,x)ifelse(n>=0,x^n,0)
-  A <- outer(n,x[i],pow)
-  DA <- n*outer(n-1,x[j],pow)
-  B <- if(sum(i)==0)DA else if(sum(j)==0)A else cbind(A,DA)
-  B <- t(B)
-  z <- c(y[i],dy[j])
-  ## B*c=z (overdetermined - use least squares)
-  ## c=solve((Bt)*B)*Bt*z
-  c <- try(solve(t(B)%*%B,t(B)%*%z),TRUE)
-  if(is.character(c))return(Recall(x,y,dy,order-1))
-  polynomial(c)
 }
 
 ## Debugging utility: Check sparse hessian.
