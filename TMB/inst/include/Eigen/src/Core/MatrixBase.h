@@ -215,8 +215,8 @@ template<typename Derived> class MatrixBase
 
     typedef Diagonal<Derived> DiagonalReturnType;
     DiagonalReturnType diagonal();
-    typedef const Diagonal<const Derived> ConstDiagonalReturnType;
-    const ConstDiagonalReturnType diagonal() const;
+	typedef typename internal::add_const<Diagonal<const Derived> >::type ConstDiagonalReturnType;
+    ConstDiagonalReturnType diagonal() const;
 
     template<int Index> struct DiagonalIndexReturnType { typedef Diagonal<Derived,Index> Type; };
     template<int Index> struct ConstDiagonalIndexReturnType { typedef const Diagonal<const Derived,Index> Type; };
@@ -457,7 +457,7 @@ template<typename Derived> class MatrixBase
     const MatrixFunctionReturnValue<Derived> sin() const;
     const MatrixSquareRootReturnValue<Derived> sqrt() const;
     const MatrixLogarithmReturnValue<Derived> log() const;
-    const MatrixPowerReturnValue<Derived> pow(RealScalar p) const;
+    const MatrixPowerReturnValue<Derived> pow(const RealScalar& p) const;
 
 #ifdef EIGEN2_SUPPORT
     template<typename ProductDerived, typename Lhs, typename Rhs>
@@ -509,6 +509,51 @@ template<typename Derived> class MatrixBase
     template<typename OtherDerived> Derived& operator-=(const ArrayBase<OtherDerived>& )
     {EIGEN_STATIC_ASSERT(std::ptrdiff_t(sizeof(typename OtherDerived::Scalar))==-1,YOU_CANNOT_MIX_ARRAYS_AND_MATRICES); return *this;}
 };
+
+
+/***************************************************************************
+* Implementation of matrix base methods
+***************************************************************************/
+
+/** replaces \c *this by \c *this * \a other.
+  *
+  * \returns a reference to \c *this
+  *
+  * Example: \include MatrixBase_applyOnTheRight.cpp
+  * Output: \verbinclude MatrixBase_applyOnTheRight.out
+  */
+template<typename Derived>
+template<typename OtherDerived>
+inline Derived&
+MatrixBase<Derived>::operator*=(const EigenBase<OtherDerived> &other)
+{
+  other.derived().applyThisOnTheRight(derived());
+  return derived();
+}
+
+/** replaces \c *this by \c *this * \a other. It is equivalent to MatrixBase::operator*=().
+  *
+  * Example: \include MatrixBase_applyOnTheRight.cpp
+  * Output: \verbinclude MatrixBase_applyOnTheRight.out
+  */
+template<typename Derived>
+template<typename OtherDerived>
+inline void MatrixBase<Derived>::applyOnTheRight(const EigenBase<OtherDerived> &other)
+{
+  other.derived().applyThisOnTheRight(derived());
+}
+
+/** replaces \c *this by \a other * \c *this.
+  *
+  * Example: \include MatrixBase_applyOnTheLeft.cpp
+  * Output: \verbinclude MatrixBase_applyOnTheLeft.out
+  */
+template<typename Derived>
+template<typename OtherDerived>
+inline void MatrixBase<Derived>::applyOnTheLeft(const EigenBase<OtherDerived> &other)
+{
+  other.derived().applyThisOnTheLeft(derived());
+}
 
 } // end namespace Eigen
 
