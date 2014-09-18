@@ -62,65 +62,6 @@ void markArgs(tape_point &tp)
   void *os; //,*Rec,*i_var,*nfz,*fz,*nrz,*rz;
   os=NULL;
 	
-	CPPAD_ASSERT_KNOWN(
-		! thread_alloc::in_parallel() ,
-		"cannot print trace of AD operations in parallel mode"
-	);
-	static const char *CompareOpName[] = 
-		{ "Lt", "Le", "Eq", "Ge", "Gt", "Ne" };
-	static const char *OpName[] = {
-		"Abs"   ,
-		"Acos"  ,
-		"Addpv" ,
-		"Addvv" ,
-		"Asin"  ,
-		"Atan"  ,
-		"Begin" ,
-		"CExp"  ,
-		"Com"   ,
-		"Cos"   ,
-		"Cosh"  ,
-		"CSum"  ,
-		"Dis"   ,
-		"Divpv" ,
-		"Divvp" ,
-		"Divvv" ,
-		"End"   ,
-		"Exp"   ,
-		"Inv"   ,
-		"Ldp"   ,
-		"Ldv"   ,
-		"Log"   ,
-		"Mulpv" ,
-		"Mulvv" ,
-		"Par"   ,
-		"Powpv" ,
-		"Powvp" ,
-		"Powvv" ,
-		"Pri"   ,
-		"Sign"  ,
-		"Sin"   ,
-		"Sinh"  ,
-		"Sqrt"  ,
-		"Stpp"  ,
-		"Stpv"  ,
-		"Stvp"  ,
-		"Stvv"  ,
-		"Subpv" ,
-		"Subvp" ,
-		"Subvv" ,
-		"Tan"   ,
-		"Tanh"  ,
-		"User"  ,
-		"Usrap" ,
-		"Usrav" ,
-		"Usrrp" ,
-		"Usrrv"
-	};
-	CPPAD_ASSERT_UNKNOWN( 
-		size_t(NumberOp) == sizeof(OpName) / sizeof(OpName[0])
-	);
-
 	// print operator
 	// markOpField(os,  "i=",      i_var, 5);
 	// if( op == CExpOp )

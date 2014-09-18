@@ -6,11 +6,11 @@
 | qnorm(u)                                | qnorm_approx(u)            |
 | dexp(x,rate=p1,log=FALSE)               | dexp(x,p1,false)           |
 | dexp(x,rate=p1,log=TRUE)                | dexp(x,p1,true)            |
-| pexp(x,rate=p1,log=FALSE)               | pexp(x,p1,false)           |
-| qexp(u,rate=p1,log=FALSE)               | qexp(u,p1,false)           |
+| pexp(x,rate=p1,log=FALSE)               | pexp(x,p1)                 |
+| qexp(u,rate=p1,log=FALSE)               | qexp(u,p1)                 |
 | dweibull(x,shape=p1,scale=p2,log=FALSE) | dweibull(x,p1,p2,false)    |
 | dweibull(x,shape=p1,scale=p2,log=TRUE)  | dweibull(x,p1,p2,true)     |
-| qweibull(u,shape=p1,scale=p2,log=FALSE) | qweibull(u,p1,p2,false)    |
+| qweibull(u,shape=p1,scale=p2,log=FALSE) | qweibull(u,p1,p2)          |
 | dbeta(u,shape1=p1,shape2=p2,log=FALSE)  | dbeta(u,p1,p2,false)       |
 | dbeta(u,shape1=p1,shape2=p2,log=TRUE)   | dbeta(u,p1,p2,true)        |
 | dbinom(k,n,prob,log=FALSE)              | dbinom(k,n,prob,false)     |
