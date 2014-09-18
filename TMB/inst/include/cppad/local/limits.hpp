@@ -1,8 +1,8 @@
-/* $Id: limits.hpp 2722 2013-01-06 16:52:46Z bradbell $ */
+/* $Id: limits.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_LIMITS_INCLUDED
 # define CPPAD_LIMITS_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -120,10 +120,8 @@ $end
 # include <cppad/local/cppad_assert.hpp>
 # include <cppad/local/declare_ad.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup limits_hpp limits.hpp
-\{
 \file limits.hpp
 File that defines CppAD numeric_limits for AD types
 */
@@ -173,6 +171,5 @@ public:
 	{	return AD<Base>( numeric_limits<Base>::max() ); }
 };
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

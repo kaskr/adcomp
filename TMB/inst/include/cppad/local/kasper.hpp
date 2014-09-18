@@ -3,13 +3,13 @@ CppAD::vector<size_t> var2op_;    /* Get operator (index) that produced the give
 				     as result */
 CppAD::vector<size_t> op_mark_;   /* Mark operators that must be computed */
 CppAD::vector<CppAD::vector<int> > colpattern;
-CppAD::vector<bool> arg_mark_;    /* rec_op_arg_ contains argument pointers.
-				     Need vector of the same length (rec_op_arg_.size()) 
+CppAD::vector<bool> arg_mark_;    /* op_arg_rec_ contains argument pointers.
+				     Need vector of the same length (op_arg_rec_.size()) 
 				     containing bool. Call this vector "arg_mark_". 
 				     Need to be able to lookup "arg_mark_[arg]" where arg 
 				     is addr_t*.
 				     We have to first convert pointer to index:  
-				       index=addr_t(op_arg-rec_op_arg_.data());
+				       index=addr_t(op_arg-op_arg_rec_.data());
 				     Then do the lookup arg_mark_[index];
 				  */
 CppAD::vector<bool> user_region_; /* Vector of same length as tp_ (tape_points) for which 
@@ -31,11 +31,11 @@ void markOpField(
 		 //const Type     &value, 
 		 const addr_t*   op_arg,
 		 size_t          width ){
-  addr_t index=addr_t(op_arg-play_.rec_op_arg_.data());
+  addr_t index=addr_t(op_arg-play_.op_arg_rec_.data());
   arg_mark_[index]=true;
 }
 bool isDepArg(const addr_t*   op_arg){
-  addr_t index=addr_t(op_arg-play_.rec_op_arg_.data());
+  addr_t index=addr_t(op_arg-play_.op_arg_rec_.data());
   return   arg_mark_[index];
 }
 void mark_tape_point_args(size_t index, size_t mark){
@@ -338,7 +338,7 @@ void my_next_reverse(
 		     //vector<size_t>& op_mark,vector<size_t>& var2op,vector<tape_point>& tp, 
 		     size_t mark)
 {	
-  // Call next_reverse until reach first relevant operator. First call will have op=EndOp.
+  // Call reverse_next until reach first relevant operator. First call will have op=EndOp.
   op_index--;
   while((op_mark_[op_index]!=mark) & (op_index>0))op_index--;
   // Set output values corresponding to the found operator
@@ -405,8 +405,10 @@ void mark_tape_point_args_index(size_t index, size_t mark){
   for(int i=0;i<numarg;i++){
     if(isDepArg(&op_arg[i])){
       if(op_mark_[var2op_[op_arg[i]]]!=mark){ // Not already marked
-	op_mark_[var2op_[op_arg[i]]]=mark;
-	op_mark_index_.push_back(var2op_[op_arg[i]]);
+	if(!constant_tape_point_[var2op_[op_arg[i]]]){ // Not constant
+	  op_mark_[var2op_[op_arg[i]]]=mark;
+	  op_mark_index_.push_back(var2op_[op_arg[i]]);
+	}
       }
     }
   }
@@ -425,7 +427,7 @@ void prepare_reverse_sweep(int col){ /* input: range component */
   op_mark_index_.clear();
   op_mark_index_.push_back(op_index);
   /* depth first search of operator indices */
-  play_.start_reverse(op, op_arg, op_index, var_index);
+  play_.reverse_start(op, op_arg, op_index, var_index);
   for(size_t i=0;i<op_mark_index_.size();i++){ /* Note - op_mark_index_.size() change 
 						  when loop runs ...*/
     if(!constant_tape_point_[op_mark_index_[i]]){
@@ -490,6 +492,17 @@ bool is_tape_point_constant(size_t index){
   const addr_t* op_arg;
   op_arg=tp1.op_arg;
   int numarg=tp2.op_arg - op_arg;
+  // Handle the user operator special case
+  if(tp1.op == UsrrvOp || tp1.op == UsrrpOp){ // Result of user atomic operation
+    bool constant=true;
+    size_t i=index;
+    while(tp_[i].op != UserOp){
+      i--;
+      constant = constant && constant_tape_point_[i];
+      if(tp_[i].op == UsrrvOp || tp_[i].op == UsrrpOp)break;
+    }
+    return constant;
+  }
   if(numarg==0)return false; // E.g. begin or end operators
   bool ans=true;
   for(int i=0;i<numarg;i++){
@@ -500,12 +513,12 @@ bool is_tape_point_constant(size_t index){
 
 pod_vector<Base> Partial;
 void my_init(vector<bool> keepcol){
-  Partial.extend(total_num_var_ * 1);
-  arg_mark_.resize(play_.rec_op_arg_.size());
+  Partial.extend(num_var_tape_ * 1);
+  arg_mark_.resize(play_.op_arg_rec_.size());
   for(size_t i=0;i<arg_mark_.size();i++)arg_mark_[i]=false;
   /* Run a reverse test-sweep to store pointers once */
   tape_point tp;
-  play_.start_reverse(tp.op, tp.op_arg, tp.op_index, tp.var_index);
+  play_.reverse_start(tp.op, tp.op_arg, tp.op_index, tp.var_index);
   tp_.resize(tp.op_index+1);
   var2op_.resize(tp.var_index+1);
   op_mark_.resize(tp.op_index+1);
@@ -517,11 +530,11 @@ void my_init(vector<bool> keepcol){
      the variable. This is easiest done by looping through the _operators_ because for a 
      given op we have access to all the resulting variables it creates.
      2. We precompute the a vector of "tape_points" so that instead of calling 
-     "next_reverse", we simply get the next tape entry by tp_[i-1].
+     "reverse_next", we simply get the next tape entry by tp_[i-1].
   */
   while(tp.op != BeginOp ){ /* tp.op_index is decremented by one in each iteration ... */
     // printTP(tp); /* For debugging */
-    play_.next_reverse(tp.op, tp.op_arg, tp.op_index, tp.var_index);
+    play_.reverse_next(tp.op, tp.op_arg, tp.op_index, tp.var_index);
     /* Csum is special case - see remarks in player.hpp and reverse_sweep.hpp */
     if(tp.op == CSumOp)play_.reverse_csum(tp.op, tp.op_arg, tp.op_index, tp.var_index);
     for(size_t i=0;i<NumRes(tp.op);i++)var2op_[tp.var_index-i]=tp.op_index;

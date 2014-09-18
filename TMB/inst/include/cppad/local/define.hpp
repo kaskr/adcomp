@@ -1,9 +1,9 @@
-/* $Id: define.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: define.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_DEFINE_INCLUDED
 # define CPPAD_DEFINE_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -14,8 +14,6 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
 /*!
-\defgroup define_hpp define.hpp
-\{
 \file define.hpp
 Define processor symbols and macros that are used by CppAD.
 */
@@ -32,30 +30,6 @@ Make sure that the type chosen returns true for is_pod<CPPAD_OP_CODE_TYPE>
 in pod_vector.hpp.
 */
 # define CPPAD_OP_CODE_TYPE unsigned char
-
-/*!
-\def CPPAD_USE_FORWARD0SWEEP
-If ture, use compute zero order sweeps using a specialized routine.
-
-The value of this define should be zero or one. 
-If it is one, a specialized routine is used for zero order forward sweeps.
-Otherwise, use the general forward routine is used for zero order.
-Using the specialized routine is an optimization that makes the source
-more complicated and a significant speed improvement has not been 
-verified (as yet).
-This preprocessor symbol makes it easier to compare these two options.
-*/
-# define CPPAD_USE_FORWARD0SWEEP 1
-
-/*! 
-\def CPPAD_BEGIN_NAMESPACE
-Declares beginning of the CppAD namespace is a way not reconized by doxygen.
-
-\def CPPAD_END_NAMESPACE
-Used for end that matches the beginning of a CppAD namespace section.
-*/
-# define CPPAD_BEGIN_NAMESPACE namespace CppAD {
-# define CPPAD_END_NAMESPACE   }
 
 
 /*!
@@ -91,7 +65,11 @@ If it is not yet defined,
 it is defined when cppad/local/define.hpp is included.
 */
 # ifndef CPPAD_NULL
+# if CPPAD_HAS_NULLPTR
+# define CPPAD_NULL     nullptr  
+# else
 # define CPPAD_NULL     0
+# endif
 # endif
  
 /*!
@@ -339,5 +317,4 @@ inline bool operator Op                                                \
 	(const VecAD_reference<double> &left, const double &right)        \
 {	return left.ADBase() Op AD<double>(right); }
 
-/*! \} */
 # endif

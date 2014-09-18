@@ -1,9 +1,9 @@
-/* $Id: log_op.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: log_op.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
 # ifndef CPPAD_LOG_OP_INCLUDED
 # define CPPAD_LOG_OP_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -13,10 +13,8 @@ A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup log_op_hpp log_op.hpp
-\{
 \file log_op.hpp
 Forward and reverse mode calculations for z = log(x).
 */
@@ -33,10 +31,11 @@ The C++ source code corresponding to this operation is
 */
 template <class Base>
 inline void forward_log_op(
-	size_t j           ,
+	size_t p           ,
+	size_t q           ,
 	size_t i_z         ,
 	size_t i_x         ,
-	size_t nc_taylor   , 
+	size_t cap_order   , 
 	Base*  taylor      )
 {	
 	size_t k;
@@ -45,17 +44,24 @@ inline void forward_log_op(
 	CPPAD_ASSERT_UNKNOWN( NumArg(LogOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(LogOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( i_x < i_z );
-	CPPAD_ASSERT_UNKNOWN( j < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+	CPPAD_ASSERT_UNKNOWN( p <= q );
 
 	// Taylor coefficients corresponding to argument and result
-	Base* x = taylor + i_x * nc_taylor;
-	Base* z = taylor + i_z * nc_taylor;
+	Base* x = taylor + i_x * cap_order;
+	Base* z = taylor + i_z * cap_order;
 
-	if( j == 0 )
-		z[0] = log( x[0] );
-	else if ( j == 1 )
-		z[1] = x[1] / x[0];
-	else
+	if( p == 0 )
+	{	z[0] = log( x[0] );
+		p++;
+		if( q == 0 )
+			return;
+	}
+	if ( p == 1 )
+	{	z[1] = x[1] / x[0];
+		p++;
+	}
+	for(size_t j = p; j <= q; j++)
 	{
 		z[j] = -z[1] * x[j-1];
 		for(k = 2; k < j; k++)
@@ -64,6 +70,47 @@ inline void forward_log_op(
 		z[j] += x[j];
 		z[j] /= x[0];
 	}
+}
+
+/*!
+Muiltiple directions Taylor coefficient for op = LogOp.
+
+The C++ source code corresponding to this operation is
+\verbatim
+	z = log(x)
+\endverbatim
+
+\copydetails forward_unary1_op_dir
+*/
+template <class Base>
+inline void forward_log_op_dir(
+	size_t q           ,
+	size_t r           ,
+	size_t i_z         ,
+	size_t i_x         ,
+	size_t cap_order   , 
+	Base*  taylor      )
+{	
+
+	// check assumptions
+	CPPAD_ASSERT_UNKNOWN( NumArg(LogOp) == 1 );
+	CPPAD_ASSERT_UNKNOWN( NumRes(LogOp) == 1 );
+	CPPAD_ASSERT_UNKNOWN( i_x < i_z );
+	CPPAD_ASSERT_UNKNOWN( 0 < q );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+
+	// Taylor coefficients corresponding to argument and result
+	size_t num_taylor_per_var = (cap_order-1) * r + 1;
+	Base* x = taylor + i_x * num_taylor_per_var;
+	Base* z = taylor + i_z * num_taylor_per_var;
+
+	size_t m = (q-1) * r + 1;
+	for(size_t ell = 0; ell < r; ell++)
+	{	z[m+ell] = Base(q) * x[m+ell];
+		for(size_t k = 1; k < q; k++)
+			z[m+ell] -= Base(k) * z[(k-1)*r+1+ell] * x[(q-k-1)*r+1+ell];
+		z[m+ell] /= (Base(q) * x[0]);
+	}	
 }
 
 /*!
@@ -80,7 +127,7 @@ template <class Base>
 inline void forward_log_op_0(
 	size_t i_z         ,
 	size_t i_x         ,
-	size_t nc_taylor   , 
+	size_t cap_order   , 
 	Base*  taylor      )
 {
 
@@ -88,11 +135,11 @@ inline void forward_log_op_0(
 	CPPAD_ASSERT_UNKNOWN( NumArg(LogOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(LogOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( i_x < i_z );
-	CPPAD_ASSERT_UNKNOWN( 0 < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( 0 < cap_order );
 
 	// Taylor coefficients corresponding to argument and result
-	Base* x = taylor + i_x * nc_taylor;
-	Base* z = taylor + i_z * nc_taylor;
+	Base* x = taylor + i_x * cap_order;
+	Base* z = taylor + i_z * cap_order;
 
 	z[0] = log( x[0] );
 }
@@ -113,7 +160,7 @@ inline void reverse_log_op(
 	size_t      d            ,
 	size_t      i_z          ,
 	size_t      i_x          ,
-	size_t      nc_taylor    , 
+	size_t      cap_order    , 
 	const Base* taylor       ,
 	size_t      nc_partial   ,
 	Base*       partial      )
@@ -123,15 +170,15 @@ inline void reverse_log_op(
 	CPPAD_ASSERT_UNKNOWN( NumArg(LogOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(LogOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( i_x < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( d < cap_order );
 	CPPAD_ASSERT_UNKNOWN( d < nc_partial );
 
 	// Taylor coefficients and partials corresponding to argument
-	const Base* x  = taylor  + i_x * nc_taylor;
+	const Base* x  = taylor  + i_x * cap_order;
 	Base* px       = partial + i_x * nc_partial;
 
 	// Taylor coefficients and partials corresponding to result
-	const Base* z  = taylor  + i_z * nc_taylor;
+	const Base* z  = taylor  + i_z * cap_order;
 	Base* pz       = partial + i_z * nc_partial;
 
 	j = d;
@@ -154,6 +201,5 @@ inline void reverse_log_op(
 	px[0] += pz[0] / x[0];
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

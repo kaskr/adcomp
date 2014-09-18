@@ -1,8 +1,8 @@
-/* $Id: sparse_binary_op.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: sparse_binary_op.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_SPARSE_BINARY_OP_INCLUDED
 # define CPPAD_SPARSE_BINARY_OP_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -12,10 +12,8 @@ A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup sparse_binary_op_hpp sparse_binary_op.hpp
-\{
 \file sparse_binary_op.hpp
 Forward and reverse mode sparsity patterns for binary operators.
 */
@@ -326,6 +324,5 @@ inline void reverse_sparse_hessian_pow_op(
 	return;
 }	
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

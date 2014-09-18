@@ -1,9 +1,9 @@
-/* $Id: ad_io.hpp 2692 2012-12-31 01:27:34Z bradbell $ */
+/* $Id: ad_io.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_AD_IO_INCLUDED
 # define CPPAD_AD_IO_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -163,10 +163,8 @@ It returns true if it succeeds and false otherwise.
 $end
 ------------------------------------------------------------------------------
 */
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup ad_io_hpp ad_io.hpp
-\{
 \file ad_io.hpp
 AD<Base> input and ouput stream operators.
 */
@@ -230,6 +228,5 @@ CPPAD_INLINE_FRIEND_TEMPLATE_FUNCTION
 std::ostream& operator << (std::ostream &os, const VecAD_reference<Base> &x)
 { 	return (os << x.ADBase()); }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

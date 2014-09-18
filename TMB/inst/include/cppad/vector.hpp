@@ -1,9 +1,9 @@
-/* $Id: vector.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: vector.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_VECTOR_INCLUDED
 # define CPPAD_VECTOR_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -16,6 +16,7 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 /*
 $begin CppAD_vector$$
 $spell
+	rvalues
 	thread_alloc
 	cppad.hpp
 	Bool
@@ -95,6 +96,12 @@ $codei%
 	%z% = %y% = %x%
 %$$
 
+$subhead Move Semantics$$
+If the C++ compiler supports move semantic rvalues using the $code &&$$
+syntax, then it will be used during the vector assignment statement.
+This means that return values and other temporaries are not be copied,
+but rather pointers are transferred.
+
 $head Element Access$$
 $index [], CppAD vector$$
 $index vector, [] CppAD$$
@@ -131,7 +138,6 @@ $codei%
 extends the vector $icode x$$ so that its new size is $icode n$$ plus one
 and $icode%x%[%n%]%$$ is equal to $icode s$$
 (equal in the sense of the $icode Scalar$$ assignment operator).
-
 
 $head push_vector$$
 $index push_vector, CppAD$$
@@ -182,19 +188,45 @@ The can be useful when using very large vectors
 and when checking for memory leaks (and there are global vectors)
 see the $cref/memory/CppAD_vector/Memory and Parallel Mode/$$ discussion.
 
+$head data$$
+$index data, CppAD vector$$
+$index vector, CppAD data$$
+If $icode x$$ is a $codei%CppAD::vector<%Scalar%>%$$ object
+$codei%
+	%x%.data()
+%$$
+returns a pointer to a $icode Scalar$$ object such that for
+$codei%0 <= %i% < %x%.size()%$$,
+$icode%x%[%i%]%$$ and $icode%x%.data()[%i%]%$$ 
+are the same $icode Scalar$$ object.
+If $icode x$$ is $code const$$, the pointer is $code const$$.
+If $icode%x%.capacity()%$$ is zero, the value of the pointer is not defined.
+The pointer may no longer be valid after the following operations on 
+$icode x$$:
+its destructor,
+$code clear$$,
+$code resize$$, 
+$code push_back$$,
+$code push_vector$$,
+assignment to another vector when original size of $icode x$$ is zero. 
+
 $head vectorBool$$
 $index vectorBool$$
 The file $code <cppad/vector.hpp>$$ also defines the class
 $code CppAD::vectorBool$$.
 This has the same specifications as $code CppAD::vector<bool>$$ 
-with the following exceptions
+with the following exceptions:
 
-$list number$$
+$subhead Memory$$
 The class $code vectorBool$$ conserves on memory
 (on the other hand, $code CppAD::vector<bool>$$ is expected to be faster
 than $code vectorBool$$).
 
-$lnext
+$subhead data$$
+The $cref/data/CppAD_vector/data/$$ function is not supported by
+$code vectorBool$$.
+
+$subhead Output$$
 The $code CppAD::vectorBool$$ output operator
 prints each boolean value as 
 a $code 0$$ for false,
@@ -203,22 +235,35 @@ and does not print any other output; i.e.,
 the vector is written a long sequence of zeros and ones with no
 surrounding $code {$$, $code }$$ and with no separating commas or spaces. 
 
-$lnext
+$subhead Element Type$$
 If $icode x$$ has type $code vectorBool$$
 and $icode i$$ has type $code size_t$$,
-the element access value $icode%x%[%i%]%$$ has an unspecified type
-(referred to here as $icode elementType$$)
-that can be implicitly converted to $code bool$$.
-The return value of the assignment operator
+the element access value $icode%x%[%i%]%$$ has an unspecified type,
+referred to here as $icode elementType$$, that supports the following
+operations:
+
+$list number$$
+$icode elementType$$ can be converted to $code bool$$; e.g.
+the following syntax is supported:
+$codei%
+	static_cast<bool>( %x%[%i%] )
+%$$
+
+$lnext
+$icode elementType$$ supports the assignment operator $code =$$ where the 
+right hand side is a $code bool$$ or an $icode elementType$$ object; e.g.,
+if $icode y$$ has type $code bool$$, the following syntax is supported:
 $codei%
 	%x%[%i%] = %y%
 %$$
-also has type $icode elementType$$. Thus, if $icode z$$
-has type $code bool$$, the syntax
+
+$lnext
+The result of an assignment to an $icode elementType$$
+also has type $icode elementType$$. 
+Thus, if $icode z$$ has type $code bool$$, the following syntax is supported:
 $codei%
 	%z% = %x%[%i%] = %y%
 %$$
-is valid.
 $lend
 
 $head Memory and Parallel Mode$$
@@ -235,7 +280,7 @@ $lnext
 Using these vectors affects the amount of memory 
 $cref/in_use/ta_inuse/$$ and $cref/available/ta_available/$$.
 $lnext
-Calling $cref/resize/CppAD_vector/resize/$$ with a zero argument,
+Calling $cref/clear/CppAD_vector/clear/$$,
 makes the corresponding memory available (though $code thread_alloc$$)
 to the current thread.
 $lnext
@@ -280,10 +325,8 @@ $end
 # include <cppad/check_simple_vector.hpp>
 # include <cppad/thread_alloc.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup vector_hpp vector.hpp
-\{
 \file vector.hpp
 File used to define CppAD::vector and CppAD::vectorBool
 */
@@ -308,13 +351,13 @@ public:
 
 	/// default constructor sets capacity_ = length_ = data_ = 0
 	inline vector(void) 
-	: capacity_(0), length_(0), data_(0)
+	: capacity_(0), length_(0), data_(CPPAD_NULL)
 	{ }
 	/// sizing constructor
 	inline vector(
 		/// number of elements in this vector
 		size_t n
-	) : capacity_(0), length_(n), data_(0)
+	) : capacity_(0), length_(n), data_(CPPAD_NULL)
 	{	if( length_ > 0 )
 		{	// set capacity and data
 			data_ = thread_alloc::create_array<Type>(length_, capacity_); 
@@ -324,7 +367,7 @@ public:
 	inline vector(
 		/// the *this vector will be a copy of \c x
 		const vector& x
-	) : capacity_(0), length_(x.length_), data_(0)
+	) : capacity_(0), length_(x.length_), data_(CPPAD_NULL)
 	{	if( length_ > 0 )
 		{	// set capacity and data	
 			data_ = thread_alloc::create_array<Type>(length_, capacity_); 
@@ -348,6 +391,14 @@ public:
 	/// number of elements currently in this vector.
 	inline size_t size(void) const
 	{	return length_; }
+
+	/// raw pointer to the data
+	inline Type* data(void)
+	{	return data_; }
+
+	/// const raw pointer to the data
+	inline const Type* data(void) const
+	{	return data_; }
 
 	/// change the number of elements in this vector.
 	inline void resize(
@@ -392,6 +443,30 @@ public:
 			data_[i] = x.data_[i];
 		return *this;
 	}
+# if CPPAD_HAS_RVALUE
+	/// vector assignment operator with move semantics
+	inline vector& operator=(
+		/// right hand size of the assingment operation
+		vector&& x
+	)
+	{	CPPAD_ASSERT_KNOWN(
+			length_ == x.length_ || (length_ == 0),
+			"vector: size miss match in assignment operation"
+		);
+		if( this != &x )
+		{	clear();
+			//
+			length_   = x.length_;
+			capacity_ = x.capacity_;
+			data_     = x.data_;
+			//
+			x.length_   = 0;
+			x.capacity_ = 0;
+			x.data_     = CPPAD_NULL;
+		}
+		return *this;
+	}
+# endif
 	/// non-constant element access; i.e., we can change this element value
 	Type& operator[](
 		/// element index, must be less than length
@@ -567,13 +642,13 @@ public:
 	typedef bool value_type;
 
 	/// default constructor (sets all member data to zero)
-	inline vectorBool(void) : n_unit_(0), length_(0), data_(0)
+	inline vectorBool(void) : n_unit_(0), length_(0), data_(CPPAD_NULL)
 	{ }
 	/// sizing constructor
 	inline vectorBool(
 		/// number of bits in this vector
 		size_t n
-	) : n_unit_(0), length_(n), data_(0)
+	) : n_unit_(0), length_(n), data_(CPPAD_NULL)
 	{	if( length_ > 0 )
 		{	// set n_unit and data
 			size_t min_unit = unit_min();
@@ -584,7 +659,7 @@ public:
 	inline vectorBool(
 		/// the *this vector will be a copy of \c v
 		const vectorBool& v
-	) : n_unit_(0), length_(v.length_), data_(0)
+	) : n_unit_(0), length_(v.length_), data_(CPPAD_NULL)
 	{	if( length_ > 0 )
 		{	// set n_unit and data
 			size_t min_unit = unit_min();
@@ -654,6 +729,28 @@ public:
 			data_[i] = v.data_[i];
 		return *this;
 	}
+# if CPPAD_HAS_RVALUE
+	/// vector assignment operator with move semantics
+	inline vectorBool& operator=(
+		/// right hand size of the assingment operation
+		vectorBool&& x
+	)
+	{	if( this != &x )
+		{	clear();
+			//
+			length_   = x.length_;
+			n_unit_   = x.n_unit_;
+			data_     = x.data_;
+			//
+			x.length_   = 0;
+			x.n_unit_   = 0;
+			x.data_     = CPPAD_NULL;
+		}
+		return *this;
+	}
+# endif
+
+
 	/// non-constant element access; i.e., we can change this element value
 	vectorBoolElement operator[](
 		/// element index, must be less than length
@@ -774,6 +871,5 @@ inline std::ostream& operator << (
 	return os;
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

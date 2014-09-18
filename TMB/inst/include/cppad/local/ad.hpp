@@ -1,9 +1,9 @@
-/* $Id: ad.hpp 2692 2012-12-31 01:27:34Z bradbell $ */
+/* $Id: ad.hpp 3070 2013-12-31 15:09:11Z bradbell $ */
 # ifndef CPPAD_AD_INCLUDED
 # define CPPAD_AD_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -23,7 +23,7 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 # include <cppad/local/player.hpp>
 # include <cppad/local/ad_tape.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 
 typedef enum {
 	tape_manage_new, 
@@ -100,8 +100,8 @@ class AD {
 	// classes
 	friend class ADTape<Base>;
 	friend class ADFun<Base>;
+	friend class atomic_base<Base>;
 	friend class discrete<Base>;
-	friend class user_atomic<Base>;
 	friend class VecAD<Base>;
 	friend class VecAD_reference<Base>;
 
@@ -146,23 +146,30 @@ public:
 	// type of value
 	typedef Base value_type;
 
-	// default constructor
+	// implicit default constructor
 	inline AD(void);
 
-	// use default copy constructor and assignment operator
+	// use default implicit copy constructor and assignment operator
 	// inline AD(const AD &x);
 	// inline AD& operator=(const AD &x);
 
-	// construction and assingment from base type
+	// implicit construction and assingment from base type
 	inline AD(const Base &b);
 	inline AD& operator=(const Base &b); 
 
-	// contructor and assignment from VecAD<Base>::reference
+	// implicit contructor and assignment from VecAD<Base>::reference
 	inline AD(const VecAD_reference<Base> &x);
 	inline AD& operator=(const VecAD_reference<Base> &x);
 
-	// construction and assignment from some other type
+# if CPPAD_IMPLICIT_CTOR_FROM_ANY_TYPE
+	// implicit construction from some other type (depricated)
 	template <class T> inline AD(const T &t);
+# else
+	// explicit construction from some other type (depricated)
+	template <class T> inline explicit AD(const T &t);
+# endif
+
+	// assignment from some other type
 	template <class T> inline AD& operator=(const T &right);
 
 	// base type corresponding to an AD object
@@ -263,7 +270,7 @@ private:
 }; 
 // ---------------------------------------------------------------------------
 
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 // tape linking private functions
 # include <cppad/local/tape_link.hpp>

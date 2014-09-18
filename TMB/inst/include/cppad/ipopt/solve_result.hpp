@@ -1,8 +1,8 @@
-/* $Id: solve_result.hpp 2657 2012-12-28 03:12:30Z bradbell $ */
+/* $Id: solve_result.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_SOLVE_RESULT_INCLUDED
 # define CPPAD_SOLVE_RESULT_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -12,11 +12,9 @@ A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 namespace ipopt {
-/*
-\defgroup solve_result solve_result.hpp
-\{
+/*!
 \file solve_result.hpp
 Class that contains information about solve problem result
 */
@@ -69,8 +67,7 @@ public:
 	{	status = not_defined; }
 };
 
-/*! \} */
 } // end namespace ipopt
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 # endif

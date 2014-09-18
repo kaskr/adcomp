@@ -1,9 +1,9 @@
-/* $Id: omp_alloc.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: omp_alloc.hpp 2910 2013-10-07 13:27:58Z bradbell $ */
 # ifndef CPPAD_OMP_ALLOC_INCLUDED
 # define CPPAD_OMP_ALLOC_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -17,7 +17,7 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 # include <omp.h>
 # endif
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 class omp_alloc{
 // ============================================================================
 public:
@@ -49,7 +49,7 @@ By default there is only one thread and all execution is in sequential mode
 
 $head number$$
 The argument and return value $icode number$$ has prototype
-$icode%
+$codei%
 	size_t %number%
 %$$ 
 and must be greater than zero.
@@ -671,7 +671,7 @@ This function has been removed because speed tests seem to indicate
 it is just as fast, or faster, to free and then reallocate the memory.
 
 $head Syntax$$
-$codei%flag% = omp_alloc::efficient(%v_ptr%, %num_bytes%)%$$
+$icode%flag% = omp_alloc::efficient(%v_ptr%, %num_bytes%)%$$
 
 $head Purpose$$
 Check if memory that is currently in use is an efficient 
@@ -745,7 +745,7 @@ By default there is only one thread and all execution is in sequential mode
 
 $head number$$
 The argument $icode number$$ has prototype
-$icode%
+$codei%
 	size_t %number%
 %$$ 
 It must be greater than zero and specifies the maximum number of 
@@ -758,6 +758,6 @@ $cref/parallel/omp_in_parallel/$$ execution mode.
 $end
 -------------------------------------------------------------------------------
 */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 # endif
