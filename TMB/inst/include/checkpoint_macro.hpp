@@ -2,8 +2,8 @@
 namespace NAME##checkpoint_namespace{					\
   using CppAD::checkpoint;						\
   bool initialized=false;						\
-  size_t m=0;								\
-  size_t n=0;								\
+  int m=0;								\
+  int n=0;								\
   checkpoint<double> *NAME##_check1;					\
   checkpoint<AD<double> > *NAME##_check2;				\
   checkpoint<AD<AD<double> > > *NAME##_check3;				\

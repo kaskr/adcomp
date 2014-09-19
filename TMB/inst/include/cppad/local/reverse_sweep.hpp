@@ -755,7 +755,9 @@ void myReverseSweep(
     std::vector<size_t>::reverse_iterator it;
 
 	OpCode           op;
+# ifndef NDEBUG
 	size_t         i_op;
+# endif
 	size_t        i_var;
 
 	const addr_t*   arg = 0;
@@ -813,7 +815,9 @@ void myReverseSweep(
 	  // 		       dep_var_taddr);
 	  op        = pf->tp_[*it].op;
 	  arg    = pf->tp_[*it].op_arg;
+# ifndef NDEBUG
 	  i_op  = pf->tp_[*it].op_index;
+# endif
 	  i_var = pf->tp_[*it].var_index;
 
 

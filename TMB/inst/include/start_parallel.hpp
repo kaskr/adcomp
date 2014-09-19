@@ -115,7 +115,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     int k=0; /* Incremented for each unique value */
     size_t m; /* Hold current minimum value */
     size_t inf=-1; /* size_t is unsigned - so -1 should give the largest possible size_t... */
-    int rowk,colk;
+    int rowk=-1,colk=-1; /* -Wall */
     while(true){
       for(int i=0;i<n;i++){if(pos(i)<vecind(i).size())value(i)=vecind(i)[pos(i)];else value(i)=inf;}
       m=value(0);
