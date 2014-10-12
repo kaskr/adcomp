@@ -923,6 +923,7 @@ ADFun< double >* MakeADGradObject(SEXP data, SEXP parameters, SEXP report, int p
   vector< AD<AD<double> > > y(1);
   y[0]=F();
   ADFun<AD<double> > tmp(F.theta,y);
+  tmp.optimize(); /* Remove 'dead' operations (could result in nan derivatives) */
   vector<AD<double> > x(n);
   for(int i=0;i<n;i++)x[i]=CppAD::Value(F.theta[i]);
   vector<AD<double> > yy(n);
