@@ -56,7 +56,6 @@ namespace Rmath {
 }
 
 #include "atomic_macro.hpp"
-#include "checkpoint_macro.hpp"
 
 /* Utilities for conversion between CppAD::vector and Eigen::Matrix */
 template<class Type>
@@ -310,3 +309,6 @@ Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
 }
 
 } /* End namespace atomic */
+
+/* User defined atomic functions */
+#include "checkpoint_macro.hpp"
