@@ -180,7 +180,7 @@ namespace atomic{
      Orders from 0 to 3 are compiled and the appropriate order is dispatched
      at run-time.
   */
-  matrix<double> expm(vector<matrix<double> > args){
+  matrix<double> expm(vector<matrix<double> > args)CSKIP({
     int nargs = args.size();
     matrix<double> ans;
     if      (nargs==1) ans=expm(nestedTriangle<0>(args)).bottomLeftCorner();
@@ -189,7 +189,7 @@ namespace atomic{
     else if (nargs==4) ans=expm(nestedTriangle<3>(args)).bottomLeftCorner();
     else error("expm: order not implemented.");
     return ans;
-  }
+  })
 
   /* Helper to convert list of matrices to CppAD::vector 
      of the format: 'c(length(args), unlist(args))'
