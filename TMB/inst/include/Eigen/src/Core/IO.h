@@ -55,7 +55,7 @@ struct IOFormat
     const std::string& _rowSeparator = "\n", const std::string& _rowPrefix="", const std::string& _rowSuffix="",
     const std::string& _matPrefix="", const std::string& _matSuffix="")
   : matPrefix(_matPrefix), matSuffix(_matSuffix), rowPrefix(_rowPrefix), rowSuffix(_rowSuffix), rowSeparator(_rowSeparator),
-    coeffSeparator(_coeffSeparator), precision(_precision), flags(_flags)
+    rowSpacer(""), coeffSeparator(_coeffSeparator), precision(_precision), flags(_flags)
   {
     int i = int(matSuffix.length())-1;
     while (i>=0 && matSuffix[i]!='\n')
@@ -185,21 +185,22 @@ std::ostream & print_matrix(std::ostream & s, const Derived& _m, const IOFormat&
     explicit_precision = fmt.precision;
   }
 
+  std::streamsize old_precision = 0;
+  if(explicit_precision) old_precision = s.precision(explicit_precision);
+
   bool align_cols = !(fmt.flags & DontAlignCols);
   if(align_cols)
   {
     // compute the largest width
-    for(Index j = 1; j < m.cols(); ++j)
+    for(Index j = 0; j < m.cols(); ++j)
       for(Index i = 0; i < m.rows(); ++i)
       {
         std::stringstream sstr;
-        if(explicit_precision) sstr.precision(explicit_precision);
+        sstr.copyfmt(s);
         sstr << m.coeff(i,j);
         width = std::max<Index>(width, Index(sstr.str().length()));
       }
   }
-  std::streamsize old_precision = 0;
-  if(explicit_precision) old_precision = s.precision(explicit_precision);
   s << fmt.matPrefix;
   for(Index i = 0; i < m.rows(); ++i)
   {

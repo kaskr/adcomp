@@ -23,6 +23,7 @@ Macros to read data and declare parameters:
     DATA_SCALAR(name)         \tab     Type                       \tab    numeric(1)    \cr
     DATA_INTEGER(name)        \tab     int                        \tab    integer(1)    \cr
     DATA_FACTOR(name)         \tab     vector<int>                \tab    factor        \cr
+    DATA_IVECTOR(name)        \tab     vector<int>                \tab    integer       \cr
     DATA_SPARSE_MATRIX(name)  \tab     Eigen::SparseMatrix<Type>  \tab    dgTMatrix     \cr
     DATA_ARRAY(name)          \tab     array<Type>                \tab    array         \cr
     PARAMETER_MATRIX(name)    \tab     matrix<Type>               \tab    matrix        \cr

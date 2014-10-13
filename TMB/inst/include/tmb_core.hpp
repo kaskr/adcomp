@@ -735,9 +735,13 @@ extern "C"
     int returnReport = INTEGER(getListElement(control,"report"))[0];
 
     /* Get the default parameter vector (tiny overhead) */
-    SEXP par,res,info;
+    SEXP par,res=NULL,info;
     objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
     int n=F.count_parallel_regions(); // Evaluates user template
+#else
+    F.count_parallel_regions(); // Evaluates user template
+#endif
     if(returnReport && F.reportvector.size()==0){
       /* Told to report, but no ADREPORT in template: Get out quickly */
       return R_NilValue;
@@ -919,6 +923,7 @@ ADFun< double >* MakeADGradObject(SEXP data, SEXP parameters, SEXP report, int p
   vector< AD<AD<double> > > y(1);
   y[0]=F();
   ADFun<AD<double> > tmp(F.theta,y);
+  tmp.optimize(); /* Remove 'dead' operations (could result in nan derivatives) */
   vector<AD<double> > x(n);
   for(int i=0;i<n;i++)x[i]=CppAD::Value(F.theta[i]);
   vector<AD<double> > yy(n);
@@ -940,9 +945,13 @@ extern "C"
     if(!isEnvironment(report))error("'report' must be an environment");
 
     /* Get the default parameter vector (tiny overhead) */
-    SEXP par,res;
+    SEXP par,res=NULL;
     objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
     int n=F.count_parallel_regions(); // Evaluates user template
+#else
+    F.count_parallel_regions(); // Evaluates user template
+#endif
     PROTECT(par=F.defaultpar());
 
     if(_openmp){ // Parallel mode

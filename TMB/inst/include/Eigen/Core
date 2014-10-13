@@ -19,6 +19,12 @@
 // defined e.g. EIGEN_DONT_ALIGN) so it needs to be done before we do anything with vectorization.
 #include "src/Core/util/Macros.h"
 
+// Disable the ipa-cp-clone optimization flag with MinGW 6.x or newer (enabled by default with -O3)
+// See http://eigen.tuxfamily.org/bz/show_bug.cgi?id=556 for details.
+#if defined(__MINGW32__) && EIGEN_GNUC_AT_LEAST(4,6)
+  #pragma GCC optimize ("-fno-ipa-cp-clone")
+#endif
+
 #include <complex>
 
 // this include file manages BLAS and MKL related macros
@@ -44,7 +50,7 @@
   #endif
 #else
   // Remember that usage of defined() in a #define is undefined by the standard
-  #if (defined __SSE2__) && ( (!defined __GNUC__) || EIGEN_GNUC_AT_LEAST(4,2) )
+  #if (defined __SSE2__) && ( (!defined __GNUC__) || (defined __INTEL_COMPILER) || EIGEN_GNUC_AT_LEAST(4,2) )
     #define EIGEN_SSE2_ON_NON_MSVC_BUT_NOT_OLD_GCC
   #endif
 #endif
@@ -89,7 +95,7 @@
     extern "C" {
       // In theory we should only include immintrin.h and not the other *mmintrin.h header files directly.
       // Doing so triggers some issues with ICC. However old gcc versions seems to not have this file, thus:
-      #ifdef __INTEL_COMPILER
+      #if defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 1110
         #include <immintrin.h>
       #else
         #include <emmintrin.h>
@@ -159,7 +165,7 @@
 #endif
 
 // required for __cpuid, needs to be included after cmath
-#if defined(_MSC_VER) && (defined(_M_IX86)||defined(_M_X64))
+#if defined(_MSC_VER) && (defined(_M_IX86)||defined(_M_X64)) && (!defined(_WIN32_WCE))
   #include <intrin.h>
 #endif
 
@@ -245,8 +251,8 @@ using std::ptrdiff_t;
 #include "src/Core/util/Constants.h"
 #include "src/Core/util/ForwardDeclarations.h"
 #include "src/Core/util/Meta.h"
-#include "src/Core/util/XprHelper.h"
 #include "src/Core/util/StaticAssert.h"
+#include "src/Core/util/XprHelper.h"
 #include "src/Core/util/Memory.h"
 
 #include "src/Core/NumTraits.h"
@@ -343,13 +349,6 @@ using std::ptrdiff_t;
 #include "src/Core/Reverse.h"
 #include "src/Core/ArrayBase.h"
 #include "src/Core/ArrayWrapper.h"
-
-#ifdef EIGEN_ENABLE_EVALUATORS
-#include "src/Core/Product.h"
-#include "src/Core/CoreEvaluators.h"
-#include "src/Core/AssignEvaluator.h"
-#include "src/Core/ProductEvaluators.h"
-#endif
 
 #ifdef EIGEN_USE_BLAS
 #include "src/Core/products/GeneralMatrixMatrix_MKL.h"

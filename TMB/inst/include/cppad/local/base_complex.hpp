@@ -1,8 +1,8 @@
-/* $Id: base_complex.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: base_complex.hpp 2765 2013-03-03 15:48:35Z bradbell $ */
 # ifndef CPPAD_BASE_COMPLEX_INCLUDED
 # define CPPAD_BASE_COMPLEX_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the
@@ -194,9 +194,7 @@ this function in the CppAD namespace.
 $codep */
 namespace CppAD {
 	inline bool isnan(const std::complex<double>& z)
-	{	CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL;	
-		static const double nan = std::numeric_limits<double>::quiet_NaN();
-		return (z != z) | (z.real() == nan) | (z.imag() == nan);
+	{	return (z != z);
 	}
 }
 /* $$
@@ -354,9 +352,7 @@ namespace CppAD {
 	{	return static_cast<int>( x.real() ); }
 	// isnan -------------------------------------------------------------
 	inline bool isnan(const std::complex<float>& z)
-	{	CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL;	
-		static const float nan = std::numeric_limits<float>::quiet_NaN();
-		return (z != z) | (z.real() == nan) | (z.imag() == nan);
+	{	return (z != z);
 	}
 	// Valid standard math functions --------------------------------
 	CPPAD_STANDARD_MATH_UNARY(std::complex<float>, cos)

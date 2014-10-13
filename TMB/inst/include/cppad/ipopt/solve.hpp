@@ -1,8 +1,8 @@
-/* $Id: solve.hpp 2738 2013-01-11 18:31:38Z bradbell $ */
+/* $Id: solve.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_SOLVE_INCLUDED
 # define CPPAD_SOLVE_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -169,7 +169,7 @@ and $icode value$$ is its setting.
 $subhead Integer$$
 You can set any Ipopt integer option using a line with the following syntax:
 $codei%
-	Numeric %name% %value%
+	Integer %name% %value%
 %$$
 Here $icode name$$ is any valid Ipopt integer option 
 and $icode value$$ is its setting.
@@ -404,11 +404,9 @@ $end
 */
 # include <cppad/ipopt/solve_callback.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 namespace ipopt {
 /*!
-\defgroup solve_hpp solve.hpp
-\{
 \file solve.hpp
 \brief Implement the ipopt::solve Nonlinear Programming Solver 
 */
@@ -640,7 +638,6 @@ void solve(
 	return;
 }
 
-/*! \} */
 } // end ipopt namespace
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

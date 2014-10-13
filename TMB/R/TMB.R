@@ -830,10 +830,16 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 
 ##' Precompile the TMB library
 ##'
-##' The precompilation should only be run once, typically right after installaion of TMB.
+##' The precompilation should only be run once, typically right after installation of TMB.
 ##' Note that the precompilation requires write access to the TMB package folder.
 ##' Two versions of the library - with/without the openmp flag - will be generated. After this,
 ##' compilation times of templates should be reduced.
+##' \itemize{
+##' \item To precompile on Linux run \code{precompile()}.
+##' \item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@@")}.
+##' }
+##' Note that precompilation has side effects: It is not possible to work with more than one
+##' model at a time for a single R instance.
 ##' @title Precompile the TMB library in order to speed up compilation of templates.
 ##' @param ... Passed to \code{compile}.
 precompile <- function(...){

@@ -1,6 +1,5 @@
 // Demonstrate user specified atomic functions.
 #include <TMB.hpp>
-#include <atomic_macro.hpp>
 
 template<class Type>
 vector<Type> dowork(vector<Type> x){

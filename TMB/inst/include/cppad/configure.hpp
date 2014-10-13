@@ -1,9 +1,9 @@
-/* $Id: configure.hpp.in 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: configure.hpp.in 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_CONFIGURE_INCLUDED
 # define CPPAD_CONFIGURE_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -34,17 +34,34 @@ $end
 */
 
 /*!
-\defgroup configure_hpp configure.hpp
-\{
  \file configure.hpp
 Replacement for config.h so that all preprocessor symbols begin with CPPAD_ 
 */
 
 /*!
+\def CPPAD_HAS_RVALUE
+Does this compiler cupport c++11 rvalues; i.e., values with move semantics
+*/
+# define CPPAD_HAS_RVALUE 0
+
+/*!
 \def CPPAD_PACKAGE_STRING
 cppad-yyyymmdd as a C string where yyyy is year, mm is month, and dd is day.
 */
-# define CPPAD_PACKAGE_STRING "cppad-20130213"
+# define CPPAD_PACKAGE_STRING "cppad-20140612"
+
+/*!
+def CPPAD_HAS_COLPACK
+Was a colpack_prefix specified on the cmake command line.
+*/
+# define CPPAD_HAS_COLPACK 0
+
+/*!
+def CPPAD_HAS_NULLPTR
+Does this compiler support the a c++11 null-pointer constant nullptr
+(true = 1, false = 0).
+*/
+# define CPPAD_HAS_NULLPTR 0
  
  /*!
 def CPPAD_INTERNAL_SPARSE_SET
@@ -52,6 +69,14 @@ is the internal representation used for sparse vectors of std::set<size_t>
 either sparse_set or sparse_list).
 */
 # define CPPAD_INTERNAL_SPARSE_SET sparse_list
+
+/*!
+\def CPPAD_IMPLICIT_CTOR_FROM_ANY_TYPE
+If this symbol is one, an implicit constor of AD<Base> is defined 
+where the argument has any type.
+Otherwise this constructor is explicit.
+*/
+# define CPPAD_IMPLICIT_CTOR_FROM_ANY_TYPE 1
 
 /*!
 \def CPPAD_BOOSTVECTOR
@@ -90,12 +115,12 @@ we are not using Eigen vector for CPPAD_TESTVECTOR.
 # define CPPAD_EIGENVECTOR 1
 
 /*!
-\def CPPAD_GETTIMEOFDAY
+\def CPPAD_HAS_GETTIMEOFDAY
 If this symbol is one, and _MSC_VER is not defined,
 this system supports the gettimeofday funcgtion.
 Otherwise, this smybol should be zero.
 */
-# define CPPAD_GETTIMEOFDAY 1
+# define CPPAD_HAS_GETTIMEOFDAY 1
 
 /*!
 \def CPPAD_SIZE_T_SAME_UNSIGNED_INT 
@@ -144,5 +169,4 @@ header files.  If it is not yet defined,
 # define CPPAD_MAX_NUM_THREADS 48
 # endif
 
-/*! \} */
 # endif

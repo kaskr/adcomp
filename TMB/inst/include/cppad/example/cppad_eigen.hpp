@@ -1,8 +1,8 @@
-/* $Id: cppad_eigen.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: cppad_eigen.hpp 3065 2013-12-29 14:03:45Z bradbell $ */
 # ifndef CPPAD_CPPAD_EIGEN_INCLUDED
 # define CPPAD_CPPAD_EIGEN_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -14,6 +14,12 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 /*
 $begin cppad_eigen.hpp$$
 $spell
+	impl
+	typename
+	Real Real
+	inline
+	neg
+	eps
 	plugin
 	atan
 	Num
@@ -50,22 +56,22 @@ $href%http://eigen.tuxfamily.org%eigen%$$
 linear algebra package with the type $icode%AD<%Base%>%$$.
 
 $head Example$$
-THe files $cref eigen_array.cpp$$ and $cref eigen_det.cpp$$ 
+The files $cref eigen_array.cpp$$ and $cref eigen_det.cpp$$ 
 contain an example and test of this include file.
 It returns true if it succeeds and false otherwise.
 
-$head eigen_plugin.hpp$$
-Here is the source code for $cref eigen_plugin.hpp$$:
-
 $head Include Files$$
-This file $code cppad_eigen.hpp$$ requires the CppAD types to be defined.
-The file $code eigen_plugin$$ defines $code value_type$$
+The file $code cppad_eigen.hpp$$ includes both
+$code <cppad/cppad.hpp>$$ and $code <Eigen/Core>$$. 
+In addition,
+The file $cref eigen_plugin.hpp$$ 
+is used to define $code value_type$$
 in the Eigen matrix class definition so its vectors are 
 $cref/simple vectors/SimpleVector/$$.
 $codep */
-# include <cppad/local/limits.hpp>
 # define EIGEN_MATRIXBASE_PLUGIN <cppad/example/eigen_plugin.hpp>
 # include <Eigen/Core>
+# include <cppad/cppad.hpp>
 /* $$
 $head Eigen NumTraits$$
 Eigen needs the following definitions to work properly
@@ -102,7 +108,7 @@ namespace Eigen {
 
 		// relaxed version of machine epsilon for comparison of different
 		// operations that should result in the same value
-		static CppAD::AD<Base> dummy_epsilon(void)
+		static CppAD::AD<Base> dummy_precision(void)
 		{	return 100. * 
 				CppAD::numeric_limits< CppAD::AD<Base> >::epsilon(); 
 		}
@@ -129,11 +135,32 @@ namespace CppAD {
 		template <class Base> const AD<Base>& real(const AD<Base>& x)
 		{	return x; }
 
-		// functions that return values
+		// functions that return values (note abs is defined by cppad.hpp)
 		template <class Base> AD<Base> imag(const AD<Base>& x)
 		{	return CppAD::AD<Base>(0.); }
 		template <class Base> AD<Base> abs2(const AD<Base>& x)
 		{	return x * x; }
+}
+
+namespace Eigen { 
+	namespace internal {
+
+		template<class Base> 
+		struct significant_decimals_default_impl< CppAD::AD<Base>, false>
+		{	typedef CppAD::AD<Base> Scalar;
+
+  			typedef typename NumTraits<Scalar>::Real RealScalar;
+  			static inline int run()
+  			{	Scalar neg_log_eps = - log(
+					NumTraits<RealScalar>::epsilon()
+				);
+				int ceil_neg_log_eps = Integer( neg_log_eps );
+				if( Scalar(ceil_neg_log_eps) < neg_log_eps )
+					ceil_neg_log_eps++;
+				return ceil_neg_log_eps;
+  			}
+		};
+	}
 }
 /* $$
 $end

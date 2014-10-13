@@ -200,7 +200,7 @@ class Matrix
       *
       * \sa resize(Index,Index)
       */
-    EIGEN_STRONG_INLINE explicit Matrix() : Base()
+    EIGEN_STRONG_INLINE Matrix() : Base()
     {
       Base::_check_template_params();
       EIGEN_INITIALIZE_COEFFS_IF_THAT_OPTION_IS_ENABLED
@@ -304,7 +304,7 @@ class Matrix
       : Base(other.derived().rows() * other.derived().cols(), other.derived().rows(), other.derived().cols())
     {
       Base::_check_template_params();
-      Base::resize(other.rows(), other.cols());
+      Base::_resize_to_match(other);
       // FIXME/CHECK: isn't *this = other.derived() more efficient. it allows to
       //              go for pure _set() implementations, right?
       *this = other;
