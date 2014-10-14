@@ -21,12 +21,12 @@ namespace atomic{
       I.setIdentity();
       return Block( this->A + I );
     }
-    /* Absolute rowSums */
-    vector<Type> rowSumAbs(){
+    /* Infinity norm */
+    Type norm(){
       matrix<Type> Aabs(this->A.rows(),this->A.cols());
       Aabs = A.array().abs();
       vector<Type> rsAabs = Aabs.rowwise().sum();
-      return rsAabs;
+      return rsAabs.maxCoeff();
     }  
     /* Matrix inverse */
     Block<Type> inverse(){
@@ -69,9 +69,11 @@ namespace atomic{
     Triangle<BlockType> addIdentity(){
       return Triangle(this->A.addIdentity(), this->B);
     }
-    /* Absolute rowSums */
-    vector<Type> rowSumAbs(){
-      return this->A.rowSumAbs() + this->B.rowSumAbs();      
+    /* Infinity norm (Strictly, the norm is larger. But we
+       wan't the number of pade iterations for the derivative
+       to be the same as for the function value) */
+    Type norm(){
+      return this->A.norm();
     }
     /* Matrix inverse. Cost = 1 inverse + 2 multiplies */
     Triangle<BlockType> inverse(){
@@ -148,7 +150,7 @@ namespace atomic{
   */
   template<class matrix_pade>
   matrix_pade expm(matrix_pade A){
-    double log2NormInf = log( A.rowSumAbs().maxCoeff() );
+    double log2NormInf = log( A.norm() );
     log2NormInf /= log(double(2.0));
     double e = std::floor(log2NormInf) + 1.0;
     double s = e + 1.0;
