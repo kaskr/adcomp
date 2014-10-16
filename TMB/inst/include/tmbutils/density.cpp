@@ -190,11 +190,14 @@ class N01{
   TYPEDEFS(scalartype_);
 public:
   /** \brief Evaluate the negative log density */
-  scalartype operator()(array<scalartype> x){
-    return (x*x*.5 + log(sqrt(2.0*M_PI)) ).sum() ;
-  }
   scalartype operator()(scalartype x){
     return x*x*.5 + log(sqrt(2.0*M_PI));
+  }
+  scalartype operator()(vectortype x){
+    return (x*x*scalartype(.5) + scalartype(log(sqrt(2.0*M_PI))) ).sum() ;
+  }
+  scalartype operator()(arraytype x){
+    return (x*x*scalartype(.5) + scalartype(log(sqrt(2.0*M_PI))) ).sum() ;
   }
   arraytype jacobian(arraytype x){return x;}
   int ndim(){return 1;}
