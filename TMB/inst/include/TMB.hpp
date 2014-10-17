@@ -39,6 +39,8 @@ using CppAD::AD;
 using CppAD::ADFun;
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"
+#include "atomic_math.hpp"
+#include "expm.hpp"
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
 #include "Vectorize.hpp"

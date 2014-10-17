@@ -1,9 +1,9 @@
-/* $Id: print_op.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: print_op.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
 # ifndef CPPAD_PRINT_OP_INCLUDED
 # define CPPAD_PRINT_OP_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-11 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -14,7 +14,7 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
 Print operation for parameters; i.e., op = PriOp.
 
@@ -52,7 +52,7 @@ If this is zero, \a var is a parameter. Otherwise it is a variable.
 \a arg[1]
 \n
 If \a pos is a parameter, <code>parameter[arg[1]]</code> is its value.
-Othwise <code>taylor[ arg[1] * nc_taylor + 0 ]</code> is the zero
+Othwise <code>taylor[ arg[1] * cap_order + 0 ]</code> is the zero
 order Taylor coefficient for \a pos.
 \n
 \n
@@ -65,7 +65,7 @@ if \a pos is not a positive value.
 \a arg[3]
 \n
 If \a var is a parameter, <code>parameter[arg[3]]</code> is its value.
-Othwise <code>taylor[ arg[3] * nc_taylor + 0 ]</code> is the zero
+Othwise <code>taylor[ arg[3] * cap_order + 0 ]</code> is the zero
 order Taylor coefficient for \a var.
 \n
 \n
@@ -89,7 +89,7 @@ is the total number of values in the \a parameter vector
 \param parameter
 Contains the value of parameters.
 
-\param nc_taylor
+\param cap_order
 number of colums in the matrix containing all the Taylor coefficients.
 
 \param taylor
@@ -112,7 +112,7 @@ inline void forward_pri_0(
 	const char*   text        ,
 	size_t        num_par     ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	const Base*   taylor      )
 {	Base pos, var;
 	const char* before;
@@ -122,7 +122,7 @@ inline void forward_pri_0(
 	// pos
 	if( arg[0] & 1 )
 	{	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) <= i_z );
-		pos = taylor[ arg[1] * nc_taylor + 0 ];
+		pos = taylor[ arg[1] * cap_order + 0 ];
 	}
 	else
 	{	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < num_par );
@@ -136,7 +136,7 @@ inline void forward_pri_0(
 	// var
 	if( arg[0] & 2 )
 	{	CPPAD_ASSERT_UNKNOWN( size_t(arg[3]) <= i_z );
-		var = taylor[ arg[3] * nc_taylor + 0 ];
+		var = taylor[ arg[3] * cap_order + 0 ];
 	}
 	else
 	{	CPPAD_ASSERT_UNKNOWN( size_t(arg[3]) < num_par );
@@ -151,5 +151,5 @@ inline void forward_pri_0(
 		s_out << before << var << after;
 }
 
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

@@ -1,8 +1,8 @@
-/* $Id: solve_callback.hpp 2676 2012-12-30 01:34:25Z bradbell $ */
-# ifndef CPPAD_SOLVE_FULL_INCLUDED
-# define CPPAD_SOLVE_FULL_INCLUDED
+/* $Id: solve_callback.hpp 3275 2014-05-20 17:35:11Z bradbell $ */
+# ifndef CPPAD_SOLVE_CALLBACK_INCLUDED
+# define CPPAD_SOLVE_CALLBACK_INCLUDED
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -17,11 +17,9 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 # include <coin/IpTNLP.hpp>
 # include <cppad/ipopt/solve_result.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 namespace ipopt {
-/*
-\defgroup solve_callback solve_callback.hpp
-\{
+/*!
 \file solve_callback.hpp
 \brief Class that connects ipopt::solve to Ipopt
 */
@@ -1110,8 +1108,7 @@ public:
 	}
 };
 
-/*! \} */
 } // end namespace ipopt
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 # endif

@@ -175,7 +175,7 @@ class MappedSuperNodalMatrix
 };
 
 /**
-  * \brief InnerIterator class to iterate over nonzero values of the current column in the supernode
+  * \brief InnerIterator class to iterate over nonzero values of the current column in the supernodal matrix L
   * 
   */
 template<typename Scalar, typename Index>
@@ -185,18 +185,18 @@ class MappedSuperNodalMatrix<Scalar,Index>::InnerIterator
      InnerIterator(const MappedSuperNodalMatrix& mat, Index outer)
       : m_matrix(mat),
         m_outer(outer), 
+        m_supno(mat.colToSup()[outer]),
         m_idval(mat.colIndexPtr()[outer]),
-        m_startval(m_idval),
-        m_endval(mat.colIndexPtr()[outer+1]),
+        m_startidval(m_idval),
+        m_endidval(mat.colIndexPtr()[outer+1]),
         m_idrow(mat.rowIndexPtr()[outer]),
-        m_startidrow(m_idrow),
         m_endidrow(mat.rowIndexPtr()[outer+1])
     {}
     inline InnerIterator& operator++()
     { 
       m_idval++; 
       m_idrow++;
-      return *this; 
+      return *this;
     }
     inline Scalar value() const { return m_matrix.valuePtr()[m_idval]; }
     
@@ -206,22 +206,23 @@ class MappedSuperNodalMatrix<Scalar,Index>::InnerIterator
     inline Index row() const { return index(); }
     inline Index col() const { return m_outer; }
     
-    inline Index supIndex() const { return m_matrix.colToSup()[m_outer]; }
+    inline Index supIndex() const { return m_supno; }
     
     inline operator bool() const 
     { 
-      return ( (m_idrow < m_endidrow) && (m_idrow > m_startidrow) ); 
+      return ( (m_idval < m_endidval) && (m_idval >= m_startidval)
+                && (m_idrow < m_endidrow) );
     }
     
   protected:
     const MappedSuperNodalMatrix& m_matrix; // Supernodal lower triangular matrix 
-    const Index m_outer; // Current column 
-    Index m_idval; //Index to browse the values in the current column
-    const Index m_startval; // Start of the column value 
-    const Index m_endval; // End of the column value 
-    Index m_idrow;  //Index to browse the row indices 
-    const Index m_startidrow; // Start of the row indices of the current column value
-    const Index m_endidrow; // End of the row indices of the current column value
+    const Index m_outer;                    // Current column 
+    const Index m_supno;                    // Current SuperNode number
+    Index m_idval;                          // Index to browse the values in the current column
+    const Index m_startidval;               // Start of the column value
+    const Index m_endidval;                 // End of the column value
+    Index m_idrow;                          // Index to browse the row indices 
+    Index m_endidrow;                       // End index of row indices of the current column
 };
 
 /**
@@ -234,32 +235,32 @@ void MappedSuperNodalMatrix<Scalar,Index>::solveInPlace( MatrixBase<Dest>&X) con
 {
     Index n = X.rows(); 
     Index nrhs = X.cols(); 
-    const Scalar * Lval = valuePtr(); // Nonzero values 
-    Matrix<Scalar,Dynamic,Dynamic> work(n, nrhs); // working vector
+    const Scalar * Lval = valuePtr();                 // Nonzero values 
+    Matrix<Scalar,Dynamic,Dynamic> work(n, nrhs);     // working vector
     work.setZero();
     for (Index k = 0; k <= nsuper(); k ++)
     {
-      Index fsupc = supToCol()[k]; // First column of the current supernode 
-      Index istart = rowIndexPtr()[fsupc];  // Pointer index to the subscript of the current column
+      Index fsupc = supToCol()[k];                    // First column of the current supernode 
+      Index istart = rowIndexPtr()[fsupc];            // Pointer index to the subscript of the current column
       Index nsupr = rowIndexPtr()[fsupc+1] - istart;  // Number of rows in the current supernode
-      Index nsupc = supToCol()[k+1] - fsupc;  // Number of columns in the current supernode
-      Index nrow = nsupr - nsupc; // Number of rows in the non-diagonal part of the supernode
-      Index irow; //Current index row
+      Index nsupc = supToCol()[k+1] - fsupc;          // Number of columns in the current supernode
+      Index nrow = nsupr - nsupc;                     // Number of rows in the non-diagonal part of the supernode
+      Index irow;                                     //Current index row
       
       if (nsupc == 1 )
       {
         for (Index j = 0; j < nrhs; j++)
         {
-          InnerIterator it(*this, fsupc); 
+          InnerIterator it(*this, fsupc);
           ++it; // Skip the diagonal element
           for (; it; ++it)
           {
             irow = it.row();
-            X(irow, j) -= X(fsupc, j) * it.value(); 
+            X(irow, j) -= X(fsupc, j) * it.value();
           }
         }
       }
-      else 
+      else
       {
         // The supernode has more than one column 
         Index luptr = colIndexPtr()[fsupc]; 
@@ -293,4 +294,5 @@ void MappedSuperNodalMatrix<Scalar,Index>::solveInPlace( MatrixBase<Dest>&X) con
 } // end namespace internal
 
 } // end namespace Eigen
+
 #endif // EIGEN_SPARSELU_MATRIX_H

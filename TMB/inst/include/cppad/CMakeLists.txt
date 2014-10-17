@@ -1,6 +1,6 @@
-#CppAD $Id: CMakeLists.txt 2577 2012-11-17 18:22:22Z bradbell $
+# $Id: CMakeLists.txt 3309 2014-05-28 00:08:58Z bradbell $
 # -----------------------------------------------------------------------------
-# CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+# CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 #
 # CppAD is distributed under multiple licenses. This distribution is under
 # the terms of the 
@@ -11,9 +11,6 @@
 # -----------------------------------------------------------------------------
 # Build the cppad/configure.hpp file.
 # Inherit environment from ../CMakeLists.txt
-#
-# Note that this file breaks the convention that all local definitions
-# are in lower case (cmake definitions are in upper case).
 # -----------------------------------------------------------------------------
 MACRO(check_match match_variable match_constant output_variable) 
 	STRING(COMPARE EQUAL ${${match_variable}} ${match_constant} match_flag )
@@ -27,19 +24,18 @@ ENDMACRO(check_match)
 # -----------------------------------------------------------------------------
 # command line arguments
 #
-# cppad_sparse_list
-command_line_arg(cppad_sparse_list YES BOOL 
-	"use sparse list for internal sparse set representation"
-)
-#
 # cppad_testvector 
 command_line_arg(cppad_testvector cppad STRING
 "Namespace of vector used for testing, one of: boost, cppad, eigen, std"
 )
 #
-# cppad_tape_addr_type
-command_line_arg(cppad_tape_addr_type "unsigned int" STRING
-"type used to identify variables on one tape, size must be <= sizeof(size_t)"
+# cppad_max_num_threads
+command_line_arg(cppad_max_num_threads 48 STRING
+	"maximum number of threads that CppAD can use use"
+)
+# cppad_sparse_list
+command_line_arg(cppad_sparse_list YES BOOL 
+	"use sparse list for internal sparse set representation"
 )
 #
 # cppad_tape_id_type
@@ -47,58 +43,111 @@ command_line_arg(cppad_tape_id_type "unsigned int" STRING
 	"type used to identify different tapes, size must be <= sizeof(size_t)"
 )
 #
-# cppad_max_num_threads
-command_line_arg(cppad_max_num_threads 48 STRING
-	"maximum number of threads that CppAD can use use"
+# cppad_tape_addr_type
+command_line_arg(cppad_tape_addr_type "unsigned int" STRING
+"type used to identify variables on one tape, size must be <= sizeof(size_t)"
+)
+#
+# cppad_implicit_ctor_from_any_type_from_any_type
+command_line_arg(cppad_implicit_ctor_from_any_type_from_any_type NO BOOL 
+	"implicit (instead of explicit) conversion from any type to AD<Base>"
 )
 # -----------------------------------------------------------------------------
-# CPPAD_INTERNAL_SPARSE_SET
+# cppad_explicit_ctor
+IF( cppad_implicit_ctor_from_any_type_from_any_type )
+	SET(cppad_implicit_ctor_from_any_type 1)
+ELSE( cppad_implicit_ctor_from_any_type_from_any_type )
+	SET(cppad_implicit_ctor_from_any_type 0)
+ENDIF( cppad_implicit_ctor_from_any_type_from_any_type )
+# -----------------------------------------------------------------------------
+# cppad_internal_sparse_set
 #
 IF( cppad_sparse_list )
-	SET(CPPAD_INTERNAL_SPARSE_SET  sparse_list )
+	SET(cppad_internal_sparse_set  sparse_list )
 ELSE( cppad_sparse_list )
-	SET(CPPAD_INTERNAL_SPARSE_SET  sparse_set )
+	SET(cppad_internal_sparse_set  sparse_set )
 ENDIF( cppad_sparse_list )
-MESSAGE(STATUS "CPPAD_INTERNAL_SPARSE_SET = ${CPPAD_INTERNAL_SPARSE_SET}" )
+MESSAGE(STATUS "cppad_internal_sparse_set = ${cppad_internal_sparse_set}" )
 #
 # -----------------------------------------------------------------------------
-# CPPAD_BOOSTVECTOR, CPPAD_CPPADVECTOR, CPPAD_EIGENVECTOR, CPPAD_STDVECTOR
+# cppad_boostvector, cppad_cppadvector, cppad_eigenvector, cppad_stdvector
 #
-check_match(cppad_testvector boost CPPAD_BOOSTVECTOR)
-check_match(cppad_testvector cppad CPPAD_CPPADVECTOR)
-check_match(cppad_testvector eigen CPPAD_EIGENVECTOR)
-check_match(cppad_testvector std   CPPAD_STDVECTOR)
-IF( NOT CPPAD_BOOSTVECTOR )
-IF( NOT CPPAD_CPPADVECTOR )
-IF( NOT CPPAD_EIGNEVECTOR )
-IF( NOT CPPAD_STDVECTOR )
+check_match(cppad_testvector boost cppad_boostvector)
+check_match(cppad_testvector cppad cppad_cppadvector)
+check_match(cppad_testvector eigen cppad_eigenvector)
+check_match(cppad_testvector std   cppad_stdvector)
+IF( NOT cppad_boostvector )
+IF( NOT cppad_cppadvector )
+IF( NOT cppad_eigenvector )
+IF( NOT cppad_stdvector )
 MESSAGE(FATAL_ERROR 
 "cppad_testvector not one of following: boost, cppad, eigen, std." 
 )
-ENDIF( NOT CPPAD_STDVECTOR )
-ENDIF( NOT CPPAD_EIGNEVECTOR )
-ENDIF( NOT CPPAD_CPPADVECTOR )
-ENDIF( NOT CPPAD_BOOSTVECTOR )
+ENDIF( NOT cppad_stdvector )
+ENDIF( NOT cppad_eigenvector )
+ENDIF( NOT cppad_cppadvector )
+ENDIF( NOT cppad_boostvector )
 
-IF( CPPAD_BOOSTVECTOR )
+IF( cppad_boostvector )
 	# FIND_PACKAGE(Boost) done by ../CMakeLists.txt
 	IF( NOT Boost_FOUND )
 		MESSAGE(FATAL_ERROR 
 "cppad_testvector == boost but cannot find boost include files"
 		)
 	ENDIF( NOT Boost_FOUND )
-ENDIF( CPPAD_BOOSTVECTOR )
+ENDIF( cppad_boostvector )
 #
-IF( CPPAD_EIGENVECTOR )
+IF( cppad_eigenvector )
 	IF( NOT eigen_prefix )
 		MESSAGE(FATAL_ERROR 
 "cppad_testvector == eigen but eigen_prefix is not specified"
 		)
 	ENDIF( NOT eigen_prefix )
-ENDIF( CPPAD_EIGENVECTOR )
+ENDIF( cppad_eigenvector )
 
 # -----------------------------------------------------------------------------
-# CPPAD_GETTIMEOFDAY
+# cppad_has_rvalue
+#
+# CHECK_CXX_SOURCE_RUNS(source variable)
+SET(CMAKE_REQUIRED_INCLUDES  "")
+SET(CMAKE_REQUIRED_LIBRARIES "")
+SET(CMAKE_REQUIRED_FLAGS     ${cppad_cxx_flags})
+SET(source "
+int main(void)
+{	int&& value = 1 + 2;
+	if( value != 3 )
+		return 1;
+	return 0;
+}" )
+CHECK_CXX_SOURCE_RUNS("${source}" rvalue_ok)
+IF( rvalue_ok )
+	SET(cppad_has_rvalue 1)
+ELSE( rvalue_ok )
+	SET(cppad_has_rvalue 0)
+ENDIF( rvalue_ok )
+MESSAGE(STATUS "cppad_has_rvalue = ${cppad_has_rvalue}" )
+# -----------------------------------------------------------------------------
+# cppad_has_nullptr
+#
+# CHECK_CXX_SOURCE_RUNS(source variable)
+SET(CMAKE_REQUIRED_INCLUDES  "")
+SET(CMAKE_REQUIRED_LIBRARIES "")
+SET(CMAKE_REQUIRED_FLAGS     ${cppad_cxx_flags})
+SET(source "
+int main(void)
+{	char *c = nullptr;
+	return 0;
+}" )
+CHECK_CXX_SOURCE_RUNS("${source}" nullptr_ok)
+IF( nullptr_ok )
+	SET(cppad_has_nullptr 1)
+ELSE( nullptr_ok )
+	SET(cppad_has_nullptr 0)
+ENDIF( nullptr_ok )
+MESSAGE(STATUS "cppad_has_nullptr = ${cppad_has_nullptr}" )
+
+# -----------------------------------------------------------------------------
+# cppad_has_gettimeofday
 #
 # CHECK_CXX_SOURCE_RUNS(source variable)
 SET(CMAKE_REQUIRED_INCLUDES  "")
@@ -113,13 +162,13 @@ int main(void)
 }" )
 CHECK_CXX_SOURCE_RUNS("${source}" gettimeofday_ok)
 IF( gettimeofday_ok )
-	SET(CPPAD_GETTIMEOFDAY 1)
+	SET(cppad_has_gettimeofday 1)
 ELSE( gettimeofday_ok )
-	SET(CPPAD_GETTIMEOFDAY 0)
+	SET(cppad_has_gettimeofday 0)
 ENDIF( gettimeofday_ok )
-MESSAGE(STATUS "CPPAD_GETTIMEOFDAY = ${CPPAD_GETTIMEOFDAY}" )
+MESSAGE(STATUS "cppad_has_gettimeofday = ${cppad_has_gettimeofday}" )
 # -----------------------------------------------------------------------------
-# CPPAD_SIZE_T_SAME_UNSIGNED_INT
+# cppad_size_t_same_unsigned_int
 #
 # CHECK_CXX_SOURCE_RUNS(source variable)
 SET(CMAKE_REQUIRED_INCLUDES  "")
@@ -135,25 +184,17 @@ int main(void)
 " )
 CHECK_CXX_SOURCE_RUNS("${source}" size_t_not_unsigned_int)
 IF( size_t_not_unsigned_int )
-	SET(CPPAD_SIZE_T_SAME_UNSIGNED_INT 0)
+	SET(cppad_size_t_same_unsigned_int 0)
 ELSE( size_t_not_unsigned_int )
-	SET(CPPAD_SIZE_T_SAME_UNSIGNED_INT 1)
+	SET(cppad_size_t_same_unsigned_int 1)
 ENDIF( size_t_not_unsigned_int )
 MESSAGE(STATUS 
-	"CPPAD_SIZE_T_SAME_UNSIGNED_INT = ${CPPAD_SIZE_T_SAME_UNSIGNED_INT}" 
+	"cppad_size_t_same_unsigned_int = ${cppad_size_t_same_unsigned_int}" 
 )
 # -----------------------------------------------------------------------------
-# CPPAD_TAPE_ADDR_TYPE, CPPAD_TAPE_ID_TYPE
+# cppad_tape_addr_type, cppad_tape_id_type
 #
 FOREACH( cmake_var cppad_tape_id_type cppad_tape_addr_type )
-	# ----------------------------------------------------------------------
-	STRING(COMPARE EQUAL ${cmake_var} cppad_tape_id_type is_id)
-	IF( is_id )
-		SET(cppad_var   CPPAD_TAPE_ID_TYPE) 
-	ELSE( is_id )
-		SET(cppad_var   CPPAD_TAPE_ADDR_TYPE) 
-	ENDIF( is_id )
-	# ----------------------------------------------------------------------
 	SET(source "
 # include <limits>
 int main(void)
@@ -167,12 +208,9 @@ int main(void)
 "Warning: using a signed ${cmake_var} (for CppAD developers not users)" 
 	)
 	ENDIF( ${cmake_var}_is_signed  )
-	# ----------------------------------------------------------------------
-	SET(${cppad_var} "${${cmake_var}}")
-	MESSAGE(STATUS "${cppad_var} = ${${cmake_var}}" )
 ENDFOREACH( cmake_var )
 # -----------------------------------------------------------------------------
-# CPPAD_MAX_NUM_THREADS
+# cppad_max_num_threads
 #
 SET(source "
 int main(void)
@@ -195,8 +233,7 @@ IF( NOT cppad_max_num_threads_is_integer_ge_4 )
 	"cppad_max_num_threads is not an integer greater than or equal 4"
 	)
 ENDIF( NOT cppad_max_num_threads_is_integer_ge_4 )
-SET(CPPAD_MAX_NUM_THREADS_DEFAULT "${cppad_max_num_threads}")
-MESSAGE(STATUS "cppad_max_num_threads = ${cppad_max_num_threads}")
+
 # -----------------------------------------------------------------------------
 # Copy a file to another location and modify its contents.
 # configure_file(InputFile OutputFile [COPYONLY] [ESCAPE_QUOTES] [@ONLY])

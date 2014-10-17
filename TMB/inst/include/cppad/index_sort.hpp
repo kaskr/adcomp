@@ -1,9 +1,9 @@
-/* $Id: index_sort.hpp 2683 2012-12-30 18:17:03Z bradbell $ */
+/* $Id: index_sort.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_INDEX_SORT_INCLUDED
 # define CPPAD_INDEX_SORT_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -61,7 +61,7 @@ $codei%
 %$$
 and for $icode%i% = 0 , %...% , %size%-2%$$,
 $codei%
-	( %keys%[ %ind%[%i%+1] ] < %keys%[ %ind[%i%] ] ) == false
+	( %keys%[ %ind%[%i%+1] ] < %keys%[ %ind%[%i%] ] ) == false
 %$$
 
 
@@ -80,10 +80,8 @@ $end
 # include <cppad/check_simple_vector.hpp>
 # include <cppad/local/define.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup index_sort_hpp index_sort.hpp
-\{
 \file index_sort.hpp
 File used to implement the CppAD index sort utility
 */
@@ -175,7 +173,6 @@ void index_sort(const VectorKey& keys, VectorSize& ind)
 	return;
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 # endif

@@ -51,7 +51,6 @@ void cholmod_configure_matrix(CholmodType& mat)
 template<typename _Scalar, int _Options, typename _Index>
 cholmod_sparse viewAsCholmod(SparseMatrix<_Scalar,_Options,_Index>& mat)
 {
-  typedef SparseMatrix<_Scalar,_Options,_Index> MatrixType;
   cholmod_sparse res;
   res.nzmax   = mat.nonZeros();
   res.nrow    = mat.rows();;
@@ -59,10 +58,12 @@ cholmod_sparse viewAsCholmod(SparseMatrix<_Scalar,_Options,_Index>& mat)
   res.p       = mat.outerIndexPtr();
   res.i       = mat.innerIndexPtr();
   res.x       = mat.valuePtr();
+  res.z       = 0;
   res.sorted  = 1;
   if(mat.isCompressed())
   {
     res.packed  = 1;
+    res.nz = 0;
   }
   else
   {
@@ -127,7 +128,7 @@ cholmod_dense viewAsCholmod(MatrixBase<Derived>& mat)
   res.ncol   = mat.cols();
   res.nzmax  = res.nrow * res.ncol;
   res.d      = Derived::IsVectorAtCompileTime ? mat.derived().size() : mat.derived().outerStride();
-  res.x      = mat.derived().data();
+  res.x      = (void*)(mat.derived().data());
   res.z      = 0;
 
   internal::cholmod_configure_matrix<Scalar>(res);
@@ -171,6 +172,7 @@ class CholmodBase : internal::noncopyable
     CholmodBase()
       : m_cholmodFactor(0), m_info(Success), m_isInitialized(false)
     {
+      m_shiftOffset[0] = m_shiftOffset[1] = RealScalar(0.0);
       cholmod_start(&m_cholmod);
     }
 
@@ -242,7 +244,7 @@ class CholmodBase : internal::noncopyable
       return internal::sparse_solve_retval<CholmodBase, Rhs>(*this, b.derived());
     }
     
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a symbolic decomposition on the sparsity pattern of \a matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       * 
@@ -266,7 +268,7 @@ class CholmodBase : internal::noncopyable
     
     /** Performs a numeric decomposition of \a matrix
       *
-      * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
+      * The given matrix must have the same sparsity pattern as the matrix on which the symbolic decomposition has been performed.
       *
       * \sa analyzePattern()
       */
@@ -296,13 +298,14 @@ class CholmodBase : internal::noncopyable
       eigen_assert(size==b.rows());
 
       // note: cd stands for Cholmod Dense
-      cholmod_dense b_cd = viewAsCholmod(b.const_cast_derived());
+      Rhs& b_ref(b.const_cast_derived());
+      cholmod_dense b_cd = viewAsCholmod(b_ref);
       cholmod_dense* x_cd = cholmod_solve(CHOLMOD_A, m_cholmodFactor, &b_cd, &m_cholmod);
       if(!x_cd)
       {
         this->m_info = NumericalIssue;
       }
-      // TODO optimize this copy by swapping when possible (be carreful with alignment, etc.)
+      // TODO optimize this copy by swapping when possible (be careful with alignment, etc.)
       dest = Matrix<Scalar,Dest::RowsAtCompileTime,Dest::ColsAtCompileTime>::Map(reinterpret_cast<Scalar*>(x_cd->x),b.rows(),b.cols());
       cholmod_free_dense(&x_cd, &m_cholmod);
     }
@@ -313,6 +316,7 @@ class CholmodBase : internal::noncopyable
     {
       eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for solving, you must first call either compute() or symbolic()/numeric()");
       const Index size = m_cholmodFactor->n;
+      EIGEN_UNUSED_VARIABLE(size);
       eigen_assert(size==b.rows());
 
       // note: cs stands for Cholmod Sparse
@@ -322,7 +326,7 @@ class CholmodBase : internal::noncopyable
       {
         this->m_info = NumericalIssue;
       }
-      // TODO optimize this copy by swapping when possible (be carreful with alignment, etc.)
+      // TODO optimize this copy by swapping when possible (be careful with alignment, etc.)
       dest = viewAsEigen<DestScalar,DestOptions,DestIndex>(*x_cs);
       cholmod_free_sparse(&x_cs, &m_cholmod);
     }
@@ -345,7 +349,7 @@ class CholmodBase : internal::noncopyable
     }
     
     template<typename Stream>
-    void dumpMemory(Stream& s)
+    void dumpMemory(Stream& /*s*/)
     {}
     
   protected:
@@ -364,8 +368,8 @@ class CholmodBase : internal::noncopyable
   *
   * This class allows to solve for A.X = B sparse linear problems via a simplicial LL^T Cholesky factorization
   * using the Cholmod library.
-  * This simplicial variant is equivalent to Eigen's built-in SimplicialLLT class. Thefore, it has little practical interest.
-  * The sparse matrix A must be selfajoint and positive definite. The vectors or matrices
+  * This simplicial variant is equivalent to Eigen's built-in SimplicialLLT class. Therefore, it has little practical interest.
+  * The sparse matrix A must be selfadjoint and positive definite. The vectors or matrices
   * X and B can be either dense or sparse.
   *
   * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
@@ -411,8 +415,8 @@ class CholmodSimplicialLLT : public CholmodBase<_MatrixType, _UpLo, CholmodSimpl
   *
   * This class allows to solve for A.X = B sparse linear problems via a simplicial LDL^T Cholesky factorization
   * using the Cholmod library.
-  * This simplicial variant is equivalent to Eigen's built-in SimplicialLDLT class. Thefore, it has little practical interest.
-  * The sparse matrix A must be selfajoint and positive definite. The vectors or matrices
+  * This simplicial variant is equivalent to Eigen's built-in SimplicialLDLT class. Therefore, it has little practical interest.
+  * The sparse matrix A must be selfadjoint and positive definite. The vectors or matrices
   * X and B can be either dense or sparse.
   *
   * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
@@ -457,7 +461,7 @@ class CholmodSimplicialLDLT : public CholmodBase<_MatrixType, _UpLo, CholmodSimp
   * This class allows to solve for A.X = B sparse linear problems via a supernodal LL^T Cholesky factorization
   * using the Cholmod library.
   * This supernodal variant performs best on dense enough problems, e.g., 3D FEM, or very high order 2D FEM.
-  * The sparse matrix A must be selfajoint and positive definite. The vectors or matrices
+  * The sparse matrix A must be selfadjoint and positive definite. The vectors or matrices
   * X and B can be either dense or sparse.
   *
   * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
@@ -500,7 +504,7 @@ class CholmodSupernodalLLT : public CholmodBase<_MatrixType, _UpLo, CholmodSuper
   * \brief A general Cholesky factorization and solver based on Cholmod
   *
   * This class allows to solve for A.X = B sparse linear problems via a LL^T or LDL^T Cholesky factorization
-  * using the Cholmod library. The sparse matrix A must be selfajoint and positive definite. The vectors or matrices
+  * using the Cholmod library. The sparse matrix A must be selfadjoint and positive definite. The vectors or matrices
   * X and B can be either dense or sparse.
   *
   * This variant permits to change the underlying Cholesky method at runtime.

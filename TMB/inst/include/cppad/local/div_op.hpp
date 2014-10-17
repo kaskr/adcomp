@@ -1,9 +1,9 @@
-/* $Id: div_op.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: div_op.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
 # ifndef CPPAD_DIV_OP_INCLUDED
 # define CPPAD_DIV_OP_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -13,10 +13,8 @@ A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup div_op_hpp div_op.hpp
-\{
 \file div_op.hpp
 Forward and reverse mode calculations for z = x / y.
 */
@@ -38,11 +36,12 @@ and the argument \a parameter is not used.
 
 template <class Base>
 inline void forward_divvv_op(
-	size_t        d           , 
+	size_t        p           , 
+	size_t        q           , 
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	Base*         taylor      )
 {
 	// check assumptions
@@ -50,21 +49,73 @@ inline void forward_divvv_op(
 	CPPAD_ASSERT_UNKNOWN( NumRes(DivvvOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < i_z );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+	CPPAD_ASSERT_UNKNOWN( p <= q );
 
 	// Taylor coefficients corresponding to arguments and result
-	Base* x = taylor + arg[0] * nc_taylor;
-	Base* y = taylor + arg[1] * nc_taylor;
-	Base* z = taylor + i_z    * nc_taylor;
+	Base* x = taylor + arg[0] * cap_order;
+	Base* y = taylor + arg[1] * cap_order;
+	Base* z = taylor + i_z    * cap_order;
 
 
-        // Using CondExp, it can make sense to divide by zero,
-        // so do not make it an error.
+	// Using CondExp, it can make sense to divide by zero,
+	// so do not make it an error.
 	size_t k;
-	z[d] = x[d];
-	for(k = 1; k <= d; k++)
-		z[d] -= z[d-k] * y[k];
-	z[d] /= y[0];
+	for(size_t d = p; d <= q; d++)
+	{	z[d] = x[d];
+		for(k = 1; k <= d; k++)
+			z[d] -= z[d-k] * y[k];
+		z[d] /= y[0];
+	}
+}
+/*!
+Multiple directions forward mode Taylor coefficients for op = DivvvOp.
+
+The C++ source code corresponding to this operation is
+\verbatim
+	z = x / y
+\endverbatim
+In the documentation below,
+this operations is for the case where both x and y are variables
+and the argument \a parameter is not used.
+
+\copydetails forward_binary_op_dir
+*/
+
+template <class Base>
+inline void forward_divvv_op_dir(
+	size_t        q           , 
+	size_t        r           , 
+	size_t        i_z         ,
+	const addr_t* arg         ,
+	const Base*   parameter   ,
+	size_t        cap_order   ,
+	Base*         taylor      )
+{
+	// check assumptions
+	CPPAD_ASSERT_UNKNOWN( NumArg(DivvvOp) == 2 );
+	CPPAD_ASSERT_UNKNOWN( NumRes(DivvvOp) == 1 );
+	CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < i_z );
+	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
+	CPPAD_ASSERT_UNKNOWN( 0 < q );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+
+	// Taylor coefficients corresponding to arguments and result
+	size_t num_taylor_per_var = (cap_order-1) * r + 1;
+	Base* x = taylor + arg[0] * num_taylor_per_var;
+	Base* y = taylor + arg[1] * num_taylor_per_var;
+	Base* z = taylor + i_z    * num_taylor_per_var;
+
+
+	// Using CondExp, it can make sense to divide by zero,
+	// so do not make it an error.
+	size_t m = (q-1) * r + 1;
+	for(size_t ell = 0; ell < r; ell++)
+	{	z[m+ell] = x[m+ell] - z[0] * y[m+ell];
+		for(size_t k = 1; k < q; k++)		
+			z[m+ell] -= z[(q-k-1)*r+1+ell] * y[(k-1)*r+1+ell];
+		z[m+ell] /= y[0];
+	}
 }
 
 
@@ -87,7 +138,7 @@ inline void forward_divvv_op_0(
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	Base*         taylor      )
 {
 	// check assumptions
@@ -97,9 +148,9 @@ inline void forward_divvv_op_0(
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
 
 	// Taylor coefficients corresponding to arguments and result
-	Base* x = taylor + arg[0] * nc_taylor;
-	Base* y = taylor + arg[1] * nc_taylor;
-	Base* z = taylor + i_z    * nc_taylor;
+	Base* x = taylor + arg[0] * cap_order;
+	Base* y = taylor + arg[1] * cap_order;
+	Base* z = taylor + i_z    * cap_order;
 
 	z[0] = x[0] / y[0];
 }
@@ -124,7 +175,7 @@ inline void reverse_divvv_op(
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	const Base*   taylor      ,
 	size_t        nc_partial  ,
 	Base*         partial     )
@@ -134,12 +185,12 @@ inline void reverse_divvv_op(
 	CPPAD_ASSERT_UNKNOWN( NumRes(DivvvOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < i_z );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( d < cap_order );
 	CPPAD_ASSERT_UNKNOWN( d < nc_partial );
 
 	// Arguments
-	const Base* y  = taylor + arg[1] * nc_taylor;
-	const Base* z  = taylor + i_z    * nc_taylor;
+	const Base* y  = taylor + arg[1] * cap_order;
+	const Base* z  = taylor + i_z    * cap_order;
 
 	// Partial derivatives corresponding to arguments and result
 	Base* px = partial + arg[0] * nc_partial;
@@ -182,40 +233,86 @@ this operations is for the case where x is a parameter and y is a variable.
 
 template <class Base>
 inline void forward_divpv_op(
-	size_t        d           , 
+	size_t        p           , 
+	size_t        q           , 
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	Base*         taylor      )
 {
 	// check assumptions
 	CPPAD_ASSERT_UNKNOWN( NumArg(DivpvOp) == 2 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(DivpvOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+	CPPAD_ASSERT_UNKNOWN( p <= q );
 
 	// Taylor coefficients corresponding to arguments and result
-	Base* y = taylor + arg[1] * nc_taylor;
-	Base* z = taylor + i_z    * nc_taylor;
+	Base* y = taylor + arg[1] * cap_order;
+	Base* z = taylor + i_z    * cap_order;
 
 	// Paraemter value
 	Base x = parameter[ arg[0] ];
 
-        // Using CondExp, it can make sense to divide by zero,
-        // so do not make it an error.
-        size_t k;
-# if USE_CPPAD_FORWARD0SWEEP
-	z[d] = Base(0);
-# else
-	if( d == 0 )
-		z[d] = x;
-	else	z[d] = Base(0);
-# endif
-	for(k = 1; k <= d; k++)
-		z[d] -= z[d-k] * y[k];
-	z[d] /= y[0];
+	// Using CondExp, it can make sense to divide by zero,
+	// so do not make it an error.
+	size_t k;
+	if( p == 0 )
+	{	z[0] = x / y[0];
+		p++;
+	}
+	for(size_t d = p; d <= q; d++)
+	{	z[d] = Base(0);
+		for(k = 1; k <= d; k++)
+			z[d] -= z[d-k] * y[k];
+		z[d] /= y[0];
+	}
+}
+/*!
+Multiple directions forward mode Taylor coefficients for op = DivpvOp.
 
+The C++ source code corresponding to this operation is
+\verbatim
+	z = x / y
+\endverbatim
+In the documentation below,
+this operations is for the case where x is a parameter and y is a variable.
+
+\copydetails forward_binary_op_dir
+*/
+
+template <class Base>
+inline void forward_divpv_op_dir(
+	size_t        q           , 
+	size_t        r           , 
+	size_t        i_z         ,
+	const addr_t* arg         ,
+	const Base*   parameter   ,
+	size_t        cap_order   ,
+	Base*         taylor      )
+{
+	// check assumptions
+	CPPAD_ASSERT_UNKNOWN( NumArg(DivpvOp) == 2 );
+	CPPAD_ASSERT_UNKNOWN( NumRes(DivpvOp) == 1 );
+	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
+	CPPAD_ASSERT_UNKNOWN( 0 < q );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+
+	// Taylor coefficients corresponding to arguments and result
+	size_t num_taylor_per_var = (cap_order-1) * r + 1;
+	Base* y = taylor + arg[1] * num_taylor_per_var;
+	Base* z = taylor + i_z    * num_taylor_per_var;
+
+	// Using CondExp, it can make sense to divide by zero,
+	// so do not make it an error.
+	size_t m = (q-1) * r + 1;
+	for(size_t ell = 0; ell < r; ell++)
+	{	z[m+ell] = - z[0] * y[m+ell];
+		for(size_t k = 1; k < q; k++)
+			z[m+ell] -= z[(q-k-1)*r+1+ell] * y[(k-1)*r+1+ell];
+		z[m+ell] /= y[0];
+	}
 }
 
 /*!
@@ -236,7 +333,7 @@ inline void forward_divpv_op_0(
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	Base*         taylor      )
 {
 	// check assumptions
@@ -248,8 +345,8 @@ inline void forward_divpv_op_0(
 	Base x = parameter[ arg[0] ];
 
 	// Taylor coefficients corresponding to arguments and result
-	Base* y = taylor + arg[1] * nc_taylor;
-	Base* z = taylor + i_z    * nc_taylor;
+	Base* y = taylor + arg[1] * cap_order;
+	Base* z = taylor + i_z    * cap_order;
 
 	z[0] = x / y[0];
 }
@@ -273,7 +370,7 @@ inline void reverse_divpv_op(
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	const Base*   taylor      ,
 	size_t        nc_partial  ,
 	Base*         partial     )
@@ -282,12 +379,12 @@ inline void reverse_divpv_op(
 	CPPAD_ASSERT_UNKNOWN( NumArg(DivvvOp) == 2 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(DivvvOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( d < cap_order );
 	CPPAD_ASSERT_UNKNOWN( d < nc_partial );
 
 	// Arguments
-	const Base* y = taylor + arg[1] * nc_taylor;
-	const Base* z = taylor + i_z    * nc_taylor;
+	const Base* y = taylor + arg[1] * cap_order;
+	const Base* z = taylor + i_z    * cap_order;
 
 	// Partial derivatives corresponding to arguments and result
 	Base* py = partial + arg[1] * nc_partial;
@@ -329,29 +426,76 @@ this operations is for the case where x is a variable and y is a parameter.
 
 template <class Base>
 inline void forward_divvp_op(
-	size_t        d           , 
+	size_t        p           , 
+	size_t        q           , 
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	Base*         taylor      )
 {
 	// check assumptions
 	CPPAD_ASSERT_UNKNOWN( NumArg(DivvpOp) == 2 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(DivvpOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+	CPPAD_ASSERT_UNKNOWN( p <= q );
 
 	// Taylor coefficients corresponding to arguments and result
-	Base* x = taylor + arg[0] * nc_taylor;
-	Base* z = taylor + i_z    * nc_taylor;
+	Base* x = taylor + arg[0] * cap_order;
+	Base* z = taylor + i_z    * cap_order;
 
 	// Parameter value
 	Base y = parameter[ arg[1] ];
 
 	// Using CondExp and multiple levels of AD, it can make sense 
 	// to divide by zero so do not make it an error.
-	z[d] = x[d] / y;
+	for(size_t d = p; d <= q; d++)
+		z[d] = x[d] / y;
+}
+/*!
+Multiple direction forward mode Taylor coefficients for op = DivvvOp.
+
+The C++ source code corresponding to this operation is
+\verbatim
+	z = x / y
+\endverbatim
+In the documentation below,
+this operations is for the case where x is a variable and y is a parameter.
+
+\copydetails forward_binary_op_dir
+*/
+
+template <class Base>
+inline void forward_divvp_op_dir(
+	size_t        q           , 
+	size_t        r           , 
+	size_t        i_z         ,
+	const addr_t* arg         ,
+	const Base*   parameter   ,
+	size_t        cap_order   ,
+	Base*         taylor      )
+{
+	// check assumptions
+	CPPAD_ASSERT_UNKNOWN( NumArg(DivvpOp) == 2 );
+	CPPAD_ASSERT_UNKNOWN( NumRes(DivvpOp) == 1 );
+	CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < i_z );
+	CPPAD_ASSERT_UNKNOWN( q < cap_order );
+	CPPAD_ASSERT_UNKNOWN( 0 < q  );
+
+	// Taylor coefficients corresponding to arguments and result
+	size_t num_taylor_per_var = (cap_order-1) * r + 1;
+	Base* x = taylor + arg[0] * num_taylor_per_var;
+	Base* z = taylor +    i_z * num_taylor_per_var;
+
+	// Parameter value
+	Base y = parameter[ arg[1] ];
+
+	// Using CondExp and multiple levels of AD, it can make sense 
+	// to divide by zero so do not make it an error.
+	size_t m = (q-1)*r + 1;
+	for(size_t ell = 0; ell < r; ell++)
+		z[m + ell] = x[m + ell] / y;
 }
 
 
@@ -373,7 +517,7 @@ inline void forward_divvp_op_0(
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	Base*         taylor      )
 {
 	// check assumptions
@@ -385,8 +529,8 @@ inline void forward_divvp_op_0(
 	Base y = parameter[ arg[1] ];
 
 	// Taylor coefficients corresponding to arguments and result
-	Base* x = taylor + arg[0] * nc_taylor;
-	Base* z = taylor + i_z    * nc_taylor;
+	Base* x = taylor + arg[0] * cap_order;
+	Base* z = taylor + i_z    * cap_order;
 
 	z[0] = x[0] / y;
 }
@@ -410,7 +554,7 @@ inline void reverse_divvp_op(
 	size_t        i_z         ,
 	const addr_t* arg         ,
 	const Base*   parameter   ,
-	size_t        nc_taylor   ,
+	size_t        cap_order   ,
 	const Base*   taylor      ,
 	size_t        nc_partial  ,
 	Base*         partial     )
@@ -419,7 +563,7 @@ inline void reverse_divvp_op(
 	CPPAD_ASSERT_UNKNOWN( NumArg(DivvpOp) == 2 );
 	CPPAD_ASSERT_UNKNOWN( NumRes(DivvpOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < i_z );
-	CPPAD_ASSERT_UNKNOWN( d < nc_taylor );
+	CPPAD_ASSERT_UNKNOWN( d < cap_order );
 	CPPAD_ASSERT_UNKNOWN( d < nc_partial );
 
 	// Argument values
@@ -440,6 +584,5 @@ inline void reverse_divvp_op(
 	}
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

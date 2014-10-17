@@ -9,19 +9,15 @@
 /**	\brief Cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
-	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
-Type pexp(Type x, Type rate, int give_log=0)
+Type pexp(Type x, Type rate)
 {
-	if(!give_log)
-		return CppAD::CondExpGe(x,Type(0),1-exp(-rate*x),Type(0));
-	else
-		return CppAD::CondExpGe(x,Type(0),log(1-exp(-rate*x)),Type(-INFINITY));
+	return CppAD::CondExpGe(x,Type(0),1-exp(-rate*x),Type(0));
 }
 
 // Vectorize pexp
-VECTORIZE3_tti(pexp);
+VECTORIZE2_tt(pexp);
 
 /**	\brief Probability density function of the exponential distribution.
 	\ingroup R_style_distribution
@@ -43,17 +39,15 @@ VECTORIZE3_tti(dexp);
 /**	\brief Inverse cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
 	\param rate Rate parameter. Must be strictly positive.
-	\param log_p true if p is log-probability, false otherwise.
 	*/
 template <class Type>
-Type qexp(Type p, Type rate, int log_p=0)
+Type qexp(Type p, Type rate)
 {
-	if(!log_p) return -log(1-p)/rate;
-	else return -log(1-exp(p))/rate;
+	return -log(1-p)/rate;
 }
 
 // Vectorize qexp.
-VECTORIZE3_tti(qexp);
+VECTORIZE2_tt(qexp);
 /**@}*/
 
 
@@ -65,19 +59,15 @@ VECTORIZE3_tti(qexp);
 	\ingroup R_style_distribution
 	\param shape Shape parameter. Must be strictly positive.
 	\param scale Scale parameter. Must be strictly positive.
-	\param give_log true if one wants the log-probability, false otherwise.
 	*/
 template<class Type> 
-Type pweibull(Type x, Type shape, Type scale, int give_log=0)
+Type pweibull(Type x, Type shape, Type scale)
 {
-	if(!give_log)
-		return CppAD::CondExpGe(x,Type(0),1-exp(-pow(x/scale,shape)),Type(0));
-	else
-		return CppAD::CondExpGe(x,Type(0),log(1-exp(-pow(x/scale,shape))),Type(-INFINITY));
+	return CppAD::CondExpGe(x,Type(0),1-exp(-pow(x/scale,shape)),Type(0));
 }
 
 // Vectorize pweibull
-VECTORIZE4_ttti(pweibull);
+VECTORIZE3_ttt(pweibull);
 
 /** 	\brief Probability density function of the Weibull distribution.
 	\ingroup R_style_distribution
@@ -102,22 +92,18 @@ VECTORIZE4_ttti(dweibull);
 	\param p Probability ; must be between 0 and 1.
 	\param shape Shape parameter. Must be strictly positive.
 	\param scale Scale parameter. Must be strictly positive.
-	\param log_p true if p is log-probability, false otherwise.
 	*/
 template<class Type> 
-Type qweibull(Type p, Type shape, Type scale, int log_p=0)
+Type qweibull(Type p, Type shape, Type scale)
 {
-	Type res;
-	
-	if(!log_p) res = scale * pow( (-log(1-p)) , 1/shape );
-	else res = scale * pow( (-log(1-exp(p))) , 1/shape );
+	Type res = scale * pow( (-log(1-p)) , 1/shape );
 	res = CppAD::CondExpLt(p,Type(0),Type(0),res);
 	res = CppAD::CondExpGt(p,Type(1),Type(0),res);
 	return res;
 }
 
 // Vectorize qweibull
-VECTORIZE4_ttti(qweibull);
+VECTORIZE3_ttt(qweibull);
 /**@}*/
 
 /**	\brief Probability mass function of the binomial distribution.
@@ -243,6 +229,7 @@ Type dmultinom(vector<Type> x, vector<Type> p, int give_log=0)
 	else return exp(logres);
 }
 
+<<<<<<< HEAD
 /** 	@name Sinh-asinh distribution.
 	Functions relative to the sinh-asinh distribution.
 	*/
@@ -351,3 +338,16 @@ Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 VECTORIZE6_ttttti(norm2SHASHo);
 /**@}*/
 
+=======
+using atomic::pnorm;
+VECTORIZE3_ttt(pnorm);
+
+using atomic::qnorm;
+VECTORIZE3_ttt(qnorm);
+
+using atomic::pgamma;
+VECTORIZE3_ttt(pgamma);
+
+using atomic::qgamma;
+VECTORIZE3_ttt(qgamma);
+>>>>>>> e98416b99b77c40d89a6bf3f9454d9f54e4cc69c

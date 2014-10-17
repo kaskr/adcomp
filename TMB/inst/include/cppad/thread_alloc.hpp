@@ -1,9 +1,9 @@
-/* $Id: thread_alloc.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: thread_alloc.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_THREAD_ALLOC_INCLUDED
 # define CPPAD_THREAD_ALLOC_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -27,10 +27,8 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 
 # include <cppad/local/cppad_assert.hpp>
 # include <cppad/local/define.hpp>
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup thread_alloc_hpp thread_alloc.hpp
-\{
 \file thread_alloc.hpp
 File used to define the CppAD multi-threading allocaor class
 */
@@ -51,7 +49,7 @@ Minimum number of double values that will fit in an allocation.
 /*!
 \def CPPAD_TRACE_CAPACITY
 If NDEBUG is not defined, print all calls to \c get_memory and \c return_memory
-that correspond to this capacity and thread CPPAD_TRACE_THEAD.
+that correspond to this capacity and thread CPPAD_TRACE_THREAD.
 (Note that if CPPAD_TRACE_CAPACITY is zero, or any other value not in the list
 of capacities, no tracing will be done.)
 */
@@ -120,7 +118,7 @@ private:
 		// -----------------------------------------------------------------
 		/// make default constructor private. It is only used by constructor
 		/// for `root arrays below.
-		block_t(void) : extra_(0), tc_index_(0), next_(0) 
+		block_t(void) : extra_(0), tc_index_(0), next_(CPPAD_NULL) 
 		{ }
 	};
 
@@ -627,7 +625,7 @@ Determine the number of threads as set during $cref/parallel_setup/ta_parallel_s
 
 $head number$$
 The return value $icode number$$ has prototype
-$icode%
+$codei%
 	size_t %number%
 %$$ 
 and is equal to the value of 
@@ -728,6 +726,7 @@ $end
 /* -----------------------------------------------------------------------
 $begin ta_get_memory$$
 $spell
+	std
 	num
 	ptr
 	thread_alloc
@@ -753,6 +752,10 @@ $codei%
 	size_t %min_bytes%
 %$$
 It specifies the minimum number of bytes to allocate.
+This value must be less than
+$codep
+	std::numeric_limits<size_t>::max() / 2
+$$
 
 $head cap_bytes$$
 This argument has prototype
@@ -811,6 +814,12 @@ $end
 	{	// see first_trace below	
 		CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL;
 
+		// check that number of requested bytes is not to large
+		CPPAD_ASSERT_KNOWN(
+			min_bytes < std::numeric_limits<size_t>::max() / 2 ,
+			"get_memory(min_bytes, cap_bytes): min_bytes is too large"
+		);
+
 		size_t num_cap = capacity_info()->number;
 		using std::cout;
 		using std::endl;
@@ -850,7 +859,7 @@ $end
 		// check if we already have a node we can use
 		void* v_node              = available_root->next_;
 		block_t* node             = reinterpret_cast<block_t*>(v_node);
-		if( node != 0 )
+		if( node != CPPAD_NULL )
 		{	CPPAD_ASSERT_UNKNOWN( node->tc_index_ == tc_index );
 
 			// remove node from available list
@@ -990,7 +999,7 @@ $end
 		void* v_node         = reinterpret_cast<void*>(node);
 		block_t* inuse_root  = info->root_inuse_ + c_index;
 		block_t* previous    = inuse_root;
-		while( (previous->next_ != 0) & (previous->next_ != v_node) )
+		while( (previous->next_ != CPPAD_NULL) & (previous->next_ != v_node) )
 			previous = reinterpret_cast<block_t*>(previous->next_);	
 
 		// check that v_ptr is valid
@@ -1108,7 +1117,7 @@ $end
 		{	size_t capacity = capacity_vec[c_index];
 			block_t* available_root = info->root_available_ + c_index;
 			void* v_ptr             = available_root->next_;
-			while( v_ptr != 0 )
+			while( v_ptr != CPPAD_NULL )
 			{	block_t* node = reinterpret_cast<block_t*>(v_ptr); 
 				void* next    = node->next_;
 				::operator delete(v_ptr);
@@ -1116,7 +1125,7 @@ $end
 
 				dec_available(capacity, thread);
 			}
-			available_root->next_ = 0;
+			available_root->next_ = CPPAD_NULL;
 		}
 		CPPAD_ASSERT_UNKNOWN( available(thread) == 0 );
 		if( inuse(thread) == 0 )
@@ -1557,8 +1566,7 @@ $end
 };
 
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 // preprocessor symbols local to this file
 # undef CPPAD_MAX_NUM_CAPACITY

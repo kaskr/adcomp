@@ -1,9 +1,9 @@
-/* $Id: hash_code.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: hash_code.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_HASH_CODE_INCLUDED
 # define CPPAD_HASH_CODE_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -13,10 +13,8 @@ A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup hash_code_hpp hash_code.hpp
-\{
 \file hash_code.hpp
 CppAD hashing utility.
 */
@@ -81,7 +79,7 @@ If it is not one of the following operartors, the operator is not
 hash coded and zero is returned:
 
 \li unary operators:
-AbsOp, AcosOp, AsinOp, AtanOp, CosOp, CoshOp, DisOp,
+AbsOp, AcosOp, AsinOp, AtanOp, CosOp, CoshOp
 ExpOp, LogOp, SinOp, SinhOp, SqrtOp, TanOp, TanhOp
 
 \li binary operators where first argument is a parameter:
@@ -90,7 +88,10 @@ AddpvOp, DivpvOp, MulpvOp, PowpvOp, SubpvOp,
 \li binary operators where second argument is a parameter:
 DivvpOp, PowvpOp, SubvpOp
 
-\li binary operators where both arguments are parameters:
+\li binary operators where first is an index and second is a variable:
+DisOp
+
+\li binary operators where both arguments are variables:
 AddvvOp, DivvvOp, MulvvOp, PowvvOp, SubvvOp
 
 \param arg
@@ -177,6 +178,10 @@ unsigned short hash_code(
 			code += v[i];
 		break;
 
+		// Binary operator where first argument is an index and
+		// second is a variable (same as both variables).
+		case DisOp:
+
 		// Binary operators where both arguments are variables
 		case AddvvOp:
 		case DivvvOp:
@@ -212,9 +217,9 @@ unsigned short hash_code(
 		case AtanOp:
 		case CosOp:
 		case CoshOp:
-		case DisOp:
 		case ExpOp:
 		case LogOp:
+		case SignOp:
 		case SinOp:
 		case SinhOp:
 		case SqrtOp:
@@ -226,7 +231,7 @@ unsigned short hash_code(
 			code += v[i];
 		break;
 
-		// return zero if not one of the cases above
+		// should have been one of he cases above
 		default:
 		CPPAD_ASSERT_UNKNOWN(false);
 	}
@@ -234,6 +239,5 @@ unsigned short hash_code(
 	return code % CPPAD_HASH_TABLE_SIZE;
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif
