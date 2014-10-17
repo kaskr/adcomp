@@ -11,10 +11,10 @@ namespace Rmath {
   #include <R_ext/Applic.h>
   void integrand_D_incpl_gamma_shape(double *x, int n, void *ex){
     double* parms=(double*)ex;
-    for(int i=0;i<n;i++) x[i] = exp(-x[i]) * pow(x[i],parms[0]-1.0) * pow(log(x[i]),parms[1]);
+    for(int i=0;i<n;i++) x[i] = exp( -x[i] + (parms[0]-1.0) * log(x[i]) + parms[2] ) * pow(log(x[i]), parms[1]);
   }
-  /* n'th order derivative of incomplete gamma wrt. shape parameter */
-  double D_incpl_gamma_shape(double x, double shape, double n){
+  /* n'th order derivative of (scaled) incomplete gamma wrt. shape parameter */
+  double D_incpl_gamma_shape(double x, double shape, double n, double logc){
     double a=0;
     double b=x;
     double epsabs=1e-8;
@@ -28,23 +28,27 @@ namespace Rmath {
     int last=0;
     int* iwork =  Calloc(limit, int);
     double* work = Calloc(lenw, double);
-    double ex[2];
+    double ex[3];
     ex[0]=shape;
     ex[1]=n;
+    ex[2]=logc; /* Scale integrand with exp(logc) */
     Rdqags(integrand_D_incpl_gamma_shape, ex, &a, &b,
 	   &epsabs, &epsrel,
 	   &result, &abserr, &neval, &ier,
 	   &limit, &lenw, &last, iwork, work);
     Free(iwork);
     Free(work);
-    if(ier!=0)warning("Integrate incomplete gamma function unreliable");
+    if(ier!=0){
+      std::cout << "x=" << x << " shape=" << shape << " n=" << n << "\n";
+      warning("Integrate incomplete gamma function unreliable");
+    }
     return result;
   }
 
-  double inv_incpl_gamma(double y, double shape){
-    double p=y/gammafn(shape);
-    double scale=1.0;
-    return qgamma(p, shape, scale, 1, 0);
+  double inv_incpl_gamma(double y, double shape, double logc){
+    double logp = log(y) - lgammafn(shape) - logc;
+    double scale = 1.0;
+    return qgamma(exp(logp), shape, scale, 1, 0);
   }
 
   /* n'th order derivative of log gamma function */
@@ -113,14 +117,15 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   ty[0]=Rmath::D_incpl_gamma_shape(tx[0],tx[1],tx[2]);
+			   ty[0]=Rmath::D_incpl_gamma_shape(tx[0],tx[1],tx[2],tx[3]);
 			   ,
 			   // ATOMIC_REVERSE
-			   px[0] = exp(-tx[0])*pow(tx[0],tx[1]-Type(1.0))*pow(log(tx[0]),tx[2]) * py[0];
+			   px[0] = exp( -tx[0] + (tx[1]-Type(1.0)) * log(tx[0]) + tx[3] ) * pow(log(tx[0]),tx[2]) * py[0];
 			   CppAD::vector<Type> tx_(tx);
 			   tx_[2] = tx_[2] + Type(1.0);  // Add one to get partial wrt. tx[1]
 			   px[1] = D_incpl_gamma_shape(tx_)[0] * py[0];
 			   px[2] = Type(0);
+			   px[3] = ty[0] * py[0];
 			   )
 
 TMB_ATOMIC_VECTOR_FUNCTION(
@@ -131,18 +136,22 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   ty[0]=Rmath::inv_incpl_gamma(tx[0],tx[1]);
+			   ty[0]=Rmath::inv_incpl_gamma(tx[0],tx[1],tx[2]);
 			   ,
 			   // ATOMIC_REVERSE
 			   Type value = ty[0];
 			   Type shape = tx[1];
-			   Type tmp = exp(-value)*pow(value,shape-Type(1));
+			   Type logc = tx[2];
+			   Type tmp = exp(-value+logc)*pow(value,shape-Type(1));
 			   px[0] = 1.0 / tmp * py[0];
-			   CppAD::vector<Type> arg(3);
+			   CppAD::vector<Type> arg(4);
 			   arg[0] = value;
 			   arg[1] = shape;
-			   arg[2] = Type(1); // 1st order partial
+			   arg[2] = Type(1); // 1st order partial wrt. shape
+			   arg[3] = logc;
 			   px[1] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
+			   arg[2] = Type(0); // 0 order partial wrt. shape
+			   px[2] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
 			   )
 
 TMB_ATOMIC_VECTOR_FUNCTION(
@@ -282,18 +291,20 @@ Type lgamma(Type x){
 
 template<class Type>
 Type pgamma(Type q, Type shape, Type scale = 1){
-  CppAD::vector<Type> tx(3);
+  CppAD::vector<Type> tx(4);
   tx[0] = q/scale;
   tx[1] = shape;
-  tx[2] = Type(0); // 0'order deriv
-  return D_incpl_gamma_shape(tx)[0] / exp(lgamma(shape));
+  tx[2] = Type(0);        // 0'order deriv
+  tx[3] = -lgamma(shape); // normalize
+  return D_incpl_gamma_shape(tx)[0];
 }
 
 template<class Type>
 Type qgamma(Type q, Type shape, Type scale = 1){
-  CppAD::vector<Type> tx(2);
-  tx[0] = q * exp(lgamma(shape));
+  CppAD::vector<Type> tx(3);
+  tx[0] = q;
   tx[1] = shape;
+  tx[2] = -lgamma(shape); // normalize
   return inv_incpl_gamma(tx)[0] * scale;
 }
 
