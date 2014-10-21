@@ -10,6 +10,9 @@ profiletargets = $(intersection:=.profile)
 all: $(outputfiles)
 	make report
 
+$(intersection) : % : %.output.RData
+	
+
 report:
 	R --vanilla < unittest.R
 
