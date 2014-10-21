@@ -9,17 +9,21 @@ namespace Rmath {
   #undef qnorm
 
   #include <R_ext/Applic.h>
-  void integrand_D_incpl_gamma_shape(double *x, int n, void *ex){
+  void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex){
     double* parms=(double*)ex;
-    for(int i=0;i<n;i++) x[i] = exp( -x[i] + (parms[0]-1.0) * log(x[i]) + parms[2] ) * pow(log(x[i]), parms[1]);
+    double shape = parms[0];
+    double n     = parms[1];
+    double logc  = parms[2];
+    for(int i=0; i<nx; i++){
+      x[i] = exp( -exp(x[i]) + shape * x[i] + logc ) * pow(x[i], n);
+    }
   }
   /* n'th order derivative of (scaled) incomplete gamma wrt. shape parameter */
   double D_incpl_gamma_shape(double x, double shape, double n, double logc){
-    double a=0;
-    double b=x;
-    double epsabs=1e-8;
-    double epsrel=1e-8;
-    double result=0;
+    double epsabs=1e-10;
+    double epsrel=1e-10;
+    double result1=0;
+    double result2=0;
     double abserr=10000;
     int neval=10000;
     int ier=0;
@@ -29,20 +33,36 @@ namespace Rmath {
     int* iwork =  Calloc(limit, int);
     double* work = Calloc(lenw, double);
     double ex[3];
-    ex[0]=shape;
-    ex[1]=n;
-    ex[2]=logc; /* Scale integrand with exp(logc) */
-    Rdqags(integrand_D_incpl_gamma_shape, ex, &a, &b,
+    ex[0] = shape;
+    ex[1] = n;
+    ex[2] = logc; /* Scale integrand with exp(logc) */
+    double bound; /* For indefinite integration */
+    int inf=-1;   /* corresponds to (-Inf, bound) */
+    bound = log(fmin2(x,shape));
+    /* integrate -Inf...min(log(x),log(shape)) */
+    Rdqagi(integrand_D_incpl_gamma_shape, ex, &bound, &inf,
 	   &epsabs, &epsrel,
-	   &result, &abserr, &neval, &ier,
+	   &result1, &abserr, &neval, &ier,
 	   &limit, &lenw, &last, iwork, work);
+    if(ier!=0){
+      warning("incpl_gamma (indef) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
+    }
+    /* integrate min(log(x),log(shape))...log(x) */
+    if(x>shape){
+      ier = 0;
+      double a = bound;
+      double b = log(x);
+      Rdqags(integrand_D_incpl_gamma_shape, ex, &a, &b,
+	     &epsabs, &epsrel,
+	     &result2, &abserr, &neval, &ier,
+	     &limit, &lenw, &last, iwork, work);
+      if(ier!=0){
+	warning("incpl_gamma (def) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
+      }
+    }
     Free(iwork);
     Free(work);
-    if(ier!=0){
-      std::cout << "x=" << x << " shape=" << shape << " n=" << n << "\n";
-      warning("Integrate incomplete gamma function unreliable");
-    }
-    return result;
+    return result1 + result2;
   }
 
   double inv_incpl_gamma(double y, double shape, double logc){
