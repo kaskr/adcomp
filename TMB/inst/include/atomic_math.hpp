@@ -20,6 +20,9 @@ namespace Rmath {
   }
   /* n'th order derivative of (scaled) incomplete gamma wrt. shape parameter */
   double D_incpl_gamma_shape(double x, double shape, double n, double logc){
+    if(n<.5){
+      return exp(logc + lgammafn(shape)) * pgamma(x, shape, 1.0, 1, 0);
+    }
     double epsabs=1e-10;
     double epsrel=1e-10;
     double result1=0;
