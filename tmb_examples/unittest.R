@@ -45,6 +45,7 @@ if(example!=""){
   f1 <- dir(pattern = ".expected.RData$")
   f2 <- sub("\\.expected\\.","\\.output\\.",f1)
   report <- function(f1,f2,full.timings=FALSE,full.diff=FALSE){
+    if(!(file.exists(f1)&file.exists(f2)))return(c("NA"=NA))
     diff <- function(x,y){
       if(is.list(x)&is.list(y))Map(diff,x,y)
       else if((!is.integer(x))&(is.numeric(x)|is.matrix(y))&length(x)>0)max(abs(x-y))
