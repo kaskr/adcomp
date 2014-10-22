@@ -131,19 +131,11 @@ VECTORIZE1_t(atan);
 VECTORIZE1_t(cos);
 VECTORIZE1_t(erf);
 VECTORIZE1_t(exp);
-VECTORIZE1_t(lgamma);
 VECTORIZE1_t(log);
 VECTORIZE1_t(log10);
 VECTORIZE1_t(sin);
 VECTORIZE1_t(sqrt);   //mangler atan2, pow
 VECTORIZE2_tt(pow);
-
-VECTORIZE4_ttti(dnorm);
-VECTORIZE4_ttti(dnbinom);
-VECTORIZE4_ttti(dgamma);
-VECTORIZE4_ttti(dlgamma);
-VECTORIZE3_tti(dpois);
-VECTORIZE4_ttti(dzipois);
 
 /* max and min of vector */
 double max(const vector<double> &x)

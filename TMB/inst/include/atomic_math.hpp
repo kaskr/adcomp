@@ -7,6 +7,8 @@ namespace Rmath {
   #undef dnorm
   #undef pnorm
   #undef qnorm
+  #undef dnbinom
+  #undef dgamma
 
   #include <R_ext/Applic.h>
   void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex){

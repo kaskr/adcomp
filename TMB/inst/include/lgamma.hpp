@@ -1,8 +1,12 @@
 /** \file
     \brief Gamma function and gamma probability densities
 */
+using atomic::lgamma;
+VECTORIZE1_t(lgamma);
+
+/* Old lgamma approximation */
 template <class Type>
-inline Type lgamma(const Type &y)
+inline Type lgamma_approx(const Type &y)
 {
   /* coefficients for gamma=7, kmax=8  Lanczos method */
   static const Type
@@ -46,6 +50,7 @@ inline Type dnbinom(const Type &x, const Type &size, const Type &prob,
     n*log(p)+x*log(Type(1)-p);
   if (give_log) return logres; else return exp(logres);
 }
+VECTORIZE4_ttti(dnbinom);
 
 /** \brief Negative binomial probability function.
   \ingroup R_style_distribution
@@ -60,6 +65,7 @@ inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
   Type n=mu*p/(Type(1)-p);
   return dnbinom(x,n,p,give_log);
 }
+VECTORIZE4_ttti(dnbinom2);
 
 /** \brief Poisson probability function. 
   \ingroup R_style_distribution
@@ -71,6 +77,7 @@ inline Type dpois(const Type &x, const Type &lambda, int give_log=0)
   Type logres = -lambda + x*log(lambda) - lgamma(x+Type(1));
   if (give_log) return logres; else return exp(logres);
 }
+VECTORIZE3_tti(dpois);
 
 /** \brief Density of X where X~gamma distributed 
   \ingroup R_style_distribution
@@ -81,6 +88,7 @@ Type dgamma(Type y, Type shape, Type scale, int give_log=0)
   Type logres=-lgamma(shape)+(shape-Type(1.0))*log(y)-y/scale-shape*log(scale);
   if(give_log)return logres; else return exp(logres);
 }
+VECTORIZE4_ttti(dgamma);
 
 /** \brief Density of log(X) where X~gamma distributed 
   \ingroup R_style_distribution
@@ -91,6 +99,8 @@ inline Type dlgamma(Type y, Type shape, Type scale, int give_log=0)
   Type logres=-lgamma(shape)-shape*log(scale)-exp(y)/scale+shape*y;
   if(give_log)return logres; else return exp(logres);
 }
+VECTORIZE4_ttti(dlgamma);
+
 /** \brief Zero-Inflated Poisson probability function. 
   \ingroup R_style_distribution
 * \details
@@ -104,6 +114,8 @@ inline Type dzipois(const Type &x, const Type &lambda, const Type &zip, int give
   else logres=log(Type(1)-zip) + dpois(x, lambda, true);
   if (give_log) return logres; else return exp(logres);
 }
+VECTORIZE4_ttti(dzipois);
+
 /** \brief Zero-Inflated negative binomial probability function. 
   \ingroup R_style_distribution
 * \details

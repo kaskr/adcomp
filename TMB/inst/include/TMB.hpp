@@ -41,9 +41,9 @@ using CppAD::ADFun;
 #include "config.hpp"
 #include "atomic_math.hpp"
 #include "expm.hpp"
+#include "Vectorize.hpp"
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
-#include "Vectorize.hpp"
 #include "start_parallel.hpp"
 #include "tmb_core.hpp"
 #include "convenience.hpp"
