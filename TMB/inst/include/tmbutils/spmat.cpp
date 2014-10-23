@@ -98,10 +98,9 @@ matrix<Type> discrLyap(matrix<Type> A_){
 
 /** Inverse of PD sparse matrix */
 template <class Type>
-matrix<Type> invertSparseMatrix(matrix<Type> A_){
-  matrix<Type> I(A_.rows(),A_.cols());
+matrix<Type> invertSparseMatrix(Eigen::SparseMatrix<Type> A){
+  matrix<Type> I(A.rows(),A.cols());
   I.setIdentity();
-  Eigen::SparseMatrix<Type> A=asSparseMatrix(A_);
   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldlt(A);
   matrix<Type> ans = ldlt.solve(I);
   return ans;
