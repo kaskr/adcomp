@@ -413,16 +413,13 @@ void printTP(tape_point tp){
   const Base*  pZ_tmp =dummy;//  Partial + i_var * K;
   size_t d=0;
   printOp(
-	  std::cout, 
+	  std::cout,
 	  &play_,
-	  i_tmp,
-	  op, 
-	  arg,
-	  d + 1, 
-	  Z_tmp, 
-	  d + 1, 
-	  pZ_tmp 
-	  );
+	  tp.op_index,
+	  tp.var_index,
+	  op,
+	  arg);
+  std::cout << "\n";
 }
 
 bool is_tape_point_constant(size_t index){
