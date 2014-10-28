@@ -334,9 +334,9 @@ void ADFun<Base>::myReverse(size_t p, const VectorBase &w, size_t dep_var_index,
 
 #ifdef DEBUG_KASPER
     int countnnz=0;
-    for(i = 0; i < num_var_tape_; i++)
-      for(j = 0; j < p; j++)
-	countnnz+=(Partial[i * p + j] != zero);
+    for(int i = 0; i < num_var_tape_; i++)
+      for(int j = 0; j < p; j++)
+	countnnz += (Partial[i * p + j] != zero);
     if(countnnz>0){
       std::cout << "Partials not correctly cleared. Nonzeros: " << countnnz << "\n";
     }
