@@ -21,8 +21,19 @@ CppAD::vector<size_t> user_region_mark_;  /* user_region_mark_[i] is marked if t
 CppAD::vector<bool> constant_tape_point_; /* Vector of same length as tp_ (tape_points) that 
 					     marks all tape_points that only depend on fixed 
 					     effects. */
-
-
+/* Helper function to print std::vector */
+template<typename T>
+void vprint(const std::vector<T>& v) {
+    std::cout << "[";
+    size_t last = v.size() - 1;
+    for(size_t i = 0; i < v.size(); ++i) {
+        std::cout << v[i];
+        if (i != last)
+            std::cout << ", ";
+    }
+    std::cout << "]";
+    std::cout << "\n";
+}
 /* Helper function for markArgs */
 void markOpField(
 		 //std::ostream      &os ,
