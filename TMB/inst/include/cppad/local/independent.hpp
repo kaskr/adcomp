@@ -1,9 +1,9 @@
-/* $Id: independent.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: independent.hpp 3146 2014-03-03 12:33:40Z bradbell $ */
 # ifndef CPPAD_INDEPENDENT_INCLUDED
 # define CPPAD_INDEPENDENT_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -131,12 +131,13 @@ void ADTape<Base>::Independent(VectorAD &x)
 		n > 0,
 		"Indepdendent: the argument vector x has zero size"
 	);
-	CPPAD_ASSERT_UNKNOWN( Rec_.num_rec_var() == 0 );
+	CPPAD_ASSERT_UNKNOWN( Rec_.num_var_rec() == 0 );
 
 	// mark the beginning of the tape and skip the first variable index 
 	// (zero) because parameters use taddr zero
-	CPPAD_ASSERT_NARG_NRES(BeginOp, 0, 1);
+	CPPAD_ASSERT_NARG_NRES(BeginOp, 1, 1);
 	Rec_.PutOp(BeginOp);
+	Rec_.PutArg(0);
 
 	// place each of the independent variables in the tape
 	CPPAD_ASSERT_NARG_NRES(InvOp, 0, 1);

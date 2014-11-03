@@ -1,9 +1,9 @@
-/* $Id: ad_valued.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: ad_valued.hpp 2859 2013-05-28 06:03:21Z bradbell $ */
 # ifndef CPPAD_AD_VALUED_INCLUDED
 # define CPPAD_AD_VALUED_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-11 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -23,13 +23,14 @@ $index function, AD valued$$
 
 $section AD Valued Operations and Functions$$
 
+$comment atomic.omh includes atomic_base.omh which atomic_base.hpp$$
 $childtable%
 	cppad/local/arithmetic.hpp%
 	cppad/local/std_math_ad.hpp%
 	cppad/local/math_other.hpp%
 	cppad/local/cond_exp.hpp%
 	cppad/local/discrete.hpp%
-	cppad/local/user_atomic.hpp
+	omh/atomic.omh
 %$$
 
 $end
@@ -43,6 +44,8 @@ $end
 # include <cppad/local/cond_exp.hpp>
 # include <cppad/local/math_other.hpp>
 # include <cppad/local/discrete.hpp>
-# include <cppad/local/user_atomic.hpp>
+# include <cppad/local/atomic_base.hpp>
+# include <cppad/local/checkpoint.hpp>
+# include <cppad/local/old_atomic.hpp>
 
 # endif

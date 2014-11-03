@@ -1,9 +1,9 @@
-/* $Id: ad_ctor.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: ad_ctor.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_AD_CTOR_INCLUDED
 # define CPPAD_AD_CTOR_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -18,6 +18,8 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 
 $begin ad_ctor$$
 $spell
+	cppad
+	ctor
 	initializes
 	Vec
 	const
@@ -43,15 +45,37 @@ creates a new $codei%AD<%Base%>%$$ object $icode y$$
 and initializes its value as equal to $icode x$$.
 
 $head x$$
-The argument $icode x$$ has prototype
+
+$subhead implicit$$
+There is an implicit constructor where $icode x$$ has one of the following
+prototypes:
 $codei%
-	const %Type% &%x%
+	const %Base%&        %x%
+	const VecAD<%Base%>& %x%
 %$$ 
-where $icode Type$$ is
-$codei%VecAD<%Base%>::reference%$$,
-$codei%AD<%Base%>%$$,
-$icode Base$$, 
-or any type that has a constructor of the form
+
+$subhead explicit$$
+There is an explicit constructor where $icode x$$ has prototype
+$codei%
+	const %Type%&        %x%
+%$$ 
+for any type that has an explicit constructor of the form
+$icode%Base%(%x%)%$$.
+
+$subhead deprecated$$
+$index deprecated, constructor$$
+$index constructor, deprecated$$
+If you set 
+$cref/cppad_implicit_ctor_from_any_type
+	/cmake
+	/cppad_implicit_ctor_from_any_type
+/$$
+to be $code YES$$ during the install procedure,
+you will get an implicit constructor with prototype
+$codei%
+	const %Type%&        %x%
+%$$ 
+for any type that has an explicit constructor of the form
 $icode%Base%(%x%)%$$.
 
 $head y$$
@@ -71,11 +95,9 @@ $end
 ------------------------------------------------------------------------------
 */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 
 /*!
-\defgroup ad_ctor_hpp ad_ctor.hpp
-\{
 \file ad_ctor.hpp
 AD<Base> constructors and and copy operations.
 */
@@ -163,6 +185,5 @@ inline AD<Base>::AD(const T &t)
 , taddr_(0)
 { }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

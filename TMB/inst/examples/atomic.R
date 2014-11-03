@@ -7,6 +7,3 @@ obj <- MakeADFun(type=c("ADFun","Fun"),
 )
 set.seed(123);x <- rnorm(n*n*n)
 h <- obj$env$spHess()
-.Call("InfoADFunObject",environment(obj$env$spHess)$ADHess$ptr,PACKAGE="atomic")
-sum(obj$env$f(order=2)->hh)
-range(hh-h)

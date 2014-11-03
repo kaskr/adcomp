@@ -1,9 +1,9 @@
-/* $Id: opt_val_hes.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: opt_val_hes.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_OPT_VAL_HES_INCLUDED
 # define CPPAD_OPT_VAL_HES_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -98,7 +98,7 @@ $latex \[
 $head Fun$$
 The argument $icode fun$$ is an object of type $icode Fun$$ 
 which must support the member functions listed below.
-CppAD will may be recording operations of the type $code%AD<%Base%>%$$
+CppAD will may be recording operations of the type $codei%AD<%Base%>%$$
 when these member functions are called.
 These member functions must not stop such a recording; e.g.,
 they must not call $cref/AD<Base>::abort_recording/abort_recording/$$.
@@ -238,10 +238,8 @@ $end
 -----------------------------------------------------------------------------
 */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup opt_val_hes_hpp opt_val_hes.hpp
-\{
 \file opt_val_hes.hpp
 \brief Computing Jabobians and Hessians of Optimal Values
 */
@@ -526,7 +524,6 @@ int opt_val_hes(
 	return signdet;
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 # endif

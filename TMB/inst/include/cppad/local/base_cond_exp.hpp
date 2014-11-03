@@ -1,9 +1,9 @@
-/* $Id: base_cond_exp.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: base_cond_exp.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_BASE_COND_EXP_INCLUDED
 # define CPPAD_BASE_COND_EXP_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -153,11 +153,9 @@ $cref/base_alloc/base_alloc.hpp/CondExpRel/$$.
 $end
 */
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 
 /*!
-\defgroup base_cond_exp_hpp base_cond_exp.hpp
-\{
 \file base_cond_exp.hpp
 CondExp operations that aid in meeting Base type requirements.
 */
@@ -282,6 +280,5 @@ ResultType CondExpTemplate(
 	return returnValue;
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

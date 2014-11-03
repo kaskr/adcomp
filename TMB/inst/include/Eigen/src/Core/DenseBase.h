@@ -13,6 +13,16 @@
 
 namespace Eigen {
 
+namespace internal {
+  
+// The index type defined by EIGEN_DEFAULT_DENSE_INDEX_TYPE must be a signed type.
+// This dummy function simply aims at checking that at compile time.
+static inline void check_DenseIndex_is_signed() {
+  EIGEN_STATIC_ASSERT(NumTraits<DenseIndex>::IsSigned,THE_INDEX_TYPE_MUST_BE_A_SIGNED_TYPE); 
+}
+
+} // end namespace internal
+  
 /** \class DenseBase
   * \ingroup Core_Module
   *
@@ -271,7 +281,7 @@ template<typename Derived> class DenseBase
     CommaInitializer<Derived> operator<< (const DenseBase<OtherDerived>& other);
 
     Eigen::Transpose<Derived> transpose();
-    typedef const Transpose<const Derived> ConstTransposeReturnType;
+	typedef typename internal::add_const<Transpose<const Derived> >::type ConstTransposeReturnType;
     ConstTransposeReturnType transpose() const;
     void transposeInPlace();
 #ifndef EIGEN_NO_DEBUG
@@ -336,6 +346,9 @@ template<typename Derived> class DenseBase
     bool isConstant(const Scalar& value, const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
     bool isZero(const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
     bool isOnes(const RealScalar& prec = NumTraits<Scalar>::dummy_precision()) const;
+    
+    inline bool hasNaN() const;
+    inline bool allFinite() const;
 
     inline Derived& operator*=(const Scalar& other);
     inline Derived& operator/=(const Scalar& other);
@@ -415,8 +428,6 @@ template<typename Derived> class DenseBase
       return derived().coeff(0,0);
     }
 
-/////////// Array module ///////////
-
     bool all(void) const;
     bool any(void) const;
     Index count() const;
@@ -442,11 +453,11 @@ template<typename Derived> class DenseBase
 
     template<typename ThenDerived>
     inline const Select<Derived,ThenDerived, typename ThenDerived::ConstantReturnType>
-    select(const DenseBase<ThenDerived>& thenMatrix, typename ThenDerived::Scalar elseScalar) const;
+    select(const DenseBase<ThenDerived>& thenMatrix, const typename ThenDerived::Scalar& elseScalar) const;
 
     template<typename ElseDerived>
     inline const Select<Derived, typename ElseDerived::ConstantReturnType, ElseDerived >
-    select(typename ElseDerived::Scalar thenScalar, const DenseBase<ElseDerived>& elseMatrix) const;
+    select(const typename ElseDerived::Scalar& thenScalar, const DenseBase<ElseDerived>& elseMatrix) const;
 
     template<int p> RealScalar lpNorm() const;
 

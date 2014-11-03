@@ -1,9 +1,9 @@
-/* $Id: ode_evaluate.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: ode_evaluate.hpp 2859 2013-05-28 06:03:21Z bradbell $ */
 # ifndef CPPAD_ODE_EVALUATE_INCLUDED
 # define CPPAD_ODE_EVALUATE_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -95,7 +95,7 @@ The value $latex n$$ is determined by the size of the vector $icode x$$.
 
 $head p$$
 The argument $icode p$$ has prototype
-$icode%
+$codei%
 	size_t %p%
 %$$
 
@@ -111,7 +111,7 @@ $latex \partial_x y(x, 1)$$ is returned.
 
 $head fp$$
 The argument $icode fp$$ has prototype
-$icode%
+$codei%
 	CppAD::vector<%Float%>& %fp%
 %$$
 The input value of the elements of $icode fp$$ does not matter.

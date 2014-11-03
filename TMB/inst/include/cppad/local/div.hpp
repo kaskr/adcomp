@@ -1,9 +1,9 @@
-/* $Id: div.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: div.hpp 2773 2013-03-09 06:00:18Z bradbell $ */
 # ifndef CPPAD_DIV_INCLUDED
 # define CPPAD_DIV_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -71,7 +71,7 @@ AD<Base> operator / (const AD<Base> &left , const AD<Base> &right)
 			result.tape_id_ = tape_id;
 		}
 	}
-	else if( Variable(right) )
+	else if( var_right )
 	{	if( IdenticalZero(left.value_) )
 		{	// result = 0 / variable
 		}

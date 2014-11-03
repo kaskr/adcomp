@@ -1,9 +1,9 @@
-// $Id: sparse_pack.hpp 2625 2012-12-23 14:34:12Z bradbell $
+// $Id: sparse_pack.hpp 3301 2014-05-24 05:20:21Z bradbell $
 # ifndef CPPAD_SPARSE_PACK_INCLUDED
 # define CPPAD_SPARSE_PACK_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -15,10 +15,8 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 # include <cppad/local/cppad_assert.hpp>
 # include <cppad/local/pod_vector.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup sparse_pack_hpp sparse_pack.hpp
-\{
 \file sparse_pack.hpp
 Vector of sets of positive integers stored as a packed array of bools.
 */
@@ -414,6 +412,5 @@ void sparsity_user2internal(
 	return;
 }
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

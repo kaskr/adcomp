@@ -1,9 +1,9 @@
-/* $Id: ad_tape.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: ad_tape.hpp 3153 2014-03-04 19:49:06Z bradbell $ */
 # ifndef CPPAD_AD_TAPE_INCLUDED
 # define CPPAD_AD_TAPE_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -14,7 +14,7 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 # include <cppad/local/define.hpp>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 
 /*!
 Class used to hold tape that records AD<Base> operations.
@@ -30,8 +30,8 @@ class ADTape {
 	// classes -------------------------------------------------------------
 	friend class AD<Base>;
 	friend class ADFun<Base>;
+	friend class atomic_base<Base>;
 	friend class discrete<Base>;
-	friend class user_atomic<Base>;
 	friend class VecAD<Base>;
 	friend class VecAD_reference<Base>;
 
@@ -156,7 +156,7 @@ value of the parameter that we are placing in the tape.
 \return 
 variable index (for this recording) correpsonding to the parameter.
 
-\par Wish List
+\par 2DO
 All these operates are preformed in \c Rec_, so we should
 move this routine from <tt>ADTape<Base></tt> to <tt>recorder<Base></tt>.
 */
@@ -186,7 +186,15 @@ size of the <tt>VecAD<Base></tt> object.
 initial values for the <tt>VecAD<Base></tt> object
 (values before it becomes a variable).
 
-\par Wish List
+\return
+index of the start of this vector in the list of vector indices.
+The value for this vector index is the length of the vector.
+There are \c length indices following for this vector.
+The values for these vector indices are the corresponding
+parameter indices in the tape for the initial value of the corresponding
+vec_ad element.  
+
+\par 2DO
 All these operates are preformed in \c Rec_, so we should
 move this routine from <tt>ADTape<Base></tt> to <tt>recorder<Base></tt>.
 */
@@ -210,6 +218,6 @@ size_t ADTape<Base>::AddVec(size_t length, const pod_vector<Base>& data)
 	return start;
 }
 
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 
 # endif

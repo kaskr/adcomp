@@ -1,9 +1,9 @@
-/* $Id: vec_ad.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: vec_ad.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_VEC_AD_INCLUDED
 # define CPPAD_VEC_AD_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -52,13 +52,12 @@ $pre
 $$
 $icode%r% = %v%[%x%]%$$
 
-
 $head Purpose$$
 If either $icode v$$ or $icode x$$ is a 
 $cref/variable/glossary/Variable/$$,
 the indexing operation
 $codei%
-	%y% = %v%[%x%]
+	%r% = %v%[%x%]
 %$$
 is recorded in the corresponding
 AD of $icode Base$$
@@ -88,7 +87,7 @@ way to represent these vectors.
 $head VecAD<Base>::reference$$
 $index VecAD<Base>::reference$$
 $index reference, VecAD<Base>$$
-The result $icode y$$ has type
+The result $icode r$$ has type
 $codei%
 	VecAD<%Base%>::reference
 %$$ 
@@ -97,16 +96,16 @@ with some notable exceptions:
 
 $subhead Exceptions$$
 $list number$$
-The object $icode y$$ cannot be used with the
+The object $icode r$$ cannot be used with the
 $cref Value$$ function to compute the corresponding $icode Base$$ value.
-If $icode v$$ is not a $cref/variable/glossary/Variable/$$
+If $icode v$$ and $icode i$$ are not $cref/variables/glossary/Variable/$$
 $codei%
-	v[%i%]
+	%b% = v[%i%]
 %$$
 can be used to compute the corresponding $icode Base$$ value.
 
 $lnext
-The object $icode y$$ cannot be used
+The object $icode r$$ cannot be used
 with the $cref/computed assignments operators/Arithmetic/$$ 
 $code +=$$, 
 $code -=$$, 
@@ -119,7 +118,7 @@ $codei%
 no matter what the types of $icode z$$.
 
 $lnext
-Assignment to $icode y$$ returns a $code void$$.
+Assignment to $icode r$$ returns a $code void$$.
 For example, the following syntax is not valid:
 $codei%
 	%z% = %v%[%x%] = %u%;
@@ -131,14 +130,14 @@ The $cref CondExp$$ functions do not accept
 $codei%VecAD<%Base%>::reference%$$ arguments.
 For example, the following syntax is not valid:
 $codei%
-	CondExpGt(%y%, %z%, %u%, %v%)
+	CondExpGt(%v%[%x%], %z%, %u%, %v%)
 %$$
 no matter what the types of $icode z$$, $icode u$$, and $icode v$$.
 
 $lnext
 The $cref/Parameter and Variable/ParVar/$$ functions cannot be used with
-$codei%VecAD<%Base%>::reference%$$ arguments
-(use the entire $codei%VecAD<%Base%>%$$ vector instead).
+$codei%VecAD<%Base%>::reference%$$ arguments like $icode r$$,
+use the entire $codei%VecAD<%Base%>%$$ vector instead; i.e. $icode v$$.
 
 $lnext
 The vectors passed to $cref Independent$$ must have elements
@@ -233,7 +232,7 @@ and less than $icode n$$; i.e., less than
 the number of elements in $icode v$$. 
 
 $subhead r$$
-The result $icode y$$ has prototype
+The result $icode r$$ has prototype
 $codei%
 	VecAD<%Base%>::reference %r%
 %$$
@@ -277,10 +276,10 @@ $cref/parameters/glossary/Parameter/$$).
 The effect of this can be seen by executing the following steps:
 
 $list number$$
-In the file $code cppad/local/forward_sweep.h$$,
-change the definition of $code CPPAD_FORWARD_SWEEP_TRACE$$ to
+In the file $code cppad/local/forward1sweep.h$$,
+change the definition of $code CPPAD_FORWARD1SWEEP_TRACE$$ to
 $codep
-	# define CPPAD_FORWARD_SWEEP_TRACE 1
+	# define CPPAD_FORWARD1SWEEP_TRACE 1
 $$
 $lnext
 In the $code Example$$ directory, execute the command
@@ -309,39 +308,53 @@ $end
 */
 # include <cppad/local/pod_vector.hpp>
 
-// Use this define to get around a bug in doxygen 1.7.5.
-// To be explicit, the documentiion for the routines in tape_link.hpp
-// you use this typedef in place of the macro below.
-# define CPPAD_VEC_AD_TYPEDEF_ADBASE  typedef AD<Base> AD_Base
+namespace CppAD { //  BEGIN_CPPAD_NAMESPACE
+/*!
+\file vec_ad.hpp
+Defines the VecAD<Base> class.
+*/
 
+/*!
+\def CPPAD_VEC_AD_COMPUTED_ASSIGNMENT(op, name)
+Prints an error message if the correspinding computed assignment is used.
+
+THis macro is used to print an error message if any of the
+computed assignments are used with the VecAD_reference class.
+The argument \c op is one of the following:
++= , -= , *= , /=.
+The argument \c name, is a string literal with the name of the 
+computed assignment \c op.
+*/
 # define CPPAD_VEC_AD_COMPUTED_ASSIGNMENT(op, name)                     \
 VecAD_reference& operator op (const VecAD_reference<Base> &right)       \
 {	CPPAD_ASSERT_KNOWN(                                                \
-		0,                                                            \
+		false,                                                        \
 		"Cannot use a ADVec element on left side of" name             \
 	);                                                                 \
 	return *this;                                                      \
 }                                                                       \
 VecAD_reference& operator op (const AD<Base> &right)                    \
 {	CPPAD_ASSERT_KNOWN(                                                \
-		0,                                                            \
+		false,                                                        \
 		"Cannot use a ADVec element on left side of" name             \
 	);                                                                 \
 	return *this;                                                      \
 }                                                                       \
 VecAD_reference& operator op (const Base &right)                        \
 {	CPPAD_ASSERT_KNOWN(                                                \
-		0,                                                            \
+		false,                                                        \
 		"Cannot use a ADVec element on left side of" name             \
 	);                                                                 \
 	return *this;                                                      \
 }
 
+/*!
+Class used to hold a reference to an element of a VecAD object.
 
-//  BEGIN CppAD namespace
-namespace CppAD {
-
-// Element of VecAD
+\tparam Base
+Elements of this class act like an AD<Base> (in a restricted sense),
+in addition they track (on the tape) the index they correspond to.
+*/
 template <class Base>
 class VecAD_reference {
 	friend bool  Parameter<Base> (const VecAD<Base> &vec);
@@ -350,12 +363,22 @@ class VecAD_reference {
 	friend class ADTape<Base>;
 
 private:
-	CPPAD_VEC_AD_TYPEDEF_ADBASE;    // define ADBase as AD<Base>
-	VecAD<Base>      *vec_;         // pointer to entire vector
-	mutable AD_Base     x_;         // index for this element
+	/// pointer to vecad vector that this is a element of
+	VecAD<Base> *vec_;
+	/// index in vecad vector that this element corresponds to
+	AD<Base>     ind_;         // index for this element
 public:
-	VecAD_reference(VecAD<Base> *v, const AD<Base> &x) 
-		: vec_( v ) , x_(x)
+	/*!
+	consructor
+
+	\param vec
+	value of vec_
+
+	\param ind
+	value of ind_
+	*/
+	VecAD_reference(VecAD<Base> *vec, const AD<Base>& ind) 
+		: vec_( vec ) , ind_(ind)
 	{ }
 
 	// assignment operators
@@ -371,11 +394,12 @@ public:
 	CPPAD_VEC_AD_COMPUTED_ASSIGNMENT( /= , " /= " )
 
 
-	// AD<Base> constructor
+	/// Conversion from VecAD_reference to AD<Base>.
+	/// puts the correspond vecad load instruction in the tape.
 	AD<Base> ADBase(void) const
 	{	AD<Base> result;
 
-		size_t i = static_cast<size_t>( Integer(x_) );
+		size_t i = static_cast<size_t>( Integer(ind_) );
 		CPPAD_ASSERT_UNKNOWN( i < vec_->length_ );
 
 		// AD<Base> value corresponding to this element
@@ -393,43 +417,42 @@ public:
 			CPPAD_ASSERT_UNKNOWN( tape != CPPAD_NULL );
 			CPPAD_ASSERT_UNKNOWN( vec_->offset_ > 0  );
 	
-			if( IdenticalPar(x_) )
+			size_t load_op_index = tape->Rec_.num_load_op_rec();
+			if( IdenticalPar(ind_) )
 			{	CPPAD_ASSERT_UNKNOWN( NumRes(LdpOp) == 1 );
 				CPPAD_ASSERT_UNKNOWN( NumArg(LdpOp) == 3 );
 
 				// put operand addresses in tape
-				// (value of third arugment does not matter)
 				tape->Rec_.PutArg(
-					vec_->offset_, i, 0
+					vec_->offset_, i, load_op_index
 				);
-				// put operator in the tape, x_ is a parameter
-				result.taddr_ = tape->Rec_.PutOp(LdpOp);
+				// put operator in the tape, ind_ is a parameter
+				result.taddr_ = tape->Rec_.PutLoadOp(LdpOp);
 				// change result to variable for this load
 				result.tape_id_ = tape->id_;
 			} 
 			else
 			{	CPPAD_ASSERT_UNKNOWN( NumRes(LdvOp) == 1 );
 				CPPAD_ASSERT_UNKNOWN( NumArg(LdvOp) == 3 );
-
-				if( Parameter(x_) )
+				addr_t ind_taddr;
+				if( Parameter(ind_) )
 				{	// kludge that should not be needed
-					// if x_ instead of i is used for index
+					// if ind_ instead of i is used for index
 					// in the tape
-					x_.tape_id_    = vec_->tape_id_;
-					x_.taddr_ = tape->RecordParOp(
-						x_.value_
+					ind_taddr  = tape->RecordParOp(
+						ind_.value_
 					);
 				}
-				CPPAD_ASSERT_UNKNOWN( Variable(x_) );
-				CPPAD_ASSERT_UNKNOWN( x_.taddr_ > 0 );
+				else	ind_taddr = ind_.taddr_;
+				CPPAD_ASSERT_UNKNOWN( ind_taddr > 0 );
 
 				// put operand addresses in tape
 				// (value of third arugment does not matter)
 				tape->Rec_.PutArg(
-					vec_->offset_, x_.taddr_, 0
+					vec_->offset_, ind_taddr, load_op_index
 				);
-				// put operator in the tape, x_ is a variable
-				result.taddr_ = tape->Rec_.PutOp(LdvOp);
+				// put operator in the tape, ind_ is a variable
+				result.taddr_ = tape->Rec_.PutLoadOp(LdvOp);
 				// change result to variable for this load
 				result.tape_id_ = tape->id_;
 			}
@@ -438,7 +461,9 @@ public:
 	}
 };
 
-// VecAD
+/*!
+Vector of AD objects that tracks indexing operations on the tape.
+*/
 template <class Base>
 class VecAD {
 	friend bool  Parameter<Base> (const VecAD<Base> &vec);
@@ -449,31 +474,31 @@ class VecAD {
 	friend std::ostream& operator << <Base>
 		(std::ostream &os, const VecAD<Base> &vec_);
 private:
-	// size of this VecAD vector
+	/// size of this VecAD vector
 	const  size_t   length_; 
 
-	// elements of this vector 
+	/// elements of this vector 
 	pod_vector<Base> data_; 
 
-	// offset in cummulate vector corresponding to this object
+	/// offset in cummulate vector corresponding to this object
 	size_t offset_; 
 
-	// tape id corresponding to the offset
+	/// tape id corresponding to the offset
 	tape_id_t tape_id_;
 public:
-	// declare the user's view of this type here
+	/// declare the user's view of this type here
 	typedef VecAD_reference<Base> reference;
 
-	// default constructor
-	// initialize tape_id_ same as for default constructor; see default.hpp
+	/// default constructor
+	/// initialize tape_id_ same as for default constructor; see default.hpp
 	VecAD(void) 
 	: length_(0) 
 	, offset_(0)
 	, tape_id_(0)
 	{	CPPAD_ASSERT_UNKNOWN( Parameter(*this) ); }
 
-	// constructor 
-	// initialize tape_id_ same as for parameters; see ad_copy.hpp
+	/// sizing constructor 
+	/// initialize tape_id_ same as for parameters; see ad_copy.hpp
 	VecAD(size_t n) 
 	: length_(n)
 	, offset_(0)
@@ -492,15 +517,18 @@ public:
 		CPPAD_ASSERT_UNKNOWN( Parameter(*this) );
 	}
 
-	// destructor
+	/// destructor
 	~VecAD(void)
 	{ }
 
-	// size
+	/// number of elements in the vector
 	size_t size(void)
 	{	return length_; }
 
-	// not taped element access
+	/// element access (not taped)
+	///
+	/// \param i
+	/// element index
 	Base &operator[](size_t i)
 	{
 		CPPAD_ASSERT_KNOWN( 
@@ -516,7 +544,14 @@ public:
 		return data_[i];
 	}
 
-	// taped elemement access
+	/*! delayed taped elemement access 
+	
+	\param x
+	element index
+
+	\par
+	This operation may convert this vector from a parameter to a variable
+	*/
 	VecAD_reference<Base> operator[](const AD<Base> &x) 
 	{
 		CPPAD_ASSERT_KNOWN(
@@ -543,7 +578,8 @@ public:
 			offset_ = 
 			AD<Base>::tape_ptr(x.tape_id_)->AddVec(length_, data_);
 
-			// advance pointer by one so is always > 0
+			// Advance pointer by one so starts at first component of this 
+			// vector; i.e., skip lenght at begining (so is always > 0) 
 			offset_++; 
 
 			// tape id corresponding to this offest
@@ -556,6 +592,12 @@ public:
 };
 
 
+/*!
+Taped setting of element to a value.
+
+\param y
+value that element is set to.
+*/
 template <class Base>
 void VecAD_reference<Base>::operator=(const AD<Base> &y)
 {
@@ -588,7 +630,7 @@ void VecAD_reference<Base>::operator=(const AD<Base> &y)
 
 
 	// index in vector for this element
-	size_t i = static_cast<size_t>( Integer(x_) );
+	size_t i = static_cast<size_t>( Integer(ind_) );
 	CPPAD_ASSERT_UNKNOWN( i < vec_->length_ );
 
 	// assign value for this element (as an AD<Base> object) 
@@ -596,33 +638,40 @@ void VecAD_reference<Base>::operator=(const AD<Base> &y)
 
 	// record the setting of this array element
 	CPPAD_ASSERT_UNKNOWN( vec_->offset_ > 0 );
-	if( Parameter(x_) )
+	if( Parameter(ind_) )
 	{	CPPAD_ASSERT_UNKNOWN( NumArg(StpvOp) == 3 );
 		CPPAD_ASSERT_UNKNOWN( NumRes(StpvOp) == 0 );
 
 		// put operand addresses in tape
 		tape->Rec_.PutArg(vec_->offset_, i, y.taddr_);
 
-		// put operator in the tape, x_ is parameter, y is variable
+		// put operator in the tape, ind_ is parameter, y is variable
 		tape->Rec_.PutOp(StpvOp);
 	}
 	else
 	{	CPPAD_ASSERT_UNKNOWN( NumArg(StvvOp) == 3 );
 		CPPAD_ASSERT_UNKNOWN( NumRes(StvvOp) == 0 );
-		CPPAD_ASSERT_UNKNOWN( x_.taddr_ > 0 );
+		CPPAD_ASSERT_UNKNOWN( ind_.taddr_ > 0 );
 
 		// put operand addresses in tape
-		tape->Rec_.PutArg(vec_->offset_, x_.taddr_, y.taddr_);
+		tape->Rec_.PutArg(vec_->offset_, ind_.taddr_, y.taddr_);
 
-		// put operator in the tape, x_ is variable, y is variable
+		// put operator in the tape, ind_ is variable, y is variable
 		tape->Rec_.PutOp(StvvOp);
 	}
 }
 
+
+/*!
+Taped setting of element to a value.
+
+\param y
+value that element is set to.
+*/
 template <class Base>
 void VecAD_reference<Base>::operator=(const Base &y)
 { 
-	size_t i = static_cast<size_t>( Integer(x_) );
+	size_t i = static_cast<size_t>( Integer(ind_) );
 	CPPAD_ASSERT_UNKNOWN( i < vec_->length_ );
 
 	// assign value for this element 
@@ -640,54 +689,60 @@ void VecAD_reference<Base>::operator=(const Base &y)
 
 	// record the setting of this array element
 	CPPAD_ASSERT_UNKNOWN( vec_->offset_ > 0 );
-	if( Parameter(x_) )
+	if( Parameter(ind_) )
 	{	CPPAD_ASSERT_UNKNOWN( NumArg(StppOp) == 3 );
 		CPPAD_ASSERT_UNKNOWN( NumRes(StppOp) == 0 );
 
 		// put operand addresses in tape
 		tape->Rec_.PutArg(vec_->offset_, i, p);
 
-		// put operator in the tape, x_ is parameter, y is parameter
+		// put operator in the tape, ind_ is parameter, y is parameter
 		tape->Rec_.PutOp(StppOp);
 	}
 	else
 	{	CPPAD_ASSERT_UNKNOWN( NumArg(StvpOp) == 3 );
 		CPPAD_ASSERT_UNKNOWN( NumRes(StvpOp) == 0 );
-		CPPAD_ASSERT_UNKNOWN( x_.taddr_ > 0 );
+		CPPAD_ASSERT_UNKNOWN( ind_.taddr_ > 0 );
 
 		// put operand addresses in tape
-		tape->Rec_.PutArg(vec_->offset_, x_.taddr_, p);
+		tape->Rec_.PutArg(vec_->offset_, ind_.taddr_, p);
 
-		// put operator in the tape, x_ is variable, y is parameter
+		// put operator in the tape, ind_ is variable, y is parameter
 		tape->Rec_.PutOp(StvpOp);
 	}
 }
 
-// fold this case into AD<Base> case above
+/*!
+Taped setting of element to a value.
+
+\param y
+value that element is set to.
+
+\par
+this case gets folded into case where value is AD<Base>. 
+*/
 template <class Base>
 inline void VecAD_reference<Base>::operator=
 (const VecAD_reference<Base> &y)
 {	*this = y.ADBase(); }
 
-// fold this case into Base case above
+/*!
+Taped setting of element to a value.
+
+\param y
+value that element is set to.
+
+\par
+this case gets folded into case where value is Base. 
+*/
 template <class Base>
 inline void VecAD_reference<Base>::operator=(int y)
 {	*this = Base(y); }
 
-template <class Base>
-CPPAD_INLINE_FRIEND_TEMPLATE_FUNCTION
-std::ostream& operator << (std::ostream &os, const VecAD<Base> &v)
-{
- 	os << "vecAD( length = " << v.length_ 
-	   << ", offset = "      << v.offset_ << ")";
-	return os;
-}
 
-
-} // END CppAD namespace
+} // END_CPPAD_NAMESPACE
 
 // preprocessor symbols that are local to this file
 # undef CPPAD_VEC_AD_COMPUTED_ASSIGNMENT
-# undef CPPAD_VEC_AD_TYPEDEF_ADBASE
 
 # endif

@@ -80,6 +80,20 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
   GVECTORIZE(FUN,T,V,I,N,N,N);			\
   GVECTORIZE(FUN,V,V,I,N,N,N);
 
+/** \brief Vectorize 3-argument functions.
+
+    For three-arguments functions (Type, Type, Type),
+    vectorize all three arguments.
+*/
+#define VECTORIZE3_ttt(FUN)			\
+  GVECTORIZE(FUN,V,T,T,N,N,N);			\
+  GVECTORIZE(FUN,T,V,T,N,N,N);			\
+  GVECTORIZE(FUN,T,T,V,N,N,N);			\
+  GVECTORIZE(FUN,V,V,T,N,N,N);			\
+  GVECTORIZE(FUN,T,V,V,N,N,N);			\
+  GVECTORIZE(FUN,V,T,V,N,N,N);			\
+  GVECTORIZE(FUN,V,V,V,N,N,N);
+
 /** \brief Vectorize 4-argument functions.
 
     For Four-arguments functions (Type, Type, Type, int),
@@ -129,7 +143,7 @@ VECTORIZE4_ttti(dnbinom);
 VECTORIZE4_ttti(dgamma);
 VECTORIZE4_ttti(dlgamma);
 VECTORIZE3_tti(dpois);
-
+VECTORIZE4_ttti(dzipois);
 
 /* max and min of vector */
 double max(const vector<double> &x)

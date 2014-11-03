@@ -88,6 +88,16 @@ updateCholesky <- function(L,H,t=0){
 ##'   \item \code{last.par.best} Full parameter of the best likelihood evaluation.
 ##'   \item \code{tracepar} Trace every likelihood evaluation ?
 ##'   \item \code{tracemgc} Trace mgc of every gradient evaluation ?
+##'   \item \code{silent} Pass 'silent=TRUE' to all try-calls ?
+##' }
+##'
+##' A high level of tracing information will be output by default when evaluating the objective function and gradient.
+##' This is useful while developing a model, but may eventually become annoying.
+##' The following will disable all tracing from an object 'obj' returned by 'MakeADFun':
+##' \itemize{
+##' \item \code{obj$env$tracemgc <- FALSE}
+##' \item \code{obj$env$inner.control$trace <- FALSE}
+##' \item \code{obj$env$silent <- TRUE}
 ##' }
 ##' 
 ##' @title Construct objective functions with derivatives based on a compiled c++ template.
@@ -458,7 +468,7 @@ MakeADFun <- function(data,parameters,map=list(),
                                       ##he=function(x)f0(x,order=2)),
                                       he=H0,env=env),
                                  inner.control)
-                          )
+                          ), silent=silent
                  )
       if(is.character(opt))return(NaN)
     } else{  
@@ -627,7 +637,7 @@ MakeADFun <- function(data,parameters,map=list(),
     as.list(reportenv)
   }
 
-  silent <- TRUE
+  silent <- FALSE
   tracepar <- FALSE
   validpar <- function(x)TRUE
   tracemgc <- TRUE
@@ -820,10 +830,16 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 
 ##' Precompile the TMB library
 ##'
-##' The precompilation should only be run once, typically right after installaion of TMB.
+##' The precompilation should only be run once, typically right after installation of TMB.
 ##' Note that the precompilation requires write access to the TMB package folder.
 ##' Two versions of the library - with/without the openmp flag - will be generated. After this,
 ##' compilation times of templates should be reduced.
+##' \itemize{
+##' \item To precompile on Linux run \code{precompile()}.
+##' \item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@@")}.
+##' }
+##' Note that precompilation has side effects: It is not possible to work with more than one
+##' model at a time for a single R instance.
 ##' @title Precompile the TMB library in order to speed up compilation of templates.
 ##' @param ... Passed to \code{compile}.
 precompile <- function(...){

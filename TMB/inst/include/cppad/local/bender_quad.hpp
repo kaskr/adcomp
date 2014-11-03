@@ -1,9 +1,9 @@
-/* $Id: bender_quad.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id: bender_quad.hpp 2859 2013-05-28 06:03:21Z bradbell $ */
 # ifndef CPPAD_BENDER_QUAD_INCLUDED
 # define CPPAD_BENDER_QUAD_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -36,8 +36,8 @@ $index BenderQuad$$
 $section Computing Jacobian and Hessian of Bender's Reduced Objective$$
 
 $head Syntax$$
-$icode%
-%# include <cppad/cppad.hpp>
+$codei%
+# include <cppad/cppad.hpp>
 BenderQuad(%x%, %y%, %fun%, %g%, %gx%, %gxx%)%$$  
 
 $head See Also$$

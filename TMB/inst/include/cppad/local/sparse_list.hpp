@@ -1,9 +1,9 @@
-/* $Id: sparse_list.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: sparse_list.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_SPARSE_LIST_INCLUDED
 # define CPPAD_SPARSE_LIST_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -15,10 +15,8 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 # include <cppad/local/define.hpp>
 # include <list>
 
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup sparse_list_hpp sparse_list.hpp
-\{
 \file sparse_list.hpp
 Vector of sets of positive integers stored as singly linked lists.
 */
@@ -424,6 +422,5 @@ void sparsity_user2internal(
 }
 
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif

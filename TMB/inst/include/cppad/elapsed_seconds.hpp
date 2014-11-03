@@ -1,9 +1,9 @@
-/* $Id: elapsed_seconds.hpp 2625 2012-12-23 14:34:12Z bradbell $ */
+/* $Id: elapsed_seconds.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
 # ifndef CPPAD_ELAPSED_SECONDS_INCLUDED
 # define CPPAD_ELAPSED_SECONDS_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -73,7 +73,7 @@ $end
 
 # ifdef _MSC_VER
 extern double microsoft_timer(void);
-# elif CPPAD_GETTIMEOFDAY 
+# elif CPPAD_HAS_GETTIMEOFDAY 
 # include <sys/time.h>
 # else
 # include <ctime>
@@ -84,10 +84,8 @@ extern double microsoft_timer(void);
 
 // needed before one can use CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL
 # include <cppad/thread_alloc.hpp>
-CPPAD_BEGIN_NAMESPACE
+namespace CppAD { // BEGIN_CPPAD_NAMESPACE
 /*!
-\defgroup elapsed_seconds_hpp elapsed_seconds.hpp
-\{
 \file elapsed_seconds.hpp
 \brief Function that returns the elapsed seconds from first call.
 */
@@ -111,7 +109,7 @@ inline double elapsed_seconds(void)
 # ifdef _MSC_VER
 {	return microsoft_timer(); }
 
-# elif CPPAD_GETTIMEOFDAY 
+# elif CPPAD_HAS_GETTIMEOFDAY 
 {	CPPAD_ASSERT_FIRST_CALL_NOT_PARALLEL;
 	static bool           first_ = true;
 	static struct timeval tv_;		
@@ -148,6 +146,5 @@ inline double elapsed_seconds(void)
 }
 # endif
 
-/*! \} */
-CPPAD_END_NAMESPACE
+} // END_CPPAD_NAMESPACE
 # endif
