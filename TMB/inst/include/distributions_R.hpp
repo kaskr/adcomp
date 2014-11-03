@@ -291,6 +291,7 @@ Type pSHASHo(Type q,Type mu,Type sigma,Type nu,Type tau,int give_log=0)
 
 // Vectorize pSHASHo
 VECTORIZE6_ttttti(pSHASHo);
+/**@}*/
 
 using atomic::pnorm;
 VECTORIZE3_ttt(pnorm);
