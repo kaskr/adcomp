@@ -122,7 +122,6 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
   GVECTORIZE(FUN,V,T,V,T,T,I);			\
   GVECTORIZE(FUN,V,V,V,T,T,I);
 
-
 using CppAD::abs;
 VECTORIZE1_t(abs);
 VECTORIZE1_t(acos);
