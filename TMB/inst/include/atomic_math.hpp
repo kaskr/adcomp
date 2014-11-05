@@ -296,6 +296,9 @@ Type logdet(matrix<Type> x){
   return logdet(mat2vec(x))[0];
 }
 
+/** \brief Distribution function of the normal distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
 template<class Type>
 Type pnorm(Type q, Type mean = 0, Type sd = 1){
   CppAD::vector<Type> tx(1);
@@ -303,6 +306,9 @@ Type pnorm(Type q, Type mean = 0, Type sd = 1){
   return pnorm1(tx)[0];
 }
 
+/** \brief Quantile function of the normal distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
 template<class Type>
 Type qnorm(Type p, Type mean = 0, Type sd = 1){
   CppAD::vector<Type> tx(1);
@@ -310,6 +316,8 @@ Type qnorm(Type p, Type mean = 0, Type sd = 1){
   return sd*qnorm1(tx)[0] + mean;
 }
 
+/** \brief Logarithm of gamma function (following R argument convention).
+*/
 template<class Type>
 Type lgamma(Type x){
   CppAD::vector<Type> tx(2);
@@ -318,6 +326,9 @@ Type lgamma(Type x){
   return D_lgamma(tx)[0];
 }
 
+/** \brief Distribution function of the gamma distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
 template<class Type>
 Type pgamma(Type q, Type shape, Type scale = 1){
   CppAD::vector<Type> tx(4);
@@ -328,6 +339,9 @@ Type pgamma(Type q, Type shape, Type scale = 1){
   return D_incpl_gamma_shape(tx)[0];
 }
 
+/** \brief Quantile function of the gamma distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
 template<class Type>
 Type qgamma(Type q, Type shape, Type scale = 1){
   CppAD::vector<Type> tx(3);

@@ -399,6 +399,7 @@ opposite order to the dimensions of \c x.
 \example linreg.cpp
 \example linreg_parallel.cpp
 \example longlinreg.cpp
+\example lr_test.cpp
 \example matrix_arrays.cpp
 \example mvrw.cpp
 \example mvrw_sparse.cpp
@@ -413,6 +414,7 @@ opposite order to the dimensions of \c x.
 \example socatt.cpp
 \example spatial.cpp
 \example thetalog.cpp
+\example transform.cpp
 
 */
 
