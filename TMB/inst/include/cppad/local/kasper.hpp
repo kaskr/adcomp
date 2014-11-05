@@ -419,10 +419,8 @@ void printTP(tape_point tp){
   Base dummy[1000];
   OpCode op=tp.op;
   const addr_t* arg=tp.op_arg;
-  size_t       i_tmp  = tp.var_index;
   const Base*  Z_tmp  =dummy;//= Taylor + i_var * J;
   const Base*  pZ_tmp =dummy;//  Partial + i_var * K;
-  size_t d=0;
   printOp(
 	  std::cout,
 	  &play_,
