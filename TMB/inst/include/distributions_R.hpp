@@ -225,6 +225,70 @@ Type dmultinom(vector<Type> x, vector<Type> p, int give_log=0)
 	else return exp(logres);
 }
 
+/** 	@name Sinh-asinh distribution.
+  	Functions relative to the sinh-asinh distribution.
+		*/
+/**@{*/
+/**	\brief Probability density function of the sinh-asinh distribution.
+  	\ingroup R_style_distribution
+	\param mu Location.
+	\param sigma Scale.
+	\param nu Skewness.
+	\param tau Kurtosis.
+	\param give_log true if one wants the log-probability, false otherwise.
+					
+	Notation adopted from R package "gamlss.dist".
+				
+	Probability density given in (2) in __Jones and Pewsey (2009) Biometrika (2009) 96 (4): 761-780__.
+								
+	It is not possible to call this function with nu a vector or tau a vector.
+*/
+template <class Type>
+Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
+{
+	// TODO : Replace log(x+sqrt(x^2+1)) by a better approximation for asinh(x).
+		
+	Type z = (x-mu)/sigma;
+   	Type c = cosh(tau*log(z+sqrt(z*z+1))-nu);
+   	Type r = sinh(tau*log(z+sqrt(z*z+1))-nu);
+   	Type logres = -log(sigma) + log(tau) -0.5*log(2*M_PI) -0.5*log(1+(z*z)) +log(c) -0.5*(r*r);
+					   	
+  	if(!give_log) return exp(logres);
+   	else return logres;
+}
+
+// Vectorize dSHASHo
+VECTORIZE6_ttttti(dSHASHo);
+
+/**	\brief Cumulative distribution function of the sinh-asinh distribution.
+  	\ingroup R_style_distribution
+	\param mu Location.
+	\param sigma Scale.
+	\param nu Skewness.
+	\param tau Kurtosis.
+	\param give_log true if one wants the log-probability, false otherwise.
+		
+	Notation adopted from R package "gamlss.dist".
+	
+	It is not possible to call this function with nu a vector or tau a vector.
+*/
+template <class Type>
+Type pSHASHo(Type q,Type mu,Type sigma,Type nu,Type tau,int give_log=0)
+{
+	// TODO : Replace pnorm_approx by pnorm when it is written. Replace log(x+sqrt(x^2+1)) by a better approximation for asinh(x).
+
+	Type z = (q-mu)/sigma;
+	Type r = sinh(tau * log(z+sqrt(z*z+1)) - nu);
+	Type p = pnorm_approx(r);
+				  	
+	if (!give_log) return p;
+	else return log(p);
+}
+
+// Vectorize pSHASHo
+VECTORIZE6_ttttti(pSHASHo);
+/**@}*/
+
 using atomic::pnorm;
 VECTORIZE3_ttt(pnorm);
 
