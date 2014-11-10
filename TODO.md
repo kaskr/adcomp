@@ -35,3 +35,4 @@ TODO
 - Implement atomic AD operator of matrix exponential.
 - Package should pass "make check"/"R CMD check" without warnings.
 - Make unary functions work on arrays and preserve dimension.
+- Disable array methods that give unexpected results (e.g. .Block() ).
