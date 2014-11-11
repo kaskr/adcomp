@@ -203,7 +203,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     for(size_t i=0;i<p*domain;i++)out(i)=0;
     for(int i=0;i<ntapes;i++)out=out+ans(i);
     return out;
-  };
+  }
   template <typename VectorBase>
   VectorBase Jacobian(const VectorBase &x){
     vector<VectorBase> ans(ntapes);
