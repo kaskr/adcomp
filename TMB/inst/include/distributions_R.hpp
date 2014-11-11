@@ -17,7 +17,7 @@ Type pexp(Type x, Type rate)
 }
 
 // Vectorize pexp
-VECTORIZE2_tt(pexp);
+VECTORIZE2_tt(pexp)
 
 /**	\brief Probability density function of the exponential distribution.
 	\ingroup R_style_distribution
@@ -34,7 +34,7 @@ Type dexp(Type x, Type rate, int give_log=0)
 }
 
 // Vectorize dexp
-VECTORIZE3_tti(dexp);
+VECTORIZE3_tti(dexp)
 
 /**	\brief Inverse cumulative distribution function of the exponential distribution.
 	\ingroup R_style_distribution
@@ -47,7 +47,7 @@ Type qexp(Type p, Type rate)
 }
 
 // Vectorize qexp.
-VECTORIZE2_tt(qexp);
+VECTORIZE2_tt(qexp)
 /**@}*/
 
 
@@ -67,7 +67,7 @@ Type pweibull(Type x, Type shape, Type scale)
 }
 
 // Vectorize pweibull
-VECTORIZE3_ttt(pweibull);
+VECTORIZE3_ttt(pweibull)
 
 /** 	\brief Probability density function of the Weibull distribution.
 	\ingroup R_style_distribution
@@ -85,7 +85,7 @@ Type dweibull(Type x, Type shape, Type scale, int give_log=0)
 }
 
 // Vectorize dweibull
-VECTORIZE4_ttti(dweibull);
+VECTORIZE4_ttti(dweibull)
 
 /**	\brief Inverse cumulative distribution function of the Weibull distribution.
 	\ingroup R_style_distribution
@@ -103,7 +103,7 @@ Type qweibull(Type p, Type shape, Type scale)
 }
 
 // Vectorize qweibull
-VECTORIZE3_ttt(qweibull);
+VECTORIZE3_ttt(qweibull)
 /**@}*/
 
 /**	\brief Probability mass function of the binomial distribution.
@@ -122,7 +122,7 @@ Type dbinom(Type k, Type size, Type prob, int give_log=0)
 }
 
 // Vectorize dbinom
-VECTORIZE4_ttti(dbinom);
+VECTORIZE4_ttti(dbinom)
 
 /**	\brief Probability density function of the beta distribution.
 	\ingroup R_style_distribution
@@ -141,7 +141,7 @@ Type dbeta(Type x, Type shape1, Type shape2, int give_log)
 }
 
 // Vectorize dbeta
-VECTORIZE4_ttti(dbeta);
+VECTORIZE4_ttti(dbeta)
 
 /**	\brief Probability density function of the Fisher distribution.
 	\ingroup R_style_distribution
@@ -158,7 +158,7 @@ Type df(Type x, Type df1, Type df2, int give_log)
 }
 
 //Vectorize df
-VECTORIZE4_ttti(df);
+VECTORIZE4_ttti(df)
 
 /**	\brief Probability density function of the logistic distribution.
 	\ingroup R_style_distribution
@@ -175,7 +175,7 @@ Type dlogis(Type x, Type location, Type scale, int give_log)
 }
 
 // Vectorize dlogis
-VECTORIZE4_ttti(dlogis);
+VECTORIZE4_ttti(dlogis)
 
 /**	\brief Probability density function of the skew-normal distribution.
 	\ingroup R_style_distribution
@@ -192,7 +192,7 @@ Type dsn(Type x, Type alpha, int give_log=0)
 }
 
 // Vectorize dsn
-VECTORIZE3_tti(dsn);
+VECTORIZE3_tti(dsn)
 
 /** 	\brief Probability density function of the Student t-distribution.
 	\ingroup R_style_distribution
@@ -208,7 +208,7 @@ Type dt(Type x, Type df, int give_log)
 }
 
 // Vectorize dt
-VECTORIZE3_tti(dt);
+VECTORIZE3_tti(dt)
 
 /** 	\brief Probability mass function of the multinomial distribution.
 	\ingroup R_style_distribution
@@ -226,13 +226,13 @@ Type dmultinom(vector<Type> x, vector<Type> p, int give_log=0)
 }
 
 using atomic::pnorm;
-VECTORIZE3_ttt(pnorm);
+VECTORIZE3_ttt(pnorm)
 
 using atomic::qnorm;
-VECTORIZE3_ttt(qnorm);
+VECTORIZE3_ttt(qnorm)
 
 using atomic::pgamma;
-VECTORIZE3_ttt(pgamma);
+VECTORIZE3_ttt(pgamma)
 
 using atomic::qgamma;
-VECTORIZE3_ttt(qgamma);
+VECTORIZE3_ttt(qgamma)

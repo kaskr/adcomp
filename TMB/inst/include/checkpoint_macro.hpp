@@ -155,7 +155,7 @@ namespace atomic{
       return vpf[THREAD][level]->Forward(0,tx);
     }
   }; /* end class forrev_derivatives */
-}; /* end namespace atomic */
+} /* end namespace atomic */
 #undef NTHREADS
 #undef THREAD
 

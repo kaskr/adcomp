@@ -66,9 +66,9 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
     vectorize both arguments.
 */
 #define VECTORIZE2_tt(FUN)			\
-  GVECTORIZE(FUN,V,T,N,N,N,N);			\
-  GVECTORIZE(FUN,T,V,N,N,N,N);			\
-  GVECTORIZE(FUN,V,V,N,N,N,N);
+  GVECTORIZE(FUN,V,T,N,N,N,N)			\
+  GVECTORIZE(FUN,T,V,N,N,N,N)			\
+  GVECTORIZE(FUN,V,V,N,N,N,N)
 
 /** \brief Vectorize 3-argument functions.
 
@@ -76,9 +76,9 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
     vectorize first two arguments.
 */
 #define VECTORIZE3_tti(FUN)			\
-  GVECTORIZE(FUN,V,T,I,N,N,N);			\
-  GVECTORIZE(FUN,T,V,I,N,N,N);			\
-  GVECTORIZE(FUN,V,V,I,N,N,N);
+  GVECTORIZE(FUN,V,T,I,N,N,N)			\
+  GVECTORIZE(FUN,T,V,I,N,N,N)			\
+  GVECTORIZE(FUN,V,V,I,N,N,N)
 
 /** \brief Vectorize 3-argument functions.
 
@@ -86,13 +86,13 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
     vectorize all three arguments.
 */
 #define VECTORIZE3_ttt(FUN)			\
-  GVECTORIZE(FUN,V,T,T,N,N,N);			\
-  GVECTORIZE(FUN,T,V,T,N,N,N);			\
-  GVECTORIZE(FUN,T,T,V,N,N,N);			\
-  GVECTORIZE(FUN,V,V,T,N,N,N);			\
-  GVECTORIZE(FUN,T,V,V,N,N,N);			\
-  GVECTORIZE(FUN,V,T,V,N,N,N);			\
-  GVECTORIZE(FUN,V,V,V,N,N,N);
+  GVECTORIZE(FUN,V,T,T,N,N,N)			\
+  GVECTORIZE(FUN,T,V,T,N,N,N)			\
+  GVECTORIZE(FUN,T,T,V,N,N,N)			\
+  GVECTORIZE(FUN,V,V,T,N,N,N)			\
+  GVECTORIZE(FUN,T,V,V,N,N,N)			\
+  GVECTORIZE(FUN,V,T,V,N,N,N)			\
+  GVECTORIZE(FUN,V,V,V,N,N,N)
 
 /** \brief Vectorize 4-argument functions.
 
@@ -100,13 +100,13 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
     vectorize first three arguments.
 */
 #define VECTORIZE4_ttti(FUN)			\
-  GVECTORIZE(FUN,V,T,T,I,N,N);			\
-  GVECTORIZE(FUN,T,V,T,I,N,N);			\
-  GVECTORIZE(FUN,T,T,V,I,N,N);			\
-  GVECTORIZE(FUN,V,V,T,I,N,N);			\
-  GVECTORIZE(FUN,T,V,V,I,N,N);			\
-  GVECTORIZE(FUN,V,T,V,I,N,N);			\
-  GVECTORIZE(FUN,V,V,V,I,N,N);
+  GVECTORIZE(FUN,V,T,T,I,N,N)			\
+  GVECTORIZE(FUN,T,V,T,I,N,N)			\
+  GVECTORIZE(FUN,T,T,V,I,N,N)			\
+  GVECTORIZE(FUN,V,V,T,I,N,N)			\
+  GVECTORIZE(FUN,T,V,V,I,N,N)			\
+  GVECTORIZE(FUN,V,T,V,I,N,N)			\
+  GVECTORIZE(FUN,V,V,V,I,N,N)
 
 /** \brief Vectorize 6-argument functions.
 
@@ -114,28 +114,28 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
     vectorize first three arguments.
 */
 #define VECTORIZE6_ttttti(FUN)			\
-  GVECTORIZE(FUN,V,T,T,T,T,I);			\
-  GVECTORIZE(FUN,T,V,T,T,T,I);			\
-  GVECTORIZE(FUN,T,T,V,T,T,I);			\
-  GVECTORIZE(FUN,V,V,T,T,T,I);			\
-  GVECTORIZE(FUN,T,V,V,T,T,I);			\
-  GVECTORIZE(FUN,V,T,V,T,T,I);			\
-  GVECTORIZE(FUN,V,V,V,T,T,I);
+  GVECTORIZE(FUN,V,T,T,T,T,I)			\
+  GVECTORIZE(FUN,T,V,T,T,T,I)			\
+  GVECTORIZE(FUN,T,T,V,T,T,I)			\
+  GVECTORIZE(FUN,V,V,T,T,T,I)			\
+  GVECTORIZE(FUN,T,V,V,T,T,I)			\
+  GVECTORIZE(FUN,V,T,V,T,T,I)			\
+  GVECTORIZE(FUN,V,V,V,T,T,I)
 
 
 using CppAD::abs;
-VECTORIZE1_t(abs);
-VECTORIZE1_t(acos);
-VECTORIZE1_t(asin);
-VECTORIZE1_t(atan);
-VECTORIZE1_t(cos);
-VECTORIZE1_t(erf);
-VECTORIZE1_t(exp);
-VECTORIZE1_t(log);
-VECTORIZE1_t(log10);
-VECTORIZE1_t(sin);
-VECTORIZE1_t(sqrt);   //mangler atan2, pow
-VECTORIZE2_tt(pow);
+VECTORIZE1_t(abs)
+VECTORIZE1_t(acos)
+VECTORIZE1_t(asin)
+VECTORIZE1_t(atan)
+VECTORIZE1_t(cos)
+VECTORIZE1_t(erf)
+VECTORIZE1_t(exp)
+VECTORIZE1_t(log)
+VECTORIZE1_t(log10)
+VECTORIZE1_t(sin)
+VECTORIZE1_t(sqrt)
+VECTORIZE2_tt(pow)
 
 /* max and min of vector */
 double max(const vector<double> &x)

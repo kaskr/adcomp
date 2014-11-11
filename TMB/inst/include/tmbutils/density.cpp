@@ -8,9 +8,9 @@ public:						\
 typedef scalartype_ scalartype;			\
 typedef vector<scalartype> vectortype;		\
 typedef matrix<scalartype> matrixtype;		\
-typedef array<scalartype> arraytype;
+typedef array<scalartype> arraytype
 
-#define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){};
+#define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){}
 
 /** \brief Multivariate normal distribution with user supplied covariance matrix
 

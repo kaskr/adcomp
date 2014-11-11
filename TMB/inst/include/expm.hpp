@@ -279,6 +279,6 @@ namespace atomic{
     return vec2mat(expm(args2vector(args)),n,n);
   }
 
-}; // end namespace atomic
+} // end namespace atomic
 
 using atomic::expm;
