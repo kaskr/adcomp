@@ -50,6 +50,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
   obj2 <- MakeADFun(obj$env$data,obj$env$parameters,type="ADFun",ADreport=TRUE,DLL=obj$env$DLL)
+  obj2$env$tracemgc <- obj2$env$tracemgc
+  obj2$env$inner.control$trace <- obj2$env$inner.control$trace
+  obj2$env$silent <- obj$env$silent
   r <- obj$env$random
   ## Get full parameter (par), Fixed effects parameter (par.fixed)
   ## and fixed effect gradient (gradient.fixed)
