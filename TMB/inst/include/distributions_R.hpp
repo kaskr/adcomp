@@ -2,6 +2,55 @@
 	\brief Probability distribution functions.
 	*/
 
+/** \brief Distribution function of the normal distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type pnorm(Type q, Type mean = 0, Type sd = 1){
+  CppAD::vector<Type> tx(1);
+  tx[0] = (q - mean) / sd;
+  return atomic::pnorm1(tx)[0];
+}
+VECTORIZE3_ttt(pnorm)
+
+/** \brief Quantile function of the normal distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type qnorm(Type p, Type mean = 0, Type sd = 1){
+  CppAD::vector<Type> tx(1);
+  tx[0] = p;
+  return sd*atomic::qnorm1(tx)[0] + mean;
+}
+VECTORIZE3_ttt(qnorm)
+
+/** \brief Distribution function of the gamma distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type pgamma(Type q, Type shape, Type scale = 1){
+  CppAD::vector<Type> tx(4);
+  tx[0] = q/scale;
+  tx[1] = shape;
+  tx[2] = Type(0);        // 0'order deriv
+  tx[3] = -lgamma(shape); // normalize
+  return atomic::D_incpl_gamma_shape(tx)[0];
+}
+VECTORIZE3_ttt(pgamma)
+
+/** \brief Quantile function of the gamma distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type qgamma(Type q, Type shape, Type scale = 1){
+  CppAD::vector<Type> tx(3);
+  tx[0] = q;
+  tx[1] = shape;
+  tx[2] = -lgamma(shape); // normalize
+  return atomic::inv_incpl_gamma(tx)[0] * scale;
+}
+VECTORIZE3_ttt(qgamma)
+
 /** 	@name Exponential distribution.
 	Functions relative to the exponential distribution.
 	*/
@@ -333,14 +382,3 @@ Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 VECTORIZE6_ttttti(norm2SHASHo)
 /**@}*/
 
-using atomic::pnorm;
-VECTORIZE3_ttt(pnorm)
-
-using atomic::qnorm;
-VECTORIZE3_ttt(qnorm)
-
-using atomic::pgamma;
-VECTORIZE3_ttt(pgamma)
-
-using atomic::qgamma;
-VECTORIZE3_ttt(qgamma)

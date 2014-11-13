@@ -1,7 +1,16 @@
 /** \file
     \brief Gamma function and gamma probability densities
 */
-using atomic::lgamma;
+
+/** \brief Logarithm of gamma function (following R argument convention).
+*/
+template<class Type>
+Type lgamma(Type x){
+  CppAD::vector<Type> tx(2);
+  tx[0] = x;
+  tx[1] = Type(0);
+  return atomic::D_lgamma(tx)[0];
+}
 VECTORIZE1_t(lgamma)
 
 /* Old lgamma approximation */
