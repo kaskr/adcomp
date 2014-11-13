@@ -558,3 +558,24 @@ and \ref SEPARABLE functions, and the notion of a \c distribution. The reader
 is referred to section \ref  Densities for details and examples.
 
 */
+
+/** \defgroup CppTutorial C++ tutorial
+\brief Help for R users to write the C++ user template
+
+Summary of how syntax differs between R and C++:
+\code
+              R code             C++/TMB code                
+              
+Comments      #                  //                          // Comment symbol
+Constants     3.4                Type(3.4);                  // Explicit casting recommended in TMB              
+Scalar        x = 5.2            Type x = Type(5.2);         // Variables must have type
+Arrays        x = numeric(10)    vector<Type> x(10);         // C++ code here does NOT initialize to 0     
+Indexing      x[1]+x[10]         x(0)+x(9);                  // C++ indexing is zero-based
+Loops         for(i in 1:10)     for(i=1;i<=10;i++)          // Integer i must be declared in C++    
+Increments    x[1] = x[1] + 3    x(0) += 3.0;                // += -= *= /= incremental operators in C++
+
+\endcode
+
+
+ 
+*/
