@@ -258,7 +258,7 @@ Type dSHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int give_log = 0)
 }
 
 // Vectorize dSHASHo
-VECTORIZE6_ttttti(dSHASHo);
+VECTORIZE6_ttttti(dSHASHo)
 
 /**	\brief Cumulative distribution function of the sinh-asinh distribution.
   	\ingroup R_style_distribution
@@ -286,7 +286,7 @@ Type pSHASHo(Type q,Type mu,Type sigma,Type nu,Type tau,int give_log=0)
 }
 
 // Vectorize pSHASHo
-VECTORIZE6_ttttti(pSHASHo);
+VECTORIZE6_ttttti(pSHASHo)
 
 /**	\brief Quantile function of the sinh-asinh distribution.
 	\ingroup R_style_distribution
@@ -310,7 +310,7 @@ Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 }
 
 // Vectorize qSHASHo
-VECTORIZE6_ttttti(qSHASHo);
+VECTORIZE6_ttttti(qSHASHo)
 
 /**	\brief Transforms a normal variable into a sinh-asinh variable.
 	\param mu Location parameter of the result sinh-asinh distribution.
@@ -330,7 +330,7 @@ Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 }
 
 // Vectorize norm2SHASHo
-VECTORIZE6_ttttti(norm2SHASHo);
+VECTORIZE6_ttttti(norm2SHASHo)
 /**@}*/
 
 using atomic::pnorm;
