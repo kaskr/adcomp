@@ -825,7 +825,9 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                      ...
                      )
   on.exit(file.remove(mvfile),add=TRUE)
-  tools:::.shlib_internal(file)
+  status <- tools:::.shlib_internal(file)
+  if(status!=0)stop("Compilation failed")
+  status
 }
 
 ##' Precompile the TMB library
