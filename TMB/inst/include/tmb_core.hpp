@@ -611,9 +611,9 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   PROTECT(hessianrows=getListElement(control,"hessianrows"));
   int nrows=length(hessianrows);
   if((nrows>0)&(nrows!=ncols))error("hessianrows and hessianrows must have same length");
-  vector<int> cols(ncols);    
-  vector<int> cols0(ncols);
-  vector<int> rows(nrows);
+  vector<size_t> cols(ncols);
+  vector<size_t> cols0(ncols);
+  vector<size_t> rows(nrows);
   if(ncols>0){
     for(int i=0;i<ncols;i++){
       cols[i]=INTEGER(hessiancols)[i]-1; //R-index -> C-index
