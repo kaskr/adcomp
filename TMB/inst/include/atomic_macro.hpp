@@ -6,6 +6,7 @@
 #define CSKIP(x) x
 #endif
 
+/** \brief Construct atomic vector function based on known derivatives */
 #define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_REVERSE) \
 CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx)CSKIP({	\
   CppAD::vector<double> ty(OUTPUT_DIM);					\

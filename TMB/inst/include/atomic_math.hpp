@@ -1,5 +1,27 @@
+/**
+   \brief Namespace with special functions and derivatives
+
+   This namespace extends the 'derivatives table' of CppAD.
+   - R's special math library is extended with derivatives in cases 
+   where symbolic derivatives are available. These special functions
+   are often iterative and therefore difficult to implement with AD
+   types. Instead, we code the derivatives based on the double versions 
+   available from R. This approach requires fewer code lines, and has the
+   benefit of obtaining the same high accuracy as R's math functions.
+   - Some matrix operations are extended with derivatives. This greatly 
+   reduces the AD memory usage. Furthermore, these atomic operations
+   can be linked to a performance library by setting preprocesor flag 
+   EIGEN_USE_BLAS.
+   - New symbols can be added by advanced users. First option is to
+   code the reverse mode derivatives by hand using the
+   TMB_ATOMIC_VECTOR_FUNCTION macro, see source code for examples.
+   Second option is to generate reverse mode derivatives automatically
+   using the macro REGISTER_ATOMIC.
+*/
 namespace atomic {
-/* Namespace with double versions of R special math library */
+/**
+   \brief Namespace with double versions of R special math library
+*/
 namespace Rmath {
   #include <Rmath.h>
   // Macros do not respect the namespace limits.
@@ -90,13 +112,25 @@ namespace Rmath {
 
 #include "atomic_macro.hpp"
 
-/* Utilities for conversion between CppAD::vector and Eigen::Matrix */
+/** \name Interface to atomic functions.
+    @{
+*/
+/** \brief Convert segment of CppAD::vector to Eigen::Matrix 
+    \param x Input vector.
+    \param m Number of rows in result.
+    \param n Number of columns in result.
+    \param offset Segment offset.
+*/
 template<class Type>
 matrix<Type> vec2mat(CppAD::vector<Type> x, int m, int n, int offset=0){
   matrix<Type> res(m,n);
   for(int i=0;i<m*n;i++)res(i)=x[i+offset];
   return res;
 }
+
+/** \brief Convert Eigen::Matrix to CppAD::vector by stacking the matrix columns.
+    \param x Input matrix.
+*/
 template<class Type>
 CppAD::vector<Type> mat2vec(matrix<Type> x){
   int n=x.size();
@@ -104,13 +138,27 @@ CppAD::vector<Type> mat2vec(matrix<Type> x){
   for(int i=0;i<n;i++)res[i]=x(i);
   return res;
 }
+/**
+    @}
+*/
 
-/* Derivative of pnorm1 (based on functions with known derivatives) */
+/** \name Atomic functions.
+    @{
+*/
+
+/** \brief Standard normal density function 'dnorm1'. 
+    Needed to define derivative of 'pnorm1'.
+*/
 template<class Type>
 Type dnorm1(Type x){
   return Type(1.0/sqrt(2.0*M_PI)) * exp(-Type(.5)*x*x);
 }
 
+/** \brief Atomic version of standard normal distribution function. 
+    Derivative is known to be 'dnorm1'.
+    \param x Input vector of length 1.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   pnorm1
@@ -125,6 +173,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = dnorm1(tx[0]) * py[0];
 			   )
 
+/** \brief Atomic version of standard normal quantile function. 
+    Derivative is expressed through 'dnorm1'.
+    \param x Input vector of length 1.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   qnorm1
@@ -138,6 +191,16 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = Type(1) / dnorm1(ty[0]) * py[0];
 			   )
 
+/** \brief Atomic version of scaled incomplete gamma function differentiated to any order wrt. shape parameter
+    \f[ \exp(c) \int_0^{y} \exp(-t) t^{\lambda-1} \log(t)^n \:dt \f]
+    where the 4 input parameters are passed as a vector \f$x=(y,\lambda,n,c)\f$.
+    Note that the normalized incomplete gamma function is obtained as the special case 
+    \f$n=0\f$ and \f$c=-\log \Gamma(\lambda)\f$.
+    Valid parameter range: \f$x \in \mathbb{R}_+\times\mathbb{R}_+\times\mathbb{N}_0\times\mathbb{R}\f$.
+    \warning No check is performed on parameters
+    \param x Input vector of length 4.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   D_incpl_gamma_shape
@@ -157,6 +220,17 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[3] = ty[0] * py[0];
 			   )
 
+/** \brief Atomic version of inverse of scaled incomplete gamma function.
+    Given \f$z\f$ find \f$y\f$ such that
+    \f[ z = \exp(c) \int_0^{y} \exp(-t) t^{\lambda-1} \:dt \f]
+    where the 3 input parameters are passed as a vector \f$x=(z,\lambda,c)\f$.
+    The special case \f$c=-\log \Gamma(\lambda)\f$ gives the inverse normalized
+    incomplete gamma function.
+    Valid parameter range: \f$x \in \mathbb{R}_+\times\mathbb{R}_+\times\mathbb{R}\f$.
+    \warning No check is performed on parameters
+    \param x Input vector of length 3.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   inv_incpl_gamma
@@ -183,6 +257,13 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[2] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
 			   )
 
+/** \brief Atomic version of the n'th order derivative of the log gamma function.
+    \f[ \frac{d^n}{d\lambda^n}\log \Gamma(\lambda) \f]
+    where the 2 input parameters are passed as a vector \f$x=(\lambda,n)\f$.
+    The special case \f$n=0\f$ gives the log gamma function.
+    \param x Input vector of length 2.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   D_lgamma
@@ -201,8 +282,16 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[1] = Type(0);
 			   )
 
+/** \cond */
 template<class Type> /* Header of matmul interface */
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y);
+/** \endcond */
+
+/** \brief Atomic version of matrix multiply (square matrices only).
+    Multiplies two n-by-n matrices.
+    \param x Input vector of length 2*n*n.
+    \return Vector of length n*n.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   matmul
@@ -230,6 +319,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   }
 			   )
 
+/** \brief Atomic version of matrix inversion.
+    Inverts n-by-n matrix by LU-decomposition.
+    \param x Input vector of length n*n.
+    \return Vector of length n*n.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   matinv
@@ -254,6 +348,10 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px=mat2vec(res);
 			   )
 
+/** \brief Atomic version of log determinant of positive definite n-by-n matrix.
+    \param x Input vector of length n*n.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   logdet
@@ -274,9 +372,18 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
 
+/**
+    @}
+*/
+
 /* ================================== INTERFACES
 */
 
+/** \name Interface to atomic functions.
+    @{
+*/
+
+/** \brief Matrix multiply */
 template<class Type>
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
   CppAD::vector<Type> arg(x.size()+y.size());
@@ -307,7 +414,10 @@ Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
   return -Type(.5)*logdetQ + Type(.5)*quadform + x.size()*Type(log(sqrt(2.0*M_PI)));
 }
 
+/**
+    @}
+*/
+
 } /* End namespace atomic */
 
-/* User defined atomic functions */
 #include "checkpoint_macro.hpp"
