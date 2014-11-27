@@ -2,26 +2,11 @@
    \brief Namespace of utility functions for TMB
 */
 namespace tmbutils{
-//#include <Eigen/Dense>
+// Utilities used by the core
 using namespace Eigen;
 #include "vector.cpp"
 #include "array.cpp"
-#include "spmat.cpp"
 
-#include "kronecker.cpp"
-#include "matexp.cpp"
-#include "splines.cpp"
-#include "order.cpp"
-
-template<class Type, class T1, class T2>
-vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
-{
-  vector<Type> logres;
-  x=(x-mean)/sd;
-  logres=-log(Type(sqrt(2*M_PI))*sd)-Type(.5)*x*x;
-  if(give_log)return logres; else return exp(logres);
-}
-  
 template <class Type, class From>
 vector<Type> asVector(From *px, int n){
   vector<Type> x(n);
@@ -40,22 +25,7 @@ array<Type> asArray(SEXP x)
   return array<Type>(y,d);
 }
 
-
 #endif
 
-
 } // End namespace
 
-/** 
-   \brief Collection of multivariate Gaussian distributions (members listed in \ref density.cpp)
-
-   \ingroup Densities
-   
-   For use of the namespace see \ref Densities
- 
-   
-*/
-namespace density{
-  using namespace tmbutils;
-#include "density.cpp"
-} // End namespace

@@ -372,6 +372,44 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
 
+typedef Eigen::LDLT<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > LDLT_t;
+/** \brief Atomic version of log determinant *and* inverse of positive definite n-by-n matrix.
+    Calculated by Cholesky decomposition.
+    \param x Input vector of length n*n.
+    \return Vector of length 1+n*n.
+*/
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   invpd
+			   ,
+			   // OUTPUT_DIM
+			   1 + tx.size()
+			   ,
+			   // ATOMIC_DOUBLE
+			   using namespace Eigen;
+			   int n=sqrt(tx.size());
+			   matrix<double> X=vec2mat(tx,n,n);
+			   matrix<double> I(X.rows(),X.cols());
+			   I.setIdentity();
+			   LDLT_t ldlt(X);
+			   matrix<double> iX = ldlt.solve(I);
+			   vector<double> D = ldlt.vectorD();
+			   double logdetX = D.log().sum();
+			   ty[0] = logdetX;
+			   for(int i=0;i<n*n;i++)ty[i+1]=iX(i);
+			   ,
+			   // ATOMIC_REVERSE  (f2(X)*W1[0] - f2(X)^T*W2*f2(X)^T)
+			   int n=sqrt(tx.size());
+			   Type W1=py[0];                     // Range direction
+			   matrix<Type> W2=vec2mat(py,n,n,1); // Range direction
+			   matrix<Type> Y=vec2mat(ty,n,n,1);  // f2(X)
+			   matrix<Type> Yt=Y.transpose();     // f2(X)^T
+			   matrix<Type> tmp=matmul(W2,Yt);    // W2*f2(X)^T
+			   matrix<Type> res=-matmul(Yt,tmp);  // -f2(X)^T*W2*f2(X)^T
+			   res = res + Y*W1;
+			   px=mat2vec(res);
+			   )
+
 /**
     @}
 */
@@ -396,6 +434,14 @@ template<class Type>
 matrix<Type> matinv(matrix<Type> x){
   int n=x.rows();
   return vec2mat(matinv(mat2vec(x)),n,n);
+}
+
+template<class Type>
+matrix<Type> matinvpd(matrix<Type> x, Type &logdet){
+  int n=x.rows();
+  CppAD::vector<Type> res = invpd(mat2vec(x));
+  logdet = res[0];
+  return vec2mat(res,n,n,1);
 }
 
 template<class Type>

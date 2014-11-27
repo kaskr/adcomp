@@ -65,7 +65,7 @@ Type objective_function<Type>::operator() ()
       for(j=0;j<p;j++)
         Sigma_y(i2,j) = Sigma(i2,j)*sigma_y(i2)*sigma_y(j);
 
-    g += MVNORM(Sigma_y)(vector<Type>(y.col(i)));
+    g += MVNORM(Sigma_y, false /* no atomic */)(vector<Type>(y.col(i)));
   }
 
   return g;
