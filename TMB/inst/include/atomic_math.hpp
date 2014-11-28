@@ -287,36 +287,42 @@ template<class Type> /* Header of matmul interface */
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y);
 /** \endcond */
 
-/** \brief Atomic version of matrix multiply (square matrices only).
-    Multiplies two n-by-n matrices.
-    \param x Input vector of length 2*n*n.
-    \return Vector of length n*n.
+/** \brief Atomic version of matrix multiply.
+    Multiplies n1-by-n2 matrix with n2-by-n3 matrix.
+    \param x Input vector of length 2+n1*n2+n2*n3 containing the
+    output dimension (length=2), the first matrix (length=n1*n2) and
+    the second matrix (length=n2*n3).
+    \return Vector of length n1*n3 containing result of matrix
+    multiplication.
 */
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   matmul
 			   ,
-			   // OUTPUT_DIM (currently square matrix only)
-			   tx.size()/2
+			   // OUTPUT_DIM
+			   CppAD::Integer(tx[0]) * CppAD::Integer(tx[1])
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt(tx.size()/2);
-			   matrix<double> X = vec2mat(tx, n, n, 0);
-			   matrix<double> Y = vec2mat(tx, n, n, n*n);
+			   int n1 = CppAD::Integer(tx[0]);
+			   int n3 = CppAD::Integer(tx[1]);
+			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   matrix<double> X = vec2mat(tx, n1, n2, 2);
+			   matrix<double> Y = vec2mat(tx, n2, n3, 2 + n1*n2);
 			   matrix<double> res = X * Y;       // Use Eigen matrix multiply
-			   for(int i=0;i<n*n;i++)ty[i] = res(i);
+			   for(int i=0;i<n1*n3;i++)ty[i] = res(i);
 			   ,
 			   // ATOMIC_REVERSE (W*Y^T, X^T*W)
-			   int n=sqrt(ty.size());
-			   matrix<Type> Xt = vec2mat(tx,n,n,0).transpose();
-			   matrix<Type> Yt = vec2mat(tx,n,n,n*n).transpose();
-			   matrix<Type> W = vec2mat(py,n,n);
+			   int n1 = CppAD::Integer(tx[0]);
+			   int n3 = CppAD::Integer(tx[1]);
+			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   matrix<Type> Xt = vec2mat(tx, n1, n2, 2).transpose();
+			   matrix<Type> Yt = vec2mat(tx, n2, n3, 2 + n1*n2).transpose();
+			   matrix<Type> W = vec2mat(py, n1, n3);
 			   matrix<Type> res1 = matmul(W, Yt); // W*Y^T
 			   matrix<Type> res2 = matmul(Xt, W); // X^T*W
-			   for(int i=0;i<n*n;i++){
-			     px[i]     = res1(i);
-			     px[i+n*n] = res2(i);
-			   }
+			   px[0] = 0; px[1] = 0;
+			   for(int i=0;i<n1*n2;i++)px[i+2] = res1(i);
+			   for(int i=0;i<n2*n3;i++)px[i+2+n1*n2] = res2(i);
 			   )
 
 /** \brief Atomic version of matrix inversion.
@@ -424,9 +430,10 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 /** \brief Matrix multiply */
 template<class Type>
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
-  CppAD::vector<Type> arg(x.size()+y.size());
-  for(int i=0;i<x.size();i++){arg[i]=x(i);}
-  for(int i=0;i<y.size();i++){arg[i+x.size()]=y(i);}
+  CppAD::vector<Type> arg(2+x.size()+y.size());
+  arg[0] = x.rows(); arg[1] = y.cols();
+  for(int i=0;i<x.size();i++){arg[2+i]=x(i);}
+  for(int i=0;i<y.size();i++){arg[2+i+x.size()]=y(i);}
   return vec2mat(matmul(arg),x.rows(),y.cols());
 }
 
