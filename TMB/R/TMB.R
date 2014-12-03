@@ -610,12 +610,15 @@ MakeADFun <- function(data,parameters,map=list(),
     log.density.propose <- logdmvnorm(samples)
     samples <- samples+par0[random]
     log.density.target <- -apply(samples,2,eval.target)
+    log.density.target[is.nan(log.density.target)] <- -Inf
     I <- log.density.target - log.density.propose
     M <- max(I)
     if(order>=1){
-      I1 <- apply(samples,2,eval.target,order=1)[-random,,drop=FALSE]
       vec <- exp(I-M)
       p <- vec/sum(vec)
+      i <- (p>0)
+      p <- p[i]
+      I1 <- apply(samples[,i,drop=FALSE],2,eval.target,order=1)[-random,,drop=FALSE]
       gr <- as.vector(I1 %*% p)
       if(order==1)return(gr)
       ## I1I1 <- t(apply(I1,1,function(x)x%*%t(x)))
