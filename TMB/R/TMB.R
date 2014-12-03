@@ -578,6 +578,7 @@ MakeADFun <- function(data,parameters,map=list(),
                  seed=NULL,          ## Random seed
                  antithetic=TRUE,    ## Reduce variance
                  keep=FALSE,         ## Keep samples and fct evals
+                 phi=NULL,           ## Function to calculate mean of
                  ...){
     if(is.numeric(seed))set.seed(seed)
     ## Clean up on exit
@@ -621,6 +622,13 @@ MakeADFun <- function(data,parameters,map=list(),
       ## I2 <- t(apply(samples,1,function(x)eval.target(x,order=2)[-random,-random]))
       ## h <- colMeans(vec*(-I1I1+I2))/mean(vec)+as.vector(gr)%*%t(as.vector(gr))
       ## if(order==2)return(h)
+    }
+    if(!is.null(phi)){
+      phival <- apply(samples,2,phi)
+      if(is.null(dim(phival)))phival <- t(phival)
+      p <- exp(I-M); p <- p/sum(p)
+      ans <- phival %*% p
+      return(ans)
     }
     value <- -log(mean(exp(I-M)))-M
     ci <- 1.96*sd(exp(I-M))/sqrt(n)
