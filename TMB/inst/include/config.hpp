@@ -43,7 +43,7 @@ static struct config_struct{
     SET(debug.all,false);
     SET(debug.getListElement,false);
     SET(optimize.instantly,true);
-    SET(optimize.parallel,true);
+    SET(optimize.parallel,false);
     SET(tape.parallel,true);
   }
 #undef SET

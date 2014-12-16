@@ -90,6 +90,31 @@ bool _openmp=true;
 bool _openmp=false;
 #endif
 
+/** \brief Call the optimize method of an ADFun object pointer. */
+template<class ADFunPointer>
+void optimizeTape(ADFunPointer pf){
+  if(!config.optimize.instantly){
+    /* Drop out */
+    return;
+  }
+  if (!config.optimize.parallel){
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+    { /* Avoid multiple tape optimizations at the same time (to reduce memory) */
+      if(config.trace.optimize)std::cout << "Optimizing tape... ";
+      pf->optimize();
+      if(config.trace.optimize)std::cout << "Done\n";
+    }
+  }
+  else
+    { /* Allow multiple tape optimizations at the same time */
+      if(config.trace.optimize)std::cout << "Optimizing tape... ";
+      pf->optimize();
+      if(config.trace.optimize)std::cout << "Done\n";
+    }
+}
+
 /* Utility: Compile time test for Type=double */
 template<class Type>
 struct isDouble{
@@ -1185,11 +1210,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   ADFun< double >* pf = new ADFun< double >;
   pf->Dependent(xxx,yyy);
 
-  if(config.optimize.instantly){
-    if(config.trace.optimize)std::cout << "Optimizing tape... ";
-    pf->optimize();
-    if(config.trace.optimize)std::cout << "Done\n";
-  }
+  optimizeTape(pf);
   /* ========================================================= */    
   
   /* Calculate row and col index vectors.
