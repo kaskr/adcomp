@@ -1198,9 +1198,6 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
                   skip, ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL
                   )
-  if(!config(DLL=obj$env$DLL)$optimize.instantly){ ## If not already optimized (because twice optimize gives fault):
-    .Call("optimizeADFunObject",ADHess$ptr,PACKAGE=obj$env$DLL)
-  }
   ev <- function(par=obj$env$par).Call("EvalADFunObject", ADHess$ptr, par,
                    control = list(
                      order = as.integer(0),

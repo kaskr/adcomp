@@ -1149,7 +1149,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   ADFun<AD<double > > tmp2(xx,yy);
  
   /* Optimize tape */
-  tmp2.optimize();  // ================== WARNING!!!
+  if(config.optimize.instantly)tmp2.optimize();
   
   /* ========================================================== NOT DONE YET */
   /* Tape hessian  */
