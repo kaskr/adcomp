@@ -2060,6 +2060,9 @@ void optimize_run(
 		skip     &= op != BeginOp;
 		skip     &= op != InvOp;
 		skip     &= user_state == user_start;
+# ifndef TMB_ENABLE_CSKIPOP
+		skip = false;
+# endif
 		if( skip )
 		{	j     = cskip_info_order[cskip_order_next];
 			if( NumRes(op) > 0 )
