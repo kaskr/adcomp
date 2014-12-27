@@ -4,7 +4,7 @@
 \title{General sdreport function.}
 \usage{
 sdreport(obj, par.fixed = NULL, hessian.fixed = NULL,
-  getJointPrecision = FALSE)
+  getJointPrecision = FALSE, bias.correct = FALSE)
 }
 \arguments{
 \item{obj}{Object returned by \code{MakeADFun}}
