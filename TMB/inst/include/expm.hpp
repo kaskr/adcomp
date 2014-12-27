@@ -94,7 +94,9 @@ namespace atomic{
     }
   };
   
-  /*
+  /** \brief Representation of 'block-binomial' matrix
+
+    \verbatim
     Representation of 'block-binomial' matrix of the form
     
     T( T( T(A, B), T(C, 0) ), T( T(D, 0), T(0, 0) ) ) =
@@ -109,6 +111,7 @@ namespace atomic{
     [ .  .  .  D  .  C  B  A ]
     
     with methods required by Pade approximation
+    \endverbatim
   */
   template <int n>
   struct nestedTriangle : Triangle<nestedTriangle<n-1> >{
@@ -142,6 +145,7 @@ namespace atomic{
       return this->A;
     }
   };
+
 
   /* 
      Pade approximation of matrix exponential.
@@ -216,7 +220,12 @@ namespace atomic{
     return ans;
   }
 
-  /* 
+
+/** \name Atomic functions.
+    @{
+*/
+  /** \brief Atomic version of generalized matrix exponential (closed under reverse mode differentiation).
+  \verbatim
      Generalized matrix exponential:
      
      C(x1,x2,...,xn)
@@ -231,8 +240,8 @@ namespace atomic{
      d/dx1 ( sum( C(x1,x2,x3) * x4 ) ) = C(x1^T, x2^T, x3^T, x4)
      d/dx2 ( sum( C(x1,x2,x3) * x4 ) ) = C(x1^T,       x3^T, x4)
      d/dx3 ( sum( C(x1,x2,x3) * x4 ) ) = C(x1^T, x2^T,       x4)
+  \endverbatim
   */
-
   TMB_ATOMIC_VECTOR_FUNCTION(
 			     // ATOMIC_NAME
 			     expm
@@ -270,7 +279,15 @@ namespace atomic{
 			       }
 			     }
 			     )
+/**
+    @}
+*/
 
+
+/** \name Interface to atomic functions.
+    @{
+*/
+  /** \brief Matrix exponential  */
   template<class Type>
   matrix<Type> expm(matrix<Type> x){
     vector<matrix<Type> > args(1);
@@ -278,6 +295,10 @@ namespace atomic{
     int n=x.rows();
     return vec2mat(expm(args2vector(args)),n,n);
   }
+/**
+    @}
+*/
+
 
 } // end namespace atomic
 

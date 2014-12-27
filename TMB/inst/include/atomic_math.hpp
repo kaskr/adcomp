@@ -1,5 +1,27 @@
+/**
+   \brief Namespace with special functions and derivatives
+
+   This namespace extends the 'derivatives table' of CppAD.
+   - R's special math library is extended with derivatives in cases 
+   where symbolic derivatives are available. These special functions
+   are often iterative and therefore difficult to implement with AD
+   types. Instead, we code the derivatives based on the double versions 
+   available from R. This approach requires fewer code lines, and has the
+   benefit of obtaining the same high accuracy as R's math functions.
+   - Some matrix operations are extended with derivatives. This greatly 
+   reduces the AD memory usage. Furthermore, these atomic operations
+   can be linked to a performance library by setting preprocesor flag 
+   EIGEN_USE_BLAS.
+   - New symbols can be added by advanced users. First option is to
+   code the reverse mode derivatives by hand using the
+   TMB_ATOMIC_VECTOR_FUNCTION macro, see source code for examples.
+   Second option is to generate reverse mode derivatives automatically
+   using the macro REGISTER_ATOMIC.
+*/
 namespace atomic {
-/* Namespace with double versions of R special math library */
+/**
+   \brief Namespace with double versions of R special math library
+*/
 namespace Rmath {
   #include <Rmath.h>
   // Macros do not respect the namespace limits.
@@ -90,13 +112,25 @@ namespace Rmath {
 
 #include "atomic_macro.hpp"
 
-/* Utilities for conversion between CppAD::vector and Eigen::Matrix */
+/** \name Interface to atomic functions.
+    @{
+*/
+/** \brief Convert segment of CppAD::vector to Eigen::Matrix 
+    \param x Input vector.
+    \param m Number of rows in result.
+    \param n Number of columns in result.
+    \param offset Segment offset.
+*/
 template<class Type>
 matrix<Type> vec2mat(CppAD::vector<Type> x, int m, int n, int offset=0){
   matrix<Type> res(m,n);
   for(int i=0;i<m*n;i++)res(i)=x[i+offset];
   return res;
 }
+
+/** \brief Convert Eigen::Matrix to CppAD::vector by stacking the matrix columns.
+    \param x Input matrix.
+*/
 template<class Type>
 CppAD::vector<Type> mat2vec(matrix<Type> x){
   int n=x.size();
@@ -104,13 +138,27 @@ CppAD::vector<Type> mat2vec(matrix<Type> x){
   for(int i=0;i<n;i++)res[i]=x(i);
   return res;
 }
+/**
+    @}
+*/
 
-/* Derivative of pnorm1 (based on functions with known derivatives) */
+/** \name Atomic functions.
+    @{
+*/
+
+/** \brief Standard normal density function 'dnorm1'. 
+    Needed to define derivative of 'pnorm1'.
+*/
 template<class Type>
 Type dnorm1(Type x){
   return Type(1.0/sqrt(2.0*M_PI)) * exp(-Type(.5)*x*x);
 }
 
+/** \brief Atomic version of standard normal distribution function. 
+    Derivative is known to be 'dnorm1'.
+    \param x Input vector of length 1.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   pnorm1
@@ -125,6 +173,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = dnorm1(tx[0]) * py[0];
 			   )
 
+/** \brief Atomic version of standard normal quantile function. 
+    Derivative is expressed through 'dnorm1'.
+    \param x Input vector of length 1.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   qnorm1
@@ -138,6 +191,16 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = Type(1) / dnorm1(ty[0]) * py[0];
 			   )
 
+/** \brief Atomic version of scaled incomplete gamma function differentiated to any order wrt. shape parameter
+    \f[ \exp(c) \int_0^{y} \exp(-t) t^{\lambda-1} \log(t)^n \:dt \f]
+    where the 4 input parameters are passed as a vector \f$x=(y,\lambda,n,c)\f$.
+    Note that the normalized incomplete gamma function is obtained as the special case 
+    \f$n=0\f$ and \f$c=-\log \Gamma(\lambda)\f$.
+    Valid parameter range: \f$x \in \mathbb{R}_+\times\mathbb{R}_+\times\mathbb{N}_0\times\mathbb{R}\f$.
+    \warning No check is performed on parameters
+    \param x Input vector of length 4.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   D_incpl_gamma_shape
@@ -157,6 +220,17 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[3] = ty[0] * py[0];
 			   )
 
+/** \brief Atomic version of inverse of scaled incomplete gamma function.
+    Given \f$z\f$ find \f$y\f$ such that
+    \f[ z = \exp(c) \int_0^{y} \exp(-t) t^{\lambda-1} \:dt \f]
+    where the 3 input parameters are passed as a vector \f$x=(z,\lambda,c)\f$.
+    The special case \f$c=-\log \Gamma(\lambda)\f$ gives the inverse normalized
+    incomplete gamma function.
+    Valid parameter range: \f$x \in \mathbb{R}_+\times\mathbb{R}_+\times\mathbb{R}\f$.
+    \warning No check is performed on parameters
+    \param x Input vector of length 3.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   inv_incpl_gamma
@@ -183,6 +257,13 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[2] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
 			   )
 
+/** \brief Atomic version of the n'th order derivative of the log gamma function.
+    \f[ \frac{d^n}{d\lambda^n}\log \Gamma(\lambda) \f]
+    where the 2 input parameters are passed as a vector \f$x=(\lambda,n)\f$.
+    The special case \f$n=0\f$ gives the log gamma function.
+    \param x Input vector of length 2.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   D_lgamma
@@ -201,35 +282,54 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[1] = Type(0);
 			   )
 
+/** \cond */
 template<class Type> /* Header of matmul interface */
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y);
+/** \endcond */
+
+/** \brief Atomic version of matrix multiply.
+    Multiplies n1-by-n2 matrix with n2-by-n3 matrix.
+    \param x Input vector of length 2+n1*n2+n2*n3 containing the
+    output dimension (length=2), the first matrix (length=n1*n2) and
+    the second matrix (length=n2*n3).
+    \return Vector of length n1*n3 containing result of matrix
+    multiplication.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   matmul
 			   ,
-			   // OUTPUT_DIM (currently square matrix only)
-			   tx.size()/2
+			   // OUTPUT_DIM
+			   CppAD::Integer(tx[0]) * CppAD::Integer(tx[1])
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt(tx.size()/2);
-			   matrix<double> X = vec2mat(tx, n, n, 0);
-			   matrix<double> Y = vec2mat(tx, n, n, n*n);
+			   int n1 = CppAD::Integer(tx[0]);
+			   int n3 = CppAD::Integer(tx[1]);
+			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   matrix<double> X = vec2mat(tx, n1, n2, 2);
+			   matrix<double> Y = vec2mat(tx, n2, n3, 2 + n1*n2);
 			   matrix<double> res = X * Y;       // Use Eigen matrix multiply
-			   for(int i=0;i<n*n;i++)ty[i] = res(i);
+			   for(int i=0;i<n1*n3;i++)ty[i] = res(i);
 			   ,
 			   // ATOMIC_REVERSE (W*Y^T, X^T*W)
-			   int n=sqrt(ty.size());
-			   matrix<Type> Xt = vec2mat(tx,n,n,0).transpose();
-			   matrix<Type> Yt = vec2mat(tx,n,n,n*n).transpose();
-			   matrix<Type> W = vec2mat(py,n,n);
+			   int n1 = CppAD::Integer(tx[0]);
+			   int n3 = CppAD::Integer(tx[1]);
+			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   matrix<Type> Xt = vec2mat(tx, n1, n2, 2).transpose();
+			   matrix<Type> Yt = vec2mat(tx, n2, n3, 2 + n1*n2).transpose();
+			   matrix<Type> W = vec2mat(py, n1, n3);
 			   matrix<Type> res1 = matmul(W, Yt); // W*Y^T
 			   matrix<Type> res2 = matmul(Xt, W); // X^T*W
-			   for(int i=0;i<n*n;i++){
-			     px[i]     = res1(i);
-			     px[i+n*n] = res2(i);
-			   }
+			   px[0] = 0; px[1] = 0;
+			   for(int i=0;i<n1*n2;i++)px[i+2] = res1(i);
+			   for(int i=0;i<n2*n3;i++)px[i+2+n1*n2] = res2(i);
 			   )
 
+/** \brief Atomic version of matrix inversion.
+    Inverts n-by-n matrix by LU-decomposition.
+    \param x Input vector of length n*n.
+    \return Vector of length n*n.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   matinv
@@ -254,6 +354,10 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px=mat2vec(res);
 			   )
 
+/** \brief Atomic version of log determinant of positive definite n-by-n matrix.
+    \param x Input vector of length n*n.
+    \return Vector of length 1.
+*/
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   logdet
@@ -274,14 +378,62 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
 
+typedef Eigen::LDLT<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > LDLT_t;
+/** \brief Atomic version of log determinant *and* inverse of positive definite n-by-n matrix.
+    Calculated by Cholesky decomposition.
+    \param x Input vector of length n*n.
+    \return Vector of length 1+n*n.
+*/
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   invpd
+			   ,
+			   // OUTPUT_DIM
+			   1 + tx.size()
+			   ,
+			   // ATOMIC_DOUBLE
+			   using namespace Eigen;
+			   int n=sqrt(tx.size());
+			   matrix<double> X=vec2mat(tx,n,n);
+			   matrix<double> I(X.rows(),X.cols());
+			   I.setIdentity();
+			   LDLT_t ldlt(X);
+			   matrix<double> iX = ldlt.solve(I);
+			   vector<double> D = ldlt.vectorD();
+			   double logdetX = D.log().sum();
+			   ty[0] = logdetX;
+			   for(int i=0;i<n*n;i++)ty[i+1]=iX(i);
+			   ,
+			   // ATOMIC_REVERSE  (f2(X)*W1[0] - f2(X)^T*W2*f2(X)^T)
+			   int n=sqrt(tx.size());
+			   Type W1=py[0];                     // Range direction
+			   matrix<Type> W2=vec2mat(py,n,n,1); // Range direction
+			   matrix<Type> Y=vec2mat(ty,n,n,1);  // f2(X)
+			   matrix<Type> Yt=Y.transpose();     // f2(X)^T
+			   matrix<Type> tmp=matmul(W2,Yt);    // W2*f2(X)^T
+			   matrix<Type> res=-matmul(Yt,tmp);  // -f2(X)^T*W2*f2(X)^T
+			   res = res + Y*W1;
+			   px=mat2vec(res);
+			   )
+
+/**
+    @}
+*/
+
 /* ================================== INTERFACES
 */
 
+/** \name Interface to atomic functions.
+    @{
+*/
+
+/** \brief Matrix multiply */
 template<class Type>
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
-  CppAD::vector<Type> arg(x.size()+y.size());
-  for(int i=0;i<x.size();i++){arg[i]=x(i);}
-  for(int i=0;i<y.size();i++){arg[i+x.size()]=y(i);}
+  CppAD::vector<Type> arg(2+x.size()+y.size());
+  arg[0] = x.rows(); arg[1] = y.cols();
+  for(int i=0;i<x.size();i++){arg[2+i]=x(i);}
+  for(int i=0;i<y.size();i++){arg[2+i+x.size()]=y(i);}
   return vec2mat(matmul(arg),x.rows(),y.cols());
 }
 
@@ -289,6 +441,14 @@ template<class Type>
 matrix<Type> matinv(matrix<Type> x){
   int n=x.rows();
   return vec2mat(matinv(mat2vec(x)),n,n);
+}
+
+template<class Type>
+matrix<Type> matinvpd(matrix<Type> x, Type &logdet){
+  int n=x.rows();
+  CppAD::vector<Type> res = invpd(mat2vec(x));
+  logdet = res[0];
+  return vec2mat(res,n,n,1);
 }
 
 template<class Type>
@@ -307,7 +467,10 @@ Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
   return -Type(.5)*logdetQ + Type(.5)*quadform + x.size()*Type(log(sqrt(2.0*M_PI)));
 }
 
+/**
+    @}
+*/
+
 } /* End namespace atomic */
 
-/* User defined atomic functions */
 #include "checkpoint_macro.hpp"

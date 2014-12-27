@@ -90,6 +90,31 @@ bool _openmp=true;
 bool _openmp=false;
 #endif
 
+/** \brief Call the optimize method of an ADFun object pointer. */
+template<class ADFunPointer>
+void optimizeTape(ADFunPointer pf){
+  if(!config.optimize.instantly){
+    /* Drop out */
+    return;
+  }
+  if (!config.optimize.parallel){
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+    { /* Avoid multiple tape optimizations at the same time (to reduce memory) */
+      if(config.trace.optimize)std::cout << "Optimizing tape... ";
+      pf->optimize();
+      if(config.trace.optimize)std::cout << "Done\n";
+    }
+  }
+  else
+    { /* Allow multiple tape optimizations at the same time */
+      if(config.trace.optimize)std::cout << "Optimizing tape... ";
+      pf->optimize();
+      if(config.trace.optimize)std::cout << "Done\n";
+    }
+}
+
 /* Utility: Compile time test for Type=double */
 template<class Type>
 struct isDouble{
@@ -390,6 +415,7 @@ public:
 	}
     }
     thetanames.resize(theta.size());
+    for(int i=0;i<thetanames.size();i++)thetanames[i]="";
     current_parallel_region=-1;
     selected_parallel_region=-1;
     max_parallel_regions=-1;
@@ -517,7 +543,26 @@ public:
     if(reversefill)theta[index++]=x;else x=theta[index++];
   }
    
-   Type operator() ();
+  Type operator() ();
+
+  Type evalUserTemplate(){
+    Type ans=this->operator()();
+    /* After evaluating the template, "index" should be equal to the length of "theta".
+       If not, we assume that the "epsilon method" has been requested from R, I.e.
+       that the un-used theta parameters are reserved for an inner product contribution
+       with the numbers reported via ADREPORT. */
+    if(index!=theta.size()){
+      if( index + reportvector.size() != theta.size() )
+	error("evalUserTemplate: Invalid parameter length.");
+      if( reportvector.size() > 0 ){
+	vector<Type> epsilon(reportvector.size());
+	this->fill(epsilon,"epsilon"); /* Assume theta has been sufficiently augmented */
+	ans += ( this->reportvector.result * epsilon ).sum();
+      }
+    }
+    return ans;
+  }
+
 }; // objective_function
 
 /* Experiment: Help manage the parallel accumulation.
@@ -695,7 +740,7 @@ ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
   ADFun< double >* pf;
   if(!returnReport){ // Default case: no ad report - parallel run allowed
     vector< AD<double> > y(1);
-    y[0]=F();
+    y[0]=F.evalUserTemplate();
     pf = new ADFun< double >(F.theta,y);
   } else { // ad report case
     F(); // Run through user template (modifies reportvector)
@@ -921,7 +966,7 @@ ADFun< double >* MakeADGradObject(SEXP data, SEXP parameters, SEXP report, int p
   int n=F.theta.size();
   Independent(F.theta);
   vector< AD<AD<double> > > y(1);
-  y[0]=F();
+  y[0]=F.evalUserTemplate();
   ADFun<AD<double> > tmp(F.theta,y);
   tmp.optimize(); /* Remove 'dead' operations (could result in nan derivatives) */
   vector<AD<double> > x(n);
@@ -1092,7 +1137,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
 
   Independent(F.theta);
   vector< AD<AD<AD<double> > > > y(1);
-  y[0]=F();
+  y[0]=F.evalUserTemplate();
   ADFun<AD<AD<double> > > tmp(F.theta,y);
 
   /* Tape gradient R^n -> R^n */
@@ -1104,7 +1149,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   ADFun<AD<double > > tmp2(xx,yy);
  
   /* Optimize tape */
-  tmp2.optimize();  // ================== WARNING!!!
+  if(config.optimize.instantly)tmp2.optimize();
   
   /* ========================================================== NOT DONE YET */
   /* Tape hessian  */
@@ -1165,11 +1210,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   ADFun< double >* pf = new ADFun< double >;
   pf->Dependent(xxx,yyy);
 
-  if(config.optimize.instantly){
-    if(config.trace.optimize)std::cout << "Optimizing tape... ";
-    pf->optimize();
-    if(config.trace.optimize)std::cout << "Done\n";
-  }
+  optimizeTape(pf);
   /* ========================================================= */    
   
   /* Calculate row and col index vectors.

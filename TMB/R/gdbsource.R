@@ -8,13 +8,21 @@
 ##' \code{gdbsource(file,TRUE)} will provide the full backtrace followed
 ##' by an interactive gdb session where the individual frames can be inspected.
 ##' Note that templates should be compiled without optimization and with debug
-##' information i.e. \code{compile(cppfile,"-O0 -g")} in order to provide
-##' correct line numbers.
+##' information in order to provide correct line numbers:
+##' \itemize{
+##' \item On Linux/OS X use \code{compile(cppfile,"-O0 -g")}.
+##' \item On Windows use \code{compile(cppfile,"-O1 -g",DLLFLAGS="")} (lower
+##' optimization level will cause errors).
+##' }
 ##' @title Source R-script through gdb to get backtrace.
 ##' @param file Your R script
 ##' @param interactive Run interactive gdb session?
 ##' @return Object of class \code{backtrace}
 gdbsource <- function(file,interactive=FALSE){
+  if(!file.exists(file))stop("File '",file,"' not found")
+  if(.Platform$OS.type=="windows"){
+    return(.gdbsource.win(file,interactive))
+  }
   gdbscript <- tempfile()
   if(interactive){
     gdbcmd <- c(paste("run --vanilla <",file),
@@ -28,6 +36,25 @@ gdbsource <- function(file,interactive=FALSE){
     cat("run\nbt\nquit\n",file=gdbscript)
     cmd <- paste("R --vanilla < ",file," -d gdb --debugger-args=\"-x",
                  gdbscript,"\"")
+    txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
+    attr(txt,"file") <- file
+    class(txt) <- "backtrace"
+    return(txt)
+  }
+}
+## Windows case
+.gdbsource.win <- function(file,interactive=FALSE){
+  gdbscript <- tempfile()
+  txt <- paste("set breakpoint pending on\nb abort\nrun --vanilla -f",
+               file, "\nbt\n")
+  cat(txt, file=gdbscript)
+  cmd <- paste("gdb Rterm -x", gdbscript)
+  if(interactive){
+    cmd <- paste("start",cmd)
+    shell(cmd)
+    return(NULL)
+  }
+  else {
     txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
     attr(txt,"file") <- file
     class(txt) <- "backtrace"

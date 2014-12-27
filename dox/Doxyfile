@@ -1059,7 +1059,7 @@ PAPER_TYPE             = a4wide
 # The EXTRA_PACKAGES tag can be to specify one or more names of LaTeX
 # packages that should be included in the LaTeX output.
 
-EXTRA_PACKAGES         = amsmath
+EXTRA_PACKAGES         = amsmath amsfonts
 
 # The LATEX_HEADER tag can be used to specify a personal LaTeX header for
 # the generated latex document. The header should contain everything until
@@ -1304,7 +1304,8 @@ PREDEFINED             =	VECTORIZE1_t(f)=       \
 		       		VECTORIZE3_tti(f)=     \
 				VECTORIZE3_ttt(f)=     \
 				VECTORIZE4_ttti(f)=    \
-				VECTORIZE6_ttttti(f)=
+				VECTORIZE6_ttttti(f)=  \
+				"TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

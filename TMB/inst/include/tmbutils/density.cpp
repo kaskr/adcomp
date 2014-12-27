@@ -21,92 +21,55 @@ typedef array<scalartype> arraytype
 template <class scalartype_>
 class MVNORM_t{
   TYPEDEFS(scalartype_);
-  scalartype logdetQ;
-  /** Lower cholesky of _covariance_ */
-  matrixtype L; 
-  matrixtype Sigma; /* Keep for convenience - not used */
+  matrixtype Q;       /* Inverse covariance matrix */
+  scalartype logdetQ; /* log-determinant of Q */
+  matrixtype Sigma;   /* Keep for convenience - not used */
 public:
   MVNORM_t(){}
-  MVNORM_t(matrixtype Sigma_){
-    setSigma(Sigma_);
+  MVNORM_t(matrixtype Sigma_, bool use_atomic=true){
+    setSigma(Sigma_, use_atomic);
   }
 
   /** \brief Covariance extractor */
   matrixtype cov(){return Sigma;}
 
-  /* Lower triangular L: A=LL' */
-  matrixtype chol(const matrixtype &a){
-    int n=a.rows();
-    matrixtype l(n,n);
-    l.setZero();
-    scalartype tmp;
-    for(int i=0;i<n;i++)
-      for(int j=0;j<=i;j++){
-	tmp=a(i,j);
-	for(int k=0;k<j;k++)tmp-=l(i,k)*l(j,k);
-	if(i==j)l(i,j)=sqrt(tmp);
-	else l(i,j)=tmp/l(j,j);
-      }
-    return l;
-  }
-  /* Find x:=solve(L,y) */
-  vectortype lsolve(matrixtype &l, 
-		    vectortype y){
-    int n=l.rows();
-    vectortype x(n);
-    scalartype tmp;
-    for(int i=0;i<n;i++){
-      tmp=y(i);
-      for(int k=0;k<i;k++)tmp-=x(k)*l(i,k);
-      x(i)=tmp/l(i,i);
-    }
-    return x;
-  }
-  /* Find x:=solve(LL',y) - array case */
-  arraytype lltsolve(matrixtype &l, 
-		     arraytype y){
-    int n=l.rows();
-    arraytype x(y);
-    arraytype tmp(y.col(0).dim);
-    for(int i=0;i<n;i++){
-      tmp=y.col(i);
-      for(int k=0;k<i;k++)tmp=tmp-x.col(k)*l(i,k);
-      x.col(i)=tmp/l(i,i);
-    }
-    /* Find x:=solve(t(L),x) */
-    y=x;
-    for(int i=n-1;i>=0;i--){
-      tmp=y.col(i);
-      for(int k=n-1;k>i;k--)tmp=tmp-x.col(k)*l(k,i);
-      x.col(i)=tmp/l(i,i);
-    }
-    return x;
-  }
-
   /* initializer via covariance matrix */
-  void setSigma(matrixtype Sigma_){
-    Sigma=Sigma_;
-    L=chol(Sigma_);
-    logdetQ=scalartype(0);
-    for(int i=0;i<L.rows();i++)logdetQ -= scalartype(2)*log(L(i,i));
+  void setSigma(matrixtype Sigma_, bool use_atomic=true){
+    Sigma = Sigma_;
+    scalartype logdetS;
+    if(use_atomic){
+      Q = atomic::matinvpd(Sigma,logdetS);
+    } else {
+      matrixtype I(Sigma.rows(),Sigma.cols());
+      I.setIdentity();
+      Eigen::LDLT<Eigen::Matrix<scalartype,Dynamic,Dynamic> > ldlt(Sigma);
+      Q = ldlt.solve(I);
+      vectortype D = ldlt.vectorD();
+      logdetS = D.log().sum();
+    }
+    logdetQ = -logdetS;
   }
   scalartype Quadform(vectortype x){
-    vectortype u=lsolve(L,x);
-    return (u*u).sum();
+    return (x*(vectortype(Q*x))).sum();
   }
   /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
   arraytype jacobian(arraytype x){
-    return lltsolve(L,x);
+    arraytype y(x.dim);
+    matrixtype m(x.size()/x.cols(),x.cols());
+    for(int i=0;i<x.size();i++)m(i)=x[i];
+    matrixtype mQ=m*Q;
+    for(int i=0;i<x.size();i++)y[i]=mQ(i);
+    return y;
   }
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
 template <class scalartype>
-MVNORM_t<scalartype> MVNORM(matrix<scalartype> x){
-  return MVNORM_t<scalartype>(x);
+MVNORM_t<scalartype> MVNORM(matrix<scalartype> x, bool use_atomic=true){
+  return MVNORM_t<scalartype>(x, use_atomic);
 }
 
 /** \brief Multivariate normal distribution with unstructered correlation matrix

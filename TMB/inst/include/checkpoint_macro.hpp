@@ -23,7 +23,36 @@
 
 /* general helper functions */
 namespace atomic{
-  /* Construct a tape of a given template _functor_
+/**
+    \name User defined atomic functions
+\note The following procedure is automatically performed with the macro REGISTER_ATOMIC.
+
+\verbatim
+    Given function f0. Define recursively higher order reverse
+    mode derivatives:
+
+    f0: R^(n)         ->  R^(m)     (  x           -> f0 (x)    )
+    f1: R^(n+m)       ->  R^(n)     ( (x,w1)       -> f0'(x)*w1 )
+    f2: R^(n+m+n)     ->  R^(n+m)   ( (x,w1,w2)    -> f1'(x)*w2 )
+    f3: R^(n+m+n+n+m) ->  R^(n+m+n) ( (x,w1,w2,w3) -> f2'(x)*w3 )
+
+    1. We define a 'generalized symbol' to represent all of these.
+    _Reverse_mode_AD_ is trivially obtained for this symbol by calling
+    itself on a higher level. Each occurance on the tape will occupy
+    O(n+m) memory units independent of the number of flops performed
+    by f0.
+
+    2. _Double_versions_ of the generalized symbol are obtained using
+    nested AD types to tape f0, then recursively tape forward and
+    reverse mode sweeps.
+
+    Finally, given (1) and (2) the macro TMB_ATOMIC_VECTOR_FUNCTION
+    will generate the atomic symbol.
+\endverbatim
+    @{
+*/
+
+  /** \brief Construct a tape of a given template _functor_
      (Will be used to tape 'f0' for different nested AD types) */
   template <class Base, class Func>
   CppAD::ADFun<Base>* generate_tape(Func f, vector<double> x_){
@@ -38,7 +67,7 @@ namespace atomic{
     CppAD::ADFun<Base>* padf=new CppAD::ADFun<Base>(x,y2);
     return padf;
   }
-  /* Lift tape of fn up one level by taping forward and reverse sweeps. 
+  /** \brief Lift tape of fn up one level by taping forward and reverse sweeps.
      Note: x_ needs only have length equal to the input domain dimension
      of f0. Zeros are filled in for all range directions.
   */
@@ -61,7 +90,7 @@ namespace atomic{
     delete padf;
     return padf2;
   }
-  /* Recursively apply forrev until the lowest Base level (double) */
+  /** \brief Recursively apply forrev until the lowest Base level (double) */
   template <class ADBase>
   CppAD::ADFun<double>* multi_forrev(CppAD::ADFun<ADBase>* padf, vector<double> x_){
     return multi_forrev(forrev(padf, x_), x_);
@@ -70,7 +99,7 @@ namespace atomic{
   CppAD::ADFun<double>* multi_forrev<double>(CppAD::ADFun<double>* padf, vector<double> x_){
     return padf;
   }
-  /* Tape symbol up to any order */
+  /** \brief Tape symbol up to any order */
   template<class Func>
   CppAD::ADFun<double>* tape_symbol(Func f, vector<double> x){
     typedef typename Func::ScalarType::value_type Base;
@@ -78,8 +107,6 @@ namespace atomic{
     CppAD::ADFun<double>* fn=multi_forrev(f0,x);
     return fn;
   }
-  /* General class to construct 'double versions' of the 
-     generalized symbol. */
 #ifdef _OPENMP
 #define NTHREADS omp_get_max_threads()
 #define THREAD omp_get_thread_num()
@@ -87,6 +114,8 @@ namespace atomic{
 #define NTHREADS 1
 #define THREAD 0
 #endif
+  /** \brief General class to construct 'double versions' of the 
+     generalized symbol. */
   template<template<class> class UserFunctor>
   struct forrev_derivatives{
     bool initialized;
@@ -155,11 +184,10 @@ namespace atomic{
       return vpf[THREAD][level]->Forward(0,tx);
     }
   }; /* end class forrev_derivatives */
-} /* end namespace atomic */
 #undef NTHREADS
 #undef THREAD
 
-/* Wrap user function into a functor, generate double versions,
+/** \brief Wrap user function into a functor, generate double versions,
    and construct atomic function in a namespace */
 #define REGISTER_ATOMIC(USERFUNCTION)					\
 namespace USERFUNCTION##NAMESPACE{					\
@@ -207,3 +235,7 @@ vector<AD<AD<AD<double> > > > USERFUNCTION(vector<AD<AD<AD<double> > > > x){ \
   return USERFUNCTION##NAMESPACE::generalized_symbol(x);		\
 }
 
+/**
+   @}
+*/
+} /* end namespace atomic */

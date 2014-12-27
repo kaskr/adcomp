@@ -578,6 +578,7 @@ MakeADFun <- function(data,parameters,map=list(),
                  seed=NULL,          ## Random seed
                  antithetic=TRUE,    ## Reduce variance
                  keep=FALSE,         ## Keep samples and fct evals
+                 phi=NULL,           ## Function to calculate mean of
                  ...){
     if(is.numeric(seed))set.seed(seed)
     ## Clean up on exit
@@ -609,18 +610,28 @@ MakeADFun <- function(data,parameters,map=list(),
     log.density.propose <- logdmvnorm(samples)
     samples <- samples+par0[random]
     log.density.target <- -apply(samples,2,eval.target)
+    log.density.target[is.nan(log.density.target)] <- -Inf
     I <- log.density.target - log.density.propose
     M <- max(I)
     if(order>=1){
-      I1 <- apply(samples,2,eval.target,order=1)[-random,,drop=FALSE]
       vec <- exp(I-M)
       p <- vec/sum(vec)
+      i <- (p>0)
+      p <- p[i]
+      I1 <- apply(samples[,i,drop=FALSE],2,eval.target,order=1)[-random,,drop=FALSE]
       gr <- as.vector(I1 %*% p)
       if(order==1)return(gr)
       ## I1I1 <- t(apply(I1,1,function(x)x%*%t(x)))
       ## I2 <- t(apply(samples,1,function(x)eval.target(x,order=2)[-random,-random]))
       ## h <- colMeans(vec*(-I1I1+I2))/mean(vec)+as.vector(gr)%*%t(as.vector(gr))
       ## if(order==2)return(h)
+    }
+    if(!is.null(phi)){
+      phival <- apply(samples,2,phi)
+      if(is.null(dim(phival)))phival <- t(phival)
+      p <- exp(I-M); p <- p/sum(p)
+      ans <- phival %*% p
+      return(ans)
     }
     value <- -log(mean(exp(I-M)))-M
     ci <- 1.96*sd(exp(I-M))/sqrt(n)
@@ -1187,9 +1198,6 @@ sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
                   skip, ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL
                   )
-  if(!config(DLL=obj$env$DLL)$optimize.instantly){ ## If not already optimized (because twice optimize gives fault):
-    .Call("optimizeADFunObject",ADHess$ptr,PACKAGE=obj$env$DLL)
-  }
   ev <- function(par=obj$env$par).Call("EvalADFunObject", ADHess$ptr, par,
                    control = list(
                      order = as.integer(0),

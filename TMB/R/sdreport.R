@@ -45,7 +45,7 @@
 ##' summary(rep,"random")                    ## Only random effects
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
-sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE){
+sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -116,7 +116,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       w[r] <- tmp[,i]
       -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
     }
-    A <- t(sapply(seq(length=length(phi)),reverse.sweep)) + Dphi.fixed
+    A <- t(do.call("cbind",lapply(seq(length=length(phi)),reverse.sweep))) + Dphi.fixed
     term2 <- A%*%(Vtheta%*%t(A)) ## second term
     cov <- term1 + term2
   }
@@ -125,6 +125,26 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ans <- list(value=phi,sd=sd,cov=cov,par.fixed=par.fixed,
               cov.fixed=Vtheta,pdHess=pdHess,
               gradient.fixed=gradient.fixed)
+  ## ======== Calculate bias corrected random effects estimates if requested
+  if(bias.correct){
+      epsilon <- rep(0,length(phi))
+      parameters <- obj$env$parameters
+      parameters[[length(parameters)+1]] <- epsilon
+      obj3 <- MakeADFun(obj$env$data,
+                        parameters,
+                        random=obj$env$random,
+                        checkParameterOrder=FALSE,
+                        DLL=obj$env$DLL)
+      par.full <- c(par.fixed,epsilon)
+      i <- (1:length(par.full))>length(par.fixed) ## epsilon indices
+      grad <- obj3$gr(par.full)
+      require(numDeriv)
+      hess <- jacobian(obj3$gr,par.full)
+      estimate <- grad[i]
+      names(estimate) <- names(phi)
+      Vestimate <- -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
+      ans$unbiased <- list(value=estimate,sd=sqrt(diag(Vestimate)),cov=Vestimate)
+  }
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm

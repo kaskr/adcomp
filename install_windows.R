@@ -3,13 +3,14 @@ if(.Platform$OS.type != "windows")stop("This script is only for windows")
 ## ===== Default locations - change for non-standard setup
 fileLocations <- function(){
   rhome <- Sys.getenv("R_HOME")
-  rbin <- paste0(rhome,"/bin")
+  rbin <- paste0(rhome,"/bin/",.Platform$r_arch)
   rtools <- c("C:/Rtools",
               "~/Rtools",
               paste0(rhome,"/../../Rtools"),
               paste0(rhome,"/../Rtools") )
   gccbin <- paste0(rtools,"/gcc-4.6.3/bin")
-  ans <- list(rhome=rhome,rbin=rbin,rtools=rtools,gccbin=gccbin)
+  gdbbin <- paste0(rtools,"/gcc-4.6.3/bin64")
+  ans <- list(rhome=rhome,rbin=rbin,rtools=rtools,gccbin=gccbin,gdbbin=gdbbin)
   lapply(ans,function(x)x[file.exists(x)][1])
 }
 
@@ -37,6 +38,8 @@ setPath <- function(...){
   ## ===== Add gcc to PATH
   if(is.na(fl$rtools))stop("Failed to locate Rtools folder")
   path <- paste(path.expand(fl$gccbin),path,sep=";")
+  ## ===== Add gdb to PATH
+  path <- paste(path.expand(fl$gdbbin),path,sep=";")
   ## ===== Add unix tools to PATH
   cwpath <- paste0(path.expand(fl$rtools),"/bin")
   path <- paste(cwpath,path,sep=";")

@@ -25,7 +25,11 @@ Alternatively, If more detailed debugging is required,  then
 \code{gdbsource(file,TRUE)} will provide the full backtrace followed
 by an interactive gdb session where the individual frames can be inspected.
 Note that templates should be compiled without optimization and with debug
-information i.e. \code{compile(cppfile,"-O0 -g")} in order to provide
-correct line numbers.
+information in order to provide correct line numbers:
+\itemize{
+\item On Linux/OS X use \code{compile(cppfile,"-O0 -g")}.
+\item On Windows use \code{compile(cppfile,"-O1 -g",DLLFLAGS="")} (lower
+optimization level will cause errors).
+}
 }
 
