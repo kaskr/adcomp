@@ -57,8 +57,8 @@ namespace Rmath {
     int limit=100;
     int lenw = 4 * limit;
     int last=0;
-    int* iwork =  Calloc(limit, int);
-    double* work = Calloc(lenw, double);
+    int* iwork = (int*)malloc(limit * sizeof(int));
+    double* work = (double*)malloc(lenw * sizeof(double));
     double ex[3];
     ex[0] = shape;
     ex[1] = n;
@@ -91,8 +91,8 @@ namespace Rmath {
 #endif
       }
     }
-    Free(iwork);
-    Free(work);
+    free(iwork);
+    free(work);
     return result1 + result2;
   }
 
