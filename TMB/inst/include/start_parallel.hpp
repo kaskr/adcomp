@@ -72,16 +72,16 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
      they all have equal domain and range dimensions.
    */
   parallelADFun(vector<Base*> vecpf_){
-    int n=vecpf_.size();
+    size_t n=vecpf_.size();
     ntapes=n;
     vecpf.resize(n);
-    for(int i=0;i<n;i++)vecpf[i]=vecpf_[i];
+    for(size_t i=0;i<n;i++)vecpf[i]=vecpf_[i];
     domain=vecpf[0]->Domain();
     range=vecpf[0]->Range();
     vecind.resize(n);
-    for(int i=0;i<n;i++){
+    for(size_t i=0;i<n;i++){
       vecind(i).resize(domain);
-      for(int j=0;j<domain;j++){
+      for(size_t j=0;j<domain;j++){
 	vecind(i)[j]=j;
       }
     }
