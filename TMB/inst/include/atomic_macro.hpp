@@ -34,8 +34,8 @@ private:								\
     if(q>0)error("Atomic '" #ATOMIC_NAME "' order not implemented.\n");	\
     if( vx.size() > 0 ){						\
       bool anyvx = false;						\
-      for(int i=0;i<vx.size();i++)anyvx |= vx[i];			\
-      for(int i=0;i<vy.size();i++)vy[i] = anyvx;			\
+      for(size_t i=0;i<vx.size();i++)anyvx |= vx[i];			\
+      for(size_t i=0;i<vy.size();i++)vy[i] = anyvx;			\
     }									\
     ty = ATOMIC_NAME(tx);	       					\
     return true;							\
@@ -56,7 +56,7 @@ private:								\
 			      CppAD::vector<bool>& st)			\
   {									\
     bool anyrt = false;							\
-    for(int i=0;i<rt.size();i++)anyrt |= rt[i];				\
+    for(size_t i=0;i<rt.size();i++)anyrt |= rt[i];			\
     for(size_t i=0;i<st.size();i++)st[i]=anyrt;				\
     return true;							\
   }									\

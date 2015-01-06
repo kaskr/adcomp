@@ -315,7 +315,7 @@ struct report_stack{
     UNPROTECT(1);
     return nam;
   }
-  size_t size(){return result.size();}
+  EIGEN_DEFAULT_DENSE_INDEX_TYPE size(){return result.size();}
 };  // report_stack
 
 /** \brief Type definition of user-provided objective function (i.e. neg. log. like) */

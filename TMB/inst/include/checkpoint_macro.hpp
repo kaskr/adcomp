@@ -73,8 +73,8 @@ namespace atomic{
   */
   template <class Base>
   CppAD::ADFun<Base>* forrev(CppAD::ADFun<AD<Base> >* padf, vector<double> x_){
-    int n=padf->Domain();
-    int m=padf->Range();
+    size_t n=padf->Domain();
+    size_t m=padf->Range();
     vector<AD<Base> > x(n+m);
     vector<AD<Base> > y(n);
     for(int i=0;i<x_.size();i++)x[i]=AD<Base>(x_[i]);
@@ -207,8 +207,8 @@ namespace USERFUNCTION##NAMESPACE{					\
 			     ty = double_version(tx);			\
 			     ,						\
 			     CppAD::vector<Type> concat(tx.size() + py.size());	\
-			     for(int i=0; i < tx.size(); i++) concat[i] = tx[i]; \
-			     for(int i=0; i < py.size(); i++) concat[tx.size()+i] = py[i]; \
+			     for(size_t i=0; i < tx.size(); i++) concat[i] = tx[i]; \
+			     for(size_t i=0; i < py.size(); i++) concat[tx.size()+i] = py[i]; \
 			     px = generalized_symbol(concat);		\
 			     )						\
   template<class Base>							\

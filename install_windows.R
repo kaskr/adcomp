@@ -78,4 +78,8 @@ if(!("TMB" %in% installed.packages())){
   createMakevars()
   modifyPathOnAttach()
   shell("make install")
+} else {
+  cat("TMB already installed. To reinstall run:\n")
+  cat("  remove.packages(\"TMB\")\n")
+  cat("  source(\"install_windows.R\")\n")
 }
