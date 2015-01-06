@@ -165,6 +165,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       ans$diag.cov.random <- diag.term1 + diag.term2
       if(getJointPrecision){ ## Get V(u,theta)^-1
         G <- hessian.random %*% A
+        G <- as.matrix(G) ## Avoid Matrix::cbind2('dsCMatrix','dgeMatrix')
         M1 <- cbind2(hessian.random,G)
         M2 <- cbind2(t(G), as.matrix(t(A)%*%G)+hessian.fixed )
         M <- rbind2(M1,M2)
