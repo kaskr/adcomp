@@ -36,7 +36,7 @@ Alternative platforms
 
 Windows
 -------
-Tested to work on 64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/). Currently not working with 32 bit R.
+Tested to work on 32/64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/). 64 bit R is recommended.
 
 _Install instructions_
 
@@ -48,8 +48,8 @@ The required Rtools will be downloaded and installed. Note that the PATH variabl
 
 _Status_
 
-- Parallel user templates work, including changing the number of threads from R.
-- Filenames and folders with spaces should be ok.
+- Parallel user templates work. However, changing the number of threads from R does not work.
+- Filenames and folders with spaces works _on systems supporting 8.3 filenames_. Systems that do not support 8.3 filenames may have problems running the windows install script, unless R is installed in a folder without spaces.
 - -Wall flag disabled by default.
 
 Mac OS X
