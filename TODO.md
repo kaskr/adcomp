@@ -1,7 +1,7 @@
 TODO
 ====
-- Upgrade to recent cppad, to get the abs/sign bugfix of version 2013-11-27.
-- Eliminate Wall warnings.
+- **DONE** Upgrade to recent cppad, to get the abs/sign bugfix of version 2013-11-27.
+- **DONE** Eliminate Wall warnings.
 - Make instructions how to disable Wall compiler flag, and more generally how to locate global Makeconf and create local Makevars.
 - Roxygen documentation:
   - The use of dyn.load is confusing (add 'seealso' to ?compile)
@@ -30,9 +30,9 @@ TODO
 - Make simple example of how to include "adjoint code". pexp(x,lambda) is a good example (cum. dist. function exp. distr)
 - Think about general features for calculating residuals, along the line of Kasper's ideas. 
 - New feature 'exportRpackage()' to wrap user template into a self contained R-package, optionally as standalone (independent of TMB package). By default linking to the TMB installation for smaller package size.
-- Implement atomic AD operators of entire Rmath special function library. Example: D_x(psigamma(x,n))=psigamma(x,n+1)
-- Implement atomic AD operators of certain matrix operations (linking to BLAS) to e.g. better handle templates using multivariate normal distribution with dense covariance matrices.
-- Implement atomic AD operator of matrix exponential.
+- **DONE** Implement atomic AD operators of entire Rmath special function library. Example: D_x(psigamma(x,n))=psigamma(x,n+1)
+- **DONE** Implement atomic AD operators of certain matrix operations (linking to BLAS) to e.g. better handle templates using multivariate normal distribution with dense covariance matrices.
+- **DONE** Implement atomic AD operator of matrix exponential.
 - Package should pass "make check"/"R CMD check" without warnings.
 - Make unary functions work on arrays and preserve dimension.
 - Disable array methods that give unexpected results (e.g. .Block() ).

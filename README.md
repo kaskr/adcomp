@@ -31,21 +31,12 @@ It is recommended to test that models can be changed, re-compiled and re-loaded 
 If everything works as intended this script should display "TRUE".
 The script has only been observed to fail for certain combinations of Linux and the gcc compiler, see below.
 
-Compiler warnings
------------------
-Some R configurations have the '-Wall' compiler flag enabled by default resulting in a large number of useless warnings. You can list your C++ compiler flags from the terminal with ```R CMD config CXXFLAGS```.
-It is recommended to remove '-Wall' from this list, e.g. by running the following in a terminal:
-
-    mkdir -p ~/.R
-    echo CXXFLAGS=`R CMD config CXXFLAGS | sed s/-Wall//g` >> ~/.R/Makevars
-
-
 Alternative platforms
 =====================
 
 Windows
 -------
-Tested to work on 64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/). Currently not working with 32 bit R.
+Tested to work on 32/64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/). 64 bit R is recommended.
 
 _Install instructions_
 
@@ -57,8 +48,8 @@ The required Rtools will be downloaded and installed. Note that the PATH variabl
 
 _Status_
 
-- Parallel user templates work, including changing the number of threads from R.
-- Filenames and folders with spaces should be ok.
+- Parallel user templates work. However, changing the number of threads from R does not work.
+- Filenames and folders with spaces works _on systems supporting 8.3 filenames_. Systems that do not support 8.3 filenames may have problems running the windows install script, unless R is installed in a folder without spaces.
 - -Wall flag disabled by default.
 
 Mac OS X
