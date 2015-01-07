@@ -693,7 +693,20 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
       setAttrib(res,R_NamesSymbol,rangenames);
     }
   }
-  if(order==1)PROTECT(res=asSEXP(asMatrix(pf->Jacobian(x),m,n)));
+  if(order==1){
+    //PROTECT(res=asSEXP(asMatrix(pf->Jacobian(x),m,n)));
+    pf->Forward(0,x);
+    vector<double> jac(n*m);
+    vector<double> u(n);
+    vector<double> v(m);
+    for(int i=0;i<m;i++) v[i] = 0.0;
+    for(int i=0;i<m;i++){
+      v[i] = 1.0; u = pf->Reverse(1,v);
+      v[i] = 0.0;
+      for(int j=0;j<n;j++) jac[i*n+j] = u[j];
+    }
+    PROTECT(res=asSEXP(asMatrix(jac,m,n)));
+  }
   //if(order==2)res=asSEXP(pf->Hessian(x,0),1);
   if(order==2){
     if(ncols==0){
