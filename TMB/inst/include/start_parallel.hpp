@@ -80,8 +80,8 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     range=vecpf[0]->Range();
     vecind.resize(n);
     for(size_t i=0;i<n;i++){
-      vecind(i).resize(domain);
-      for(size_t j=0;j<domain;j++){
+      vecind(i).resize(range);
+      for(size_t j=0;j<range;j++){
 	vecind(i)[j]=j;
       }
     }
