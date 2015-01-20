@@ -40,12 +40,11 @@ SEXP asSEXP(const vector<Type> &a)
   UNPROTECT(1);
   return val;
 }
-template<class Type>
-SEXP asSEXP(const Type &a)
+SEXP asSEXP(const double &a)
 {
    SEXP val;
    PROTECT(val=allocVector(REALSXP,1));
-   REAL(val)[0]=asDouble(a);
+   REAL(val)[0]=a;
    UNPROTECT(1);
    return val;
 }
@@ -138,4 +137,41 @@ SEXP asSEXP(const tmbutils::array<Type> &a)
    setAttrib(val, R_DimSymbol, dim);
    UNPROTECT(2);
    return val;
+}
+
+/** Create R-triplet sparse matrix from Eigen sparse matrix */
+template<class Type>
+SEXP asSEXP(Eigen::SparseMatrix<Type> x){
+  typedef typename Eigen::SparseMatrix<Type>::InnerIterator Iterator;
+  // Allocate return object
+  int nnz = x.nonZeros();
+  SEXP ans = PROTECT(R_do_new_object(R_do_MAKE_CLASS("dgTMatrix")));
+  SEXP dim = PROTECT(allocVector(INTSXP, 2));
+  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
+  SEXP values = PROTECT(allocVector(REALSXP, nnz));
+  SEXP i = PROTECT(allocVector(INTSXP, nnz));
+  SEXP j = PROTECT(allocVector(INTSXP, nnz));
+  SEXP factors = PROTECT(allocVector(VECSXP, 0));
+  R_do_slot_assign(ans, install("i"), i);
+  R_do_slot_assign(ans, install("j"), j);
+  R_do_slot_assign(ans, install("Dim"), dim);
+  R_do_slot_assign(ans, install("Dimnames"), dimnames);
+  R_do_slot_assign(ans, install("x"), values);
+  R_do_slot_assign(ans, install("factors"), factors);
+  // Insert
+  INTEGER(dim)[0] = x.rows();
+  INTEGER(dim)[1] = x.cols();
+  int k=0;
+  for (int cx=0; cx<x.outerSize(); cx++)
+    {
+      for (Iterator itx(x,cx); itx; ++itx)
+	{
+	  INTEGER(i)[k] = itx.row();
+	  INTEGER(j)[k] = itx.col();
+	  REAL(values)[k] = asDouble(itx.value());
+	  k++;
+	}
+    }
+  UNPROTECT(7);
+  return ans;
 }
