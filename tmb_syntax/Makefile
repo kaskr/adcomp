@@ -4,3 +4,6 @@ check_distributions:
 
 matrix_arrays:
 	R --vanilla < matrix_arrays.R
+
+report:
+	R --vanilla < report.R

@@ -672,7 +672,14 @@ MakeADFun <- function(data,parameters,map=list(),
                   if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
                   ans
                 },
-                he=function(x=last.par)f(x,order=2),
+                he=function(x=last.par,atomic=TRUE){
+                    ## If no atomics on tape we have all orders implemented:
+                    if(!atomic) return( f(x,order=2) )
+                    ## Otherwise, get Hessian as 1st order derivative of gradient:
+                    if(is.null(ADGrad))
+                        ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+                    f(x,type="ADGrad",order=1)
+                },
                 hessian=hessian,method=method,
                 retape=retape,env=env,
                 report=report,...))
@@ -703,6 +710,7 @@ MakeADFun <- function(data,parameters,map=list(),
                   ans
                 },
                 he=function(x=last.par[-random],...){
+                  stop("Hessian not yet implemented for models with random effects.")
                   if(MCcontrol$doMC){
                     ff(x,order=0)
                     MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=2)
