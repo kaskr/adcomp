@@ -218,7 +218,41 @@ Levels: d e f g h i j
 /** \brief Get data array from R and declare it as array<int> */
 #define DATA_IARRAY(name) tmbutils::array<int> name(tmbutils::asArray<int>(	\
 	getListElement(objective_function::data,#name,&isArray)));
+/** \brief Get data list object from R and makes it available in C++
 
+Example (incomplete) of use:
+In R: 
+\verbatim
+data <- list()
+data$object <- list(a=1:10, b=matrix(1:6,2))
+obj <- MakeADFun(data,........) 
+\endverbatim
+
+In C++: 
+\verbatim
+// Corresponding list object on the C++ side
+template<class Type>
+struct my_list {
+  vector<Type> a;
+  matrix<Type> b;
+  my_list(SEXP x){ // Constructor
+    a = asVector<Type>(getListElement(x,"a"));
+    b = asMatrix<Type>(getListElement(x,"b"));
+  }
+};
+
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+  DATA_STRUCT(object, my_list);
+  REPORT(object.a); // Now you can use "a" and "b" as you like
+  REPORT(object.b);
+  return 0;
+}
+\endverbatim
+*/ 
+#define DATA_STRUCT(name, struct)struct<Type> name(getListElement(this->data,#name));
+	
 // kasper: Not sure used anywhere
 /** \brief Get the hessian sparsity pattern of ADFun object pointer */
 template<class Type>

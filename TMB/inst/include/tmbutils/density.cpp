@@ -660,8 +660,8 @@ public:
 /** \brief Evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
 
   For detailed explanation of GMRFs see the class definition @ref GMRF_t
-  \param Q precission matrix
-  \param order Convolution order, i.e. the precission matrix is Q^order (matrix product)
+  \param Q precision matrix
+  \param order Convolution order, i.e. the precision matrix is Q^order (matrix product)
 
 */
 template <class scalartype>

@@ -49,6 +49,7 @@ using CppAD::ADFun;
 #include "convenience.hpp"
 #include "distributions_R.hpp"
 #include "tmbutils/tmbutils_extra.cpp"
+#include "tmbutils/R_inla.cpp"
 using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;
