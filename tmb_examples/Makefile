@@ -1,8 +1,10 @@
+excludes = lr_test spde_aniso spde
 rfiles = $(basename $(wildcard *.R))
 cppfiles = $(basename $(wildcard *.cpp))
-intersection= $(filter $(rfiles), $(cppfiles)) 
-outputfiles = $(intersection:=.output.RData)
-profiletargets = $(intersection:=.profile)
+all_examples = $(filter $(rfiles), $(cppfiles))
+examples = $(filter-out $(excludes), $(all_examples))
+outputfiles = $(examples:=.output.RData)
+profiletargets = $(examples:=.profile)
 
 %.output.RData : %.R %.cpp
 	unset MAKEFLAGS; example=$(basename $<) R --vanilla < unittest.R
@@ -10,7 +12,7 @@ profiletargets = $(intersection:=.profile)
 all: $(outputfiles)
 	make report
 
-$(intersection) : % : %.output.RData
+$(all_examples) : % : %.output.RData
 	
 
 report:
