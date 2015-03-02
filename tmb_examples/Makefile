@@ -7,7 +7,7 @@ outputfiles = $(examples:=.output.RData)
 profiletargets = $(examples:=.profile)
 
 %.output.RData : %.R %.cpp
-	unset MAKEFLAGS; example=$(basename $<) R --vanilla < unittest.R
+	unset MAKEFLAGS; example=$(basename $<) R --vanilla < tools/unittest.R
 
 all: $(outputfiles)
 	make report
@@ -16,13 +16,16 @@ $(all_examples) : % : %.output.RData
 	
 
 report:
-	R --vanilla < unittest.R
+	R --vanilla < tools/unittest.R
 
 clean :
 	rm -rf *.o *.so *~ core *.output.RData Rplots.pdf *.profile
 
 %.profile : %.R %.cpp
-	example=$(basename $<) R --vanilla < profiler.R
+	example=$(basename $<) R --vanilla < tools/profiler.R
+
+%.logpid : %.R %.cpp
+	example=$(basename $<) R --vanilla < tools/logpid.R
 
 profile_all: $(outputfiles) $(profiletargets)
 
