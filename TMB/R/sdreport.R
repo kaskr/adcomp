@@ -45,7 +45,8 @@
 ##' summary(rep,"random")                    ## Only random effects
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
-sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE){
+sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
+                     bias.correct.control=list(sd=FALSE)){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -135,14 +136,33 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
                         random=obj$env$random,
                         checkParameterOrder=FALSE,
                         DLL=obj$env$DLL)
+      ## Get good initial parameters
+      obj3$env$start <- c(par, epsilon)
+      obj3$env$random.start <- expression(start[random])
+      ## Test if Hessian pattern is un-changed
+      h <- obj$env$spHess(random=TRUE)
+      h3 <- obj3$env$spHess(random=TRUE)
+      pattern.unchanged <- identical(h@i,h3@i) & identical(h@p,h3@p)
+      ## If pattern un-changed we can re-use symbolic Cholesky:
+      if(pattern.unchanged){
+          cat("Re-using symbolic Cholesky\n")
+          obj3$env$L.created.by.newton <- L
+      } else {
+          if( .Call("have_tmb_symbolic", PACKAGE = "TMB") )
+              runSymbolicAnalysis(obj3)
+      }
       par.full <- c(par.fixed,epsilon)
       i <- (1:length(par.full))>length(par.fixed) ## epsilon indices
       grad <- obj3$gr(par.full)
-      require(numDeriv)
-      hess <- jacobian(obj3$gr,par.full)
+      if(bias.correct.control$sd){
+          require(numDeriv)
+          hess <- jacobian(obj3$gr,par.full)
+          Vestimate <- -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
+      } else {
+          Vestimate <- matrix(NA)
+      }
       estimate <- grad[i]
       names(estimate) <- names(phi)
-      Vestimate <- -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
       ans$unbiased <- list(value=estimate,sd=sqrt(diag(Vestimate)),cov=Vestimate)
   }
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
