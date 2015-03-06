@@ -9,12 +9,12 @@
 #ifdef TMB_SAFEBOUNDS
 #undef NDEBUG
 #undef eigen_assert
-void eigen_Rprintf(const char* x);
-#define eigen_assert(x) if (!(x)) { eigen_Rprintf("TMB has received an error from Eigen. "); \
-                                  eigen_Rprintf("The following condition was not met:\n");          \
-                                  eigen_Rprintf(#x);                                                \
-                                  eigen_Rprintf("\nPlease check your matrix-vector bounds etc., "); \
-                                  eigen_Rprintf("or run your program through a debugger.\n");       \
+void eigen_REprintf(const char* x);
+#define eigen_assert(x) if (!(x)) { eigen_REprintf("TMB has received an error from Eigen. "); \
+                                  eigen_REprintf("The following condition was not met:\n");          \
+                                  eigen_REprintf(#x);                                                \
+                                  eigen_REprintf("\nPlease check your matrix-vector bounds etc., "); \
+                                  eigen_REprintf("or run your program through a debugger.\n");       \
 				  abort();}
 #else
 #undef NDEBUG
@@ -35,7 +35,7 @@ void eigen_Rprintf(const char* x);
 #include <R.h>
 #include <Rinternals.h>
 #include "Rstream.hpp"
-void eigen_Rprintf(const char* x){Rprintf(x);}
+void eigen_REprintf(const char* x){REprintf(x);}
 
 #include "tmbutils/tmbutils.cpp"
 using tmbutils::matrix;
