@@ -2,6 +2,22 @@
 * \brief Interfaces to R and CppAD
 */
 
+/*
+  Call to external C++ code can potentially result in exeptions that
+  will crash R. However, we do not want R to crash on failed memory
+  allocations. Therefore:
+
+  * All interface functions (those called with .Call from R) must have
+    TMB_TRY wrapped around CppAD/Eigen code that allocates memory.
+
+  * Special attention must be payed to parallel code, as each thread
+    is responsible for catching its own exceptions.
+*/
+#define TMB_TRY try
+#define TMB_CATCH catch(std::bad_alloc& ba)
+#define TMB_ERROR_BAD_ALLOC error("Memory allocation fail in function '%s'\n", \
+				  __FUNCTION__)
+
 /* Memory manager:
    Count the number of external pointers alive.
    When total number is zero it is safe to dyn.unload
@@ -819,6 +835,7 @@ extern "C"
   SEXP MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
   {
+    ADFun<double>* pf = NULL;
     /* Some type checking */
     if(!isNewList(data))error("'data' must be a list");
     if(!isNewList(parameters))error("'parameters' must be a list");
@@ -846,10 +863,19 @@ extern "C"
       std::cout << n << " regions found.\n";
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
+      bool bad_thread_alloc = false;
 #pragma omp parallel for if (config.tape.parallel)
       for(int i=0;i<n;i++){
-	pfvec[i]=MakeADFunObject(data, parameters, report, control, i, info);
-	if(config.optimize.instantly)pfvec[i]->optimize();
+	TMB_TRY {
+	  pfvec[i] = NULL;
+	  pfvec[i] = MakeADFunObject(data, parameters, report, control, i, info);
+	  if (config.optimize.instantly) pfvec[i]->optimize();
+	}
+	TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if(bad_thread_alloc){
+	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+	TMB_ERROR_BAD_ALLOC;
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
@@ -857,9 +883,16 @@ extern "C"
       R_RegisterCFinalizer(res,finalizeparallelADFun);
 #endif
     } else { // Serial mode
-      /* Actual work: tape creation */
-      ADFun<double>* pf=MakeADFunObject(data, parameters, report, control, -1, info);
-      if(config.optimize.instantly)pf->optimize();
+      TMB_TRY{
+	/* Actual work: tape creation */
+	pf = NULL;
+	pf = MakeADFunObject(data, parameters, report, control, -1, info);
+	if (config.optimize.instantly) pf->optimize();
+      }
+      TMB_CATCH {
+	if (pf != NULL) delete pf;
+	TMB_ERROR_BAD_ALLOC;
+      }
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
       setAttrib(res,install("range.names"),info);
@@ -919,13 +952,18 @@ extern "C"
 
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
-    if(isNull(f))error("Expected external pointer - got NULL");
-    SEXP tag=R_ExternalPtrTag(f);
-    if(!strcmp(CHAR(tag), "ADFun"))
-      return EvalADFunObjectTemplate<ADFun<double> >(f,theta,control);
-    if(!strcmp(CHAR(tag), "parallelADFun"))
-      return EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
-    error("NOT A KNOWN FUNCTION POINTER");
+    TMB_TRY {
+      if(isNull(f))error("Expected external pointer - got NULL");
+      SEXP tag=R_ExternalPtrTag(f);
+      if(!strcmp(CHAR(tag), "ADFun"))
+	return EvalADFunObjectTemplate<ADFun<double> >(f,theta,control);
+      if(!strcmp(CHAR(tag), "parallelADFun"))
+	return EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
+      error("NOT A KNOWN FUNCTION POINTER");
+    }
+    TMB_CATCH {
+      TMB_ERROR_BAD_ALLOC;
+    }
   }
   
 }
@@ -950,9 +988,15 @@ extern "C"
     if(!isEnvironment(report))error("'report' must be an environment");
     
     /* Create DoubleFun pointer */
-    objective_function<double>* pF = 
-      new objective_function<double>(data,parameters,report);
-    
+    objective_function<double>* pF = NULL;
+    TMB_TRY {
+      pF = new objective_function<double>(data,parameters,report);
+    }
+    TMB_CATCH {
+      if (pF != NULL) delete pF;
+      TMB_ERROR_BAD_ALLOC;
+    }
+
     /* Convert DoubleFun pointer to R_ExternalPtr */
     SEXP res,ans;
     PROTECT(res=R_MakeExternalPtr((void*) pF,mkChar("DoubleFun"),R_NilValue));
@@ -965,25 +1009,28 @@ extern "C"
   
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control)
   {
-    objective_function<double>* pf;
-    pf=(objective_function<double>*)R_ExternalPtrAddr(f);
-    PROTECT(theta=coerceVector(theta,REALSXP));
-    int n=pf->theta.size();
-    if(LENGTH(theta)!=n)error("Wrong parameter length.");
-
-    vector<double> x(n);
-    for(int i=0;i<n;i++)x[i]=REAL(theta)[i];
-    pf->theta=x;
-    
-    /* Since we are actually evaluating objective_function::operator() (not
-       an ADFun object) we should remember to initialize parameter-index. */
-    pf->index=0;
-    pf->parnames.resize(0); // To avoid mem leak.
-    pf->reportvector.clear();
-    SEXP res;
-    res=asSEXP(pf->operator()());
-    UNPROTECT(1);
-    return res;
+    TMB_TRY {
+      objective_function<double>* pf;
+      pf = (objective_function<double>*) R_ExternalPtrAddr(f);
+      PROTECT( theta=coerceVector(theta,REALSXP) );
+      int n = pf->theta.size();
+      if (LENGTH(theta)!=n) error("Wrong parameter length.");
+      vector<double> x(n);
+      for(int i=0;i<n;i++) x[i] = REAL(theta)[i];
+      pf->theta=x;
+      /* Since we are actually evaluating objective_function::operator() (not
+	 an ADFun object) we should remember to initialize parameter-index. */
+      pf->index=0;
+      pf->parnames.resize(0); // To avoid mem leak.
+      pf->reportvector.clear();
+      SEXP res;
+      res = asSEXP( pf->operator()() );
+      UNPROTECT(1);
+      return res;
+    }
+    TMB_CATCH {
+      TMB_ERROR_BAD_ALLOC;
+    }
   }
 
   /** \brief Gets parameter order by running the user template
@@ -991,15 +1038,18 @@ extern "C"
    We spend a function evaluation on getting the parameter order (!) */
   SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report)
   {
-    /* Some type checking */
-    if(!isNewList(data))error("'data' must be a list");
-    if(!isNewList(parameters))error("'parameters' must be a list");
-    if(!isEnvironment(report))error("'report' must be an environment");
-    objective_function<double> F(data,parameters,report);
-    //F.reversefill=true;
-    F(); // Run through user template
-    //return(F.defaultpar());
-    return F.parNames();
+    TMB_TRY {
+      /* Some type checking */
+      if(!isNewList(data))error("'data' must be a list");
+      if(!isNewList(parameters))error("'parameters' must be a list");
+      if(!isEnvironment(report))error("'report' must be an environment");
+      objective_function<double> F(data,parameters,report);
+      F(); // Run through user template
+      return F.parNames();
+    }
+    TMB_CATCH {
+      TMB_ERROR_BAD_ALLOC;
+    }
   }
 
 } /* Double interface */
@@ -1031,6 +1081,7 @@ extern "C"
   /** \brief Tape the gradient using nested AD types */
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
+    ADFun<double>* pf = NULL;
     /* Some type checking */
     if(!isNewList(data))error("'data' must be a list");
     if(!isNewList(parameters))error("'parameters' must be a list");
@@ -1051,10 +1102,19 @@ extern "C"
       std::cout << n << " regions found.\n";
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
+      bool bad_thread_alloc = false;
 #pragma omp parallel for if (config.tape.parallel)
       for(int i=0;i<n;i++){
-	pfvec[i]=MakeADGradObject(data, parameters, report, i);
-	if(config.optimize.instantly)pfvec[i]->optimize();
+	TMB_TRY {
+	  pfvec[i] = NULL;
+	  pfvec[i] = MakeADGradObject(data, parameters, report, i);
+	  if (config.optimize.instantly) pfvec[i]->optimize();
+	}
+	TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if(bad_thread_alloc){
+	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+	TMB_ERROR_BAD_ALLOC;
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
@@ -1063,8 +1123,15 @@ extern "C"
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
-      ADFun<double>* pf=MakeADGradObject(data, parameters, report, -1);
-      if(config.optimize.instantly)pf->optimize();
+      TMB_TRY {
+        pf = NULL;
+        pf = MakeADGradObject(data, parameters, report, -1);
+        if(config.optimize.instantly)pf->optimize();
+      }
+      TMB_CATCH {
+	if (pf != NULL) delete pf;
+	TMB_ERROR_BAD_ALLOC;
+      }
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,mkChar("ADFun"),R_NilValue));
       R_RegisterCFinalizer(res,finalizeADFun);
@@ -1251,24 +1318,11 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
     
   }
   
-  //yyy=tmp2.Jacobian(xxx);
-
-  //    ADFun< double >* pf = new ADFun< double >(xxx,yyy);
-  ADFun< double >* pf = new ADFun< double >;
-  pf->Dependent(xxx,yyy);
-
-  optimizeTape(pf);
   /* ========================================================= */    
   
   /* Calculate row and col index vectors.
      The variable "k" now holds the number of non-zeros.
   */
-
-  // colproj used to remap (i,j) pairs. Not used anymore.
-  vector<int> colproj(n); /* column projection index vector */
-  int cumsum=0;
-  for(int i = 0; i < n; i++){colproj[i]=cumsum;cumsum+=KEEP_COL(i);}
-  
   vector<int> rowindex(k);
   vector<int> colindex(k);
   k=0;
@@ -1277,8 +1331,6 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
       icol=&tmp2.colpattern[i];
       for(int j=0;j<int(icol->size());j++){
 	if(KEEP_ROW( icol->operator[](j), i )){
-	  // rowindex[k]=colproj[icol->operator[](j)];
-	  // colindex[k]=colproj[i];
 	  rowindex[k]=icol->operator[](j);
 	  colindex[k]=i;
 	  k++;
@@ -1286,6 +1338,12 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
       }
     }
   }
+  //yyy=tmp2.Jacobian(xxx);
+
+  //    ADFun< double >* pf = new ADFun< double >(xxx,yyy);
+  ADFun< double >* pf = new ADFun< double >;
+  pf->Dependent(xxx,yyy);
+
   sphess ans(pf,rowindex,colindex);
   return ans;
 } // MakeADHessObject2
@@ -1329,11 +1387,26 @@ extern "C"
     start_parallel(); /* Start threads */
 
     /* parallel test */
+    bool bad_thread_alloc = false;
     vector<sphess*> Hvec(n);
 #pragma omp parallel for if (config.tape.parallel)
-    //for(int i=0;i<n;i++)Hvec[i]=&MakeADHessObject2(data, parameters, report, skip, i);
-    for(int i=0;i<n;i++)Hvec[i]=new sphess(MakeADHessObject2(data, parameters, report, skip, i));
-
+    for (int i=0; i<n; i++) {
+      TMB_TRY {
+	Hvec[i] = NULL;
+	Hvec[i] = new sphess( MakeADHessObject2(data, parameters, report, skip, i) );
+	optimizeTape( Hvec[i]->pf );
+      }
+      TMB_CATCH { bad_thread_alloc = true; }
+    }
+    if (bad_thread_alloc) {
+      for(int i=0; i<n; i++) {
+	if (Hvec[i] != NULL) {
+	  delete Hvec[i]->pf;
+	  delete Hvec[i];
+	}
+      }
+      TMB_ERROR_BAD_ALLOC;
+    }
     //parallelADFun<double> tmp(Hvec);
     parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
 
@@ -1343,15 +1416,21 @@ extern "C"
   } // MakeADHessObject2
 #else
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
-    //MakeADHessObject2_parallel(data, parameters, report, skip);
-    //sphess H=MakeADHessObject2(data, parameters, report, skip, 10000/* -1*/);
-    sphess H=MakeADHessObject2(data, parameters, report, skip, -1);
-    //TMB_PRINT(H.pf->Range());
-    /* Get the default parameter vector */
-    return asSEXP(H,"ADFun");
+    sphess* pH = NULL;
+    TMB_TRY {
+      pH = new sphess( MakeADHessObject2(data, parameters, report, skip, -1) );
+      optimizeTape( pH->pf );
+      return asSEXP(*pH, "ADFun");
+    }
+    TMB_CATCH {
+      if (pH != NULL) {
+	delete pH->pf;
+	delete pH;
+      }
+      TMB_ERROR_BAD_ALLOC;
+    }
   } // MakeADHessObject2
 #endif
-  
 }
 
 #endif /* #ifndef WITH_LIBTMB */
