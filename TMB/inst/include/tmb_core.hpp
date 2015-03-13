@@ -1313,6 +1313,17 @@ extern "C"
 #endif
 }
 
+extern "C"
+{
+  SEXP usingAtomics(){
+    SEXP ans;
+    PROTECT(ans = allocVector(INTSXP,1));
+    INTEGER(ans)[0] = atomic::atomicFunctionGenerated;
+    UNPROTECT(1);
+    return ans;
+  }
+}
+
 #endif /* #ifndef WITH_LIBTMB */
 
 
@@ -1333,6 +1344,7 @@ extern "C"
   SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report);
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip);
+  SEXP usingAtomics();
 }
 
 #endif /* #ifdef WITH_LIBTMB */

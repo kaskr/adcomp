@@ -330,6 +330,9 @@ MakeADFun <- function(data,parameters,map=list(),
   }
 
   retape()
+
+  ## Has atomic functions been generated for the tapes ?
+  usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
   
   f <- function(theta=par,order=0,type=c("ADdouble","double","ADGrad"),
                 cols=NULL,rows=NULL,
@@ -673,7 +676,7 @@ MakeADFun <- function(data,parameters,map=list(),
                   if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
                   ans
                 },
-                he=function(x=last.par,atomic=TRUE){
+                he=function(x=last.par,atomic=usingAtomics()){
                     ## If no atomics on tape we have all orders implemented:
                     if(!atomic) return( f(x,order=2) )
                     ## Otherwise, get Hessian as 1st order derivative of gradient:
