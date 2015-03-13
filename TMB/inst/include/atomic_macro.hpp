@@ -6,6 +6,9 @@
 #define CSKIP(x) x
 #endif
 
+/* Flag to detect if any atomic functions have been created */
+bool atomicFunctionGenerated = false;
+
 /** \brief Construct atomic vector function based on known derivatives */
 #define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_REVERSE) \
 CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx)CSKIP({	\
@@ -19,6 +22,7 @@ template <class Type>							\
 class atomic##ATOMIC_NAME : public CppAD::atomic_base<Type> {		\
 public:									\
   atomic##ATOMIC_NAME(const char* name) : CppAD::atomic_base<Type>(name){ \
+    atomicFunctionGenerated = true;					\
     std::cout << "Constructing atomic " << #ATOMIC_NAME << "\n" ;	\
     this->option(CppAD::atomic_base<Type>::bool_sparsity_enum);		\
   }									\

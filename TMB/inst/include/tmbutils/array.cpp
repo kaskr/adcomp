@@ -63,6 +63,21 @@ struct array:Map< Array<Type,Dynamic,1> >{
     ans << n1,n2,n3,n4;
     return ans;
   }
+  vector<int> c(int n1, int n2, int n3, int n4, int n5){
+    vector<int> ans(5);
+    ans << n1,n2,n3,n4,n5;
+    return ans;
+  }
+  vector<int> c(int n1, int n2, int n3, int n4, int n5, int n6){
+    vector<int> ans(6);
+    ans << n1,n2,n3,n4,n5,n6;
+    return ans;
+  }
+  vector<int> c(int n1, int n2, int n3, int n4, int n5, int n6, int n7){
+    vector<int> ans(7);
+    ans << n1,n2,n3,n4,n5,n6,n7;
+    return ans;
+  }
 
 
   /* Default constructor: e.g. array<double> a; */
@@ -76,6 +91,9 @@ struct array:Map< Array<Type,Dynamic,1> >{
   array(int n1, int n2):MapBase(NULL,0){initZeroArray(c(n1,n2));}
   array(int n1, int n2, int n3):MapBase(NULL,0){initZeroArray(c(n1,n2,n3));}
   array(int n1, int n2, int n3, int n4):MapBase(NULL,0){initZeroArray(c(n1,n2,n3,n4));}
+  array(int n1, int n2, int n3, int n4, int n5):MapBase(NULL,0){initZeroArray(c(n1,n2,n3,n4,n5));}
+  array(int n1, int n2, int n3, int n4, int n5, int n6):MapBase(NULL,0){initZeroArray(c(n1,n2,n3,n4,n5,n6));}
+  array(int n1, int n2, int n3, int n4, int n5, int n6, int n7):MapBase(NULL,0){initZeroArray(c(n1,n2,n3,n4,n5,n6,n7));}
 
   /* Default construction: always deep copy ! */
   template<class T>
@@ -161,6 +179,18 @@ struct array:Map< Array<Type,Dynamic,1> >{
   /** \brief Elementwise subsetting 4D array */
   Type& operator()(int i1, int i2, int i3, int i4){
     return this->MapBase::operator[](index(c(i1,i2,i3,i4)));
+  }
+  /** \brief Elementwise subsetting 5D array */
+  Type& operator()(int i1, int i2, int i3, int i4, int i5){
+    return this->MapBase::operator[](index(c(i1,i2,i3,i4,i5)));
+  }
+  /** \brief Elementwise subsetting 6D array */
+  Type& operator()(int i1, int i2, int i3, int i4, int i5, int i6){
+    return this->MapBase::operator[](index(c(i1,i2,i3,i4,i5,i6)));
+  }
+  /** \brief Elementwise subsetting 7D array */
+  Type& operator()(int i1, int i2, int i3, int i4, int i5, int i6, int i7){
+    return this->MapBase::operator[](index(c(i1,i2,i3,i4,i5,i6,i7)));
   }
 
 
