@@ -303,6 +303,7 @@ class ARk_t{
   /* Initial distribution matrices. */
   matrixtype V0;    /* kxk variance  */
   matrixtype Q0;    /* kxk precision */
+  matrixtype L0;    /* kxk Cholesky Q0 = L0*L0' */
   /* gamma is found through (I-M)*gamma=phi ... */
   matrixtype M;     /* kxk   */
   matrixtype I;     /* kxk   */
@@ -343,9 +344,9 @@ public:
     /* build Q0 matrix */
     Q0=V0.inverse();
     /* log determinant */
-    matrixtype L=Q0.llt().matrixL(); /*L L' = Q*/
+    L0=Q0.llt().matrixL(); /* L0 L0' = Q0 */
     logdetQ0=scalartype(0);
-    for(int i=0;i<k;i++)logdetQ0+=scalartype(2)*log(L(i,i));
+    for(int i=0;i<k;i++)logdetQ0+=scalartype(2)*log(L0(i,i));
   }
   /** \brief Covariance extractor. 
       Run Youle-Walker recursions and return a vector of length n representing
@@ -367,12 +368,24 @@ public:
 
   /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
-    if(x.size()<k)std::cout << "AR(k) density requires vector length at least k\n";
     scalartype value=0;
-    for(int i=0;i<k;i++)
-      for(int j=0;j<k;j++)
-	value+=scalartype(.5)*x[i]*Q0(i,j)*x[j];
-    value-=scalartype(.5)*(logdetQ0- k*scalartype(log(2.0*M_PI)) );
+    /* Initial distribution. For i = k,...,1 the recursions for
+       solving L' y = u (1-based index notation) are:
+
+       y(i) = L(i,i)^-1 * ( u(i) - L(i+1,i) * y(i+1) - ... - L(k,i) * y(k) )
+
+       where u(i) ~ N(0,1).
+    */
+    scalartype mu, sd;
+    int col;
+    for(int i=0; (i<k) & (i<x.size()); i++){
+      mu = scalartype(0);
+      col = k-1-i; /* reversed index */
+      for(int j=col+1; j<k; j++) mu -= L0(j,col) * x(k-1-j);
+      mu /= L0(col, col);
+      sd = scalartype(1) / L0(col, col);
+      value -= dnorm(x[i], mu, sd, true);
+    }
     scalartype tmp;
     for(int i=k;i<x.size();i++){
       tmp=scalartype(0);
