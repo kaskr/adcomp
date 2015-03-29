@@ -23,7 +23,8 @@ class atomic##ATOMIC_NAME : public CppAD::atomic_base<Type> {		\
 public:									\
   atomic##ATOMIC_NAME(const char* name) : CppAD::atomic_base<Type>(name){ \
     atomicFunctionGenerated = true;					\
-    std::cout << "Constructing atomic " << #ATOMIC_NAME << "\n" ;	\
+    if(config.trace.atomic)						\
+    	std::cout << "Constructing atomic " << #ATOMIC_NAME << "\n" ;	\
     this->option(CppAD::atomic_base<Type>::bool_sparsity_enum);		\
   }									\
 private:								\

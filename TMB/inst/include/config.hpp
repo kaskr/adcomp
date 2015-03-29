@@ -12,6 +12,7 @@ static struct config_struct{
     bool all;        /* Print tracing information */
     bool parallel;   /* Trace info from parallel for loops */
     bool optimize;
+    bool atomic;     /* Trace construction of atomic functions */
   } trace;
   struct {
     bool instantly;  /* Always optimize just after tape creation */
@@ -40,6 +41,7 @@ static struct config_struct{
     SET(trace.all,true);
     SET(trace.parallel,true);
     SET(trace.optimize,true);
+    SET(trace.atomic,true);
     SET(debug.all,false);
     SET(debug.getListElement,false);
     SET(optimize.instantly,true);
