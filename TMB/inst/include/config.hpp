@@ -9,9 +9,8 @@ static struct config_struct{
      - Can be either bool or integer.
   */
   struct {
-    bool all;        /* Print tracing information */
     bool parallel;   /* Trace info from parallel for loops */
-    bool optimize;
+    bool optimize;   /* Trace tape optimization */
     bool atomic;     /* Trace construction of atomic functions */
   } trace;
   struct {
@@ -22,7 +21,6 @@ static struct config_struct{
     bool parallel;   /* Parallel tape creation */
   } tape;
   struct {
-    bool all;        /* Print debug info */
     bool getListElement;
   } debug;
 
@@ -38,11 +36,9 @@ static struct config_struct{
   }
 #define SET(name,value)set(#name,name,value);
   void set(){
-    SET(trace.all,true);
     SET(trace.parallel,true);
     SET(trace.optimize,true);
     SET(trace.atomic,true);
-    SET(debug.all,false);
     SET(debug.getListElement,false);
     SET(optimize.instantly,true);
     SET(optimize.parallel,false);
