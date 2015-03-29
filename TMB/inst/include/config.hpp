@@ -1,24 +1,38 @@
-/* Simple configuration - does not require maintainance on the R side. 
-   Configuration variables can either be set from R with config() or
-   from the user template after the include statement.
-*/
+/** \file
+ * \brief Configuration of user template.
+ */
 
+/** \brief Configuration variables of a user template.
+
+    Configuration variables can either be set from R with config(...,
+    DLL="mymodel") or from the user template after the include
+    statement:
+    \code
+    #include <TMB.hpp>
+    config.trace.parallel     = true;
+    config.trace.optimize     = true;
+    config.trace.atomic       = true;
+    config.optimize.instantly = true;
+    config.optimize.parallel  = false;
+    config.tape.parallel      = true;
+    \endcode
+*/
 static struct config_struct{
   /* Configuration variables.
      - Default values _must_be_ specified with SET(var,value) 
      - Can be either bool or integer.
   */
   struct {
-    bool parallel;   /* Trace info from parallel for loops */
-    bool optimize;   /* Trace tape optimization */
-    bool atomic;     /* Trace construction of atomic functions */
+    bool parallel;   /**< \brief Trace info from parallel for loops */
+    bool optimize;   /**< \brief Trace tape optimization */
+    bool atomic;     /**< \brief Trace construction of atomic functions */
   } trace;
   struct {
-    bool instantly;  /* Always optimize just after tape creation */
-    bool parallel;   /* Allow optimize in parallel (memory consuming) */
+    bool instantly;  /**< \brief Always optimize just after tape creation */
+    bool parallel;   /**< \brief Allow optimize in parallel (memory consuming) */
   } optimize;
   struct {
-    bool parallel;   /* Parallel tape creation */
+    bool parallel;   /**< \brief Enable parallel tape creation */
   } tape;
   struct {
     bool getListElement;
