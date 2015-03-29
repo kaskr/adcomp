@@ -177,8 +177,8 @@ public:
     Let \f$f(x)\f$ denote a multivariate Gaussian mean-zero negative log density
     represented by its covariance matrix \f$\Sigma\f$. Define recursively the vectors
     \f[x_0\sim N(0,\Sigma)\f]
-    \f[x_1 = \phi x_0 + \varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\sigma\Sigma)\f]
-    \f[x_i = \phi x_{i-1} + \varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\sigma\Sigma)\f]
+    \f[x_1 = \phi x_0 + \sigma\varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\Sigma)\f]
+    \f[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\f]
     where \f$\sigma=\sqrt{1-\phi^2}\f$. Then \f$E(x_i)=0\f$, \f$V(x_i)=\Sigma\f$ and the covariance
     is \f$E(x_ix_j')=\phi^{|i-j|}\Sigma\f$. We refer to this process as a stationary 1st order
     autoregressive process with multivariate increments with parameter phi and marginal distribution f.
