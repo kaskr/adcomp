@@ -1,4 +1,4 @@
-/* $Id: cppad_colpack.hpp 3240 2014-04-29 13:12:19Z bradbell $ */
+/* $Id$ */
 /* --------------------------------------------------------------------------
 CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 

@@ -1,14 +1,14 @@
-/* $Id: ad_fun.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_AD_FUN_INCLUDED
 # define CPPAD_AD_FUN_INCLUDED
 #include <vector>
 #include <algorithm>
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
+the terms of the
                     GNU General Public License Version 3.
 
 A copy of this license is included in the COPYING file of this distribution.
@@ -16,7 +16,7 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 /*
 $begin ADFun$$
-$spell 
+$spell
 	xk
 	Ind
 	bool
@@ -78,11 +78,25 @@ class ADFun {
 // ------------------------------------------------------------
 // Private member variables
 private:
+	/// Has this ADFun object been optmized
+	bool has_been_optimized_;
+
 	/// Check for nan's and report message to user (default value is true).
 	bool check_for_nan_;
 
-	/// debug checking number of comparision operations that changed
-	size_t compare_change_;
+	/// If zero, ignoring comparison operators. Otherwise is the
+	/// compare change count at which to store the operator index.
+	size_t compare_change_count_;
+
+	/// If compare_change_count_ is zero, compare_change_number_ is also zero.
+	/// Otherwise, it is set to the number of comparison operations that had a
+	/// different result during the subsequent zero order forward.
+	size_t compare_change_number_;
+
+	/// If compare_change_count is zero, compare_change_op_index_ is also
+	/// zero. Otherwise it is the operator index for the comparison operator
+	//// that corresponded to the number changing from count-1 to count.
+	size_t compare_change_op_index_;
 
 	/// number of orders stored in taylor_
 	size_t num_order_taylor_;
@@ -143,7 +157,7 @@ private:
 		bool               set_type  ,
 		bool               transpose ,
 		size_t             q         ,
-		const VectorSet&   r         ,  
+		const VectorSet&   r         ,
 		VectorSet&         s
 	);
 	// vector of std::set<size_t> version of ForSparseJac
@@ -153,7 +167,7 @@ private:
 		const std::set<size_t>&  set_type  ,
 		bool                     transpose ,
 		size_t                   q         ,
-		const VectorSet&         r         ,  
+		const VectorSet&         r         ,
 		VectorSet&               s
 	);
 	// ------------------------------------------------------------
@@ -165,7 +179,7 @@ private:
 		bool               transpose ,
 		bool               nz_compare,
 		size_t             p         ,
-		const VectorSet&   s         ,  
+		const VectorSet&   s         ,
 		VectorSet&         r
 	);
 	// vector of std::set<size_t> version of RevSparseJac
@@ -176,7 +190,7 @@ private:
 		bool                     transpose ,
 		bool                     nz_compare,
 		size_t                   p         ,
-		const VectorSet&         s         ,  
+		const VectorSet&         s         ,
 		VectorSet&               r
 	);
 	// ------------------------------------------------------------
@@ -187,7 +201,7 @@ private:
 		bool               set_type  ,
 		bool               transpose ,
 		size_t             q         ,
-		const VectorSet&   s         ,  
+		const VectorSet&   s         ,
 		VectorSet&         h
 	);
 	// vector of std::set<size_t> version of RevSparseHes
@@ -197,7 +211,7 @@ private:
 		const std::set<size_t>&  set_type  ,
 		bool                     transpose ,
 		size_t                   q         ,
-		const VectorSet&         s         ,  
+		const VectorSet&         s         ,
 		VectorSet&               h
 	);
 	// ------------------------------------------------------------
@@ -224,7 +238,7 @@ private:
 		      sparse_jacobian_work& work
 	);
 	// ------------------------------------------------------------
-	// combined sparse_set, sparse_list and sparse_pack version of 
+	// combined sparse_set, sparse_list and sparse_pack version of
 	// SparseHessian (see doxygen in sparse_hessian.hpp)
 	template <class VectorBase, class VectorSet, class VectorSize>
 	size_t SparseHessianCompute(
@@ -240,7 +254,7 @@ private:
 public:
 	#include "kasper.hpp"
 	/// copy constructor
-	ADFun(const ADFun& g) 
+	ADFun(const ADFun& g)
 	: num_var_tape_(0)
 	{	CppAD::ErrorHandler::Call(
 		true,
@@ -254,7 +268,7 @@ public:
 	 }
 
 	/// default constructor
-	ADFun(void); 
+	ADFun(void);
 
 	// assignment operator
 	// (see doxygen in fun_construct.hpp)
@@ -284,7 +298,7 @@ public:
 
 	/// forward mode user API, multiple directions one order.
 	template <typename VectorBase>
-	VectorBase Forward(size_t q, 
+	VectorBase Forward(size_t q,
 		const VectorBase& x, std::ostream& s = std::cout
 	);
 
@@ -296,50 +310,50 @@ public:
 	template <typename VectorBase>
 	void myReverse(size_t p, const VectorBase &v, size_t dep_var_index, VectorBase &value);
 
-	// forward mode Jacobian sparsity 
+	// forward mode Jacobian sparsity
 	// (see doxygen documentation in for_sparse_jac.hpp)
 	template <typename VectorSet>
 	VectorSet ForSparseJac(
 		size_t q, const VectorSet &r, bool transpose = false
 	);
-	// reverse mode Jacobian sparsity 
+	// reverse mode Jacobian sparsity
 	// (see doxygen documentation in rev_sparse_jac.hpp)
 	template <typename VectorSet>
 	VectorSet RevSparseJac(
 		size_t q, const VectorSet &s, bool transpose = false,
 		bool nz_compare = false
 	);
-	// reverse mode Hessian sparsity 
+	// reverse mode Hessian sparsity
 	// (see doxygen documentation in rev_sparse_hes.hpp)
 	template <typename VectorSet>
 	VectorSet RevSparseHes(
 		size_t q, const VectorSet &s, bool transpose = false
 	);
 
-	/// amount of memeory used for Jacobain sparsity pattern
+	/// amount of memory used for Jacobain sparsity pattern
 	size_t size_forward_bool(void) const
 	{	return for_jac_sparse_pack_.memory(); }
 
-	/// free memeory used for Jacobain sparsity pattern
-	void size_forward_bool(size_t zero) 
+	/// free memory used for Jacobain sparsity pattern
+	void size_forward_bool(size_t zero)
 	{	CPPAD_ASSERT_KNOWN(
 			zero == 0,
 			"size_forward_bool: argument not equal to zero"
 		);
-		for_jac_sparse_pack_.resize(0, 0); 
+		for_jac_sparse_pack_.resize(0, 0);
 	}
 
 	/// total number of elements used for Jacobian sparsity pattern
 	size_t size_forward_set(void) const
 	{	return for_jac_sparse_set_.number_elements(); }
 
-	/// free memeory used for Jacobain sparsity pattern
+	/// free memory used for Jacobain sparsity pattern
 	void size_forward_set(size_t zero)
 	{	CPPAD_ASSERT_KNOWN(
 			zero == 0,
 			"size_forward_bool: argument not equal to zero"
 		);
-		for_jac_sparse_set_.resize(0, 0); 
+		for_jac_sparse_set_.resize(0, 0);
 	}
 
 	/// number of operators in the operation sequence
@@ -358,13 +372,13 @@ public:
 	size_t size_par(void) const
 	{	return play_.num_par_rec(); }
 
-	/// number taylor coefficient orders calculated 
+	/// number taylor coefficient orders calculated
 	size_t size_order(void) const
-	{	return num_order_taylor_; } 
+	{	return num_order_taylor_; }
 
-	/// number taylor coefficient directions calculated 
+	/// number taylor coefficient directions calculated
 	size_t size_direction(void) const
-	{	return num_direction_taylor_; } 
+	{	return num_direction_taylor_; }
 
 	/// number of characters in the operation sequence
 	size_t size_text(void) const
@@ -382,10 +396,10 @@ public:
 	void capacity_order(size_t c);
 
 	/// set number of orders and directions currently allocated
-	void capacity_order(size_t c, size_t r);   
+	void capacity_order(size_t c, size_t r);
 
 	/// number of variables in conditional expressions that can be skipped
-	size_t number_skip(void);   
+	size_t number_skip(void);
 
 	/// number of independent variables
 	size_t Domain(void) const
@@ -401,24 +415,41 @@ public:
 			i < dep_taddr_.size(),
 			"Argument to Parameter is >= dimension of range space"
 		);
-		return dep_parameter_[i]; 
+		return dep_parameter_[i];
 	}
 
-# ifndef NDEBUG
-	/// in not NDEBUG case, number of comparison operations that change
+	/// Deprecated: number of comparison operations that changed
+	/// for the previous zero order forward (than when function was recorded)
 	size_t CompareChange(void) const
-	{	return compare_change_; }
-# endif
+	{	return compare_change_number_; }
+
+	/// count as which to store operator index
+	void compare_change_count(size_t count)
+	{	compare_change_count_    = count;
+		compare_change_number_   = 0;
+		compare_change_op_index_ = 0;
+	}
+
+	/// number of comparison operations that changed
+	size_t compare_change_number(void) const
+	{	return compare_change_number_; }
+
+	/// operator index for the count-th  comparison change
+	size_t compare_change_op_index(void) const
+	{	if( has_been_optimized_ )
+			return 0;
+		return compare_change_op_index_;
+	}
 
 	/// calculate entire Jacobian
 	template <typename VectorBase>
-	VectorBase Jacobian(const VectorBase &x); 
+	VectorBase Jacobian(const VectorBase &x);
 
 	/// calculate Hessian for one component of f
 	template <typename VectorBase>
-	VectorBase Hessian(const VectorBase &x, const VectorBase &w); 
+	VectorBase Hessian(const VectorBase &x, const VectorBase &w);
 	template <typename VectorBase>
-	VectorBase Hessian(const VectorBase &x, size_t i); 
+	VectorBase Hessian(const VectorBase &x, size_t i);
 
 	/// forward mode calculation of partial w.r.t one domain component
 	template <typename VectorBase>
@@ -446,16 +477,16 @@ public:
 		const VectorSize_t &I ,
 		const VectorSize_t &J );
 
-	/// calculate sparse Jacobians 
+	/// calculate sparse Jacobians
 	template <typename VectorBase>
 	VectorBase SparseJacobian(
 		const VectorBase &x
-	); 
+	);
 	template <typename VectorBase, typename VectorSet>
 	VectorBase SparseJacobian(
-		const VectorBase &x , 
+		const VectorBase &x ,
 		const VectorSet  &p
-	); 
+	);
 	template <class VectorBase, class VectorSet, class VectorSize>
 	size_t SparseJacobianForward(
 		const VectorBase&     x     ,
@@ -475,18 +506,18 @@ public:
 		sparse_jacobian_work& work
 	);
 
-	/// calculate sparse Hessians 
+	/// calculate sparse Hessians
 	template <typename VectorBase>
 	VectorBase SparseHessian(
-		const VectorBase&    x  , 
+		const VectorBase&    x  ,
 		const VectorBase&    w
-	); 
+	);
 	template <typename VectorBase, typename VectorBool>
 	VectorBase SparseHessian(
 		const VectorBase&    x  ,
 		const VectorBase&    w  ,
 		const VectorBool&    p
-	); 
+	);
 	template <class VectorBase, class VectorSet, class VectorSize>
 	size_t SparseHessian(
 		const VectorBase&    x   ,
@@ -496,11 +527,11 @@ public:
 		const VectorSize&    c   ,
 		VectorBase&          hes ,
 		sparse_hessian_work& work
-	); 
+	);
 
 	// Optimize the tape
 	// (see doxygen documentation in optimize.hpp)
-	void optimize(void);
+	void optimize(const std::string& options = "no_conditional_skip");
 	// ------------------- Deprecated -----------------------------
 
 	/// deprecated: assign a new operation sequence
@@ -511,12 +542,12 @@ public:
 	size_t Size(void) const
 	{	return num_var_tape_; }
 
-	/// Deprecated: # taylor_ coefficients currently stored 
+	/// Deprecated: # taylor_ coefficients currently stored
 	/// (per variable,direction)
 	size_t Order(void) const
 	{	return num_order_taylor_ - 1; }
 
-	/// Deprecated: amount of memory for this object 
+	/// Deprecated: amount of memory for this object
 	/// Note that an approximation is used for the std::set<size_t> memory
 	size_t Memory(void) const
 	{	size_t pervar  = cap_order_taylor_ * sizeof(Base)
@@ -526,24 +557,24 @@ public:
 		return total;
 	}
 
-	/// Deprecated: # taylor_ coefficient orderss stored 
+	/// Deprecated: # taylor_ coefficient orderss stored
 	/// (per variable,direction)
 	size_t taylor_size(void) const
-	{	return num_order_taylor_; } 
+	{	return num_order_taylor_; }
 
-	/// Deprecated: Does this AD operation sequence use 
+	/// Deprecated: Does this AD operation sequence use
 	/// VecAD<Base>::reference operands
 	bool use_VecAD(void) const
 	{	return play_.num_vec_ind_rec() > 0; }
 
-	/// Deprecated: # taylor_ coefficient orders calculated 
+	/// Deprecated: # taylor_ coefficient orders calculated
 	/// (per variable,direction)
 	size_t size_taylor(void) const
-	{	return num_order_taylor_; } 
+	{	return num_order_taylor_; }
 
-	/// Deprecated: set number of orders currently allocated 
+	/// Deprecated: set number of orders currently allocated
 	/// (per variable,direction)
-	void capacity_taylor(size_t per_var);   
+	void capacity_taylor(size_t per_var);
 };
 // ---------------------------------------------------------------------------
 
@@ -568,6 +599,6 @@ public:
 # include <cppad/local/drivers.hpp>
 # include <cppad/local/fun_check.hpp>
 # include <cppad/local/omp_max_thread.hpp>
-# include <cppad/local/optimize.hpp> 
+# include <cppad/local/optimize.hpp>
 
 # endif

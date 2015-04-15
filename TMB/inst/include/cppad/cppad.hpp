@@ -1,4 +1,4 @@
-/* $Id: cppad.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CPPAD_INCLUDED
 # define CPPAD_CPPAD_INCLUDED
 /* --------------------------------------------------------------------------

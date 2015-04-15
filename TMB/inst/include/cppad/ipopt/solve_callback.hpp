@@ -1,4 +1,4 @@
-/* $Id: solve_callback.hpp 3275 2014-05-20 17:35:11Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_SOLVE_CALLBACK_INCLUDED
 # define CPPAD_SOLVE_CALLBACK_INCLUDED
 /* --------------------------------------------------------------------------

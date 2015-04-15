@@ -1,4 +1,4 @@
-// $Id: std_set.hpp 3232 2014-04-27 15:38:21Z bradbell $
+// $Id$
 # ifndef CPPAD_STD_SET_INCLUDED
 # define CPPAD_STD_SET_INCLUDED
 

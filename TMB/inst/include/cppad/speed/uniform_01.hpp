@@ -1,4 +1,4 @@
-/* $Id: uniform_01.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_UNIFORM_01_INCLUDED
 # define CPPAD_UNIFORM_01_INCLUDED 
 

@@ -1,4 +1,4 @@
-/* $Id: reverse.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_REVERSE_INCLUDED
 # define CPPAD_REVERSE_INCLUDED
 

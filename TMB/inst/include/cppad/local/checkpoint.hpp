@@ -1,9 +1,9 @@
-/* $Id: checkpoint.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CHECKPOINT_INCLUDED
 # define CPPAD_CHECKPOINT_INCLUDED
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the 
@@ -206,6 +206,9 @@ public:
 		f_[0].optimize();
 		// Copy for other threads
 		for(size_t i=1;i<NTHREADS;i++)f_[i]=f_[0];
+		// now disable checking of comparison opertaions
+		// 2DO: add a debugging mode that checks for changes and aborts
+		f_[0].compare_change_count(0);
 	}
 	/*!
 	Implement the user call to <tt>afun(ax, ay)</tt>.
@@ -280,13 +283,13 @@ public:
 				}
 			}
 		}
-		ty = f_[THREAD].Forward(q, tx);
+		ty = f_.Forward(q, tx);
 
 		// no longer need the Taylor coefficients in f_
 		// (have to reconstruct them every time)
 		size_t c = 0;
 		size_t r = 0;
-		f_[THREAD].capacity_order(c, r);
+		f_.capacity_order(c, r);
 		return ok;
 	}
 	/*!

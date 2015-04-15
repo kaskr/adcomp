@@ -1,4 +1,4 @@
-/* $Id: num_skip.hpp 3132 2014-03-01 16:55:48Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_NUM_SKIP_INCLUDED
 # define CPPAD_NUM_SKIP_INCLUDED
 

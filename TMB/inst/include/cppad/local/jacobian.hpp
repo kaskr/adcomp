@@ -1,4 +1,4 @@
-/* $Id: jacobian.hpp 3307 2014-05-25 13:17:40Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_JACOBIAN_INCLUDED
 # define CPPAD_JACOBIAN_INCLUDED
 

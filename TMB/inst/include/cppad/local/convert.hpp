@@ -1,4 +1,4 @@
-/* $Id: convert.hpp 2691 2012-12-30 23:39:57Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CONVERT_INCLUDED
 # define CPPAD_CONVERT_INCLUDED
 

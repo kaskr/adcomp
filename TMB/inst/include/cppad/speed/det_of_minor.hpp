@@ -1,4 +1,4 @@
-/* $Id: det_of_minor.hpp 3060 2013-12-27 20:38:57Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_DET_OF_MINOR_INCLUDED
 # define CPPAD_DET_OF_MINOR_INCLUDED
 

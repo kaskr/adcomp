@@ -1,4 +1,4 @@
-/* $Id: ode_evaluate.hpp 2859 2013-05-28 06:03:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_ODE_EVALUATE_INCLUDED
 # define CPPAD_ODE_EVALUATE_INCLUDED
 

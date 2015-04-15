@@ -1,4 +1,4 @@
-/* $Id: check_simple_vector.hpp 2870 2013-07-28 17:00:59Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CHECK_SIMPLE_VECTOR_INCLUDED
 # define CPPAD_CHECK_SIMPLE_VECTOR_INCLUDED
 

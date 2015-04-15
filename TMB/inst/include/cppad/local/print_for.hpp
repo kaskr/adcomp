@@ -1,4 +1,4 @@
-/* $Id: print_for.hpp 3170 2014-03-09 14:33:53Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_PRINT_FOR_INCLUDED
 # define CPPAD_PRINT_FOR_INCLUDED
 

@@ -1,4 +1,4 @@
-/* $Id: for_one.hpp 2683 2012-12-30 18:17:03Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_FOR_ONE_INCLUDED
 # define CPPAD_FOR_ONE_INCLUDED
 

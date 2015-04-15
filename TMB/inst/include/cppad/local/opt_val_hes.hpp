@@ -1,4 +1,4 @@
-/* $Id: opt_val_hes.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_OPT_VAL_HES_INCLUDED
 # define CPPAD_OPT_VAL_HES_INCLUDED
 

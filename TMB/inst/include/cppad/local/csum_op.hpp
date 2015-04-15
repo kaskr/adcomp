@@ -1,4 +1,4 @@
-// $Id: csum_op.hpp 3301 2014-05-24 05:20:21Z bradbell $
+// $Id$
 # ifndef CPPAD_CSUM_OP_INCLUDED
 # define CPPAD_CSUM_OP_INCLUDED
 

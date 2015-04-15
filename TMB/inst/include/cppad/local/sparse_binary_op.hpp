@@ -1,4 +1,4 @@
-/* $Id: sparse_binary_op.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_SPARSE_BINARY_OP_INCLUDED
 # define CPPAD_SPARSE_BINARY_OP_INCLUDED
 /* --------------------------------------------------------------------------

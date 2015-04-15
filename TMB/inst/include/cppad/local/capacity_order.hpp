@@ -1,4 +1,4 @@
-/* $Id: capacity_order.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CAPACITY_ORDER_INCLUDED
 # define CPPAD_CAPACITY_ORDER_INCLUDED
 

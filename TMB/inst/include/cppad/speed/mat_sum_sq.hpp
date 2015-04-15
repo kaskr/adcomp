@@ -1,4 +1,4 @@
-/* $Id: mat_sum_sq.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_MAT_SUM_SQ_INCLUDED
 # define CPPAD_MAT_SUM_SQ_INCLUDED
 
