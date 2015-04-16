@@ -1,4 +1,4 @@
-source("readdat.R")
+source("tools/readdat.R")
 
 d=readadmb("../admb_examples/socatt/socatt.dat")
 
