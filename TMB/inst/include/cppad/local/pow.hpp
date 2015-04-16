@@ -1,4 +1,4 @@
-/* $Id: pow.hpp 2939 2013-10-14 11:06:18Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_POW_INCLUDED
 # define CPPAD_POW_INCLUDED
 

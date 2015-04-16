@@ -1,4 +1,4 @@
-/* $Id: parameter_op.hpp 3301 2014-05-24 05:20:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_PARAMETER_OP_INCLUDED
 # define CPPAD_PARAMETER_OP_INCLUDED
 

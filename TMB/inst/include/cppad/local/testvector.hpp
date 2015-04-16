@@ -1,4 +1,4 @@
-/* $Id: testvector.hpp 2576 2012-11-17 13:44:48Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_TESTVECTOR_INCLUDED
 # define CPPAD_TESTVECTOR_INCLUDED
 

@@ -1,4 +1,4 @@
-/* $Id: bender_quad.hpp 2859 2013-05-28 06:03:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_BENDER_QUAD_INCLUDED
 # define CPPAD_BENDER_QUAD_INCLUDED
 

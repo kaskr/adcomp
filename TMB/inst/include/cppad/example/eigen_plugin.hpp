@@ -1,4 +1,4 @@
-/* $Id: eigen_plugin.hpp 2572 2012-11-15 19:43:06Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_EIGEN_PLUGIN_INCLUDED
 # define CPPAD_EIGEN_PLUGIN_INCLUDED
 /* --------------------------------------------------------------------------

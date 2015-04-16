@@ -1,4 +1,4 @@
-/* $Id: cppad_eigen.hpp 3065 2013-12-29 14:03:45Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CPPAD_EIGEN_INCLUDED
 # define CPPAD_CPPAD_EIGEN_INCLUDED
 /* --------------------------------------------------------------------------

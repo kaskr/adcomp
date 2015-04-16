@@ -1,4 +1,4 @@
-/* $Id: base_cond_exp.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_BASE_COND_EXP_INCLUDED
 # define CPPAD_BASE_COND_EXP_INCLUDED
 

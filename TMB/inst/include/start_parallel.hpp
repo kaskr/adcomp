@@ -13,7 +13,8 @@ size_t thread_num(){
 }
 void start_parallel(){
   int nthreads=omp_get_max_threads();
-  std::cout << "Using " << nthreads <<  " threads\n";
+  if(config.trace.parallel)
+    std::cout << "Using " << nthreads <<  " threads\n";
   CppAD::thread_alloc::parallel_setup(nthreads,in_parallel,thread_num);
   CppAD::parallel_ad<AD<AD<AD<double> > > >();
   CppAD::parallel_ad<AD<AD<double> > >();
@@ -109,8 +110,10 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     veci.resize(kmax);vecj.resize(kmax);
     vector<int> pos(n); /* keep track of positions in individual index vectors */
     for(int i=0;i<n;i++){pos(i)=0;};
-    TMB_PRINT(pos);
-    for(int i=0;i<n;i++){TMB_PRINT(vecind(i).size());};
+    if(config.trace.parallel) std::cout << "Hessian number of non-zeros:\n";
+    for(int i=0;i<n;i++){
+      if(config.trace.parallel) std::cout << "nnz = " << vecind(i).size() << "\n";
+    };
     vector<size_t> value(n); /* value corresponding to pos */
     int k=0; /* Incremented for each unique value */
     size_t m; /* Hold current minimum value */
@@ -139,7 +142,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   };
   /* Destructor */
   ~parallelADFun(){
-    std::cout << "Free parallelADFun object.\n";
+    if(config.trace.parallel) std::cout << "Free parallelADFun object.\n";
     for(int i=0;i<vecpf.size();i++){
       delete vecpf[i];
     }

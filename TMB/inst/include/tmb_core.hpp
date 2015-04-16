@@ -860,7 +860,8 @@ extern "C"
 
     if(_openmp && !returnReport){ // Parallel mode
 #ifdef _OPENMP
-      std::cout << n << " regions found.\n";
+      if(config.trace.parallel)
+	std::cout << n << " regions found.\n";
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
@@ -1099,7 +1100,8 @@ extern "C"
 
     if(_openmp){ // Parallel mode
 #ifdef _OPENMP
-      std::cout << n << " regions found.\n";
+      if(config.trace.parallel)
+	std::cout << n << " regions found.\n";
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
@@ -1262,11 +1264,12 @@ extern "C"
 {
 #ifdef _OPENMP
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
-
-    std::cout << "Count num parallel regions\n";
+    if(config.trace.parallel)
+      std::cout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
     int n=F.count_parallel_regions();
-    std::cout << n << " regions found.\n";
+    if(config.trace.parallel)
+      std::cout << n << " regions found.\n";
 
     start_parallel(); /* Start threads */
 

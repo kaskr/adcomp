@@ -1,4 +1,4 @@
-source("readdat.R")
+source("tools/readdat.R")
 data <- readadmb()
 data$IDfac <- local(factor(rep(1:length(nID),nID)),data)
 length(data$IDfac)==length(data$ID)

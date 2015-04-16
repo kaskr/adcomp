@@ -1,4 +1,4 @@
-/* $Id: near_equal_ext.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_NEAR_EQUAL_EXT_INCLUDED
 # define CPPAD_NEAR_EQUAL_EXT_INCLUDED
 

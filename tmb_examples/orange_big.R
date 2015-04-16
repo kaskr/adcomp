@@ -3,7 +3,7 @@
 require(TMB)
 
 # Read data
-source("data_orange.R")
+source("orange_data.R")
 
 compile("orange_big.cpp")
 dyn.load(dynlib("orange_big"))

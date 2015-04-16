@@ -1,4 +1,4 @@
-/* $Id: fun_check.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_FUN_CHECK_INCLUDED
 # define CPPAD_FUN_CHECK_INCLUDED
 

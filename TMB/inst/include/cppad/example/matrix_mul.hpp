@@ -1,4 +1,4 @@
-// $Id: matrix_mul.hpp 2903 2013-09-19 15:53:13Z bradbell $
+// $Id$
 # ifndef CPPAD_MATRIX_MUL_INCLUDED
 # define CPPAD_MATRIX_MUL_INCLUDED
 
@@ -61,7 +61,9 @@ $codep */
 	// dimension of the domain space
 	const size_t n_;
 	// dimension of the range space
+# ifndef NDEBUG
 	const size_t m_;
+# endif
 	public:
 	// ---------------------------------------------------------------------
 	// constructor
@@ -70,8 +72,10 @@ $codep */
 	nr_result_(nr_result) ,
 	n_middle_(n_middle)    ,
 	nc_result_(nc_result) ,
-	n_( nr_result * n_middle + n_middle * nc_result ) ,
-	m_( n_middle * nc_result ) 
+	n_( nr_result * n_middle + n_middle * nc_result ) 
+# ifndef NDEBUG
+	, m_( n_middle * nc_result ) 
+# endif
 	{ }
 	private:
 /* $$

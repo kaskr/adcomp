@@ -1,4 +1,4 @@
-/* $Id: omp_alloc.hpp 2910 2013-10-07 13:27:58Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_OMP_ALLOC_INCLUDED
 # define CPPAD_OMP_ALLOC_INCLUDED
 

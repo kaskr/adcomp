@@ -1,4 +1,4 @@
-/* $Id: omp_max_thread.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_OMP_MAX_THREAD_INCLUDED
 # define CPPAD_OMP_MAX_THREAD_INCLUDED
 

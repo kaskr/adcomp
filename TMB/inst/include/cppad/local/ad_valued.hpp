@@ -1,4 +1,4 @@
-/* $Id: ad_valued.hpp 2859 2013-05-28 06:03:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_AD_VALUED_INCLUDED
 # define CPPAD_AD_VALUED_INCLUDED
 

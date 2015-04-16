@@ -1,4 +1,4 @@
-/* $Id: rev_sparse_jac.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_REV_SPARSE_JAC_INCLUDED
 # define CPPAD_REV_SPARSE_JAC_INCLUDED
 

@@ -1,4 +1,4 @@
-/* $Id: equal_op_seq.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_EQUAL_OP_SEQ_INCLUDED
 # define CPPAD_EQUAL_OP_SEQ_INCLUDED
 

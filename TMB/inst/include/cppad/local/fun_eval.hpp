@@ -1,4 +1,4 @@
-/* $Id: fun_eval.hpp 3174 2014-03-10 01:26:06Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_FUN_EVAL_INCLUDED
 # define CPPAD_FUN_EVAL_INCLUDED
 

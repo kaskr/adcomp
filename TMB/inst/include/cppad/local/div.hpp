@@ -1,4 +1,4 @@
-/* $Id: div.hpp 2773 2013-03-09 06:00:18Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_DIV_INCLUDED
 # define CPPAD_DIV_INCLUDED
 

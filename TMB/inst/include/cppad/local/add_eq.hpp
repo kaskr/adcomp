@@ -1,4 +1,4 @@
-/* $Id: add_eq.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_ADD_EQ_INCLUDED
 # define CPPAD_ADD_EQ_INCLUDED
 

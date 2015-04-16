@@ -1,4 +1,4 @@
-/* $Id: ad_io.hpp 3232 2014-04-27 15:38:21Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_AD_IO_INCLUDED
 # define CPPAD_AD_IO_INCLUDED
 

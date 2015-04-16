@@ -1,4 +1,4 @@
-/* $Id: check_numeric_type.hpp 2506 2012-10-24 19:36:49Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_CHECK_NUMERIC_TYPE_INCLUDED
 # define CPPAD_CHECK_NUMERIC_TYPE_INCLUDED
 

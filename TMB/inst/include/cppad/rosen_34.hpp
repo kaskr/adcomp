@@ -1,4 +1,4 @@
-/* $Id: rosen_34.hpp 2575 2012-11-17 12:25:04Z bradbell $ */
+/* $Id$ */
 # ifndef CPPAD_ROSEN_34_INCLUDED
 # define CPPAD_ROSEN_34_INCLUDED
 
