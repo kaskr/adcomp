@@ -92,13 +92,8 @@ updateCholesky <- function(L,H,t=0){
 ##' }
 ##'
 ##' A high level of tracing information will be output by default when evaluating the objective function and gradient.
-##' This is useful while developing a model, but may eventually become annoying.
-##' The following will disable all tracing from an object 'obj' returned by 'MakeADFun':
-##' \itemize{
-##' \item \code{obj$env$tracemgc <- FALSE}
-##' \item \code{obj$env$inner.control$trace <- FALSE}
-##' \item \code{obj$env$silent <- TRUE}
-##' }
+##' This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
+##' \code{silent=TRUE} to the \code{MakeADFun} call.
 ##' 
 ##' @title Construct objective functions with derivatives based on a compiled c++ template.
 ##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (Order does not matter and un-used components are allowed).
@@ -118,6 +113,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param DLL Name of shared object file compiled by user.
 ##' @param checkParameterOrder Optional check for correct parameter order.
 ##' @param regexp Match random effects by regular expressions?
+##' @param silent Disable all tracing information?
 ##' @param ... Currently unused.
 ##' @return List with components (fn,gr, etc) suitable for an optim call.
 MakeADFun <- function(data,parameters,map=list(),
@@ -134,6 +130,7 @@ MakeADFun <- function(data,parameters,map=list(),
                       DLL=getUserDLL(),
                       checkParameterOrder=TRUE, ## Optional check
                       regexp=FALSE,
+                      silent=FALSE,
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
@@ -272,7 +269,22 @@ MakeADFun <- function(data,parameters,map=list(),
   ADFun <- NULL
   Fun <- NULL
   ADGrad <- NULL
-  reparam <- NULL
+  tracepar <- FALSE
+  validpar <- function(x)TRUE
+  tracemgc <- TRUE
+  ## Disable all tracing information
+  beSilent <- function(){
+      tracemgc <<- FALSE
+      inner.control$trace <<- FALSE
+      silent <<- TRUE
+      cf <- config(DLL=DLL)
+      i <- grep("^trace.",names(cf))
+      cf[i] <- 0
+      cf$DLL <- DLL
+      do.call(config, cf)
+      NULL
+  }
+  if(silent)beSilent()
 
   ## All external pointers are created in function "retape" and can be re-created
   ## by running retape() if e.g. the number of openmp threads is changed.
@@ -420,11 +432,11 @@ MakeADFun <- function(data,parameters,map=list(),
         ## hessian: Hessian of random effect part only.
         ## ihessian: Inverse subset of hessian (same dim but larger pattern!).
         ## Hfull: Pattern of full hessian including fixed effects.
-        cat("Matching hessian patterns... ")
+        if (!silent) cat("Matching hessian patterns... ")
         iperm <- Matrix::invPerm(L@perm+1L)
         e$ind1 <- lookup(hessian,ihessian,iperm) ## Same dimensions
         e$ind2 <- lookup(hessian,e$Hfull,random)  ## Note: dim(Hfull)>dim(hessian) !
-        cat("Done\n")
+        if (!silent) cat("Done\n")
       }
       w <- rep(0,length=length(e$Hfull@x))
       w[e$ind2] <- ihessian@x[e$ind1]
@@ -652,10 +664,6 @@ MakeADFun <- function(data,parameters,map=list(),
     as.list(reportenv)
   }
 
-  silent <- FALSE
-  tracepar <- FALSE
-  validpar <- function(x)TRUE
-  tracemgc <- TRUE
   if(is.null(random)){  ## Output if pure fixed effect model
     return(list(par=par,
                 fn=function(x=last.par,...){
@@ -1170,9 +1178,9 @@ newton <- function (par,fn,gr,he,
       tail10 <- tail(fn.history[1:i],10)
       improve10 <- tail10[1] - tail10[length(tail10)]  
       if(improve10<tol10){
-        cat("Not improving much - will try early exit...")
+        if(trace>=1)cat("Not improving much - will try early exit...")
         pd <- iterate(par,pd.check=TRUE)
-        cat("PD hess?:",pd,"\n")
+        if(trace>=1)cat("PD hess?:",pd,"\n")
         if(pd)break;
         fail <- fail+1
       }
