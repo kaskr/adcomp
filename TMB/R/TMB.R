@@ -101,6 +101,8 @@ updateCholesky <- function(L,H,t=0){
 ##' @param map List defining how to optionally collect and fix parameters - see details.
 ##' @param type Character vector defining which operation stacks are generated from the users template - see details.
 ##' @param random Character vector defining the random effect parameters. See also \code{regexp}.
+##' @param profile Parameters to profile out of the likelihood (this subset will be appended to \code{random} with Laplace
+##' approximation disabled).
 ##' @param random.start Expression defining the strategy for choosing random effect initial values as function of previous function evaluations - see details.
 ##' @param hessian Calculate Hessian at optimum?
 ##' @param method Outer optimization method.
@@ -119,6 +121,7 @@ updateCholesky <- function(L,H,t=0){
 MakeADFun <- function(data,parameters,map=list(),
                       type=c("ADFun","Fun","ADGrad"[!is.null(random)]),
                       random=NULL,
+                      profile=NULL,
                       random.start=expression(last.par.best[random]),
                       hessian=FALSE,method="BFGS",
                       inner.method="newton",
@@ -296,6 +299,9 @@ MakeADFun <- function(data,parameters,map=list(),
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
       .Call("EvalDoubleFunObject",Fun$ptr,unlist(parameters),control=list(order=as.integer(0)),PACKAGE=DLL)
     }
+    if(is.character(profile)){
+        random <<- c(random, profile)
+    }
     if(is.character(random)){
       if(!regexp){ ## Default: do exact match
         if(!all(random %in% names(parameters))){
@@ -306,7 +312,7 @@ MakeADFun <- function(data,parameters,map=list(),
         }
         if(any(duplicated(random))){
           cat("Duplicates in 'random' - will be removed\n")
-          random <- unique(random)
+          random <<- unique(random)
         }
         tmp <- lapply(parameters,function(x)x*0)
         tmp[random] <- lapply(tmp[random],function(x)x*0+1)
@@ -318,6 +324,17 @@ MakeADFun <- function(data,parameters,map=list(),
           cat("Selected random effects did not match any model parameters.\n")
           random <<- NULL
         }
+      }
+      if(is.character(profile)){
+          ## Convert 'profile' to a pointer into random (represented
+          ## as logical index vector):
+          tmp <- lapply(parameters,function(x)x*0)
+          tmp[profile] <- lapply(tmp[profile],function(x)x*0+1)
+          profile <<- match( which(as.logical(unlist(tmp))) , random )
+          if(any(duplicated(profile))) stop("Profile parameter vector not unique.")
+          tmp <- rep(0L, length(random))
+          tmp[profile] <- 1L
+          profile <<- tmp
       }
       par <<- unlist(parameters)
     }
@@ -411,6 +428,16 @@ MakeADFun <- function(data,parameters,map=list(),
       ## therefore tril takes long time. Further, "diag<-" is too slow.
       ## FIXED! :
       ihessian <- solveSubset2(L)
+      ## Profile case correction (1st order case only)
+      if(!is.null(profile)){
+          ## Naive way:
+          ##   ihessian[profile,] <- 0
+          ##   ihessian[,profile] <- 0
+          ## However, this would modify sparseness pattern and also not
+          ## account for 'ihessian' being permuted:
+          perm <- L@perm+1L
+          ihessian <- .Call("tmb_sparse_izamd", ihessian, profile[perm], 0.0, PACKAGE="TMB")
+      }
       
       ## General function to lookup entries A subset B.
       ## lookup.old <- function(A,B){
@@ -501,6 +528,16 @@ MakeADFun <- function(data,parameters,map=list(),
     } else {
       hessian <- spHess(par,random=TRUE)
     }
+    ## Profile case correction (0 and 1st order)
+    if( !is.null(profile) ){
+        ## Naive way:
+        ##   hessian[profile, ] <- 0
+        ##   hessian[, profile] <- 0
+        ##   diag(hessian)[profile] <- 1
+        ## However, this would modify sparseness pattern:
+        hessian <- .Call("tmb_sparse_izamd", hessian, profile, 1.0, PACKAGE="TMB")
+    }
+    ## Update Cholesky:
     if(inherits(env$L.created.by.newton,"dCHMsuper")){
       L <- env$L.created.by.newton
       ##.Call("destructive_CHM_update",L,hessian,as.double(0),PACKAGE="Matrix")
@@ -511,6 +548,10 @@ MakeADFun <- function(data,parameters,map=list(),
     
     if(order==0){
       res <- h(par,order=0,hessian=hessian,L=L)
+      ## Profile case correction
+      if(!is.null(profile)){
+          res <- res + sum(profile)/2*log(2*pi)
+      }
       if(is.finite(res)){
         if(res<value.best){
           last.par.best <<- par; value.best <<- res
@@ -523,6 +564,19 @@ MakeADFun <- function(data,parameters,map=list(),
       grad <- h(par,order=1,hessian=hessian,L=L)
       #res <- grad[-random] - t(grad[random])%*%solve(hess[random,random])%*%hess[random,-random]
       #res <- grad[-random] - t(grad[random])%*%solve(hess[random,])%*%t(hess[-random,])
+
+      ## Profile case correction. The remaining calculations must be
+      ## done with the original hessian (which has been destroyed)
+      if(!is.null(profile)){
+          ## Update hessian and Cholesky:
+          if(!skipFixedEffects){ ## old way
+              hess <- spHess(par) ## Full hessian
+              hessian <- hess[random,random] ## Subset
+          } else {
+              hessian <- spHess(par,random=TRUE)
+          }
+          updateCholesky(L,hessian)
+      }
       
       ## res <- grad[-random] -
       ##   hess[-random,random]%*%as.vector(solve(hess[random,random],grad[random]))
