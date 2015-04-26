@@ -6,6 +6,8 @@
 ##' The fixed effects covariance matrix is approximated by
 ##' \deqn{V(\hat\theta)=-\nabla^2 l(\hat\theta)^{-1}}
 ##' where \eqn{l} denotes the log likelihood function (i.e. \code{-obj$fn}).
+##' If \code{ignore.parm.uncertainty=TRUE} then the Hessian calculation is
+##' omitted and a zero-matrix is used in place of \eqn{V(\hat\theta)}.
 ##' 
 ##' For non-random effect models the standard delta-method is used to calculate the covariance
 ##' matrix. Let \eqn{\phi(\theta)} denote some non-linear function of \eqn{\theta}. Then
@@ -21,6 +23,7 @@
 ##' denotes the Jacobian of \eqn{\pmatrix{\hat u(\theta) \cr \theta}} wrt. \eqn{\theta}.
 ##' Here, the first term represents the expected conditional variance given the fixed effects
 ##' and the second term represents the variance of the conditional mean wrt. the fixed effects.
+##'
 ##' Now the delta method can be applied on a general non-linear function \eqn{\phi(u,\theta)}
 ##' of random effects \eqn{u} and fixed effects \eqn{\theta}:
 ##' \deqn{V(\phi(\hat u,\hat\theta))\approx \nabla\phi V \pmatrix{ \hat u \cr \hat\theta }\nabla\phi'}
@@ -36,6 +39,7 @@
 ##' @param par.fixed Optional. Fixed effect parameter estimate (will be known to \code{obj} when an optimization has been carried out).
 ##' @param hessian.fixed Optional. Hessian wrt. fixed effects (will be calculated from \code{obj} if missing).
 ##' @param getJointPrecision Optional. Return full joint precision matrix of random and fixed effects?
+##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of fixed effects?
 ##' @return Object of class \code{sdreport}
 ##' @examples
 ##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
@@ -46,7 +50,7 @@
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
-                     bias.correct.control=list(sd=FALSE)){
+                     bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -65,12 +69,20 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
     gradient.fixed <- obj$gr(par.fixed) ## <-- updates last.par
     par <- obj$env$last.par
   }
+  ## In case of empty parameter vector:
+  if(length(par.fixed)==0) ignore.parm.uncertainty <- TRUE
   ## Get Hessian wrt. fixed effects (hessian.fixed) and check if positive definite (pdHess).
-  if(is.null(hessian.fixed)){
-    hessian.fixed <- optimHess(par.fixed,obj$fn,obj$gr) ## Marginal precision of theta.
+  if(ignore.parm.uncertainty){
+      hessian.fixed <- NULL
+      pdHess <- TRUE
+      Vtheta <- matrix(0, length(par.fixed), length(par.fixed))
+  } else {
+      if(is.null(hessian.fixed)){
+          hessian.fixed <- optimHess(par.fixed,obj$fn,obj$gr) ## Marginal precision of theta.
+      }
+      pdHess <- !is.character(try(chol(hessian.fixed),silent=TRUE))
+      Vtheta <- solve(hessian.fixed)
   }
-  pdHess <- !is.character(try(chol(hessian.fixed),silent=TRUE))
-  Vtheta <- solve(hessian.fixed)
   ## Get random effect block of the full joint Hessian (hessian.random) and its
   ## Cholesky factor (L)
   if(!is.null(r)){
@@ -110,15 +122,19 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
     tmp <- solve(hessian.random,t(Dphi.random))
     tmp <- as.matrix(tmp)
     term1 <- Dphi.random%*%tmp ## first term.
-    ## Use columns of tmp as direction for reverse mode sweep
-    f <- obj$env$f
-    w <- rep(0, length(par))
-    reverse.sweep <- function(i){
-      w[r] <- tmp[,i]
-      -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
+    if(ignore.parm.uncertainty){
+        term2 <- 0
+    } else {
+        ## Use columns of tmp as direction for reverse mode sweep
+        f <- obj$env$f
+        w <- rep(0, length(par))
+        reverse.sweep <- function(i){
+            w[r] <- tmp[,i]
+            -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
+        }
+        A <- t(do.call("cbind",lapply(seq(length=length(phi)),reverse.sweep))) + Dphi.fixed
+        term2 <- A%*%(Vtheta%*%t(A)) ## second term
     }
-    A <- t(do.call("cbind",lapply(seq(length=length(phi)),reverse.sweep))) + Dphi.fixed
-    term2 <- A%*%(Vtheta%*%t(A)) ## second term
     cov <- term1 + term2
   }
   ## Output
@@ -171,29 +187,41 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       ihessian.random <- .Call("tmb_invQ", L, PACKAGE = "TMB")
       iperm <- Matrix::invPerm(L@perm+1L)
       diag.term1 <- diag(ihessian.random)[iperm]
-      f <- obj$env$f
-      w <- rep(0, length(par))
-      reverse.sweep <- function(i){
-        w[i] <- 1
-        f(par, order = 1, type = "ADGrad",rangeweight = w)[r]
+      if(ignore.parm.uncertainty){
+          diag.term2 <- 0
+      } else {
+          f <- obj$env$f
+          w <- rep(0, length(par))
+          reverse.sweep <- function(i){
+              w[i] <- 1
+              f(par, order = 1, type = "ADGrad",rangeweight = w)[r]
+          }
+          nonr <- setdiff(seq(length=length(par)),r)
+          tmp <- sapply(nonr,reverse.sweep)
+          A <- solve(hessian.random,tmp)
+          diag.term2 <- rowSums((A %*% Vtheta)*A)
       }
-      nonr <- setdiff(seq(length=length(par)),r)
-      tmp <- sapply(nonr,reverse.sweep)
-      A <- solve(hessian.random,tmp)
-      diag.term2 <- rowSums((A %*% Vtheta)*A)
       ans$par.random <- par[r]
       ans$diag.cov.random <- diag.term1 + diag.term2
       if(getJointPrecision){ ## Get V(u,theta)^-1
-        G <- hessian.random %*% A
-        G <- as.matrix(G) ## Avoid Matrix::cbind2('dsCMatrix','dgeMatrix')
-        M1 <- cbind2(hessian.random,G)
-        M2 <- cbind2(t(G), as.matrix(t(A)%*%G)+hessian.fixed )
-        M <- rbind2(M1,M2)
-        M <- forceSymmetric(M,uplo="L")
-        dn <- c(names(par)[r],names(par[-r]))
-        dimnames(M) <- list(dn,dn)
-        p <- Matrix::invPerm(c(r,(1:length(par))[-r]))
-        ans$jointPrecision <- M[p,p]
+          if(length(par.fixed) == 0) {
+              ans$jointPrecision <- hessian.random
+          }
+          else if (!ignore.parm.uncertainty) {
+              G <- hessian.random %*% A
+              G <- as.matrix(G) ## Avoid Matrix::cbind2('dsCMatrix','dgeMatrix')
+              M1 <- cbind2(hessian.random,G)
+              M2 <- cbind2(t(G), as.matrix(t(A)%*%G)+hessian.fixed )
+              M <- rbind2(M1,M2)
+              M <- forceSymmetric(M,uplo="L")
+              dn <- c(names(par)[r],names(par[-r]))
+              dimnames(M) <- list(dn,dn)
+              p <- Matrix::invPerm(c(r,(1:length(par))[-r]))
+              ans$jointPrecision <- M[p,p]
+          }
+          else {
+              warning("ignore.parm.uncertainty ==> No joint precision available")
+          }
       }
     } else {
       warning("Could not report sd's of full randomeffect vector.")
@@ -212,6 +240,7 @@ summary.sdreport <- function(object,select=c("all","fixed","random","report"),p.
     assign(select,TRUE)
     all <- FALSE
   }
+  if(length(object$par.fixed)==0) fixed <- FALSE
   ans1 <- ans2 <- ans3 <- NULL
   if(fixed)ans1 <- cbind(object$par.fixed,sqrt(diag(object$cov.fixed)))
   if(random)ans2 <- cbind(object$par.random,sqrt(as.numeric(object$diag.cov.random)))
