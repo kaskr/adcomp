@@ -4,12 +4,13 @@
 \title{Construct objective functions with derivatives based on a compiled c++ template.}
 \usage{
 MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
-  "ADGrad"[!is.null(random)]), random = NULL,
+  "ADGrad"[!is.null(random)]), random = NULL, profile = NULL,
   random.start = expression(last.par.best[random]), hessian = FALSE,
   method = "BFGS", inner.method = "newton", inner.control = list(maxit =
   1000), MCcontrol = list(doMC = FALSE, seed = 123, n = 100),
   ADreport = FALSE, atomic = TRUE, LaplaceNonZeroGradient = FALSE,
-  DLL = getUserDLL(), checkParameterOrder = TRUE, regexp = FALSE, ...)
+  DLL = getUserDLL(), checkParameterOrder = TRUE, regexp = FALSE,
+  silent = FALSE, ...)
 }
 \arguments{
 \item{data}{List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (Order does not matter and un-used components are allowed).}
@@ -21,6 +22,9 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 \item{type}{Character vector defining which operation stacks are generated from the users template - see details.}
 
 \item{random}{Character vector defining the random effect parameters. See also \code{regexp}.}
+
+\item{profile}{Parameters to profile out of the likelihood (this subset will be appended to \code{random} with Laplace
+approximation disabled).}
 
 \item{random.start}{Expression defining the strategy for choosing random effect initial values as function of previous function evaluations - see details.}
 
@@ -45,6 +49,8 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 \item{checkParameterOrder}{Optional check for correct parameter order.}
 
 \item{regexp}{Match random effects by regular expressions?}
+
+\item{silent}{Disable all tracing information?}
 
 \item{...}{Currently unused.}
 }
@@ -121,12 +127,7 @@ list format.
 }
 
 A high level of tracing information will be output by default when evaluating the objective function and gradient.
-This is useful while developing a model, but may eventually become annoying.
-The following will disable all tracing from an object 'obj' returned by 'MakeADFun':
-\itemize{
-\item \code{obj$env$tracemgc <- FALSE}
-\item \code{obj$env$inner.control$trace <- FALSE}
-\item \code{obj$env$silent <- TRUE}
-}
+This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
+\code{silent=TRUE} to the \code{MakeADFun} call.
 }
 

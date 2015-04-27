@@ -240,3 +240,34 @@ SEXP match_pattern(SEXP A_, SEXP B_){
   return ans;
 }
 
+/*
+  Sparse version of 'insert zeros and modify diagonal' ( izamd )
+  keeping the sparsity pattern un-modified:
+
+  A[:,p] <- 0;  A[p,:] <- 0;  diag(A)[p] <- d;
+
+  A_      : Sparse matrix to modify
+  mark_   : Logical (int) index vector of rows and columns.
+  diag_   : Diagonal replacement (double).
+
+*/
+SEXP tmb_sparse_izamd(SEXP A_, SEXP mark_, SEXP diag_){
+  CHM_SP A = AS_CHM_SP(A_);
+  int *Ai=A->i, *Ap=A->p;
+  double *Ax = A->x;
+  int ncol=A->ncol;
+  int *mark = INTEGER(mark_);
+  double diag = REAL(diag_)[0];
+  int i, l=0;
+  for(int j = 0; j < ncol; j++){
+    for(int k = Ap[j]; k < Ap[j+1]; k++){
+      i = Ai[k];
+      if (mark[i]) Ax[l] = 0;
+      if (mark[j]) Ax[l] = 0;
+      if ( (mark[i] || mark[j]) && (i == j) ) Ax[l] = diag;
+      l++;
+    }
+  }
+  return A_;
+}
+
