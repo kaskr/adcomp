@@ -37,7 +37,8 @@ obj <- MakeADFun(data=list(N=N),
                    eta=matrix(0,n,n),
                    transf_phi1=invf(0.5),
                    transf_phi2=invf(0.5)),
-                 random=c("eta"))
+                 random=c("eta"),
+                 DLL="ar1xar1")
 runSymbolicAnalysis(obj)
 obj$control <- list(trace=1,parscale=c(1,1)*1e-2,REPORT=1,reltol=1e-12)
 obj$hessian <- TRUE

@@ -17,7 +17,17 @@ grepRandomParameters <- function(parameters,random){
   tmp[r] <- lapply(tmp[r],function(x)x*0+1)
   which(as.logical(unlist(tmp)))
 }
-getUserDLL <- function()names(tail(getLoadedDLLs(),1)) ## Assume users code is the final dyn.loaded library
+
+## Guess name of user's loaded DLL code
+getUserDLL <- function(){
+    dlls <- getLoadedDLLs()
+    isTMBdll <- function(dll)!is(try(getNativeSymbolInfo("MakeADFunObject",dll),TRUE),"try-error")
+    TMBdll <- sapply(dlls, isTMBdll)
+    if(sum(TMBdll) == 0) stop("There are no TMB models loaded (use 'dyn.load').")
+    if(sum(TMBdll) >1 ) stop("Multiple TMB models loaded. Failed to guess DLL name.")
+    names(dlls[TMBdll])
+}
+
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L,H,t=0){
