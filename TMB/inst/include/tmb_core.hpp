@@ -177,9 +177,18 @@ Rboolean isNumericScalar(SEXP x){
 #define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumeric)),#name));
 /** \brief Get parameter scalar from R and declare it as Type */
 #define PARAMETER(name) Type name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumericScalar)),#name)[0]);
-/** \brief Get data vector from R and declare it as vector<Type> */
-#define DATA_VECTOR(name) vector<Type> name(asVector<Type>(	\
-	getListElement(objective_function::data,#name,&isNumeric)));
+/** \brief Get data vector from R and declare it as vector<Type>
+    \note If name is found in the parameter list it will be read as a
+    parameter vector. */
+#define DATA_VECTOR(name)						\
+vector<Type> name;							\
+if (!isNull(getListElement(objective_function::parameters,#name))) {	\
+  name = objective_function::fillShape(asVector<Type>(			\
+         objective_function::getShape(#name,&isNumeric)),#name);	\
+} else {								\
+  name = asVector<Type>(getListElement(					\
+         objective_function::data,#name,&isNumeric));			\
+}
 /** \brief Get data matrix from R and declare it as matrix<Type> */
 #define DATA_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
 	getListElement(objective_function::data,#name,&isMatrix)));
@@ -223,9 +232,18 @@ Levels: d e f g h i j
  Important: \c ADREPORT(name) must not be used before \c name has been assigned a value*/
 #define ADREPORT(name) objective_function::reportvector.push(name,#name);
 #define PARALLEL_REGION if(this->parallel_region())
-/** \brief Get data array from R and declare it as array<Type> */
-#define DATA_ARRAY(name) tmbutils::array<Type> name(tmbutils::asArray<Type>(	\
-	getListElement(objective_function::data,#name,&isArray)));
+/** \brief Get data array from R and declare it as array<Type>
+    \note If name is found in the parameter list it will be read as a
+    parameter array. */
+#define DATA_ARRAY(name)						\
+tmbutils::array<Type> name;						\
+if (!isNull(getListElement(objective_function::parameters,#name))) {	\
+  name = objective_function::fillShape(tmbutils::asArray<Type>(		\
+         objective_function::getShape(#name,&isArray)),#name);		\
+} else {								\
+  name = tmbutils::asArray<Type>(getListElement(			\
+         objective_function::data,#name,&isArray));			\
+}
 /** \brief Get parameter array from R and declare it as array<Type> */
 #define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name,&isArray)),#name));
 /** \brief Get data matrix from R and declare it as matrix<int> */
