@@ -51,6 +51,18 @@ Type qgamma(Type q, Type shape, Type scale = 1){
 }
 VECTORIZE3_ttt(qgamma)
 
+/** \brief Distribution function of the poisson distribution (following R argument convention).
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type ppois(Type q, Type lambda){
+  CppAD::vector<Type> tx(2);
+  tx[0] = q;
+  tx[1] = lambda;
+  return atomic::ppois(tx)[0];
+}
+VECTORIZE2_tt(ppois)
+
 /** 	@name Exponential distribution.
 	Functions relative to the exponential distribution.
 	*/
