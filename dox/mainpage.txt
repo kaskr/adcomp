@@ -222,7 +222,7 @@ gives access to a variety of multivariate normal distributions:
   	    a (sparse) precision matrix.
  - Separable covariance functions, i.e. time-space separability.
   
-These seemingly unrelated concepts are all implemented via the concept of a \c distribution, 
+These seemingly unrelated concepts are all implemented via the notion of a \c distribution, 
 and this explains why they are placed in the same namespace. You can combine two
 \c distributions, and this lets you build up complex multivariate distributions using
 compact notation. Due to the flexibility of the approach it is more abstract than
@@ -252,7 +252,7 @@ A special case is that all the lower triangle elements of *Sigma* are free param
 that we want to estimate. Special provision for this is provided in TMB.
 We then require \c Sigma to be a correlation matrix, i.e. all diagonal elements are 1,
 so there are *n(n-1)/2* free parameters to be estimated. 
-A specialised distribution \c UNSTRUCTURED_CORR is provided for this situation,
+A specialised distribution \ref UNSTRUCTURED_CORR is provided for this situation,
 which automatically ensures the positive definiteness of *Sigma*. 
   \code 
   using namespace density;
@@ -283,10 +283,9 @@ using the \c ".cov()" operator
 
 
 <h2>Autoregressive processes</h2>
-Consider a univariate Gaussian AR1 process *x(t), t=0,...,n-1* with the following
-constraints:
-- *x(t)* is stationary, i.e. *x(0)* has been assigned the stationary variance.
-- *x(t)* has mean 0 and variance 1 for all *t*.
+Consider a stationary univariate Gaussian AR1 process *x(t), t=0,...,n-1*. The stationary
+distribution is choosen so that:
+- *x(t)* has mean 0 and variance 1 (for all *t*).
 
 The multivariate density of the vector *x* can be evaluated as follows
   \code 
@@ -341,8 +340,7 @@ series are constitute rows in \c x. Note the following:
 
 <h4>Higher order AR processes</h4>
   
-There also exists \ref ARk_t of arbitrary autoregressive order. Are
-these stationary????
+There also exists \ref ARk_t of arbitrary autoregressive order. 
 
 <h2>Gaussian Markov random fields (GMRF)</h2>
  GMRF may be defined in two ways:
