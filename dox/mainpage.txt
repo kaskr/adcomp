@@ -316,27 +316,27 @@ Now, *var[x(t)] = sigma^2*.
 It is also possible to construct multivariate AR1 processes. This is the first
 real illustrations of how distributions can be used as building blocks
 to obtain more complex distributions. Consider the *p* dimensional AR1 process
-
-   *x(t) = phi*x(t-1) + e(t),                  t=0,...,n-1*
-
-where *e(t)~N(0,R)* with R being a p \c x p covariance matrix to be described below.
+  \code
+   x(t) = phi*x(t-1) + e(t),                  t=0,...,n-1
+  \endcode
+where *e(t)~N(0,R)* with *R* being a p \c x p covariance matrix to be described below.
   \code
   using namespace density;
   int n = 10;                   // Number of time steps
   int p=3;                      // dim(x)
-  array<Type> x(n,p);           // Evaluation point       
+  array<Type> x(p,n);           // Evaluation point       
   vector<Type> unconstrained_params(p*(p-1)/2);
   Type phi;
   res = AR1(phi,UNSTRUCTURED_CORR(unconstrained_params))(x);
   \endcode
-
 The t'th column of array \c x is the vector *x(t)*, i.e. the univariate time
-series are constitute rows in \c x. Note the following:
+series constitute rows in \c x. Note the following:
 - The multivariate process *x(t)* is stationary in the same sense as the 
    univariate AR1 process described above.
-- The distribution of *x(t)* is specified via the second argument to \c AR1, which
-  in our situation is \c UNSTRUCTURED_CORR, i.e. a unit variance multinormal
-  density. 
+- The covarinace matrix *R* is specified via \c UNSTRUCTURED_CORR  
+  to be a correlation matrix, i.e. unit variance, with all correlation parameters
+  free. Note that the correlation parameters are not given directly by
+  the vector \c unconstrained_params. 
 
 <h4>Higher order AR processes</h4>
   
