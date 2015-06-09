@@ -204,12 +204,12 @@ MakeADFun <- function(data,parameters,map=list(),
     ## Order in which parameters were requested:
     parNameOrder <- .Call("getParameterOrder",data,parameters,new.env(),PACKAGE=DLL)
     if(!identical(names(parameters),parNameOrder)){
-      cat("Order of parameters:\n")
-      print(names(parameters))
-      cat("Not matching template order:\n")
-      print(parNameOrder)
+      if(!silent) cat("Order of parameters:\n")
+      if(!silent) print(names(parameters))
+      if(!silent) cat("Not matching template order:\n")
+      if(!silent) print(parNameOrder)
       parameters <- parameters[parNameOrder]
-      cat("Your parameter list has been re-ordered.\n(Disable this warning with checkParameterOrder=FALSE)\n")
+      if(!silent) cat("Your parameter list has been re-ordered.\n(Disable this warning with checkParameterOrder=FALSE)\n")
     }
   }
   
