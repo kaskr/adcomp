@@ -286,7 +286,44 @@ Type objective_function<Type>::operator() ()
 \endverbatim
 */ 
 #define DATA_STRUCT(name, struct)struct<Type> name(getListElement(this->data,#name));
-	
+
+/* Utilities for OSA residuals */
+template<class VT, class Type>
+struct data_indicator : VT{
+  VT cdf_lower, cdf_upper;
+  /* Construct from observation */
+  data_indicator(VT obs){
+    VT::operator=(obs); VT::fill(Type(1.0));
+    cdf_lower = obs; cdf_lower.setZero();
+    cdf_upper = obs; cdf_upper.setZero();
+  }
+  /* Fill with parameter vector */
+  void fill(vector<Type> p){
+    int n = (*this).size();
+    if(p.size() >= n  ) VT::operator=(p.segment(0, n));
+    if(p.size() >= 2*n) cdf_lower = p.segment(n, n);
+    if(p.size() >= 3*n) cdf_upper = p.segment(2 * n, n);
+  }
+};
+
+/** \brief Declare an indicator array 'name' of same shape as 'obs'.
+ */
+#define DATA_ARRAY_INDICATOR(name, obs)					\
+data_indicator<tmbutils::array<Type>, Type > name(obs);			\
+if (!isNull(getListElement(objective_function::parameters,#name))) {	\
+  name.fill( objective_function::fillShape(asVector<Type>(		\
+             objective_function::getShape(#name,&isNumeric)),#name) );	\
+}
+
+/** \brief Declare an indicator vector 'name' of same shape as 'obs'.
+ */
+#define DATA_VECTOR_INDICATOR(name, obs)				\
+data_indicator<tmbutils::vector<Type>, Type > name(obs);		\
+if (!isNull(getListElement(objective_function::parameters,#name))) {	\
+  name.fill( objective_function::fillShape(asVector<Type>(		\
+             objective_function::getShape(#name,&isNumeric)),#name) );	\
+}
+
 // kasper: Not sure used anywhere
 /** \brief Get the hessian sparsity pattern of ADFun object pointer */
 template<class Type>
