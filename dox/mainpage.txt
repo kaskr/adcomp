@@ -237,41 +237,32 @@ with covariance matrix *Sigma* (a symmetric positive definite matrix).
 
 The multivariate density of the vector *x* can be evaluated as follows
   \code 
-    using namespace density;
-    int n = 10;
-
-  matrix<Type> Sigma(n,n);     
+  using namespace density;
+  int n = 10;                  // Dimension
+  matrix<Type> Sigma(n,n);     // Covariance matrix
   // ..... User must assign value to Sigma here
-  vector<Type> x(n);           // Evaluation point           
-  x(0,n-1) = Type(0.0);        // Point of evaluation: x = (0,0,...,0)
-  res = MVNORM(Sigma)(x);  
+  res = MVNORM(Sigma)(x);      // Evaluate negative log likelihod
   \endcode
-
-This allows for any structure in *Sigma*, under the positive definiteness constraint.
-A special case is that all the lower triangle elements of *Sigma* are free parameters
-that we want to estimate. Special provision for this is provided in TMB.
-We then require \c Sigma to be a correlation matrix, i.e. all diagonal elements are 1,
-so there are *n(n-1)/2* free parameters to be estimated. 
-A specialised distribution \ref UNSTRUCTURED_CORR is provided for this situation,
-which automatically ensures the positive definiteness of *Sigma*. 
+_Sigma_ can be parameterized in different ways. Due to the symmetry of *Sigma* there
+are at most *n(n+1)/2* free parameters (*n* variances and *n(n-1)/2*
+correlation parameters). If you want to estimate all of
+these freely (modulo the positive definite constraint) 
+you can use \ref UNSTRUCTURED_CORR to specify the correlation matrix, 
+and \ref VECSCALE to specify variances.
+\ref UNSTRUCTURED_CORR takes as input a vector a dummy parameters that are used to build
+the correlation matrix via its cholesky factor. 
   \code 
   using namespace density;
   int n = 10;
-  vector<Type> unconstrained_params(n*(n-1)/2);           
-  vector<Type> x(n);           // Evaluation point           
-  res = UNSTRUCTURED_CORR(unconstrained_params)(x);  
-  \endcode
-The \c unconstrained_params are not directly the lower triangular elements of *Sigma*,
-but instead related to the cholesky factor of *Sigma* (see \ref UNSTRUCTURED_CORR_t for ).
-
-To control the variances of the elements of *x* we scale the distribution
-  \code 
-  vector<Type> unconstrained_params(n*(n-1)/2);
-  vector<Type> x(n);                               // Evaluation point       
-  vector<Type> sds(n);                             // Vector of std. dev.
+  vector<Type> dummy_params(n*(n-1)/2);  // Dummy parameterization of correlation matrix         
+  vector<Type> sds(n);                   // Standard deviations
+  vector<Type> x(n);                     // Evaluation point           
+  x.fill(0.0);                           // Point of evaluation: x = (0,0,...,0)
   res = VECSCALE(UNSTRUCTURED_CORR(unconstrained_params),sds)(x);
   \endcode
-
+If all elements of \c dummy_params are estimated we are in effect
+estimating a full correlation matrix without any constraints
+on its elements (except for the mandatory positive definiteness).
 The actual value of the correlation matrix, but not the full covariance matrix,
 can easily be assessed
 using the \c ".cov()" operator
@@ -399,6 +390,7 @@ opposite order to the dimensions of \c x.
 \example longlinreg.cpp
 \example lr_test.cpp
 \example matrix_arrays.cpp
+\example multivariate_distributions.cpp
 \example mvrw.cpp
 \example mvrw_sparse.cpp
 \example nan_error_ex.cpp
@@ -410,6 +402,8 @@ opposite order to the dimensions of \c x.
 \example sdv_multi_compact.cpp
 \example sdv_multi.cpp
 \example socatt.cpp
+\example spde.cpp
+\example spde_aniso.cpp
 \example spatial.cpp
 \example thetalog.cpp
 \example transform.cpp
