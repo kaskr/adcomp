@@ -5,6 +5,14 @@
 template <class Type>
 Type f(Type x){return Type(2)/(Type(1) + exp(-Type(2) * x)) - Type(1);}
 
+/* 'squeeze' transform : [0,1] -> (0,1) to machine tolerance */
+template<class Type>
+Type squeeze(Type u){
+  Type eps = std::numeric_limits<double>::epsilon();
+  u = (1.0 - eps) * (u - .5) + .5;
+  return u;
+}
+
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
@@ -12,19 +20,23 @@ Type objective_function<Type>::operator() ()
   PARAMETER_ARRAY(eta);
   PARAMETER(transf_phi1); /* fastest running dim */
   PARAMETER(transf_phi2); /* slowest running dim */
-  Type phi1=f(transf_phi1);
-  Type phi2=f(transf_phi2);
+  Type phi1 = f(transf_phi1);
+  Type phi2 = f(transf_phi2);
 
   using namespace density;
   Type res=0;
-  // phi1 fastest running
-  // res+=AR1(phi2,AR1(phi1))(eta);
-  // Equivalent:
-  res+=SEPARABLE(AR1(phi2),AR1(phi1))(eta);
+  res += SEPARABLE( AR1(phi2), AR1(phi1) )(eta);
 
-  // logdpois = N log lam - lam
-  for(int i=0;i<N.size();i++)res-=N[i]*eta[i]-exp(eta[i]);
+  /* keep = vector of ones */
+  DATA_VECTOR_INDICATOR(keep, N);
+
+  for(int i=0; i < N.size(); i++){
+    res -= keep[i] * dpois(N[i], exp(eta[i]), true);
+    /* For OSA residuals only: */
+    Type cdf = squeeze( ppois(N[i], exp(eta[i])) );
+    res -= keep.cdf_lower[i] * log( cdf );       // NaN protected
+    res -= keep.cdf_upper[i] * log( 1.0 - cdf ); // NaN protected
+  }
 
   return res;
-
 }
