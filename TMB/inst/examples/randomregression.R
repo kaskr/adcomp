@@ -25,7 +25,8 @@ parameters <- list(
 obj <- MakeADFun(data=data,
                  parameters=parameters,
                  random=c("a","b"),
-                 type = c("ADFun", "Fun")
+                 type = c("ADFun", "Fun"),
+                 DLL="randomregression"
                  )
 
 obj$fn()

@@ -48,7 +48,7 @@ parameters <- list(
   logsdObs=sdObs*0
   )
 newtonOption(smartsearch=FALSE)
-obj <- MakeADFun(data,parameters,random="u")
+obj <- MakeADFun(data,parameters,random="u",DLL="rw")
 obj$hessian <- TRUE
 
 obj$fn()

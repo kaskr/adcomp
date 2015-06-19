@@ -31,6 +31,7 @@ namespace Rmath {
   #undef qnorm
   #undef dnbinom
   #undef dgamma
+  #undef ppois
 
   #include <R_ext/Applic.h>
   void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex){
@@ -280,6 +281,33 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   tx_[1]=tx[1]+Type(1.0);
 			   px[0] = D_lgamma(tx_)[0] * py[0];
 			   px[1] = Type(0);
+			   )
+
+/** \brief Atomic version of poisson cdf \f$ppois(n,\lambda)\f$.
+    Valid parameter range: \f$x =(n,\lambda) \in \mathbb{N}_0\times\mathbb{R}_+\f$.
+    \warning No check is performed on parameters
+    \param x Input vector of length 2.
+    \return Vector of length 1.
+*/
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   ppois
+			   ,
+			   // OUTPUT_DIM
+			   1
+			   ,
+			   // ATOMIC_DOUBLE
+			   ty[0]=Rmath::Rf_ppois(tx[0],tx[1],1,0);
+			   ,
+			   // ATOMIC_REVERSE
+			   Type value = ty[0];
+			   Type n = tx[0];
+			   Type lambda = tx[1];
+			   CppAD::vector<Type> arg(2);
+			   arg[0] = n - Type(1);
+			   arg[1] = lambda;
+			   px[0] = Type(0);
+			   px[1] = (-value + ppois(arg)[0]) * py[0];
 			   )
 
 /** \cond */

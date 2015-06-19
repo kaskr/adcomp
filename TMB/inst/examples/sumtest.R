@@ -3,7 +3,7 @@ dyn.load(dynlib("sumtest"))
 parameters=list(x=numeric(5)+0.1 )
 df <- list()
 
-obj <- MakeADFun(data=df,parameters=parameters,random=c("x"))
+obj <- MakeADFun(data=df,parameters=parameters,random=c("x"), DLL="sumtest")
 r <- obj$env$random
 par <- obj$env$par
 h <- obj$env$spHess(par)[r,r]

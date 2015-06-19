@@ -220,7 +220,7 @@ namespace USERFUNCTION##NAMESPACE{					\
     for(int i=0;i<y.size();i++)y[i]=yy[i];				\
     return y;								\
   }									\
-};									\
+}									\
 vector<double> USERFUNCTION(vector<double> x){				\
   USERFUNCTION##NAMESPACE::double_version.init(x);			\
   return USERFUNCTION##NAMESPACE::generalized_symbol(x);		\

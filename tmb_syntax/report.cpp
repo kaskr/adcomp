@@ -15,5 +15,11 @@ Type objective_function<Type>::operator() ()
   REPORT(d);
   REPORT(p);
 
+  //// Vector of anything:
+  vector<matrix<Type> > voa(2);
+  voa[0] = c;
+  voa[1] = c;
+  REPORT(voa);
+
   return 0;
 }

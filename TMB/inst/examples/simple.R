@@ -21,7 +21,8 @@ x <- as.numeric(A%*%beta+B%*%u+eps)
 map <- NULL
 obj <- MakeADFun(data=list(x=x,B=B,A=A),
                  parameters=list(u=u*0+.1,beta=beta*0+.1,logsdu=.1,logsd0=0.1),
-                 random="u"
+                 random="u",
+                 DLL="simple"
                  )
 newtonOption(smartsearch=FALSE)
 obj$fn(obj$par)

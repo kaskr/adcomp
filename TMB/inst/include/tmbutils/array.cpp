@@ -126,6 +126,9 @@ struct array:Map< Array<Type,Dynamic,1> >{
   */
   array & operator= (const array & other)
   {
+    if(this->dim.size() == 0){ // Not initialized (default constructed)
+      this->initZeroArray(other.dim);
+    }
     this->MapBase::operator=(other);
     this->setdim(other.dim);
     return *this;
