@@ -100,3 +100,17 @@ Type invlogit(Type x){
   return Type(1.0)/(Type(1.0)+exp(-x));
 }
 VECTORIZE1_t(invlogit)
+
+/** Bessel K function
+
+    Same as besselK from R.
+    \note Differentiation wrt. second argument currently not allowed (will throw an error at run time).
+*/
+template<class Type>
+Type besselK(Type x, Type nu){
+  if (CppAD::Variable(nu)) error("besselK(x,nu) does not yet allow 'nu' to be a PARAMETER.");
+  CppAD::vector<Type> tx(2);
+  tx[0] = x;
+  tx[1] = nu;
+  return atomic::besselK(tx)[0];
+}
