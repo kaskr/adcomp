@@ -23,7 +23,7 @@ These pages describes the C++ part of TMB. The R part is documented via the ordi
 \brief A general introduction to TMB
 
 
-A TMB projects consists of an R file (*.R) and a C++ file (*.cpp). 
+A TMB project consists of an R file (*.R) and a C++ file (*.cpp). 
 The R file does pre- and post processing of data in addition to maximizing
 the log-likelihood contained in *.cpp. See \ref Examples for more details.
 All R functions are documented within the standard help system in R.
@@ -186,12 +186,13 @@ to that of R.
 - The densities (\c d...) are provided both in the discrete and continuous case, 
 	cumulative distributions (\c p...) and inverse cumulative distributions (\c q...) 
 	are provided only for continuous distributions.
-- Scalar and \c vector arguments (in combination) are supported, but not \c array or \c matrix.
+- Scalar and \c vector arguments (in combination) are supported, 
+but not \c array or \c matrix arguments.
 - The last argument (of type \c int) corresponds to the \c log argument 
   in R: 1=logaritm, 0=ordinary scale. \c true (logaritm) and \c false (ordinary scale) can 
   also be used.
 - Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
-  used an "out of range" error will occur, and can be picked up by the debugger.
+  used an "out of range" error will occur, which can be picked up by the debugger.
 - \c DATA_IVECTOR() and \c DATA_INTEGER() cannot be used with probability distributions, except possibly for the last (log) argument.
 - Some example:
   \code 
@@ -203,7 +204,6 @@ to that of R.
   dexp(x,rate,true);                      // OK if x is length 10 
   dexp(x,rate_matrix,true);               // Error, matrix arguments not allowed
   \endcode 
-  See ... for how to deal with \c array or \c matrix objects. 
 - To sum over elements in the vector returned use \code sum(dexp(x,rate));\endcode 
 */
 
@@ -222,56 +222,61 @@ gives access to a variety of multivariate normal distributions:
   	    a (sparse) precision matrix.
  - Separable covariance functions, i.e. time-space separability.
   
-These seemingly unrelated concepts are all implemented via the concept of a \c distribution, 
-and this explains why they are placed in the same namespace. You can combine two
-\c distributions, and this lets you build up complex multivariate distributions using
+These seemingly unrelated concepts are all implemented via the notion of a \c distribution, 
+which explains why they are placed in the same namespace. You can combine two
+\c distributions, and this lets you build up complex multivariate distributions using extremely
 compact notation. Due to the flexibility of the approach it is more abstract than
 other parts of TMB, but here it will be explained from scratch. Before looking 
-at the different categories we note the following:
+at the different categories of multivariate distributions we note the following
+which is of practical importance:
 - All members in the \c density namespace return the \b negative log density,
   opposed to the univariate densities in \ref R_style_distribution.
   
 <h2>Multivariate normal distributions</h2>
-Consider a zero-mean multivariate normal vector *x = {x(0),...,x(n-1)}* 
-with covariance matrix *Sigma* (a symmetric positive definite matrix).
-
-The multivariate density of the vector *x* can be evaluated as follows
+Consider a zero-mean multivariate normal distribution
+with covariance matrix *Sigma* (symmetric positive definite),
+that we want to evaluate at _x_:
   \code 
-    using namespace density;
-    int n = 10;
-
-  matrix<Type> Sigma(n,n);     
-  // ..... User must assign value to Sigma here
-  vector<Type> x(n);           // Evaluation point           
-  x(0,n-1) = Type(0.0);        // Point of evaluation: x = (0,0,...,0)
-  res = MVNORM(Sigma)(x);  
+  int n = 10;
+  vector<Type> x(n);                     // Evaluation point           
+  x.fill(0.0);                           // Point of evaluation: x = (0,0,...,0)
   \endcode
 
-This allows for any structure in *Sigma*, under the positive definiteness constraint.
-A special case is that all the lower triangle elements of *Sigma* are free parameters
-that we want to estimate. Special provision for this is provided in TMB.
-We then require \c Sigma to be a correlation matrix, i.e. all diagonal elements are 1,
-so there are *n(n-1)/2* free parameters to be estimated. 
-A specialised distribution \c UNSTRUCTURED_CORR is provided for this situation,
-which automatically ensures the positive definiteness of *Sigma*. 
+
+The negative log-normal density is evaluated as follows:
+\code 
+  using namespace density;
+  matrix<Type> Sigma(n,n);     // Covariance matrix
+  // ..... User must assign value to Sigma here
+  res = MVNORM(Sigma)(x);      // Evaluate negative log likelihod
+\endcode
+In the last line \c MVNORM(Sigma) should be interpreted as
+a multivariate density, which via the last parenthesis \c (x) is evaluated at \c x.
+A less compact way of expressing this is
+\code 
+  MVNORM_t<Type> your_dmnorm(Sigma);
+  res = your_dmnorm(x);                
+\endcode
+in which \c your_dmnorm is a variable that holds the "density". 
+    
+_Sigma_ can be parameterized in different ways. Due to the symmetry of *Sigma* there
+are at most *n(n+1)/2* free parameters (*n* variances and *n(n-1)/2*
+correlation parameters). If you want to estimate all of
+these freely (modulo the positive definite constraint) 
+you can use \ref UNSTRUCTURED_CORR to specify the correlation matrix, 
+and \ref VECSCALE to specify variances.
+\ref UNSTRUCTURED_CORR takes as input a vector a dummy parameters that internally 
+is used to build the correlation matrix via its cholesky factor. 
   \code 
   using namespace density;
   int n = 10;
-  vector<Type> unconstrained_params(n*(n-1)/2);           
-  vector<Type> x(n);           // Evaluation point           
-  res = UNSTRUCTURED_CORR(unconstrained_params)(x);  
-  \endcode
-The \c unconstrained_params are not directly the lower triangular elements of *Sigma*,
-but instead related to the cholesky factor of *Sigma* (see \ref UNSTRUCTURED_CORR_t for ).
-
-To control the variances of the elements of *x* we scale the distribution
-  \code 
-  vector<Type> unconstrained_params(n*(n-1)/2);
-  vector<Type> x(n);                               // Evaluation point       
-  vector<Type> sds(n);                             // Vector of std. dev.
+  vector<Type> unconstrained_params(n*(n-1)/2);  // Dummy parameterization of correlation matrix         
+  vector<Type> sds(n);                   // Standard deviations
   res = VECSCALE(UNSTRUCTURED_CORR(unconstrained_params),sds)(x);
   \endcode
-
+If all elements of \c dummy_params are estimated we are in effect
+estimating a full correlation matrix without any constraints
+on its elements (except for the mandatory positive definiteness).
 The actual value of the correlation matrix, but not the full covariance matrix,
 can easily be assessed
 using the \c ".cov()" operator
@@ -283,10 +288,9 @@ using the \c ".cov()" operator
 
 
 <h2>Autoregressive processes</h2>
-Consider a univariate Gaussian AR1 process *x(t), t=0,...,n-1* with the following
-constraints:
-- *x(t)* is stationary, i.e. *x(0)* has been assigned the stationary variance.
-- *x(t)* has mean 0 and variance 1 for all *t*.
+Consider a stationary univariate Gaussian AR1 process *x(t), t=0,...,n-1*. The stationary
+distribution is choosen so that:
+- *x(t)* has mean 0 and variance 1 (for all *t*).
 
 The multivariate density of the vector *x* can be evaluated as follows
   \code 
@@ -294,7 +298,7 @@ The multivariate density of the vector *x* can be evaluated as follows
   using namespace density;
  
   vector<Type> x(n);           // Evaluation point           
-  x(0,n-1) = Type(0.0);        // Point of evaluation: x = (0,0,...,0)
+  x.fill(0.0);                    // Point of evaluation: x = (0,0,...,0)
   Type rho = 0.2;              // Correlation parameter
   res = AR1(rho)(x);           // Evaluate negative log-density of AR1 process at point x 
   \endcode	
@@ -304,52 +308,49 @@ Due to the assumed stationarity the correlation parameter must satisfy:
 
 Note that *cor[x(t),x(t-1)] = rho*. 
 
-The \c SCALE function can be used to obtain an arbitrary standard deviation.
+The \c SCALE function can be used to set the standard deviation.
   \code 
   Type sigma = 2.1;            // standard deviation of x
   res = SCALE(AR1(rho),sigma)(x);  
   \endcode
-
-Now, *var[x(t)] = sigma^2*. 
+Now, *var[x(t)] = sigma^2*. Because all elements of \c x are scaled by the
+same constant we use SCALE rather than VECSCALE. 
 
 <h4>Multivariate AR1 processes</h4>
-
-It is also possible to construct multivariate AR1 processes. This is the first
-real illustrations of how distributions can be used as building blocks
+This is the first real illustrations of how distributions can be used as building blocks
 to obtain more complex distributions. Consider the *p* dimensional AR1 process
-
-   *x(t) = phi*x(t-1) + e(t),                  t=0,...,n-1*
-
-where *e(t)~N(0,R)* with R being a p \c x p covariance matrix to be described below.
   \code
-  using namespace density;
   int n = 10;                   // Number of time steps
   int p=3;                      // dim(x)
-  array<Type> x(n,p);           // Evaluation point       
-  vector<Type> unconstrained_params(p*(p-1)/2);
-  Type phi;
-  res = AR1(phi,UNSTRUCTURED_CORR(unconstrained_params))(x);
+  array<Type> x(p,n);           // Evaluation point       
   \endcode
-
-The t'th column of array \c x is the vector *x(t)*, i.e. the univariate time
-series are constitute rows in \c x. Note the following:
+The columns in \c x refer to the different time points.   
+We then evaluate the (negative log) joint density of the time series.
+  \code
+  MVNORM_t<Type> your_dmnorm(Sigma);  // Density of x(t) 
+  Type phi;                           // Correlation parameter
+  res = AR1(phi,your_dmnorm)(x);
+  \endcode
+Note the following:
+- We have introduced an intermediate variable \c your_dmnorm, which
+  holds the p-dim density marginal density of *x(t)*. 
+  This is a zero-mean normal density with covariance matrix \c Sigma.
+- All *p* univarite time series have the same serial correlation \phi. 
 - The multivariate process *x(t)* is stationary in the same sense as the 
    univariate AR1 process described above.
-- The distribution of *x(t)* is specified via the second argument to \c AR1, which
-  in our situation is \c UNSTRUCTURED_CORR, i.e. a unit variance multinormal
-  density. 
 
 <h4>Higher order AR processes</h4>
   
-There also exists \ref ARk_t of arbitrary autoregressive order. Are
-these stationary????
+There also exists \ref ARk_t of arbitrary autoregressive order. 
 
 <h2>Gaussian Markov random fields (GMRF)</h2>
  GMRF may be defined in two ways:
  1. Via a (sparse) precision matrix Q 
  2. Via a d-dimensional lattice
  
- For further details please see \ref GMRF_t.
+ For further details please see \ref GMRF_t. Under 1) a sparse Q 
+ corresponding to a Matern covariance function can be
+ obtained via the \ref R_inla namespace.
 
 <h2>Separable construction of covariance (precision) matrices</h2>
 A typical use of separability is to create space-time models with
@@ -396,11 +397,13 @@ opposite order to the dimensions of \c x.
 
 \example ar1_4D.cpp
 \example called_from_R.cpp
+\example laplace.cpp
 \example linreg.cpp
 \example linreg_parallel.cpp
 \example longlinreg.cpp
 \example lr_test.cpp
 \example matrix_arrays.cpp
+\example multivariate_distributions.cpp
 \example mvrw.cpp
 \example mvrw_sparse.cpp
 \example nan_error_ex.cpp
@@ -412,6 +415,8 @@ opposite order to the dimensions of \c x.
 \example sdv_multi_compact.cpp
 \example sdv_multi.cpp
 \example socatt.cpp
+\example spde.cpp
+\example spde_aniso.cpp
 \example spatial.cpp
 \example thetalog.cpp
 \example transform.cpp
@@ -521,8 +526,6 @@ new variables \c w via the \c pnorm and \c qgamma functions as follows:
 \endcode
 \c w now has a gamma distribution.
 
-\b NOTE: at the time of writing \c pnorm and \c qgamma are yet not implemented.
-
 <h3>Discrete latent variables</h3>
 
 The Laplace approximation can not be applied to discrete latent variables that
@@ -560,7 +563,10 @@ is referred to section \ref  Densities for details and examples.
 */
 
 /** \defgroup CppTutorial C++ tutorial
-\brief Help for R users to write the C++ user template
+\brief Help for R users to write the C++ user template \b and for C++ programmers about
+  TMB specifics
+
+<h3>I know R but not C++</h3>
 
 Summary of how syntax differs between R and C++:
 \code
@@ -576,6 +582,12 @@ Increments    x[1] = x[1] + 3    x(0) += 3.0;                // += -= *= /= incr
 
 \endcode
 
-
+<h3>I know C++</h3>
+TMB specific C++ include:
+- You should not use \c if(x) statements where \c x is 
+   a \c PARAMETER, or is derived from a variable of type
+   \c PARAMETER. (It is OK to use \c if on \c DATA types, however.)
+   TMB will remove the \c if(x) statement, so the code will
+   produce unexpected results.
  
 */

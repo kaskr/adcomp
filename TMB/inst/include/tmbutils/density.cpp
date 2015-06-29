@@ -16,7 +16,17 @@ typedef array<scalartype> arraytype
 
     Class to evaluate the negative log density of a mean zero
     multivariate Gaussian variable with general covariance matrix Sigma.
-    Intended for small dense covariance matrices.
+    Intended for small dense covariance matrices.    
+    \code
+      matrix<Type> Sigma(3,3);
+      Sigma.fill(0.1);             // Fill the whole matrix
+      Sigma.diagonal() *= 10.0;    // Multiply diagonal by 10 to positive definite Sigma
+      vector<Type> x0(3);          // Point of evaluation
+      x0.fill(0.0);                // Initialize x0 to be zero
+      MVNORM_t<Type> N_0_Sigma(Sigma);   // N_0_Sigma is now a Distribution  
+      res = N_0_Sigma(x0);         // Evaluates (neg. log) density at x
+    \endcode
+
 */
 template <class scalartype_>
 class MVNORM_t{
@@ -30,7 +40,16 @@ public:
     setSigma(Sigma_, use_atomic);
   }
 
-  /** \brief Covariance extractor */
+  /** \brief Covariance matrix extractor 
+
+    Typical use:
+    \code 
+      matrix<Type> Sigma(3,3);
+      MVNORM_t<Type> N_0_Sigma(Sigma);   // N_0_Sigma is now a Distribution  
+      N_0_Sigma.cov();                   // Returns covariance matrix (Sigma in this case)
+    \endcode
+    Useful for classes such as \ref UNSTRUCTURED_CORR_t that inherits from MVNORM_t.
+  */
   matrixtype cov(){return Sigma;}
 
   /* initializer via covariance matrix */
@@ -81,6 +100,20 @@ public:
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
+
+/** \brief Evaluates multivariate zero-mean normal density with user supplied covariance matrix
+
+    \param x Point (vector) at which the density will be evaluated.
+    \param use_atomic Determines if "atomic macros" are used (default).
+    
+    Shortform version for working with the density of the \ref MVNORM_t 
+    distribution (C++ class). Typical use:
+    \code 
+      MVNORM(Sigma)(x);
+    \endcode
+    where \c Sigma is a covariance matrix. The part \c MVNORM(Sigma) creates
+    an object of MVNORM_t, which is then evaluated by the part \c (x).
+*/
 template <class scalartype>
 MVNORM_t<scalartype> MVNORM(matrix<scalartype> x, bool use_atomic=true){
   return MVNORM_t<scalartype>(x, use_atomic);
@@ -89,10 +122,12 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> x, bool use_atomic=true){
 /** \brief Multivariate normal distribution with unstructered correlation matrix
 
    Class to evaluate the negative log density of a multivariate Gaussian 
-   variable with unstructured symmetric positive definite correlation matrix.
-
-   The unstructured correlation matrix is parameterized via a lower triangular matrix
-   with unit diagonal i.e. (n*n-n)/2 parameters to describe an n dimensional correlation matrix.
+   variable with \b unstructured symmetric positive definite correlation matrix (*Sigma*). The
+   typical application of this is that you want to estimate all the elements of *Sigma*,
+   in such a way that the symmetry and positive definiteness constraint is respected. 
+   We parameterize *S* via a lower triangular matrix *L*
+   with unit diagonal i.e. we need (n*n-n)/2 parameters to describe 
+   an n dimensional correlation matrix.
 
    For instance in the case n=4 the correlation matrix is given by
    \f[\Sigma = D^{-\frac{1}{2}}LL'D^{-\frac{1}{2}}\f]
@@ -114,13 +149,22 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> x, bool use_atomic=true){
    \code
    // Construct density object of dimension 4
    vector<Type> Lx(6);
-   UNSTRUCTURED_CORR_t<Type> neg_log_density(Lx);
-   // Evaluate density
+   UNSTRUCTURED_CORR_t<Type> nll(Lx);
    vector<Type> x(4);
-   Type ans=neg_log_density(x);
+   res = nll(x);               // Evaluate neg. log density
    \endcode
 
-   \remark The correlation matrix is available through member "Sigma".
+   \remark *Sigma* is available via \ref MVNORM_t.cov , e.g.
+   \code
+     nll.cov();
+   \endcode
+   
+   \remarks *Sigma* 1's on its diagonal. To scale the variances we can use \ref VECSCALE_t , e.g.
+   \code
+     vector<Type> sds(4);
+     sds.fill(2.0);                            // Set all standard deviations to 2.0
+     res = VECSCALE_t(nll,sds)(x);
+   \endcode
 */   
 template <class scalartype_>
 class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
@@ -149,6 +193,8 @@ class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
     this->setSigma(Sigma); /* Call MVNORM_t initializer */
   }
 };
+/** \brief Evaluates the density with unstructure correlation matrix. 
+     See UNSTRUCTURED_CORR_t for details */
 template <class scalartype>
 UNSTRUCTURED_CORR_t<scalartype> UNSTRUCTURED_CORR(vector<scalartype> x){
   return UNSTRUCTURED_CORR_t<scalartype>(x);
@@ -747,6 +793,21 @@ SCALE_t<distribution> SCALE(distribution f_, scalartype scale_){
 
     @param f_ distribution
     @param scale_ vector
+    
+    \remark 
+    To scale the standard deviations of a 
+    unit-variance multivariate normal distribution of class UNSTRUCTURED_CORR_t:
+    \code
+      vector<Type> Lx(6);				       
+      UNSTRUCTURED_CORR_t<Type> nll(Lx);
+      vector<Type> sds(4);
+      sds.fill(2.0);                            // Set all standard deviations to 2.0
+      res = VECSCALE_t(nll,sds)(x);
+    \endcode
+    
+    \remark
+    Another application is to scale the variance of a unit-variance AR(1) process;
+    see \ref AR1_t . 
 */ 
 template <class distribution>
 class VECSCALE_t{
@@ -775,6 +836,7 @@ public:
   int ndim(){return f.ndim();}
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
+/** \brief Evaluates a scaled density. See VECSCALE_t for details */
 template <class vectortype, class distribution>
 VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
   return VECSCALE_t<distribution>(f_,scale_);

@@ -5,6 +5,9 @@
 
 /** \brief SPDE methods from INLA R-package .
 
+Constructs precission matrix Q of the type defined in Lindgren et al. (2011).
+Requires RINLA package to build stuff. Q built this way can be used in \ref GMRF_t. 
+
 */
 
 namespace R_inla {
