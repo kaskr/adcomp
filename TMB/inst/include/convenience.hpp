@@ -100,3 +100,33 @@ Type invlogit(Type x){
   return Type(1.0)/(Type(1.0)+exp(-x));
 }
 VECTORIZE1_t(invlogit)
+
+/** Bessel K function
+
+    Same as besselK from R.
+    \note Differentiation wrt. second argument currently not allowed (will throw an error at run time).
+*/
+template<class Type>
+Type besselK(Type x, Type nu){
+  if (CppAD::Variable(nu)) error("besselK(x,nu) does not yet allow 'nu' to be a PARAMETER.");
+  CppAD::vector<Type> tx(2);
+  tx[0] = x;
+  tx[1] = nu;
+  return atomic::besselK(tx)[0];
+}
+
+/** Matern correlation function
+
+    Compute values of the Matern correlation function for given distances and parameters. Same as 'matern' from the geoR package.
+
+    \param u Distance.
+    \param phi Range parameter.
+    \param kappa Smoothness parameter.
+    \note Differentiation wrt. kappa currently not allowed (will throw an error at run time).
+*/
+template<class Type>
+Type matern(Type u, Type phi, Type kappa){
+  Type x = CppAD::CondExpEq(u, Type(0), Type(1), u / phi); /* Avoid NaN when u=0 */
+  Type ans = 1.0 / ( exp(lgamma(kappa)) * pow(2, kappa - 1.0) ) * pow(x, kappa) * besselK(x, kappa);
+  return CppAD::CondExpEq(u, Type(0), Type(1), ans);
+}

@@ -198,6 +198,8 @@ struct array:Map< Array<Type,Dynamic,1> >{
 
 
   int index(vector<int> tup){
+    eigen_assert( tup.size() == dim.size() );
+    eigen_assert( ( (dim*0 <= tup) && (tup < dim) ).all() );
     return (tup*mult).sum();
   }
   vector<int> tuple(int i){

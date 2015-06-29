@@ -42,6 +42,10 @@ using tmbutils::matrix;
 using tmbutils::vector;
 using CppAD::AD;
 using CppAD::ADFun;
+namespace CppAD{
+  /* Add to CppAD so that 'Variable' works for any 'Type' */
+  bool Variable(double x){ return false; }
+}
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"
 #include "atomic_math.hpp"

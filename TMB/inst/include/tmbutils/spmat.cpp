@@ -27,7 +27,8 @@ Eigen::SparseMatrix<Type> asSparseMatrix(matrix<Type> x){
   std::vector<T> tripletList;
   for(int i=0;i<x.rows();i++)
     for(int j=0;j<x.cols();j++)
-      if(x(i,j)!=Type(0))tripletList.push_back(T(i,j,x(i,j)));
+      if( (x(i,j)!=Type(0)) || CppAD::Variable(x(i,j)) )
+	tripletList.push_back(T(i,j,x(i,j)));
   Eigen::SparseMatrix<Type> mat(x.rows(),x.cols());
   mat.setFromTriplets(tripletList.begin(), tripletList.end());
   return mat;  
@@ -40,7 +41,8 @@ Eigen::SparseVector<Type> asSparseVector(vector<Type> x){
   std::vector<T> tripletList;
   Eigen::SparseVector<Type> mat(x.rows());
   for(int i=0;i<x.rows();i++)
-    if(x(i)!=Type(0))mat.coeffRef(i)=x(i);
+    if( (x(i)!=Type(0)) || CppAD::Variable(x(i)) )
+      mat.coeffRef(i)=x(i);
   return mat;  
 }
 
