@@ -36,3 +36,4 @@ TODO
 - Package should pass "make check"/"R CMD check" without warnings.
 - Make unary functions work on arrays and preserve dimension.
 - Disable array methods that give unexpected results (e.g. .Block() ).
+- ```sdreport(...,bias.correct=TRUE)``` does not work in parallel (currently need prior call ```openmp(1)```).
