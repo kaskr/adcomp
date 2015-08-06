@@ -103,7 +103,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
 #'
 #' @references This is from 'efficient' No-U-Turn sampler (algorithm 3) of
 #' Hoffman and Gelman (2014).
-buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
+.buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
     if(j==0){
         ## base case, take one step in direction v
         eps <- v*eps
@@ -111,7 +111,7 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
         theta <- theta+eps*r
         r <- r+(eps/2)*gr(theta)
         ## verify valid trajectory
-        H <- calculate.H(theta=theta, r=r, fn=fn)
+        H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
         slice <- log(u) <= H
         ## if(!s) print(paste("invalid s at k=", k))
@@ -119,7 +119,7 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
                     r.plus=r, s=s, slice=slice))
     } else {
         ## recursion - build left and right subtrees
-        xx <- buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
+        xx <- .buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
                                   fn=fn,gr=gr)
         theta.minus <- xx$theta.minus
         theta.plus <- xx$theta.plus
@@ -131,13 +131,13 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
         if(xx$s==1){
             if(v== -1){
                 yy <-
-                    buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
+                    .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                         j=j-1, eps=eps, fn=fn, gr=gr)
                 theta.minus <- yy$theta.minus
                 r.minus <- yy$r.minus
             } else {
                 yy <-
-                    buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
+                    .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                         j=j-1, eps=eps, fn=fn, gr=gr)
                 theta.plus <- yy$theta.plus
                 r.plus <- yy$r.plus
@@ -153,7 +153,7 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
             ## print(yy$slice/(yy$slice+ xx$slice))
             slice.new <- xx$slice + yy$slice
             ## check for valid proposal
-            test <- test.nuts(theta.plus=theta.plus,
+            test <- .test.nuts(theta.plus=theta.plus,
                               theta.minus=theta.minus, r.plus=r.plus,
                               r.minus=r.minus)
             ## if(!test) print(paste("U turn at k=", k))
@@ -188,19 +188,19 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
         theta.out[m,] <- theta.minus <- theta.plus <- theta.cur
         r.cur <- r.plus <- r.minus <- rnorm(length(theta.cur),0,1)
         ## Draw a slice variable u
-        u <- sample.u(theta=theta.cur, r=r.cur, fn=fn)
+        u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn)
         j <- 0; n <- 1; s <- 1
         while(s==1) {
             v <- sample(x=c(1,-1), size=1)
             if(v==1){
                 ## move in right direction
-                res <- buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
+                res <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                        j=j, eps=eps, fn=fn, gr=gr)
                 theta.plus <- res$theta.plus
                 r.plus <- res$r.plus
             } else {
                 ## move in left direction
-                res <- buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
+                res <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                        j=j, eps=eps, fn=fn, gr=gr)
                 theta.minus <- res$theta.minus
                 r.minus <- res$r.minus
@@ -213,7 +213,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
                 }
             }
             n <- n+res$n
-            s <- res$s*test.nuts(theta.plus, theta.minus, r.plus, r.minus)
+            s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
             j <- j+1
             if(j>10 & s) {warning("j got to >10, skipping to next m");break}
         }
@@ -227,16 +227,16 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
 
 
 #' Draw a slice sample for given position and momentum variables
-sample.u <- function(theta, r, fn)
-    runif(n=1, min=0, max=exp(calculate.H(theta=theta,r=r, fn=fn)))
+.sample.u <- function(theta, r, fn)
+    runif(n=1, min=0, max=exp(.calculate.H(theta=theta,r=r, fn=fn)))
 #' Calculate the Hamiltonian value for position and momentum variables.
 #'
 #' @details This function currently assumes iid standard normal momentum
 #' variables.
-calculate.H <- function(theta, r, fn) fn(theta)-(1/2)*sum(r^2)
+.calculate.H <- function(theta, r, fn) fn(theta)-(1/2)*sum(r^2)
 #' Test whether a "U-turn" has occured in a branch of the binary tree
-#' created by \ref\code{buildtree} function.
-test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
+#' created by \ref\code{.buildtree} function.
+.test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
     theta.temp <- (theta.plus-theta.minus)
    as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
 }
@@ -250,7 +250,7 @@ test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
 #' @details The function repeatedly doubles (in a random direction) until
 #' either a U-turn occurs or the trajectory becomes unstable.
 #'
-buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
+.buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
     if(j==0){
         ## base case, take one step in direction v
         eps <- v*eps
@@ -258,7 +258,7 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
         theta <- theta+eps*r
         r <- r+(eps/2)*gr(theta)
         ## verify valid trajectory
-        H <- calculate.H(theta=theta, r=r, fn=fn)
+        H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
         n <- log(u) <= H
         ## if(!s) print(paste("invalid s at k=", k))
@@ -266,7 +266,7 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
                     r.plus=r, s=s, n=n))
     } else {
         ## recursion - build left and right subtrees
-        xx <- buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
+        xx <- .buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
                                   fn=fn,gr=gr)
         theta.minus <- xx$theta.minus
         theta.plus <- xx$theta.plus
@@ -279,13 +279,13 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
         if(s==1){
             if(v== -1){
                 yy <-
-                    buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
+                    .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                         j=j-1, eps=eps, fn=fn, gr=gr)
                 theta.minus <- yy$theta.minus
                 r.minus <- yy$r.minus
             } else {
                 yy <-
-                    buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
+                    .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                         j=j-1, eps=eps, fn=fn, gr=gr)
                 theta.plus <- yy$theta.plus
                 r.plus <- yy$r.plus
@@ -300,7 +300,7 @@ buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
             }
             n.new <- xx$n + yy$n
             ## check for valid proposal
-            test <- test.nuts(theta.plus=theta.plus,
+            test <- .test.nuts(theta.plus=theta.plus,
                               theta.minus=theta.minus, r.plus=r.plus,
                               r.minus=r.minus)
             ## if(!test) print(paste("U turn at k=", k))
@@ -342,8 +342,8 @@ find.epsilon <- function(theta,  fn, gr, eps=1){
     r.new <- r+(eps/2)*gr(theta)
     theta.new <- theta+eps*r.new
     r.new <- r.new+(eps/2)*gr(theta.new)
-    H1 <- calculate.H(theta=theta, r=r, fn=fn)
-    H2 <- calculate.H(theta=theta.new, r=r.new, fn=fn)
+    H1 <- .calculate.H(theta=theta, r=r, fn=fn)
+    H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
     a <- 2*(exp(H2)/exp(H1)>.5)-1
     k <- 1
     while( (exp(H2)/exp(H1))^a > 2^(-a) ){
@@ -352,7 +352,7 @@ find.epsilon <- function(theta,  fn, gr, eps=1){
         r.new <- r+(eps/2)*gr(theta)
         theta.new <- theta+eps*r.new
         r.new <- r.new+(eps/2)*gr(theta.new)
-        H2 <- calculate.H(theta=theta.new, r=r.new, fn=fn)
+        H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
         k <- k+1
         if(k>50) {
             warning("more than 50 iterations to find epsilon, stopping")
