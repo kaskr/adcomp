@@ -15,6 +15,7 @@
 #' sampler.
 #' @param ... Further arguments to be passed to the algorithm. See help
 #' files for the samplers for further arguments.
+#' @example inst/examples/mcmc_examples.R
 mcmc <- function(obj, nsim, algorithm, params.init=NULL, ...){
     ## Initialization for all algorithms
     algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS"))
