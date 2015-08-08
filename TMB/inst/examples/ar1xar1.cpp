@@ -5,14 +5,6 @@
 template <class Type>
 Type f(Type x){return Type(2)/(Type(1) + exp(-Type(2) * x)) - Type(1);}
 
-/* 'squeeze' transform : [0,1] -> (0,1) to machine tolerance */
-template<class Type>
-Type squeeze(Type u){
-  Type eps = std::numeric_limits<double>::epsilon();
-  u = (1.0 - eps) * (u - .5) + .5;
-  return u;
-}
-
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
