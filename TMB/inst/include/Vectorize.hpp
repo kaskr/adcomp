@@ -39,7 +39,7 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
 		  declare##Type5(arg5) comma##Type6			\
 		  declare##Type6(arg6) )				\
 {									\
-  int n = 1;								\
+  int n = 0;								\
   outputsize##Type1(n,arg1);						\
   outputsize##Type2(n,arg2);						\
   outputsize##Type3(n,arg3);						\
