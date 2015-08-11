@@ -56,6 +56,20 @@ public:
   scalartype operator()(vectortype x){
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
+  /** \brief Evaluate _projected_ negative log density
+      \param keep Vector of 0/1 indicating marginal to evaluate.
+   */
+  scalartype operator()(vectortype x, vectortype keep){
+    matrix<scalartype> S = Sigma;
+    vector<scalartype> not_keep = scalartype(1.0) - keep;
+    for(int i = 0; i < S.rows(); i++){
+      for(int j = 0; j < S.cols(); j++){
+	S(i,j) = S(i,j) * keep(i) * keep(j);
+      }
+      S(i,i) += not_keep(i) * scalartype(1.0 / (2.0 * M_PI));
+    }
+    return MVNORM_t<scalartype>(S)(x * keep);
+  }
   arraytype jacobian(arraytype x){
     arraytype y(x.dim);
     matrixtype m(x.size()/x.cols(),x.cols());
