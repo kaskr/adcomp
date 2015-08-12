@@ -100,75 +100,12 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
     return(theta.out)
 }
 
-#' [BETA VERSION] Sample from a posterior using the No-U-Turn sampler.
-#'
-#' @references This is from 'efficient' No-U-Turn sampler (algorithm 3) of
-#' Hoffman and Gelman (2014).
-.buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
-    if(j==0){
-        ## base case, take one step in direction v
-        eps <- v*eps
-        r <- r+(eps/2)*gr(theta)
-        theta <- theta+eps*r
-        r <- r+(eps/2)*gr(theta)
-        ## verify valid trajectory
-        H <- .calculate.H(theta=theta, r=r, fn=fn)
-        s <- H-log(u) + delta.max > 0
-        slice <- log(u) <= H
-        ## if(!s) print(paste("invalid s at k=", k))
-        return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
-                    r.plus=r, s=s, slice=slice))
-    } else {
-        ## recursion - build left and right subtrees
-        xx <- .buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
-                                  fn=fn,gr=gr)
-        theta.minus <- xx$theta.minus
-        theta.plus <- xx$theta.plus
-        theta.prime <- xx$theta.prime
-        r.minus <- xx$r.minus
-        r.plus <- xx$r.plus
-        slice.new <- xx$slice
-        s <- xx$s
-        if(xx$s==1){
-            if(v== -1){
-                yy <-
-                    .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
-                                        j=j-1, eps=eps, fn=fn, gr=gr)
-                theta.minus <- yy$theta.minus
-                r.minus <- yy$r.minus
-            } else {
-                yy <-
-                    .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
-                                        j=j-1, eps=eps, fn=fn, gr=gr)
-                theta.plus <- yy$theta.plus
-                r.plus <- yy$r.plus
-            }
-            ## This isn't in the paper but if both slice variables failed,
-            ## then you get 0/0. So I skip this test
-            temp <- yy$slice+ xx$slice
-            if(temp!=0){
-            ## choose whether to keep this theta
-                if(runif(n=1, min=0, max=1) <= yy$slice/temp)
-                    theta.prime <- yy$theta.prime
-            }
-            ## print(yy$slice/(yy$slice+ xx$slice))
-            slice.new <- xx$slice + yy$slice
-            ## check for valid proposal
-            test <- .test.nuts(theta.plus=theta.plus,
-                              theta.minus=theta.minus, r.plus=r.plus,
-                              r.minus=r.minus)
-            ## if(!test) print(paste("U turn at k=", k))
-            ## check if any of the stopping conditions were met
-            s <- xx$s*yy$s*test
-        }
-        return(list(theta.minus=theta.minus, theta.plus=theta.plus,
-                    theta.prime=theta.prime,
-                    r.minus=r.minus, r.plus=r.plus, s=s, slice=slice.new))
-    }
-}
 
-#' Draw MCMC samples from a model posterior using a Hamiltonian sampler.
+#' [BETA VERSION] Draw MCMC samples from a model posterior using the
+#' No-U-Turn (NUTS) sampler from Hoffman and Gelman (2014).
 #'
+#' @details This is the 'efficient' NUTS algorithm but does not use dual
+#' averaging to tune \code{eps}, so it must be specified.
 #' @param nsim The number of samples to return.
 #' @param eps The length of the leapfrog steps.
 #' @param fn A function that returns the log of the posterior density. This
@@ -179,7 +116,6 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
 #' @param params.init A vector of initial parameter values.
 #' @references Neal, R. M. 2011. MCMC using Hamiltonian dynamics.
 #' @return A matrix of \code{nsim} samples from the posterior.
-
 mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
     theta.cur <- params.init
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
