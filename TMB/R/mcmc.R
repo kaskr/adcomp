@@ -22,7 +22,7 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, ...){
     fn <- function(x) {
         z <- -obj$fn(x)
         if(is.nan(z)){
-            warning("fn returned NaN")
+            warning(paste("replacing NaN w/ Inf at:", paste(x, collapse=" ")))
             z <- Inf
         }
         return(z)
