@@ -27,7 +27,7 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, ...){
         }
         return(z)
     }
-    gr <- function(x) -obj$gr(x)
+    gr <- function(x) -as.vector(obj$gr(x))
     obj$env$beSilent()                  # silence console output
     ## argument checking
     if(is.null(params.init)){
