@@ -79,8 +79,21 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, ...){
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
 #' which were accepted ('accepted'), and the total function and gradient
 #' calls ('n.calls'), which for this algorithm is \code{nsim}*(\code{L}+2)
-mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, diagnostic=FALSE){
-    theta.cur <- params.init
+mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
+                      diagnostic=FALSE){
+    ## If using covariance matrix and Cholesky decomposition, redefine
+    ## these functions to include this transformation. The algorithm will
+    ## work in the transformed space
+    if(!is.null(covar)){
+        fn2 <- function(theta) fn(chd %*% theta)
+        gr2 <- function(theta) gr(chd %*% theta)
+        chd <- t(chol(covar))               # lower triangular Cholesky decomp.
+        chd.inv <- solve(chd)               # inverse
+        theta.cur <- chd.inv %*% params.init
+    } else {
+        fn2 <- fn; gr2 <- gr
+        theta.cur <- params.init
+    }
     accepted <- rep(NA, nsim)
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
     if(diagnostic) theta.proposed <- theta.out
@@ -90,21 +103,21 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, diagnostic=FALSE){
         theta.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
         r.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
         ## Make a half step for first iteration
-        r.new <- r.new+eps*gr(theta.new)/2
+        r.new <- r.new+eps*gr2(theta.new)/2
         for(i in 1:L){
             theta.leapfrog[i,] <- theta.new
             r.leapfrog[i,] <- r.new
             theta.new <- theta.new+eps*r.new
             ## Full step except at end
-            if(i!=L) r.new <- r.new+eps*gr(theta.new)
+            if(i!=L) r.new <- r.new+eps*gr2(theta.new)
         }
         ## half step for momentum at the end
-        r.new <- r.new+eps*gr(theta.new)/2
+        r.new <- r.new+eps*gr2(theta.new)/2
         ## negate r to make proposal symmetric
         r.new <- -r.new
         if(diagnostic) theta.proposed[m,] <- theta.new
         if(runif(1) <
-           exp(-fn(theta.cur)+fn(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2)){
+           exp(-fn2(theta.cur)+fn2(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2)){
             ## accept the proposed state
             theta.cur <- theta.new
             accepted[m] <- TRUE
@@ -113,6 +126,12 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, diagnostic=FALSE){
             accepted[m] <- FALSE
         }
         theta.out[m,] <- theta.cur
+    }
+    ## Back transform parameters if used
+    if(!is.null(covar)) {
+        theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
+        if(diagnostic)
+            theta.proposed <- t(apply(theta.proposed, 1, function(x) chd %*% x))
     }
     message(paste("Acceptance rate = ", round(mean(accepted),1)))
     if(diagnostic){
