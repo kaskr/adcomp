@@ -13,10 +13,12 @@
 #' @param algorithm A string specifiying an algorithm. Currently supported
 #' are "HMC" for Hamiltonian sampler and "NUTS" for the No-U-Turn
 #' sampler.
+#' @param diagnostic Whether to return diagnostic information about
+#' chain. See individual algorithm for more information.
 #' @param ... Further arguments to be passed to the algorithm. See help
 #' files for the samplers for further arguments.
 #' @example inst/examples/mcmc_examples.R
-mcmc <- function(obj, nsim, algorithm, params.init=NULL, ...){
+mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, ...){
     ## Initialization for all algorithms
     algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS"))
     fn <- function(x) {
@@ -38,13 +40,21 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, ...){
     ## Select and run the chain.
     if(algorithm=="HMC")
         mcmc.out <-
-            mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init, ...)
+            mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+                     diagnostic=diagnostic, ...)
     else if(algorithm=="NUTS")
         mcmc.out <-
-            mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init, ...)
+            mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+                      diagnostic=diagnostic, ...)
     ## Clean up returned matrix
-    mcmc.out <- as.data.frame(mcmc.out)
-    names(mcmc.out) <- names(obj$par)
+    if(diagnostic){
+        mcmc.out <- as.data.frame(mcmc.out)
+        names(mcmc.out) <- names(obj$par)
+    } else {
+        print(str(mcmc.out))
+        mcmc.out$par <- as.data.frame(mcmc.out$par)
+        names(mcmc.out$par) <- names(obj$par)
+    }
     return(invisible(mcmc.out))
 }
 
@@ -61,12 +71,19 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, ...){
 #' @param gr A function that returns a vector of gradients of the log of
 #' the posterior density (same as with \code{fn}).
 #' @param params.init A vector of initial parameter values.
+#' @param diagnostic Whether to return a list of diagnostic metrics about
+#' the chain. Useful for assessing efficiency and tuning chain.
 #' @references Neal, R. M. 2011. MCMC using Hamiltonian dynamics.
-#' @return A matrix of \code{nsim} samples from the posterior.
-mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
+#' @return If \code{diagnostic} is FALSE (default), returns a matrix of
+#' \code{nsim} samples from the posterior. Otherwise returns a list
+#' containing samples ('par'), proposed samples ('par.proposed'), vector of
+#' which were accepted ('accepted'), and the total function and gradient
+#' calls ('n.calls'), which for this algorithm is \code{nsim}*(\code{L}+2)
+mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, diagnostic=FALSE){
     theta.cur <- params.init
     accepted <- rep(NA, nsim)
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
+    if(diagnostic) theta.proposed <- theta.out
     for(m in 1:nsim){
         r.cur <- r.new <- rnorm(length(params.init),0,1)
         theta.new <- theta.cur
@@ -85,6 +102,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
         r.new <- r.new+eps*gr(theta.new)/2
         ## negate r to make proposal symmetric
         r.new <- -r.new
+        if(diagnostic) theta.proposed[m,] <- theta.new
         if(runif(1) <
            exp(-fn(theta.cur)+fn(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2)){
             ## accept the proposed state
@@ -97,7 +115,12 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
         theta.out[m,] <- theta.cur
     }
     message(paste("Acceptance rate = ", round(mean(accepted),1)))
-    return(theta.out)
+    if(diagnostic){
+        return(list(par=theta.out, par.proposed=theta.proposed, accepted=accepted,
+                    n.calls=nsim*(L+2)))
+    } else {
+        return(theta.out)
+    }
 }
 
 
@@ -114,12 +137,24 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init){
 #' @param gr A function that returns a vector of gradients of the log of
 #' the posterior density (same as with \code{fn}).
 #' @param params.init A vector of initial parameter values.
-#' @references Neal, R. M. 2011. MCMC using Hamiltonian dynamics.
-#' @return A matrix of \code{nsim} samples from the posterior.
-mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
+#' @param diagnostic Whether to return a list of diagnostic metrics about
+#' the chain. Useful for assessing efficiency and tuning chain.
+#' @references Hoffman and Gelman (2014). The No-U-Turn sampler: Adaptively
+#' setting path lengths in Hamiltonian Monte Carlo.
+#' @return If \code{diagnostic} is FALSE (default), returns a matrix of
+#' \code{nsim} samples from the posterior. Otherwise returns a list
+#' containing samples ('par'),  vector of steps taken at each iteration
+#' ('steps.taken'), and the total function and gradient
+#' calls ('n.calls').
+mcmc.nuts <- function(nsim, fn, gr, params.init, eps, diagnostic=FALSE){
     theta.cur <- params.init
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
-    j.results <- rep(NA, len=nsim)      # For diagnostics
+    ## how many steps were taken at each iteration, useful for tuning
+    j.results <- rep(NA, len=nsim)
+    ## count the model calls as global variable; updated inside
+    ## .buildtree. Some subtrees wont finish due to exit conditions so this
+    ## is dynamic and not a simple formula like with HMC.
+    assign("n.calls", value=0, envir=.GlobalEnv)
     for(m in 1:nsim){
         ## initialize
         theta.out[m,] <- theta.minus <- theta.plus <- theta.cur
@@ -159,7 +194,12 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
     j.stats <- 2^(c(min(j.results), median(j.results), max(j.results)))
     message(paste0("NUTS diagnostics: Approximate leapfrog steps(min, median, max)=(",
                    paste(j.stats, collapse=","), ")"))
-    return(theta.out)
+    message(paste("Total function calls:", n.calls))
+    if(diagnostic){
+        return(list(par=theta.out, steps.taken= 2^j.results, n.calls=n.calls))
+    } else {
+        return(theta.out)
+    }
 }
 
 
@@ -198,6 +238,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps){
         H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
         n <- log(u) <= H
+        assign("n.calls", value=n.calls+3, envir=.GlobalEnv)
         ## if(!s) print(paste("invalid s at k=", k))
         return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
                     r.plus=r, s=s, n=n))
