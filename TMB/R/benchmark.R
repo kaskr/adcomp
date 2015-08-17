@@ -11,9 +11,9 @@
 ##' (for pure fixed effect models only the first two).
 ##' Expressions to time can be overwritten by the user (\code{expr}).
 ##' A \code{plot} method is available for Parallel benchmarks.
-##' 
+##'
 ##' @title Benchmark parallel templates
-##' @param obj Object from \code{MakeADFun} 
+##' @param obj Object from \code{MakeADFun}
 ##' @param n Number of replicates to obtain reliable results.
 ##' @param expr Optional expression to benchmark instead of default.
 ##' @param cores Optional vector of cores.
@@ -36,10 +36,11 @@ benchmark <- function(obj,n=10,expr=NULL,cores=NULL){
         cholesky=updateCholesky(L,h)
         )
   }
-  if(is.null(names(expr)))names(expr) <- sapply(expr,deparse)
-  addLoopToExpression <- function(y)substitute(for (i in seq(length = n)){x},list(x=y))
-  expr <- lapply(expr,addLoopToExpression)  
-  if(!is.null(obj$env$random)){ 
+  else if(is.null(names(expr)))
+    names(expr) <- vapply(expr, function(.) deparse(.)[[1L]], "")
+  addLoopToExpression <- function(y) substitute(for (i in seq_len(n)) { EE }, list(EE=y))
+  expr <- lapply(expr, addLoopToExpression)
+  if(!is.null(obj$env$random)){
     h <- obj$env$spHess() ## Avoid timing the construction
     h@x[] <- 0
     diag(h) <- 1
