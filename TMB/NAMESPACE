@@ -1,10 +1,39 @@
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
 
-# Export all names
+###____________________ IMPORTS ___________________________________
+
+## Base R - packages ----------------------
+importFrom("graphics", abline, legend, matplot, plot)
+importFrom("methods", as, is, new,
+	   cbind2, rbind2)
+importFrom("stats", approx, confint, integrate, nlminb,
+	   optim, optimHess, pchisq, qchisq, qnorm, rnorm,
+	   runif, sd)
+importFrom("utils", as.relistable, relist,
+	   head, tail)
+
+## Recommended R - packages ----------------------
+importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMatrix, dpoMatrix)
+importMethodsFrom("Matrix", coerce, cov2cor, determinant,
+                  "%*%", crossprod,tcrossprod,
+		  t, diag, chol2inv, solve, colSums,rowSums)
+importFrom("Matrix",
+	   Cholesky, forceSymmetric, invPerm,
+	   tril, triu)
+
+###____________________ EXPORTS ___________________________________
+
+## Export all names (TODO: do better!)
 exportPattern(".")
 
-# Import all packages listed as Imports or Depends
-import(
-  Matrix
-)
+## Methods :
+S3method(confint, tmbprofile)
+S3method(plot, tmbprofile)
+
+S3method(print, sdreport)
+S3method(summary, sdreport)
+
+S3method(plot, parallelBenchmark)
+
+S3method(print, backtrace)
+
+
