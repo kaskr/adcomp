@@ -182,8 +182,8 @@ oneStepPredict <- function(obj,
     li <- lapply(obj$env$parList(par = tmp), function(x) any(x!=0))
     fix <- names(li)[unlist(li)]
     parameters <- obj$env$parameters
-    map <- lapply(parameters[fix], function(x)factor(x*NA))
-    args$map <- map ## Overwrite map
+    ## Overwrite map
+    args$map <- lapply(parameters[fix], function(x)factor(x*NA))
     ## Find randomeffects character
     args$random <- names(li[!unlist(li)])
     ## Move data$name to parameter$name
@@ -269,7 +269,7 @@ oneStepPredict <- function(obj,
         nthreads.restore <- TMB::openmp()
         on.exit( TMB::openmp( nthreads.restore ), add=TRUE)
         TMB::openmp(1)
-        library(parallel)
+        requireNamespace("parallel") # was library(parallel)
         lapply <- parallel::mclapply
     }
     ## Trace one-step functions
