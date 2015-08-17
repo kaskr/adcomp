@@ -171,8 +171,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       i <- (1:length(par.full))>length(par.fixed) ## epsilon indices
       grad <- obj3$gr(par.full)
       if(bias.correct.control$sd){
-          require(numDeriv)
-          hess <- jacobian(obj3$gr,par.full)
+          ## requireNamespace("numDeriv")
+          hess <- numDeriv::jacobian(obj3$gr,par.full)
           Vestimate <- -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
       } else {
           Vestimate <- matrix(NA)
@@ -185,7 +185,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
       ihessian.random <- .Call("tmb_invQ", L, PACKAGE = "TMB")
-      iperm <- Matrix::invPerm(L@perm+1L)
+      iperm <- invPerm(L@perm+1L)
       diag.term1 <- diag(ihessian.random)[iperm]
       if(ignore.parm.uncertainty){
           diag.term2 <- 0
@@ -216,7 +216,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               M <- forceSymmetric(M,uplo="L")
               dn <- c(names(par)[r],names(par[-r]))
               dimnames(M) <- list(dn,dn)
-              p <- Matrix::invPerm(c(r,(1:length(par))[-r]))
+              p <- invPerm(c(r,(1:length(par))[-r]))
               ans$jointPrecision <- M[p,p]
           }
           else {
@@ -232,14 +232,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
 }
 summary.sdreport <- function(object,select=c("all","fixed","random","report"),p.value=FALSE,...){
   select <- match.arg(select)
-  if(select=="all"){
-    fixed <- random <- report <- TRUE
-    all <- TRUE
-  } else {
-    fixed <- random <- report <- FALSE
-    assign(select,TRUE)
-    all <- FALSE
-  }
+  all <- (select=="all")
+  fixed <- random <- report <- all
+  ## if(!all) assign(select,  TRUE)
   if(length(object$par.fixed)==0) fixed <- FALSE
   ans1 <- ans2 <- ans3 <- NULL
   if(fixed)ans1 <- cbind(object$par.fixed,sqrt(diag(object$cov.fixed)))

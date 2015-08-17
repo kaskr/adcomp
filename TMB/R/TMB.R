@@ -470,7 +470,7 @@ MakeADFun <- function(data,parameters,map=list(),
         ## ihessian: Inverse subset of hessian (same dim but larger pattern!).
         ## Hfull: Pattern of full hessian including fixed effects.
         if (!silent) cat("Matching hessian patterns... ")
-        iperm <- Matrix::invPerm(L@perm+1L)
+        iperm <- invPerm(L@perm+1L)
         e$ind1 <- lookup(hessian,ihessian,iperm) ## Same dimensions
         e$ind2 <- lookup(hessian,e$Hfull,random)  ## Note: dim(Hfull)>dim(hessian) !
         if (!silent) cat("Done\n")
@@ -848,9 +848,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
-      ans <- base::system.file(...)
-      ans <- chartr("\\", "/", shortPathName(ans))
-      ans
+      ans <- system.file(...)
+      chartr("\\", "/", shortPathName(ans))
     }
   }
   ## libtmb existence
@@ -921,7 +920,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                      )
   on.exit(file.remove(mvfile),add=TRUE)
   status <- tools:::.shlib_internal(file)
-  if(status!=0)stop("Compilation failed")
+  if(status!=0) stop("Compilation failed")
   status
 }
 
