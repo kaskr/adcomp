@@ -29,7 +29,13 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, ...){
         }
         return(z)
     }
-    gr <- function(x) -as.vector(obj$gr(x))
+    gr <- function(x) {
+        z <- -as.vector(obj$gr(x))
+        if(any(is.nan(z))){
+               warning(paste("NaN at:", paste(x, collapse=" ")))
+           }
+        return(z)
+    }
     obj$env$beSilent()                  # silence console output
     ## argument checking
     if(is.null(params.init)){
@@ -115,8 +121,8 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
         ## negate r to make proposal symmetric
         r.new <- -r.new
         if(diagnostic) theta.proposed[m,] <- theta.new
-        if(runif(1) <
-           exp(-fn2(theta.cur)+fn2(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2)){
+        alpha <- -fn2(theta.cur)+fn2(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2
+        if(is.finite(alpha) & log(runif(1)) < alpha){
             ## accept the proposed state
             theta.cur <- theta.new
             accepted[m] <- TRUE
