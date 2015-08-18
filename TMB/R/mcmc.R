@@ -46,12 +46,11 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, ...){
         mcmc.out <-
             mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
                       diagnostic=diagnostic, ...)
-    ## Clean up returned matrix
-    if(diagnostic){
+    ## Clean up returned output, a matrix if diag is FALSE, otherwise a list
+    if(!diagnostic){
         mcmc.out <- as.data.frame(mcmc.out)
         names(mcmc.out) <- names(obj$par)
     } else {
-        print(str(mcmc.out))
         mcmc.out$par <- as.data.frame(mcmc.out$par)
         names(mcmc.out$par) <- names(obj$par)
     }
@@ -127,7 +126,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
         }
         theta.out[m,] <- theta.cur
     }
-    ## Back transform parameters if used
+    ## Back transform parameters if covar is used
     if(!is.null(covar)) {
         theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
         if(diagnostic)
@@ -165,7 +164,22 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' containing samples ('par'),  vector of steps taken at each iteration
 #' ('steps.taken'), and the total function and gradient
 #' calls ('n.calls').
-mcmc.nuts <- function(nsim, fn, gr, params.init, eps, diagnostic=FALSE){
+mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
+                      diagnostic=FALSE){
+    ## If using covariance matrix and Cholesky decomposition, redefine
+    ## these functions to include this transformation. The algorithm will
+    ## work in the transformed space
+    if(!is.null(covar)){
+        fn2 <- function(theta) fn(chd %*% theta)
+        gr2 <- function(theta) gr(chd %*% theta)
+        chd <- t(chol(covar))               # lower triangular Cholesky decomp.
+        chd.inv <- solve(chd)               # inverse
+        theta.cur <- chd.inv %*% params.init
+    } else {
+        fn2 <- fn; gr2 <- gr
+        theta.cur <- params.init
+    }
+
     theta.cur <- params.init
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
     ## how many steps were taken at each iteration, useful for tuning
@@ -179,20 +193,20 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, diagnostic=FALSE){
         theta.out[m,] <- theta.minus <- theta.plus <- theta.cur
         r.cur <- r.plus <- r.minus <- rnorm(length(theta.cur),0,1)
         ## Draw a slice variable u
-        u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn)
+        u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn2)
         j <- 0; n <- 1; s <- 1
         while(s==1) {
             v <- sample(x=c(1,-1), size=1)
             if(v==1){
                 ## move in right direction
                 res <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
-                                       j=j, eps=eps, fn=fn, gr=gr)
+                                  j=j, eps=eps, fn=fn2, gr=gr2)
                 theta.plus <- res$theta.plus
                 r.plus <- res$r.plus
             } else {
                 ## move in left direction
                 res <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
-                                       j=j, eps=eps, fn=fn, gr=gr)
+                                  j=j, eps=eps, fn=fn2, gr=gr2)
                 theta.minus <- res$theta.minus
                 r.minus <- res$r.minus
             }
@@ -209,6 +223,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, diagnostic=FALSE){
             if(j>10 & s) {warning("j got to >10, skipping to next m");break}
         }
         j.results[m] <- j-1
+    }
+    ## Back transform parameters if covar is used
+    if(!is.null(covar)) {
+        theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
     }
     j.stats <- 2^(c(min(j.results), median(j.results), max(j.results)))
     message(paste0("NUTS diagnostics: Approximate leapfrog steps(min, median, max)=(",
