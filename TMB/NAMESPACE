@@ -13,7 +13,7 @@ importFrom("utils", as.relistable, relist,
 
 ## Recommended R - packages ----------------------
 importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMatrix, dpoMatrix)
-importMethodsFrom("Matrix", coerce, cov2cor, determinant,
+importMethodsFrom("Matrix", coerce, cov2cor, determinant, drop,
                   "%*%", crossprod,tcrossprod,
 		  t, diag, chol2inv, solve, colSums,rowSums)
 importFrom("Matrix",
