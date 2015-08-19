@@ -8,11 +8,11 @@
 ##' where \eqn{l} denotes the log likelihood function (i.e. \code{-obj$fn}).
 ##' If \code{ignore.parm.uncertainty=TRUE} then the Hessian calculation is
 ##' omitted and a zero-matrix is used in place of \eqn{V(\hat\theta)}.
-##' 
+##'
 ##' For non-random effect models the standard delta-method is used to calculate the covariance
 ##' matrix. Let \eqn{\phi(\theta)} denote some non-linear function of \eqn{\theta}. Then
 ##' \deqn{V(\phi(\hat\theta))\approx \nabla\phi V(\hat\theta) \nabla\phi'}
-##' 
+##'
 ##' For random effect models a generalized delta-method is used. First the joint covariance
 ##' of random and fixed effects is estimated by
 ##' \deqn{V \pmatrix{ \hat u \cr \hat\theta } \approx
@@ -33,7 +33,7 @@
 ##' \eqn{V \pmatrix{ \hat u \cr \hat\theta } ^{-1} } will be part of the output. This matrix must be manually
 ##' inverted using \code{solve(jointPrecision)} in order to get the joint covariance matrix. Note, that the
 ##' parameter order will follow the original order (i.e. \code{obj$env$par}).
-##' 
+##'
 ##' @title General sdreport function.
 ##' @param obj Object returned by \code{MakeADFun}
 ##' @param par.fixed Optional. Fixed effect parameter estimate (will be known to \code{obj} when an optimization has been carried out).
@@ -95,7 +95,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   }
   ## ======== Determine case
   ## If no random effects use standard delta method
-  simpleCase <- is.null(r)  
+  simpleCase <- is.null(r)
   ## Get ADreport vector (phi)
   phi <- try(obj2$fn(par),silent=TRUE)
   if(is.character(phi) | length(phi)==0){ ## Nothing to report
@@ -133,7 +133,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
             -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
         }
         A <- t(do.call("cbind",lapply(seq(length=length(phi)),reverse.sweep))) + Dphi.fixed
-        term2 <- A%*%(Vtheta%*%t(A)) ## second term
+        term2 <- A %*% (Vtheta %*% t(A)) ## second term
     }
     cov <- term1 + term2
   }
@@ -171,8 +171,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       i <- (1:length(par.full))>length(par.fixed) ## epsilon indices
       grad <- obj3$gr(par.full)
       if(bias.correct.control$sd){
-          require(numDeriv)
-          hess <- jacobian(obj3$gr,par.full)
+          ## requireNamespace("numDeriv")
+          hess <- numDeriv::jacobian(obj3$gr,par.full)
           Vestimate <- -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
       } else {
           Vestimate <- matrix(NA)
@@ -185,7 +185,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
       ihessian.random <- .Call("tmb_invQ", L, PACKAGE = "TMB")
-      iperm <- Matrix::invPerm(L@perm+1L)
+      iperm <- invPerm(L@perm+1L)
       diag.term1 <- diag(ihessian.random)[iperm]
       if(ignore.parm.uncertainty){
           diag.term2 <- 0
@@ -216,7 +216,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               M <- forceSymmetric(M,uplo="L")
               dn <- c(names(par)[r],names(par[-r]))
               dimnames(M) <- list(dn,dn)
-              p <- Matrix::invPerm(c(r,(1:length(par))[-r]))
+              p <- invPerm(c(r,(1:length(par))[-r]))
               ans$jointPrecision <- M[p,p]
           }
           else {
@@ -230,28 +230,31 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   class(ans) <- "sdreport"
   ans
 }
-summary.sdreport <- function(object,select=c("all","fixed","random","report"),p.value=FALSE,...){
-  select <- match.arg(select)
-  if(select=="all"){
-    fixed <- random <- report <- TRUE
-    all <- TRUE
-  } else {
-    fixed <- random <- report <- FALSE
-    assign(select,TRUE)
-    all <- FALSE
-  }
-  if(length(object$par.fixed)==0) fixed <- FALSE
+
+summary.sdreport <- function(object, select = c("all", "fixed", "random", "report"),
+                             p.value=FALSE, ...)
+{
+  select <- match.arg(select, several.ok = TRUE)# *several* : e.g. c("fixed", "report")
+  ## check if 'meth' (or "all") is among the 'select'ed ones :
+  s.has <- function(meth) any(match(c(meth, "all"), select, nomatch=0L)) > 0L
   ans1 <- ans2 <- ans3 <- NULL
-  if(fixed)ans1 <- cbind(object$par.fixed,sqrt(diag(object$cov.fixed)))
-  if(random)ans2 <- cbind(object$par.random,sqrt(as.numeric(object$diag.cov.random)))
-  if(report)ans3 <- cbind(object$value,object$sd)
-  ans <- rbind(ans1,ans2,ans3)
-  colnames(ans) <- c("Estimate","Std. Error")
-  if(p.value){
-    ans <- cbind(ans,p.value=pchisq((ans[,"Estimate"]/ans[,"Std. Error"])^2,df=1,lower.tail=FALSE))
-  }
+  if(s.has("fixed"))  ans1 <- cbind(object$par.fixed,  sqrt(diag(object$cov.fixed)))
+  if(s.has("random")) ans2 <- cbind(object$par.random, sqrt(as.numeric(object$diag.cov.random)))
+  if(s.has("report")) ans3 <- cbind(object$value,      object$sd)
+  ans <- rbind(ans1, ans2, ans3)
+  if(length(ans) && ncol(ans) == 2) {
+    colnames(ans) <- c("Estimate", "Std. Error")
+    ans <- cbind(ans, "z value" = (z <- ans[,"Estimate"] / ans[,"Std. Error"]))
+    if(p.value)
+      ans <- cbind(ans,"Pr(>|z^2|)" = pchisq(z^2, df=1, lower.tail=FALSE))
+  } else
+      warning("no or empty summary selected via 'select = %s'",
+              deparse(select))
   ans
 }
+
+## FIXME? The following logic is not "R standard":
+##        print.summary.<foo>() should print *more* than print.<foo>()
 print.sdreport <- function(x,...){
   print(summary(x))
   cat("\n")
