@@ -261,7 +261,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
 #' created by \ref\code{.buildtree} function.
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
     theta.temp <- (theta.plus-theta.minus)
-   as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
+   as.numeric( theta.temp %*% r.minus >= 0 * theta.temp %*% r.plus >= 0)
 }
 
 #' A recursive function that builds a leapfrog trajectory using a balanced
@@ -285,7 +285,12 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
         s <- H-log(u) + delta.max > 0
         n <- log(u) <= H
         assign("n.calls", value=n.calls+3, envir=.GlobalEnv)
-        ## if(!s) print(paste("invalid s at k=", k))
+        ## Useful code for debugging. Returns entire path to global env.
+        ## if(!s) warning("invalid s")
+        ## if(!exists('theta.trajectory'))
+        ##     theta.trajectory <<- theta
+        ## else
+        ##     theta.trajectory <<- rbind(theta.trajectory, theta)
         return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
                     r.plus=r, s=s, n=n))
     } else {
@@ -327,7 +332,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
             test <- .test.nuts(theta.plus=theta.plus,
                               theta.minus=theta.minus, r.plus=r.plus,
                               r.minus=r.minus)
-            ## if(!test) print(paste("U turn at k=", k))
+            ## if(!test) warning(paste("U turn at j=", j))
             ## check if any of the stopping conditions were met
             s <- xx$s*yy$s*test
         }
@@ -386,8 +391,3 @@ find.epsilon <- function(theta,  fn, gr, eps=1){
     message(paste("Reasonable epsilon=", eps, "found after", k, "steps"))
     return(invisible(eps))
 }
-
-
-
-
-
