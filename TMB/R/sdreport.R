@@ -39,6 +39,8 @@
 ##' @param par.fixed Optional. Fixed effect parameter estimate (will be known to \code{obj} when an optimization has been carried out).
 ##' @param hessian.fixed Optional. Hessian wrt. fixed effects (will be calculated from \code{obj} if missing).
 ##' @param getJointPrecision Optional. Return full joint precision matrix of random and fixed effects?
+##' @param bias.correct logical indicating if bias correction should be applied
+##' @param bias.correct.control a \code{\link{list}} of bias correction options; currently only \code{sd} is used.
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of fixed effects?
 ##' @return Object of class \code{sdreport}
 ##' @examples
@@ -132,7 +134,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
             w[r] <- tmp[,i]
             -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
         }
-        A <- t(do.call("cbind",lapply(seq(length=length(phi)),reverse.sweep))) + Dphi.fixed
+        A <- t(do.call("cbind",lapply(seq_along(phi), reverse.sweep))) + Dphi.fixed
         term2 <- A %*% (Vtheta %*% t(A)) ## second term
     }
     cov <- term1 + term2
@@ -170,16 +172,16 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       par.full <- c(par.fixed,epsilon)
       i <- (1:length(par.full))>length(par.fixed) ## epsilon indices
       grad <- obj3$gr(par.full)
-      if(bias.correct.control$sd){
-          ## requireNamespace("numDeriv")
-          hess <- numDeriv::jacobian(obj3$gr,par.full)
-          Vestimate <- -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
-      } else {
-          Vestimate <- matrix(NA)
-      }
+      Vestimate <-
+          if(bias.correct.control$sd) {
+              ## requireNamespace("numDeriv")
+              hess <- numDeriv::jacobian(obj3$gr,par.full)
+              -hess[i,i] + hess[i,!i] %*% Vtheta %*% hess[!i,i]
+          } else
+              matrix(NA)
       estimate <- grad[i]
       names(estimate) <- names(phi)
-      ans$unbiased <- list(value=estimate,sd=sqrt(diag(Vestimate)),cov=Vestimate)
+      ans$unbiased <- list(value=estimate, sd=sqrt(diag(Vestimate)), cov=Vestimate)
   }
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
@@ -194,11 +196,11 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
           w <- rep(0, length(par))
           reverse.sweep <- function(i){
               w[i] <- 1
-              f(par, order = 1, type = "ADGrad",rangeweight = w)[r]
+              f(par, order = 1, type = "ADGrad", rangeweight = w)[r]
           }
-          nonr <- setdiff(seq(length=length(par)),r)
+          nonr <- setdiff(seq_along(par), r)
           tmp <- sapply(nonr,reverse.sweep)
-          A <- solve(hessian.random,tmp)
+          A <- solve(hessian.random, tmp)
           diag.term2 <- rowSums((A %*% Vtheta)*A)
       }
       ans$par.random <- par[r]
@@ -250,17 +252,26 @@ summary.sdreport <- function(object, select = c("all", "fixed", "random", "repor
   } else
       warning("no or empty summary selected via 'select = %s'",
               deparse(select))
-  ans
+  structure(list(object = object,
+                 coefficients = ans), class = "summary.sdreport")
 }
 
 ## FIXME? The following logic is not "R standard":
 ##        print.summary.<foo>() should print *more* than print.<foo>()
-print.sdreport <- function(x,...){
-  print(summary(x))
-  cat("\n")
-  if(!x$pdHess){
-    cat("Warning:\n")
-    cat("Hessian of fixed effects was not positive definite.\n")
+print.sdreport <- function(x, ...)
+{
+  cat("sdreport(.) result\n")
+  if(!x$pdHess) {
+    cat("Warning:\nHessian of fixed effects was not positive definite.\n")
   }
-  cat("Maximum gradient component:",max(abs(x$gradient.fixed)),"\n")
+  cat("Maximum gradient component:", max(abs(x$gradient.fixed)),"\n")
+  invisible(x)
+}
+
+print.summary.sdreport <- function(x, ...)
+{
+  print.sdreport(x$object, ...)
+  cat("Coefficients:\n")
+  print(x$coefficients, ...)
+  invisible(x)
 }
