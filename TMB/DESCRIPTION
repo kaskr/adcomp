@@ -1,8 +1,8 @@
 Package: TMB
 Type: Package
-Title: General random effect model builder tool inspired by ADMB.
-Version: 1.1
-Date: 2014-09-19
+Title: General Random Effect Model Builder Tool Inspired by ADMB
+Version: 1.1-1
+Date: 2015-08-17
 Author: Kasper Kristensen
 Maintainer: Kasper Kristensen <kaskr@imm.dtu.dk>
 Description: With this tool, a user should be able to quickly implement complex
@@ -13,7 +13,7 @@ Description: With this tool, a user should be able to quickly implement complex
     derivatives. Key features are: Automatic sparseness detection, parallelism
     through BLAS and parallel user templates.
 License: GPL-2
-Depends:
-    R (>= 3.0.0),
-    Matrix(>= 1.0-12)
+Depends: R (>= 3.0.0)
+Imports: graphics, methods, stats, tools, utils, Matrix (>= 1.0-12)
 LinkingTo: Matrix
+Suggests: numDeriv, parallel, MASS

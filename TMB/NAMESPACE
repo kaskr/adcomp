@@ -1,10 +1,61 @@
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
 
-# Export all names
-exportPattern(".")
+###____________________ IMPORTS ___________________________________
 
-# Import all packages listed as Imports or Depends
-import(
-  Matrix
-)
+## Base R - packages ----------------------
+importFrom("graphics", abline, legend, matplot, plot)
+importFrom("methods", as, is, new,
+	   cbind2, rbind2)
+importFrom("stats", approx, confint, integrate, nlminb,
+	   optim, optimHess, pchisq, qchisq, qnorm, rnorm,
+	   runif, sd)
+importFrom("utils", as.relistable, relist,
+	   head, tail)
+
+## Recommended R - packages ----------------------
+importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMatrix, dpoMatrix)
+importMethodsFrom("Matrix", coerce, cov2cor, determinant, drop,
+                  "%*%", crossprod,tcrossprod,
+		  t, diag, chol2inv, solve, colSums,rowSums)
+importFrom("Matrix",
+	   Cholesky, forceSymmetric, invPerm,
+	   tril, triu)
+
+###____________________ EXPORTS ___________________________________
+
+## Export all  but those  listed as "internal"
+## TODO: get rid of that block -> drop man/TMB-internal.Rd
+## TODO First: look for runExample() below: --> several *internal*s are used in runExample() --> rather document ?!
+export(benchmark, compile,
+       dynlib, # <- used in runExample("linreg_parallel") _FIXME_ ?
+       gdbsource,
+       ## getUserDLL, grepRandomParameters,
+       ## info, isParallelTemplate,
+       MakeADFun,
+       newton, ## newtonDefaults,
+       newtonOption,  # <- used in 5 different runExample(.) -- inst/examples/*.R
+       oneStepPredict, openmp,
+       ## parallelBenchmark,
+       ## plot.parallelBenchmark, plot.tmbprofile,
+       precompile,
+       ## print.backtrace, print.sdreport,
+       Rinterface, runExample,
+       runSymbolicAnalysis, # <- used in  runExample() -- inst/examples/ar1xar1.R
+       sdreport,
+       ## setDefaults, sparseHessianFun, summary.sdreport,
+       template, # tmbOption, updateCholesky
+       tmbprofile)
+
+
+## Methods :
+S3method(confint, tmbprofile)
+S3method(plot, tmbprofile)
+
+S3method(print, sdreport)
+S3method(summary, sdreport)
+S3method(print, summary.sdreport)
+
+S3method(plot, parallelBenchmark)
+
+S3method(print, backtrace)
+
+
