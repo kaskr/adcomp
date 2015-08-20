@@ -52,6 +52,7 @@ S3method(plot, tmbprofile)
 
 S3method(print, sdreport)
 S3method(summary, sdreport)
+S3method(print, summary.sdreport)
 
 S3method(plot, parallelBenchmark)
 
