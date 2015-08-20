@@ -30,9 +30,8 @@ getUserDLL <- function(){
 
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
-updateCholesky <- function(L,H,t=0){
-  .Call("destructive_CHM_update",L,H,as.double(t),PACKAGE="Matrix")
-}
+updateCholesky <- Matrix:::destructive_Chol_update
+## TODO: Ask MM to export from Matrix!
 
 ##' Construct objective functions with derivatives based on the users c++ template.
 ##'
@@ -128,7 +127,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param silent Disable all tracing information?
 ##' @param ... Currently unused.
 ##' @return List with components (fn,gr, etc) suitable for an optim call.
-MakeADFun <- function(data,parameters,map=list(),
+MakeADFun <- function(data, parameters, map=list(),
                       type=c("ADFun","Fun","ADGrad"[!is.null(random)]),
                       random=NULL,
                       profile=NULL,
@@ -147,7 +146,7 @@ MakeADFun <- function(data,parameters,map=list(),
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
-    stop("data must be a list")
+    stop("'data' must be a list")
   ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&is.numeric(x)
   ok.data <- function(x)ok(x)|is.factor(x)|is(x,"sparseMatrix")|is.list(x)
   check.passed <- function(x){
@@ -267,14 +266,16 @@ MakeADFun <- function(data,parameters,map=list(),
     for(i in seq(skeleton)){
       ans[[nonempindex[i]]][] <- as.vector(li[[i]])
     }
+    ## MM:   ans[] <- lapply(ans, reshape)  # _____________________
     for(i in seq(ans)){
       ans[[i]] <- reshape(ans[[i]])
     }
     ans
   }
-  
-  #type <- match.arg(type)
+
+  type <- match.arg(type, eval(type), several.ok = TRUE)
   #if("ADFun"%in%type)ptrADFun <- .Call("MakeADFunObject",data,parameters) else ptrADFun <- NULL
+
   reportenv <- new.env()
   par <- NULL
   last.par.ok <- last.par <- last.par1 <- last.par2 <- last.par.best <- NULL
@@ -285,6 +286,10 @@ MakeADFun <- function(data,parameters,map=list(),
   tracepar <- FALSE
   validpar <- function(x)TRUE
   tracemgc <- TRUE
+
+  ## dummy assignments better than  "globalVariables(....)"
+  L.created.by.newton <- skipFixedEffects <- spHess <- NULL
+
   ## Disable all tracing information
   beSilent <- function(){
       tracemgc <<- FALSE
@@ -365,65 +370,69 @@ MakeADFun <- function(data,parameters,map=list(),
     ## * Probably more efficient - especially in terms of memory.
     ## * Only possible if a taped gradient is available - see function "ff" below.
     env$skipFixedEffects <- !is.null(ADGrad)
-    delayedAssign("spHess",sparseHessianFun(env, skipFixedEffects=skipFixedEffects ), assign.env = env )
-  }
+    delayedAssign("spHess", sparseHessianFun(env, skipFixedEffects=skipFixedEffects ),
+                  assign.env = env)
+  }## end{retape}
 
   retape()
 
   ## Has atomic functions been generated for the tapes ?
   usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
-  
-  f <- function(theta=par,order=0,type=c("ADdouble","double","ADGrad"),
-                cols=NULL,rows=NULL,
-                sparsitypattern=0,rangecomponent=1,rangeweight=NULL,
-                dumpstack=0){
-    type <- match.arg(type)
-    if(type=="ADdouble"){
-      res <- .Call("EvalADFunObject",ADFun$ptr,theta,
-                   control=list(
-                     order=as.integer(order),
-                     hessiancols=as.integer(cols),
-                     hessianrows=as.integer(rows),
-                     sparsitypattern=as.integer(sparsitypattern),
-                     rangecomponent=as.integer(rangecomponent),
-                     rangeweight=rangeweight,
-                     dumpstack=as.integer(dumpstack)
-                     ),
-                   PACKAGE=DLL
-                   )
-      last.par <<- theta
-      if(order==1)last.par1 <<- theta
-      if(order==2)last.par2 <<- theta
-    } else
-    if(type=="double"){
-      res <- .Call("EvalDoubleFunObject",Fun$ptr,theta,
-                   control=list(order=as.integer(order)),PACKAGE=DLL)
-    }
-    if(type=="ADGrad"){
-      res <- .Call("EvalADFunObject",ADGrad$ptr,
-                   theta,control=list(order=as.integer(order),
-                           hessiancols=as.integer(cols),
-                           hessianrows=as.integer(rows),
-                           sparsitypattern=as.integer(sparsitypattern),
-                           rangecomponent=as.integer(rangecomponent),
-                           rangeweight=rangeweight,
-                           dumpstack=as.integer(dumpstack)),PACKAGE=DLL)
-    }
-    res
-  }
 
-  h <- function(theta=par,order=0,hessian,L,...){
-    if(order==0){
+  f <- function(theta=par, order=0, type=c("ADdouble","double","ADGrad"),
+                cols=NULL, rows=NULL,
+                sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
+                dumpstack=0) {
+    switch(match.arg(type),
+           "ADdouble" = {
+          res <- .Call("EvalADFunObject", ADFun$ptr, theta,
+                       control=list(
+                                 order=as.integer(order),
+                                 hessiancols=as.integer(cols),
+                                 hessianrows=as.integer(rows),
+                                 sparsitypattern=as.integer(sparsitypattern),
+                                 rangecomponent=as.integer(rangecomponent),
+                                 rangeweight=rangeweight,
+                                 dumpstack=as.integer(dumpstack)
+                               ),
+                       PACKAGE=DLL
+                       )
+          last.par <<- theta
+          if(order==1)last.par1 <<- theta
+          if(order==2)last.par2 <<- theta
+        },
+
+        "double" = {
+          res <- .Call("EvalDoubleFunObject", Fun$ptr, theta,
+                       control=list(order=as.integer(order)),PACKAGE=DLL)
+        },
+
+        "ADGrad" = {
+          res <- .Call("EvalADFunObject", ADGrad$ptr, theta,
+                       control=list(order=as.integer(order),
+                                    hessiancols=as.integer(cols),
+                                    hessianrows=as.integer(rows),
+                                    sparsitypattern=as.integer(sparsitypattern),
+                                    rangecomponent=as.integer(rangecomponent),
+                                    rangeweight=rangeweight,
+                                    dumpstack=as.integer(dumpstack)),PACKAGE=DLL)
+        },
+        stop("invalid 'type'")) # end{ switch() }
+    res
+  } ## end{ f }
+
+  h <- function(theta=par, order=0, hessian, L, ...) {
+    if(order == 0) {
       ##logdetH <- determinant(hessian)$mod
       logdetH <- 2*determinant(L)$mod
-      ans <- f(theta,order=0)+
-        .5*logdetH - length(random)/2*log(2*pi)
+      ans <- f(theta,order=0) + .5*logdetH - length(random)/2*log(2*pi)
       if(LaplaceNonZeroGradient){
         grad <- f(theta,order=1)[random]
-        ans <- ans - .5*sum(grad*as.numeric(solve(L,grad)))
-      }
+        ans - .5* sum(grad * as.numeric( solve(L, grad) ))
+      } else
+        ans
     }
-    if(order==1){
+    else if(order == 1) {
       if(LaplaceNonZeroGradient)stop("Not correct for LaplaceNonZeroGradient=TRUE")
       ##browser()
       e <- environment(spHess)
@@ -479,25 +488,24 @@ MakeADFun <- function(data,parameters,map=list(),
       w[e$ind2] <- ihessian@x[e$ind1]
       ## Reverse mode evaluate ptr in rangedirection w
       ## now gives .5*tr(Hdot*Hinv) !!
-      ans <- as.vector(f(theta,order=1))+
-        .Call("EvalADFunObject",e$ADHess$ptr,theta,
-                   control=list(
-                     order=as.integer(1),
-                     hessiancols=as.integer(0),
-                     hessianrows=as.integer(0),
-                     sparsitypattern=as.integer(0),
-                     rangecomponent=as.integer(1),
-                     rangeweight=as.double(w),
-                     dumpstack=as.integer(0)
-                     ),PACKAGE=DLL
-                   )
+      ## return
+      as.vector( f(theta,order=1) ) +
+        .Call("EvalADFunObject", e$ADHess$ptr, theta,
+              control=list(
+                        order=as.integer(1),
+                        hessiancols=as.integer(0),
+                        hessianrows=as.integer(0),
+                        sparsitypattern=as.integer(0),
+                        rangecomponent=as.integer(1),
+                        rangeweight=as.double(w),
+                        dumpstack=as.integer(0)
+                      ),
+              PACKAGE=DLL)
+    }## order == 1
+    else stop(sprintf("'order'=%d not yet implemented", order))
+  } ## end{ h }
 
-      
-    }
-    return(ans)
-  }
-
-  ff <- function(par.fixed=par[-random],order=0,...){
+  ff <- function(par.fixed=par[-random], order=0, ...) {
     names(par.fixed) <- names(par[-random])
     f0 <- function(par.random,order=0,...){
       par[random] <- par.random
@@ -523,8 +531,8 @@ MakeADFun <- function(data,parameters,map=list(),
                                  inner.control)
                           ), silent=silent
                  )
-      if(is.character(opt))return(NaN)
-    } else{  
+      if(is.character(opt)) return(NaN) ## Rather at least return error message ?
+    } else {
       opt <- optim(eval(random.start),fn=f0,gr=function(x)f0(x,order=1),
                    method=inner.method,control=inner.control)
     }
@@ -553,9 +561,8 @@ MakeADFun <- function(data,parameters,map=list(),
       ##.Call("destructive_CHM_update",L,hessian,as.double(0),PACKAGE="Matrix")
       updateCholesky(L,hessian)
     } else
-    L <- Cholesky(hessian,perm=TRUE,LDL=FALSE,super=TRUE)
+      L <- Cholesky(hessian,perm=TRUE,LDL=FALSE,super=TRUE)
 
-    
     if(order==0){
       res <- h(par,order=0,hessian=hessian,L=L)
       ## Profile case correction
@@ -594,18 +601,18 @@ MakeADFun <- function(data,parameters,map=list(),
       if(!skipFixedEffects){
         ## Relies on "hess[-random,random]" !!!!!
         res <- grad[-random] -
-          hess[-random,random]%*%as.vector(solve(L,grad[random]))        
+          hess[-random,random] %*% as.vector(solve(L,grad[random]))
       } else {
         ## Smarter: Do a reverse sweep of ptrADGrad
         w <- rep(0,length(par))
         w[random] <- as.vector(solve(L,grad[random]))
         res <- grad[-random] -
-          f(par,order=1,type="ADGrad",rangeweight=w)[-random]
+          f(par, order=1, type="ADGrad", rangeweight=w)[-random]
       }
-      
+
       res <- drop(res)
     }
-    if(order==2){
+    if(order == 2) {
       n <- length(par); nr <- length(random); nf <- n-nr
       fixed <- setdiff(1:n,random)
       D1h <- h(par,order=1) ## 1*n
@@ -614,16 +621,16 @@ MakeADFun <- function(data,parameters,map=list(),
       D3f <- sapply(random,function(i)
                     f(par,type="ADGrad",
                       order=2,rangecomponent=i))  ## n^2 * nr
-      D1eta <- -t(D2f[-random,]%*%solve(D2f[random,]))  ## nr*nf
+      I.D2f <- solve(D2f[random,])
+      D1eta <- -t(D2f[-random,] %*% I.D2f) ## nr*nf
       D3f.D1eta <- D3f%*%D1eta ## n^2 * nf
       dim(D3f.D1eta) <- c(n,n,nf)
       dim(D3f) <- c(n,n,nr)
       D3f.fixed <- D3f[fixed,,] ##nf*n*nr
-      D2eta <- sapply(1:nf,function(i){
-        -solve(D2f[random,]) %*%
-        ( t(D3f.fixed[i,fixed,]) +  D3f.D1eta[random,fixed,i] +
-        ( D3f.fixed[i,random,] + D3f.D1eta[random,random,i] ) %*% D1eta )
-        }) # nr*nf*nf
+      D2eta <- sapply(1:nf, function(i) {
+        -I.D2f %*% (t(D3f.fixed[i,fixed,]) + D3f.D1eta[random,fixed, i] +
+                    ( D3f.fixed[i,random,] + D3f.D1eta[random,random,i] ) %*% D1eta )
+      }) # nr*nf*nf
       dim(D2eta) <- c(nr,nf,nf)
       D2h.fixed <- D2h[fixed,] #nf*n
       res <- sapply(1:nf,function(i){
@@ -639,9 +646,9 @@ MakeADFun <- function(data,parameters,map=list(),
       #attr(res,"D2f") <- D2f
       #attr(res,"D3f") <- D3f
     }
-    if(all(is.finite(res)))last.par.ok <<- par
-    return(res)
-  }
+    if(all(is.finite(res))) last.par.ok <<- par
+    res
+  } ## end{ ff }
 
   ## Monte Carlo improvement of Laplace approximation
   ## Importance sampling from *fixed* reference measure determined
@@ -676,10 +683,10 @@ MakeADFun <- function(data,parameters,map=list(),
         u <- solve(L,u,system="Pt") ## Multiply Pt %*% u
         as.matrix(u)
     }
+    M.5.log2pi <- -.5* log(2*pi) # = log(1/sqrt(2*pi))
     logdmvnorm <- function(u){
-        logdetH <- 2*determinant(L,logarithm=TRUE)$modulus
-        ans <- nrow(h)*log(1/sqrt(2*pi))+.5*logdetH-.5*colSums(u*as.matrix(h%*%u))
-        ans
+        logdetH.5 <- determinant(L,logarithm=TRUE)$modulus # = log(det(L)) =  .5 * log(det(H))
+        nrow(h)*M.5.log2pi + logdetH.5 - .5*colSums(u*as.matrix(h %*% u))
     }
     eval.target <- function(u,order=0){
       par[random] <- u
@@ -728,78 +735,75 @@ MakeADFun <- function(data,parameters,map=list(),
     as.list(reportenv)
   }
 
-  if(is.null(random)){  ## Output if pure fixed effect model
-    return(list(par=par,
-                fn=function(x=last.par,...){
-                  if(tracepar){cat("par:\n");print(x)}
-                  if(!validpar(x))return(NaN)
-                  res <- f(x,order=0)
-                  if(!ADreport){
-                    if(is.finite(res)){
-                      if(res<value.best){
-                        last.par.best <<- x; value.best <<- res
-                      }
-                    }
-                  }
-                  res
-                },
-                gr=function(x=last.par,...){
-                  ans <- f(x,order=1)
-                  if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
-                  ans
-                },
-                he=function(x=last.par,atomic=usingAtomics()){
-                    ## If no atomics on tape we have all orders implemented:
-                    if(!atomic) return( f(x,order=2) )
-                    ## Otherwise, get Hessian as 1st order derivative of gradient:
-                    if(is.null(ADGrad))
-                        ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
-                    f(x,type="ADGrad",order=1)
-                },
-                hessian=hessian,method=method,
-                retape=retape,env=env,
-                report=report,...))
+  ## return :
+  if(is.null(random)) {  ## Output if pure fixed effect model
+    list(par=par,
+         fn=function(x=last.par,...){
+           if(tracepar){cat("par:\n");print(x)}
+           if(!validpar(x))return(NaN)
+           res <- f(x,order=0)
+           if(!ADreport) {
+               if(is.finite(res) && res < value.best) {
+                   last.par.best <<- x; value.best <<- res
+               }
+           }
+           res
+         },
+         gr=function(x=last.par,...){
+           ans <- f(x,order=1)
+           if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
+           ans
+         },
+         he=function(x=last.par,atomic=usingAtomics()){
+           ## If no atomics on tape we have all orders implemented:
+           if(!atomic) return( f(x,order=2) )
+           ## Otherwise, get Hessian as 1st order derivative of gradient:
+           if(is.null(ADGrad))
+             ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+           f(x,type="ADGrad",order=1)
+         },
+         hessian=hessian, method=method,
+         retape=retape, env=env,
+         report=report,...)
   }
-  if(!is.null(random)){  ## Output if random effect model
-    return(list(par=par[-random],
-                fn=function(x=last.par[-random],...){
-                  if(tracepar){cat("par:\n");print(x)}
-                  if(!validpar(x))return(NaN)
-                  ans <- try({
-                    if(MCcontrol$doMC){
-                      ff(x,order=0)
-                      MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=0)
-                    } else
-                    ff(x,order=0)
-                  },silent=silent)
-                  if(is.character(ans))NaN else ans
-                },
-                gr=function(x=last.par[-random],...){
-                  ans <- {
-                    if(MCcontrol$doMC){
-                      ff(x,order=0)
-                      MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=1)
-                    } else
-                    ff(x,order=1)
-                  }
-                  if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
-                  ans
-                },
-                he=function(x=last.par[-random],...){
-                  stop("Hessian not yet implemented for models with random effects.")
-                  if(MCcontrol$doMC){
-                    ff(x,order=0)
-                    MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=2)
-                  } else
-                  ff(x,order=2)
-                },
-                hessian=hessian,method=method,
-                retape=retape,env=env,
-                report=report,...))
+  else { ## !is.null(random) :  Output if random effect model
+    list(par=par[-random],
+         fn=function(x=last.par[-random],...){
+           if(tracepar){cat("par:\n");print(x)}
+           if(!validpar(x))return(NaN)
+           ans <- try({
+             if(MCcontrol$doMC){
+               ff(x,order=0)
+               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=0)
+             } else
+               ff(x,order=0)
+           },silent=silent)
+           if(is.character(ans))NaN else ans
+         },
+         gr=function(x=last.par[-random],...){
+           ans <- {
+             if(MCcontrol$doMC){
+               ff(x,order=0)
+               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=1)
+             } else
+               ff(x,order=1)
+           }
+           if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
+           ans
+         },
+         he=function(x=last.par[-random],...){
+           stop("Hessian not yet implemented for models with random effects.")
+           if(MCcontrol$doMC){
+             ff(x,order=0)
+             MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=2)
+           } else
+             ff(x,order=2)
+         },
+         hessian=hessian, method=method,
+         retape=retape, env=env,
+         report=report, ...)
   }
-   
-  return(env)
-}
+}## end{ MakeADFun }
 
 .removeComments <- function(x){
   x <- paste(x,collapse="\n")
@@ -848,17 +852,15 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
-      ans <- system.file(...)
+      ans <- base::system.file(...)
       chartr("\\", "/", shortPathName(ans))
     }
   }
   ## libtmb existence
-  if(!openmp){
-    libtmb <- libtmb && file.exists(system.file(dynlib("libs/libTMB"),package="TMB"))
-  }
-  if(openmp){
-    libtmb <- libtmb && file.exists(system.file(dynlib("libs/libTMBomp"),package="TMB"))
-  }
+  libtmb <- libtmb &&
+    file.exists(system.file(if(!openmp) dynlib("libs/libTMB")
+			    else        dynlib("libs/libTMBomp"),
+			    package="TMB"))
   ## Function to create temporary makevars, Note:
   ## * R_MAKEVARS_USER overrules all other Makevars in tools:::.shlib_internal
   oldmvuser <- mvuser <- Sys.getenv("R_MAKEVARS_USER",NA)
@@ -867,7 +869,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   } else {
     on.exit(Sys.setenv(R_MAKEVARS_USER=oldmvuser))
   }
-  if(is.na(mvuser) && (file.exists(f <- path.expand("~/.R/Makevars"))))mvuser <- f
+  if(is.na(mvuser) && file.exists(f <- path.expand("~/.R/Makevars")))
+    mvuser <- f
   if(!is.na(mvuser)){
     cat("Note: Using Makevars in",mvuser,"\n")
   }
@@ -960,7 +963,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##'
 ##' This function generates a c++ template with a header and include statement. Here is a brief
 ##' overview of the c++ syntax used to code the objective function.
-##' 
+##'
 ##' Macros to read data and declare parameters:
 ##'  \tabular{lll}{
 ##'     \bold{Template Syntax}    \tab     \bold{C++ type}            \tab    \bold{R type} \cr
@@ -1053,9 +1056,9 @@ Rinterface <- function(file){
   cat(paste(txt,collapse="\n"))
 }
 
-## Get som info about the ADFun pointers
-info <- function(obj){
-  if(!is.environment(obj$env))stop("Wrong object")
+## Get some info about the ADFun pointers
+info <- function(obj) {
+  if(!is.environment(obj$env)) stop("Wrong object")
   env <- obj$env
   fun <- function(name){
     if(is.null(get(name,env)))return(NA)
@@ -1103,7 +1106,7 @@ info <- function(obj){
 ##' @param ustep Adaptive stepsize initial guess between 0 and 1.
 ##' @param power Parameter controlling adaptive stepsize.
 ##' @param u0 Parameter controlling adaptive stepsize.
-##' @param grad.tol Gradient convergence tolerance. 
+##' @param grad.tol Gradient convergence tolerance.
 ##' @param step.tol Stepsize convergence tolerance.
 ##' @param tol10 Try to exit if last 10 iterations not improved more than this.
 ##' @param env Environment for cached Cholesky factor.
@@ -1120,7 +1123,7 @@ newton <- function (par,fn,gr,he,
                     silent=TRUE,
                     ustep = 1, ## Start out optimistic: Newton step
                     power=.5, ## decrease=function(u)const*u^power
-                    u0=1e-4,  ## Increase u=0 to this value  
+                    u0=1e-4,  ## Increase u=0 to this value
                     grad.tol=tol,
                     step.tol=tol,
                     tol10=1e-3, ## Try to exit if last 10 iterations not improved much
@@ -1129,20 +1132,19 @@ newton <- function (par,fn,gr,he,
 {
   ## Test if a Cholesky factor is present inside the environment of "he" function.
   ## If not - create one...
-  if(is.null(env$L.created.by.newton)){
+  if(is.null(L <- env$L.created.by.newton)) {
     h.pattern <- he(par)
     ## Make sure Cholesky is succesful
     h.pattern@x[] <- 0
     diag(h.pattern) <- 1
-    env$L.created.by.newton <- Cholesky(h.pattern,super=super)
+    L <- env$L.created.by.newton <- Cholesky(h.pattern, super=super)
   }
-  L <- env$L.created.by.newton
   chol.solve <- function(h,g){
     ##.Call("destructive_CHM_update",L,h,as.double(0),PACKAGE="Matrix")
     updateCholesky(L,h)
     as.vector(solve(L,g))
   }
-  optimize <- stats::optimize
+  ## optimize <- stats::optimize
   nam <- names(par)
   par <- as.vector(par)
   g <- h <- NULL
@@ -1157,8 +1159,8 @@ newton <- function (par,fn,gr,he,
     }
     g <<- as.vector(gr(par))
     if(any( !is.finite(g) ))stop("Newton dropout because inner gradient had non-finite components.")
-    if(is.finite(mgcmax))
-      if(max(abs(g))>mgcmax)stop("Newton dropout because inner gradient too steep.")
+    if(is.finite(mgcmax) && max(abs(g)) > mgcmax)
+      stop("Newton dropout because inner gradient too steep.")
     if(max(abs(g))<grad.tol)return(par)
     h <<- he(par)
     if(smartsearch){
@@ -1184,7 +1186,7 @@ newton <- function (par,fn,gr,he,
         if(gradient)attr(ans,"gradient") <- sum(solve(L,dp)*gr(p))
         ans
       }
-      
+
       ## Adaptive stepsize algorithm (smartsearch)
       phi <- function(u)1/u-1
       invphi <- function(x)1/(x+1)
@@ -1210,12 +1212,12 @@ newton <- function (par,fn,gr,he,
         if(is.finite(fu.value)){
           eps <- sqrt(.Machine$double.eps)
           if(fu.value>fnpar+eps){
-            if(ustep<=0)break; ## Avoid trap
+            if(ustep<=0)break  ## Avoid trap
             ustep <<- decrease(ustep)
           }
-          else break;
+          else break
         } else {
-          if(ustep<=0)break; ## Avoid trap
+          if(ustep<=0)break  ## Avoid trap
           ustep <<- decrease(ustep)
         }
       }
@@ -1226,10 +1228,7 @@ newton <- function (par,fn,gr,he,
     if(trace>=1)cat("mgc:",max(abs(g)) ,"\n")
     par - alpha * dpar
   }
-  norm <- function(x){
-    res <- sqrt(sum(x^2))
-    res
-  }
+  norm <- function(x) sqrt(sum(x^2))
   fn.history <- numeric(maxit)
   fail <- 0
   for (i in seq(length=maxit)){
@@ -1239,12 +1238,12 @@ newton <- function (par,fn,gr,he,
     fn.history[i] <- fn(par)
     if(i>10){
       tail10 <- tail(fn.history[1:i],10)
-      improve10 <- tail10[1] - tail10[length(tail10)]  
+      improve10 <- tail10[1] - tail10[length(tail10)]
       if(improve10<tol10){
         if(trace>=1)cat("Not improving much - will try early exit...")
         pd <- iterate(par,pd.check=TRUE)
         if(trace>=1)cat("PD hess?:",pd,"\n")
-        if(pd)break;
+        if(pd)break
         fail <- fail+1
       }
     }
@@ -1265,48 +1264,49 @@ newton <- function (par,fn,gr,he,
 }
 
 
-sparseHessianFun <- function(obj,skipFixedEffects=FALSE){
+sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
   r <- obj$env$random
-  if(skipFixedEffects){
-    ## Assuming that random effects comes first in parameter list, we can set
-    ## skip <- as.integer(length(obj$env$par)-length(r)) ## ==number of fixed effects
-    skip <- seq.int(length.out=length(obj$env$par))[-r]
-  } else {
-    ##skip <- as.integer(0)
-    skip <- integer(0) ## <-- Empty integer vector
-  }
+  skip <-
+    if(skipFixedEffects) {
+      ## Assuming that random effects comes first in parameter list, we can set
+      ## skip <- as.integer(length(obj$env$par)-length(r)) ## ==number of fixed effects
+      seq_along(obj$env$par)[-r]
+    } else {
+      integer(0) ## <-- Empty integer vector
+    }
   ## ptr.list
-  ADHess <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters, 
+  ADHess <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters,
                   obj$env$reportenv,
                   skip, ## <-- Skip this index vector of parameters
-                  PACKAGE=obj$env$DLL
-                  )
-  ev <- function(par=obj$env$par).Call("EvalADFunObject", ADHess$ptr, par,
-                   control = list(
-                     order = as.integer(0),
-                     hessiancols = integer(0),
-                     hessianrows = integer(0),
-                     sparsitypattern = as.integer(0),
-                     rangecomponent = as.integer(1),
-                     dumpstack=as.integer(0)),PACKAGE=obj$env$DLL)
-  i=as.integer(attr(ADHess$ptr,"i"))
-  j=as.integer(attr(ADHess$ptr,"j"))
-  n <- length(obj$env$par)
-  M <- new("dsTMatrix",i=i,j=j,x=ev(),Dim=as.integer(c(n,n)),uplo="L")
+                  PACKAGE=obj$env$DLL)
+  ev <- function(par)
+          .Call("EvalADFunObject", ADHess$ptr, par,
+                control = list(
+                            order = as.integer(0),
+                            hessiancols = integer(0),
+                            hessianrows = integer(0),
+                            sparsitypattern = as.integer(0),
+                            rangecomponent = as.integer(1),
+                            dumpstack=as.integer(0)),
+		PACKAGE=obj$env$DLL)
+  n <- as.integer(length(obj$env$par))
+  M <- new("dsTMatrix",
+           i = as.integer(attr(ADHess$ptr,"i")),
+           j = as.integer(attr(ADHess$ptr,"j")),
+           x = ev(obj$env$par), Dim = c(n,n), uplo = "L")
   Hfull <- as(M,"dsCMatrix")
   Hrandom <- Hfull[r,r,drop=FALSE]
-  function(par=obj$env$par,random=FALSE){
-    if(!random){
+  ## before returning the function, remove unneeded variables from the environment:
+  rm(skip, n, M)
+  function(par, random=FALSE) {
+    if(!random) {
       Hfull@x[] <- ev(par)
-      return(Hfull)
+      Hfull
+    } else if(skipFixedEffects) {
+        .Call("setxslot", Hrandom, ev(par), PACKAGE="TMB")
     } else {
-      if(skipFixedEffects){
-        return( .Call("setxslot",Hrandom,ev(par),PACKAGE="TMB") )
-      }
-      else {
         Hfull@x[] <- ev(par)
-        return(Hfull[r,r])
-      }
+        Hfull[r,r]
     }
   }
 }
