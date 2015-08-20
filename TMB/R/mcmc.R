@@ -163,6 +163,9 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' @param params.init A vector of initial parameter values.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
 #' the chain. Useful for assessing efficiency and tuning chain.
+#' @param max_doublings Integer representing the maximum times the path
+#' length should double within an MCMC iteration. Default of 8, so 256
+#' steps.
 #' @references Hoffman and Gelman (2014). The No-U-Turn sampler: Adaptively
 #' setting path lengths in Hamiltonian Monte Carlo.
 #' @return If \code{diagnostic} is FALSE (default), returns a matrix of
@@ -171,7 +174,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' ('steps.taken'), and the total function and gradient
 #' calls ('n.calls').
 mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
-                      diagnostic=FALSE){
+                      diagnostic=FALSE, max_doublings=8){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
     ## work in the transformed space
@@ -226,7 +229,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
             n <- n+res$n
             s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
             j <- j+1
-            if(j>10 & s) {warning("j got to >10, skipping to next m");break}
+            if(j>max_doublings & s) {warning("j larger than max_doublings, skipping to next m");break}
         }
         j.results[m] <- j-1
     }
