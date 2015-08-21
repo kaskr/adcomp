@@ -149,18 +149,32 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using the
-#' No-U-Turn (NUTS) sampler from Hoffman and Gelman (2014).
+#' No-U-Turn (NUTS) sampler with dual averaging from Hoffman and Gelman
+#' (2014).
 #'
 #' @details This is the 'efficient' NUTS algorithm but does not use dual
 #' averaging to tune \code{eps}, so it must be specified.
 #' @param nsim The number of samples to return.
-#' @param eps The length of the leapfrog steps.
+#' @param eps The length of the leapfrog steps. If NULL is passed (the
+#' default) then dual averaging is used during the first \code{Madapt}
+#' steps.
+#' @param delta The target acceptance rate for the dual averaging
+#' algorithm. Must be specified if \code{eps} is NULL. The rate can be
+#' "understood as the average acceptance probability that HMC would give to
+#' the position-momentum states explored during the final doubling
+#' iteration."
 #' @param fn A function that returns the log of the posterior density. This
 #' function should not return the negative log, following the notation of
 #' Hoffman and Gelman (2014).
 #' @param gr A function that returns a vector of gradients of the log of
 #' the posterior density (same as with \code{fn}).
 #' @param params.init A vector of initial parameter values.
+#' @param Madapt The number of iterations during which to tune \code{eps}
+#' if the dual averaging algorithm is used. Afterward the final \code{eps}
+#' is used for the remaining iterations.
+#' @param delta The target acceptance rate for the dual averaging
+#' algorithm. See paper for interpretation of this for NUTS which does not
+#' have a Metropolis step.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
 #' the chain. Useful for assessing efficiency and tuning chain.
 #' @param max_doublings Integer representing the maximum times the path
@@ -173,7 +187,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' containing samples ('par'),  vector of steps taken at each iteration
 #' ('steps.taken'), and the total function and gradient
 #' calls ('n.calls').
-mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
+mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
                       diagnostic=FALSE, max_doublings=8){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
@@ -188,15 +202,21 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
         fn2 <- fn; gr2 <- gr
         theta.cur <- params.init
     }
-
     theta.cur <- params.init
-    theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
+    theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
     ## how many steps were taken at each iteration, useful for tuning
     j.results <- rep(NA, len=nsim)
     ## count the model calls as global variable; updated inside
     ## .buildtree. Some subtrees wont finish due to exit conditions so this
     ## is dynamic and not a simple formula like with HMC.
     assign("n.calls", value=0, envir=.GlobalEnv)
+    ## Initialize the dual-averaging algorithm. Could make these arguments
+    ## later.
+    epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
+    eps <- epsvec[1] <- .05 #find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1)
+    mu <- log(10*eps)
+    epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+    ## Start of MCMC chain
     for(m in 1:nsim){
         ## initialize
         theta.out[m,] <- theta.minus <- theta.plus <- theta.cur
@@ -208,18 +228,21 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
             v <- sample(x=c(1,-1), size=1)
             if(v==1){
                 ## move in right direction
-                res <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
-                                  j=j, eps=eps, fn=fn2, gr=gr2)
+                res <- .buildtree_DA(theta=theta.plus, r=r.plus, u=u, v=v,
+                                     j=j, eps=eps, theta0=theta0, r0=r0,
+                                     fn=fn2, gr=gr2)
                 theta.plus <- res$theta.plus
                 r.plus <- res$r.plus
             } else {
                 ## move in left direction
-                res <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
-                                  j=j, eps=eps, fn=fn2, gr=gr2)
+                res <- .buildtree_DA(theta=theta.minus, r=r.minus, u=u, v=v,
+                                     j=j, eps=eps, theta0=theta0, r0=r0,
+                                     fn=fn2, gr=gr2)
                 theta.minus <- res$theta.minus
                 r.minus <- res$r.minus
             }
             ## test whether to accept this state
+            if(is.na(res$s)) browser()
             if(res$s==1) {
                 if(runif(n=1, min=0,max=1) <= res$n/n){
                     theta.cur <- res$theta.prime
@@ -232,7 +255,21 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
             if(j>max_doublings & s) {warning("j larger than max_doublings, skipping to next m");break}
         }
         j.results[m] <- j-1
-    }
+        ## Do the adapting of eps. Note that indexing is subtle here, the
+        ## paper uses 0 but R needs to start at 1. I've thus offset
+        ## every index by +1.
+        if(m <= Madapt){
+            Hbar[m+1] <-
+                (1-1/(m+t0))*Hbar[m] + (delta-res$alpha/res$nalpha)/(m+t0)
+            logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
+            epsvec[m+1] <- exp(logeps)
+            logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
+            epsbar[m+1] <- exp(logepsbar)
+            eps <- epsvec[m+1]
+        } else {
+            eps <- epsbar[Madapt]
+        }
+    } ## end of MCMC loop
     ## Back transform parameters if covar is used
     if(!is.null(covar)) {
         theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
@@ -242,7 +279,8 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
                    paste(j.stats, collapse=","), ")"))
     message(paste("Total function calls:", n.calls))
     if(diagnostic){
-        return(list(par=theta.out, steps.taken= 2^j.results, n.calls=n.calls))
+        return(list(par=theta.out, steps.taken= 2^j.results,
+                    n.calls=n.calls, epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
     } else {
         return(theta.out)
     }
@@ -267,13 +305,17 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
 #' A recursive function that builds a leapfrog trajectory using a balanced
 #' binary tree.
 #'
-#' @references This is from 'efficient' No-U-Turn sampler (algorithm 3) of
-#' Hoffman and Gelman (2014).
+#' @references This is from the No-U-Turn sampler with dual averaging
+#' (algorithm 6) of Hoffman and Gelman (2014).
 #'
 #' @details The function repeatedly doubles (in a random direction) until
-#' either a U-turn occurs or the trajectory becomes unstable.
+#' either a U-turn occurs or the trajectory becomes unstable. This is the
+#' 'efficient' version that samples uniformly from the path without storing
+#' it. Thus the function returns a single proposed value and not the whole
+#' trajectory.
 #'
-.buildtree <- function(theta, r, u, v, j, eps, fn, gr, delta.max=1000){
+.buildtree <- function(theta, r, u, v, j, eps, theta0, r0, fn, gr,
+                         delta.max=1000){
     if(j==0){
         ## base case, take one step in direction v
         eps <- v*eps
@@ -284,61 +326,64 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, eps, covar=NULL,
         H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
         n <- log(u) <= H
-        assign("n.calls", value=n.calls+3, envir=.GlobalEnv)
         ## Useful code for debugging. Returns entire path to global env.
         ## if(!s) warning("invalid s")
         ## if(!exists('theta.trajectory'))
         ##     theta.trajectory <<- theta
         ## else
         ##     theta.trajectory <<- rbind(theta.trajectory, theta)
+        temp <- .calculate.H(theta=theta, r=r, fn=fn)-
+            .calculate.H(theta=theta0, r=r0, fn=fn)
+        alpha <- min(exp(temp),1)
+        assign("n.calls", value=n.calls+5, envir=.GlobalEnv)
         return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
-                    r.plus=r, s=s, n=n))
+                    r.plus=r, s=s, n=n, alpha=alpha, nalpha=1))
     } else {
         ## recursion - build left and right subtrees
-        xx <- .buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
-                                  fn=fn,gr=gr)
+        xx <- .buildtree_DA(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
+                            theta0=theta0, r0=r0, fn=fn,gr=gr)
         theta.minus <- xx$theta.minus
         theta.plus <- xx$theta.plus
         theta.prime <- xx$theta.prime
         r.minus <- xx$r.minus
         r.plus <- xx$r.plus
-        s <- xx$s
-        n.new <- xx$n
+        alpha <- xx$alpha
+        nalpha <- xx$nalpha
         ## If it didn't fail, update the above quantities
         if(s==1){
             if(v== -1){
-                yy <-
-                    .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
-                                        j=j-1, eps=eps, fn=fn, gr=gr)
+                yy <- .buildtree_DA(theta=theta.minus, r=r.minus, u=u, v=v,
+                                    j=j-1, eps=eps, theta0=theta0, r0=r0,
+                                    fn=fn, gr=gr)
                 theta.minus <- yy$theta.minus
                 r.minus <- yy$r.minus
             } else {
-                yy <-
-                    .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
-                                        j=j-1, eps=eps, fn=fn, gr=gr)
+                yy <- .buildtree_DA(theta=theta.plus, r=r.plus, u=u, v=v,
+                                    j=j-1, eps=eps, theta0=theta0, r0=r0,
+                                    fn=fn, gr=gr)
                 theta.plus <- yy$theta.plus
                 r.plus <- yy$r.plus
             }
             ## This isn't in the paper but if both slice variables failed,
             ## then you get 0/0. So I skip this test
-            temp <- yy$n+ xx$n
-            if(temp!=0){
-            ## choose whether to keep this theta
-                if(runif(n=1, min=0, max=1) <= yy$n/temp)
+            nprime <- yy$n+ xx$n
+            if(nprime!=0){
+                ## choose whether to keep this theta
+                if(runif(n=1, min=0, max=1) <= yy$n/nprime)
                     theta.prime <- yy$theta.prime
             }
-            n.new <- xx$n + yy$n
             ## check for valid proposal
             test <- .test.nuts(theta.plus=theta.plus,
-                              theta.minus=theta.minus, r.plus=r.plus,
-                              r.minus=r.minus)
+                               theta.minus=theta.minus, r.plus=r.plus,
+                               r.minus=r.minus)
             ## if(!test) warning(paste("U turn at j=", j))
             ## check if any of the stopping conditions were met
             s <- xx$s*yy$s*test
         }
         return(list(theta.minus=theta.minus, theta.plus=theta.plus,
                     theta.prime=theta.prime,
-                    r.minus=r.minus, r.plus=r.plus, s=s, n=n.new))
+                    r.minus=r.minus, r.plus=r.plus, s=s, n=nprime,
+                    alpha=alpha, nalpha=1))
     }
 }
 
