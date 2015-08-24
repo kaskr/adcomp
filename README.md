@@ -20,7 +20,7 @@ To build API-Function reference (requires that you have "doxygen" installed) typ
 
 * make dox
 
-Once the documentation is buildt open dox/html/index.html in your web browser. 
+Once the documentation is built open dox/html/index.html in your web browser.
 Use the search field to find functions and their documentation.
 
 It is recommended to test that models can be changed, re-compiled and re-loaded without problems:
@@ -82,7 +82,7 @@ For a quick example of how to use it start R, load TMB and run
 
 Issues with library unloading
 -----------------------------
-On recent versions of gcc the following problem may be encountered: When the user cpp file is changed, re-compiled and re-loaded, the changes does not take place. To see if you are affected by this issue, assuming your compiled DLL is called "mymodel.so", try running:
+On recent versions of gcc the following problem may be encountered: When the user cpp file is changed, re-compiled and re-loaded, the changes do not take place. To see if you are affected by this issue, assuming your compiled DLL is called "mymodel.so", try running:
 
 * readelf -s mymodel.so | grep UNIQUE
 
