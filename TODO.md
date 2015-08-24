@@ -16,7 +16,7 @@ TODO
 - **DONE** Rinterface should remember to set DLL="..."
 - **DONE** sdreport() on R-side to get sd of ADREPORT().
 - **DONE** solveSubset to get sd's of all random effects.
-- Make importence sampler work in high dim - need a GMRFsample.
+- Make importance sampler work in high dim - need a GMRFsample.
 - Compile and testing workflow:
   - **DONE** Eliminate need to restart R.
   - **DONE** Give better message if PARAMETER(name) evaluates to NULL.
