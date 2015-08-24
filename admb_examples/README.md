@@ -1,7 +1,7 @@
 README
 ======
 
-This folder contain the ADMB examples.
+This folder contains the ADMB examples.
 
 - Folder names should be the same as TMB example names.
 - Each ADMB example should return sdreport output which will be automatically compared with the corresponding TMB example.

@@ -1,7 +1,7 @@
 README
 ======
 
-This models runs without any comandline options, but a bit faster with:
+This models runs without any command line options, but a bit faster with:
 
 ./longlinreg -lmn 10
 
