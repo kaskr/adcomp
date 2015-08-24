@@ -115,7 +115,7 @@ familiar with software in the BUGS family.
 The following rules apply:
 - Distribution assignments do not need to take place before the latent variable
   is used in a calculation.
-- More complicated distributionnal assigments are allowed, say u(0)-u(1) ~ N(0,1),
+- More complicated distributional assignments are allowed, say u(0)-u(1) ~ N(0,1),
   but this requires the user to have a deeper understanding of the probabilistic aspects of the model.
 - For latent variables only normal distributions should be used (otherwise
   the Laplace approximation will perform poorly). For response variables
