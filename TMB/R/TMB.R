@@ -45,7 +45,7 @@ updateCholesky <- function(L,H,t=0){
 ##'   \item \code{report} A function to report all variables reported with the REPORT() macro in the user template.
 ##'   \item \code{env} Environment with access to all parts of the structure.
 ##' }
-##' and is thus ready for a call to R's \code{optim} function.
+##' and is thus ready for a call to an R optimizer, such as \code{nlminb} or \code{optim}.
 ##' Data (\code{data}) and parameters (\code{parameters}) are directly read by the user template via the macros beginning with DATA_
 ##' and PARAMETER_. The order of the PARAMETER_ macros defines the order of parameters in the final objective function.
 ##' There are no restrictions on the order of random parameters, fixed parameters or data in the template.
@@ -97,7 +97,7 @@ updateCholesky <- function(L,H,t=0){
 ##'   \item \code{last.par} Full parameter of the latest likelihood evaluation.
 ##'   \item \code{last.par.best} Full parameter of the best likelihood evaluation.
 ##'   \item \code{tracepar} Trace every likelihood evaluation ?
-##'   \item \code{tracemgc} Trace mgc of every gradient evaluation ?
+##'   \item \code{tracemgc} Trace maximum gradient component of every gradient evaluation ?
 ##'   \item \code{silent} Pass 'silent=TRUE' to all try-calls ?
 ##' }
 ##'
@@ -106,19 +106,18 @@ updateCholesky <- function(L,H,t=0){
 ##' \code{silent=TRUE} to the \code{MakeADFun} call.
 ##' 
 ##' @title Construct objective functions with derivatives based on a compiled c++ template.
-##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (Order does not matter and un-used components are allowed).
+##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
 ##' @param map List defining how to optionally collect and fix parameters - see details.
 ##' @param type Character vector defining which operation stacks are generated from the users template - see details.
 ##' @param random Character vector defining the random effect parameters. See also \code{regexp}.
-##' @param profile Parameters to profile out of the likelihood (this subset will be appended to \code{random} with Laplace
-##' approximation disabled).
+##' @param profile Parameters to profile out of the likelihood (this subset will be appended to \code{random} with Laplace approximation disabled).
 ##' @param random.start Expression defining the strategy for choosing random effect initial values as function of previous function evaluations - see details.
 ##' @param hessian Calculate Hessian at optimum?
 ##' @param method Outer optimization method.
-##' @param inner.method Inner optimization method (see function "newton")
-##' @param inner.control List controlling inner optimization
-##' @param MCcontrol List controlling importance sampler (turned off by default) 
+##' @param inner.method Inner optimization method (see function "newton").
+##' @param inner.control List controlling inner optimization.
+##' @param MCcontrol List controlling importance sampler (turned off by default).
 ##' @param ADreport Calculate derivatives of macro ADREPORT(vector) instead of objective_function return value?
 ##' @param atomic Allow tape to contain atomic functions?
 ##' @param LaplaceNonZeroGradient Allow Taylor expansion around non-stationary point?
@@ -127,7 +126,7 @@ updateCholesky <- function(L,H,t=0){
 ##' @param regexp Match random effects by regular expressions?
 ##' @param silent Disable all tracing information?
 ##' @param ... Currently unused.
-##' @return List with components (fn,gr, etc) suitable for an optim call.
+##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data,parameters,map=list(),
                       type=c("ADFun","Fun","ADGrad"[!is.null(random)]),
                       random=NULL,
@@ -828,7 +827,7 @@ openmp <- function(n=NULL){
 
 ##' Compile a c++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
 ##'
-##' TMB relies on R's built in functionality to create shared libraries independent on the platform.
+##' TMB relies on R's built in functionality to create shared libraries independent of the platform.
 ##' A template is compiled by \code{compile("template.cpp")}, which will call R's makefile with appropriate
 ##' preprocessor flags.
 ##' Compiler and compiler flags can be stored in a configuration file. In order of precedence either via
@@ -998,7 +997,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##'     m.transpose()             \tab   R equivalent of t(m)                   \cr
 ##'  }
 ##'
-##' Some distributions are avaliable as c++ templates with syntax close to R's distributions:
+##' Some distributions are available as c++ templates with syntax close to R's distributions:
 ##' \tabular{ll}{
 ##'    \bold{Function header}                \tab \bold{Distribution}                      \cr
 ##'    dnbinom2(x,mu,var,int give_log=0)     \tab Negative binomial with mean and variance \cr
@@ -1054,7 +1053,7 @@ Rinterface <- function(file){
   cat(paste(txt,collapse="\n"))
 }
 
-## Get som info about the ADFun pointers
+## Get some info about the ADFun pointers
 info <- function(obj){
   if(!is.environment(obj$env))stop("Wrong object")
   env <- obj$env
@@ -1084,7 +1083,7 @@ info <- function(obj){
 ##' preventing ordinary newton iterations. In this situation the newton iterations are performed on
 ##' a modified objective function defined by adding a quadratic penalty around the expansion point \eqn{u_0}:
 ##' \deqn{f_{t}(u) = f(u) + \frac{t}{2} \|u-u_0\|^2}{f_t(u) = f(u) + t/2 |u-u_0|^2}
-##' This functions hessian ( \eqn{f''(u)+t I} ) is positive definite for \eqn{t} sufficiently
+##' This function's hessian ( \eqn{f''(u)+t I} ) is positive definite for \eqn{t} sufficiently
 ##' large. The value \eqn{t} is updated at every iteration: If the hessian is positive definite \eqn{t} is
 ##' decreased, otherwise increased. Detailed control of the update process can be obtained with the
 ##' arguments \code{ustep}, \code{power} and \code{u0}.
@@ -1098,7 +1097,7 @@ info <- function(obj){
 ##' @param tol Convergence tolerance.
 ##' @param alpha Newton stepsize in the fixed stepsize case.
 ##' @param smartsearch Turn on adaptive stepsize algorithm for non-convex problems?
-##' @param mgcmax Refuse to optimize if the gradient is too steep.
+##' @param mgcmax Refuse to optimize if the maximum gradient component is too steep.
 ##' @param super Supernodal Cholesky?
 ##' @param silent Be silent?
 ##' @param ustep Adaptive stepsize initial guess between 0 and 1.
