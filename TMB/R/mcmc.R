@@ -103,7 +103,9 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
     accepted <- rep(NA, nsim)
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
     if(diagnostic) theta.proposed <- theta.out
+    eps0 <- eps
     for(m in 1:nsim){
+        eps <- eps0*runif(1,.9,1.1)
         r.cur <- r.new <- rnorm(length(params.init),0,1)
         theta.new <- theta.cur
         theta.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
@@ -268,7 +270,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
             epsbar[m+1] <- exp(logepsbar)
             eps <- epsvec[m+1]
         } else {
-            eps <- epsbar[Madapt]
+            eps <- epsbar[Madapt]*runif(1,.9,1.1)
         }
     } ## end of MCMC loop
     ## Back transform parameters if covar is used
