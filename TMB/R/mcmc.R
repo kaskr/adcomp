@@ -45,18 +45,19 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
     }
     ## Select and run the chain.
     if(algorithm=="HMC")
-        mcmc.out <-
+        time <- system.time(mcmc.out <-
             mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
-                     diagnostic=diagnostic, ...)
+                     diagnostic=diagnostic, ...))
     else if(algorithm=="NUTS")
-        mcmc.out <-
+        time <- system.time(mcmc.out <-
             mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
-                      diagnostic=diagnostic, ...)
+                      diagnostic=diagnostic, ...))
     ## Clean up returned output, a matrix if diag is FALSE, otherwise a list
     if(!diagnostic){
         mcmc.out <- as.data.frame(mcmc.out)
         names(mcmc.out) <- names(obj$par)
     } else {
+        mcmc.out$time <- time
         mcmc.out$par <- as.data.frame(mcmc.out$par)
         names(mcmc.out$par) <- names(obj$par)
     }
@@ -219,8 +220,8 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
     ## Start of MCMC chain
     for(m in 1:nsim){
         ## initialize
-        theta.out[m,] <- theta.minus <- theta.plus <- theta.cur
-        r.cur <- r.plus <- r.minus <- rnorm(length(theta.cur),0,1)
+        theta.out[m,] <- theta.minus <- theta.plus <- theta0 <- theta.cur
+        r.cur <- r.plus <- r.minus <- r0 <- rnorm(length(theta.cur),0,1)
         ## Draw a slice variable u
         u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn2)
         j <- 0; n <- 1; s <- 1
@@ -228,14 +229,14 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
             v <- sample(x=c(1,-1), size=1)
             if(v==1){
                 ## move in right direction
-                res <- .buildtree_DA(theta=theta.plus, r=r.plus, u=u, v=v,
+                res <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                      j=j, eps=eps, theta0=theta0, r0=r0,
                                      fn=fn2, gr=gr2)
                 theta.plus <- res$theta.plus
                 r.plus <- res$r.plus
             } else {
                 ## move in left direction
-                res <- .buildtree_DA(theta=theta.minus, r=r.minus, u=u, v=v,
+                res <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                      j=j, eps=eps, theta0=theta0, r0=r0,
                                      fn=fn2, gr=gr2)
                 theta.minus <- res$theta.minus
@@ -299,7 +300,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
 #' created by \ref\code{.buildtree} function.
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
     theta.temp <- (theta.plus-theta.minus)
-   as.numeric( theta.temp %*% r.minus >= 0 * theta.temp %*% r.plus >= 0)
+   as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
 }
 
 #' A recursive function that builds a leapfrog trajectory using a balanced
@@ -327,20 +328,22 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
         s <- H-log(u) + delta.max > 0
         n <- log(u) <= H
         ## Useful code for debugging. Returns entire path to global env.
-        ## if(!s) warning("invalid s")
-        ## if(!exists('theta.trajectory'))
-        ##     theta.trajectory <<- theta
-        ## else
-        ##     theta.trajectory <<- rbind(theta.trajectory, theta)
+        if(!exists('theta.trajectory'))
+            theta.trajectory <<- theta
+        else
+            theta.trajectory <<- rbind(theta.trajectory, theta)
         temp <- .calculate.H(theta=theta, r=r, fn=fn)-
             .calculate.H(theta=theta0, r=r0, fn=fn)
         alpha <- min(exp(temp),1)
-        assign("n.calls", value=n.calls+5, envir=.GlobalEnv)
+        if(exists('n.calls'))
+            assign("n.calls", value=n.calls+5, envir=.GlobalEnv)
+        else
+            assign("n.calls", value=0, envir=.GlobalEnv)
         return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
                     r.plus=r, s=s, n=n, alpha=alpha, nalpha=1))
     } else {
         ## recursion - build left and right subtrees
-        xx <- .buildtree_DA(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
+        xx <- .buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
                             theta0=theta0, r0=r0, fn=fn,gr=gr)
         theta.minus <- xx$theta.minus
         theta.plus <- xx$theta.plus
@@ -349,16 +352,18 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
         r.plus <- xx$r.plus
         alpha <- xx$alpha
         nalpha <- xx$nalpha
+        s <- xx$s
+        nprime <- xx$n
         ## If it didn't fail, update the above quantities
         if(s==1){
             if(v== -1){
-                yy <- .buildtree_DA(theta=theta.minus, r=r.minus, u=u, v=v,
+                yy <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                     j=j-1, eps=eps, theta0=theta0, r0=r0,
                                     fn=fn, gr=gr)
                 theta.minus <- yy$theta.minus
                 r.minus <- yy$r.minus
             } else {
-                yy <- .buildtree_DA(theta=theta.plus, r=r.plus, u=u, v=v,
+                yy <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                     j=j-1, eps=eps, theta0=theta0, r0=r0,
                                     fn=fn, gr=gr)
                 theta.plus <- yy$theta.plus
