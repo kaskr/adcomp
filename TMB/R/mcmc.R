@@ -20,7 +20,7 @@
 #' @example inst/examples/mcmc_examples.R
 run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, ...){
     ## Initialization for all algorithms
-    algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS"))
+    algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
     fn <- function(x) {
         z <- -obj$fn(x)
         if(is.nan(z)){
@@ -52,6 +52,10 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
         time <- system.time(mcmc.out <-
             mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
                       diagnostic=diagnostic, ...))
+    else if(algorithm=="RWM")
+        time <- system.time(mcmc.out <-
+            mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init,
+                      diagnostic=diagnostic, ...))
     ## Clean up returned output, a matrix if diag is FALSE, otherwise a list
     if(!diagnostic){
         mcmc.out <- as.data.frame(mcmc.out)
@@ -63,6 +67,58 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
     }
     return(invisible(mcmc.out))
 }
+
+
+#' [BETA VERSION] Draw MCMC samples from a model posterior using a
+#' Random Walk Metropolis sampler.
+#'
+#' @param nsim The number of samples to return.
+#' @param fn A function that returns the log of the posterior density.
+#' @param params.init A vector of initial parameter values.
+#' @param diagnostic Whether to return a list of diagnostic metrics about
+#' the chain. Useful for assessing efficiency and tuning chain.
+#' @details This
+#' @param covar A covariance matrix to be used in generating multivariate
+#' normal proposals. A value of NULL (default) indicates to use iid
+#' standard normal.
+#' @param alpha The amount to scale the proposal, i.e,
+#' Xnew=Xcur+alpha*Xproposed where Xproposed is generated from a mean-zero
+#' multivariate normal. Varying \code{alpha} varies the acceptance rate.
+#' @return If \code{diagnostic} is FALSE (default), returns a matrix of
+#' \code{nsim} samples from the posterior. Otherwise returns a list
+#' containing samples ('par'), proposed samples ('par.proposed'), vector of
+#' which were accepted ('accepted'), and the total function calls
+#' ('n.calls'), which for this algorithm is \code{nsim}
+mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALSE){
+    accepted <- rep(0, length=nsim)
+    n.params <- length(params.init)
+    theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
+    if(diagnostic) theta.proposed <- theta.out
+    theta.cur <- theta.out[1,] <- params.init
+    if(is.null(covar)) f <- function() rnorm(n=n.params, 0, 1)
+        else f <-  function() mvtnorm::rmvnorm(n=1, mean=rep(0, n.params), sigma=covar)
+    for(m in 2:nsim){
+        ## generate proposal
+        theta.new <- theta.cur + alpha*f()
+        if(diagnostic) theta.proposed[m,] <- theta.new
+        if(log(runif(1))< fn(theta.new)-fn(theta.cur)){
+            ## accept
+            accepted[m] <- 1
+            theta.cur <- theta.out[m,] <- theta.new
+        } else {
+            ## do not accept
+            theta.out[m,] <- theta.cur
+        }
+    }
+    if(diagnostic){
+        theta.out <- list(par=theta.out, accepted=accepted,
+                         acceptance=mean(accepted), n.calls=nsim,
+                         par.proposed=theta.proposed)
+    }
+    return(theta.out)
+}
+
+
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a Hamiltonian sampler.
 #'
