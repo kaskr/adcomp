@@ -57,7 +57,7 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
         mcmc.out <- as.data.frame(mcmc.out)
         names(mcmc.out) <- names(obj$par)
     } else {
-        mcmc.out$time <- time
+        mcmc.out$time <- as.numeric(time[3])        # grab the elapsed time
         mcmc.out$par <- as.data.frame(mcmc.out$par)
         names(mcmc.out$par) <- names(obj$par)
     }
