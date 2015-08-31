@@ -394,11 +394,11 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
         H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
         n <- log(u) <= H
-        ## Useful code for debugging. Returns entire path to global env.
-        if(!exists('theta.trajectory'))
-            theta.trajectory <<- theta
-        else
-            theta.trajectory <<- rbind(theta.trajectory, theta)
+        ## ## Useful code for debugging. Returns entire path to global env.
+        ## if(!exists('theta.trajectory'))
+        ##     theta.trajectory <<- theta
+        ## else
+        ##     theta.trajectory <<- rbind(theta.trajectory, theta)
         temp <- .calculate.H(theta=theta, r=r, fn=fn)-
             .calculate.H(theta=theta0, r=r0, fn=fn)
         alpha <- min(exp(temp),1)
