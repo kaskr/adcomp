@@ -246,8 +246,8 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' containing samples ('par'),  vector of steps taken at each iteration
 #' ('steps.taken'), and the total function and gradient
 #' calls ('n.calls').
-mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
-                      diagnostic=FALSE, max_doublings=8){
+mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
+                      delta=0.5, covar=NULL, diagnostic=FALSE, max_doublings=7){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
     ## work in the transformed space
@@ -269,12 +269,19 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
     ## .buildtree. Some subtrees wont finish due to exit conditions so this
     ## is dynamic and not a simple formula like with HMC.
     assign("n.calls", value=0, envir=.GlobalEnv)
-    ## Initialize the dual-averaging algorithm. Could make these arguments
-    ## later.
-    epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
-    eps <- epsvec[1] <- .05 #find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1)
-    mu <- log(10*eps)
-    epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+    useDA <- is.null(eps)               # whether to use DA algorithm
+    if(useDA){
+        ## Initialize the dual-averaging algorithm. Could make these arguments
+        ## later.
+        message(paste("No eps given so using dual averaging during first", Madapt, "steps."))
+        epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
+        eps <- epsvec[1] <- find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1)
+        mu <- log(10*eps)
+        epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+    } else {
+        ## dummy values to return
+        epsvec <- epsbar <- Hbar <- NULL
+    }
     ## Start of MCMC chain
     for(m in 1:nsim){
         ## initialize
@@ -288,15 +295,15 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
             if(v==1){
                 ## move in right direction
                 res <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
-                                     j=j, eps=eps, theta0=theta0, r0=r0,
-                                     fn=fn2, gr=gr2)
+                                  j=j, eps=eps, theta0=theta0, r0=r0,
+                                  fn=fn2, gr=gr2)
                 theta.plus <- res$theta.plus
                 r.plus <- res$r.plus
             } else {
                 ## move in left direction
                 res <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
-                                     j=j, eps=eps, theta0=theta0, r0=r0,
-                                     fn=fn2, gr=gr2)
+                                  j=j, eps=eps, theta0=theta0, r0=r0,
+                                  fn=fn2, gr=gr2)
                 theta.minus <- res$theta.minus
                 r.minus <- res$r.minus
             }
@@ -314,19 +321,21 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, delta, covar=NULL,
             if(j>max_doublings & s) {warning("j larger than max_doublings, skipping to next m");break}
         }
         j.results[m] <- j-1
-        ## Do the adapting of eps. Note that indexing is subtle here, the
-        ## paper uses 0 but R needs to start at 1. I've thus offset
-        ## every index by +1.
-        if(m <= Madapt){
-            Hbar[m+1] <-
-                (1-1/(m+t0))*Hbar[m] + (delta-res$alpha/res$nalpha)/(m+t0)
-            logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
-            epsvec[m+1] <- exp(logeps)
-            logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
-            epsbar[m+1] <- exp(logepsbar)
-            eps <- epsvec[m+1]
-        } else {
-            eps <- epsbar[Madapt]*runif(1,.9,1.1)
+        if(useDA){
+            ## Do the adapting of eps. Note that indexing is subtle here, the
+            ## paper uses 0 but R needs to start at 1. I've thus offset
+            ## every index by +1.
+            if(m <= Madapt){
+                Hbar[m+1] <-
+                    (1-1/(m+t0))*Hbar[m] + (delta-res$alpha/res$nalpha)/(m+t0)
+                logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
+                epsvec[m+1] <- exp(logeps)
+                logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
+                epsbar[m+1] <- exp(logepsbar)
+                eps <- epsvec[m+1]
+            } else {
+                eps <- epsbar[Madapt]*runif(1,.9,1.1)
+            }
         }
     } ## end of MCMC loop
     ## Back transform parameters if covar is used
