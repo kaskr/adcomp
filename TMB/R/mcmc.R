@@ -94,22 +94,42 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
     n.params <- length(params.init)
     theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
     if(diagnostic) theta.proposed <- theta.out
-    theta.cur <- theta.out[1,] <- params.init
-    if(is.null(covar)) f <- function() rnorm(n=n.params, 0, 1)
-        else f <-  function() mvtnorm::rmvnorm(n=1, mean=rep(0, n.params), sigma=covar)
-    for(m in 2:nsim){
+    ## If using covariance matrix and Cholesky decomposition, redefine
+    ## these functions to include this transformation. The algorithm will
+    ## work in the transformed space.
+    if(!is.null(covar)){
+        fn2 <- function(theta) fn(chd %*% theta)
+        chd <- t(chol(covar))               # lower triangular Cholesky decomp.
+        chd.inv <- solve(chd)               # inverse
+        theta.cur <- chd.inv %*% params.init
+    } else {
+        fn2 <- fn
+        theta.cur <- params.init
+    }
+    fn.cur <- fn2(theta.cur)
+    f <- function() rnorm(n=n.params, mean=0, sd=1)
+    for(m in 1:nsim){
         ## generate proposal
         theta.new <- theta.cur + alpha*f()
+        fn.new <- fn2(theta.new)
         if(diagnostic) theta.proposed[m,] <- theta.new
-        if(log(runif(1))< fn(theta.new)-fn(theta.cur)){
+        if(log(runif(1))< fn.new-fn.cur){
             ## accept
             accepted[m] <- 1
             theta.cur <- theta.out[m,] <- theta.new
+            fn.cur <- fn.new
         } else {
             ## do not accept
             theta.out[m,] <- theta.cur
         }
+    } # end of MCMC loop
+    ## Back transform parameters if covar is used
+    if(!is.null(covar)) {
+        theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
+        if(diagnostic)
+            theta.proposed <- t(apply(theta.proposed, 1, function(x) chd %*% x))
     }
+    message(paste("Acceptance rate = ", round(mean(accepted),1)))
     if(diagnostic){
         theta.out <- list(par=theta.out, accepted=accepted,
                          acceptance=mean(accepted), n.calls=nsim,
