@@ -9,9 +9,9 @@ obj$env$beSilent()
 find.epsilon(theta=opt$par, fn=function(x) -obj$fn(x), gr=function(x) -obj$gr(x))
 ## Run two gradient based algorithms
 system.time(simple.hmc <-
-    mcmc(obj=obj, nsim=1000, algorithm='HMC', L=5, eps=.1, params.init=opt$par))
+    run_mcmc(obj=obj, nsim=1000, algorithm='HMC', L=5, eps=.1, params.init=opt$par))
 system.time(simple.nuts <-
-    mcmc(obj=obj, nsim=1000, algorithm='NUTS', eps=.1, params.init=opt$par))
+    run_mcmc(obj=obj, nsim=1000, algorithm='NUTS', eps=.1, params.init=opt$par))
 ## See how they compare
 par(mfrow=c(2,4))
 for(i in 1:4) acf(simple.hmc[,i])
