@@ -9,7 +9,7 @@
 ##' may be given directly (\code{lincomb}).
 ##'
 ##' @title Adaptive likelihood profiling.
-##' @param obj  Object from \code{MakeADFun} that has been optimized.
+##' @param obj Object from \code{MakeADFun} that has been optimized.
 ##' @param name Name or index of a parameter to profile.
 ##' @param lincomb Optional linear combination of parameters to
 ##' profile. By default a unit vector corresponding to \code{name}.
@@ -18,6 +18,7 @@
 ##' @param ystep Adjusts the resolution of the likelihood profile.
 ##' @param maxit Max number of iterations for adaptive algorithm.
 ##' @param slice Do slicing rather than profiling?
+##' @param trace Trace progress?
 ##' @param ... Unused
 ##' @return data.frame with parameter and function values.
 ##' @examples
@@ -160,7 +161,7 @@ plot.tmbprofile <- function(x,type="l",level=.95,...){
     }
 }
 
-confint.tmbprofile <- function (object, level = 0.95, ...){
+confint.tmbprofile <- function (object, parm, level = 0.95, ...){
     i <- which.min(object$value)
     left <- head(object, i)
     right <- tail(object, nrow(object)-i )

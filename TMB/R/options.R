@@ -29,6 +29,7 @@ newtonDefaults <- function(){
 }
 flagsDefaults <- function(){
   function(file){
+    ## FIXME: TMBisParallel()  does not exist ???
     if(TMBisParallel(file)) "-O2 -fopenmp" else NULL
   }
 }
