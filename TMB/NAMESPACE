@@ -45,6 +45,8 @@ export(benchmark, compile,
        template, # tmbOption, updateCholesky
        tmbprofile)
 
+## MCMC :
+export(run_mcmc, find.epsilon)
 
 ## Methods :
 S3method(confint, tmbprofile)
