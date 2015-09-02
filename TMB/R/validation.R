@@ -177,15 +177,14 @@ oneStepPredict <- function(obj,
     ## Use the best encountered parameter for new object
     args$parameters <- obj$env$parList(par = obj$env$last.par.best)
     ## Fix all non-random components of parameter list
-    tmp <- as.logical(obj$env$par * 0)
-    tmp[-obj$env$random] <- TRUE
-    li <- lapply(obj$env$parList(par = tmp), function(x) any(x!=0))
-    fix <- names(li)[unlist(li)]
-    parameters <- obj$env$parameters
-    map <- lapply(parameters[fix], function(x)factor(x*NA))
+    names.random <- unique(names(obj$env$par[obj$env$random]))
+    names.all <- names(args$parameters)
+    fix <- setdiff(names.all, names.random)
+    map <- lapply(args$parameters[fix], function(x)factor(x*NA))
     args$map <- map ## Overwrite map
     ## Find randomeffects character
-    args$random <- names(li[!unlist(li)])
+    args$random <- names.random
+    args$regexp <- FALSE
     ## Move data$name to parameter$name
     args$parameters[observation.name] <- args$data[observation.name]
     args$data[observation.name] <- NULL
@@ -269,7 +268,7 @@ oneStepPredict <- function(obj,
         nthreads.restore <- TMB::openmp()
         on.exit( TMB::openmp( nthreads.restore ), add=TRUE)
         TMB::openmp(1)
-        library(parallel)
+        requireNamespace("parallel") # was library(parallel)
         lapply <- parallel::mclapply
     }
     ## Trace one-step functions

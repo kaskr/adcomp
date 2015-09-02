@@ -130,3 +130,11 @@ Type matern(Type u, Type phi, Type kappa){
   Type ans = 1.0 / ( exp(lgamma(kappa)) * pow(2, kappa - 1.0) ) * pow(x, kappa) * besselK(x, kappa);
   return CppAD::CondExpEq(u, Type(0), Type(1), ans);
 }
+
+/** 'squeeze' transform : [0,1] -> (0,1) to machine tolerance */
+template<class Type>
+Type squeeze(Type u){
+  Type eps = std::numeric_limits<double>::epsilon();
+  u = (1.0 - eps) * (u - .5) + .5;
+  return u;
+}

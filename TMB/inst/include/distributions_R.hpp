@@ -12,6 +12,7 @@ Type pnorm(Type q, Type mean = 0, Type sd = 1){
   return atomic::pnorm1(tx)[0];
 }
 VECTORIZE3_ttt(pnorm)
+VECTORIZE1_t(pnorm)
 
 /** \brief Quantile function of the normal distribution (following R argument convention).
     \ingroup R_style_distribution
@@ -23,6 +24,7 @@ Type qnorm(Type p, Type mean = 0, Type sd = 1){
   return sd*atomic::qnorm1(tx)[0] + mean;
 }
 VECTORIZE3_ttt(qnorm)
+VECTORIZE1_t(qnorm)
 
 /** \brief Distribution function of the gamma distribution (following R argument convention).
     \ingroup R_style_distribution
