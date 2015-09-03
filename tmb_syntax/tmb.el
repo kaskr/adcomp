@@ -5,7 +5,7 @@
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
 
-(defconst tmb-mode-version "1.0" "TMB Mode version number.")
+(defconst tmb-mode-version "1.1" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -34,7 +34,7 @@
 ;; tmb-report-face               ADREPORT
 ;; font-lock-builtin-face        error
 ;; font-lock-comment-face        //
-;; font-lock-constant-face       isNumeric
+;; font-lock-constant-face       dim
 ;; font-lock-function-name-face  [Type] myfunction
 ;; font-lock-keyword-face        log
 ;; font-lock-type-face           Type
@@ -72,6 +72,7 @@
 ;;; History:
 ;;
 ;; 01 Sep 2015  1.0  Created main function `tmb-mode', derived from `c++-mode'.
+;; 03 Sep 2015  1.1  Shortened list of recognized FUNCTIONS for maintainability.
 
 ;;; Code:
 
@@ -105,112 +106,55 @@
 
 (defvar tmb-font-lock-keywords
   (eval-when-compile
-    (let ((TYPE '("scalartype" "Type"))
+    (let ((TYPE '("Integer" "Type"))
           (DATA
            '("DATA_INTEGER" "DATA_IVECTOR" "DATA_IARRAY"
              "DATA_SCALAR"  "DATA_VECTOR"  "DATA_ARRAY"
              "DATA_FACTOR"  "DATA_STRUCT"
              "DATA_MATRIX"  "DATA_SPARSE_MATRIX"
-             "DATA_VECTOR_INDICATOR" "DATA_ARRAY_INDICATOR"
-             "TMB_ATOMIC_VECTOR_FUNCTION"))
+             "DATA_VECTOR_INDICATOR" "DATA_ARRAY_INDICATOR"))
           (PARAMETERS
            '("PARAMETER" "PARAMETER_VECTOR"
              "PARAMETER_ARRAY" "PARAMETER_MATRIX"))
           (REPORT '("ADREPORT" "REPORT"))
           (FUNCTIONS
-           '(;; C
-             "free" "malloc"
-             ;; C++
-             "clear" "cout" "erase"
-             ;; AD
-             "ForTwo" "Forward" "myReverse" "Reverse" "RevTwo"
-             "Dependent" "Independent" "Value" "Variable"
-             "ForSparseJac" "Hessian" "Jacobian" "RevSparseHes"
-             "generalized_symbol" "optimize" "tape_symbol" "traceforward0sweep"
-             "Domain" "Range"
-             "CondExpEq" "CondExpGe" "CondExpGt" "CondExpLt"
-             "REGISTER_ATOMIC" "SEPARABLE"
-             ;; OpenMP
-             "omp_get_max_threads" "omp_get_thread_num" "start_parallel"
-             ;; Rcpp
-             "allocVector" "asSEXP" "defineVar" "install" "mkChar" "set"
-             "getAttrib" "setAttrib"
-             "R_FlushConsole" "Rprintf" "REprintf"
-             "LENGTH"
-             "SET_STRING_ELT" "SET_VECTOR_ELT" "STRING_ELT" "VECTOR_ELT"
-             "PROTECT" "UNPROTECT"
-             "R_do_slot_assign" "R_ExternalPtrAddr" "R_ExternalPtrTag"
-             "R_MakeExternalPtr" "R_RunExitFinalizers"
-             ;; TMB housekeeping
-             "conservativeResize" "increase" "pushParname"
-             "evalUserTemplate"
-             "KEEP_COL" "KEEP_ROW"
-             "CallCFinalizer" "R_RegisterCFinalizer" "RegisterCFinalizer"
-             "HessianSparsityPattern" "optimizeTape"
-             "count_parallel_regions" "set_parallel_region"
+           '(;; I/O
+             "cout" "endl"
              ;; Basic math
              "abs" "exp" "log" "pow" "sqrt"
-             "ceil" "floor" "max" "min" "trunc"
-             "mod"
+             "ceil" "floor" "mod" "trunc"
              "acos" "asin" "atan" "cos" "cosh" "sin" "sinh" "tan" "tanh"
-             "besselK" "invlogit"
-             ;; Is what
-             "isEnvironment" "isMatrix" "isNewList" "isReal"
-             "R_IsNA" "RObjectTestExpectedType"
-             ;; Cast
-             "asDouble" "asMatrix" "asVector" "coerceVector"
-             "CHAR" "INTEGER" "Integer" "REAL" "real"
-             "mat2vec" "vec2mat"
-             ;; Vectors and matrices, basics
-             "array" "c" "matrix" "tuple" "value" "vec"
-             "begin" "end" "head" "index" "reverse" "segment" "tail"
-             "dim" "length" "resize" "push" "setdim" "size" "squeeze"
-             "ncols" "nrows" "outerSize" "size1" "size2"
+             "invlogit" "lgamma" "logit"
+             ;; Arrays, basics
+             "array" "matrix"
+             "head" "segment" "size" "tail"
              "col" "cols" "colwise" "row" "rows" "rowwise"
-             "asDiagonal" "block"  "diagonal"
-             "init" "initZeroArray" "setIdentity" "setZero"
-             "maxCoeff" "prod" "sum"
-             "perm"
-             "fill" "fillShape" "getShape"
-             ;; Vectors and matrices, linear algebra
-             "determinant" "inverse" "norm" "solve" "trace" "transpose"
-             "rotate" "scale"
-             "expm" "matmul" "matmult"
-             "invpd" "logdet" "matinv" "matinvpd"
-             "cov" "UNSTRUCTURED_CORR"
-             "eigenvalues" "eigenvectors"
-             "jacobian"
-             ;; Time series
-             "AR1"
-             ;; Lists
-             "getListElement"
-             ;; Factors
-             "NLEVELS"
+             "block" "diagonal" "transpose"
+             "max" "min" "prod" "sum"
+             "maxCoeff" "minCoeff"
+             "setIdentity" "setZero"
+             ;; Arrays, linear algebra
+             "determinant" "expm" "inverse" "norm" "trace"
              ;; Distributions
              "dnorm" "pnorm" "qnorm"
              "dnorm1" "pnorm1" "qnorm1"
              "pnorm_approx" "qnorm_approx"
-             "dt"
-             "df"
-             "MVNORM"
-             "dbinom"
-             "dzinbinom" "dzinbinom2"
-             "dmultinom"
-             "dpois" "ppois"
-             "dzipois"
-             "dnbinom" "dnbinom2"
-             "dexp" "pexp" "qexp"
+             "AR1" "MVNORM"
+             "dt" "df"
+             "dbinom" "dmultinom"
+             "dpois" "ppois" "dzipois"
+             "dnbinom" "dnbinom2" "dzinbinom" "dzinbinom2"
              "dbeta"
-             "dgamma" "dlgamma" "lgamma" "lgammafn" "pgamma" "psigamma" "qgamma"
-             "dweibull" "qweibull"
-             "SCALE" "VECSCALE"))
-          (CONSTANTS '("isNumeric" "isNumericScalar"))
-          (IMPORTANT '("error" "TMB_CATCH" "TMB_ERROR_BAD_ALLOC" "TMB_TRY")))
+             "dexp" "pexp" "qexp"
+             "dgamma" "dlgamma" "pgamma" "qgamma"
+             "dweibull" "pweibull" "qweibull"))
+          (CONSTANTS '("dim"))
+          (IMPORTANT '("error")))
       (list
        (cons (regexp-opt TYPE 'words) font-lock-type-face)
-       (cons (regexp-opt DATA 'words) tmb-data-face)
-       (cons (regexp-opt PARAMETERS 'words) tmb-parameter-face)
-       (cons (regexp-opt REPORT 'words) tmb-report-face)
+       (cons (regexp-opt DATA 'words) 'tmb-data-face)
+       (cons (regexp-opt PARAMETERS 'words) 'tmb-parameter-face)
+       (cons (regexp-opt REPORT 'words) 'tmb-report-face)
        (cons (regexp-opt FUNCTIONS 'words) font-lock-keyword-face)
        (cons (regexp-opt CONSTANTS 'words) font-lock-constant-face)
        (cons (regexp-opt IMPORTANT 'words) font-lock-builtin-face)))))
