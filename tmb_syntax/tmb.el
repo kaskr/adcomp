@@ -63,7 +63,7 @@
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'font-lock-variable-name-face nil
 ;;                       :foreground 'unspecified)
-;;   (local-set-key [?\C-c ?\C-c] 'tmb-run-r-script))
+;;   (local-set-key [f9] 'tmb-run-r-script))
 ;; (add-hook 'tmb-mode-hook 'my-tmb-hook)
 ;;
 ;; Usage:
