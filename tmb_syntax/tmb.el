@@ -57,7 +57,7 @@
 ;; If you want to set the default R command, syntax colors, or keybindings, here
 ;; is an example that does that:
 ;; (defun my-tmb-hook ()
-;;   (setq tmb-r-command "Rscript")
+;;   (setq tmb-r-command "R --slave <")
 ;;   (set-face-attribute 'tmb-data-face      nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'tmb-parameter-face nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
