@@ -63,8 +63,8 @@
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'font-lock-variable-name-face nil
 ;;                       :foreground 'unspecified)
-;;   (local-set-key [f9]  'tmb-run-r-script)
-;;   (local-set-key [f10] 'tmb-open-r     ))
+;;   (local-set-key [f9]  'tmb-run-r  )
+;;   (local-set-key [f10] 'tmb-open-r))
 ;; (add-hook 'tmb-mode-hook 'my-tmb-hook)
 ;;
 ;; Usage:
@@ -80,9 +80,9 @@
 ;;
 ;; 04 Sep 2015  1.2  Added user functions `tmb-clean', `tmb-for',
 ;;                   `tmb-kill-process', `tmb-open', `tmb-open-r',
-;;                   `tmb-run-another', `tmb-run-makefile', `tmb-run-r-script',
-;;                   and `tmb-toggle-section'. Added user variables
-; ;                  `tmb-make-command' and `tmb-r-command'. Disabled
+;;                   `tmb-run-any', `tmb-run-make', `tmb-run-r', and
+;;                   `tmb-toggle-section'. Added user variables
+;;                   `tmb-make-command' and `tmb-r-command'. Disabled
 ;;                   `abbrev-mode'.
 ;; 03 Sep 2015  1.1  Shortened list of recognized FUNCTIONS for maintainability.
 ;; 01 Sep 2015  1.0  Created main function `tmb-mode', derived from `c++-mode'.
@@ -107,10 +107,10 @@
 ;; 2  User variables
 
 (defcustom tmb-make-command "make"
-  "Shell command to run makefile using `tmb-run-makefile'."
+  "Shell command to run makefile using `tmb-run-make'."
   :tag "Make" :type 'string :group 'tmb)
 (defcustom tmb-r-command "R --quiet --vanilla <"
-  "Shell command to run R script using `tmb-run-r-script'."
+  "Shell command to run R script using `tmb-run-r'."
   :tag "R" :type 'string :group 'tmb)
 (defface tmb-data-face '((t :inherit font-lock-type-face))
   "Font Lock face to highlight TMB data macros." :group 'tmb)
@@ -212,25 +212,23 @@
 (defun tmb-open-r ()
   "Open R script with same filename prefix as current buffer." (interactive)
   (tmb-open "R"))
-(defun tmb-run-another (script)
-  "Run another R script, querying user for SCRIPT filename.\n
+(defun tmb-run-any (script)
+  "Run any R script, querying user for SCRIPT filename.\n
 If the R script has the same filename prefix as the current buffer, then use
-`tmb-run-r-script' instead.\n
+`tmb-run-r' instead.\n
 Filename history is accessible using M-p and up arrow."
   (interactive "fRun R script: ")(save-buffer)
   (compile (concat tmb-r-command " " script))
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
-(defun tmb-run-makefile ()
-  "Run Makefile in current directory, using `tmb-make-command'."
+(defun tmb-run-make ()
+  "Run makefile in current directory, using `tmb-make-command'."
   (interactive)(save-buffer)(compile tmb-make-command)
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
-(defun tmb-run-r-script ()
+(defun tmb-run-r ()
   "Run R script with same filename prefix as current buffer.\n
-If the R script has a different filename, then use `tmb-run-another' instead."
+If the R script has a different filename, then use `tmb-run-any' instead."
   (interactive)
-  (let ((prefix (file-name-sans-extension (buffer-name))))
-    (save-buffer)(compile (concat tmb-r-command " " prefix ".R")))
-  (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
+  (tmb-run-any (concat (file-name-sans-extension (buffer-name)) ".R")))
 (defun tmb-toggle-section ()
   "Toggle whether the current section is indicated in the mode line."
   (interactive)(which-function-mode (if which-function-mode 0 1))
@@ -248,14 +246,14 @@ The `tmb-help' command shows this page.\n
   (abbrev-mode 0))
 (modify-syntax-entry ?_ "w" tmb-mode-syntax-table)
 (define-key tmb-mode-map [?\C-c ?\C-/] 'tmb-help          )
-(define-key tmb-mode-map [?\C-c ?\C-a] 'tmb-run-another   )
+(define-key tmb-mode-map [?\C-c ?\C-a] 'tmb-run-any       )
 (define-key tmb-mode-map [?\C-c ?\C-d] 'tmb-clean         )
 (define-key tmb-mode-map [?\C-c ?\C-f] 'tmb-for           )
 (define-key tmb-mode-map [?\C-c ?\C-k] 'tmb-kill-process  )
-(define-key tmb-mode-map [?\C-c ?\C-m] 'tmb-run-makefile  )
+(define-key tmb-mode-map [?\C-c ?\C-m] 'tmb-run-make      )
 (define-key tmb-mode-map [?\C-c ?\C-o] 'tmb-open          )
 (define-key tmb-mode-map [?\C-c ?\C-p] 'tmb-open-r        )
-(define-key tmb-mode-map [?\C-c ?\C-r] 'tmb-run-r-script  )
+(define-key tmb-mode-map [?\C-c ?\C-r] 'tmb-run-r         )
 (define-key tmb-mode-map [?\C-c ?\C-s] 'tmb-toggle-section)
 
 (provide 'tmb)
