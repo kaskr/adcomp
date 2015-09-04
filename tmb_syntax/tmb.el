@@ -205,7 +205,7 @@
       (find-file-other-window file))))
 (defun tmb-run-another (script)
   "Run another R script, querying user for SCRIPT filename.\n
-If script has same filename prefix as current buffer, then use
+If the R script has the same filename prefix as the current buffer, then use
 `tmb-run-r-script' instead.\n
 Filename history is accessible using M-p and up arrow."
   (interactive "fRun R script: ")(save-buffer)
@@ -213,7 +213,7 @@ Filename history is accessible using M-p and up arrow."
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (defun tmb-run-r-script ()
   "Run R script with same filename prefix as current buffer.\n
-If script has a different filename, then use `tmb-run-another' instead."
+If the R script has a different filename, then use `tmb-run-another' instead."
   (interactive)
   (let ((prefix (file-name-sans-extension (buffer-name))))
     (save-buffer)(compile (concat tmb-r-command " " prefix ".R")))
