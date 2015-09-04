@@ -63,7 +63,8 @@
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'font-lock-variable-name-face nil
 ;;                       :foreground 'unspecified)
-;;   (local-set-key [f9] 'tmb-run-r-script))
+;;   (local-set-key [f9]  'tmb-run-r-script)
+;;   (local-set-key [f10] 'tmb-open-r     ))
 ;; (add-hook 'tmb-mode-hook 'my-tmb-hook)
 ;;
 ;; Usage:
@@ -78,9 +79,11 @@
 ;;; History:
 ;;
 ;; 04 Sep 2015  1.2  Added user functions `tmb-clean', `tmb-for',
-;;                   `tmb-kill-process', `tmb-open', `tmb-run-another',
-;;                   `tmb-run-r-script', and `tmb-toggle-section'. Added user
-;;                   variable `tmb-r-command'. Disabled `abbrev-mode'.
+;;                   `tmb-kill-process', `tmb-open', `tmb-open-r',
+;;                   `tmb-run-another', `tmb-run-makefile', `tmb-run-r-script',
+;;                   and `tmb-toggle-section'. Added user variables
+; ;                  `tmb-make-command' and `tmb-r-command'. Disabled
+;;                   `abbrev-mode'.
 ;; 03 Sep 2015  1.1  Shortened list of recognized FUNCTIONS for maintainability.
 ;; 01 Sep 2015  1.0  Created main function `tmb-mode', derived from `c++-mode'.
 
@@ -103,6 +106,9 @@
 
 ;; 2  User variables
 
+(defcustom tmb-make-command "make"
+  "Shell command to run makefile using `tmb-run-makefile'."
+  :tag "Make" :type 'string :group 'tmb)
 (defcustom tmb-r-command "R --quiet --vanilla <"
   "Shell command to run R script using `tmb-run-r-script'."
   :tag "R" :type 'string :group 'tmb)
@@ -203,6 +209,9 @@
   (let ((file (concat (file-name-sans-extension (buffer-name)) "." ext)))
     (if (not (file-regular-p file))(error "File %s not found" file)
       (find-file-other-window file))))
+(defun tmb-open-r ()
+  "Open R script with same filename prefix as current buffer." (interactive)
+  (tmb-open "R"))
 (defun tmb-run-another (script)
   "Run another R script, querying user for SCRIPT filename.\n
 If the R script has the same filename prefix as the current buffer, then use
@@ -210,6 +219,10 @@ If the R script has the same filename prefix as the current buffer, then use
 Filename history is accessible using M-p and up arrow."
   (interactive "fRun R script: ")(save-buffer)
   (compile (concat tmb-r-command " " script))
+  (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
+(defun tmb-run-makefile ()
+  "Run Makefile in current directory, using `tmb-make-command'."
+  (interactive)(save-buffer)(compile tmb-make-command)
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (defun tmb-run-r-script ()
   "Run R script with same filename prefix as current buffer.\n
@@ -239,7 +252,9 @@ The `tmb-help' command shows this page.\n
 (define-key tmb-mode-map [?\C-c ?\C-d] 'tmb-clean         )
 (define-key tmb-mode-map [?\C-c ?\C-f] 'tmb-for           )
 (define-key tmb-mode-map [?\C-c ?\C-k] 'tmb-kill-process  )
+(define-key tmb-mode-map [?\C-c ?\C-m] 'tmb-run-makefile  )
 (define-key tmb-mode-map [?\C-c ?\C-o] 'tmb-open          )
+(define-key tmb-mode-map [?\C-c ?\C-p] 'tmb-open-r        )
 (define-key tmb-mode-map [?\C-c ?\C-r] 'tmb-run-r-script  )
 (define-key tmb-mode-map [?\C-c ?\C-s] 'tmb-toggle-section)
 
