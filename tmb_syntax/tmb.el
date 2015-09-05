@@ -5,7 +5,7 @@
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
 
-(defconst tmb-mode-version "1.2" "TMB Mode version number.")
+(defconst tmb-mode-version "1.3" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -63,8 +63,9 @@
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'font-lock-variable-name-face nil
 ;;                       :foreground 'unspecified)
-;;   (local-set-key [f9]  'tmb-run-r  )
-;;   (local-set-key [f10] 'tmb-open-r))
+;;   (local-set-key [f9]           'tmb-run-r )
+;;   (local-set-key [f10]          'tmb-open-r)
+;;   (local-set-key [down-mouse-3] 'imenu    ))
 ;; (add-hook 'tmb-mode-hook 'my-tmb-hook)
 ;;
 ;; Usage:
@@ -78,6 +79,8 @@
 
 ;;; History:
 ;;
+;; 05 Sep 2015  1.3  Added user function `tmb-template-mini'. Renamed
+;;                   `tmb-toggle-section' to `tmb-toggle-function'.
 ;; 04 Sep 2015  1.2  Added user functions `tmb-clean', `tmb-for',
 ;;                   `tmb-kill-process', `tmb-open', `tmb-open-r',
 ;;                   `tmb-run-any', `tmb-run-make', `tmb-run-r', and
@@ -216,7 +219,9 @@
   "Run any R script, querying user for SCRIPT filename.\n
 If the R script has the same filename prefix as the current buffer, then use
 `tmb-run-r' instead.\n
-Filename history is accessible using M-p and up arrow."
+Filename history is accessible in the minibuffer prompt \
+(\\<minibuffer-local-map>\\[previous-history-element], \
+ \\[next-history-element])."
   (interactive "fRun R script: ")(save-buffer)
   (compile (concat tmb-r-command " " script))
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
@@ -229,10 +234,57 @@ Filename history is accessible using M-p and up arrow."
 If the R script has a different filename, then use `tmb-run-any' instead."
   (interactive)
   (tmb-run-any (concat (file-name-sans-extension (buffer-name)) ".R")))
-(defun tmb-toggle-section ()
-  "Toggle whether the current section is indicated in the mode line."
+(defun tmb-template-mini ()
+  "Create minimal TMB files (mini.cpp, mini.R) in current directory."
+  (interactive)
+  (if (file-exists-p "mini.cpp")
+      (error "Error: file mini.cpp already exists in current directory"))
+  (if (file-exists-p "mini.R")
+      (error "Error: file mini.R already exists in current directory"))
+  (if (get-buffer "mini.cpp")(error "Error: buffer mini.cpp already exists"))
+  (if (get-buffer "mini.R")(error "Error: buffer mini.R already exists"))
+  (delete-other-windows)(find-file "mini.cpp")(insert "
+#include <TMB.hpp>
+
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+  DATA_VECTOR(x);
+  PARAMETER(mu);
+  PARAMETER(logSigma);
+
+  Type f;
+  f = -sum(dnorm(x, mu, exp(logSigma), true));
+
+  return f;
+}
+")
+  (goto-char (point-min))(delete-char 1)(save-buffer "mini.cpp")
+  (find-file-other-window "mini.R")(insert "
+data <- list(x=rivers)
+parameters <- list(mu=0, logSigma=0)
+
+require(TMB)
+compile(\"mini.cpp\")
+dyn.load(dynlib(\"mini\"))
+
+################################################################################
+
+model <- MakeADFun(data, parameters)
+time <- system.time(fit <- nlminb(model$par, model$fn, model$gr))
+rep <- sdreport(model)
+
+rep
+")
+  (goto-char (point-min))(delete-char 1)(save-buffer "mini.R")
+  (other-window 1)(tmb-mode)
+  (message (concat "Ready to run R script ("
+                   (substitute-command-keys "\\[tmb-run-r]")
+                   ") or edit code.")))
+(defun tmb-toggle-function ()
+  "Toggle whether the current function is indicated in the mode line."
   (interactive)(which-function-mode (if which-function-mode 0 1))
-  (message "Section indicator %s" (if which-function-mode "ON" "OFF")))
+  (message "Function indicator %s" (if which-function-mode "ON" "OFF")))
 
 ;; 5  Main function
 
@@ -240,20 +292,29 @@ If the R script has a different filename, then use `tmb-run-any' instead."
 (define-derived-mode tmb-mode c++-mode "TMB"
   "Major mode for creating statistical models with TMB.\n
 The `tmb-help' command shows this page.\n
+Start a new model from `tmb-template-mini'. Navigate between functions using
+`imenu' and indicate the current function in the mode line with
+`tmb-toggle-function'. Prototype for-loops with `tmb-for'. Use `tmb-open-r' to
+open the corresponding R script and `tmb-open' for other model-related files.\n
+Build and run the model using `tmb-run-r', `tmb-run-any', or `tmb-run-make'.
+Stop the compilation or model run with `tmb-kill-process'. The C++ binary files
+(*.o, *.so, *.dll) can be removed using `tmb-clean'.\n
 \\{tmb-mode-map}"
   (set (make-local-variable 'font-lock-defaults)
        '(tmb-font-lock-keywords nil nil))
   (abbrev-mode 0))
 (modify-syntax-entry ?_ "w" tmb-mode-syntax-table)
-(define-key tmb-mode-map [?\C-c ?\C-/] 'tmb-help          )
-(define-key tmb-mode-map [?\C-c ?\C-a] 'tmb-run-any       )
-(define-key tmb-mode-map [?\C-c ?\C-d] 'tmb-clean         )
-(define-key tmb-mode-map [?\C-c ?\C-f] 'tmb-for           )
-(define-key tmb-mode-map [?\C-c ?\C-k] 'tmb-kill-process  )
-(define-key tmb-mode-map [?\C-c ?\C-m] 'tmb-run-make      )
-(define-key tmb-mode-map [?\C-c ?\C-o] 'tmb-open          )
-(define-key tmb-mode-map [?\C-c ?\C-p] 'tmb-open-r        )
-(define-key tmb-mode-map [?\C-c ?\C-r] 'tmb-run-r         )
-(define-key tmb-mode-map [?\C-c ?\C-s] 'tmb-toggle-section)
+(define-key tmb-mode-map [f12]         'tmb-template-mini  )
+(define-key tmb-mode-map [?\C-c ?\C-.] 'tmb-mode-version   )
+(define-key tmb-mode-map [?\C-c ?\C-/] 'tmb-help           )
+(define-key tmb-mode-map [?\C-c ?\C-a] 'tmb-run-any        )
+(define-key tmb-mode-map [?\C-c ?\C-d] 'tmb-clean          )
+(define-key tmb-mode-map [?\C-c ?\C-f] 'tmb-for            )
+(define-key tmb-mode-map [?\C-c ?\C-k] 'tmb-kill-process   )
+(define-key tmb-mode-map [?\C-c ?\C-m] 'tmb-run-make       )
+(define-key tmb-mode-map [?\C-c ?\C-o] 'tmb-open           )
+(define-key tmb-mode-map [?\C-c ?\C-p] 'tmb-open-r         )
+(define-key tmb-mode-map [?\C-c ?\C-r] 'tmb-run-r          )
+(define-key tmb-mode-map [?\C-c ?\C-s] 'tmb-toggle-function)
 
 (provide 'tmb)
