@@ -233,7 +233,7 @@
 If the R script has a different filename, then use `tmb-run-any' instead.\n
 Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
 \\[tmb-scroll-up]."
-  (interactive)
+  (interactive)(save-buffer)
   (tmb-run-any (concat (file-name-sans-extension (buffer-name)) ".R")))
 (defun tmb-run-any (script)
   "Run any R script, querying user for SCRIPT filename.\n
@@ -250,7 +250,7 @@ Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
 (defun tmb-run-debug ()
   "Debug model with GDB.\n
 The R session stays alive if it was running when this function was called."
-  (interactive)
+  (interactive)(save-buffer)
   (require 'ess-site)
   (let* ((ess-dialect "R")
          (inferior-R-args "--quiet --vanilla")
