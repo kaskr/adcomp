@@ -104,7 +104,7 @@
 
 (require 'cc-mode) ; c++-font-lock-keywords
 (require 'compile) ; compilation-scroll-output
-;; (require 'ess-site) ; ess-eval-linewise, load when user runs `tmb-run-debug'
+;; (require 'ess-site) ; ess-eval-linewise, load when user calls `tmb-run-debug'
 (defgroup tmb nil
   "Major mode for editing Template Model Builder code."
   :tag "TMB" :group 'languages)
@@ -245,19 +245,22 @@ Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
   (compile (concat tmb-r-command " " script))
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (declare-function ess-eval-linewise "ess-inf")
+(declare-function ess-process-live-p "ess-inf")
 (defun tmb-run-debug ()
-  "Debug model with GDB." (interactive)
+  "Debug model with GDB.\n
+The R session stays alive if it was running when this function was called."
+  (interactive)
   (require 'ess-site)
   (let* ((ess-dialect "R")
          (inferior-R-args "--quiet --vanilla")
          (ess-ask-for-ess-directory nil)
          (prefix (file-name-sans-extension (buffer-name)))
-         (oarg (if (string-match "windows" (prin1-to-string system-type)) 1 0))
-         (cmd-1 (concat "require(TMB)"))
-         (cmd-2 (concat "compile('" prefix ".cpp', '-g -O" oarg "')"))
-         (cmd-3 (concat "gdbsource('" prefix ".R', TRUE)"))
-         (cmd-4 (concat "quit()"))
-         (cmd (concat cmd-1 "; " cmd-2 "; " cmd-3 "; " cmd-4)))
+         (o (if (string-match "windows" (prin1-to-string system-type)) "1" "0"))
+         (cmd-1 "require(TMB)")
+         (cmd-2 (concat "; compile(\"" prefix ".cpp\",\"-g -O" o "\")"))
+         (cmd-3 (concat "; gdbsource(\"" prefix ".R\",TRUE)"))
+         (cmd-4 (if (ess-process-live-p) "" "; q()"))
+         (cmd (concat cmd-1 cmd-2 cmd-3 cmd-4)))
     (ess-eval-linewise cmd)))
 (defun tmb-run-make ()
   "Run makefile in current directory, using `tmb-make-command'."
