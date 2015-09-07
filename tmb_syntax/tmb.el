@@ -80,13 +80,13 @@
 ;;; History:
 ;;
 ;; 07 Sep 2015  2.0  Added user functions `tmb-run-debug', `tmb-scroll-down',
-;;                   and `tmb-scroll-up'. Renamed `tmb-open' to `tmb-open-any'
-;;                   and `tmb-run-r' to `tmb-run'. Changed `tmb-open' and
-;;                   `tmb-open-any' so cursor stays in main window. Changed
-;;                   `tmb-run' and `tmb-run-any' so compilation window points at
-;;                   first error. Changed `tmb-template-mini' so it compiles
-;;                   faster. Changed keybindings. The `tmb-run-debug' function
-;;                   requires ESS.
+;;                   `tmb-scroll-up', `tmb-show-compilation', and `tmb-show-r'.
+;;                   Renamed `tmb-open' to `tmb-open-any' and `tmb-run-r' to
+;;                   `tmb-run'. Changed `tmb-open' and `tmb-open-any' so cursor
+;;                   stays in main window. Changed `tmb-run' and `tmb-run-any'
+;;                   so compilation window points at first error. Changed
+;;                   `tmb-template-mini' so it compiles faster. Changed
+;;                   keybindings. The `tmb-run-debug' function requires ESS.
 ;; 05 Sep 2015  1.3  Added user function `tmb-template-mini'. Renamed
 ;;                   `tmb-toggle-section' to `tmb-toggle-function'.
 ;; 04 Sep 2015  1.2  Added user functions `tmb-clean', `tmb-for',
@@ -104,7 +104,10 @@
 
 (require 'cc-mode) ; c++-font-lock-keywords
 (require 'compile) ; compilation-scroll-output
-;; (require 'ess-site) ; ess-eval-linewise, load when user calls `tmb-run-debug'
+;; (require 'ess-site) ; slow, not loaded unless needed
+(declare-function ess-eval-linewise "ess-inf")
+(declare-function ess-process-live-p "ess-inf")
+(declare-function ess-show-buffer "ess-inf")
 (defgroup tmb nil
   "Major mode for editing Template Model Builder code."
   :tag "TMB" :group 'languages)
@@ -203,7 +206,7 @@
   (let* ((prog (file-name-sans-extension (buffer-name)))
          (pattern (concat prog "\\.o\\|" prog "\\.so\\|" prog "\\.dll"))
          (files (directory-files "." nil pattern t)))
-    (dolist (x files)(delete-file x)))(message "Removed binary files."))
+    (dolist (x files)(delete-file x)))(message "Removed binary files"))
 (defun tmb-for ()
   "Insert for(int i=0; i<; i++)." (interactive)
   (insert "for(int i=0; i<; i++)")(search-backward ";"))
@@ -216,7 +219,7 @@
   (interactive)(kill-process (car (process-list))))
 (defun tmb-mode-version ()
   "Show TMB Mode version number." (interactive)
-  (message (concat "TMB Mode version " tmb-mode-version)))
+  (message "TMB Mode version %s" tmb-mode-version))
 (defun tmb-open ()
   "Open R script with same filename prefix as current buffer." (interactive)
   (tmb-open-any "R"))
@@ -244,8 +247,6 @@ Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
   (interactive "fRun R script: ")(save-buffer)
   (compile (concat tmb-r-command " " script))
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
-(declare-function ess-eval-linewise "ess-inf")
-(declare-function ess-process-live-p "ess-inf")
 (defun tmb-run-debug ()
   "Debug model with GDB.\n
 The R session stays alive if it was running when this function was called."
@@ -268,18 +269,27 @@ The R session stays alive if it was running when this function was called."
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (defun tmb-scroll-down (N)
   "Scroll other window down N lines, or visit next error message.\n
-The behavior of this command depends on whether the other window is a
-compilation buffer or not."
+The behavior of this command depends on whether the compilation buffer is
+visible."
   (interactive "p")
-  (if (string-equal (buffer-name (window-buffer (next-window))) "*compilation*")
-      (next-error N)(scroll-other-window N)))
+  (if (null (get-buffer-window "*compilation*"))(scroll-other-window N)
+    (next-error N)))
 (defun tmb-scroll-up (N)
   "Scroll other window up N lines, or visit previous error message.\n
-The behavior of this command depends on whether the other window is a
-compilation buffer or not."
+The behavior of this command depends on whether the compilation buffer is
+visible."
   (interactive "p")
-  (if (string-equal (buffer-name (window-buffer (next-window))) "*compilation*")
-      (previous-error N)(scroll-other-window (- N))))
+  (if (null (get-buffer-window "*compilation*"))(scroll-other-window (- N))
+    (previous-error N)))
+(defun tmb-show-compilation ()
+  "Show compilation buffer." (interactive)
+  (if (null (get-buffer "*compilation*"))
+      (error "*compilation* buffer not found")(display-buffer "*compilation*")))
+(defun tmb-show-r ()
+  "Show R interactive buffer." (interactive)
+  (require 'ess-site)
+  (if (null (get-buffer "*R*"))(error "*R* interactive buffer not found")
+    (ess-show-buffer "*R*")))
 (defun tmb-template-mini ()
   "Create minimal TMB files (mini.cpp, mini.R) in current directory."
   (interactive)
@@ -340,9 +350,10 @@ rep
 The `tmb-help' command shows this page.\n
 Start a new model from `tmb-template-mini'. Navigate between functions using
 `imenu' and indicate the current function in the mode line with
-`tmb-toggle-function'. Prototype for-loops with `tmb-for'. Use `tmb-open' to
-open the corresponding R script and `tmb-open-any' to open other model-related
-files.\n
+`tmb-toggle-function'. Prototype for-loops with `tmb-for'.\n
+Use `tmb-open' to open the corresponding R script and `tmb-open-any' to open
+other model-related files. Show interactive *compilation* and *R* buffers with
+`tmb-show-compilation' and `tmb-show-r'.\n
 Build and run the model using `tmb-run', `tmb-run-any', or `tmb-run-make'.
 Stop the compilation or model run with `tmb-kill-process'. The C++ binary files
 (*.o, *.so, *.dll) can be removed using `tmb-clean'. Invoke a GDB debug session
@@ -352,28 +363,32 @@ While staying in the TMB window, navigate the secondary window with
 \\[beginning-of-buffer-other-window], \\[scroll-other-window-down], \
 \\[tmb-scroll-up] (scroll home, page up, line up), and
 \\[end-of-buffer-other-window], \\[scroll-other-window], \
-\\[tmb-scroll-down] (scroll end, page down, line down).\n
+\\[tmb-scroll-down] (scroll end, page down, line down).
+This is particularly efficient for navigating error messages listed
+in the compilation buffer.\n
 \\{tmb-mode-map}"
   (set (make-local-variable 'font-lock-defaults)
        '(tmb-font-lock-keywords nil nil))
   (abbrev-mode 0)
   (setq compilation-scroll-output 'first-error))
 (modify-syntax-entry ?_ "w" tmb-mode-syntax-table)
-(define-key tmb-mode-map [f12]               'tmb-template-mini  )
-(define-key tmb-mode-map [?\C-c C-backspace] 'tmb-clean          )
-(define-key tmb-mode-map [M-up]              'tmb-scroll-up      )
-(define-key tmb-mode-map [M-down]            'tmb-scroll-down    )
-(define-key tmb-mode-map [?\C-c ?\C-.]       'tmb-mode-version   )
-(define-key tmb-mode-map [?\C-c ?\C-/]       'tmb-help           )
-(define-key tmb-mode-map [?\C-c ?\C-a]       'tmb-run-any        )
-(define-key tmb-mode-map [?\C-c ?\C-c]       'tmb-run            )
-(define-key tmb-mode-map [?\C-c ?\C-d]       'tmb-run-debug      )
-(define-key tmb-mode-map [?\C-c ?\C-f]       'tmb-for            )
-(define-key tmb-mode-map [?\C-c ?\C-k]       'tmb-kill-process   )
-(define-key tmb-mode-map [?\C-c ?\C-m]       'tmb-run-make       )
-(define-key tmb-mode-map [?\C-c ?\C-o]       'tmb-open-any       )
-(define-key tmb-mode-map [?\C-c ?\C-p]       'tmb-open           )
-(define-key tmb-mode-map [?\C-c ?\C-s]       'tmb-toggle-function)
-(define-key tmb-mode-map [?\C-\M-v]          'ignore             )
+(define-key tmb-mode-map [f12]               'tmb-template-mini   )
+(define-key tmb-mode-map [?\C-c C-backspace] 'tmb-clean           )
+(define-key tmb-mode-map [M-up]              'tmb-scroll-up       )
+(define-key tmb-mode-map [M-down]            'tmb-scroll-down     )
+(define-key tmb-mode-map [?\C-c ?\C-.]       'tmb-mode-version    )
+(define-key tmb-mode-map [?\C-c ?\C-/]       'tmb-help            )
+(define-key tmb-mode-map [?\C-c ?\C-a]       'tmb-run-any         )
+(define-key tmb-mode-map [?\C-c ?\C-c]       'tmb-run             )
+(define-key tmb-mode-map [?\C-c ?\C-d]       'tmb-run-debug       )
+(define-key tmb-mode-map [?\C-c ?\C-f]       'tmb-for             )
+(define-key tmb-mode-map [?\C-c ?\C-k]       'tmb-kill-process    )
+(define-key tmb-mode-map [?\C-c ?\C-l]       'tmb-show-compilation)
+(define-key tmb-mode-map [?\C-c ?\C-m]       'tmb-run-make        )
+(define-key tmb-mode-map [?\C-c ?\C-o]       'tmb-open-any        )
+(define-key tmb-mode-map [?\C-c ?\C-p]       'tmb-open            )
+(define-key tmb-mode-map [?\C-c ?\C-r]       'tmb-show-r          )
+(define-key tmb-mode-map [?\C-c ?\C-s]       'tmb-toggle-function )
+(define-key tmb-mode-map [?\C-\M-v]          'ignore              )
 
 (provide 'tmb)
