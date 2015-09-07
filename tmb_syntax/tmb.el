@@ -262,7 +262,7 @@ The R session stays alive if it was running when this function was called."
          (cmd-3 (concat "; gdbsource(\"" prefix ".R\",TRUE)"))
          (cmd-4 (if (ess-process-live-p) "" "; q()"))
          (cmd (concat cmd-1 cmd-2 cmd-3 cmd-4)))
-    (ess-eval-linewise cmd)))
+    (ess-eval-linewise cmd)(message "Starting debug session...")))
 (defun tmb-run-make ()
   "Run makefile in current directory, using `tmb-make-command'."
   (interactive)(save-buffer)(compile tmb-make-command)
