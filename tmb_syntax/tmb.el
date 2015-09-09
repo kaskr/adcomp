@@ -5,7 +5,7 @@
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
 
-(defconst tmb-mode-version "2.0" "TMB Mode version number.")
+(defconst tmb-mode-version "2.1" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -54,8 +54,16 @@
 ;;
 ;; Customization:
 ;;
+;; This mode lets Emacs scan C++ files to check if they #include <TMB.hpp> in
+;; the first `magic-mode-regexp-match-limit' characters of the file. To make
+;; Emacs search deeper than the first few lines of C++ files, you can increase
+;; the limit in your .emacs:
+;;
+;; (setq magic-mode-regexp-match-limit 40000)
+;;
 ;; If you want to set the default R command, syntax colors, or keybindings, here
 ;; is an example that does that:
+;;
 ;; (defun my-tmb-hook ()
 ;;   (setq tmb-r-command "R --slave <")
 ;;   (set-face-attribute 'tmb-data-face      nil :foreground "dodgerblue")
@@ -79,14 +87,13 @@
 
 ;;; History:
 ;;
+;; 09 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
+;;                   `tmb-run-debug' and `tmb-template-mini'.
 ;; 07 Sep 2015  2.0  Added user functions `tmb-run-debug', `tmb-scroll-down',
 ;;                   `tmb-scroll-up', `tmb-show-compilation', and `tmb-show-r'.
 ;;                   Renamed `tmb-open' to `tmb-open-any' and `tmb-run-r' to
-;;                   `tmb-run'. Changed `tmb-open' and `tmb-open-any' so cursor
-;;                   stays in main window. Changed `tmb-run' and `tmb-run-any'
-;;                   so compilation window points at first error. Changed
-;;                   `tmb-template-mini' so it compiles faster. Changed
-;;                   keybindings. The `tmb-run-debug' function requires ESS.
+;;                   `tmb-run'. Improved `tmb-open', `tmb-open-any', `tmb-run',
+;;                   `tmb-run-any', and `tmb-template-mini'.
 ;; 05 Sep 2015  1.3  Added user function `tmb-template-mini'. Renamed
 ;;                   `tmb-toggle-section' to `tmb-toggle-function'.
 ;; 04 Sep 2015  1.2  Added user functions `tmb-clean', `tmb-for',
@@ -104,21 +111,14 @@
 
 (require 'cc-mode) ; c++-font-lock-keywords
 (require 'compile) ; compilation-scroll-output
-;; (require 'ess-site) ; slow, not loaded unless needed
+;; (require 'ess-site) ; slow, load only when needed
+(add-to-list 'magic-mode-alist '(tmb-include-p . tmb-mode))
 (declare-function ess-eval-linewise "ess-inf")
 (declare-function ess-process-live-p "ess-inf")
 (declare-function ess-show-buffer "ess-inf")
 (defgroup tmb nil
   "Major mode for editing Template Model Builder code."
   :tag "TMB" :group 'languages)
-;; Switch to `tmb-mode' if C++ buffer includes TMB header
-(setq magic-mode-regexp-match-limit 40000)
-(defun tmb-include-p ()
-  "Search for #include <TMB.hpp> in C++ file."
-  (if (string-equal (file-name-extension (buffer-name)) "cpp")
-      (re-search-forward "#include ?<TMB.hpp>"
-                         magic-mode-regexp-match-limit t)))
-(setq magic-mode-alist '((tmb-include-p . tmb-mode)))
 
 ;; 2  User variables
 
@@ -250,37 +250,38 @@ Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
 (defun tmb-run-debug ()
   "Debug model with GDB.\n
 The R session stays alive if it was running when this function was called."
-  (interactive)(save-buffer)
+  (interactive)(save-buffer)(message "Invoking debug session...")
   (require 'ess-site)
+  ;; Platform-specific: -O1 and DLLFLAGS in Windows, -O0 otherwise
   (let* ((ess-dialect "R")
          (inferior-R-args "--quiet --vanilla")
          (ess-ask-for-ess-directory nil)
          (prefix (file-name-sans-extension (buffer-name)))
-         (o (if (string-match "windows" (prin1-to-string system-type)) "1" "0"))
          (cmd-1 "require(TMB)")
-         (cmd-2 (concat "; compile(\"" prefix ".cpp\",\"-g -O" o "\")"))
+         (cmd-2 (concat "; compile(\"" prefix ".cpp\",\"-g -O"
+                        (if (tmb-windows-os-p) "1\",DLLARGS=\"\")" "0\")")))
          (cmd-3 (concat "; gdbsource(\"" prefix ".R\",TRUE)"))
          (cmd-4 (if (ess-process-live-p) "" "; q()"))
          (cmd (concat cmd-1 cmd-2 cmd-3 cmd-4)))
-    (ess-eval-linewise cmd)(message "Starting debug session...")))
+    (ess-eval-linewise cmd)(message "Invoking debug session...done")))
 (defun tmb-run-make ()
   "Run makefile in current directory, using `tmb-make-command'."
   (interactive)(save-buffer)(compile tmb-make-command)
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
-(defun tmb-scroll-down (N)
+(defun tmb-scroll-down (n)
   "Scroll other window down N lines, or visit next error message.\n
 The behavior of this command depends on whether the compilation buffer is
 visible."
   (interactive "p")
-  (if (null (get-buffer-window "*compilation*"))(scroll-other-window N)
-    (next-error N)))
-(defun tmb-scroll-up (N)
+  (if (null (get-buffer-window "*compilation*"))(scroll-other-window n)
+    (next-error n)))
+(defun tmb-scroll-up (n)
   "Scroll other window up N lines, or visit previous error message.\n
 The behavior of this command depends on whether the compilation buffer is
 visible."
   (interactive "p")
-  (if (null (get-buffer-window "*compilation*"))(scroll-other-window (- N))
-    (previous-error N)))
+  (if (null (get-buffer-window "*compilation*"))(scroll-other-window (- n))
+    (previous-error n)))
 (defun tmb-show-compilation ()
   "Show compilation buffer." (interactive)
   (if (null (get-buffer "*compilation*"))
@@ -293,6 +294,7 @@ visible."
 (defun tmb-template-mini ()
   "Create minimal TMB files (mini.cpp, mini.R) in current directory."
   (interactive)
+  ;; Platform-specific: -O1 in Windows, -O0 otherwise
   (if (file-exists-p "mini.cpp")
       (error "Error: file mini.cpp already exists in current directory"))
   (if (file-exists-p "mini.R")
@@ -321,7 +323,7 @@ data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
 require(TMB)
-compile(\"mini.cpp\", \"-g -O0 -Wall\")
+compile(\"mini.cpp\", \"-g -O" (if (tmb-windows-os-p) "1" "0") " -Wall\")
 dyn.load(dynlib(\"mini\"))
 
 ################################################################################
@@ -332,8 +334,7 @@ rep <- sdreport(model)
 
 rep
 ")
-  (goto-char (point-min))(save-buffer "mini.R")
-  (other-window 1)(tmb-mode)
+  (goto-char (point-min))(save-buffer "mini.R")(other-window 1)(tmb-mode)
   (message (concat "Ready to run R script ("
                    (substitute-command-keys "\\<tmb-mode-map>\\[tmb-run]")
                    ") or edit code.")))
@@ -342,7 +343,18 @@ rep
   (interactive)(which-function-mode (if which-function-mode 0 1))
   (message "Function indicator %s" (if which-function-mode "ON" "OFF")))
 
-;; 5  Main function
+;; 5  Internal functions
+
+(defun tmb-include-p ()
+  "Check if C++ file has #include <TMB.hpp>."
+  (if (string-equal (file-name-extension (buffer-name)) "cpp")
+      (re-search-forward "#include ?<TMB.hpp>"
+                         magic-mode-regexp-match-limit t)))
+(defun tmb-windows-os-p ()
+  "Check if TMB is running in a Windows operating system."
+  (if (string-match "windows" (prin1-to-string system-type)) t nil))
+
+;; 6  Main function
 
 ;;;###autoload
 (define-derived-mode tmb-mode c++-mode "TMB"
