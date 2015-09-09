@@ -259,7 +259,7 @@ The R session stays alive if it was running when this function was called."
          (prefix (file-name-sans-extension (buffer-name)))
          (cmd-1 "require(TMB)")
          (cmd-2 (concat "; compile(\"" prefix ".cpp\",\"-g -O"
-                        (if (tmb-windows-os-p) "1\",DLLARGS=\"\")" "0\")")))
+                        (if (tmb-windows-os-p) "1\",DLLFLAGS=\"\")" "0\")")))
          (cmd-3 (concat "; gdbsource(\"" prefix ".R\",TRUE)"))
          (cmd-4 (if (ess-process-live-p) "" "; q()"))
          (cmd (concat cmd-1 cmd-2 cmd-3 cmd-4)))
