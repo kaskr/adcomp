@@ -104,6 +104,7 @@
 ##' @param seed Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine.
 ##' @param parallel Run in parallel using the \code{parallel} package?
 ##' @param trace Trace progress?
+##' @param ... Control parameters for OSA method
 ##' @return \code{data.frame} with OSA residuals in column \code{residual}.
 ##' @examples
 ##' ######################## Gaussian case
@@ -131,7 +132,8 @@ oneStepPredict <- function(obj,
                            discreteSupport = NULL,
                            seed = 123,
                            parallel = FALSE,
-                           trace = TRUE
+                           trace = TRUE,
+                           ...
                            ){
     if (missing(observation.name)) stop("'observation.name' must define a data component")
     if (!(observation.name %in% names(obj$env$data))) stop("'observation.name' must be in data component")
@@ -370,6 +372,9 @@ oneStepPredict <- function(obj,
         newobj$fn(p) ## Test eval
         newobj$env$value.best <- -Inf ## <-- Never overwrite last.par.best
         nan2zero <- function(x)if(!is.finite(x)) 0 else x
+        ## Set default configuration for this method (modify with '...'):
+        formals(tmbprofile)$ytol <- 10  ## Tail tolerance (increase => more tail)
+        formals(tmbprofile)$ystep <- .5 ## Grid spacing   (decrease => more accuracy)
         oneStepGeneric <- function(k){
             tracefun(k)
             ans <- try({
@@ -378,8 +383,28 @@ oneStepPredict <- function(obj,
                     newobj$fn(observation(k, y))
                 }
                 nll <- f(obs[index]) ## Marginal negative log-likelihood
-                F1 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), -Inf, obs[index])$value
-                F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
+                newobj$env$last.par.best <- newobj$env$last.par ## <-- used by tmbprofile
+                slice <- tmbprofile(newobj, k, slice=TRUE, ...)
+                spline <- splinefun(slice[[1]], slice[[2]])
+                spline.range <- range(slice[[1]])
+                if(trace >= 2){
+                    plotfun <- function(slice, spline){
+                        plot(slice, type="p", level=NULL)
+                        plot(spline, spline.range[1], spline.range[2], add=TRUE)
+                        abline(v=obs[index], type="dashed")
+                    }
+                    if(trace >= 3){
+                        slice$value <- exp( -slice$value )
+                        plotfun(slice, function(x)exp(-spline(x)))
+                    }
+                    else
+                        plotfun(slice, spline)
+                }
+                F1 <- integrate(function(x)exp(-(spline(x) - nll)), spline.range[1], obs[index])$value
+                F2 <- integrate(function(x)exp(-(spline(x) - nll)), obs[index], spline.range[2])$value
+                ## Was:
+                ##  F1 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), -Inf, obs[index])$value
+                ##  F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
                 nlcdf.lower = nll - log(F1)
                 nlcdf.upper = nll - log(F2)
                 c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper)
