@@ -204,7 +204,7 @@ SEXP tmb_invQ_tril_halfdiag(SEXP Lfac){
   CHM_SP iQ = tmb_inv_super(L, &c);
   half_diag(iQ);
   iQ->stype=0; /* Change to non-sym */
-  return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "", R_NilValue);
+  return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , -1 /* uplo="L" */ , 0, "", R_NilValue);
 }
 
 /* Given sparse matrices A and B (sorted columns).
@@ -271,3 +271,9 @@ SEXP tmb_sparse_izamd(SEXP A_, SEXP mark_, SEXP diag_){
   return A_;
 }
 
+/* Half the diagonal of a matrix (note: modifies input) */
+SEXP tmb_half_diag(SEXP A_){
+  CHM_SP A = AS_CHM_SP(A_);
+  half_diag(A);
+  return A_;
+}
