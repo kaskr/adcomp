@@ -51,6 +51,10 @@
 ;;      M-x byte-compile-file
 ;; 3. Edit .emacs so that `tmb-mode' is loaded at startup:
 ;;      (require 'tmb)
+;; 4. In Windows, the PATH environment variable should include the directory
+;;      containing the R executables (path/to/bin/x64).
+;; 5. Some features of this package require that Emacs Speaks Statistics (ESS)
+;;      is also installed.
 ;;
 ;; Customization:
 ;;
@@ -87,7 +91,7 @@
 
 ;;; History:
 ;;
-;; 09 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
+;; 10 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
 ;;                   `tmb-run-debug' and `tmb-template-mini'.
 ;; 07 Sep 2015  2.0  Added user functions `tmb-run-debug', `tmb-scroll-down',
 ;;                   `tmb-scroll-up', `tmb-show-compilation', and `tmb-show-r'.
