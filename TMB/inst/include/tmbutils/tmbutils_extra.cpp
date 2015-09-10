@@ -28,3 +28,5 @@ namespace density{
   using namespace tmbutils;
 #include "density.cpp"
 } // End namespace
+
+#include "romberg.cpp"
