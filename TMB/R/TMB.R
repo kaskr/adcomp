@@ -18,6 +18,16 @@ grepRandomParameters <- function(parameters,random){
   which(as.logical(unlist(tmp)))
 }
 
+## Assign without losing other attributes than 'names' (which may get
+## overwritten when subsetting)
+"keepAttrib<-" <- function(x, value){
+    attr <- attributes(x)
+    keep <- setdiff(names(attr), "names")
+    x <- value
+    attributes(x)[keep] <- attr[keep]
+    x
+}
+
 ## Guess name of user's loaded DLL code
 getUserDLL <- function(){
     dlls <- getLoadedDLLs()
@@ -212,7 +222,7 @@ MakeADFun <- function(data, parameters, map=list(),
       if(!silent) print(names(parameters))
       if(!silent) cat("Not matching template order:\n")
       if(!silent) print(parNameOrder)
-      parameters <- parameters[parNameOrder]
+      keepAttrib( parameters ) <- parameters[parNameOrder]
       if(!silent) cat("Your parameter list has been re-ordered.\n(Disable this warning with checkParameterOrder=FALSE)\n")
     }
   }
@@ -245,7 +255,7 @@ MakeADFun <- function(data, parameters, map=list(),
                           ans
                         })
     ## Now do the change:
-    parameters[names(map)] <- param.map
+    keepAttrib( parameters[names(map)] ) <- param.map
   }
 
   ## Utility to get back parameter list in original shape
