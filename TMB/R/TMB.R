@@ -49,6 +49,11 @@ updateCholesky <- function(L, H, t=0){
   ## TODO: Ask MM to export from Matrix!
 }
 
+## Test for invalid external pointer
+isNullPointer <- function(pointer) {
+  .Call("isNullPointer", pointer, PACKAGE="TMB")
+}
+
 ##' Construct objective functions with derivatives based on the users c++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
@@ -398,6 +403,10 @@ MakeADFun <- function(data, parameters, map=list(),
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
                 dumpstack=0) {
+    if(isNullPointer(ADFun$ptr)) {
+        if(silent)beSilent()
+        retape()
+    }
     switch(match.arg(type),
            "ADdouble" = {
           res <- .Call("EvalADFunObject", ADFun$ptr, theta,
