@@ -28,10 +28,14 @@ getUserDLL <- function(){
     names(dlls[TMBdll])
 }
 
+## Un-exported functions that we need
+.shlib_internal <- get(".shlib_internal", envir = asNamespace("tools"), inherits = FALSE)
+destructive_Chol_update <- get("destructive_Chol_update", envir = asNamespace("Matrix"), inherits = FALSE)
+
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
-  Matrix:::destructive_Chol_update(L, H, t)
+  destructive_Chol_update(L, H, t) ## Was: Matrix:::destructive_Chol_update(L, H, t)
   ## TODO: Ask MM to export from Matrix!
 }
 
@@ -932,7 +936,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                      ...
                      )
   on.exit(file.remove(mvfile),add=TRUE)
-  status <- tools:::.shlib_internal(file)
+  status <- .shlib_internal(file)  ## Was: tools:::.shlib_internal(file)
   if(status!=0) stop("Compilation failed")
   status
 }
