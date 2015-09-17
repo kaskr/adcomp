@@ -91,10 +91,9 @@
 
 ;;; History:
 ;;
-;; 17 Sep 2015  2.2  Added GUI menu and toolbar. Added user function
-;;                   `tmb-new-buffer'. Added internal variables `tmb-menu',
-;;                   `tmb-mode-map', and `tmb-tool-bar-map'. Improved
-;;                   `tmb-template-mini'.
+;; 17 Sep 2015  2.2  Added GUI menu and toolbar. Added internal variables
+;;                   `tmb-menu', `tmb-mode-map', and `tmb-tool-bar-map'.
+;;                   Improved `tmb-template-mini'.
 ;; 10 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
 ;;                   `tmb-run-debug' and `tmb-template-mini'.
 ;; 07 Sep 2015  2.0  Added user functions `tmb-run-debug', `tmb-scroll-down',
@@ -247,24 +246,8 @@
     (define-key map [?\C-c ?\C-s]       'tmb-toggle-function )
     (define-key map [?\C-\M-v]          'ignore              )
     map))
-(defvar tmb-tool-bar-map
-  (let ((tool-bar-map (make-sparse-keymap)) ; ; undo-form from menu-bar.el
-        (undo-form '(and (not buffer-read-only)(not (eq t buffer-undo-list))
-                         (if (eq last-command 'undo)(listp pending-undo-list)
-                           (consp buffer-undo-list)))))
-    (tool-bar-add-item "new" 'tmb-new-buffer 'tmb-new-buffer :help "New")
-    (tool-bar-add-item "open" 'find-file 'find-file :help "Open")
-    (tool-bar-add-item "save" 'save-buffer 'save-buffer :help "Save"
-                       :enable '(buffer-modified-p))
-    (tool-bar-add-item "cut" 'kill-region 'kill-region :help "Cut")
-    (tool-bar-add-item "copy" 'copy-region-as-kill 'copy-region-as-kill
-                       :help "Copy")
-    (tool-bar-add-item "paste" 'yank 'yank :help "Paste")
-    (tool-bar-add-item "undo" 'undo 'undo :help "Undo" :enable undo-form)
-    (tool-bar-add-item "close" 'kill-this-buffer 'kill-this-buffer
-                       :help "Close")
-    (tool-bar-add-item "jump-to" 'tmb-run 'tmb-run :help "Run")
-    tool-bar-map))
+(defvar tmb-tool-bar-map (tool-bar-make-keymap))
+(tool-bar-local-item "jump-to" 'tmb-run 'Run tmb-tool-bar-map)
 
 ;; 4  User functions
 
@@ -287,10 +270,6 @@
 (defun tmb-mode-version ()
   "Show TMB Mode version number." (interactive)
   (message "TMB Mode version %s" tmb-mode-version))
-(defun tmb-new-buffer ()
-  "Create new buffer." (interactive)
-  (switch-to-buffer (generate-new-buffer "Untitled"))
-  (eval (list (default-value 'major-mode))))
 (defun tmb-open ()
   "Open R script with same filename prefix as current buffer." (interactive)
   (tmb-open-any "R"))
@@ -366,13 +345,8 @@ visible."
   "Create minimal TMB files (mini.cpp, mini.R) in current directory."
   (interactive)
   ;; Platform-specific: -O1 in Windows, -O0 otherwise
-  (if (file-exists-p "mini.cpp")
-      (error "Error: file mini.cpp already exists in current directory"))
-  (if (file-exists-p "mini.R")
-      (error "Error: file mini.R already exists in current directory"))
-  (if (get-buffer "mini.cpp")(error "Error: buffer mini.cpp already exists"))
-  (if (get-buffer "mini.R")(error "Error: buffer mini.R already exists"))
-  (delete-other-windows)(find-file "mini.cpp")(insert "\
+  (delete-other-windows)(find-file "mini.cpp")
+  (delete-region (point-min)(point-max))(insert "\
 #include <TMB.hpp>
 
 template<class Type>
@@ -388,8 +362,9 @@ Type objective_function<Type>::operator() ()
   return f;
 }
 ")
-  (goto-char (point-min))(save-buffer "mini.cpp")
-  (find-file-other-window "mini.R")(insert "\
+  (goto-char (point-min))(write-file "mini.cpp" t)
+  (find-file-other-window "mini.R")
+  (delete-region (point-min)(point-max))(insert "\
 data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
@@ -405,7 +380,7 @@ rep <- sdreport(model)
 
 rep
 ")
-  (goto-char (point-min))(save-buffer "mini.R")(other-window 1)(tmb-mode)
+  (goto-char (point-min))(write-file "mini.R" t)(other-window 1)(tmb-mode)
   (message (concat "Ready to run R script ("
                    (substitute-command-keys "\\<tmb-mode-map>\\[tmb-run]")
                    ") or edit code.")))
@@ -455,7 +430,6 @@ in the compilation buffer.\n
   (set (make-local-variable 'font-lock-defaults)
        '(tmb-font-lock-keywords nil nil))
   (set (make-local-variable 'tool-bar-map) tmb-tool-bar-map)
-  (setq compilation-scroll-output 'first-error)
-)
+  (setq compilation-scroll-output 'first-error))
 
 (provide 'tmb)
