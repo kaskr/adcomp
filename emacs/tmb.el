@@ -91,7 +91,7 @@
 
 ;;; History:
 ;;
-;; 17 Sep 2015  2.2  Added GUI menu and toolbar. Added internal variables
+;; 18 Sep 2015  2.2  Added GUI menu and toolbar. Added internal variables
 ;;                   `tmb-menu', `tmb-mode-map', and `tmb-tool-bar-map'.
 ;;                   Improved `tmb-template-mini'.
 ;; 10 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
@@ -246,8 +246,10 @@
     (define-key map [?\C-c ?\C-s]       'tmb-toggle-function )
     (define-key map [?\C-\M-v]          'ignore              )
     map))
-(defvar tmb-tool-bar-map (tool-bar-make-keymap))
-(tool-bar-local-item "jump-to" 'tmb-run 'Run tmb-tool-bar-map)
+(defvar tmb-tool-bar-map
+  (let ((map (tool-bar-make-keymap)))
+    (tool-bar-local-item "jump-to" 'tmb-run 'Run map)
+    map))
 
 ;; 4  User functions
 
