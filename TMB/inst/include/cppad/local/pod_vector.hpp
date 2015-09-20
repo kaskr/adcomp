@@ -54,9 +54,19 @@ template <> inline bool is_pod<int>(void)                { return true; }
 template <> inline bool is_pod<unsigned char>(void)      { return true; }
 template <> inline bool is_pod<unsigned short int>(void) { return true; }
 template <> inline bool is_pod<unsigned int>(void)       { return true; }
-# if CPPAD_SIZE_T_NOT_UNSIGNED_INT
-template <> inline bool is_pod<size_t>(void)             { return true; }
-# endif
+/*
+  This line:
+
+  template <> inline bool is_pod<size_t>(void)             { return true; }
+
+  is a re-definition *if* 'size_t' is equal to 'unsigned int'.
+  To avoid this issue we will assume that 'size_t' is always an alias to one
+  of the unsigned integer types, although this is not guarantied to be correct:
+  http://stackoverflow.com/questions/23749822/is-size-t-guaranteed-to-be-an-alias-type-to-one-of-integer-types
+  FIXME: throw a compile time error if assumption is wrong.
+ */
+template <> inline bool is_pod<unsigned long int>(void)  { return true; }
+
 # endif // CPPAD_CSTDINT_HAS_8_TO_64
 
 /// CppAD pod types so far: 
