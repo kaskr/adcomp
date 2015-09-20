@@ -191,7 +191,7 @@ to that of R.
   in R: 1=logaritm, 0=ordinary scale. \c true (logaritm) and \c false (ordinary scale) can 
   also be used.
 - Vector arguments must all be of the same length (no recycling of elements). If vectors of different lengths are
-  used an "out of range" error will occur, and can be picked up by the debugger.
+  used an "out of range" error will occur, which can be picked up by the debugger.
 - \c DATA_IVECTOR() and \c DATA_INTEGER() cannot be used with probability distributions, except possibly for the last (log) argument.
 - Some example:
   \code 
@@ -203,7 +203,6 @@ to that of R.
   dexp(x,rate,true);                      // OK if x is length 10 
   dexp(x,rate_matrix,true);               // Error, matrix arguments not allowed
   \endcode 
-  See ... for how to deal with \c array or \c matrix objects. 
 - To sum over elements in the vector returned use \code sum(dexp(x,rate));\endcode 
 */
 
@@ -566,6 +565,11 @@ Increments    x[1] = x[1] + 3    x(0) += 3.0;                // += -= *= /= incr
 
 \endcode
 
-
+<h3>C++ issues in TMB</h3>
+- You should not use \c if(x) statements where \c x is 
+   a \c PARAMETER, or is derived from a variable of type
+   \c PARAMETER. (It is OK to use \c if on \c DATA types, however.)
+   TMB will remove the \c if(x) statement, so the code will
+   produce unexpected results.
  
 */
