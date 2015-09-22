@@ -30,3 +30,4 @@ namespace density{
 } // End namespace
 
 #include "romberg.cpp"
+#include "autodiff.cpp"
