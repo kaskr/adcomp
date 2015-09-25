@@ -18,6 +18,16 @@ grepRandomParameters <- function(parameters,random){
   which(as.logical(unlist(tmp)))
 }
 
+## Assign without losing other attributes than 'names' (which may get
+## overwritten when subsetting)
+"keepAttrib<-" <- function(x, value){
+    attr <- attributes(x)
+    keep <- setdiff(names(attr), "names")
+    x <- value
+    attributes(x)[keep] <- attr[keep]
+    x
+}
+
 ## Guess name of user's loaded DLL code
 getUserDLL <- function(){
     dlls <- getLoadedDLLs()
@@ -28,11 +38,20 @@ getUserDLL <- function(){
     names(dlls[TMBdll])
 }
 
+## Un-exported functions that we need
+.shlib_internal <- get(".shlib_internal", envir = asNamespace("tools"), inherits = FALSE)
+destructive_Chol_update <- get("destructive_Chol_update", envir = asNamespace("Matrix"), inherits = FALSE)
+
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
-  Matrix:::destructive_Chol_update(L, H, t)
+  destructive_Chol_update(L, H, t) ## Was: Matrix:::destructive_Chol_update(L, H, t)
   ## TODO: Ask MM to export from Matrix!
+}
+
+## Test for invalid external pointer
+isNullPointer <- function(pointer) {
+  .Call("isNullPointer", pointer, PACKAGE="TMB")
 }
 
 ##' Construct objective functions with derivatives based on the users c++ template.
@@ -208,7 +227,7 @@ MakeADFun <- function(data, parameters, map=list(),
       if(!silent) print(names(parameters))
       if(!silent) cat("Not matching template order:\n")
       if(!silent) print(parNameOrder)
-      parameters <- parameters[parNameOrder]
+      keepAttrib( parameters ) <- parameters[parNameOrder]
       if(!silent) cat("Your parameter list has been re-ordered.\n(Disable this warning with checkParameterOrder=FALSE)\n")
     }
   }
@@ -241,7 +260,7 @@ MakeADFun <- function(data, parameters, map=list(),
                           ans
                         })
     ## Now do the change:
-    parameters[names(map)] <- param.map
+    keepAttrib( parameters[names(map)] ) <- param.map
   }
 
   ## Utility to get back parameter list in original shape
@@ -384,6 +403,10 @@ MakeADFun <- function(data, parameters, map=list(),
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
                 dumpstack=0) {
+    if(isNullPointer(ADFun$ptr)) {
+        if(silent)beSilent()
+        retape()
+    }
     switch(match.arg(type),
            "ADdouble" = {
           res <- .Call("EvalADFunObject", ADFun$ptr, theta,
@@ -932,7 +955,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                      ...
                      )
   on.exit(file.remove(mvfile),add=TRUE)
-  status <- tools:::.shlib_internal(file)
+  status <- .shlib_internal(file)  ## Was: tools:::.shlib_internal(file)
   if(status!=0) stop("Compilation failed")
   status
 }
@@ -946,6 +969,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 ##' \itemize{
 ##' \item To precompile on Linux run \code{precompile()}.
 ##' \item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@@")}.
+##' \item Precompiling is not supported on Windows at present.
 ##' }
 ##' Note that precompilation has side effects: It is not possible to work with more than one
 ##' model at a time for a single R instance.

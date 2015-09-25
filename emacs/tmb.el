@@ -4,8 +4,9 @@
 
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
+;; URL:      http://www.hafro.is/~arnima/tmb.html
 
-(defconst tmb-mode-version "2.1" "TMB Mode version number.")
+(defconst tmb-mode-version "2.2" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -26,7 +27,7 @@
 ;;
 ;; Major mode for editing Template Model Builder (TMB) code, derived from
 ;; `c++-mode'. Provides syntax highlighting, IDE compilation, file manipulation,
-;; and smaller tools. The syntax groups for highlighting are:
+;; basic templates, and smaller tools. The syntax groups for highlighting are:
 ;;
 ;; Face                          Example
 ;; tmb-data-face                 DATA_VECTOR
@@ -91,6 +92,12 @@
 
 ;;; History:
 ;;
+;; 22 Sep 2015  2.2  Added user function `tmp-toggle-nan-debug' and internal
+;;                   functions `tmb-nan-off' and `tmb-nan-on'. Added internal
+;;                   variables `tmb-menu', `tmb-mode-map', and
+;;                   `tmb-tool-bar-map'. Added GUI menu and toolbar. Renamed
+;;                   `tmb-toggle-function' to `tmb-toggle-show-function'.
+;;                   Improved `tmb-template-mini'.
 ;; 10 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
 ;;                   `tmb-run-debug' and `tmb-template-mini'.
 ;; 07 Sep 2015  2.0  Added user functions `tmb-run-debug', `tmb-scroll-down',
@@ -190,7 +197,9 @@
              "dbeta"
              "dexp" "pexp" "qexp"
              "dgamma" "dlgamma" "pgamma" "qgamma"
-             "dweibull" "pweibull" "qweibull"))
+             "dweibull" "pweibull" "qweibull"
+             ;; Debug
+             "feenableexcept"))
           (CONSTANTS '("dim"))
           (WARNINGS '("error")))
       (list
@@ -202,6 +211,56 @@
        (cons (regexp-opt CONSTANTS 'words) font-lock-constant-face)
        (cons (regexp-opt WARNINGS 'words) font-lock-warning-face)))))
 (nconc tmb-font-lock-keywords c++-font-lock-keywords)
+(defvar tmb-menu
+  '("TMB"
+    ["View Script"      tmb-open            ]
+    ["View Compilation" tmb-show-compilation]
+    "--"
+    ["Run"              tmb-run             ]
+    ["Make"             tmb-run-make        ]
+    "--"
+    ["Stop"             tmb-kill-process    ]
+    ["Clean"            tmb-clean           ]
+    "--"
+    ["Debug"            tmb-run-debug       ]
+    ["Toggle NaN Debug" tmb-toggle-nan-debug]
+    "--"
+    ["Mini Template"    tmb-template-mini   ]
+    "--"
+    ["Help"             tmb-help            ]
+    ["TMB Mode Version" tmb-mode-version    ]))
+(defvar tmb-mode-map
+  ;; Don't use C-c C-                        x
+  ;; Special   C-c C-        h
+  ;; Custom    C-c C- a cd f    klmnopqrs
+  ;; Available C-c C-  b  e g ij         tuvw yz
+  (let ((map (make-sparse-keymap)))
+    (easy-menu-define nil map nil tmb-menu)
+    (define-key map [f12]               'tmb-template-mini       )
+    (define-key map [?\C-c C-backspace] 'tmb-clean               )
+    (define-key map [M-up]              'tmb-scroll-up           )
+    (define-key map [M-down]            'tmb-scroll-down         )
+    (define-key map [?\C-c ?\C-.]       'tmb-mode-version        )
+    (define-key map [?\C-c ?\C-/]       'tmb-help                )
+    (define-key map [?\C-c ?\C-a]       'tmb-run-any             )
+    (define-key map [?\C-c ?\C-c]       'tmb-run                 )
+    (define-key map [?\C-c ?\C-d]       'tmb-run-debug           )
+    (define-key map [?\C-c ?\C-f]       'tmb-for                 )
+    (define-key map [?\C-c ?\C-k]       'tmb-kill-process        )
+    (define-key map [?\C-c ?\C-l]       'tmb-show-compilation    )
+    (define-key map [?\C-c ?\C-m]       'tmb-run-make            )
+    (define-key map [?\C-c ?\C-n]       'tmb-toggle-nan-debug    )
+    (define-key map [?\C-c ?\C-o]       'tmb-open-any            )
+    (define-key map [?\C-c ?\C-p]       'tmb-open                )
+    (define-key map [?\C-c ?\C-q]       'tmb-kill-process        )
+    (define-key map [?\C-c ?\C-r]       'tmb-show-r              )
+    (define-key map [?\C-c ?\C-s]       'tmb-toggle-show-function)
+    (define-key map [?\C-\M-v]          'ignore                  )
+    map))
+(defvar tmb-tool-bar-map
+  (let ((map (tool-bar-make-keymap)))
+    (tool-bar-local-item "jump-to" 'tmb-run 'Run map)
+    map))
 
 ;; 4  User functions
 
@@ -299,13 +358,8 @@ visible."
   "Create minimal TMB files (mini.cpp, mini.R) in current directory."
   (interactive)
   ;; Platform-specific: -O1 in Windows, -O0 otherwise
-  (if (file-exists-p "mini.cpp")
-      (error "Error: file mini.cpp already exists in current directory"))
-  (if (file-exists-p "mini.R")
-      (error "Error: file mini.R already exists in current directory"))
-  (if (get-buffer "mini.cpp")(error "Error: buffer mini.cpp already exists"))
-  (if (get-buffer "mini.R")(error "Error: buffer mini.R already exists"))
-  (delete-other-windows)(find-file "mini.cpp")(insert "\
+  (delete-other-windows)(find-file "mini.cpp")
+  (delete-region (point-min)(point-max))(insert "\
 #include <TMB.hpp>
 
 template<class Type>
@@ -321,13 +375,14 @@ Type objective_function<Type>::operator() ()
   return f;
 }
 ")
-  (goto-char (point-min))(save-buffer "mini.cpp")
-  (find-file-other-window "mini.R")(insert "\
+  (goto-char (point-min))(write-file "mini.cpp" t)
+  (find-file-other-window "mini.R")
+  (delete-region (point-min)(point-max))(insert "\
 data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
 require(TMB)
-compile(\"mini.cpp\", \"-g -O" (if (tmb-windows-os-p) "1" "0") " -Wall\")
+compile(\"mini.cpp\", \"-O" (if (tmb-windows-os-p) "1" "0") " -Wall\")
 dyn.load(dynlib(\"mini\"))
 
 ################################################################################
@@ -338,22 +393,41 @@ rep <- sdreport(model)
 
 rep
 ")
-  (goto-char (point-min))(save-buffer "mini.R")(other-window 1)(tmb-mode)
+  (goto-char (point-min))(write-file "mini.R" t)(other-window 1)(tmb-mode)
   (message (concat "Ready to run R script ("
                    (substitute-command-keys "\\<tmb-mode-map>\\[tmb-run]")
                    ") or edit code.")))
-(defun tmb-toggle-function ()
-  "Toggle whether the current function is indicated in the mode line."
+(defun tmb-toggle-show-function ()
+  "Toggle whether to show the current function name in the mode line."
   (interactive)(which-function-mode (if which-function-mode 0 1))
   (message "Function indicator %s" (if which-function-mode "ON" "OFF")))
+(defun tmb-toggle-nan-debug ()
+  "Toggle floating point exceptions, for debugging." (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward "#include *<fenv.h>" nil t)
+        (tmb-nan-off)(tmb-nan-on))))
 
 ;; 5  Internal functions
 
 (defun tmb-include-p ()
   "Check if C++ file has #include <TMB.hpp>."
   (if (string-equal (file-name-extension (buffer-name)) "cpp")
-      (re-search-forward "#include ?<TMB.hpp>"
+      (re-search-forward "#include *<TMB.hpp>"
                          magic-mode-regexp-match-limit t)))
+(defun tmb-nan-off ()
+  "Disable floating point exceptions."
+  (flush-lines "#include *<fenv.h>" (point-min)(point-max))
+  (flush-lines "feenableexcept\(.*\);" (point-min)(point-max))
+  (message "Floating point exceptions disabled"))
+(defun tmb-nan-on ()
+  "Enable floating point exceptions."
+  (goto-char (point-min))(re-search-forward "#include *<TMB.hpp>")
+  (insert "\n#include <fenv.h>")
+  (search-forward "objective_function<Type>::operator()")(search-forward "{")
+  (insert "\n  feenableexcept"
+          "(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW);")
+  (message "Floating point exceptions enabled"))
 (defun tmb-windows-os-p ()
   "Check if TMB is running in a Windows operating system."
   (if (string-match "windows" (prin1-to-string system-type)) t nil))
@@ -365,15 +439,15 @@ rep
   "Major mode for creating statistical models with TMB.\n
 The `tmb-help' command shows this page.\n
 Start a new model from `tmb-template-mini'. Navigate between functions using
-`imenu' and indicate the current function in the mode line with
-`tmb-toggle-function'. Prototype for-loops with `tmb-for'.\n
+`imenu' and show the current function name in the mode line with
+`tmb-toggle-show-function'. Prototype for-loops with `tmb-for'.\n
 Use `tmb-open' to open the corresponding R script and `tmb-open-any' to open
 other model-related files. Show interactive *compilation* and *R* buffers with
 `tmb-show-compilation' and `tmb-show-r'.\n
 Build and run the model using `tmb-run', `tmb-run-any', or `tmb-run-make'.
 Stop the compilation or model run with `tmb-kill-process'. The C++ binary files
 (*.o, *.so, *.dll) can be removed using `tmb-clean'. Invoke a GDB debug session
-with `tmb-run-debug'.\n
+with `tmb-run-debug', where `tmb-toggle-nan-debug' can be helpful.\n
 While staying in the TMB window, navigate the secondary window with
 \\<tmb-mode-map>\
 \\[beginning-of-buffer-other-window], \\[scroll-other-window-down], \
@@ -383,28 +457,11 @@ While staying in the TMB window, navigate the secondary window with
 This is particularly efficient for navigating error messages listed
 in the compilation buffer.\n
 \\{tmb-mode-map}"
+  (abbrev-mode 0)
+  (modify-syntax-entry ?_ "w" tmb-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults)
        '(tmb-font-lock-keywords nil nil))
-  (abbrev-mode 0)
+  (set (make-local-variable 'tool-bar-map) tmb-tool-bar-map)
   (setq compilation-scroll-output 'first-error))
-(modify-syntax-entry ?_ "w" tmb-mode-syntax-table)
-(define-key tmb-mode-map [f12]               'tmb-template-mini   )
-(define-key tmb-mode-map [?\C-c C-backspace] 'tmb-clean           )
-(define-key tmb-mode-map [M-up]              'tmb-scroll-up       )
-(define-key tmb-mode-map [M-down]            'tmb-scroll-down     )
-(define-key tmb-mode-map [?\C-c ?\C-.]       'tmb-mode-version    )
-(define-key tmb-mode-map [?\C-c ?\C-/]       'tmb-help            )
-(define-key tmb-mode-map [?\C-c ?\C-a]       'tmb-run-any         )
-(define-key tmb-mode-map [?\C-c ?\C-c]       'tmb-run             )
-(define-key tmb-mode-map [?\C-c ?\C-d]       'tmb-run-debug       )
-(define-key tmb-mode-map [?\C-c ?\C-f]       'tmb-for             )
-(define-key tmb-mode-map [?\C-c ?\C-k]       'tmb-kill-process    )
-(define-key tmb-mode-map [?\C-c ?\C-l]       'tmb-show-compilation)
-(define-key tmb-mode-map [?\C-c ?\C-m]       'tmb-run-make        )
-(define-key tmb-mode-map [?\C-c ?\C-o]       'tmb-open-any        )
-(define-key tmb-mode-map [?\C-c ?\C-p]       'tmb-open            )
-(define-key tmb-mode-map [?\C-c ?\C-r]       'tmb-show-r          )
-(define-key tmb-mode-map [?\C-c ?\C-s]       'tmb-toggle-function )
-(define-key tmb-mode-map [?\C-\M-v]          'ignore              )
 
 (provide 'tmb)
