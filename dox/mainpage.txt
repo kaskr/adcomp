@@ -521,8 +521,6 @@ new variables \c w via the \c pnorm and \c qgamma functions as follows:
 \endcode
 \c w now has a gamma distribution.
 
-\b NOTE: at the time of writing \c pnorm and \c qgamma are yet not implemented.
-
 <h3>Discrete latent variables</h3>
 
 The Laplace approximation can not be applied to discrete latent variables that
