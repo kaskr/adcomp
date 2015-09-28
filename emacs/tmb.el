@@ -399,16 +399,16 @@ rep
   (message (concat "Ready to run R script ("
                    (substitute-command-keys "\\<tmb-mode-map>\\[tmb-run]")
                    ") or edit code.")))
-(defun tmb-toggle-show-function ()
-  "Toggle whether to show the current function name in the mode line."
-  (interactive)(which-function-mode (if which-function-mode 0 1))
-  (message "Function indicator %s" (if which-function-mode "ON" "OFF")))
 (defun tmb-toggle-nan-debug ()
   "Toggle floating point exceptions, for debugging." (interactive)
   (save-excursion
     (goto-char (point-min))
     (if (re-search-forward "#include *<fenv.h>" nil t)
         (tmb-nan-off)(tmb-nan-on))))
+(defun tmb-toggle-show-function ()
+  "Toggle whether to show the current function name in the mode line."
+  (interactive)(which-function-mode (if which-function-mode 0 1))
+  (message "Function indicator %s" (if which-function-mode "ON" "OFF")))
 
 ;; 5  Internal functions
 
