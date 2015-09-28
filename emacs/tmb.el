@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      http://www.hafro.is/~arnima/tmb.html
 
-(defconst tmb-mode-version "2.2" "TMB Mode version number.")
+(defconst tmb-mode-version "2.3" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -92,6 +92,7 @@
 
 ;;; History:
 ;;
+;; 28 Sep 2015  2.3  Improved `tmp-toggle-nan-debug' functionality.
 ;; 22 Sep 2015  2.2  Added user function `tmp-toggle-nan-debug' and internal
 ;;                   functions `tmb-nan-off' and `tmb-nan-on'. Added internal
 ;;                   variables `tmb-menu', `tmb-mode-map', and
@@ -200,7 +201,8 @@
              "dweibull" "pweibull" "qweibull"
              ;; Debug
              "feenableexcept"))
-          (CONSTANTS '("dim"))
+          (CONSTANTS
+           '("dim" "FE_DIVBYZERO" "FE_INVALID" "FE_OVERFLOW" "FE_UNDERFLOW"))
           (WARNINGS '("error")))
       (list
        (cons (regexp-opt TYPE 'words) font-lock-type-face)
@@ -426,7 +428,7 @@ rep
   (insert "\n#include <fenv.h>")
   (search-forward "objective_function<Type>::operator()")(search-forward "{")
   (insert "\n  feenableexcept"
-          "(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW);")
+          "(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO /* | FE_UNDERFLOW */ );")
   (message "Floating point exceptions enabled"))
 (defun tmb-windows-os-p ()
   "Check if TMB is running in a Windows operating system."
