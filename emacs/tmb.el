@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      http://www.hafro.is/~arnima/tmb.html
 
-(defconst tmb-mode-version "2.3" "TMB Mode version number.")
+(defconst tmb-mode-version "3.0" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -92,8 +92,13 @@
 
 ;;; History:
 ;;
-;; 28 Sep 2015  2.3  Improved `tmp-toggle-nan-debug' functionality.
-;; 22 Sep 2015  2.2  Added user function `tmp-toggle-nan-debug' and internal
+;; 29 Sep 2015  3.0  Added user functions `tmb-compile' and `tmb-compile-any'.
+;;                   Added user variables `tmb-debug-args' and
+;;                   `tmb-template-args'. Renamed `tmb-run-debug' to `tmb-debug'
+;;                   and `tmb-run-make' to `tmb-make'. Removed internal function
+;;                   `tmb-windows-os-p'.
+;; 28 Sep 2015  2.3  Improved `tmb-toggle-nan-debug'.
+;; 22 Sep 2015  2.2  Added user function `tmb-toggle-nan-debug' and internal
 ;;                   functions `tmb-nan-off' and `tmb-nan-on'. Added internal
 ;;                   variables `tmb-menu', `tmb-mode-map', and
 ;;                   `tmb-tool-bar-map'. Added GUI menu and toolbar. Renamed
@@ -126,6 +131,7 @@
 ;; (require 'ess-site) ; slow, load only when needed
 (add-to-list 'magic-mode-alist '(tmb-include-p . tmb-mode))
 (declare-function ess-eval-linewise "ess-inf")
+(declare-function ess-load-file "ess-inf")
 (declare-function ess-process-live-p "ess-inf")
 (declare-function ess-show-buffer "ess-inf")
 (defgroup tmb nil
@@ -134,22 +140,34 @@
 
 ;; 2  User variables
 
+(defcustom tmb-debug-args
+  (concat ",\"-g -O"
+          (if (string-match "windows" (prin1-to-string system-type))
+              "1\",DLLFLAGS=\"\"" "0\""))
+  "Arguments for compile() function in `tmb-debug'."
+  :tag "Debug args" :type 'string)
 (defcustom tmb-make-command "make"
-  "Shell command to run makefile using `tmb-run-make'."
-  :tag "Make" :type 'string :group 'tmb)
+  "Shell command to run makefile using `tmb-make'."
+  :tag "Make" :type 'string)
 (defcustom tmb-r-command "R --quiet --vanilla <"
   "Shell command to run R script using `tmb-run'."
-  :tag "R" :type 'string :group 'tmb)
+  :tag "R" :type 'string)
+(defcustom tmb-template-args
+  (concat ", \"-O"
+          (if (string-match "windows" (prin1-to-string system-type)) "1" "0")
+          " -Wall\"")
+  "Arguments for compile() function in `tmb-template-mini'."
+  :tag "Template args" :type 'string)
 (defface tmb-data-face '((t :inherit font-lock-type-face))
-  "Font Lock face to highlight TMB data macros." :group 'tmb)
+  "Font Lock face to highlight TMB data macros." :tag "Data")
 (defvar tmb-data-face 'tmb-data-face
   "Face name for TMB data macros.")
 (defface tmb-parameter-face '((t :inherit font-lock-type-face))
-  "Font Lock face to highlight TMB parameter macros." :group 'tmb)
+  "Font Lock face to highlight TMB parameter macros." :tag "Parameter")
 (defvar tmb-parameter-face 'tmb-parameter-face
   "Face name for TMB parameter macros.")
 (defface tmb-report-face '((t :inherit font-lock-keyword-face))
-  "Font Lock face to highlight TMB report macros." :group 'tmb)
+  "Font Lock face to highlight TMB report macros." :tag "Report")
 (defvar tmb-report-face 'tmb-report-face
   "Face name for TMB report macros.")
 
@@ -217,14 +235,16 @@
   '("TMB"
     ["View Script"      tmb-open            ]
     ["View Compilation" tmb-show-compilation]
+    ["View R Session"   tmb-show-r          ]
     "--"
+    ["Compile"          tmb-compile         ]
     ["Run"              tmb-run             ]
-    ["Make"             tmb-run-make        ]
+    ["Make"             tmb-make            ]
     "--"
     ["Stop"             tmb-kill-process    ]
     ["Clean"            tmb-clean           ]
     "--"
-    ["Debug"            tmb-run-debug       ]
+    ["Debug"            tmb-debug           ]
     ["Toggle NaN Debug" tmb-toggle-nan-debug]
     "--"
     ["Mini Template"    tmb-template-mini   ]
@@ -234,8 +254,8 @@
 (defvar tmb-mode-map
   ;; Don't use C-c C-                        x
   ;; Special   C-c C-        h
-  ;; Custom    C-c C- a cd f    klmnopqrs
-  ;; Available C-c C-  b  e g ij         tuvw yz
+  ;; Custom    C-c C- abcd f    klmnopqrs  v
+  ;; Available C-c C-     e g ij         tu w yz
   (let ((map (make-sparse-keymap)))
     (easy-menu-define nil map nil tmb-menu)
     (define-key map [f12]               'tmb-template-mini       )
@@ -244,19 +264,21 @@
     (define-key map [M-down]            'tmb-scroll-down         )
     (define-key map [?\C-c ?\C-.]       'tmb-mode-version        )
     (define-key map [?\C-c ?\C-/]       'tmb-help                )
-    (define-key map [?\C-c ?\C-a]       'tmb-run-any             )
-    (define-key map [?\C-c ?\C-c]       'tmb-run                 )
-    (define-key map [?\C-c ?\C-d]       'tmb-run-debug           )
+    (define-key map [?\C-c ?\C-a]       'tmb-compile-any         )
+    (define-key map [?\C-c ?\C-b]       'tmb-run-any             )
+    (define-key map [?\C-c ?\C-c]       'tmb-compile             )
+    (define-key map [?\C-c ?\C-d]       'tmb-debug               )
     (define-key map [?\C-c ?\C-f]       'tmb-for                 )
     (define-key map [?\C-c ?\C-k]       'tmb-kill-process        )
     (define-key map [?\C-c ?\C-l]       'tmb-show-compilation    )
-    (define-key map [?\C-c ?\C-m]       'tmb-run-make            )
+    (define-key map [?\C-c ?\C-m]       'tmb-make                )
     (define-key map [?\C-c ?\C-n]       'tmb-toggle-nan-debug    )
     (define-key map [?\C-c ?\C-o]       'tmb-open-any            )
     (define-key map [?\C-c ?\C-p]       'tmb-open                )
     (define-key map [?\C-c ?\C-q]       'tmb-kill-process        )
     (define-key map [?\C-c ?\C-r]       'tmb-show-r              )
     (define-key map [?\C-c ?\C-s]       'tmb-toggle-show-function)
+    (define-key map [?\C-c ?\C-v]       'tmb-run                 )
     (define-key map [?\C-\M-v]          'ignore                  )
     map))
 (defvar tmb-tool-bar-map
@@ -272,6 +294,42 @@
          (pattern (concat prog "\\.o\\|" prog "\\.so\\|" prog "\\.dll"))
          (files (directory-files "." nil pattern t)))
     (dolist (x files)(delete-file x)))(message "Removed binary files"))
+(defun tmb-compile ()
+  "Compile R script with same filename prefix as current buffer.\n
+If the R script has a different filename, then use `tmb-compile-any' instead.\n
+Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
+\\[tmb-scroll-up]."
+  (interactive)
+  (tmb-compile-any (concat (file-name-sans-extension (buffer-name)) ".R")))
+(defun tmb-compile-any (script)
+  "Compile any R script, querying user for SCRIPT filename.\n
+If the R script has the same filename prefix as the current buffer, then use
+`tmb-compile' instead.\n
+Filename history is accessible in the minibuffer prompt \
+(\\<minibuffer-local-map>\\[previous-history-element],\
+ \\[next-history-element]).\n
+Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
+\\[tmb-scroll-up]."
+  (interactive "fCompile R script: ")(save-buffer)
+  (compile (concat tmb-r-command " " script))
+  (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
+(defun tmb-debug ()
+  "Debug model with GDB.\n
+The user variable `tmb-template-args' is passed to the compile() function.
+The R session stays alive if it was running when this function was called."
+  (interactive)(save-buffer)
+  (require 'ess-site)
+  ;; Platform-specific: -O1 and DLLFLAGS in Windows, -O0 otherwise
+  (let* ((ess-dialect "R")
+         (inferior-R-args "--quiet --vanilla")
+         (ess-ask-for-ess-directory nil)
+         (prefix (file-name-sans-extension (buffer-name)))
+         (cmd-1 "require(TMB)")
+         (cmd-2 (concat "; compile(\"" prefix ".cpp\"" tmb-debug-args ")"))
+         (cmd-3 (concat "; gdbsource(\"" prefix ".R\",TRUE)"))
+         (cmd-4 (if (ess-process-live-p) "" "; q()"))
+         (cmd (concat cmd-1 cmd-2 cmd-3 cmd-4)))
+    (ess-eval-linewise cmd)))
 (defun tmb-for ()
   "Insert for(int i=0; i<; i++)." (interactive)
   (insert "for(int i=0; i<; i++)")(search-backward ";"))
@@ -282,6 +340,10 @@
 (defun tmb-kill-process ()
   "Stop the current process, usually TMB compilation or model run."
   (interactive)(kill-process (car (process-list))))
+(defun tmb-make ()
+  "Run makefile in current directory, using `tmb-make-command'."
+  (interactive)(save-buffer)(compile tmb-make-command)
+  (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (defun tmb-mode-version ()
   "Show TMB Mode version number." (interactive)
   (message "TMB Mode version %s" tmb-mode-version))
@@ -296,9 +358,8 @@
 (defun tmb-run ()
   "Run R script with same filename prefix as current buffer.\n
 If the R script has a different filename, then use `tmb-run-any' instead.\n
-Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
-\\[tmb-scroll-up]."
-  (interactive)(save-buffer)
+The script is sourced in an existing R session, or a new R session is started."
+  (interactive)
   (tmb-run-any (concat (file-name-sans-extension (buffer-name)) ".R")))
 (defun tmb-run-any (script)
   "Run any R script, querying user for SCRIPT filename.\n
@@ -307,32 +368,13 @@ If the R script has the same filename prefix as the current buffer, then use
 Filename history is accessible in the minibuffer prompt \
 (\\<minibuffer-local-map>\\[previous-history-element],\
  \\[next-history-element]).\n
-Navigate compilation errors with \\<tmb-mode-map>\\[tmb-scroll-down] and \
-\\[tmb-scroll-up]."
+The script is sourced in an existing R session, or a new session is started."
   (interactive "fRun R script: ")(save-buffer)
-  (compile (concat tmb-r-command " " script))
-  (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
-(defun tmb-run-debug ()
-  "Debug model with GDB.\n
-The R session stays alive if it was running when this function was called."
-  (interactive)(save-buffer)(message "Invoking debug session...")
   (require 'ess-site)
-  ;; Platform-specific: -O1 and DLLFLAGS in Windows, -O0 otherwise
   (let* ((ess-dialect "R")
          (inferior-R-args "--quiet --vanilla")
-         (ess-ask-for-ess-directory nil)
-         (prefix (file-name-sans-extension (buffer-name)))
-         (cmd-1 "require(TMB)")
-         (cmd-2 (concat "; compile(\"" prefix ".cpp\",\"-g -O"
-                        (if (tmb-windows-os-p) "1\",DLLFLAGS=\"\")" "0\")")))
-         (cmd-3 (concat "; gdbsource(\"" prefix ".R\",TRUE)"))
-         (cmd-4 (if (ess-process-live-p) "" "; q()"))
-         (cmd (concat cmd-1 cmd-2 cmd-3 cmd-4)))
-    (ess-eval-linewise cmd)(message "Invoking debug session...done")))
-(defun tmb-run-make ()
-  "Run makefile in current directory, using `tmb-make-command'."
-  (interactive)(save-buffer)(compile tmb-make-command)
-  (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
+         (ess-ask-for-ess-directory nil))
+    (ess-load-file script)))
 (defun tmb-scroll-down (n)
   "Scroll other window down N lines, or visit next error message.\n
 The behavior of this command depends on whether the compilation buffer is
@@ -357,7 +399,8 @@ visible."
   (if (null (get-buffer "*R*"))(error "*R* interactive buffer not found")
     (ess-show-buffer "*R*")))
 (defun tmb-template-mini ()
-  "Create minimal TMB files (mini.cpp, mini.R) in current directory."
+  "Create minimal TMB files (mini.cpp, mini.R) in current directory.\n
+The user variable `tmb-template-args' is passed to the compile() function."
   (interactive)
   ;; Platform-specific: -O1 in Windows, -O0 otherwise
   (delete-other-windows)(find-file "mini.cpp")
@@ -384,7 +427,7 @@ data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
 require(TMB)
-compile(\"mini.cpp\", \"-O" (if (tmb-windows-os-p) "1" "0") " -Wall\")
+compile(\"mini.cpp\"" tmb-template-args ")
 dyn.load(dynlib(\"mini\"))
 
 ################################################################################
@@ -393,11 +436,11 @@ model <- MakeADFun(data, parameters)
 fit <- nlminb(model$par, model$fn, model$gr)
 rep <- sdreport(model)
 
-rep
+print(rep)
 ")
   (goto-char (point-min))(write-file "mini.R" t)(other-window 1)(tmb-mode)
-  (message (concat "Ready to run R script ("
-                   (substitute-command-keys "\\<tmb-mode-map>\\[tmb-run]")
+  (message (concat "Ready to compile R script ("
+                   (substitute-command-keys "\\<tmb-mode-map>\\[tmb-compile]")
                    ") or edit code.")))
 (defun tmb-toggle-nan-debug ()
   "Toggle floating point exceptions, for debugging." (interactive)
@@ -430,9 +473,6 @@ rep
   (insert "\n  feenableexcept"
           "(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO /* | FE_UNDERFLOW */ );")
   (message "Floating point exceptions enabled"))
-(defun tmb-windows-os-p ()
-  "Check if TMB is running in a Windows operating system."
-  (if (string-match "windows" (prin1-to-string system-type)) t nil))
 
 ;; 6  Main function
 
@@ -446,10 +486,12 @@ Start a new model from `tmb-template-mini'. Navigate between functions using
 Use `tmb-open' to open the corresponding R script and `tmb-open-any' to open
 other model-related files. Show interactive *compilation* and *R* buffers with
 `tmb-show-compilation' and `tmb-show-r'.\n
-Build and run the model using `tmb-run', `tmb-run-any', or `tmb-run-make'.
-Stop the compilation or model run with `tmb-kill-process'. The C++ binary files
-(*.o, *.so, *.dll) can be removed using `tmb-clean'. Invoke a GDB debug session
-with `tmb-run-debug', where `tmb-toggle-nan-debug' can be helpful.\n
+Build and run the model using `tmb-compile', `tmb-compile-any', `tmb-run',
+`tmb-run-any', or `tmb-make'. Stop the compilation or model run with
+`tmb-kill-process'.\n
+The C++ binary files (*.o, *.so, *.dll) can be removed using `tmb-clean'.
+Invoke a GDB debug session with `tmb-debug', where `tmb-toggle-nan-debug'
+can be helpful.\n
 While staying in the TMB window, navigate the secondary window with
 \\<tmb-mode-map>\
 \\[beginning-of-buffer-other-window], \\[scroll-other-window-down], \
