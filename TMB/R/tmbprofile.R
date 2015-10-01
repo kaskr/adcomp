@@ -122,12 +122,18 @@ tmbprofile <- function(obj,
         ans$objective
       }
     }
+    ## Robustify f against failure
+    f.original <- f
+    f <- function(x){
+        y <- try(f.original(x), silent=TRUE)
+        if(is(y, "try-error")) y <- NA
+        y
+    }
     start <- NULL
     evalAlongLine <- function(h){
         start <<- rep(0, length(par)-1)
         x <- 0; y <- f(x)
         if(slice)obj$env$random.start <- expression(last.par[random])
-        na2false <- function(x)ifelse(is.na(x),FALSE,x)
         for(it in 1:maxit){
             yinit <- y[1]
             xcurrent <- tail(x,1)
@@ -138,14 +144,15 @@ tmbprofile <- function(obj,
             ynext <- f(xnext)
             x <- c(x,xnext)
             y <- c(y,ynext)
-            if(na2false(abs(ynext-yinit)>ytol))break;
+            if( is.na(ynext) )            break;
+            if( abs(ynext-yinit) > ytol ) break;
             speedMax <- ystep
             speedMin <-
                 if(ynext >= yinit) ystep/4     ## 'tail-part'
                 else               ystep/8     ## 'center-part' => slow down
-            if(na2false( abs(ynext-ycurrent) > speedMax) )
+            if( abs(ynext-ycurrent) > speedMax )
                 h <- h / 2
-            if(na2false( abs(ynext-ycurrent) < speedMin) )
+            if( abs(ynext-ycurrent) < speedMin )
                 h <- h * 2
         }
         ans <- data.frame(x=x+that, y=y)
