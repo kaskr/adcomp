@@ -87,5 +87,8 @@ On recent versions of gcc the following problem may be encountered: When the use
 * readelf -s mymodel.so | grep UNIQUE
 
 If this gives a lot of output it is not possible to unload the library, and R will have to be restarted every time the model is re-compiled.
-A workaround is to use clang++ instead of gcc.
+There are at least two alternative solutions to this problem:
 
+1. Use the clang compiler instead of gcc
+
+2. Use gcc with compilation flag ```-fno-gnu-unique``` (version 4.8.3 and newer)
