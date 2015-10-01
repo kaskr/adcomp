@@ -31,7 +31,7 @@ A template is compiled by \code{compile("template.cpp")}, which will call R's ma
 preprocessor flags.
 Compiler and compiler flags can be stored in a configuration file. In order of precedence either via
 the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
-Additional configuration variables can be set with \code{...} argument, which will overwrite any
+Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 previous selections.
 }
 

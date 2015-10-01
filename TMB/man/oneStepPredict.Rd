@@ -8,7 +8,7 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
   method = c("oneStepGaussianOffMode", "fullGaussian", "oneStepGeneric",
   "oneStepGaussian", "cdf"), subset = NULL, conditional = NULL,
   discrete = NULL, discreteSupport = NULL, seed = 123, parallel = FALSE,
-  trace = TRUE)
+  trace = TRUE, ...)
 }
 \arguments{
 \item{obj}{Output from \code{MakeADFun}.}
@@ -32,6 +32,8 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 \item{parallel}{Run in parallel using the \code{parallel} package?}
 
 \item{trace}{Trace progress?}
+
+\item{...}{Control parameters for OSA method}
 }
 \value{
 \code{data.frame} with OSA residuals in column \code{residual}.
