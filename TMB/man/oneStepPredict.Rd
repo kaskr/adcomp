@@ -7,8 +7,8 @@
 oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
   method = c("oneStepGaussianOffMode", "fullGaussian", "oneStepGeneric",
   "oneStepGaussian", "cdf"), subset = NULL, conditional = NULL,
-  discrete = NULL, discreteSupport = NULL, seed = 123, parallel = FALSE,
-  trace = TRUE, ...)
+  discrete = NULL, discreteSupport = NULL, range = c(-Inf, Inf),
+  seed = 123, parallel = FALSE, trace = TRUE, ...)
 }
 \arguments{
 \item{obj}{Output from \code{MakeADFun}.}
@@ -25,7 +25,9 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 
 \item{discrete}{Are observations discrete? (assumed FALSE by default)}
 
-\item{discreteSupport}{Support of discrete distribution (\code{method="oneStepGeneric"} only).}
+\item{discreteSupport}{Possible outcomes of discrete distribution (\code{method="oneStepGeneric"} only).}
+
+\item{range}{Possible range of the observations.}
 
 \item{seed}{Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine.}
 
