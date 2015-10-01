@@ -870,7 +870,7 @@ openmp <- function(n=NULL){
 ##' preprocessor flags.
 ##' Compiler and compiler flags can be stored in a configuration file. In order of precedence either via
 ##' the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
-##' Additional configuration variables can be set with \code{...} argument, which will overwrite any
+##' Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 ##' previous selections.
 ##' @title Compile a c++ template to DLL suitable for MakeADFun.
 ##' @param file c++ file.
@@ -951,7 +951,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                        system.file(dynlib("libs/libTMB"),package="TMB")[libtmb && !openmp],
                        system.file(dynlib("libs/libTMBomp"),package="TMB")[libtmb && openmp] ),
                      PKG_CXXFLAGS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
-                     CXXFLAGS=flags[flags!=""], ## Optionally overwrite cxxflags
+                     CXXFLAGS=flags[flags!=""], ## Optionally override cxxflags
                      ...
                      )
   on.exit(file.remove(mvfile),add=TRUE)
