@@ -78,3 +78,8 @@ install-metis-full: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 	fi
 	make build-package
 	LIBCHOLMOD=`pwd`/SuiteSparse/libcholmod.so R CMD INSTALL --preclean $(TARBALL)
+
+## Get a rough changelog since most recent github revision tag
+## (Use as starting point when updating NEWS file)
+changelog:
+	git --no-pager log --format="%B" `git describe --abbrev=0 --tags`..HEAD
