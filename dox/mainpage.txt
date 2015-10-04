@@ -23,7 +23,7 @@ These pages describes the C++ part of TMB. The R part is documented via the ordi
 \brief A general introduction to TMB
 
 
-A TMB projects consists of an R file (*.R) and a C++ file (*.cpp). 
+A TMB project consists of an R file (*.R) and a C++ file (*.cpp). 
 The R file does pre- and post processing of data in addition to maximizing
 the log-likelihood contained in *.cpp. See \ref Examples for more details.
 All R functions are documented within the standard help system in R.
