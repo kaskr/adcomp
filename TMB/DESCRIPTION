@@ -1,7 +1,7 @@
 Package: TMB
 Type: Package
 Title: General Random Effect Model Builder Tool Inspired by ADMB
-Version: 1.1-1
+Version: 1.5.1
 Date: 2015-08-17
 Author: Kasper Kristensen
 Maintainer: Kasper Kristensen <kaskr@imm.dtu.dk>
