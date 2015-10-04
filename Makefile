@@ -1,5 +1,8 @@
+R=R
+# -> you can do    R=R-devel  make ....
+
 PACKAGE=TMB
-VERSION=1.1-1
+VERSION := $(shell sed -n '/^Version: /s///p' TMB/DESCRIPTION)
 TARBALL=${PACKAGE}_${VERSION}.tar.gz
 ZIPFILE=${PACKAGE}_${VERSION}.zip
 
@@ -33,7 +36,7 @@ check:
 	R CMD check $(PACKAGE)
 
 unlock:
-	rm -rf ${R_LIBS}/00LOCK-TMB
+	rm -rf `Rscript --vanilla -e 'writeLines(.Library)'`/00LOCK-TMB
 
 .PHONY: dox
 dox:
