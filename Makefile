@@ -3,6 +3,7 @@ R=R
 
 PACKAGE=TMB
 VERSION := $(shell sed -n '/^Version: /s///p' TMB/DESCRIPTION)
+DATE := $(shell sed -n '/^Date: /s///p' TMB/DESCRIPTION)
 TARBALL=${PACKAGE}_${VERSION}.tar.gz
 ZIPFILE=${PACKAGE}_${VERSION}.zip
 
@@ -81,5 +82,11 @@ install-metis-full: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 
 ## Get a rough changelog since most recent github revision tag
 ## (Use as starting point when updating NEWS file)
+## NOTE: Run *after* updating version and date in DESCRIPTION.
 changelog:
-	git --no-pager log --format="%B" `git describe --abbrev=0 --tags`..HEAD
+	echo; \
+	echo "------------------------------------------------------------------------"; \
+	echo TMB $(VERSION) \($(DATE)\); \
+	echo "------------------------------------------------------------------------"; \
+	echo; \
+	git --no-pager log --format="o %B" `git describe --abbrev=0 --tags`..HEAD | sed s/^-/\ \ -/g
