@@ -41,6 +41,7 @@ unlock:
 
 .PHONY: dox
 dox:
+	sed -i s/^PROJECT_NUMBER.*/PROJECT_NUMBER=v$(VERSION)/g dox/Doxyfile
 	cd dox; doxygen
 
 dox-clean:
