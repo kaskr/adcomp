@@ -1305,6 +1305,7 @@ PREDEFINED             =	VECTORIZE1_t(f)=       \
 				VECTORIZE3_ttt(f)=     \
 				VECTORIZE4_ttti(f)=    \
 				VECTORIZE6_ttttti(f)=  \
+				CSKIP(body)=;          \
 				"TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
