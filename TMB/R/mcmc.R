@@ -32,7 +32,8 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
     gr <- function(x) {
         z <- -as.vector(obj$gr(x))
         if(any(is.nan(z))){
-               warning(paste("NaN at:", paste(x, collapse=" ")))
+            warning(paste("NaN at:", paste(x, collapse=" ")))
+            z <- 0
            }
         return(z)
     }
