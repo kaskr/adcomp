@@ -193,6 +193,8 @@ class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
     this->setSigma(Sigma); /* Call MVNORM_t initializer */
   }
 };
+/** \brief Evaluates the density with unstructure correlation matrix. 
+     See UNSTRUCTURED_CORR_t for details */
 template <class scalartype>
 UNSTRUCTURED_CORR_t<scalartype> UNSTRUCTURED_CORR(vector<scalartype> x){
   return UNSTRUCTURED_CORR_t<scalartype>(x);
@@ -834,6 +836,7 @@ public:
   int ndim(){return f.ndim();}
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
+/** \brief Evaluates a scaled density. See VECSCALE_t for details */
 template <class vectortype, class distribution>
 VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
   return VECSCALE_t<distribution>(f_,scale_);
