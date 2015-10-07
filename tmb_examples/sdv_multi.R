@@ -23,7 +23,7 @@ obj <- MakeADFun(data=
 obj$hessian <- F
 #ttt=obj$fn()
 ##Rprof();opt <- do.call("optim",obj);Rprof(NULL)
-newtonOption(smartsearch=TRUE)
+newtonOption(obj,smartsearch=TRUE)
 ##print(system.time(opt <- do.call("optim",obj)))
 ttt=system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,
          lower=c(rep(-.99,3),rep(-3.0,3),rep(-3.0,3),rep(-5.0,3)),

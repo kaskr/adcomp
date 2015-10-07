@@ -61,6 +61,18 @@ gdbsource <- function(file,interactive=FALSE){
     return(txt)
   }
 }
+
+##' If \code{gdbsource} is run non-interactively (the default) only
+##' the relevant information will be printed. Note that this will only
+##' work if the cpp file and the R file share the same base name.
+##'
+##' @title Print problematic cpp line number.
+##' @param x Backtrace from \code{gdbsource}
+##' @param ... Not used
+##' @rdname gdbsource
+##' @method print backtrace
+##' @S3method print backtrace
+##' @return NULL
 print.backtrace <- function(x,...){
   ## Backtrace begins here
   line <- grep("#0",x)

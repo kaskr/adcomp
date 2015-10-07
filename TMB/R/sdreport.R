@@ -40,10 +40,12 @@
 ##' @param hessian.fixed Optional. Hessian wrt. fixed effects (will be calculated from \code{obj} if missing).
 ##' @param getJointPrecision Optional. Return full joint precision matrix of random and fixed effects?
 ##' @param bias.correct logical indicating if bias correction should be applied
-##' @param bias.correct.control a \code{\link{list}} of bias correction options; currently only \code{sd} is used.
+##' @param bias.correct.control a \code{list} of bias correction options; currently only \code{sd} is used.
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of fixed effects?
 ##' @return Object of class \code{sdreport}
+##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}
 ##' @examples
+##' \dontrun{
 ##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
 ##' sdreport(obj)
 ##' runExample("rw",thisR=TRUE)              ## Random effect example
@@ -51,6 +53,7 @@
 ##' summary(rep,"random")                    ## Only random effects
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
+##' }
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
@@ -233,6 +236,17 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ans
 }
 
+##' Extract parameters, random effects and reported variables along
+##' with uncertainties and optionally Chi-square statistics.
+##'
+##' @title summary tables of model parameters
+##' @param object Output from \code{\link{sdreport}}
+##' @param select Parameter classes to select
+##' @param p.value Add column with approximate p-values
+##' @param ... Not used
+##' @return matrix
+##' @method summary sdreport
+##' @S3method summary sdreport
 summary.sdreport <- function(object, select = c("all", "fixed", "random", "report"),
                              p.value=FALSE, ...)
 {
@@ -256,8 +270,15 @@ summary.sdreport <- function(object, select = c("all", "fixed", "random", "repor
   ans
 }
 
-## FIXME? The following logic is not "R standard":
-##        print.summary.<foo>() should print *more* than print.<foo>()
+##' Print parameter estimates and give convergence diagnostic based on
+##' gradient and Hessian.
+##'
+##' @title Print brief model summary
+##' @param x Output from \code{\link{sdreport}}
+##' @param ... Not used
+##' @return NULL
+##' @method print sdreport
+##' @S3method print sdreport
 print.sdreport <- function(x, ...)
 {
   cat("sdreport(.) result\n")

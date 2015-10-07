@@ -108,6 +108,7 @@
 ##' @param ... Control parameters for OSA method
 ##' @return \code{data.frame} with OSA residuals in column \code{residual}.
 ##' @examples
+##' \dontrun{
 ##' ######################## Gaussian case
 ##' runExample("simple")
 ##' osa.simple <- oneStepPredict(obj, observation.name = "x", method="fullGaussian")
@@ -117,6 +118,7 @@
 ##' runExample("ar1xar1")
 ##' osa.ar1xar1 <- oneStepPredict(obj, "N", "keep", method="cdf", discrete=TRUE, subset=1:100)
 ##' qqnorm(osa.ar1xar1$residual); abline(0,1)
+##' }
 oneStepPredict <- function(obj,
                            ## Names of data objects (not all are optional)
                            observation.name = NULL,

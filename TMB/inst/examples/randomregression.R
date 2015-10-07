@@ -35,7 +35,7 @@ obj$gr()
 ## Estimate
 obj$control <- list(trace=1)
 obj$hessian <- TRUE
-newtonOption(smartsearch=FALSE,maxit=5)
+newtonOption(obj,smartsearch=FALSE,maxit=5)
 ##Rprof()
 system.time(opt <- do.call("optim",obj))
 ##Rprof(NULL)

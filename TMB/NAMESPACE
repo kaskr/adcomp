@@ -22,29 +22,27 @@ importFrom("Matrix",
 
 ###____________________ EXPORTS ___________________________________
 
-## Export all  but those  listed as "internal"
-## TODO: get rid of that block -> drop man/TMB-internal.Rd
-## TODO First: look for runExample() below: --> several *internal*s are used in runExample() --> rather document ?!
 export(benchmark, compile,
-       dynlib, # <- used in runExample("linreg_parallel") _FIXME_ ?
+       config,
+       dynlib,
        gdbsource,
-       ## getUserDLL, grepRandomParameters,
-       ## info, isParallelTemplate,
        MakeADFun,
-       newton, ## newtonDefaults,
-       newtonOption,  # <- used in 5 different runExample(.) -- inst/examples/*.R
-       oneStepPredict, openmp,
-       ## parallelBenchmark,
-       ## plot.parallelBenchmark, plot.tmbprofile,
+       newton,
+       newtonOption,
+       oneStepPredict,
+       openmp,
+       plot.parallelBenchmark,
+       plot.tmbprofile,
        precompile,
-       ## print.backtrace, print.sdreport,
-       Rinterface, runExample,
-       runSymbolicAnalysis, # <- used in  runExample() -- inst/examples/ar1xar1.R
+       print.backtrace,
+       print.sdreport,
+       Rinterface,
+       runExample,
+       runSymbolicAnalysis,
        sdreport,
-       ## setDefaults, sparseHessianFun, summary.sdreport,
-       template, # tmbOption, updateCholesky
+       summary.sdreport,
+       template,
        tmbprofile)
-
 
 ## Methods :
 S3method(confint, tmbprofile)
@@ -56,5 +54,3 @@ S3method(summary, sdreport)
 S3method(plot, parallelBenchmark)
 
 S3method(print, backtrace)
-
-

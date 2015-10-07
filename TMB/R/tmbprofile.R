@@ -22,7 +22,9 @@
 ##' @param trace Trace progress?
 ##' @param ... Unused
 ##' @return data.frame with parameter and function values.
+##' @seealso \code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
 ##' @examples
+##' \dontrun{
 ##' runExample("randomregression",thisR=TRUE)
 ##' ## Parameter names for this model:
 ##' ## mu  mu  sigma  sigma  sigma0
@@ -36,6 +38,7 @@
 ##' prof2 <- tmbprofile(obj,name="mu1 - mu2",lincomb = c(1,-1,0,0,0))
 ##' plot(prof2)
 ##' confint(prof2)
+##' }
 tmbprofile <- function(obj,
                        name,
                        lincomb,
@@ -169,6 +172,16 @@ tmbprofile <- function(obj,
     ans
 }
 
+##' Plot (negative log) likelihood profile with confidence interval added.
+##'
+##' @title Plot likelihood profile.
+##' @param x Output from \code{\link{tmbprofile}}.
+##' @param type Plot type.
+##' @param level Add horizontal and vertical lines depicting this confidence level (\code{NULL} disables the lines).
+##' @param ... Additional plot arguments.
+##' @return NULL
+##' @method plot tmbprofile
+##' @S3method plot tmbprofile
 plot.tmbprofile <- function(x,type="l",level=.95,...){
     plot(as.data.frame(x), type=type, ...)
     if(!is.null(level)){
@@ -178,6 +191,16 @@ plot.tmbprofile <- function(x,type="l",level=.95,...){
     }
 }
 
+##' Calculate confidence interval from a likelihood profile.
+##'
+##' @title Profile based confidence intervals.
+##' @param object Output from \code{\link{tmbprofile}}.
+##' @param parm Not used
+##' @param level Confidence level.
+##' @param ... Not used
+##' @return Lower and upper limit as a matrix.
+##' @method confint tmbprofile
+##' @S3method confint tmbprofile
 confint.tmbprofile <- function (object, parm, level = 0.95, ...){
     i <- which.min(object$value)
     left <- head(object, i)

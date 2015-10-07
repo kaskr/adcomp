@@ -1,15 +1,3 @@
-##' Internal TMB Functions
-##'
-##' Internal TMB functions
-##'
-##' These are not to be called by the user (or in some cases are just
-##' waiting for proper documentation to be written :).
-##'
-##' @name TMB-internal
-##' @aliases checkSparseHessian config dynlib flagsDefaults getUserDLL grepRandomParameters info isParallelTemplate newtonDefaults newtonOption parallelBenchmark plot.parallelBenchmark print.backtrace print.sdreport runSymbolicAnalysis setDefaults sparseHessianFun summary.sdreport tmbOption updateCholesky
-##' @rdname TMB-internal
-NULL
-
 ## Utilities
 grepRandomParameters <- function(parameters,random){
   r <- sort(unique(unlist(lapply(random,function(regexp)grep(regexp,names(parameters))))))
@@ -54,7 +42,7 @@ isNullPointer <- function(pointer) {
   .Call("isNullPointer", pointer, PACKAGE="TMB")
 }
 
-##' Construct objective functions with derivatives based on the users c++ template.
+##' Construct objective functions with derivatives based on the users C++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
 ##' and its gradient. The object contains the following components:
@@ -105,7 +93,7 @@ isNullPointer <- function(pointer) {
 ##'   \item \code{"Fun"} Run through the template with ordinary double-types.
 ##'   \item \code{"ADGrad"} Run through the template with nested AD-types and produce a stack of operations representing the objective function gradient.
 ##' }
-##' Each of these are represented by external pointers to c++ structures available in the environment \code{env}.
+##' Each of these are represented by external pointers to C++ structures available in the environment \code{env}.
 ##'
 ##' Further objects in the environment \code{env}:
 ##' \itemize{
@@ -125,7 +113,7 @@ isNullPointer <- function(pointer) {
 ##' This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 ##' \code{silent=TRUE} to the \code{MakeADFun} call.
 ##' 
-##' @title Construct objective functions with derivatives based on a compiled c++ template.
+##' @title Construct objective functions with derivatives based on a compiled C++ template.
 ##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
 ##' @param map List defining how to optionally collect and fix parameters - see details.
@@ -863,7 +851,7 @@ openmp <- function(n=NULL){
   .Call("omp_num_threads",n,PACKAGE="TMB")
 }
 
-##' Compile a c++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
+##' Compile a C++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
 ##'
 ##' TMB relies on R's built in functionality to create shared libraries independent of the platform.
 ##' A template is compiled by \code{compile("template.cpp")}, which will call R's makefile with appropriate
@@ -872,8 +860,8 @@ openmp <- function(n=NULL){
 ##' the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
 ##' Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 ##' previous selections.
-##' @title Compile a c++ template to DLL suitable for MakeADFun.
-##' @param file c++ file.
+##' @title Compile a C++ template to DLL suitable for MakeADFun.
+##' @param file C++ file.
 ##' @param flags Character with compile flags.
 ##' @param safebounds Turn on preprocessor flag for bound checking?
 ##' @param safeunload Turn on preprocessor flag for safe DLL unloading?
@@ -990,13 +978,19 @@ precompile <- function(...){
   file.remove("libTMBomp.cpp")
 }
 
-## Add dynlib extension
-dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
+##' Add the platform dependent dynlib extension. In order for examples
+##' to work across platforms DLLs should be loaded by
+##' \code{dyn.load(dynlib("name"))}.
+##'
+##' @title Add dynlib extension
+##' @param name Library name without extension
+##' @return Character
+dynlib <- function(name)paste0(name,.Platform$dynlib.ext)
 
 ##' Create a cpp template to get started.
 ##'
-##' This function generates a c++ template with a header and include statement. Here is a brief
-##' overview of the c++ syntax used to code the objective function.
+##' This function generates a C++ template with a header and include statement. Here is a brief
+##' overview of the C++ syntax used to code the objective function.
 ##'
 ##' Macros to read data and declare parameters:
 ##'  \tabular{lll}{
@@ -1034,7 +1028,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##'     m.transpose()             \tab   R equivalent of t(m)                   \cr
 ##'  }
 ##'
-##' Some distributions are available as c++ templates with syntax close to R's distributions:
+##' Some distributions are available as C++ templates with syntax close to R's distributions:
 ##' \tabular{ll}{
 ##'    \bold{Function header}                \tab \bold{Distribution}                      \cr
 ##'    dnbinom2(x,mu,var,int give_log=0)     \tab Negative binomial with mean and variance \cr
@@ -1146,21 +1140,22 @@ info <- function(obj) {
 ##' @param env Environment for cached Cholesky factor.
 ##' @param ... Currently unused.
 ##' @return List with solution similar to \code{optim} output.
+##' @seealso \code{\link{newtonOption}}
 newton <- function (par,fn,gr,he,
-                    trace = newtonOption("trace"),
-                    maxit = newtonOption("maxit"),
-                    tol=newtonOption("tol"),
-                    alpha=1,
-                    smartsearch=newtonOption("smartsearch"),
-                    mgcmax=newtonOption("mgcmax"),
-                    super=TRUE,
-                    silent=TRUE,
+                    trace = 1,
+                    maxit = 100,
+                    tol = 1e-8,
+                    alpha = 1,
+                    smartsearch = TRUE,
+                    mgcmax = 1e60,
+                    super = TRUE,
+                    silent = TRUE,
                     ustep = 1, ## Start out optimistic: Newton step
                     power=.5, ## decrease=function(u)const*u^power
                     u0=1e-4,  ## Increase u=0 to this value
-                    grad.tol=tol,
-                    step.tol=tol,
-                    tol10=1e-3, ## Try to exit if last 10 iterations not improved much
+                    grad.tol = tol,
+                    step.tol = tol,
+                    tol10 = 1e-3, ## Try to exit if last 10 iterations not improved much
                     env=environment(),
                     ...)
 {
@@ -1297,6 +1292,27 @@ newton <- function (par,fn,gr,he,
   list(par=par,value=value,gradient=g,hessian=h,iterations=i)
 }
 
+##' Inner-problem options can be set for a model object using this
+##' function.
+##'
+##' @title Set newton options for a model object.
+##' @param obj Object from \code{\link{MakeADFun}} for which to change settings.
+##' @param ... Parameters for the \code{\link{newton}} optimizer to set.
+##' @return List of updated parameters.
+newtonOption <- function(obj,...){
+  if(!is.environment(obj$env)){
+    stop("First argument to 'newtonOption' must be a model object (output from MakeADFun)")
+  }
+  x <- list(...)
+  validOpts <- setdiff(names(formals(newton)),
+                       c("par","fn","gr","he","env","..."))
+  inValidOpts <- setdiff(names(x), validOpts)
+  if(length(inValidOpts) > 0){
+      stop("Invalid newton option(s):", paste0(" '",inValidOpts,"'"))
+  }
+  obj$env$inner.control[names(x)] <- x
+  invisible( obj$env$inner.control )
+}
 
 sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
   r <- obj$env$random
@@ -1362,6 +1378,14 @@ checkSparseHessian <- function(obj,par=obj$env$last.par,
   invisible(res)
 }
 
+##' Aggressively tries to reduce fill-in of sparse Cholesky factor by
+##' running a full suite of ordering algorithms. NOTE: requires a
+##' specialized installation of the package. More information is
+##' available at the package URL.
+##'
+##' @title Run symbolic analysis on sparse Hessian
+##' @param obj Output from \code{MakeADFun}
+##' @return NULL
 runSymbolicAnalysis <- function(obj){
   ok <- .Call("have_tmb_symbolic",PACKAGE="TMB")
   if(!ok){

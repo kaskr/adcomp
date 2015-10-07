@@ -1,0 +1,15 @@
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Misc",
+         title = "{TMB}: Automatic Differentiation and Laplace Approximation",
+         year = "2015",
+	 author =
+         c(person("Kasper", "Kristensen"),
+           person("Anders", "Nielsen"),
+           person(c("Casper", "W."), "Berg"),
+           person(c("Hans", "J."), "Skaug"),
+           person("Brad", "Bell")),
+	 note = "ArXiv e-print; in press, \\emph{Journal of Statistical Software}",
+	 url = "http://arxiv.org/abs/1509.00660")
+

@@ -24,7 +24,7 @@ obj <- MakeADFun(data=list(x=x,B=B,A=A),
                  random="u",
                  DLL="simple"
                  )
-newtonOption(smartsearch=FALSE)
+newtonOption(obj,smartsearch=FALSE)
 obj$fn(obj$par)
 obj$gr(obj$par)
 obj$control <- list(parscale=obj$par*0+1e-1,trace=10)

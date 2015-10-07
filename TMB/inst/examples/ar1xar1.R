@@ -43,7 +43,7 @@ runSymbolicAnalysis(obj)
 obj$control <- list(trace=1,parscale=c(1,1)*1e-2,REPORT=1,reltol=1e-12)
 obj$hessian <- TRUE
 ##Rprof();opt <- do.call("optim",obj);Rprof(NULL)
-newtonOption(smartsearch=FALSE)
+newtonOption(obj,smartsearch=FALSE)
 system.time(opt <- do.call("optim",obj))
 ##obj$gr()
 c(phi1,phi2)
