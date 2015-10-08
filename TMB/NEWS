@@ -1,4 +1,48 @@
 ------------------------------------------------------------------------
+TMB 1.6.0 (2015-10-08)
+------------------------------------------------------------------------
+
+o Major changeset to get closer to CRAN submission
+
+  - Added 'dontrun' to most examples. Reason: All useful TMB examples
+  take too long time to run because they require compilation.
+
+  - Removed TMB-internals.
+
+  - Added Roxygen for remaining functions: dynlib()
+  runSymbolicAnalysis() config() plot.parallelBenchmark()
+  summary.sdreport() print.sdreport() print.backtrace()
+  plot.tmbprofile() confint.tmbprofile()
+
+  - Got rid of global configuration, e.g flagsDefaults(),
+  newtonDefaults() etc.
+
+  - Reworked newtonOption() and adapted all examples to new syntax.
+  (NOTE: not entirely backwards compatible since to old version
+  modified global settings, which we do not allow anymore).
+
+  - Fixed several typos, e.g. c++ -> C++
+
+  - CITATION: Added arxiv reference.
+
+  - DESCRIPTION: Changed title and added URL.
+
+  - NAMESPACE: Cleanup
+
+o CppAD jacobian: prefer reverse mode over forward mode if work is equal
+  - TMB only requires 1st order reverse (not forward) mode to be
+  implemented for atomic functions. This can result in the error
+  'order not implemented' if CppAD automatically selects forward over
+  reverse mode.
+  - In cases where the work of forward and reverse mode are equal it
+  is therefore more natural (from TMB perspective) to select reverse
+  mode.
+
+o Document parallel_accumulator #122
+
+o Lots of doxygen documentation updates
+
+------------------------------------------------------------------------
 TMB 1.5-1 (2015-10-04)
 ------------------------------------------------------------------------
 
