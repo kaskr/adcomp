@@ -48,6 +48,7 @@ determined from \code{name}. Alternatively the linear combination
 may be given directly (\code{lincomb}).
 }
 \examples{
+\dontrun{
 runExample("randomregression",thisR=TRUE)
 ## Parameter names for this model:
 ## mu  mu  sigma  sigma  sigma0
@@ -61,5 +62,9 @@ confint(prof)
 prof2 <- tmbprofile(obj,name="mu1 - mu2",lincomb = c(1,-1,0,0,0))
 plot(prof2)
 confint(prof2)
+}
+}
+\seealso{
+\code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
 }
 

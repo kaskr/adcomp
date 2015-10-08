@@ -13,8 +13,8 @@ template(file = NULL)
 Create a cpp template to get started.
 }
 \details{
-This function generates a c++ template with a header and include statement. Here is a brief
-overview of the c++ syntax used to code the objective function.
+This function generates a C++ template with a header and include statement. Here is a brief
+overview of the C++ syntax used to code the objective function.
 
 Macros to read data and declare parameters:
  \tabular{lll}{
@@ -52,7 +52,7 @@ Basic calculations:
     m.transpose()             \tab   R equivalent of t(m)                   \cr
  }
 
-Some distributions are available as c++ templates with syntax close to R's distributions:
+Some distributions are available as C++ templates with syntax close to R's distributions:
 \tabular{ll}{
    \bold{Function header}                \tab \bold{Distribution}                      \cr
    dnbinom2(x,mu,var,int give_log=0)     \tab Negative binomial with mean and variance \cr

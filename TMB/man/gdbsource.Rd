@@ -2,20 +2,31 @@
 % Please edit documentation in R/gdbsource.R
 \name{gdbsource}
 \alias{gdbsource}
+\alias{print.backtrace}
 \title{Source R-script through gdb to get backtrace.}
 \usage{
 gdbsource(file, interactive = FALSE)
+
+\method{print}{backtrace}(x, ...)
 }
 \arguments{
 \item{file}{Your R script}
 
 \item{interactive}{Run interactive gdb session?}
+
+\item{x}{Backtrace from \code{gdbsource}}
+
+\item{...}{Not used}
 }
 \value{
 Object of class \code{backtrace}
 }
 \description{
 Source R-script through gdb to get backtrace.
+
+If \code{gdbsource} is run non-interactively (the default) only
+the relevant information will be printed. Note that this will only
+work if the cpp file and the R file share the same base name.
 }
 \details{
 This function is useful for debugging templates.

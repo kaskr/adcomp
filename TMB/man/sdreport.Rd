@@ -19,7 +19,7 @@ sdreport(obj, par.fixed = NULL, hessian.fixed = NULL,
 
 \item{bias.correct}{logical indicating if bias correction should be applied}
 
-\item{bias.correct.control}{a \code{\link{list}} of bias correction options; currently only \code{sd} is used.}
+\item{bias.correct.control}{a \code{list} of bias correction options; currently only \code{sd} is used.}
 
 \item{ignore.parm.uncertainty}{Optional. Ignore estimation variance of fixed effects?}
 }
@@ -65,6 +65,7 @@ inverted using \code{solve(jointPrecision)} in order to get the joint covariance
 parameter order will follow the original order (i.e. \code{obj$env$par}).
 }
 \examples{
+\dontrun{
 runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
 sdreport(obj)
 runExample("rw",thisR=TRUE)              ## Random effect example
@@ -72,5 +73,9 @@ rep <- sdreport(obj)
 summary(rep,"random")                    ## Only random effects
 summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 summary(rep,"report")                    ## Only report
+}
+}
+\seealso{
+\code{\link{summary.sdreport}}, \code{\link{print.sdreport}}
 }
 

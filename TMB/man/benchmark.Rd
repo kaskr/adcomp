@@ -2,9 +2,13 @@
 % Please edit documentation in R/benchmark.R
 \name{benchmark}
 \alias{benchmark}
+\alias{plot.parallelBenchmark}
 \title{Benchmark parallel templates}
 \usage{
 benchmark(obj, n = 10, expr = NULL, cores = NULL)
+
+\method{plot}{parallelBenchmark}(x, type = "b", ..., show = c("speedup",
+  "time"), legendpos = "topleft")
 }
 \arguments{
 \item{obj}{Object from \code{MakeADFun}}
@@ -14,9 +18,21 @@ benchmark(obj, n = 10, expr = NULL, cores = NULL)
 \item{expr}{Optional expression to benchmark instead of default.}
 
 \item{cores}{Optional vector of cores.}
+
+\item{x}{Object to plot}
+
+\item{type}{Plot type}
+
+\item{...}{Further plot arguments}
+
+\item{show}{Plot relative speedup or relative time?}
+
+\item{legendpos}{Position of legend}
 }
 \description{
 Benchmark parallel templates
+
+Plot result of parallel benchmark
 }
 \details{
 By default this function will perform timings of the most critical
@@ -32,10 +48,12 @@ Expressions to time can be overwritten by the user (\code{expr}).
 A \code{plot} method is available for Parallel benchmarks.
 }
 \examples{
+\dontrun{
 runExample("linreg_parallel",thisR=TRUE)  ## Create obj
 ben <- benchmark(obj,n=100,cores=1:4)
 plot(ben)
 ben <- benchmark(obj,n=10,cores=1:4,expr=expression(do.call("optim",obj)))
 plot(ben)
+}
 }
 
