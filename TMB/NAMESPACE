@@ -7,7 +7,7 @@ importFrom("methods", as, is, new,
 	   cbind2, rbind2)
 importFrom("stats", approx, confint, integrate, nlminb,
 	   optim, optimHess, pchisq, qchisq, qnorm, rnorm,
-	   runif, sd)
+	   runif, sd, splinefun)
 importFrom("utils", as.relistable, relist,
 	   head, tail)
 
