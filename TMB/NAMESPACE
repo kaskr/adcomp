@@ -10,6 +10,10 @@ importFrom("stats", approx, confint, integrate, nlminb,
 	   runif, sd, splinefun)
 importFrom("utils", as.relistable, relist,
 	   head, tail)
+## Windows specific imports
+if(.Platform$OS.type == "windows"){
+    importFrom("utils", shortPathName)
+}
 
 ## Recommended R - packages ----------------------
 importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMatrix, dpoMatrix)

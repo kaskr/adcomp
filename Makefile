@@ -91,3 +91,12 @@ changelog:
 	echo "------------------------------------------------------------------------"; \
 	echo; \
 	git --no-pager log --format="o %B" `git describe --abbrev=0 --tags`..HEAD | sed s/^-/\ \ -/g
+
+## The CRAN version must be customized a bit...
+## FIXME: Is it possible to get 'Makevars' POSIX compliant without
+## losing the current flexibility e.g. 'make install-metis'? (Main
+## obstacle is lack of 'ifdef' in POSIX make).
+cran-version:
+	echo "PKG_LIBS = \$$(LAPACK_LIBS) \$$(BLAS_LIBS) \$$(FLIBS) \$$(SHLIB_OPENMP_CFLAGS)" > TMB/src/Makevars
+	echo "PKG_CFLAGS = \$$(SHLIB_OPENMP_CFLAGS)" >> TMB/src/Makevars
+	sed -i /^SystemRequirements.*/d TMB/DESCRIPTION
