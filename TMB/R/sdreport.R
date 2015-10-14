@@ -48,12 +48,12 @@
 ##' \dontrun{
 ##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
 ##' sdreport(obj)
-##' runExample("rw",thisR=TRUE)              ## Random effect example
+##' }
+##' runExample("simple",thisR=TRUE)          ## Random effect example
 ##' rep <- sdreport(obj)
 ##' summary(rep,"random")                    ## Only random effects
 ##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
 ##' summary(rep,"report")                    ## Only report
-##' }
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
