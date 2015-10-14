@@ -1,58 +1,70 @@
-##' After optimization of an AD model, \code{sdreport} is used to calculate standard deviations of
-##' all model parameters, including non linear functions of random and fixed effects parameters
-##' specified through the ADREPORT() macro from the user template.
+##' After optimization of an AD model, \code{sdreport} is used to
+##' calculate standard deviations of all model parameters, including
+##' non linear functions of random effects and parameters specified
+##' through the ADREPORT() macro from the user template.
 ##'
-##' First, the Hessian wrt. the fixed effect parameter vector (\eqn{\theta}) is calculated.
-##' The fixed effects covariance matrix is approximated by
-##' \deqn{V(\hat\theta)=-\nabla^2 l(\hat\theta)^{-1}}
-##' where \eqn{l} denotes the log likelihood function (i.e. \code{-obj$fn}).
-##' If \code{ignore.parm.uncertainty=TRUE} then the Hessian calculation is
-##' omitted and a zero-matrix is used in place of \eqn{V(\hat\theta)}.
+##' First, the Hessian wrt. the parameter vector (\eqn{\theta}) is
+##' calculated.  The parameter covariance matrix is approximated by
+##' \deqn{V(\hat\theta)=-\nabla^2 l(\hat\theta)^{-1}} where \eqn{l}
+##' denotes the log likelihood function (i.e. \code{-obj$fn}).  If
+##' \code{ignore.parm.uncertainty=TRUE} then the Hessian calculation
+##' is omitted and a zero-matrix is used in place of
+##' \eqn{V(\hat\theta)}.
 ##'
-##' For non-random effect models the standard delta-method is used to calculate the covariance
-##' matrix. Let \eqn{\phi(\theta)} denote some non-linear function of \eqn{\theta}. Then
-##' \deqn{V(\phi(\hat\theta))\approx \nabla\phi V(\hat\theta) \nabla\phi'}
+##' For non-random effect models the standard delta-method is used to
+##' calculate the covariance matrix of transformed parameters. Let
+##' \eqn{\phi(\theta)} denote some non-linear function of
+##' \eqn{\theta}. Then \deqn{V(\phi(\hat\theta))\approx \nabla\phi
+##' V(\hat\theta) \nabla\phi'}
 ##'
-##' For random effect models a generalized delta-method is used. First the joint covariance
-##' of random and fixed effects is estimated by
+##' For random effect models a generalized delta-method is used. First
+##' the joint covariance of random effects and parameters is estimated
+##' by
 ##' \deqn{V \pmatrix{ \hat u \cr \hat\theta } \approx
 ##' \pmatrix{ H_{uu}^{-1} & 0 \cr 0 & 0 } +
 ##' J V(\hat\theta) J'
 ##' }
-##' where \eqn{H_{uu}} denotes random effect block of the full joint Hessian of \code{obj$env$f} and \eqn{J}
-##' denotes the Jacobian of \eqn{\pmatrix{\hat u(\theta) \cr \theta}} wrt. \eqn{\theta}.
-##' Here, the first term represents the expected conditional variance given the fixed effects
-##' and the second term represents the variance of the conditional mean wrt. the fixed effects.
+##' where \eqn{H_{uu}} denotes random effect block of the full joint
+##' Hessian of \code{obj$env$f} and \eqn{J} denotes the Jacobian of
+##' \eqn{\pmatrix{\hat u(\theta) \cr \theta}} wrt. \eqn{\theta}.
+##' Here, the first term represents the expected conditional variance
+##' given the parameters and the second term represents the variance
+##' of the conditional mean wrt. the parameters.
 ##'
-##' Now the delta method can be applied on a general non-linear function \eqn{\phi(u,\theta)}
-##' of random effects \eqn{u} and fixed effects \eqn{\theta}:
-##' \deqn{V(\phi(\hat u,\hat\theta))\approx \nabla\phi V \pmatrix{ \hat u \cr \hat\theta }\nabla\phi'}
+##' Now the delta method can be applied on a general non-linear
+##' function \eqn{\phi(u,\theta)} of random effects \eqn{u} and
+##' parameters \eqn{\theta}:
+##' \deqn{V(\phi(\hat u,\hat\theta))\approx \nabla\phi V \pmatrix{
+##' \hat u \cr \hat\theta }\nabla\phi'}
 ##'
-##' The full joint covariance is not returned by default, because it may require large amounts of memory.
-##' It may be obtained by specifying \code{getJointPrecision=TRUE}, in which case
-##' \eqn{V \pmatrix{ \hat u \cr \hat\theta } ^{-1} } will be part of the output. This matrix must be manually
-##' inverted using \code{solve(jointPrecision)} in order to get the joint covariance matrix. Note, that the
-##' parameter order will follow the original order (i.e. \code{obj$env$par}).
+##' The full joint covariance is not returned by default, because it
+##' may require large amounts of memory.  It may be obtained by
+##' specifying \code{getJointPrecision=TRUE}, in which case \eqn{V
+##' \pmatrix{ \hat u \cr \hat\theta } ^{-1} } will be part of the
+##' output. This matrix must be manually inverted using
+##' \code{solve(jointPrecision)} in order to get the joint covariance
+##' matrix. Note, that the parameter order will follow the original
+##' order (i.e. \code{obj$env$par}).
 ##'
 ##' @title General sdreport function.
 ##' @param obj Object returned by \code{MakeADFun}
-##' @param par.fixed Optional. Fixed effect parameter estimate (will be known to \code{obj} when an optimization has been carried out).
-##' @param hessian.fixed Optional. Hessian wrt. fixed effects (will be calculated from \code{obj} if missing).
-##' @param getJointPrecision Optional. Return full joint precision matrix of random and fixed effects?
+##' @param par.fixed Optional. Parameter estimate (will be known to \code{obj} when an optimization has been carried out).
+##' @param hessian.fixed Optional. Hessian wrt. parameters (will be calculated from \code{obj} if missing).
+##' @param getJointPrecision Optional. Return full joint precision matrix of random effects and parameters?
 ##' @param bias.correct logical indicating if bias correction should be applied
 ##' @param bias.correct.control a \code{list} of bias correction options; currently only \code{sd} is used.
-##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of fixed effects?
+##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of parameters?
 ##' @return Object of class \code{sdreport}
 ##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}
 ##' @examples
 ##' \dontrun{
-##' runExample("linreg_parallel",thisR=TRUE) ## Fixed effect example
+##' runExample("linreg_parallel",thisR=TRUE) ## Non-random effect example
 ##' sdreport(obj)
 ##' }
 ##' runExample("simple",thisR=TRUE)          ## Random effect example
 ##' rep <- sdreport(obj)
 ##' summary(rep,"random")                    ## Only random effects
-##' summary(rep,"fixed",p.value=TRUE)        ## Only fixed effects
+##' summary(rep,"fixed",p.value=TRUE)        ## Only non-random effects
 ##' summary(rep,"report")                    ## Only report
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE){
@@ -241,7 +253,10 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
 ##'
 ##' @title summary tables of model parameters
 ##' @param object Output from \code{\link{sdreport}}
-##' @param select Parameter classes to select
+##' @param select Parameter classes to select. Can be any subset of
+##' \code{"fixed"} (\eqn{\hat\theta}), \code{"random"} (\eqn{\hat u}) or
+##' \code{"report"} (\eqn{\phi(\hat u,\hat\theta)}) using notation as
+##' \code{\link{sdreport}}.
 ##' @param p.value Add column with approximate p-values
 ##' @param ... Not used
 ##' @return matrix
