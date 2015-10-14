@@ -16,7 +16,7 @@ Type objective_function<Type>::operator() ()
   Type phi2 = f(transf_phi2);
 
   using namespace density;
-  Type res=0;
+  Type res = 0;
   res += SEPARABLE( AR1(phi2), AR1(phi1) )(eta);
 
   /* keep = vector of ones */

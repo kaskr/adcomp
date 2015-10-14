@@ -15,18 +15,13 @@ A <- as(A,"dgTMatrix")
 u <- rnorm(ncol(B)) ## logsdu=0
 beta <- rnorm(ncol(A))*100
 eps <- rnorm(nrow(B),sd=1) ## logsd0=0
-x <- as.numeric(A%*%beta+B%*%u+eps)
+x <- as.numeric( A %*% beta + B %*% u + eps )
 
 ## Fit model
-map <- NULL
-obj <- MakeADFun(data=list(x=x,B=B,A=A),
-                 parameters=list(u=u*0+.1,beta=beta*0+.1,logsdu=.1,logsd0=0.1),
+obj <- MakeADFun(data=list(x=x, B=B, A=A),
+                 parameters=list(u=u*0, beta=beta*0, logsdu=1, logsd0=1),
                  random="u",
-                 DLL="simple"
+                 DLL="simple",
+                 silent=TRUE
                  )
-newtonOption(obj,smartsearch=FALSE)
-obj$fn(obj$par)
-obj$gr(obj$par)
-obj$control <- list(parscale=obj$par*0+1e-1,trace=10)
-obj$hessian <- TRUE
-opt <- do.call("optim",obj)
+opt <- nlminb(obj$par, obj$fn, obj$gr)
