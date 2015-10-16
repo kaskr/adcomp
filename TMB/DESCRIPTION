@@ -5,6 +5,7 @@ Version: 1.6.1
 Date: 2015-10-14
 Author: Kasper Kristensen
 Maintainer: Kasper Kristensen <kaskr@imm.dtu.dk>
+Copyright: See the file COPYRIGHTS
 Description: With this tool, a user should be able to quickly implement complex
     random effect models through simple C++ templates. The package combines
     CppAD (C++ automatic differentiation), Eigen (templated matrix-vector
