@@ -927,7 +927,9 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
     if(!is(tr,"try-error"))cat("Note: Library",paste0("'",dynlib(libname),"'"),"was unloaded.\n")
   }
   ## Includes and preprocessor flags specific for the template
+  useRcppEigen <- !file.exists( system.file("include/Eigen",package="TMB") )
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
+                   paste0("-I",system.file("include",package="RcppEigen"))[useRcppEigen],
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb]
