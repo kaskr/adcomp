@@ -6,7 +6,7 @@
 ##' @param thisR Run inside this R?
 ##' @param clean Cleanup before compile?
 ##' @param exfolder Alternative folder with examples.
-##' @param dontrun Build only - don't run ?
+##' @param dontrun Build only (don't run) and remove temporary object files ?
 ##' @param ... Passed to \code{compile}.
 runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
                        clean=FALSE,exfolder=NULL,
@@ -59,7 +59,7 @@ runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
     cat("Building example",name,"\n")
     time <- system.time(compile(paste0(name,".cpp"),...))
     cat("Build time",time["elapsed"],"seconds\n\n")
-    file.remove(paste0(name,".o"))
+    if(dontrun)file.remove(paste0(name,".o"))
   }
   if(!dontrun){
     cat("Running example",name,"\n")
