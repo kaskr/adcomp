@@ -3,8 +3,13 @@ Type: Package
 Title: Template Model Builder: A General Random Effect Tool Inspired by ADMB
 Version: 1.6.1
 Date: 2015-10-14
-Author: Kasper Kristensen
-Maintainer: Kasper Kristensen <kaskr@imm.dtu.dk>
+Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr@dtu.dk"),
+             person("Brad","Bell",role="cph"),
+             person("Hans","Skaug",role="ctb"),
+             person("Arni","Magnusson",role="ctb"),
+             person("Casper","Berg",role="ctb"),
+             person("Anders","Nielsen",role="ctb"),
+             person("Martin","Maechler",role="ctb"))
 Copyright: See the file COPYRIGHTS
 Description: With this tool, a user should be able to quickly implement complex
     random effect models through simple C++ templates. The package combines
