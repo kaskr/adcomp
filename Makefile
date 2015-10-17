@@ -96,8 +96,13 @@ changelog:
 ## FIXME: Is it possible to get 'Makevars' POSIX compliant without
 ## losing the current flexibility e.g. 'make install-metis'? (Main
 ## obstacle is lack of 'ifdef' in POSIX make).
+## FIXME: 'LinkingTo RcppEigen' is not really right but perhaps the
+## best we can do to assert RcppEigen is installed? (we need the
+## Eigen headers, nothing else)
 cran-version:
 	cd TMB; git clean -xdf
+	sed -i 's/^LinkingTo.*/LinkingTo: Matrix, RcppEigen/' TMB/DESCRIPTION
+	rm -rf TMB/inst/include/Eigen
 	echo "PKG_LIBS = \$$(LAPACK_LIBS) \$$(BLAS_LIBS) \$$(FLIBS) \$$(SHLIB_OPENMP_CFLAGS)" > TMB/src/Makevars
 	echo "PKG_CFLAGS = \$$(SHLIB_OPENMP_CFLAGS)"                                         >> TMB/src/Makevars
 	sed -i /^SystemRequirements.*/d TMB/DESCRIPTION
