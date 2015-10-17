@@ -251,7 +251,7 @@ Type dsn(Type x, Type alpha, int give_log=0)
 	// TODO : change pnorm_approx to pnorm when pnorm is written	
 	
 	if(!give_log) return 2 * dnorm(x,Type(0),Type(1),0) * pnorm_approx(alpha*x);
-	else return log(2) + log(dnorm(x,Type(0),Type(1),0)) + log(pnorm_approx(alpha*x));
+	else return log(2.0) + log(dnorm(x,Type(0),Type(1),0)) + log(pnorm_approx(alpha*x));
 }
 
 // Vectorize dsn
