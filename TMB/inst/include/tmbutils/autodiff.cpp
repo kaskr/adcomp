@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /**
    \brief Automatic differentiation (gradient, hessian, jacobian)
 

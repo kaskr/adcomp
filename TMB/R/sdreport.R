@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' After optimization of an AD model, \code{sdreport} is used to
 ##' calculate standard deviations of all model parameters, including
 ##' non linear functions of random effects and parameters specified

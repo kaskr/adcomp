@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Get or set internal configuration variables of user's DLL.
 ##'
 ##' A model compiled with the \code{TMB} C++ library has several

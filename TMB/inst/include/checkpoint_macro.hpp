@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /*
     Given function f0. Define recursively higher order reverse
     mode derivatives:

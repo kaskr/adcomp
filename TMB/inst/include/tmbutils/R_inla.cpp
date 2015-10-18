@@ -1,3 +1,6 @@
+// Copyright (C) 2015 Hans Skaug
+// License: GPL-2
+
 /**
    \file R_inla.cpp
    Makes SPDE methods from INLA R-package available in TMB.

@@ -1,6 +1,8 @@
 /*
-  Borrowed from Rcpp package - thanks.
-  
+  Borrowed from Rcpp package.
+  Copyright (C) 2011 - 2013  Dirk Eddelbuettel, Romain Francois and Jelmer Ypma
+  License: GPL-2
+
   After including this file we can replace "std::cout" by "Rcout", and it 
   will be possible to correctly capture the text output from R.
 */

@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Benchmark parallel templates
 ##'
 ##' By default this function will perform timings of the most critical

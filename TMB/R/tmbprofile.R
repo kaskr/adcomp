@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Calculate 1D likelihood profiles wrt. single parameters or more
 ##' generally, wrt. arbitrary linear combinations of parameters
 ##' (e.g. contrasts).

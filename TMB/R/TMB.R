@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ## Utilities
 grepRandomParameters <- function(parameters,random){
   r <- sort(unique(unlist(lapply(random,function(regexp)grep(regexp,names(parameters))))))

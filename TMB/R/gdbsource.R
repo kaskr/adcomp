@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Source R-script through gdb to get backtrace.
 ##'
 ##' This function is useful for debugging templates.

@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Compile and run a test example (\code{runExample()} shows all available examples).
 ##'
 ##' @title Run one of the test examples.

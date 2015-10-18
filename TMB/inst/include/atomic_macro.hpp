@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /* Conditionally skip compilation */
 #ifdef WITH_LIBTMB
 #define CSKIP(x) ;

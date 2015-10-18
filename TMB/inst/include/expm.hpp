@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 namespace atomic{
   /* Matrix class with methods required by Pade approximation */
   template<class Type>
