@@ -871,6 +871,7 @@ openmp <- function(n=NULL){
 ##' @param openmp Turn on openmp flag? Auto detected for parallel templates.
 ##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
 ##' @param ... Passed as Makeconf variables.
+##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file),libtmb=TRUE,...){
   if(.Platform$OS.type=="windows"){
@@ -967,7 +968,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 ##' Note that precompilation has side effects: It is not possible to work with more than one
 ##' model at a time for a single R instance.
 ##' @title Precompile the TMB library in order to speed up compilation of templates.
-##' @param ... Passed to \code{compile}.
+##' @param ... Passed to \code{\link{compile}}.
 precompile <- function(...){
   owdir <- getwd()
   on.exit(setwd(owdir))
@@ -994,8 +995,10 @@ dynlib <- function(name)paste0(name,.Platform$dynlib.ext)
 
 ##' Create a cpp template to get started.
 ##'
-##' This function generates a C++ template with a header and include statement. Here is a brief
-##' overview of the C++ syntax used to code the objective function.
+##' This function generates a C++ template with a header and include
+##' statement. Here is a brief overview of the C++ syntax used to code
+##' the objective function. For a full reference see the Doxygen
+##' documentation (more information at the package URL).
 ##'
 ##' Macros to read data and declare parameters:
 ##'  \tabular{lll}{

@@ -1,7 +1,8 @@
 ## Copyright (C) 2013-2015 Kasper Kristensen
 ## License: GPL-2
 
-##' Calculate one-step-ahead (OSA) residuals for a latent variable model.
+##' Calculate one-step-ahead (OSA) residuals for a latent variable
+##' model. (\emph{Beta version; may change without notice})
 ##'
 ##' Given a TMB latent variable model this function calculates OSA
 ##' standardized residuals that can be used for goodness-of-fit

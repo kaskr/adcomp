@@ -10,7 +10,7 @@
 ##' @param clean Cleanup before compile?
 ##' @param exfolder Alternative folder with examples.
 ##' @param dontrun Build only (don't run) and remove temporary object files ?
-##' @param ... Passed to \code{compile}.
+##' @param ... Passed to \code{\link{compile}}.
 runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
                        clean=FALSE,exfolder=NULL,
                        dontrun=FALSE,...){
