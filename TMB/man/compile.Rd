@@ -34,4 +34,7 @@ the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
 Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 previous selections.
 }
+\seealso{
+\code{\link{precompile}}
+}
 

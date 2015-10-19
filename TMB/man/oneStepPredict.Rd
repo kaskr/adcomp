@@ -41,7 +41,8 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 \code{data.frame} with OSA residuals in column \code{residual}.
 }
 \description{
-Calculate one-step-ahead (OSA) residuals for a latent variable model.
+Calculate one-step-ahead (OSA) residuals for a latent variable
+model. (\emph{Beta version; may change without notice})
 }
 \details{
 Given a TMB latent variable model this function calculates OSA
@@ -137,12 +138,12 @@ filled with zeros.
 }
 }
 \examples{
-\dontrun{
 ######################## Gaussian case
 runExample("simple")
 osa.simple <- oneStepPredict(obj, observation.name = "x", method="fullGaussian")
 qqnorm(osa.simple$residual); abline(0,1)
 
+\dontrun{
 ######################## Poisson case (First 100 observations)
 runExample("ar1xar1")
 osa.ar1xar1 <- oneStepPredict(obj, "N", "keep", method="cdf", discrete=TRUE, subset=1:100)

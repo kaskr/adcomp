@@ -7,7 +7,7 @@
 precompile(...)
 }
 \arguments{
-\item{...}{Passed to \code{compile}.}
+\item{...}{Passed to \code{\link{compile}}.}
 }
 \description{
 Precompile the TMB library

@@ -13,8 +13,10 @@ template(file = NULL)
 Create a cpp template to get started.
 }
 \details{
-This function generates a C++ template with a header and include statement. Here is a brief
-overview of the C++ syntax used to code the objective function.
+This function generates a C++ template with a header and include
+statement. Here is a brief overview of the C++ syntax used to code
+the objective function. For a full reference see the Doxygen
+documentation (more information at the package URL).
 
 Macros to read data and declare parameters:
  \tabular{lll}{

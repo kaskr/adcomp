@@ -5,7 +5,7 @@
 \title{Run one of the test examples.}
 \usage{
 runExample(name = NULL, all = FALSE, thisR = TRUE, clean = FALSE,
-  exfolder = NULL, ...)
+  exfolder = NULL, dontrun = FALSE, ...)
 }
 \arguments{
 \item{name}{Character name of example.}
@@ -18,7 +18,9 @@ runExample(name = NULL, all = FALSE, thisR = TRUE, clean = FALSE,
 
 \item{exfolder}{Alternative folder with examples.}
 
-\item{...}{Passed to \code{compile}.}
+\item{dontrun}{Build only (don't run) and remove temporary object files ?}
+
+\item{...}{Passed to \code{\link{compile}}.}
 }
 \description{
 Compile and run a test example (\code{runExample()} shows all available examples).
