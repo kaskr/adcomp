@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: sdv_multi_compact.cpp</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,7 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -78,24 +78,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">sdv_multi_compact.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
-</ul>
-</div></div><!-- contents -->
+<div class="fragment"><div class="line"><span class="comment">// Compact version of sdv_multi</span></div>
+<div class="line"><span class="preprocessor">#include &lt;<a class="code" href="TMB_8hpp.html">TMB.hpp</a>&gt;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
+<div class="line">Type <a name="a0"></a><a class="code" href="classobjective__function.html#a789a65f93df89fa5bc1d992cd56d5c87">objective_function&lt;Type&gt;::operator() </a>()</div>
+<div class="line">{</div>
+<div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(n);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(p);</div>
+<div class="line">  <a name="a2"></a><a class="code" href="tmb__core_8hpp.html#a97c14a26ca75571090d332f15130ae4b">DATA_ARRAY</a>(y);</div>
+<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(phi);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(log_sigma);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(mu_x);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(off_diag_x);</div>
+<div class="line">  <a name="a4"></a><a class="code" href="tmb__core_8hpp.html#a6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(h);</div>
+<div class="line"></div>
+<div class="line">  <span class="keyword">using namespace </span>density;</div>
+<div class="line"></div>
+<div class="line">  Type g=0;</div>
+<div class="line">  <a name="_a5"></a><a class="code" href="structvector.html">vector&lt;Type&gt;</a> sigma=exp(log_sigma);</div>
+<div class="line">  <a name="_a6"></a><a class="code" href="structarray.html">array&lt;Type&gt;</a> ht=h.<a name="a7"></a><a class="code" href="structarray.html#a9f0df57cc5403f71194f2159ec80bd66">transpose</a>(); <span class="comment">// For row access</span></div>
+<div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> sigma_init=sigma/sqrt(Type(1.0)-phi*phi); <span class="comment">// Initial sd of AR1</span></div>
+<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=0;j&lt;p;j++)g += <a name="a8"></a><a class="code" href="namespacedensity.html#a564c96720317ef7994dabc36d0d9e2b5">SCALE</a>(<a name="a9"></a><a class="code" href="namespacedensity.html#a74cd095b6502e658b9e9f0c58da1c60d">AR1</a>(phi(j)),sigma_init(j))(ht.col(j));</div>
+<div class="line"></div>
+<div class="line">  <span class="comment">// Likelihood contribution: observations</span></div>
+<div class="line">  <a name="_a10"></a><a class="code" href="classdensity_1_1UNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t&lt;Type&gt;</a> neg_log_density(off_diag_x);</div>
+<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;n;i++)</div>
+<div class="line">  {</div>
+<div class="line">    <a class="code" href="structvector.html">vector&lt;Type&gt;</a> sigma_y = exp(Type(0.5)*(mu_x + <a class="code" href="structvector.html">vector&lt;Type&gt;</a>(h.col(i))));</div>
+<div class="line">    g += <a name="a11"></a><a class="code" href="namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>(neg_log_density,sigma_y)(<a class="code" href="structvector.html">vector&lt;Type&gt;</a>(y.col(i)));</div>
+<div class="line">  }</div>
+<div class="line"></div>
+<div class="line">  <span class="keywordflow">return</span> g;</div>
+<div class="line">}</div>
+</div><!-- fragment --> </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

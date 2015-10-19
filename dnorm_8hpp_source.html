@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: dnorm.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,11 +37,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -61,7 +61,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+    </ul>
+  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -76,26 +81,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_83072381524e36aa65dff0229ec85225.html">TMB</a></li><li class="navelem"><a class="el" href="dir_5093d667102b00c01eb804fef6752bc8.html">inst</a></li><li class="navelem"><a class="el" href="dir_c71304b49dff604a28ae32b79c530cf0.html">include</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">dnorm.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
-</ul>
-</div></div><!-- contents -->
+<a href="dnorm_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// License: GPL-2</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">    9</a></span>&#160;Type <a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(Type x, Type mean, Type sd, <span class="keywordtype">int</span> give_log=0)</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;{</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  Type logres;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  logres=-log(Type(sqrt(2*M_PI))*sd)-Type(.5)*pow((x-mean)/sd,2);</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="comment">//return 1/(sqrt(2*M_PI)*sd)*exp(-.5*pow((x-mean)/sd,2));</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keywordflow">if</span>(give_log)<span class="keywordflow">return</span> logres; <span class="keywordflow">else</span> <span class="keywordflow">return</span> exp(logres);</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<a class="code" href="Vectorize_8hpp.html#aaa831df2ce539aea822c9f13c83df800">VECTORIZE4_ttti</a>(<a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>)</div>
+<div class="ttc" id="Vectorize_8hpp_html_aaa831df2ce539aea822c9f13c83df800"><div class="ttname"><a href="Vectorize_8hpp.html#aaa831df2ce539aea822c9f13c83df800">VECTORIZE4_ttti</a></div><div class="ttdeci">#define VECTORIZE4_ttti(FUN)</div><div class="ttdoc">Vectorize 4-argument functions. </div><div class="ttdef"><b>Definition:</b> <a href="Vectorize_8hpp_source.html#l00105">Vectorize.hpp:105</a></div></div>
+<div class="ttc" id="dnorm_8hpp_html_a5eb914782c488bd3ec4a50d4e4a73394"><div class="ttname"><a href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a></div><div class="ttdeci">Type dnorm(Type x, Type mean, Type sd, int give_log=0)</div><div class="ttdef"><b>Definition:</b> <a href="dnorm_8hpp_source.html#l00009">dnorm.hpp:9</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

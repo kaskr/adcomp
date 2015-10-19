@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['r_5finla',['R_inla',['../namespaceR__inla.html',1,'']]],
+  ['r_5finla_2ecpp',['R_inla.cpp',['../R__inla_8cpp.html',1,'']]],
+  ['r_20style_20probability_20distributions',['R style probability distributions',['../group__R__style__distribution.html',1,'']]],
+  ['range',['Range',['../structparallelADFun.html#a0de448716d7c39ecc4728ca60be88f63',1,'parallelADFun::Range()'],['../structparallelADFun.html#af44e9d5cbd34c9d6cac12f8c1c4caeb8',1,'parallelADFun::range()']]],
+  ['rcerr',['Rcerr',['../Rstream_8hpp.html#a7246be3aae342730334dc3251f75ce9e',1,'Rstream.hpp']]],
+  ['rcout',['Rcout',['../Rstream_8hpp.html#a9e88e81b80878667a7808988c0e8ee2c',1,'Rstream.hpp']]],
+  ['register_5fatomic',['REGISTER_ATOMIC',['../checkpoint__macro_8hpp.html#a201d25cbe3bbd5e1ba23e34f0477f12c',1,'checkpoint_macro.hpp']]],
+  ['registercfinalizer',['RegisterCFinalizer',['../structmemory__manager__struct.html#abad1601b37663e05816054a1fa7690f9',1,'memory_manager_struct']]],
+  ['report',['report',['../classobjective__function.html#a6887027498f804f831e6f7421fd4f89c',1,'objective_function::report()'],['../tmb__core_8hpp.html#ac2d7888f4e0385930448f992de53079b',1,'REPORT():&#160;tmb_core.hpp']]],
+  ['report_5fstack',['report_stack',['../structreport__stack.html',1,'']]],
+  ['reportnames',['reportnames',['../structreport__stack.html#abb092d175b44833fd3732c3e0326672b',1,'report_stack']]],
+  ['reportvector',['reportvector',['../classobjective__function.html#a93113a92ea3e820b6ff7e8feff753588',1,'objective_function']]],
+  ['result',['result',['../structreport__stack.html#ac0c4335695824bcdc1d612fbd251debe',1,'report_stack::result()'],['../structparallel__accumulator.html#ac926c14f2b108e8cb9d371c9ffbb3a2c',1,'parallel_accumulator::result()']]],
+  ['reverse',['Reverse',['../structparallelADFun.html#add94e8266fed6e000ca94ebebaa885bd',1,'parallelADFun']]],
+  ['reversefill',['reversefill',['../classobjective__function.html#a0327263cbe620b7db97106f671e75948',1,'objective_function']]],
+  ['robjecttester',['RObjectTester',['../tmb__core_8hpp.html#a88eb0be837cb8e6184b9a21b83832de0',1,'tmb_core.hpp']]],
+  ['robjecttestexpectedtype',['RObjectTestExpectedType',['../tmb__core_8hpp.html#ae842370b6391666215fed36e060e746f',1,'tmb_core.hpp']]],
+  ['romberg',['romberg',['../namespaceromberg.html',1,'']]],
+  ['romberg_2ecpp',['romberg.cpp',['../romberg_8cpp.html',1,'']]],
+  ['rostream',['Rostream',['../classRostream.html',1,'Rostream&lt; OUTPUT &gt;'],['../classRostream.html#a4272ef1621c5ee5eedfbb55aec561d11',1,'Rostream::Rostream()']]],
+  ['rotate',['rotate',['../structarray.html#abb991ca87f1bcf63068affa08db51b81',1,'array::rotate()'],['../structtmbutils_1_1array.html#a1b01dd3c11ea14f37b8db1ff18364da1',1,'tmbutils::array::rotate()']]],
+  ['rstream_2ehpp',['Rstream.hpp',['../Rstream_8hpp.html',1,'']]],
+  ['rstreambuf',['Rstreambuf',['../classRstreambuf.html',1,'Rstreambuf&lt; OUTPUT &gt;'],['../classRstreambuf.html#a190f2652407a135feabfe977635d92db',1,'Rstreambuf::Rstreambuf()']]]
+];

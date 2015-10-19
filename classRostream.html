@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: Rostream&lt; OUTPUT &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,10 +37,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
@@ -61,7 +61,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+    </ul>
+  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -76,26 +82,90 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+</div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="classRostream-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">Rostream&lt; OUTPUT &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
+
+<p><code>#include &lt;<a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a>&gt;</code></p>
+
+<p>Inherits ostream.</p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a4272ef1621c5ee5eedfbb55aec561d11"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRostream.html#a4272ef1621c5ee5eedfbb55aec561d11">Rostream</a> ()</td></tr>
+<tr class="separator:a4272ef1621c5ee5eedfbb55aec561d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a242f26b5709952b7b8805bb076f4f306"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRostream.html#a242f26b5709952b7b8805bb076f4f306">~Rostream</a> ()</td></tr>
+<tr class="separator:a242f26b5709952b7b8805bb076f4f306"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;bool OUTPUT&gt;<br/>
+class Rostream&lt; OUTPUT &gt;</h3>
+
+
+<p>Definition at line <a class="el" href="Rstream_8hpp_source.html#l00026">26</a> of file <a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a4272ef1621c5ee5eedfbb55aec561d11"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;bool OUTPUT&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classRostream.html">Rostream</a>&lt; OUTPUT &gt;::<a class="el" href="classRostream.html">Rostream</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="Rstream_8hpp_source.html#l00030">30</a> of file <a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a242f26b5709952b7b8805bb076f4f306"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;bool OUTPUT&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classRostream.html">Rostream</a>&lt; OUTPUT &gt;::~<a class="el" href="classRostream.html">Rostream</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="Rstream_8hpp_source.html#l00034">34</a> of file <a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li><a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a></li>
 </ul>
-</div></div><!-- contents -->
+</div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

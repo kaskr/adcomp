@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: Matrices and arrays</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,7 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -78,24 +78,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">Matrices and arrays</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
+
+<p>Matrices, vectors and arrays in TMB versus R.  
+<a href="#details">More...</a></p>
+<p>Matrices, vectors and arrays in TMB versus R. </p>
+<h1><a class="anchor" id="Relation_R"></a>
+Relationship to R</h1>
+<p>In R you can apply both matrix multiplication ("%*%") and elementwise multiplication ("*") to objects of type "matrix", i.e. it is the operator that determines the operation. In TMB we instead have two different types of objects, while the multiplication operator "*" is the same:</p>
 <ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
+<li><code>matrix:</code> linear algebra</li>
+<li><code>array:</code> elementwise operations; () and [] style indexing.</li>
+<li><code>vector:</code> can be used in linear algebra with <code>matrix</code>, but at the same time admits R style element-wise operations.</li>
 </ul>
-</div></div><!-- contents -->
+<p>See <a class="el" href="matrix_arrays_8cpp-example.html">matrix_arrays.cpp</a> for examples of use.</p>
+<h1><a class="anchor" id="Relation_Eigen"></a>
+Relationship to Eigen</h1>
+<p>The TMB types <code>matrix</code> and <code>array</code> inherits from the the Eigen types Matrix and Array. The advanced user of TMB will benefit from familiarity with the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen documentation</a>. </p>
+</div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

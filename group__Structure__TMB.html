@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: The structure of TMB</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,7 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -78,24 +78,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">The structure of TMB</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
-</ul>
-</div></div><!-- contents -->
+
+<p>An overview of the components that constitute TMB.  
+<a href="#details">More...</a></p>
+<p>An overview of the components that constitute TMB. </p>
+<p>This documentation only covers the "native" TMB code, not <a href="http://www.coin-or.org/CppAD/Doc/doxydoc/html/index.html">CppAD</a> or <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen</a> These packages have their own documentation, which may be relevant. In particular, some of the standard functions like <code>sin()</code> and <code>cos()</code> are part of <a class="el" href="namespaceCppAD.html">CppAD</a>, and are hence not documented through TMB.</p>
+<div class="image">
+<img src="TMB_components.png" alt="TMB_components.png"/>
+<div class="caption">
+test</div></div>
+</div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

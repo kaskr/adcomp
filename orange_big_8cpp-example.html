@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: orange_big.cpp</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,7 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -78,24 +78,66 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">orange_big.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
-</ul>
-</div></div><!-- contents -->
+<div class="fragment"><div class="line"><span class="comment">// Scaled up version of the Orange Tree example (50,000 latent random variables)</span></div>
+<div class="line"><span class="preprocessor">#include &lt;<a class="code" href="TMB_8hpp.html">TMB.hpp</a>&gt;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
+<div class="line">Type <a name="a0"></a><a class="code" href="classobjective__function.html#a789a65f93df89fa5bc1d992cd56d5c87">objective_function&lt;Type&gt;::operator() </a>()</div>
+<div class="line">{</div>
+<div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(n);</div>
+<div class="line">  <a name="a2"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(t);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(<a name="a3"></a><a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>);</div>
+<div class="line">  <a name="a4"></a><a class="code" href="tmb__core_8hpp.html#ace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>(ngroup);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(multiply);</div>
+<div class="line">  <a name="a5"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(beta);</div>
+<div class="line">  <a name="a6"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(log_sigma);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(log_sigma_u);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);</div>
+<div class="line"></div>
+<div class="line">  Type sigma=exp(log_sigma);</div>
+<div class="line">  Type sigma_u=exp(log_sigma_u);</div>
+<div class="line"></div>
+<div class="line">  <a name="a7"></a><a class="code" href="tmb__core_8hpp.html#a43a13c435127491364e4a167478f4992">ADREPORT</a>(sigma);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a43a13c435127491364e4a167478f4992">ADREPORT</a>(sigma_u);</div>
+<div class="line"></div>
+<div class="line">  <span class="keyword">using namespace </span>density;</div>
+<div class="line">  <span class="keywordtype">int</span> i,j,k,ii;</div>
+<div class="line"></div>
+<div class="line">  Type g=0;</div>
+<div class="line"></div>
+<div class="line">  <span class="keywordflow">for</span>(k=0;k&lt; multiply;k++)</div>
+<div class="line">  {</div>
+<div class="line">    ii = 0;</div>
+<div class="line">    <span class="keywordflow">for</span>(i=0;i&lt; <a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>;i++)</div>
+<div class="line">    {</div>
+<div class="line">      <span class="comment">// Random effects contribution</span></div>
+<div class="line">      Type u1 = u[i+k*<a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>];</div>
+<div class="line">      g -= -(log_sigma_u);</div>
+<div class="line">      g -= -.5*pow(u1/sigma_u,2);</div>
+<div class="line"></div>
+<div class="line">      <a name="_a8"></a><a class="code" href="structvector.html">vector&lt;Type&gt;</a> a(3); </div>
+<div class="line">      a[0] = 192.0 + beta[0] + u1;</div>
+<div class="line">      a[1] = 726.0 + beta[1];</div>
+<div class="line">      a[2] = 356.0 + beta[2];</div>
+<div class="line"></div>
+<div class="line">      Type tmp;</div>
+<div class="line">      Type f;</div>
+<div class="line"></div>
+<div class="line">      <span class="keywordflow">for</span>(j=0;j&lt;ngroup(i);j++)</div>
+<div class="line">      {</div>
+<div class="line">        f = a[0]/(1+exp(-(t[ii]-a[1])/a[2]));</div>
+<div class="line">        tmp = (y[ii] - f)/sigma;</div>
+<div class="line">        g -= -log_sigma - 0.5*tmp*tmp;</div>
+<div class="line">        ii++;</div>
+<div class="line">      }</div>
+<div class="line">    }</div>
+<div class="line">  }</div>
+<div class="line"></div>
+<div class="line">  <span class="keywordflow">return</span> g;</div>
+<div class="line">}</div>
+</div><!-- fragment --> </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

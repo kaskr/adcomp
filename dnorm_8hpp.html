@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: dnorm.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,11 +37,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -61,7 +61,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
+    </ul>
+  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -76,26 +81,79 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_83072381524e36aa65dff0229ec85225.html">TMB</a></li><li class="navelem"><a class="el" href="dir_5093d667102b00c01eb804fef6752bc8.html">inst</a></li><li class="navelem"><a class="el" href="dir_c71304b49dff604a28ae32b79c530cf0.html">include</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">dnorm.hpp File Reference<div class="ingroups"><a class="el" href="group__R__style__distribution.html">R style probability distributions</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
-</ul>
-</div></div><!-- contents -->
+
+<p>Univariate normal density.  
+<a href="#details">More...</a></p>
+
+<p><a href="dnorm_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a5eb914782c488bd3ec4a50d4e4a73394"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a5eb914782c488bd3ec4a50d4e4a73394"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a> (Type x, Type mean, Type sd, int give_log=0)</td></tr>
+<tr class="separator:a5eb914782c488bd3ec4a50d4e4a73394"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Univariate normal density. </p>
+
+<p>Definition in file <a class="el" href="dnorm_8hpp_source.html">dnorm.hpp</a>.</p>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a5eb914782c488bd3ec4a50d4e4a73394"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">Type dnorm </td>
+          <td>(</td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>mean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>sd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>give_log</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="linreg_8cpp-example.html#a6">linreg.cpp</a>, <a class="el" href="linreg_parallel_8cpp-example.html#a5">linreg_parallel.cpp</a>, <a class="el" href="longlinreg_8cpp-example.html#a6">longlinreg.cpp</a>, <a class="el" href="lr_test_8cpp-example.html#a4">lr_test.cpp</a>, <a class="el" href="mvrw_8cpp-example.html#a8">mvrw.cpp</a>, <a class="el" href="mvrw_sparse_8cpp-example.html#a9">mvrw_sparse.cpp</a>, <a class="el" href="sam_8cpp-example.html#a12">sam.cpp</a>, <a class="el" href="sde_linear_8cpp-example.html#a8">sde_linear.cpp</a>, <a class="el" href="sdv_multi_8cpp-example.html#a7">sdv_multi.cpp</a>, <a class="el" href="socatt_8cpp-example.html#a9">socatt.cpp</a>, <a class="el" href="thetalog_8cpp-example.html#a6">thetalog.cpp</a>, and <a class="el" href="transform_8cpp-example.html#a8">transform.cpp</a>.</dd>
+</dl>
+<p>Definition at line <a class="el" href="dnorm_8hpp_source.html#l00009">9</a> of file <a class="el" href="dnorm_8hpp_source.html">dnorm.hpp</a>.</p>
+
+<p>Referenced by <a class="el" href="group__R__style__distribution.html#gabd423200dbd32faa8abc12a645c90dd3">dsn()</a>, and <a class="el" href="classARk__t.html#a7a53d57817410df961ecb36c3a6ca14e">ARk_t&lt; scalartype_ &gt;::operator()()</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

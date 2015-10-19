@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: Comprehensive Documentation of C++ Functions and Classes (API)</title>
+<title>TMB Documentation: linreg_parallel.cpp</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,7 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
@@ -78,24 +78,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Comprehensive Documentation of C++ Functions and Classes (API) </div>  </div>
+<div class="title">linreg_parallel.cpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
-<p>These pages describes the C++ part of TMB. The R part is documented via the ordinary R help system.</p>
-<ul>
-<li>
-<b>Modules:</b> Introduction and summary of TMB (start here if you are new). </li>
-<li>
-<b>Namespaces:</b> TMB's package system </li>
-<li>
-<b>Classes:</b> The C++ classes used in TMB </li>
-<li>
-<b>Files:</b> The C++ files that constitute TMB </li>
-<li>
-<b>Examples:</b> List of pre built models that comes with TMB </li>
-<li>
-<b>Search</b> <b>field:</b> Start typing a keyword, and all matching keywords will be listed. Very useful! </li>
-</ul>
-</div></div><!-- contents -->
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="TMB_8hpp.html">TMB.hpp</a>&gt;</span></div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
+<div class="line">Type <a name="a0"></a><a class="code" href="classobjective__function.html#a789a65f93df89fa5bc1d992cd56d5c87">objective_function&lt;Type&gt;::operator() </a>()</div>
+<div class="line">{</div>
+<div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a name="a2"></a><a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</div>
+<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logSigma);</div>
+<div class="line">  <a name="_a4"></a><a class="code" href="structparallel__accumulator.html">parallel_accumulator&lt;Type&gt;</a> nll(<span class="keyword">this</span>);</div>
+<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;x.size();i++)nll-=<a name="a5"></a><a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>[i],a+b*x[i],exp(logSigma),<span class="keyword">true</span>);</div>
+<div class="line">  <span class="keywordflow">return</span> nll;</div>
+<div class="line">}</div>
+</div><!-- fragment --> </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>
