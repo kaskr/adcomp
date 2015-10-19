@@ -9,7 +9,19 @@ Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr
              person("Arni","Magnusson",role="ctb"),
              person("Casper","Berg",role="ctb"),
              person("Anders","Nielsen",role="ctb"),
-             person("Martin","Maechler",role="ctb"))
+             person("Martin","Maechler",role="ctb"),
+             person("Theo","Michelot",role="ctb"),
+             person("Mollie","Brooks",role="ctb") )
+Maintainer: Kasper Kristensen <kaskr@dtu.dk>
+Author: Kasper Kristensen [aut, cre, cph],
+        Brad Bell [cph],
+        Hans Skaug [ctb],
+        Arni Magnusson [ctb],
+        Casper Berg [ctb],
+        Anders Nielsen [ctb],
+        Martin Maechler [ctb],
+        Theo Michelot [ctb],
+        Mollie Brooks [ctb]
 Copyright: See the file COPYRIGHTS
 Description: With this tool, a user should be able to quickly implement complex
     random effect models through simple C++ templates. The package combines
@@ -23,6 +35,5 @@ URL: http://tmb-project.org
 BugReports: https://github.com/kaskr/adcomp/issues
 Depends: R (>= 3.0.0)
 Imports: graphics, methods, stats, utils, Matrix (>= 1.0-12)
-LinkingTo: Matrix
-Suggests: numDeriv, parallel, MASS
-SystemRequirements: GNU make
+LinkingTo: Matrix, RcppEigen
+Suggests: numDeriv, parallel
