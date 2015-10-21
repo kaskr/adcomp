@@ -35,5 +35,5 @@ URL: http://tmb-project.org
 BugReports: https://github.com/kaskr/adcomp/issues
 Depends: R (>= 3.0.0)
 Imports: graphics, methods, stats, utils, Matrix (>= 1.0-12)
-LinkingTo: Matrix, RcppEigen
+LinkingTo: Matrix
 Suggests: numDeriv, parallel
