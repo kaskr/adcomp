@@ -56,11 +56,11 @@ template <> inline int Rstreambuf<false>::overflow(int c ) {
   return c ;
 }
 template <> inline int Rstreambuf<true>::sync(){
-  ::R_FlushConsole() ;
+  //::R_FlushConsole() ;
   return 0 ;
 }
 template <> inline int Rstreambuf<false>::sync(){
-  ::R_FlushConsole() ;
+  //::R_FlushConsole() ;
   return 0 ;
 }
 Rostream<true>  Rcout;

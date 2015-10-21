@@ -8,6 +8,10 @@
 #define TMB_DEBUG 0
 #define TMB_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
 
+/* Early inclusion of Rprintf and REprintf */
+#include <R_ext/Print.h>
+#include "Rstream.hpp"
+
 /* Include the Eigen library. */
 #ifdef TMB_SAFEBOUNDS
 #undef NDEBUG
@@ -37,7 +41,6 @@ void eigen_REprintf(const char* x);
    CppAD when compiling with '-std=c++11'. */
 #include <R.h>
 #include <Rinternals.h>
-#include "Rstream.hpp"
 void eigen_REprintf(const char* x){REprintf(x);}
 
 #include "tmbutils/tmbutils.cpp"
