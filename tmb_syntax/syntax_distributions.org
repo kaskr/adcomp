@@ -23,5 +23,6 @@
 | dnbinom(k,n,prob,log=TRUE)              | dnbinom(k,n,prob,true)   |
 | dgamma(x,shape=p1,scale=p2)             | dgamma(x,p1,p2,false)    |
 | dgamma(x,shape=p1,scale=p2,log=TRUE)    | dgamma(x,p1,p2,true)     |
+| dpois(x,lambda=p1,log=TRUE)             | dpois(x,p1,true)         |
 # Note: Vectorize macros does not set default give_log=0
 # Note: New Vectorize macros should be used with old distributions. 
