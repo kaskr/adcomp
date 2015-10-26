@@ -4,17 +4,15 @@
 \alias{mcmc.hmc}
 \title{[BETA VERSION] Draw MCMC samples from a model posterior using a Hamiltonian sampler.}
 \usage{
-mcmc.hmc(nsim, L, eps, fn, gr, params.init, covar = NULL,
-  diagnostic = FALSE)
+mcmc.hmc(nsim, L, fn, gr, params.init, eps = NULL, covar = NULL,
+  delta = 0.5, diagnostic = FALSE, Madapt = NULL)
 }
 \arguments{
 \item{nsim}{The number of samples to return.}
 
 \item{L}{The number of leapfrog steps to take. The NUTS algorithm does
-not require this as an input. If L is 1 this function will perform
+not require this as an input. If L=1 this function will perform
 Langevin sampling.}
-
-\item{eps}{The length of the leapfrog steps.}
 
 \item{fn}{A function that returns the log of the posterior density. This
 function should not return the negative log, following the notation of
@@ -24,6 +22,8 @@ Hoffman and Gelman (2014).}
 the posterior density (same as with \code{fn}).}
 
 \item{params.init}{A vector of initial parameter values.}
+
+\item{eps}{The length of the leapfrog steps.}
 
 \item{diagnostic}{Whether to return a list of diagnostic metrics about
 the chain. Useful for assessing efficiency and tuning chain.}

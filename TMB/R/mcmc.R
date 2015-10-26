@@ -1,8 +1,12 @@
 #' [BETA VERSION] Draw samples from the posterior of a TMB model using a
 #' specified MCMC algorithm.
 #'
-#' @details The user is responsible for specifying the model properly
-#' (priors, starting values, desired parameters fixed, etc.).
+#' @details This function is a top-level wrapper designed specifically to
+#' work with TMB models. There are several MCMC algorithms available for
+#' use. The user is responsible for specifying the model properly (priors,
+#' starting values, desired parameters fixed, etc.), as well as assessing
+#' the convergence of the resulting samples (e.g., through the
+#' \code{coda} package) before making inference.
 #' @title MCMC sampling of TMB models
 #' @author Cole Monnahan
 #' @param obj A TMB model object.
@@ -10,15 +14,33 @@
 #' @param params.init The initial parameter vector. The default of NULL
 #' signifies to use the starting values present in the model
 #' (i.e., \code{obj$par}).
+#' @param covar An optional covariance matrix which can be used to improve
+#' the efficiency of sampling. The lower Cholesky decomposition of this
+#' matrix is used to transform the parameter space. If the posterior is
+#' approximately multivariate normal and \code{covar} approximates the
+#' covariance, then the transformed parameter space will be close to
+#' multivariate standard normal. In this case the algorithm will be more
+#' efficient, but there will be overhead in the matrix calculations which
+#' need to be done at each step. The default of NULL specifies to not do
+#' this transformation.
 #' @param algorithm A string specifiying an algorithm. Currently supported
-#' are "HMC" for Hamiltonian sampler and "NUTS" for the No-U-Turn
-#' sampler.
+#' are: \itemize{
+#' \item{"RWM"}{the random walk Metropolis sampler}
+#' \item{"HMC"}{the Hamiltonian sampler (see Neal 2011)}
+#' \item{"NUTS"}{the No-U-Turn sampler (see Hoffman and Gelman 2014)}
+#' }
+#' These algorithms require different arguments; see their help files for more information.
 #' @param diagnostic Whether to return diagnostic information about
 #' chain. See individual algorithm for more information.
 #' @param ... Further arguments to be passed to the algorithm. See help
 #' files for the samplers for further arguments.
+#' @return If \code{diagnostic} is FALSE, returns a data frame with
+#' posterior samples. Otherwise it returns a list containing the samples
+#' and properties of the sampler useful for diagnosing behavior and
+#' efficiency.
 #' @example inst/examples/mcmc_examples.R
-run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, ...){
+#' @export
+mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=FALSE, ...){
     ## Initialization for all algorithms
     algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
     fn <- function(x) {
@@ -32,7 +54,7 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
     gr <- function(x) {
         z <- -as.vector(obj$gr(x))
         if(any(is.nan(z))){
-            warning(paste("NaN at:", paste(x, collapse=" ")))
+            warning(paste("NaN gradient at:", paste(x, collapse=" ")))
             z <- 0
            }
         return(z)
@@ -47,15 +69,15 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
     ## Select and run the chain.
     if(algorithm=="HMC")
         time <- system.time(mcmc.out <-
-            mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+            mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar,
                      diagnostic=diagnostic, ...))
     else if(algorithm=="NUTS")
         time <- system.time(mcmc.out <-
-            mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+            mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar,
                       diagnostic=diagnostic, ...))
     else if(algorithm=="RWM")
         time <- system.time(mcmc.out <-
-            mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init,
+            mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar,
                       diagnostic=diagnostic, ...))
     ## Clean up returned output, a matrix if diag is FALSE, otherwise a list
     if(!diagnostic){
@@ -71,7 +93,7 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, diagnostic=FALSE, .
 
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a
-#' Random Walk Metropolis sampler.
+#' Random Walk Metropolis (RWM) sampler.
 #'
 #' @param nsim The number of samples to return.
 #' @param fn A function that returns the log of the posterior density.
@@ -108,10 +130,9 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
         theta.cur <- params.init
     }
     fn.cur <- fn2(theta.cur)
-    f <- function() rnorm(n=n.params, mean=0, sd=1)
     for(m in 1:nsim){
         ## generate proposal
-        theta.new <- theta.cur + alpha*f()
+        theta.new <- theta.cur + alpha*rnorm(n=n.params, mean=0, sd=1)
         fn.new <- fn2(theta.new)
         if(diagnostic) theta.proposed[m,] <- theta.new
         if(log(runif(1))< fn.new-fn.cur){
@@ -145,7 +166,7 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
 #'
 #' @param nsim The number of samples to return.
 #' @param L The number of leapfrog steps to take. The NUTS algorithm does
-#' not require this as an input. If L is 1 this function will perform
+#' not require this as an input. If L=1 this function will perform
 #' Langevin sampling.
 #' @param eps The length of the leapfrog steps.
 #' @param fn A function that returns the log of the posterior density. This
@@ -162,7 +183,7 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
 #' which were accepted ('accepted'), and the total function and gradient
 #' calls ('n.calls'), which for this algorithm is \code{nsim}*(\code{L}+2)
-mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
+mcmc.hmc <- function(nsim, L, fn, gr, params.init, eps=NULL, covar=NULL,
                      delta=0.5, diagnostic=FALSE, Madapt=NULL){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
@@ -184,14 +205,14 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
     useDA <- is.null(eps)
     if(useDA){
         if(is.null(Madapt)){
-            message("Madapt not specified, defaulting to half of nsim")
+            message("MCMC HMC: Madapt not specified, defaulting to half of nsim")
             Madapt <- floor(nsim/2)
         }
         ## Initialize the dual-averaging algorithm.
-        message(paste("No eps given so using dual averaging during first", Madapt, "steps."))
+        message(paste("MCMC HMC: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
         eps <- epsvec[1] <-
-            find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
+            .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
         mu <- log(10*eps)
         epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
@@ -252,8 +273,8 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
         if(diagnostic)
             theta.proposed <- t(apply(theta.proposed, 1, function(x) chd %*% x))
     }
-    message(paste("Acceptance rate = ", round(mean(accepted),1)))
-    if(useDA) message(paste("Dual averaging final average eps =", epsbar[Madapt]))
+    message(paste("MCMC HMC: Acceptance rate = ", round(mean(accepted),1)))
+    if(useDA) message(paste("MCMC HMC: Dual averaging final average eps =", round(epsbar[Madapt], 3)))
     if(diagnostic){
         return(list(par=theta.out, par.proposed=theta.proposed, accepted=accepted,
                     n.calls=nsim*(L+2), epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
@@ -303,7 +324,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' ('steps.taken'), and the total function and gradient
 #' calls ('n.calls').
 mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
-                      delta=0.5, covar=NULL, diagnostic=FALSE, max_doublings=7){
+                      delta=0.5, covar=NULL, diagnostic=FALSE, max_doublings=4){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
     ## work in the transformed space
@@ -335,7 +356,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
         message(paste("MCMC NUTS: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
         eps <- epsvec[1] <-
-            find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=TRUE)
+            .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
         mu <- log(10*eps)
         epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
@@ -368,7 +389,9 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
                 r.minus <- res$r.minus
             }
             ## test whether to accept this state
-            if(is.na(res$s)) browser()
+            if(is.na(res$s)){
+                stop(paste('stopping condition (s) undefined in NUTS for params:', paste(res$theta, collapse=" ")))
+            }
             if(res$s==1) {
                 if(runif(n=1, min=0,max=1) <= res$n/n){
                     theta.cur <- res$theta.prime
@@ -405,7 +428,8 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
         theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
     }
     j.stats <- 2^(c(min(j.results), median(j.results), max(j.results)))
-    if(useDA) message(paste("MCMC NUTS: Dual averaging final average eps =", epsbar[Madapt]))
+    if(useDA)
+        message(paste("MCMC NUTS: Dual averaging final average eps =", round(epsbar[Madapt], 3)))
     message(paste0("MCMC NUTS: Approximate leapfrog steps(min, median, max)=(",
                    paste(j.stats, collapse=","), ")"))
     if(diagnostic){
@@ -443,7 +467,6 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
 #' 'efficient' version that samples uniformly from the path without storing
 #' it. Thus the function returns a single proposed value and not the whole
 #' trajectory.
-#'
 .buildtree <- function(theta, r, u, v, j, eps, theta0, r0, fn, gr,
                          delta.max=1000){
     if(j==0){
@@ -521,9 +544,6 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
     }
 }
 
-
-
-
 #' Estimate a reasonable starting value for epsilon (step size) for a given
 #' model, for use with Hamiltonian MCMC algorithms.
 #'
@@ -544,7 +564,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
 #' @details The algorithm uses a while loop and will break after 50
 #' iterations.
 #'
-find.epsilon <- function(theta,  fn, gr, eps=1, verbose=TRUE){
+.find.epsilon <- function(theta,  fn, gr, eps=1, verbose=TRUE){
     r <- rnorm(n=length(theta), mean=0, sd=1)
     ## Do one leapfrog step
     r.new <- r+(eps/2)*gr(theta)

@@ -3,9 +3,11 @@
 \name{mcmc.nuts}
 \alias{mcmc.nuts}
 \title{[BETA VERSION] Draw MCMC samples from a model posterior using the
-No-U-Turn (NUTS) sampler from Hoffman and Gelman (2014).}
+No-U-Turn (NUTS) sampler with dual averaging from Hoffman and Gelman
+(2014).}
 \usage{
-mcmc.nuts(nsim, fn, gr, params.init, eps, diagnostic = FALSE)
+mcmc.nuts(nsim, fn, gr, params.init, Madapt = NULL, eps = NULL,
+  delta = 0.5, covar = NULL, diagnostic = FALSE, max_doublings = 7)
 }
 \arguments{
 \item{nsim}{The number of samples to return.}
@@ -19,10 +21,30 @@ the posterior density (same as with \code{fn}).}
 
 \item{params.init}{A vector of initial parameter values.}
 
-\item{eps}{The length of the leapfrog steps.}
+\item{Madapt}{The number of iterations during which to tune \code{eps}
+if the dual averaging algorithm is used. Afterward the final \code{eps}
+is used for the remaining iterations.}
+
+\item{eps}{The length of the leapfrog steps. If NULL is passed (the
+default) then dual averaging is used during the first \code{Madapt}
+steps.}
+
+\item{delta}{The target acceptance rate for the dual averaging
+algorithm. Must be specified if \code{eps} is NULL. The rate can be
+"understood as the average acceptance probability that HMC would give to
+the position-momentum states explored during the final doubling
+iteration."}
 
 \item{diagnostic}{Whether to return a list of diagnostic metrics about
 the chain. Useful for assessing efficiency and tuning chain.}
+
+\item{max_doublings}{Integer representing the maximum times the path
+length should double within an MCMC iteration. Default of 8, so 256
+steps.}
+
+\item{delta}{The target acceptance rate for the dual averaging
+algorithm. See paper for interpretation of this for NUTS which does not
+have a Metropolis step.}
 }
 \value{
 If \code{diagnostic} is FALSE (default), returns a matrix of
@@ -33,7 +55,8 @@ calls ('n.calls').
 }
 \description{
 [BETA VERSION] Draw MCMC samples from a model posterior using the
-No-U-Turn (NUTS) sampler from Hoffman and Gelman (2014).
+No-U-Turn (NUTS) sampler with dual averaging from Hoffman and Gelman
+(2014).
 }
 \details{
 This is the 'efficient' NUTS algorithm but does not use dual

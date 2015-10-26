@@ -1,20 +1,31 @@
 require(TMB)
+## Draw samples with the RWM, HMC and NUTS algorithms and compare.
 
-## Draw samples with the HMC and NUTS algorithms and compare.
-
-## Run the simple example, obj and opt are loaded into workspace
+## Run the simple example, so that obj and opt are loaded into workspace
 runExample("simple")
-obj$env$beSilent()
-## A helper function to get an approximate epsilon.
-find.epsilon(theta=opt$par, fn=function(x) -obj$fn(x), gr=function(x) -obj$gr(x))
-## Run two gradient based algorithms
-system.time(simple.hmc <-
-    run_mcmc(obj=obj, nsim=1000, algorithm='HMC', L=5, eps=.1, params.init=opt$par))
-system.time(simple.nuts <-
-    run_mcmc(obj=obj, nsim=1000, algorithm='NUTS', eps=.1, params.init=opt$par))
-## See how they compare
-par(mfrow=c(2,4))
-for(i in 1:4) acf(simple.hmc[,i])
-for(i in 1:4) acf(simple.nuts[,i])
 
-rm(list=c('obj', 'opt', 'simple.hmc', 'simple.nuts'))
+## Run two gradient based algorithms, using adative step size (eps) for
+## each.
+rwm <- mcmc(obj=obj, nsim=500, algorithm='RWM', params.init=opt$par,
+            alpha=.08, diagnostic=TRUE)
+hmc <- mcmc(obj=obj, nsim=500, algorithm='HMC', L=1, params.init=opt$par,
+            diagnostic=TRUE)
+nuts <- mcmc(obj=obj, nsim=500, algorithm='NUTS', params.init=opt$par,
+             diagnostic=TRUE)
+
+## Look at the adaptation of eps
+with(hmc, plot(epsbar))
+with(nuts, plot(epsbar))
+
+## See how they compare via ACF
+par(mfrow=c(3,4))
+for(i in 1:4) acf(rwm$par[,i])
+for(i in 1:4) acf(hmc$par[,i])
+for(i in 1:4) acf(nuts$par[,i])
+
+## also look at effective size per time
+min(coda::effectiveSize(rwm$par))/rwm$time
+min(coda::effectiveSize(hmc$par))/hmc$time
+min(coda::effectiveSize(nuts$par))/nuts$time
+
+rm(list=c('obj', 'opt', 'rwm', 'hmc', 'nuts'))

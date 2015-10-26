@@ -4,7 +4,8 @@
 \alias{mcmc}
 \title{MCMC sampling of TMB models}
 \usage{
-mcmc(obj, nsim, algorithm, params.init = NULL, diagnostic = FALSE, ...)
+mcmc(obj, nsim, algorithm, params.init = NULL, covar = NULL,
+  diagnostic = FALSE, ...)
 }
 \arguments{
 \item{obj}{A TMB model object.}
@@ -12,12 +13,26 @@ mcmc(obj, nsim, algorithm, params.init = NULL, diagnostic = FALSE, ...)
 \item{nsim}{The number of (dependent) samples to draw.}
 
 \item{algorithm}{A string specifiying an algorithm. Currently supported
-are "HMC" for Hamiltonian sampler and "NUTS" for the No-U-Turn
-sampler.}
+are: \itemize{
+\item{"RWM"}{the random walk Metropolis sampler}
+\item{"HMC"}{the Hamiltonian sampler (see Neal 2011)}
+\item{"NUTS"}{the No-U-Turn sampler (see Hoffman and Gelman 2014)}
+}
+These algorithms require different arguments; see their help files for more information.}
 
 \item{params.init}{The initial parameter vector. The default of NULL
 signifies to use the starting values present in the model
 (i.e., \code{obj$par}).}
+
+\item{covar}{An optional covariance matrix which can be used to improve
+the efficiency of sampling. The lower Cholesky decomposition of this
+matrix is used to transform the parameter space. If the posterior is
+approximately multivariate normal and \code{covar} approximates the
+covariance, then the transformed parameter space will be close to
+multivariate standard normal. In this case the algorithm will be more
+efficient, but there will be overhead in the matrix calculations which
+need to be done at each step. The default of NULL specifies to not do
+this transformation.}
 
 \item{diagnostic}{Whether to return diagnostic information about
 chain. See individual algorithm for more information.}
@@ -25,13 +40,23 @@ chain. See individual algorithm for more information.}
 \item{...}{Further arguments to be passed to the algorithm. See help
 files for the samplers for further arguments.}
 }
+\value{
+If \code{diagnostic} is FALSE, returns a data frame with
+posterior samples. Otherwise it returns a list containing the samples
+and properties of the sampler useful for diagnosing behavior and
+efficiency.
+}
 \description{
 [BETA VERSION] Draw samples from the posterior of a TMB model using a
 specified MCMC algorithm.
 }
 \details{
-The user is responsible for specifying the model properly
-(priors, starting values, desired parameters fixed, etc.).
+This function is a top-level wrapper designed specifically to
+work with TMB models. There are several MCMC algorithms available for
+use. The user is responsible for specifying the model properly (priors,
+starting values, desired parameters fixed, etc.), as well as assessing
+the convergence of the resulting samples (e.g., through the
+\code{coda} package) before making inference.
 }
 \examples{
 require(TMB)
@@ -45,9 +70,9 @@ obj$env$beSilent()
 find.epsilon(theta=opt$par, fn=function(x) -obj$fn(x), gr=function(x) -obj$gr(x))
 ## Run two gradient based algorithms
 system.time(simple.hmc <-
-    mcmc(obj=obj, nsim=1000, algorithm='HMC', L=5, eps=.1, params.init=opt$par))
+    run_mcmc(obj=obj, nsim=1000, algorithm='HMC', L=5, eps=.1, params.init=opt$par))
 system.time(simple.nuts <-
-    mcmc(obj=obj, nsim=1000, algorithm='NUTS', eps=.1, params.init=opt$par))
+    run_mcmc(obj=obj, nsim=1000, algorithm='NUTS', eps=.1, params.init=opt$par))
 ## See how they compare
 par(mfrow=c(2,4))
 for(i in 1:4) acf(simple.hmc[,i])
