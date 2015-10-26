@@ -7,8 +7,8 @@
 oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
   method = c("oneStepGaussianOffMode", "fullGaussian", "oneStepGeneric",
   "oneStepGaussian", "cdf"), subset = NULL, conditional = NULL,
-  discrete = NULL, discreteSupport = NULL, seed = 123, parallel = FALSE,
-  trace = TRUE)
+  discrete = NULL, discreteSupport = NULL, range = c(-Inf, Inf),
+  seed = 123, parallel = FALSE, trace = TRUE, ...)
 }
 \arguments{
 \item{obj}{Output from \code{MakeADFun}.}
@@ -25,19 +25,24 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 
 \item{discrete}{Are observations discrete? (assumed FALSE by default)}
 
-\item{discreteSupport}{Support of discrete distribution (\code{method="oneStepGeneric"} only).}
+\item{discreteSupport}{Possible outcomes of discrete distribution (\code{method="oneStepGeneric"} only).}
+
+\item{range}{Possible range of the observations.}
 
 \item{seed}{Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine.}
 
 \item{parallel}{Run in parallel using the \code{parallel} package?}
 
 \item{trace}{Trace progress?}
+
+\item{...}{Control parameters for OSA method}
 }
 \value{
 \code{data.frame} with OSA residuals in column \code{residual}.
 }
 \description{
-Calculate one-step-ahead (OSA) residuals for a latent variable model.
+Calculate one-step-ahead (OSA) residuals for a latent variable
+model. (\emph{Beta version; may change without notice})
 }
 \details{
 Given a TMB latent variable model this function calculates OSA
@@ -138,9 +143,11 @@ runExample("simple")
 osa.simple <- oneStepPredict(obj, observation.name = "x", method="fullGaussian")
 qqnorm(osa.simple$residual); abline(0,1)
 
+\dontrun{
 ######################## Poisson case (First 100 observations)
 runExample("ar1xar1")
 osa.ar1xar1 <- oneStepPredict(obj, "N", "keep", method="cdf", discrete=TRUE, subset=1:100)
 qqnorm(osa.ar1xar1$residual); abline(0,1)
+}
 }
 

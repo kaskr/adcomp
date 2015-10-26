@@ -1,4 +1,8 @@
-##' Calculate one-step-ahead (OSA) residuals for a latent variable model.
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
+##' Calculate one-step-ahead (OSA) residuals for a latent variable
+##' model. (\emph{Beta version; may change without notice})
 ##'
 ##' Given a TMB latent variable model this function calculates OSA
 ##' standardized residuals that can be used for goodness-of-fit
@@ -100,10 +104,12 @@
 ##' @param subset Index vector of observations that will be added one by one during OSA. By default \code{1:length(observations)} (with \code{conditional} subtracted).
 ##' @param conditional Index vector of observations that are fixed during OSA. By default the empty set.
 ##' @param discrete Are observations discrete? (assumed FALSE by default)
-##' @param discreteSupport Support of discrete distribution (\code{method="oneStepGeneric"} only).
+##' @param discreteSupport Possible outcomes of discrete distribution (\code{method="oneStepGeneric"} only).
+##' @param range Possible range of the observations.
 ##' @param seed Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine.
 ##' @param parallel Run in parallel using the \code{parallel} package?
 ##' @param trace Trace progress?
+##' @param ... Control parameters for OSA method
 ##' @return \code{data.frame} with OSA residuals in column \code{residual}.
 ##' @examples
 ##' ######################## Gaussian case
@@ -111,10 +117,12 @@
 ##' osa.simple <- oneStepPredict(obj, observation.name = "x", method="fullGaussian")
 ##' qqnorm(osa.simple$residual); abline(0,1)
 ##'
+##' \dontrun{
 ##' ######################## Poisson case (First 100 observations)
 ##' runExample("ar1xar1")
 ##' osa.ar1xar1 <- oneStepPredict(obj, "N", "keep", method="cdf", discrete=TRUE, subset=1:100)
 ##' qqnorm(osa.ar1xar1$residual); abline(0,1)
+##' }
 oneStepPredict <- function(obj,
                            ## Names of data objects (not all are optional)
                            observation.name = NULL,
@@ -129,19 +137,26 @@ oneStepPredict <- function(obj,
                            conditional = NULL,
                            discrete = NULL,
                            discreteSupport = NULL,
+                           range = c(-Inf, Inf),
                            seed = 123,
                            parallel = FALSE,
-                           trace = TRUE
+                           trace = TRUE,
+                           ...
                            ){
-    if (missing(observation.name)) stop("'observation.name' must define a data component")
-    if (!(observation.name %in% names(obj$env$data))) stop("'observation.name' must be in data component")
-    if (is.null(obj$env$random)) stop("oneStepPredict is only for random effect models")
+    if (missing(observation.name))
+        stop("'observation.name' must define a data component")
+    if (!(observation.name %in% names(obj$env$data)))
+        stop("'observation.name' must be in data component")
+    if (is.null(obj$env$random))
+        stop("oneStepPredict is only for random effect models")
     method <- match.arg(method)
     if (is.null(data.term.indicator)){
         if(method != "fullGaussian"){
             stop(paste0("method='",method,"' requires a 'data.term.indicator'"))
         }
     }
+    if (!missing(discreteSupport) && !missing(range))
+        stop("Cannot specify both 'discreteSupport' and 'range'")
     obs <- as.vector(obj$env$data[[observation.name]])
     if(is.null(discrete)){
         ndup <- sum(duplicated(obs))
@@ -365,11 +380,22 @@ oneStepPredict <- function(obj,
     }
 
     ## ######################### CASE: oneStepGeneric
-    if((method == "oneStepGeneric") & (!discrete)){
+    if((method == "oneStepGeneric") && missing(discreteSupport)){
         p <- newobj$par
         newobj$fn(p) ## Test eval
         newobj$env$value.best <- -Inf ## <-- Never overwrite last.par.best
         nan2zero <- function(x)if(!is.finite(x)) 0 else x
+        ## Set default configuration for this method (modify with '...'):
+        formals(tmbprofile)$ytol <- 10  ## Tail tolerance (increase => more tail)
+        formals(tmbprofile)$ystep <- .5 ## Grid spacing   (decrease => more accuracy)
+        ## Handle discrete case
+        if(discrete){
+            formals(tmbprofile)$h <- 1
+            integrate <- function(f, lower, upper, ...){
+                grid <- ceiling(lower):floor(upper)
+                list( value = sum( f(grid) ) )
+            }
+        }
         oneStepGeneric <- function(k){
             tracefun(k)
             ans <- try({
@@ -378,8 +404,33 @@ oneStepPredict <- function(obj,
                     newobj$fn(observation(k, y))
                 }
                 nll <- f(obs[index]) ## Marginal negative log-likelihood
-                F1 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), -Inf, obs[index])$value
-                F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
+                newobj$env$last.par.best <- newobj$env$last.par ## <-- used by tmbprofile
+                slice <- tmbprofile(newobj, k, slice=TRUE,
+                                    parm.range = range,...)
+                spline <- splinefun(slice[[1]], slice[[2]])
+                spline.range <- range(slice[[1]])
+                if(trace >= 2){
+                    plotfun <- function(slice, spline){
+                        plot(slice, type="p", level=NULL)
+                        plot(spline, spline.range[1], spline.range[2], add=TRUE)
+                        abline(v=obs[index], lty="dashed")
+                    }
+                    if(trace >= 3){
+                        slice$value <- exp( -(slice$value - nll) )
+                        plotfun(slice, function(x)exp(-(spline(x) - nll)))
+                    }
+                    else
+                        plotfun(slice, spline)
+                }
+                F1 <- integrate(function(x)exp(-(spline(x) - nll)),
+                                spline.range[1],
+                                obs[index])$value
+                F2 <- integrate(function(x)exp(-(spline(x) - nll)),
+                                obs[index] + discrete,
+                                spline.range[2])$value
+                ## Was:
+                ##  F1 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), -Inf, obs[index])$value
+                ##  F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
                 nlcdf.lower = nll - log(F1)
                 nlcdf.upper = nll - log(F2)
                 c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper)
@@ -391,7 +442,7 @@ oneStepPredict <- function(obj,
     }
 
     ## ######################### CASE: oneStepDiscrete
-    if((method == "oneStepGeneric") & (discrete)){
+    if((method == "oneStepGeneric") && !missing(discreteSupport)){
         p <- newobj$par
         newobj$fn(p) ## Test eval
         obs <- as.integer(round(obs))

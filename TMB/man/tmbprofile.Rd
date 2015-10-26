@@ -5,7 +5,8 @@
 \title{Adaptive likelihood profiling.}
 \usage{
 tmbprofile(obj, name, lincomb, h = 1e-04, ytol = 2, ystep = 0.1,
-  maxit = ceiling(5 * ytol/ystep), slice = FALSE, trace = TRUE, ...)
+  maxit = ceiling(5 * ytol/ystep), parm.range = c(-Inf, Inf),
+  slice = FALSE, trace = TRUE, ...)
 }
 \arguments{
 \item{obj}{Object from \code{MakeADFun} that has been optimized.}
@@ -22,6 +23,8 @@ profile. By default a unit vector corresponding to \code{name}.}
 \item{ystep}{Adjusts the resolution of the likelihood profile.}
 
 \item{maxit}{Max number of iterations for adaptive algorithm.}
+
+\item{parm.range}{Valid parameter range.}
 
 \item{slice}{Do slicing rather than profiling?}
 
@@ -45,18 +48,23 @@ determined from \code{name}. Alternatively the linear combination
 may be given directly (\code{lincomb}).
 }
 \examples{
-runExample("randomregression",thisR=TRUE)
+runExample("simple",thisR=TRUE)
 ## Parameter names for this model:
-## mu  mu  sigma  sigma  sigma0
+## beta   beta   logsdu   logsd0
 
 ## Profile wrt. sigma0:
-prof <- tmbprofile(obj,"sigma0")
+prof <- tmbprofile(obj,"logsd0")
 plot(prof)
 confint(prof)
 
-## Profile the difference between the mu parameters (name is optional):
-prof2 <- tmbprofile(obj,name="mu1 - mu2",lincomb = c(1,-1,0,0,0))
+\dontrun{
+## Profile the difference between the beta parameters (name is optional):
+prof2 <- tmbprofile(obj,name="beta1 - beta2",lincomb = c(1,-1,0,0))
 plot(prof2)
 confint(prof2)
+}
+}
+\seealso{
+\code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
 }
 

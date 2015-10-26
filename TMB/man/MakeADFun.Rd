@@ -2,7 +2,7 @@
 % Please edit documentation in R/TMB.R
 \name{MakeADFun}
 \alias{MakeADFun}
-\title{Construct objective functions with derivatives based on a compiled c++ template.}
+\title{Construct objective functions with derivatives based on a compiled C++ template.}
 \usage{
 MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
   "ADGrad"[!is.null(random)]), random = NULL, profile = NULL,
@@ -58,7 +58,7 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 }
 \description{
-Construct objective functions with derivatives based on the users c++ template.
+Construct objective functions with derivatives based on the users C++ template.
 }
 \details{
 A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
@@ -110,7 +110,7 @@ different types as template parameter, selected by argument \code{type}:
   \item \code{"Fun"} Run through the template with ordinary double-types.
   \item \code{"ADGrad"} Run through the template with nested AD-types and produce a stack of operations representing the objective function gradient.
 }
-Each of these are represented by external pointers to c++ structures available in the environment \code{env}.
+Each of these are represented by external pointers to C++ structures available in the environment \code{env}.
 
 Further objects in the environment \code{env}:
 \itemize{

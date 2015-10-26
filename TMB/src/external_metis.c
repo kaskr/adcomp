@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 #include <R.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>

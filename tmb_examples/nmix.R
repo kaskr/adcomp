@@ -16,13 +16,18 @@ parameters <- list(
                    u=rep(0,data$nG)
 )
 dyn.load(dynlib("nmix"))
-## Phase 1
-map <- list(u=factor(rep(NA,data$nG)),log_sigma=factor(NA))
-obj <- MakeADFun(data,parameters,map=map,DLL="nmix")
-opt <- nlminb(obj$par,obj$fn,obj$gr)
-pl <- obj$env$parList(opt$par) ## Parameter estimate after phase 1
-## Phase 2
-obj <- MakeADFun(data,pl,random="u",DLL="nmix")
-system.time( opt <- nlminb(obj$par,obj$fn,obj$gr) )
+
+# There is no direct equivalent of "phases" in TMB, but it can be achieved via the 
+# "map" argument to MakeADFun. "phases" means keeping a subset of the parameters
+# fixed when the model is first fit.
+
+## Phase 1: u and log_sigma fixed
+map <- list(u=factor(rep(NA,data$nG)),log_sigma=factor(NA))    # Say which parameters are fixed
+obj <- MakeADFun(data,parameters,map=map,DLL="nmix")           # Note "map" argument
+opt <- nlminb(obj$par,obj$fn,obj$gr)                           # Fit model
+pl <- obj$env$parList(opt$par)                            # Parameter estimate after phase 1
+## Phase 2: all parameters active
+obj <- MakeADFun(data,pl,random="u",DLL="nmix")           # Note "pl" and missing "map"
+system.time( opt <- nlminb(obj$par,obj$fn,obj$gr) )       # Fit model again
 rep <- sdreport(obj)
 rep

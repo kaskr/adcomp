@@ -1,0 +1,158 @@
+------------------------------------------------------------------------
+TMB 1.6.0 (2015-10-08)
+------------------------------------------------------------------------
+
+o Major changeset to get closer to CRAN submission
+
+  - Added 'dontrun' to most examples. Reason: All useful TMB examples
+  take too long time to run because they require compilation.
+
+  - Removed TMB-internals.
+
+  - Added Roxygen for remaining functions: dynlib()
+  runSymbolicAnalysis() config() plot.parallelBenchmark()
+  summary.sdreport() print.sdreport() print.backtrace()
+  plot.tmbprofile() confint.tmbprofile()
+
+  - Got rid of global configuration, e.g flagsDefaults(),
+  newtonDefaults() etc.
+
+  - Reworked newtonOption() and adapted all examples to new syntax.
+  (NOTE: not entirely backwards compatible since to old version
+  modified global settings, which we do not allow anymore).
+
+  - Fixed several typos, e.g. c++ -> C++
+
+  - CITATION: Added arxiv reference.
+
+  - DESCRIPTION: Changed title and added URL.
+
+  - NAMESPACE: Cleanup
+
+o CppAD jacobian: prefer reverse mode over forward mode if work is equal
+  - TMB only requires 1st order reverse (not forward) mode to be
+  implemented for atomic functions. This can result in the error
+  'order not implemented' if CppAD automatically selects forward over
+  reverse mode.
+  - In cases where the work of forward and reverse mode are equal it
+  is therefore more natural (from TMB perspective) to select reverse
+  mode.
+
+o Document parallel_accumulator #122
+
+o Lots of doxygen documentation updates
+
+------------------------------------------------------------------------
+TMB 1.5-1 (2015-10-04)
+------------------------------------------------------------------------
+
+o From now on the github version follows the R version
+
+o Added NEWS file
+
+o Emacs mode version 3.0 from Arni Magnusson
+
+o Robustify tmbprofile() #137
+
+o Experimental oneStepPredict() now handles discrete case as part of a
+  general 'oneStepGeneric' method.
+
+o tmbprofile() multiple changes
+  - Allow specification of a valid range of the parameter.
+  - Get more detail in the center of the distribution.
+    (does not affect cases where likelihood has been optimized)
+
+o C++: New namespace 'autodiff' makes it easy to use AD from the user
+  template.
+
+o C++: New namespace 'romberg' with wrappers around CppAD integration
+  routines.
+
+o Automatic retape when loading saved ADFun objects.
+
+o Keep attribute 'check.passed' when subsetting parameter list
+
+o Fix 32 bit
+
+o match pattern: Improvement for large problems. As a result it is now
+  be possible to handle 2^31-1 nonzeros in Cholesky factor. Old method
+  would break down around 2^30.
+
+o MVNORM_t: Method to evaluate marginals.
+
+o oneStepPredict() now works with maps #108.
+
+o Lots of improvements and cleanups from Martin Maechler.
+
+------------------------------------------------------------------------
+TMB 1.5-0 (2015-08-10)
+------------------------------------------------------------------------
+
+o Add pnorm/qnorm one-argument vectorized versions.
+
+o bugfix: Vectorized math operations crashed in the zero-length case.
+
+o Add missing bounds check to array class #100 - Now checks each index
+  component (not just the re-mapped univariate index).
+
+o BesselK atomic + Matern correlation function.
+
+o asSparseMatrix and asSparseVector fix: Conversion from dense to sparse
+  should not drop zero-entries that could potentially become nonzero
+  (i.e. parameter dependent entries).
+
+o CppAD::Variable now works for TMB models.
+
+o Script to enable 'runSymbolicAnalysis' on all Linux and OS X systems.
+
+o New experimental function 'oneStepPredict' for OSA residuals with
+  ar1xar1 as an example.
+
+o New atomic function 'ppois'.
+
+o REPORT: Allow report vector of 'anything'.
+
+o getUserDLL: Improve guess of user's DLL code (when DLL not given to
+  MakeADFun).
+
+o Eliminate warning with '-Wpedantic'.
+
+o sdreport new option: ignore.parm.uncertainty.
+
+o New example: HMM filter.
+
+o General 1D likelihood profile function + method to get profile
+  confidence intervals + plot method.
+
+o MakeADFun: New option to move outer parameters to the inner problem
+  (purpose: get same speed as the REML trick for linear fixed effects
+  without loosing the ML interpretation).
+
+o MakeADFun: New argument 'silent' to disable all tracing output.
+
+------------------------------------------------------------------------
+TMB 1.4-0 (2015-04-16)
+------------------------------------------------------------------------
+
+o CppAD updated to development version. Reduced peak memory usage with
+  up to 50% for large models.
+
+o New configuration variables.
+
+o Avoid crashes due to memory allocation errors.
+
+o Print index errors to error stream.
+
+o Allow compilation with -std=c++11.
+
+o sdreport: bias.correct optimizations.
+
+o Implement up to 7d array (like admb).
+
+o Allow lists as data object with R-inla SPDE structures as an example.
+
+------------------------------------------------------------------------
+TMB 1.0-0 (2013-09-10)
+------------------------------------------------------------------------
+
+o Initial release.

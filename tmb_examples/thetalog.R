@@ -12,8 +12,8 @@ parameters <- list(
   logQ=0,
   logR=0
   )
-newtonOption(smartsearch=FALSE)
 obj <- MakeADFun(data,parameters,random="X",DLL="thetalog")
+newtonOption(obj,smartsearch=FALSE)
 obj$fn()
 obj$gr()
 system.time(opt <- nlminb(obj$par,obj$fn,obj$gr))

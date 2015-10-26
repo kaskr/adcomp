@@ -224,7 +224,7 @@ Vector ADFun<Base>::Jacobian(const Vector &x)
 
 	// choose the method with the least work
 	Vector jac( n * m );
-	if( workForward <= workReverse )
+	if( workForward < workReverse )
 		JacobianFor(*this, x, jac);
 	else	JacobianRev(*this, x, jac);
 

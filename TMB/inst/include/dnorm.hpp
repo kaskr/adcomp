@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /** \file
     \brief Univariate normal density
     \ingroup R_style_distribution

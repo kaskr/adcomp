@@ -2,13 +2,13 @@
 % Please edit documentation in R/TMB.R
 \name{compile}
 \alias{compile}
-\title{Compile a c++ template to DLL suitable for MakeADFun.}
+\title{Compile a C++ template to DLL suitable for MakeADFun.}
 \usage{
 compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
   openmp = isParallelTemplate(file), libtmb = TRUE, ...)
 }
 \arguments{
-\item{file}{c++ file.}
+\item{file}{C++ file.}
 
 \item{flags}{Character with compile flags.}
 
@@ -23,7 +23,7 @@ compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
 \item{...}{Passed as Makeconf variables.}
 }
 \description{
-Compile a c++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
+Compile a C++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
 }
 \details{
 TMB relies on R's built in functionality to create shared libraries independent of the platform.
@@ -31,7 +31,10 @@ A template is compiled by \code{compile("template.cpp")}, which will call R's ma
 preprocessor flags.
 Compiler and compiler flags can be stored in a configuration file. In order of precedence either via
 the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
-Additional configuration variables can be set with \code{...} argument, which will overwrite any
+Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 previous selections.
+}
+\seealso{
+\code{\link{precompile}}
 }
 

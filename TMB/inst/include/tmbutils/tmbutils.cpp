@@ -1,5 +1,18 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /** \file 
    \brief Namespace of utility functions for TMB
+*/
+
+/** \brief Utility functions for TMB (automatically included)
+
+Contains basic data types such as vectors, matrices and arrays.
+Included automatically so you \b should \b NOT include it via
+   \code
+   using tmbutils
+   \endcode
+
 */
 namespace tmbutils{
 // Utilities used by the core

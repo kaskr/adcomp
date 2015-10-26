@@ -1,3 +1,8 @@
+// R's spline function wrapped into template class that can be used
+// with TMB.
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /*
  *  R : A Computer Language for Statistical Data Analysis
  *  Copyright (C) 1995, 1996  Robert Gentleman and Ross Ihaka
@@ -38,16 +43,6 @@
  *	is used for all computations, except for periodic splines where
  *	Choleski is more efficient.
  */
-
-// #ifdef HAVE_CONFIG_H
-// #include <config.h>
-// #endif
-
-// #include <R_ext/Arith.h>
-// #include <R_ext/Applic.h>
-// #include <stdio.h>
-// #include <errno.h>
-//# include <cppad/cppad.hpp>
 
 template <class Type>
 class splinefun

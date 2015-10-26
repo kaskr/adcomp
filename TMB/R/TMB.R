@@ -1,14 +1,5 @@
-##' Internal TMB Functions
-##'
-##' Internal TMB functions
-##'
-##' These are not to be called by the user (or in some cases are just
-##' waiting for proper documentation to be written :).
-##'
-##' @name TMB-internal
-##' @aliases checkSparseHessian config dynlib flagsDefaults getUserDLL grepRandomParameters info isParallelTemplate newtonDefaults newtonOption parallelBenchmark plot.parallelBenchmark print.backtrace print.sdreport runSymbolicAnalysis setDefaults sparseHessianFun summary.sdreport tmbOption updateCholesky
-##' @rdname TMB-internal
-NULL
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
 
 ## Utilities
 grepRandomParameters <- function(parameters,random){
@@ -16,6 +7,16 @@ grepRandomParameters <- function(parameters,random){
   tmp <- lapply(parameters,function(x)x*0)
   tmp[r] <- lapply(tmp[r],function(x)x*0+1)
   which(as.logical(unlist(tmp)))
+}
+
+## Assign without losing other attributes than 'names' (which may get
+## overwritten when subsetting)
+"keepAttrib<-" <- function(x, value){
+    attr <- attributes(x)
+    keep <- setdiff(names(attr), "names")
+    x <- value
+    attributes(x)[keep] <- attr[keep]
+    x
 }
 
 ## Guess name of user's loaded DLL code
@@ -28,14 +29,23 @@ getUserDLL <- function(){
     names(dlls[TMBdll])
 }
 
+## Un-exported functions that we need
+.shlib_internal <- get(".shlib_internal", envir = asNamespace("tools"), inherits = FALSE)
+destructive_Chol_update <- get("destructive_Chol_update", envir = asNamespace("Matrix"), inherits = FALSE)
+
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
-  Matrix:::destructive_Chol_update(L, H, t)
+  destructive_Chol_update(L, H, t) ## Was: Matrix:::destructive_Chol_update(L, H, t)
   ## TODO: Ask MM to export from Matrix!
 }
 
-##' Construct objective functions with derivatives based on the users c++ template.
+## Test for invalid external pointer
+isNullPointer <- function(pointer) {
+  .Call("isNullPointer", pointer, PACKAGE="TMB")
+}
+
+##' Construct objective functions with derivatives based on the users C++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
 ##' and its gradient. The object contains the following components:
@@ -86,7 +96,7 @@ updateCholesky <- function(L, H, t=0){
 ##'   \item \code{"Fun"} Run through the template with ordinary double-types.
 ##'   \item \code{"ADGrad"} Run through the template with nested AD-types and produce a stack of operations representing the objective function gradient.
 ##' }
-##' Each of these are represented by external pointers to c++ structures available in the environment \code{env}.
+##' Each of these are represented by external pointers to C++ structures available in the environment \code{env}.
 ##'
 ##' Further objects in the environment \code{env}:
 ##' \itemize{
@@ -106,7 +116,7 @@ updateCholesky <- function(L, H, t=0){
 ##' This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 ##' \code{silent=TRUE} to the \code{MakeADFun} call.
 ##' 
-##' @title Construct objective functions with derivatives based on a compiled c++ template.
+##' @title Construct objective functions with derivatives based on a compiled C++ template.
 ##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
 ##' @param map List defining how to optionally collect and fix parameters - see details.
@@ -208,7 +218,7 @@ MakeADFun <- function(data, parameters, map=list(),
       if(!silent) print(names(parameters))
       if(!silent) cat("Not matching template order:\n")
       if(!silent) print(parNameOrder)
-      parameters <- parameters[parNameOrder]
+      keepAttrib( parameters ) <- parameters[parNameOrder]
       if(!silent) cat("Your parameter list has been re-ordered.\n(Disable this warning with checkParameterOrder=FALSE)\n")
     }
   }
@@ -241,7 +251,7 @@ MakeADFun <- function(data, parameters, map=list(),
                           ans
                         })
     ## Now do the change:
-    parameters[names(map)] <- param.map
+    keepAttrib( parameters[names(map)] ) <- param.map
   }
 
   ## Utility to get back parameter list in original shape
@@ -384,6 +394,10 @@ MakeADFun <- function(data, parameters, map=list(),
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
                 dumpstack=0) {
+    if(isNullPointer(ADFun$ptr)) {
+        if(silent)beSilent()
+        retape()
+    }
     switch(match.arg(type),
            "ADdouble" = {
           res <- .Call("EvalADFunObject", ADFun$ptr, theta,
@@ -468,11 +482,20 @@ MakeADFun <- function(data, parameters, map=list(),
       ## General function to lookup entries A in B[r,r] assuming pattern of A
       ## is subset of pattern of B[r,r].
       lookup <- function(A,B,r=NULL){
-        A <- tril(A);B <- tril(B)
-        B@x[] <- seq.int(length.out=length(B@x)) ## Pointers to full B matrix (FIXME: what if length(B@x)>2^32 ? )
-        B <- forceSymmetric(B)
-        if(!is.null(r))B <- B[r,r,drop=FALSE] ## Reduce to have same dim as A
-        m <- .Call("match_pattern",A,B,PACKAGE="TMB") ## Same length as A@x with pointers to B@x
+        A <- tril(A); B <- tril(B)
+        B@x[] <- seq.int(length.out=length(B@x)) ## Pointers to full B matrix (Can have up to 2^31-1 non-zeros)
+        if(!is.null(r)){
+            ## Goal is to get:
+            ##     B <- forceSymmetric(B)
+            ##     B <- B[r,r,drop=FALSE]
+            ## However the internal Matrix code for
+            ## "B[r,r,drop=FALSE]" creates temporary "dgCMatrix"
+            ## thereby almost doubling the number of non-zeros. Need
+            ## solution that works with max (2^31-1) non-zeros:
+            B <- .Call("tmb_half_diag", B, PACKAGE="TMB")
+            B <- tril( B[r,r,drop=FALSE] ) + tril( t(B)[r,r,drop=FALSE] )
+        }
+        m <- .Call("match_pattern", A, B, PACKAGE="TMB") ## Same length as A@x with pointers to B@x
         B@x[m]
       }
       if(is.null(e$ind1)){
@@ -831,23 +854,24 @@ openmp <- function(n=NULL){
   .Call("omp_num_threads",n,PACKAGE="TMB")
 }
 
-##' Compile a c++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
+##' Compile a C++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
 ##'
 ##' TMB relies on R's built in functionality to create shared libraries independent of the platform.
 ##' A template is compiled by \code{compile("template.cpp")}, which will call R's makefile with appropriate
 ##' preprocessor flags.
 ##' Compiler and compiler flags can be stored in a configuration file. In order of precedence either via
 ##' the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
-##' Additional configuration variables can be set with \code{...} argument, which will overwrite any
+##' Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 ##' previous selections.
-##' @title Compile a c++ template to DLL suitable for MakeADFun.
-##' @param file c++ file.
+##' @title Compile a C++ template to DLL suitable for MakeADFun.
+##' @param file C++ file.
 ##' @param flags Character with compile flags.
 ##' @param safebounds Turn on preprocessor flag for bound checking?
 ##' @param safeunload Turn on preprocessor flag for safe DLL unloading?
 ##' @param openmp Turn on openmp flag? Auto detected for parallel templates.
 ##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
 ##' @param ... Passed as Makeconf variables.
+##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file),libtmb=TRUE,...){
   if(.Platform$OS.type=="windows"){
@@ -907,7 +931,9 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
     if(!is(tr,"try-error"))cat("Note: Library",paste0("'",dynlib(libname),"'"),"was unloaded.\n")
   }
   ## Includes and preprocessor flags specific for the template
+  useRcppEigen <- !file.exists( system.file("include/Eigen",package="TMB") )
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
+                   paste0("-I",system.file("include",package="RcppEigen"))[useRcppEigen],
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb]
@@ -919,11 +945,11 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                        system.file(dynlib("libs/libTMB"),package="TMB")[libtmb && !openmp],
                        system.file(dynlib("libs/libTMBomp"),package="TMB")[libtmb && openmp] ),
                      PKG_CXXFLAGS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
-                     CXXFLAGS=flags[flags!=""], ## Optionally overwrite cxxflags
+                     CXXFLAGS=flags[flags!=""], ## Optionally override cxxflags
                      ...
                      )
   on.exit(file.remove(mvfile),add=TRUE)
-  status <- tools:::.shlib_internal(file)
+  status <- .shlib_internal(file)  ## Was: tools:::.shlib_internal(file)
   if(status!=0) stop("Compilation failed")
   status
 }
@@ -937,11 +963,12 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 ##' \itemize{
 ##' \item To precompile on Linux run \code{precompile()}.
 ##' \item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@@")}.
+##' \item Precompiling is not supported on Windows at present.
 ##' }
 ##' Note that precompilation has side effects: It is not possible to work with more than one
 ##' model at a time for a single R instance.
 ##' @title Precompile the TMB library in order to speed up compilation of templates.
-##' @param ... Passed to \code{compile}.
+##' @param ... Passed to \code{\link{compile}}.
 precompile <- function(...){
   owdir <- getwd()
   on.exit(setwd(owdir))
@@ -957,13 +984,21 @@ precompile <- function(...){
   file.remove("libTMBomp.cpp")
 }
 
-## Add dynlib extension
-dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
+##' Add the platform dependent dynlib extension. In order for examples
+##' to work across platforms DLLs should be loaded by
+##' \code{dyn.load(dynlib("name"))}.
+##'
+##' @title Add dynlib extension
+##' @param name Library name without extension
+##' @return Character
+dynlib <- function(name)paste0(name,.Platform$dynlib.ext)
 
 ##' Create a cpp template to get started.
 ##'
-##' This function generates a c++ template with a header and include statement. Here is a brief
-##' overview of the c++ syntax used to code the objective function.
+##' This function generates a C++ template with a header and include
+##' statement. Here is a brief overview of the C++ syntax used to code
+##' the objective function. For a full reference see the Doxygen
+##' documentation (more information at the package URL).
 ##'
 ##' Macros to read data and declare parameters:
 ##'  \tabular{lll}{
@@ -1001,7 +1036,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##'     m.transpose()             \tab   R equivalent of t(m)                   \cr
 ##'  }
 ##'
-##' Some distributions are available as c++ templates with syntax close to R's distributions:
+##' Some distributions are available as C++ templates with syntax close to R's distributions:
 ##' \tabular{ll}{
 ##'    \bold{Function header}                \tab \bold{Distribution}                      \cr
 ##'    dnbinom2(x,mu,var,int give_log=0)     \tab Negative binomial with mean and variance \cr
@@ -1113,21 +1148,22 @@ info <- function(obj) {
 ##' @param env Environment for cached Cholesky factor.
 ##' @param ... Currently unused.
 ##' @return List with solution similar to \code{optim} output.
+##' @seealso \code{\link{newtonOption}}
 newton <- function (par,fn,gr,he,
-                    trace = newtonOption("trace"),
-                    maxit = newtonOption("maxit"),
-                    tol=newtonOption("tol"),
-                    alpha=1,
-                    smartsearch=newtonOption("smartsearch"),
-                    mgcmax=newtonOption("mgcmax"),
-                    super=TRUE,
-                    silent=TRUE,
+                    trace = 1,
+                    maxit = 100,
+                    tol = 1e-8,
+                    alpha = 1,
+                    smartsearch = TRUE,
+                    mgcmax = 1e60,
+                    super = TRUE,
+                    silent = TRUE,
                     ustep = 1, ## Start out optimistic: Newton step
                     power=.5, ## decrease=function(u)const*u^power
                     u0=1e-4,  ## Increase u=0 to this value
-                    grad.tol=tol,
-                    step.tol=tol,
-                    tol10=1e-3, ## Try to exit if last 10 iterations not improved much
+                    grad.tol = tol,
+                    step.tol = tol,
+                    tol10 = 1e-3, ## Try to exit if last 10 iterations not improved much
                     env=environment(),
                     ...)
 {
@@ -1264,6 +1300,27 @@ newton <- function (par,fn,gr,he,
   list(par=par,value=value,gradient=g,hessian=h,iterations=i)
 }
 
+##' Inner-problem options can be set for a model object using this
+##' function.
+##'
+##' @title Set newton options for a model object.
+##' @param obj Object from \code{\link{MakeADFun}} for which to change settings.
+##' @param ... Parameters for the \code{\link{newton}} optimizer to set.
+##' @return List of updated parameters.
+newtonOption <- function(obj,...){
+  if(!is.environment(obj$env)){
+    stop("First argument to 'newtonOption' must be a model object (output from MakeADFun)")
+  }
+  x <- list(...)
+  validOpts <- setdiff(names(formals(newton)),
+                       c("par","fn","gr","he","env","..."))
+  inValidOpts <- setdiff(names(x), validOpts)
+  if(length(inValidOpts) > 0){
+      stop("Invalid newton option(s):", paste0(" '",inValidOpts,"'"))
+  }
+  obj$env$inner.control[names(x)] <- x
+  invisible( obj$env$inner.control )
+}
 
 sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
   r <- obj$env$random
@@ -1329,6 +1386,14 @@ checkSparseHessian <- function(obj,par=obj$env$last.par,
   invisible(res)
 }
 
+##' Aggressively tries to reduce fill-in of sparse Cholesky factor by
+##' running a full suite of ordering algorithms. NOTE: requires a
+##' specialized installation of the package. More information is
+##' available at the package URL.
+##'
+##' @title Run symbolic analysis on sparse Hessian
+##' @param obj Output from \code{MakeADFun}
+##' @return NULL
 runSymbolicAnalysis <- function(obj){
   ok <- .Call("have_tmb_symbolic",PACKAGE="TMB")
   if(!ok){

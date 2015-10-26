@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /* ========================================================== 
    Supernodal version of solvesubset for CHOLMOD supernodal
    sparse Cholesky structures.
@@ -45,6 +48,16 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 #include "Matrix.h"
+
+/* Copy-pasted from "Writing R Extensions" */
+#ifdef __GNUC__
+// this covers gcc, clang, icc
+# undef alloca
+# define alloca(x) __builtin_alloca((x))
+#elif defined(HAVE_ALLOCA_H)
+// needed for native compilers on Solaris and AIX
+# include <alloca.h>
+#endif
 
 // Notes about the CHOLMOD super-nodal storage. 
 // According to the documentation of CHOLMOD we have:
@@ -204,7 +217,7 @@ SEXP tmb_invQ_tril_halfdiag(SEXP Lfac){
   CHM_SP iQ = tmb_inv_super(L, &c);
   half_diag(iQ);
   iQ->stype=0; /* Change to non-sym */
-  return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "", R_NilValue);
+  return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , -1 /* uplo="L" */ , 0, "", R_NilValue);
 }
 
 /* Given sparse matrices A and B (sorted columns).
@@ -271,3 +284,9 @@ SEXP tmb_sparse_izamd(SEXP A_, SEXP mark_, SEXP diag_){
   return A_;
 }
 
+/* Half the diagonal of a matrix (note: modifies input) */
+SEXP tmb_half_diag(SEXP A_){
+  CHM_SP A = AS_CHM_SP(A_);
+  half_diag(A);
+  return A_;
+}

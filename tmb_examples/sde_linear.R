@@ -68,10 +68,10 @@ parameters <- list(
                    logsY=log(sigmaY)
                    )
 
-# The inner problem is quadratic
-newtonOption(smartsearch=FALSE)
-
 obj <- MakeADFun(data,parameters,random=c("X"),DLL="sde_linear")
+
+# The inner problem is quadratic
+newtonOption(obj,smartsearch=FALSE)
 
 # Estimate parameters and latent variables
 system.time(opt <- nlminb(obj$par,obj$fn,obj$gr))

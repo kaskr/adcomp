@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /**
    \brief Namespace with special functions and derivatives
 
@@ -394,14 +397,14 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   tx.size()
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt(tx.size());
+			   int n=sqrt((double)tx.size());
 			   matrix<double> X(n,n);
 			   for(int i=0;i<n*n;i++){X(i)=tx[i];}
 			   matrix<double> res=X.inverse();   // Use Eigen matrix inverse (LU)
 			   for(int i=0;i<n*n;i++)ty[i]=res(i);
 			   ,
 			   // ATOMIC_REVERSE  (-f(X)^T*W*f(X)^T)
-			   int n=sqrt(ty.size());
+			   int n=sqrt((double)ty.size());
 			   matrix<Type> W=vec2mat(py,n,n);   // Range direction
 			   matrix<Type> Y=vec2mat(ty,n,n);   // f(X)
 			   matrix<Type> Yt=Y.transpose();    // f(X)^T
@@ -422,7 +425,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt(tx.size());
+			   int n=sqrt((double)tx.size());
 			   matrix<double> X=vec2mat(tx,n,n);
 			   matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
 			   vector<double> LUdiag = LU.diagonal();
@@ -449,7 +452,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   ,
 			   // ATOMIC_DOUBLE
 			   using namespace Eigen;
-			   int n=sqrt(tx.size());
+			   int n=sqrt((double)tx.size());
 			   matrix<double> X=vec2mat(tx,n,n);
 			   matrix<double> I(X.rows(),X.cols());
 			   I.setIdentity();
@@ -461,7 +464,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<n*n;i++)ty[i+1]=iX(i);
 			   ,
 			   // ATOMIC_REVERSE  (f2(X)*W1[0] - f2(X)^T*W2*f2(X)^T)
-			   int n=sqrt(tx.size());
+			   int n=sqrt((double)tx.size());
 			   Type W1=py[0];                     // Range direction
 			   matrix<Type> W2=vec2mat(py,n,n,1); // Range direction
 			   matrix<Type> Y=vec2mat(ty,n,n,1);  // f2(X)

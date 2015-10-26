@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 namespace atomic{
   /* Matrix class with methods required by Pade approximation */
   template<class Type>
@@ -251,7 +254,7 @@ namespace atomic{
 			     ,
 			     // ATOMIC_DOUBLE
 			     int nargs=CppAD::Integer(tx[0]);
-			     int n=sqrt((tx.size()-1)/nargs);
+			     int n=sqrt((double)(tx.size()-1)/nargs);
 			     vector<matrix<double> > args(nargs);
 			     for(int i=0;i<nargs;i++){
 			       args[i] = vec2mat(tx, n, n, 1 + i*n*n);
@@ -261,7 +264,7 @@ namespace atomic{
 			     ,
 			     // ATOMIC_REVERSE
 			     int nargs=CppAD::Integer(tx[0]);
-			     int n=sqrt(ty.size());
+			     int n=sqrt((double)ty.size());
 			     vector<matrix<Type> > args(nargs+1);
 			     for(int i=0;i<nargs;i++){
 			       args[i] = vec2mat(tx, n, n, 1 + i*n*n).transpose();

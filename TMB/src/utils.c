@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 # include <R.h>
 # include <Rinternals.h>
 # ifdef _OPENMP
@@ -29,3 +32,7 @@ SEXP setxslot(SEXP x, SEXP y){
   return x;
 }
 
+/* Is external pointer nil ? */
+SEXP isNullPointer(SEXP pointer) {
+  return ScalarLogical(!R_ExternalPtrAddr(pointer));
+}

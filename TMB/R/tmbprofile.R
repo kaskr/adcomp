@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Calculate 1D likelihood profiles wrt. single parameters or more
 ##' generally, wrt. arbitrary linear combinations of parameters
 ##' (e.g. contrasts).
@@ -18,23 +21,27 @@
 ##' @param ystep Adjusts the resolution of the likelihood profile.
 ##' @param maxit Max number of iterations for adaptive algorithm.
 ##' @param slice Do slicing rather than profiling?
+##' @param parm.range Valid parameter range.
 ##' @param trace Trace progress?
 ##' @param ... Unused
 ##' @return data.frame with parameter and function values.
+##' @seealso \code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
 ##' @examples
-##' runExample("randomregression",thisR=TRUE)
+##' runExample("simple",thisR=TRUE)
 ##' ## Parameter names for this model:
-##' ## mu  mu  sigma  sigma  sigma0
+##' ## beta   beta   logsdu   logsd0
 ##'
 ##' ## Profile wrt. sigma0:
-##' prof <- tmbprofile(obj,"sigma0")
+##' prof <- tmbprofile(obj,"logsd0")
 ##' plot(prof)
 ##' confint(prof)
 ##'
-##' ## Profile the difference between the mu parameters (name is optional):
-##' prof2 <- tmbprofile(obj,name="mu1 - mu2",lincomb = c(1,-1,0,0,0))
+##' \dontrun{
+##' ## Profile the difference between the beta parameters (name is optional):
+##' prof2 <- tmbprofile(obj,name="beta1 - beta2",lincomb = c(1,-1,0,0))
 ##' plot(prof2)
 ##' confint(prof2)
+##' }
 tmbprofile <- function(obj,
                        name,
                        lincomb,
@@ -42,6 +49,7 @@ tmbprofile <- function(obj,
                        ytol=2,
                        ystep=.1,
                        maxit=ceiling(5*ytol/ystep),
+                       parm.range = c(-Inf, Inf),
                        slice=FALSE,
                        trace=TRUE,...){
     ## Cleanup 'obj' when we exit from this function:
@@ -120,23 +128,38 @@ tmbprofile <- function(obj,
         ans$objective
       }
     }
+    ## Robustify f against failure
+    f.original <- f
+    f <- function(x){
+        y <- try(f.original(x), silent=TRUE)
+        if(is(y, "try-error")) y <- NA
+        y
+    }
     start <- NULL
     evalAlongLine <- function(h){
         start <<- rep(0, length(par)-1)
         x <- 0; y <- f(x)
         if(slice)obj$env$random.start <- expression(last.par[random])
-        na2false <- function(x)ifelse(is.na(x),FALSE,x)
         for(it in 1:maxit){
             yinit <- y[1]
             xcurrent <- tail(x,1)
             ycurrent <- tail(y,1)
             xnext <- xcurrent+h
+            if(xnext + that < parm.range[1])                break;
+            if(               parm.range[2] < xnext + that) break;
             ynext <- f(xnext)
             x <- c(x,xnext)
             y <- c(y,ynext)
-            if(na2false(abs(ynext-yinit)>ytol))break;
-            if(na2false(abs(ynext-ycurrent)>ystep))h <- h/2
-            if(na2false(abs(ynext-ycurrent)<ystep/4))h <- h*2
+            if( is.na(ynext) )            break;
+            if( abs(ynext-yinit) > ytol ) break;
+            speedMax <- ystep
+            speedMin <-
+                if(ynext >= yinit) ystep/4     ## 'tail-part'
+                else               ystep/8     ## 'center-part' => slow down
+            if( abs(ynext-ycurrent) > speedMax )
+                h <- h / 2
+            if( abs(ynext-ycurrent) < speedMin )
+                h <- h * 2
         }
         ans <- data.frame(x=x+that, y=y)
         names(ans) <- c(name,"value")
@@ -152,6 +175,16 @@ tmbprofile <- function(obj,
     ans
 }
 
+##' Plot (negative log) likelihood profile with confidence interval added.
+##'
+##' @title Plot likelihood profile.
+##' @param x Output from \code{\link{tmbprofile}}.
+##' @param type Plot type.
+##' @param level Add horizontal and vertical lines depicting this confidence level (\code{NULL} disables the lines).
+##' @param ... Additional plot arguments.
+##' @return NULL
+##' @method plot tmbprofile
+##' @S3method plot tmbprofile
 plot.tmbprofile <- function(x,type="l",level=.95,...){
     plot(as.data.frame(x), type=type, ...)
     if(!is.null(level)){
@@ -161,6 +194,16 @@ plot.tmbprofile <- function(x,type="l",level=.95,...){
     }
 }
 
+##' Calculate confidence interval from a likelihood profile.
+##'
+##' @title Profile based confidence intervals.
+##' @param object Output from \code{\link{tmbprofile}}.
+##' @param parm Not used
+##' @param level Confidence level.
+##' @param ... Not used
+##' @return Lower and upper limit as a matrix.
+##' @method confint tmbprofile
+##' @S3method confint tmbprofile
 confint.tmbprofile <- function (object, parm, level = 0.95, ...){
     i <- which.min(object$value)
     left <- head(object, i)

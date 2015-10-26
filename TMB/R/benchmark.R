@@ -1,3 +1,6 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ##' Benchmark parallel templates
 ##'
 ##' By default this function will perform timings of the most critical
@@ -18,11 +21,13 @@
 ##' @param expr Optional expression to benchmark instead of default.
 ##' @param cores Optional vector of cores.
 ##' @examples
+##' \dontrun{
 ##' runExample("linreg_parallel",thisR=TRUE)  ## Create obj
 ##' ben <- benchmark(obj,n=100,cores=1:4)
 ##' plot(ben)
 ##' ben <- benchmark(obj,n=10,cores=1:4,expr=expression(do.call("optim",obj)))
 ##' plot(ben)
+##' }
 benchmark <- function(obj,n=10,expr=NULL,cores=NULL){
   if(!is.null(cores)){
     return(parallelBenchmark(obj,n=n,cores=cores,expr=expr))
@@ -32,7 +37,7 @@ benchmark <- function(obj,n=10,expr=NULL,cores=NULL){
     expr <- expression(
         template.likelihood = obj$env$f(order=0),
         template.gradient = obj$env$f(order=1),
-        template.sparse.hessian = obj$env$spHess(),
+        template.sparse.hessian = obj$env$spHess(random=TRUE),
         cholesky=updateCholesky(L,h)
         )
   }
@@ -54,6 +59,7 @@ benchmark <- function(obj,n=10,expr=NULL,cores=NULL){
   as.data.frame(ans)[c(3)]
 }
 
+## Internal helper function
 parallelBenchmark <- function(obj,n,cores=1:4,...){
   ans <- lapply(cores,function(nc){
     openmp(nc)
@@ -68,6 +74,18 @@ parallelBenchmark <- function(obj,n,cores=1:4,...){
   ans
 }
 
+##' Plot result of parallel benchmark
+##'
+##' @title Plot result of benchmark
+##' @param x Object to plot
+##' @param type Plot type
+##' @param ... Further plot arguments
+##' @param show Plot relative speedup or relative time?
+##' @param legendpos Position of legend
+##' @return NULL
+##' @rdname benchmark
+##' @method plot parallelBenchmark
+##' @S3method plot parallelBenchmark
 plot.parallelBenchmark <- function(x,type="b",...,show=c("speedup","time"),legendpos="topleft"){
   show <- match.arg(show)
   ncores <- as.numeric(colnames(x))
@@ -86,4 +104,5 @@ plot.parallelBenchmark <- function(x,type="b",...,show=c("speedup","time"),legen
     if(is.null(rownames(x)))rownames(x) <- 1:n
     legend(legendpos,legend=rownames(x),col=1:n,lty=1:n)
   }
+  NULL
 }

@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 namespace tmbutils{
 // Convenience utilites
 #include "spmat.cpp"
@@ -28,3 +31,6 @@ namespace density{
   using namespace tmbutils;
 #include "density.cpp"
 } // End namespace
+
+#include "romberg.cpp"
+#include "autodiff.cpp"

@@ -7,7 +7,7 @@
 precompile(...)
 }
 \arguments{
-\item{...}{Passed to \code{compile}.}
+\item{...}{Passed to \code{\link{compile}}.}
 }
 \description{
 Precompile the TMB library
@@ -20,6 +20,7 @@ compilation times of templates should be reduced.
 \itemize{
 \item To precompile on Linux run \code{precompile()}.
 \item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@")}.
+\item Precompiling is not supported on Windows at present.
 }
 Note that precompilation has side effects: It is not possible to work with more than one
 model at a time for a single R instance.

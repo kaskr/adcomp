@@ -1,5 +1,9 @@
+R=R
+# -> you can do    R=R-devel  make ....
+
 PACKAGE=TMB
-VERSION=1.1-1
+VERSION := $(shell sed -n '/^Version: /s///p' TMB/DESCRIPTION)
+DATE := $(shell sed -n '/^Date: /s///p' TMB/DESCRIPTION)
 TARBALL=${PACKAGE}_${VERSION}.tar.gz
 ZIPFILE=${PACKAGE}_${VERSION}.zip
 
@@ -33,10 +37,11 @@ check:
 	R CMD check $(PACKAGE)
 
 unlock:
-	rm -rf ${R_LIBS}/00LOCK-TMB
+	rm -rf `Rscript --vanilla -e 'writeLines(.Library)'`/00LOCK-TMB
 
 .PHONY: dox
 dox:
+	sed -i s/^PROJECT_NUMBER.*/PROJECT_NUMBER=v$(VERSION)/g dox/Doxyfile
 	cd dox; doxygen
 
 dox-clean:
@@ -75,3 +80,36 @@ install-metis-full: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 	fi
 	make build-package
 	LIBCHOLMOD=`pwd`/SuiteSparse/libcholmod.so R CMD INSTALL --preclean $(TARBALL)
+
+## Get a rough changelog since most recent github revision tag
+## (Use as starting point when updating NEWS file)
+## NOTE: Run *after* updating version and date in DESCRIPTION.
+changelog:
+	echo; \
+	echo "------------------------------------------------------------------------"; \
+	echo TMB $(VERSION) \($(DATE)\); \
+	echo "------------------------------------------------------------------------"; \
+	echo; \
+	git --no-pager log --format="o %B" `git describe --abbrev=0 --tags`..HEAD | sed s/^-/\ \ -/g
+
+## The CRAN version must be customized a bit...
+## FIXME: Is it possible to get 'Makevars' POSIX compliant without
+## losing the current flexibility e.g. 'make install-metis'? (Main
+## obstacle is lack of 'ifdef' in POSIX make).
+## FIXME: 'LinkingTo RcppEigen' is not really right but perhaps the
+## best we can do to assert RcppEigen is installed? (we need the
+## Eigen headers, nothing else)
+cran-version:
+	cd TMB; git clean -xdf
+	sed -i 's/^LinkingTo.*/LinkingTo: Matrix, RcppEigen/' TMB/DESCRIPTION
+	rm -rf TMB/inst/include/Eigen
+	echo "PKG_LIBS = \$$(LAPACK_LIBS) \$$(BLAS_LIBS) \$$(FLIBS) \$$(SHLIB_OPENMP_CFLAGS)" > TMB/src/Makevars
+	echo "PKG_CFLAGS = \$$(SHLIB_OPENMP_CFLAGS)"                                         >> TMB/src/Makevars
+	sed -i /^SystemRequirements.*/d TMB/DESCRIPTION
+	echo ".onAttach <- function(lib, pkg) {"                                                      >> TMB/R/zzz.R
+	echo "  exfolder <- system.file(\"examples\", package = \"TMB\")"                             >> TMB/R/zzz.R
+	echo "  dll <- paste0(exfolder, Sys.getenv(\"R_ARCH\"), \"/simple\", .Platform\$$dynlib.ext)" >> TMB/R/zzz.R
+	echo "  if(!file.exists(dll)) runExample(\"simple\", dontrun=TRUE)"                           >> TMB/R/zzz.R
+	echo "}"                                                                                      >> TMB/R/zzz.R
+	make doc-update
+	make build-package

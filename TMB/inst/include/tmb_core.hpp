@@ -1,3 +1,6 @@
+// Copyright (C) 2013-2015 Kasper Kristensen
+// License: GPL-2
+
 /** \file 
 * \brief Interfaces to R and CppAD
 */
@@ -670,11 +673,34 @@ public:
 
 }; // objective_function
 
-/* Experiment: Help manage the parallel accumulation.
-   Usage:
-   parallel_accumulator<Type> res(this);
-   For safety we avoid adding an operator=() !
- */
+/** \brief Helper to manage parallel accumulation.
+
+    - A parallel accumulator only has two valid operators: increment
+      (+=) and decrement (-=). Other usage would break the assumptions
+      underlying the parallel accumulator.
+    - In particular, direct assignment is forbidden. The parallel
+      accumulator is automatically zero initialized.
+
+    Example:
+    \code
+    // Initialize a variable for parallel summation:
+    parallel_accumulator<Type> res(this);
+
+    // Only two valid methods:
+    res += ...;
+    res -= ...;
+
+    // Automatic cast to Type when exit from function
+    // (cast to Type is not allowed elsewhere):
+    return res;
+    \endcode
+
+    \note It is only recommended to apply the parallel accumulator for
+    models that are known to work in serial (debugging becomes
+    substantially more difficult with parallel accumulation turned
+    on).
+
+*/
 template<class Type>
 struct parallel_accumulator{
   Type result;

@@ -4,10 +4,8 @@
 \alias{newton}
 \title{Generalized newton optimizer.}
 \usage{
-newton(par, fn, gr, he, trace = newtonOption("trace"),
-  maxit = newtonOption("maxit"), tol = newtonOption("tol"), alpha = 1,
-  smartsearch = newtonOption("smartsearch"),
-  mgcmax = newtonOption("mgcmax"), super = TRUE, silent = TRUE,
+newton(par, fn, gr, he, trace = 1, maxit = 100, tol = 1e-08, alpha = 1,
+  smartsearch = TRUE, mgcmax = 1e+60, super = TRUE, silent = TRUE,
   ustep = 1, power = 0.5, u0 = 1e-04, grad.tol = tol, step.tol = tol,
   tol10 = 0.001, env = environment(), ...)
 }
@@ -73,5 +71,8 @@ This function's hessian ( \eqn{f''(u)+t I} ) is positive definite for \eqn{t} su
 large. The value \eqn{t} is updated at every iteration: If the hessian is positive definite \eqn{t} is
 decreased, otherwise increased. Detailed control of the update process can be obtained with the
 arguments \code{ustep}, \code{power} and \code{u0}.
+}
+\seealso{
+\code{\link{newtonOption}}
 }
 

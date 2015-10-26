@@ -1,13 +1,13 @@
+## Copyright (C) 2013-2015 Kasper Kristensen
+## License: GPL-2
+
 ## .First.lib <- function(lib, pkg) {
 ##   library.dynam("TMB", pkg, lib)
-##   setDefaults()
 ## }
 
 .onLoad <- function(lib, pkg) {
   library.dynam("TMB", pkg, lib)
-  setDefaults()
 }
-
 
 ## .LastLib <- function(libpath)
 ## {
