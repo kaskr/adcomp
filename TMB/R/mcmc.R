@@ -163,7 +163,7 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
 #' which were accepted ('accepted'), and the total function and gradient
 #' calls ('n.calls'), which for this algorithm is \code{nsim}*(\code{L}+2)
 mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
-                      diagnostic=FALSE){
+                     delta=0.5, diagnostic=FALSE, Madapt=NULL){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
     ## work in the transformed space
@@ -180,9 +180,29 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
     accepted <- rep(NA, nsim)
     theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
     if(diagnostic) theta.proposed <- theta.out
-    eps0 <- eps
+    ## A NULL value for eps signifies to use the dual averaging algorithm
+    useDA <- is.null(eps)
+    if(useDA){
+        if(is.null(Madapt)){
+            message("Madapt not specified, defaulting to half of nsim")
+            Madapt <- floor(nsim/2)
+        }
+        ## Initialize the dual-averaging algorithm.
+        message(paste("No eps given so using dual averaging during first", Madapt, "steps."))
+        epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
+        eps <- epsvec[1] <-
+            find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
+        mu <- log(10*eps)
+        epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+    } else {
+        ## dummy values to return
+        epsvec <- epsbar <- Hbar <- NULL
+    }
+    ## Start of MCMC chain
+    eps0 <- eps                         # eps0 is average eps
     for(m in 1:nsim){
-        eps <- eps0*runif(1,.9,1.1)
+        ## Randomize eps if not doing adapation below
+        if(!useDA) eps <- eps0*runif(1,.9,1.1)
         r.cur <- r.new <- rnorm(length(params.init),0,1)
         theta.new <- theta.cur
         theta.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
@@ -201,8 +221,8 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
         ## negate r to make proposal symmetric
         r.new <- -r.new
         if(diagnostic) theta.proposed[m,] <- theta.new
-        alpha <- -fn2(theta.cur)+fn2(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2
-        if(is.finite(alpha) & log(runif(1)) < alpha){
+        logalpha <- -fn2(theta.cur)+fn2(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2
+        if(is.finite(logalpha) & log(runif(1)) < logalpha){
             ## accept the proposed state
             theta.cur <- theta.new
             accepted[m] <- TRUE
@@ -211,7 +231,21 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
             accepted[m] <- FALSE
         }
         theta.out[m,] <- theta.cur
-    }
+        if(useDA){
+            ## Do the adapting of eps.
+            if(m <= Madapt){
+                Hbar[m+1] <-
+                    (1-1/(m+t0))*Hbar[m] + (delta-min(1,exp(logalpha)))/(m+t0)
+                logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
+                epsvec[m+1] <- exp(logeps)
+                logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
+                epsbar[m+1] <- exp(logepsbar)
+                eps <- epsvec[m+1]
+            } else {
+                eps <- epsbar[Madapt]*runif(1,.9,1.1)
+            }
+        }
+    } ## end of MCMC loop
     ## Back transform parameters if covar is used
     if(!is.null(covar)) {
         theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
@@ -219,9 +253,10 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
             theta.proposed <- t(apply(theta.proposed, 1, function(x) chd %*% x))
     }
     message(paste("Acceptance rate = ", round(mean(accepted),1)))
+    if(useDA) message(paste("Dual averaging final average eps =", epsbar[Madapt]))
     if(diagnostic){
         return(list(par=theta.out, par.proposed=theta.proposed, accepted=accepted,
-                    n.calls=nsim*(L+2)))
+                    n.calls=nsim*(L+2), epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
     } else {
         return(theta.out)
     }
@@ -267,7 +302,7 @@ mcmc.hmc <- function(nsim, L, eps, fn, gr, params.init, covar=NULL,
 #' containing samples ('par'),  vector of steps taken at each iteration
 #' ('steps.taken'), and the total function and gradient
 #' calls ('n.calls').
-mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
+mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
                       delta=0.5, covar=NULL, diagnostic=FALSE, max_doublings=7){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
@@ -292,11 +327,15 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
     assign("n.calls", value=0, envir=.GlobalEnv)
     useDA <- is.null(eps)               # whether to use DA algorithm
     if(useDA){
-        ## Initialize the dual-averaging algorithm. Could make these arguments
-        ## later.
-        message(paste("No eps given so using dual averaging during first", Madapt, "steps."))
+        if(is.null(Madapt)){
+            message("MCMC NUTS: Madapt not specified, defaulting to half of nsim")
+            Madapt <- floor(nsim/2)
+        }
+        ## Initialize the dual-averaging algorithm.
+        message(paste("MCMC NUTS: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
-        eps <- epsvec[1] <- find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1)
+        eps <- epsvec[1] <-
+            find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=TRUE)
         mu <- log(10*eps)
         epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
@@ -339,13 +378,15 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
             n <- n+res$n
             s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
             j <- j+1
-            if(j>max_doublings & s) {warning("j larger than max_doublings, skipping to next m");break}
+            ## Stop doubling if too many or it's diverged enough
+            if(j>max_doublings & s) {
+                ## warning("j larger than max_doublings, skipping to next m")
+                break
+            }
         }
         j.results[m] <- j-1
         if(useDA){
-            ## Do the adapting of eps. Note that indexing is subtle here, the
-            ## paper uses 0 but R needs to start at 1. I've thus offset
-            ## every index by +1.
+            ## Do the adapting of eps.
             if(m <= Madapt){
                 Hbar[m+1] <-
                     (1-1/(m+t0))*Hbar[m] + (delta-res$alpha/res$nalpha)/(m+t0)
@@ -364,9 +405,9 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
         theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
     }
     j.stats <- 2^(c(min(j.results), median(j.results), max(j.results)))
-    message(paste0("NUTS diagnostics: Approximate leapfrog steps(min, median, max)=(",
+    if(useDA) message(paste("MCMC NUTS: Dual averaging final average eps =", epsbar[Madapt]))
+    message(paste0("MCMC NUTS: Approximate leapfrog steps(min, median, max)=(",
                    paste(j.stats, collapse=","), ")"))
-    message(paste("Total function calls:", n.calls))
     if(diagnostic){
         return(list(par=theta.out, steps.taken= 2^j.results,
                     n.calls=n.calls, epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
@@ -503,7 +544,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt, eps=NULL,
 #' @details The algorithm uses a while loop and will break after 50
 #' iterations.
 #'
-find.epsilon <- function(theta,  fn, gr, eps=1){
+find.epsilon <- function(theta,  fn, gr, eps=1, verbose=TRUE){
     r <- rnorm(n=length(theta), mean=0, sd=1)
     ## Do one leapfrog step
     r.new <- r+(eps/2)*gr(theta)
@@ -526,6 +567,6 @@ find.epsilon <- function(theta,  fn, gr, eps=1){
             break
         }
     }
-    message(paste("Reasonable epsilon=", eps, "found after", k, "steps"))
+    if(verbose) message(paste("Reasonable epsilon=", eps, "found after", k, "steps"))
     return(invisible(eps))
 }
