@@ -190,7 +190,7 @@ mcmc.hmc <- function(nsim, L, fn, gr, params.init, eps=NULL, covar=NULL,
     ## work in the transformed space
     if(!is.null(covar)){
         fn2 <- function(theta) fn(chd %*% theta)
-        gr2 <- function(theta) gr(chd %*% theta)
+        gr2 <- function(theta) as.vector( t( gr(chd %*% theta) ) %*% chd )
         chd <- t(chol(covar))               # lower triangular Cholesky decomp.
         chd.inv <- solve(chd)               # inverse
         theta.cur <- chd.inv %*% params.init
@@ -330,7 +330,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
     ## work in the transformed space
     if(!is.null(covar)){
         fn2 <- function(theta) fn(chd %*% theta)
-        gr2 <- function(theta) gr(chd %*% theta)
+        gr2 <- function(theta) as.vector( t( gr(chd %*% theta) ) %*% chd )
         chd <- t(chol(covar))               # lower triangular Cholesky decomp.
         chd.inv <- solve(chd)               # inverse
         theta.cur <- chd.inv %*% params.init
