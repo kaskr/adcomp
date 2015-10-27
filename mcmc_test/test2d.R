@@ -13,7 +13,7 @@ image(x,x,f)
 
 ## FIXME: Also test the other mcmc algorithms
 getOneSample <- function(plot = FALSE){
-    sim <- run_mcmc(model, 10000, "HMC", L=5, eps=.1)
+    sim <- mcmc(model, 10000, "HMC", L=5, eps=.1)
     ans <- tail(sim,1)
     if(plot) points(ans)
     unlist(ans)
