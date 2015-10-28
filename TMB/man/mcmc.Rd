@@ -41,7 +41,7 @@ chain. See individual algorithm for more information.}
 files for the samplers for further arguments.}
 }
 \value{
-If \code{diagnostic} is FALSE, returns a data frame with
+If \code{diagnostic} is \code{FALSE}, returns a data frame with
 posterior samples. Otherwise it returns a list containing the samples
 and properties of the sampler useful for diagnosing behavior and
 efficiency.
@@ -55,32 +55,53 @@ This function is a top-level wrapper designed specifically to
 work with TMB models. There are several MCMC algorithms available for
 use. The user is responsible for specifying the model properly (priors,
 starting values, desired parameters fixed, etc.), as well as assessing
-the convergence of the resulting samples (e.g., through the
+the convergence and validity of the resulting samples (e.g., through the
 \code{coda} package) before making inference.
 }
 \examples{
 require(TMB)
+## Draw samples with the RWM, HMC and NUTS algorithms and compare.
 
-## Draw samples with the HMC and NUTS algorithms and compare.
-
-## Run the simple example, obj and opt are loaded into workspace
+## Run the simple example, so that obj and opt are loaded into workspace
 runExample("simple")
-obj$env$beSilent()
-## A helper function to get an approximate epsilon.
-find.epsilon(theta=opt$par, fn=function(x) -obj$fn(x), gr=function(x) -obj$gr(x))
-## Run two gradient based algorithms
-system.time(simple.hmc <-
-    run_mcmc(obj=obj, nsim=1000, algorithm='HMC', L=5, eps=.1, params.init=opt$par))
-system.time(simple.nuts <-
-    run_mcmc(obj=obj, nsim=1000, algorithm='NUTS', eps=.1, params.init=opt$par))
-## See how they compare
-par(mfrow=c(2,4))
-for(i in 1:4) acf(simple.hmc[,i])
-for(i in 1:4) acf(simple.nuts[,i])
 
-rm(list=c('obj', 'opt', 'simple.hmc', 'simple.nuts'))
+## Fit model
+obj <- MakeADFun(data=list(x=x, B=B, A=A),
+                 parameters=list(u=u*0, beta=beta*0, logsdu=1, logsd0=1),
+                 random="u",
+                 DLL="simple",
+                 silent=TRUE
+                 )
+opt <- nlminb(obj$par, obj$fn, obj$gr)
+
+## Run RWM and two gradient based algorithms, using adative step size (eps)
+## for each. Start from the MLE.
+rwm <- mcmc(obj=obj, nsim=500*8, algorithm='RWM', params.init=opt$par,
+            alpha=.08, diagnostic=TRUE)
+## Thin it to better approximate the gradient methods
+rwm$par <- rwm$par[seq(1, nrow(rwm$par), by=8),]
+hmc <- mcmc(obj=obj, nsim=500, algorithm='HMC', L=8, params.init=opt$par,
+            diagnostic=TRUE, eps=0.1)
+nuts <- mcmc(obj=obj, nsim=500, algorithm='NUTS', params.init=opt$par,
+             diagnostic=TRUE, eps=0.1)
+
+## See how they compare via ACF
+par(mfrow=c(3,4))
+for(i in 1:4) acf(rwm$par[,i])
+for(i in 1:4) acf(hmc$par[,i])
+for(i in 1:4) acf(nuts$par[,i])
+
+## also look at effective size per time
+min(coda::effectiveSize(rwm$par))/rwm$time
+min(coda::effectiveSize(hmc$par))/hmc$time
+min(coda::effectiveSize(nuts$par))/nuts$time
+
+rm(list=c('obj', 'opt', 'rwm', 'hmc', 'nuts'))
 }
 \author{
 Cole Monnahan
+}
+\seealso{
+\code{\link{mcmc.hmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.rwm}}
 }
 

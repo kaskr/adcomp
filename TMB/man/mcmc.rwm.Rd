@@ -19,9 +19,15 @@ mcmc.rwm(nsim, fn, params.init, alpha = 1, covar = NULL,
 Xnew=Xcur+alpha*Xproposed where Xproposed is generated from a mean-zero
 multivariate normal. Varying \code{alpha} varies the acceptance rate.}
 
-\item{covar}{A covariance matrix to be used in generating multivariate
-normal proposals. A value of NULL (default) indicates to use iid
-standard normal.}
+\item{covar}{An optional covariance matrix which can be used to improve
+the efficiency of sampling. The lower Cholesky decomposition of this
+matrix is used to transform the parameter space. If the posterior is
+approximately multivariate normal and \code{covar} approximates the
+covariance, then the transformed parameter space will be close to
+multivariate standard normal. In this case the algorithm will be more
+efficient, but there will be overhead in the matrix calculations which
+need to be done at each step. The default of NULL specifies to not do
+this transformation.}
 
 \item{diagnostic}{Whether to return a list of diagnostic metrics about
 the chain. Useful for assessing efficiency and tuning chain.}
@@ -30,7 +36,7 @@ the chain. Useful for assessing efficiency and tuning chain.}
 If \code{diagnostic} is FALSE (default), returns a matrix of
 \code{nsim} samples from the posterior. Otherwise returns a list
 containing samples ('par'), proposed samples ('par.proposed'), vector of
-which were accepted ('accepted'), and the total function calls
+which proposals were accepted ('accepted'), and the total function calls
 ('n.calls'), which for this algorithm is \code{nsim}
 }
 \description{
@@ -38,6 +44,10 @@ which were accepted ('accepted'), and the total function calls
 Random Walk Metropolis (RWM) sampler.
 }
 \details{
-This
+This algorithm does not yet contain adaptation of \code{alpha}
+so some trial and error may be required for efficient sampling.
+}
+\seealso{
+\code{\link{mcmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.hmc}}
 }
 

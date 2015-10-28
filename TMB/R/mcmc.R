@@ -5,7 +5,7 @@
 #' work with TMB models. There are several MCMC algorithms available for
 #' use. The user is responsible for specifying the model properly (priors,
 #' starting values, desired parameters fixed, etc.), as well as assessing
-#' the convergence of the resulting samples (e.g., through the
+#' the convergence and validity of the resulting samples (e.g., through the
 #' \code{coda} package) before making inference.
 #' @title MCMC sampling of TMB models
 #' @author Cole Monnahan
@@ -34,12 +34,12 @@
 #' chain. See individual algorithm for more information.
 #' @param ... Further arguments to be passed to the algorithm. See help
 #' files for the samplers for further arguments.
-#' @return If \code{diagnostic} is FALSE, returns a data frame with
+#' @return If \code{diagnostic} is \code{FALSE}, returns a data frame with
 #' posterior samples. Otherwise it returns a list containing the samples
 #' and properties of the sampler useful for diagnosing behavior and
 #' efficiency.
 #' @example inst/examples/mcmc_examples.R
-#' @export
+#' @seealso \code{\link{mcmc.hmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.rwm}}
 mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=FALSE, ...){
     ## Initialization for all algorithms
     algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
@@ -100,18 +100,26 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=
 #' @param params.init A vector of initial parameter values.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
 #' the chain. Useful for assessing efficiency and tuning chain.
-#' @details This
-#' @param covar A covariance matrix to be used in generating multivariate
-#' normal proposals. A value of NULL (default) indicates to use iid
-#' standard normal.
+#' @details This algorithm does not yet contain adaptation of \code{alpha}
+#' so some trial and error may be required for efficient sampling.
+#' @param covar An optional covariance matrix which can be used to improve
+#' the efficiency of sampling. The lower Cholesky decomposition of this
+#' matrix is used to transform the parameter space. If the posterior is
+#' approximately multivariate normal and \code{covar} approximates the
+#' covariance, then the transformed parameter space will be close to
+#' multivariate standard normal. In this case the algorithm will be more
+#' efficient, but there will be overhead in the matrix calculations which
+#' need to be done at each step. The default of NULL specifies to not do
+#' this transformation.
 #' @param alpha The amount to scale the proposal, i.e,
 #' Xnew=Xcur+alpha*Xproposed where Xproposed is generated from a mean-zero
 #' multivariate normal. Varying \code{alpha} varies the acceptance rate.
 #' @return If \code{diagnostic} is FALSE (default), returns a matrix of
 #' \code{nsim} samples from the posterior. Otherwise returns a list
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
-#' which were accepted ('accepted'), and the total function calls
+#' which proposals were accepted ('accepted'), and the total function calls
 #' ('n.calls'), which for this algorithm is \code{nsim}
+#' @seealso \code{\link{mcmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.hmc}}
 mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALSE){
     accepted <- rep(0, length=nsim)
     n.params <- length(params.init)
@@ -160,31 +168,58 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
     return(theta.out)
 }
 
-
-
-#' [BETA VERSION] Draw MCMC samples from a model posterior using a Hamiltonian sampler.
-#'
+#' [BETA VERSION] Draw MCMC samples from a model posterior using a
+#' Hamiltonian sampler.
+#' @details This function implements algorithm 5 of Hoffman and Gelman
+#' (2014), which includes adaptive step sizes (\code{eps}) via an algorithm
+#' called dual averaging. In theory neither the step length nor step size
+#' needs to be input by the user to obtain efficient sampling from the
+#' posterior.
 #' @param nsim The number of samples to return.
 #' @param L The number of leapfrog steps to take. The NUTS algorithm does
-#' not require this as an input. If L=1 this function will perform
-#' Langevin sampling.
-#' @param eps The length of the leapfrog steps.
-#' @param fn A function that returns the log of the posterior density. This
-#' function should not return the negative log, following the notation of
-#' Hoffman and Gelman (2014).
+#' not require this as an input. If \code{L=1} this function will perform
+#' Langevin sampling. In some contexts \code{L} can roughly be thought of
+#' as a thinning rate.
+#' @param eps The length of the leapfrog steps. If a numeric value is
+#' passed, it will be used throughout the entire chain. A \code{NULL}
+#' value will initiate adaptation of \code{eps} using the dual averaging
+#' algorithm during the first \code{Madapt} steps.
+#' @param Madapt An optional argument for how many iterations to adapt
+#' \code{eps} in the dual averaging algorithm. A value of \code{NULL}
+#' results in a default of \code{Madapt=nsim/2}.
+#' @param delta The target acceptance rate if using apative
+#' \code{eps}. Defaults to 50\%.
+#' @param fn A function that returns the log of the posterior density.
 #' @param gr A function that returns a vector of gradients of the log of
-#' the posterior density (same as with \code{fn}).
+#' the posterior density (same as \code{fn}).
 #' @param params.init A vector of initial parameter values.
+#' @param covar An optional covariance matrix which can be used to improve
+#' the efficiency of sampling. The lower Cholesky decomposition of this
+#' matrix is used to transform the parameter space. If the posterior is
+#' approximately multivariate normal and \code{covar} approximates the
+#' covariance, then the transformed parameter space will be close to
+#' multivariate standard normal. In this case the algorithm will be more
+#' efficient, but there will be overhead in the matrix calculations which
+#' need to be done at each step. The default of NULL specifies to not do
+#' this transformation.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
 #' the chain. Useful for assessing efficiency and tuning chain.
-#' @references Neal, R. M. 2011. MCMC using Hamiltonian dynamics.
+#' @references
+#' \itemize{
+#' \item{Neal, R. M. (2011). MCMC using Hamiltonian dynamics. Handbook
+#' of Markov Chain Monte Carlo.}
+#' \item{Hoffman and Gelman (2014). The No-U-Turn sampler: Adaptively
+#' setting path lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res.
+#' 15:1593-1623.}
+#' }
+#' @seealso \code{\link{mcmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.rwm}}
 #' @return If \code{diagnostic} is FALSE (default), returns a matrix of
 #' \code{nsim} samples from the posterior. Otherwise returns a list
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
 #' which were accepted ('accepted'), and the total function and gradient
-#' calls ('n.calls'), which for this algorithm is \code{nsim}*(\code{L}+2)
-mcmc.hmc <- function(nsim, L, fn, gr, params.init, eps=NULL, covar=NULL,
-                     delta=0.5, diagnostic=FALSE, Madapt=NULL){
+#' calls ('n.calls'), which for this algorithm is \code{nsim*(L+2)}.
+mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
+                     delta=0.5, Madapt=NULL, diagnostic=FALSE){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
     ## work in the transformed space
@@ -285,46 +320,63 @@ mcmc.hmc <- function(nsim, L, fn, gr, params.init, eps=NULL, covar=NULL,
 
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using the
-#' No-U-Turn (NUTS) sampler with dual averaging from Hoffman and Gelman
-#' (2014).
+#' No-U-Turn (NUTS) sampler with dual averaging.
 #'
-#' @details This is the 'efficient' NUTS algorithm but does not use dual
-#' averaging to tune \code{eps}, so it must be specified.
+#' @details This function implements algorithm 6 of Hoffman and Gelman
+#' (2014), which includes adaptive step sizes (\code{eps}) via an algorithm
+#' called dual averaging. In theory neither the step length nor step size
+#' needs to be input by the user to obtain efficient sampling from the
+#' posterior.
 #' @param nsim The number of samples to return.
-#' @param eps The length of the leapfrog steps. If NULL is passed (the
-#' default) then dual averaging is used during the first \code{Madapt}
-#' steps.
+#' @param eps The length of the leapfrog steps. If a numeric value is
+#' passed, it will be used throughout the entire chain. A \code{NULL}
+#' value will initiate adaptation of \code{eps} using the dual averaging
+#' algorithm during the first \code{Madapt} steps.
+#' @param Madapt An optional argument for how many iterations to adapt
+#' \code{eps} in the dual averaging algorithm. A value of \code{NULL}
+#' results in a default of \code{Madapt=nsim/2}.
 #' @param delta The target acceptance rate for the dual averaging
-#' algorithm. Must be specified if \code{eps} is NULL. The rate can be
-#' "understood as the average acceptance probability that HMC would give to
-#' the position-momentum states explored during the final doubling
-#' iteration."
-#' @param fn A function that returns the log of the posterior density. This
-#' function should not return the negative log, following the notation of
-#' Hoffman and Gelman (2014).
+#' algorithm. Defaults to 50\%. NUTS does not include an accept/reject
+#' Metropolis step, so this rate can be understood as the "average acceptance
+#' probability that HMC would give to the position-momentum states explored
+#' during the final doubling iteration."
+#' @param fn A function that returns the log of the posterior density.
 #' @param gr A function that returns a vector of gradients of the log of
-#' the posterior density (same as with \code{fn}).
+#' the posterior density (same as \code{fn}).
+#' @param covar An optional covariance matrix which can be used to improve
+#' the efficiency of sampling. The lower Cholesky decomposition of this
+#' matrix is used to transform the parameter space. If the posterior is
+#' approximately multivariate normal and \code{covar} approximates the
+#' covariance, then the transformed parameter space will be close to
+#' multivariate standard normal. In this case the algorithm will be more
+#' efficient, but there will be overhead in the matrix calculations which
+#' need to be done at each step. The default of NULL specifies to not do
+#' this transformation.
 #' @param params.init A vector of initial parameter values.
-#' @param Madapt The number of iterations during which to tune \code{eps}
-#' if the dual averaging algorithm is used. Afterward the final \code{eps}
-#' is used for the remaining iterations.
-#' @param delta The target acceptance rate for the dual averaging
-#' algorithm. See paper for interpretation of this for NUTS which does not
-#' have a Metropolis step.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
 #' the chain. Useful for assessing efficiency and tuning chain.
 #' @param max_doublings Integer representing the maximum times the path
-#' length should double within an MCMC iteration. Default of 8, so 256
-#' steps.
-#' @references Hoffman and Gelman (2014). The No-U-Turn sampler: Adaptively
-#' setting path lengths in Hamiltonian Monte Carlo.
+#' length should double within an MCMC iteration. Default of 4, so 16
+#' steps. If a U-turn has not occured before this many steps the algorithm
+#' will stop and return a sample from the given tree.
+#' @references
+#'  \itemize{
+#' \item{Neal, R. M. (2011). MCMC using Hamiltonian dynamics. Handbook
+#' of Markov Chain Monte Carlo.}
+#' \item{Hoffman and Gelman (2014). The No-U-Turn sampler: Adaptively
+#' setting path lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res.
+#' 15:1593-1623.}
+#' }
 #' @return If \code{diagnostic} is FALSE (default), returns a matrix of
 #' \code{nsim} samples from the posterior. Otherwise returns a list
 #' containing samples ('par'),  vector of steps taken at each iteration
 #' ('steps.taken'), and the total function and gradient
-#' calls ('n.calls').
-mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
-                      delta=0.5, covar=NULL, diagnostic=FALSE, max_doublings=4){
+#' calls ('n.calls'), which in the case of NUTS is dynamic and tracked via
+#' a global variable, and finally the average \code{eps} ('epsbar') from
+#' the dual averaging algorithm if used (otherwise NULL).
+#' @seealso \code{\link{mcmc}}, \code{\link{mcmc.hmc}}, \code{\link{mcmc.rwm}}
+mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Madapt=NULL,
+                      delta=0.5, covar=NULL, diagnostic=FALSE){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
     ## work in the transformed space
@@ -434,12 +486,11 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
                    paste(j.stats, collapse=","), ")"))
     if(diagnostic){
         return(list(par=theta.out, steps.taken= 2^j.results,
-                    n.calls=n.calls, epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
+                    n.calls=n.calls, epsbar=epsbar))
     } else {
         return(theta.out)
     }
 }
-
 
 #' Draw a slice sample for given position and momentum variables
 .sample.u <- function(theta, r, fn)
@@ -583,7 +634,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, Madapt=NULL, eps=NULL,
         H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
         k <- k+1
         if(k>50) {
-            warning("more than 50 iterations to find epsilon, stopping")
+            warning("more than 50 iterations to find initial epsilon, stopping")
             break
         }
     }
