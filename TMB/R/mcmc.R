@@ -1,3 +1,6 @@
+## Copyright (C) 2015 Cole Monnahan
+## License: GPL-2
+
 #' [BETA VERSION] Draw samples from the posterior of a TMB model using a
 #' specified MCMC algorithm.
 #'
@@ -367,13 +370,13 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' setting path lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res.
 #' 15:1593-1623.}
 #' }
-#' @return If \code{diagnostic} is FALSE (default), returns a matrix of
-#' \code{nsim} samples from the posterior. Otherwise returns a list
-#' containing samples ('par'),  vector of steps taken at each iteration
-#' ('steps.taken'), and the total function and gradient
-#' calls ('n.calls'), which in the case of NUTS is dynamic and tracked via
-#' a global variable, and finally the average \code{eps} ('epsbar') from
-#' the dual averaging algorithm if used (otherwise NULL).
+#' @return If \code{diagnostic} is FALSE (default), returns a matrix
+#' of \code{nsim} samples from the posterior. Otherwise returns a list
+#' containing samples ('par'), vector of steps taken at each iteration
+#' ('steps.taken'), and the total function and gradient calls
+#' ('n.calls'), which in the case of NUTS is dynamic, and finally the
+#' average \code{eps} ('epsbar') from the dual averaging algorithm if
+#' used (otherwise NULL).
 #' @seealso \code{\link{mcmc}}, \code{\link{mcmc.hmc}}, \code{\link{mcmc.rwm}}
 mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Madapt=NULL,
                       delta=0.5, covar=NULL, diagnostic=FALSE){
@@ -394,10 +397,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
     theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
     ## how many steps were taken at each iteration, useful for tuning
     j.results <- rep(NA, len=nsim)
-    ## count the model calls as global variable; updated inside
-    ## .buildtree. Some subtrees wont finish due to exit conditions so this
-    ## is dynamic and not a simple formula like with HMC.
-    assign("n.calls", value=0, envir=.GlobalEnv)
+    ## count the model calls; updated inside .buildtree. Some subtrees
+    ## wont finish due to exit conditions so this is dynamic and not a
+    ## simple formula like with HMC.
+    info <- as.environment( list(n.calls = 0) )
     useDA <- is.null(eps)               # whether to use DA algorithm
     if(useDA){
         if(is.null(Madapt)){
@@ -429,14 +432,14 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                 ## move in right direction
                 res <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                   j=j, eps=eps, theta0=theta0, r0=r0,
-                                  fn=fn2, gr=gr2)
+                                  fn=fn2, gr=gr2, info=info)
                 theta.plus <- res$theta.plus
                 r.plus <- res$r.plus
             } else {
                 ## move in left direction
                 res <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                   j=j, eps=eps, theta0=theta0, r0=r0,
-                                  fn=fn2, gr=gr2)
+                                  fn=fn2, gr=gr2, info=info)
                 theta.minus <- res$theta.minus
                 r.minus <- res$r.minus
             }
@@ -486,40 +489,40 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                    paste(j.stats, collapse=","), ")"))
     if(diagnostic){
         return(list(par=theta.out, steps.taken= 2^j.results,
-                    n.calls=n.calls, epsbar=epsbar))
+                    n.calls=info$n.calls, epsbar=epsbar))
     } else {
         return(theta.out)
     }
 }
 
-#' Draw a slice sample for given position and momentum variables
+# Draw a slice sample for given position and momentum variables
 .sample.u <- function(theta, r, fn)
     runif(n=1, min=0, max=exp(.calculate.H(theta=theta,r=r, fn=fn)))
-#' Calculate the Hamiltonian value for position and momentum variables.
-#'
-#' @details This function currently assumes iid standard normal momentum
-#' variables.
+# Calculate the Hamiltonian value for position and momentum variables.
+#
+# @details This function currently assumes iid standard normal momentum
+# variables.
 .calculate.H <- function(theta, r, fn) fn(theta)-(1/2)*sum(r^2)
-#' Test whether a "U-turn" has occured in a branch of the binary tree
-#' created by \ref\code{.buildtree} function.
+# Test whether a "U-turn" has occured in a branch of the binary tree
+# created by \ref\code{.buildtree} function.
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
     theta.temp <- (theta.plus-theta.minus)
    as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
 }
 
-#' A recursive function that builds a leapfrog trajectory using a balanced
-#' binary tree.
-#'
-#' @references This is from the No-U-Turn sampler with dual averaging
-#' (algorithm 6) of Hoffman and Gelman (2014).
-#'
-#' @details The function repeatedly doubles (in a random direction) until
-#' either a U-turn occurs or the trajectory becomes unstable. This is the
-#' 'efficient' version that samples uniformly from the path without storing
-#' it. Thus the function returns a single proposed value and not the whole
-#' trajectory.
+# A recursive function that builds a leapfrog trajectory using a balanced
+# binary tree.
+#
+# @references This is from the No-U-Turn sampler with dual averaging
+# (algorithm 6) of Hoffman and Gelman (2014).
+#
+# @details The function repeatedly doubles (in a random direction) until
+# either a U-turn occurs or the trajectory becomes unstable. This is the
+# 'efficient' version that samples uniformly from the path without storing
+# it. Thus the function returns a single proposed value and not the whole
+# trajectory.
 .buildtree <- function(theta, r, u, v, j, eps, theta0, r0, fn, gr,
-                         delta.max=1000){
+                         delta.max=1000, info = environment() ){
     if(j==0){
         ## base case, take one step in direction v
         eps <- v*eps
@@ -538,16 +541,13 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         temp <- .calculate.H(theta=theta, r=r, fn=fn)-
             .calculate.H(theta=theta0, r=r0, fn=fn)
         alpha <- min(exp(temp),1)
-        if(exists('n.calls'))
-            assign("n.calls", value=n.calls+5, envir=.GlobalEnv)
-        else
-            assign("n.calls", value=0, envir=.GlobalEnv)
+        info$n.calls <- info$n.calls + 5
         return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
                     r.plus=r, s=s, n=n, alpha=alpha, nalpha=1))
     } else {
         ## recursion - build left and right subtrees
         xx <- .buildtree(theta=theta, r=r, u=u, v=v, j=j-1, eps=eps,
-                            theta0=theta0, r0=r0, fn=fn,gr=gr)
+                            theta0=theta0, r0=r0, fn=fn, gr=gr, info=info)
         theta.minus <- xx$theta.minus
         theta.plus <- xx$theta.plus
         theta.prime <- xx$theta.prime
@@ -562,13 +562,13 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
             if(v== -1){
                 yy <- .buildtree(theta=theta.minus, r=r.minus, u=u, v=v,
                                     j=j-1, eps=eps, theta0=theta0, r0=r0,
-                                    fn=fn, gr=gr)
+                                    fn=fn, gr=gr, info=info)
                 theta.minus <- yy$theta.minus
                 r.minus <- yy$r.minus
             } else {
                 yy <- .buildtree(theta=theta.plus, r=r.plus, u=u, v=v,
                                     j=j-1, eps=eps, theta0=theta0, r0=r0,
-                                    fn=fn, gr=gr)
+                                    fn=fn, gr=gr, info=info)
                 theta.plus <- yy$theta.plus
                 r.plus <- yy$r.plus
             }
@@ -595,26 +595,26 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
     }
 }
 
-#' Estimate a reasonable starting value for epsilon (step size) for a given
-#' model, for use with Hamiltonian MCMC algorithms.
-#'
-#' This is Algorithm 4 from Hoffman and Gelman (2010) and is used in the
-#' dual-averaging algorithms for both HMC and NUTS to find a reasonable
-#' starting value.
-#' @title Estimate step size for Hamiltonian MCMC algorithms
-#' @param theta An initial parameter vector.
-#' @param fn A function returning the log-likelihood (not the negative of
-#' it) for a given parameter vector.
-#' @param gr A function returning the gradient of the log-likelihood of a
-#' model.
-#' @param eps A value for espilon to initiate the algorithm. Defaults to
-#' 1. If this is far too big the algorithm won't work well and an
-#' alternative value can be used.
-#' @return Returns the "reasonable" espilon invisible, while printing how
-#' many steps to reach it.
-#' @details The algorithm uses a while loop and will break after 50
-#' iterations.
-#'
+# Estimate a reasonable starting value for epsilon (step size) for a given
+# model, for use with Hamiltonian MCMC algorithms.
+#
+# This is Algorithm 4 from Hoffman and Gelman (2010) and is used in the
+# dual-averaging algorithms for both HMC and NUTS to find a reasonable
+# starting value.
+# @title Estimate step size for Hamiltonian MCMC algorithms
+# @param theta An initial parameter vector.
+# @param fn A function returning the log-likelihood (not the negative of
+# it) for a given parameter vector.
+# @param gr A function returning the gradient of the log-likelihood of a
+# model.
+# @param eps A value for espilon to initiate the algorithm. Defaults to
+# 1. If this is far too big the algorithm won't work well and an
+# alternative value can be used.
+# @return Returns the "reasonable" espilon invisible, while printing how
+# many steps to reach it.
+# @details The algorithm uses a while loop and will break after 50
+# iterations.
+#
 .find.epsilon <- function(theta,  fn, gr, eps=1, verbose=TRUE){
     r <- rnorm(n=length(theta), mean=0, sd=1)
     ## Do one leapfrog step

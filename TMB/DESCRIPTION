@@ -11,7 +11,8 @@ Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr
              person("Anders","Nielsen",role="ctb"),
              person("Martin","Maechler",role="ctb"),
              person("Theo","Michelot",role="ctb"),
-             person("Mollie","Brooks",role="ctb") )
+             person("Mollie","Brooks",role="ctb"),
+             person("Cole","Monnahan",role="ctb") )
 Maintainer: Kasper Kristensen <kaskr@dtu.dk>
 Author: Kasper Kristensen [aut, cre, cph],
         Brad Bell [cph],
@@ -21,7 +22,8 @@ Author: Kasper Kristensen [aut, cre, cph],
         Anders Nielsen [ctb],
         Martin Maechler [ctb],
         Theo Michelot [ctb],
-        Mollie Brooks [ctb]
+        Mollie Brooks [ctb],
+        Cole Monnahan [ctb]
 Copyright: See the file COPYRIGHTS
 Description: With this tool, a user should be able to quickly implement complex
     random effect models through simple C++ templates. The package combines

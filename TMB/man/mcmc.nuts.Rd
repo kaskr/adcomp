@@ -52,13 +52,13 @@ this transformation.}
 the chain. Useful for assessing efficiency and tuning chain.}
 }
 \value{
-If \code{diagnostic} is FALSE (default), returns a matrix of
-\code{nsim} samples from the posterior. Otherwise returns a list
-containing samples ('par'),  vector of steps taken at each iteration
-('steps.taken'), and the total function and gradient
-calls ('n.calls'), which in the case of NUTS is dynamic and tracked via
-a global variable, and finally the average \code{eps} ('epsbar') from
-the dual averaging algorithm if used (otherwise NULL).
+If \code{diagnostic} is FALSE (default), returns a matrix
+of \code{nsim} samples from the posterior. Otherwise returns a list
+containing samples ('par'), vector of steps taken at each iteration
+('steps.taken'), and the total function and gradient calls
+('n.calls'), which in the case of NUTS is dynamic, and finally the
+average \code{eps} ('epsbar') from the dual averaging algorithm if
+used (otherwise NULL).
 }
 \description{
 [BETA VERSION] Draw MCMC samples from a model posterior using the
