@@ -14,7 +14,7 @@ Files: inst/include/tmbutils/*
 Copyright: 2013 - 2015  Kasper Kristensen
 License: GPL-2
 
-Files: inst/include/tmbutils/splines.cpp
+Files: inst/include/tmbutils/splines.hpp
 Copyright: 1998 - 2001  Robert Gentleman, Ross Ihaka and the R Development Core Team
 License: GPL-2
 

@@ -17,8 +17,8 @@ Included automatically so you \b should \b NOT include it via
 namespace tmbutils{
 // Utilities used by the core
 using namespace Eigen;
-#include "vector.cpp"
-#include "array.cpp"
+#include "vector.hpp"
+#include "array.hpp"
 
 template <class Type, class From>
 vector<Type> asVector(From *px, int n){

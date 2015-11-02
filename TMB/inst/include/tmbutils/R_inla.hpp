@@ -2,7 +2,7 @@
 // License: GPL-2
 
 /**
-   \file R_inla.cpp
+   \file R_inla.hpp
    Makes SPDE methods from INLA R-package available in TMB.
 */
 

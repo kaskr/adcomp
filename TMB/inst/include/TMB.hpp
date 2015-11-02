@@ -43,7 +43,7 @@ void eigen_REprintf(const char* x);
 #include <Rinternals.h>
 void eigen_REprintf(const char* x){REprintf(x);}
 
-#include "tmbutils/tmbutils.cpp"
+#include "tmbutils/tmbutils.hpp"
 using tmbutils::matrix;
 using tmbutils::vector;
 using CppAD::AD;
@@ -63,8 +63,8 @@ namespace CppAD{
 #include "tmb_core.hpp"
 #include "convenience.hpp"
 #include "distributions_R.hpp"
-#include "tmbutils/tmbutils_extra.cpp"
-#include "tmbutils/R_inla.cpp"
+#include "tmbutils/tmbutils_extra.hpp"
+#include "tmbutils/R_inla.hpp"
 using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;

@@ -2,7 +2,7 @@
 // License: GPL-2
 
 /**
-   \file vector.cpp
+   \file vector.hpp
    Array templates using inheritance.
 */
 
