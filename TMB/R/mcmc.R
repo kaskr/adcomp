@@ -624,8 +624,12 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
     H1 <- .calculate.H(theta=theta, r=r, fn=fn)
     H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
     a <- 2*(exp(H2)/exp(H1)>.5)-1
+    ## If jumped into bad region, a can be NaN so setup algorithm to keep
+    ## halving eps instead of throwing error
+    if(!is.finite(a)) a <- -1
     k <- 1
-    while( (exp(H2)/exp(H1))^a > 2^(-a) ){
+    ## Similarly, keep going if there are infinite values
+    while (!is.finite(H1) | !is.finite(H2) | a*H2-a*H1 > -a*log(2)) {
         eps <- (2^a)*eps
         ## Do one leapfrog step
         r.new <- r+(eps/2)*gr(theta)
@@ -634,8 +638,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
         k <- k+1
         if(k>50) {
-            warning("more than 50 iterations to find initial epsilon, stopping")
-            break
+            stop("More than 50 iterations to find reasonable eps. Model is likely misspecified or some other issue.")
         }
     }
     if(verbose) message(paste("Reasonable epsilon=", eps, "found after", k, "steps"))
