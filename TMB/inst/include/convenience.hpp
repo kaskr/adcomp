@@ -58,7 +58,7 @@ VECTORIZE1_t(pnorm_approx)
 
 /** \brief  Approximate inverse normal cumulative distribution function, similar to R's qnorm (one-argument case only).
 * \details
-To be replaced by more accurate version based on Rmath library.
+Has been replaced by more accurate version based on Rmath library.
 */
 template<class Type>
 Type qnorm_approx(Type x){
@@ -140,4 +140,26 @@ Type squeeze(Type u){
   Type eps = std::numeric_limits<double>::epsilon();
   u = (1.0 - eps) * (u - .5) + .5;
   return u;
+}
+
+/** Taped maximum of vector */
+template <class Type>
+Type max(const vector<Type> &x)
+{
+  Type res = x[0];
+  for(int i=0; i < x.size(); i++){
+    res = CppAD::CondExpGt(res, x[i], res, x[i]);
+  }
+  return res;
+}
+
+/** Taped minimum of vector */
+template <class Type>
+Type min(const vector<Type> &x)
+{
+  Type res = x[0];
+  for(int i = 0; i < x.size(); i++){
+    res = CppAD::CondExpLt(res, x[i], res, x[i]);
+  }
+  return res;
 }

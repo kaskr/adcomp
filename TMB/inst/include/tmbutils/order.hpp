@@ -2,7 +2,7 @@
 // License: GPL-2
 
 /** \file 
-   \brief "Differentiable" sorting of a vector.
+   \brief Taped sorting of a vector.
 
    Example:
    \code
