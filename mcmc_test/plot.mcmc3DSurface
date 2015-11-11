@@ -16,7 +16,7 @@
 #' @param sharedMouse  If a subscene receives a mouse event, the same action will be carried out on all subscenes in this list. Passed to function rgl::mfrow3d().  Default is TRUE.
 #' @param alpha Vector of alpha values between 0.0 (fully transparent) .. 1.0 (opaque). Passed indirectly to rgl::rgl.material(). Default is 0.75.
 #' @param Plot Logical - create a plot.  If FALSE, 'mcmcOut' will still be invisibly returned with objective values added to a new column (see below).  Default is TRUE.
-#' @param ... Additional paramters passed to rgl:persp3d().
+#' @param ... Additional parameters passed to rgl:persp3d().
 #' @return 'mcmcOut' will be invisibly returned with objective values added to a new column of mcmcOut$parThin, if it exists, or to mcmcOut$par otherwise.
 #' @examples
 #' ## Not run:
@@ -26,22 +26,19 @@
 #' hmc <- mcmc(obj=obj, nsim=500*20, algorithm='HMC', L=1, params.init=opt$par, diagnostic=TRUE, eps=0.1)
 #' hmc$parThin <- hmc$par[seq(1, nrow(hmc$par), by=20),]
 #' 
-#' # 4 different plots: Plot3d, Image, Contour, and Persp3d; variables 1 & 2 are used by default; since parThin exists it will be used.
+#' # Four different plots are rendered: Plot3d, Image, Contour, and Persp3d; variables 1 & 2 are used by default; since parThin exists it will be used.
+#' # Rotation with mouse movement and zooming with the mouse wheel are available for the rgl graphics.
 #' hmc <- plot.mcmc3DSurface(hmc, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4])) 
 #' 
 #' hmc$parThin[1:4,] # objective function value as been added for each row.
 #' 
 #' plot.mcmc3DSurface(hmc, "Persp3d", varX = 1, varY = 4) # beta(1) and logsd0 with Persp3d only
 #' 
-#' plot.mcmc3DSurface(hmc, "Persp3d", pairwise = T, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4]))  # Rotation with mouse movement and zooming with the mouse wheel will happen to all subscenes simutanously. 
-#' 
-#' runExample("linreg_parallel")
-#' hmc.lp <- mcmc(obj=obj, nsim=1e5, algorithm='HMC', L = 1, params.init=opt$par,diagnostic=TRUE, eps=0.1)
-#' plot.mcmc3DSurface(hmc.lp, c("Persp3d"),  pairwise = T)
+#' plot.mcmc3DSurface(hmc, "Persp3d", pairwise = T, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4]))  # Rotation and zooming will happen to all subscenes simultaneously. 
 #'
-#' nuts.lp <- mcmc(obj=obj, nsim=500, algorithm='NUTS', params.init=opt$par, diagnostic=TRUE, eps=0.1)
-#' nuts.lp <- plot.mcmc3DSurface(nuts.lp, Plot = F) # Only the objective function values have been added to a new column of par.
-#' nuts.lp$par[1:4,]  # No parThin, so par was used.
+#' nuts <- mcmc(obj=obj, nsim=500, algorithm='NUTS', params.init=opt$par, diagnostic=TRUE, eps=0.1)
+#' nuts <- plot.mcmc3DSurface(nuts, Plot = F) # Only the objective function values have been added to a new column of par.
+#' nuts$par[1:4,]  # No parThin, so par was used.
 #' 
 #' ## End(Not run)
 
@@ -83,7 +80,7 @@ plot.mcmc3DSurface <- function(mcmcOut, plots = c("Plot3d", "Image", "Contour", 
 
    if(!any("obj" == names(Par))) {
 
-       Par$objct <- NA
+       Par$obj <- NA
        for ( i in 1:nrow(Par)) {
          bar(i, nrow(Par))
          Par$obj[i] <- nlminb(Par[i, 1:(ncol(Par) - 1)], objct$fn, objct$gr, control = list(step.min = 0.001, eval.max = 1, iter.max =1))$objective  # Perhaps overkill on the control parameters
