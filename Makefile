@@ -99,6 +99,10 @@ changelog:
 ## FIXME: 'LinkingTo RcppEigen' is not really right but perhaps the
 ## best we can do to assert RcppEigen is installed? (we need the
 ## Eigen headers, nothing else)
+eliminate-cout:
+	cd TMB/inst/include; sed -i /.*using\ std::cout.*/d cppad/*.hpp cppad/*/*.hpp
+	cd TMB/inst/include; sed -i s/[std:]*cout/Rcout/g cppad/*.hpp cppad/*/*.hpp ./*.hpp tmbutils/*.hpp
+	git checkout TMB/inst/include/Rstream.hpp
 cran-version:
 	cd TMB; git clean -xdf
 	sed -i 's/^LinkingTo.*/LinkingTo: Matrix, RcppEigen/' TMB/DESCRIPTION
@@ -111,5 +115,6 @@ cran-version:
 	echo "  dll <- paste0(exfolder, Sys.getenv(\"R_ARCH\"), \"/simple\", .Platform\$$dynlib.ext)" >> TMB/R/zzz.R
 	echo "  if(!file.exists(dll)) runExample(\"simple\", dontrun=TRUE)"                           >> TMB/R/zzz.R
 	echo "}"                                                                                      >> TMB/R/zzz.R
+	make eliminate-cout
 	make doc-update
 	make build-package

@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------
+TMB 1.6.3 (2015-11-11)
+------------------------------------------------------------------------
+
+o Fix array rows() method (The method inherited from Eigen would
+  report the length of the underlying vector).
+
+o Eliminate std::cout in CRAN version.
+
+o MCMC samplers (HMC, NUTS and RWM) added by Cole Monnahan.
+
+------------------------------------------------------------------------
 TMB 1.6.0 (2015-10-08)
 ------------------------------------------------------------------------
 

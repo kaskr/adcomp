@@ -121,19 +121,6 @@ matrix<Type> asMatrix(SEXP x)
    return y;
 }
 
-
-template<class Type>
-vector<Type> asVector(matrix<Type> x)
-{
-  int nr=x.size1();
-  int nc=x.size2();
-  vector<Type> res(nr*nc);
-  for(int i=0;i<nr;i++)
-    for(int j=0;j<nc;j++)
-      res[i*nc+j]=x(i,j);
-  return res;
-}
-
 template<class Type>
 SEXP asSEXP(const tmbutils::array<Type> &a)
 {

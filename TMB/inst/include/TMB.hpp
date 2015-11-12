@@ -8,6 +8,10 @@
 #define TMB_DEBUG 0
 #define TMB_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
 
+/* Early inclusion of Rprintf and REprintf */
+#include <R_ext/Print.h>
+#include "Rstream.hpp"
+
 /* Include the Eigen library. */
 #ifdef TMB_SAFEBOUNDS
 #undef NDEBUG
@@ -37,10 +41,9 @@ void eigen_REprintf(const char* x);
    CppAD when compiling with '-std=c++11'. */
 #include <R.h>
 #include <Rinternals.h>
-#include "Rstream.hpp"
 void eigen_REprintf(const char* x){REprintf(x);}
 
-#include "tmbutils/tmbutils.cpp"
+#include "tmbutils/tmbutils.hpp"
 using tmbutils::matrix;
 using tmbutils::vector;
 using CppAD::AD;
@@ -60,8 +63,8 @@ namespace CppAD{
 #include "tmb_core.hpp"
 #include "convenience.hpp"
 #include "distributions_R.hpp"
-#include "tmbutils/tmbutils_extra.cpp"
-#include "tmbutils/R_inla.cpp"
+#include "tmbutils/tmbutils_extra.hpp"
+#include "tmbutils/R_inla.hpp"
 using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;

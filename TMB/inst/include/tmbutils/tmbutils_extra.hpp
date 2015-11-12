@@ -3,11 +3,11 @@
 
 namespace tmbutils{
 // Convenience utilites
-#include "spmat.cpp"
-#include "kronecker.cpp"
-#include "matexp.cpp"
-#include "splines.cpp"
-#include "order.cpp"
+#include "spmat.hpp"
+#include "kronecker.hpp"
+#include "matexp.hpp"
+#include "splines.hpp"
+#include "order.hpp"
 
 template<class Type, class T1, class T2>
 vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
@@ -21,7 +21,7 @@ vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
 } // End namespace
 
 /** 
-   \brief Collection of multivariate Gaussian distributions (members listed in \ref density.cpp)
+   \brief Collection of multivariate Gaussian distributions (members listed in \ref density.hpp)
 
    \ingroup Densities
    
@@ -29,8 +29,8 @@ vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
 */
 namespace density{
   using namespace tmbutils;
-#include "density.cpp"
+#include "density.hpp"
 } // End namespace
 
-#include "romberg.cpp"
-#include "autodiff.cpp"
+#include "romberg.hpp"
+#include "autodiff.hpp"

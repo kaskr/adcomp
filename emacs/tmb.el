@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      http://www.hafro.is/~arnima/tmb.html
 
-(defconst tmb-mode-version "3.0" "TMB Mode version number.")
+(defconst tmb-mode-version "3.1" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -92,6 +92,8 @@
 
 ;;; History:
 ;;
+;; 10 Nov 2015  3.1  Added user function `tmb-toggle-window', internal function
+;;                   `tmb-split-window', and user variable `tmb-window-right'.
 ;; 01 Oct 2015  3.0  Added user functions `tmb-compile' and `tmb-multi-window'.
 ;;                   Added user variables `tmb-compile-args' and
 ;;                   `tmb-debug-args'. Renamed `tmb-run-debug' to `tmb-debug',
@@ -154,6 +156,10 @@
   :tag "Debug args" :type 'string)
 (defcustom tmb-make-command "make"
   "Shell command to run makefile using `tmb-make'." :tag "Make" :type 'string)
+(defcustom tmb-window-right t
+  "Non-nil places secondary window on the right, nil places it below.\n
+The secondary window shows compilation and model runs, among other things."
+  :tag "Window right" :type 'boolean)
 (defface tmb-data-face '((t :inherit font-lock-type-face))
   "Font Lock face to highlight TMB data macros." :tag "Data")
 (defvar tmb-data-face 'tmb-data-face
@@ -245,14 +251,15 @@
     "--"
     ["Mini Template"       tmb-template-mini   ]
     ["Multi-Window Layout" tmb-multi-window    ]
+    ["Toggle Window"       tmb-toggle-window   ]
     "--"
     ["Help"                tmb-help            ]
     ["TMB Mode Version"    tmb-mode-version    ]))
 (defvar tmb-mode-map
   ;; Don't use C-c C-                        x
-  ;; Special   C-c C-        h
-  ;; Custom    C-c C- abcd f    klmnopqrs  vw
-  ;; Available C-c C-     e g ij         tu   yz
+  ;; Special   C-c C-       gh
+  ;; Custom    C-c C- abcd f    klmnopqrst vw
+  ;; Available C-c C-     e   ij          u   yz
   (let ((map (make-sparse-keymap)))
     (easy-menu-define nil map nil tmb-menu)
     (define-key map [f12]               'tmb-template-mini       )
@@ -275,6 +282,7 @@
     (define-key map [?\C-c ?\C-q]       'tmb-kill-process        )
     (define-key map [?\C-c ?\C-r]       'tmb-show-r              )
     (define-key map [?\C-c ?\C-s]       'tmb-toggle-show-function)
+    (define-key map [?\C-c ?\C-t]       'tmb-toggle-window       )
     (define-key map [?\C-c ?\C-v]       'tmb-run                 )
     (define-key map [?\C-c ?\C-w]       'tmb-multi-window        )
     (define-key map [?\C-\M-v]          'ignore                  )
@@ -290,14 +298,14 @@
     (dolist (x files)(delete-file x)))(message "Removed binary files"))
 (defun tmb-compile ()
   "Compile model, using `tmb-compile-command' and `tmb-compile-args'."
-  (interactive)(save-buffer)
+  (interactive)(save-buffer)(tmb-split-window)
   (compile (concat tmb-compile-command " -e \"require(TMB); compile('"
                    (buffer-name) "'" tmb-compile-args ")\""))
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (defun tmb-debug ()
   "Debug model with GDB, using `tmb-debug-args'.\n
 The R session stays alive if it was running when this function was called."
-  (interactive)(save-buffer)
+  (interactive)(save-buffer)(tmb-split-window)
   (let* ((ess-dialect "R")
          (inferior-R-args "--quiet --vanilla")
          (ess-ask-for-ess-directory nil)
@@ -329,7 +337,7 @@ The R session stays alive if it was running when this function was called."
     (split-window-horizontally)(set-window-buffer (next-window) r-script)))
 (defun tmb-make ()
   "Run makefile in current directory, using `tmb-make-command'."
-  (interactive)(save-buffer)(compile tmb-make-command)
+  (interactive)(save-buffer)(tmb-split-window)(compile tmb-make-command)
   (with-current-buffer "*compilation*" (setq show-trailing-whitespace nil)))
 (defun tmb-mode-version ()
   "Show TMB Mode version number." (interactive)
@@ -341,7 +349,7 @@ The R session stays alive if it was running when this function was called."
   "Open file with extension EXT in other window." (interactive "sExtension: ")
   (let ((file (concat (file-name-sans-extension (buffer-name)) "." ext)))
     (if (not (file-regular-p file))(error "File %s not found" file)
-      (save-selected-window (find-file-other-window file)))))
+      (tmb-split-window)(save-selected-window (find-file-other-window file)))))
 (defun tmb-run ()
   "Run R script with same filename prefix as current buffer.\n
 If the R script has a different filename, then use `tmb-run-any' instead.\n
@@ -360,7 +368,7 @@ The script is sourced in an existing R session, or a new session is started."
   (let* ((ess-dialect "R")
          (inferior-R-args "--quiet --vanilla")
          (ess-ask-for-ess-directory nil))
-    (ess-load-file script)))
+    (tmb-split-window)(ess-load-file script)))
 (defun tmb-scroll-down (n)
   "Scroll other window down N lines, or visit next error message.\n
 The behavior of this command depends on whether the compilation buffer is
@@ -378,11 +386,12 @@ visible."
 (defun tmb-show-compilation ()
   "Show compilation buffer." (interactive)
   (if (null (get-buffer "*compilation*"))
-      (error "*compilation* buffer not found")(display-buffer "*compilation*")))
+      (error "*compilation* buffer not found")
+    (tmb-split-window)(display-buffer "*compilation*")))
 (defun tmb-show-r ()
   "Show R interactive buffer." (interactive)
   (if (null (get-buffer "*R*"))(error "*R* interactive buffer not found")
-    (ess-show-buffer "*R*")))
+    (tmb-split-window)(ess-show-buffer "*R*")))
 (defun tmb-template-mini ()
   "Create minimal TMB files (mini.cpp, mini.R) in current directory.\n
 The user variable `tmb-compile-args' is passed to the compile() function."
@@ -405,7 +414,7 @@ Type objective_function<Type>::operator() ()
 ")
   (goto-char (point-min))(write-file "mini.cpp" t)
   (save-selected-window
-    (find-file-other-window "mini.R")
+    (tmb-split-window)(find-file-other-window "mini.R")
     (delete-region (point-min)(point-max))(insert "\
 data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
@@ -436,6 +445,10 @@ print(rep)
   "Toggle whether to show the current function name in the mode line."
   (interactive)(which-function-mode (if which-function-mode 0 1))
   (message "Function indicator %s" (if which-function-mode "ON" "OFF")))
+(defun tmb-toggle-window ()
+  "Toggle whether secondary window is on the right or below." (interactive)
+  (delete-other-windows)(setq tmb-window-right (not tmb-window-right))
+  (message "Secondary window %s" (if tmb-window-right "RIGHT" "BELOW")))
 
 ;; 5  Internal functions
 
@@ -457,6 +470,11 @@ print(rep)
   (insert "\n  feenableexcept"
           "(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO /* | FE_UNDERFLOW */ );")
   (message "Floating point exceptions enabled"))
+(defun tmb-split-window ()
+  "Split window if it is the only window, otherwise do nothing.\n
+The orientation of the split depends on the value of `tmb-window-right'."
+  (if (one-window-p)(if tmb-window-right
+                        (split-window-horizontally)(split-window-vertically))))
 
 ;; 6  Main function
 
@@ -469,8 +487,9 @@ Start a new model from `tmb-template-mini'. Navigate between functions using
 `tmb-toggle-show-function'. Prototype for-loops with `tmb-for'.\n
 Use `tmb-open' to open the corresponding R script and `tmb-open-any' to open
 other model-related files. Show interactive *compilation* and *R* buffers with
-`tmb-show-compilation' and `tmb-show-r'. The `tmb-multi-window' layout is an
-alternative to the default left-right layout.\n
+`tmb-show-compilation' and `tmb-show-r'. Use `tmb-toggle-window' to set
+`tmb-window-right' to your viewing preference. The `tmb-multi-window' layout is
+an alternative to the default left-right layout.\n
 Build and run the model using `tmb-compile', `tmb-run', and `tmb-make'.
 Stop the compilation or model run with `tmb-kill-process'.\n
 The C++ binary files (*.o, *.so, *.dll) can be removed using `tmb-clean'.

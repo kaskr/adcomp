@@ -2,7 +2,7 @@
 // License: GPL-2
 
 /**
-   \file vector.cpp
+   \file vector.hpp
    Array templates using inheritance.
 */
 
@@ -147,11 +147,20 @@ struct array:Map< Array<Type,Dynamic,1> >{
     std::cout << "\n";
   };
 
-  /* Number of outer-most dimensions */
+  /** \brief Number of outer-most dimensions
+      \return Last array dimension (Similar to R's ncol in 2D case
+      only)
+   */
   int cols(){
     return dim[dim.size()-1];
   }
 
+  /** \brief Number of inner-most dimensions
+      \return First array dimension (Similar to R's nrow)
+   */
+  int rows(){
+    return dim[0];
+  }
 
   /** \brief Extract sub-array with write access 
       Index i refers to the outer-most (i.e. final) dimension.
