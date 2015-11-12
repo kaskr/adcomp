@@ -542,6 +542,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         ## verify valid trajectory
         H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
+        if(is.na(s) | is.nan(s)) s <- 0
         n <- log(u) <= H
         ## ## Useful code for debugging. Returns entire path to global env.
         ## if(!exists('theta.trajectory'))
@@ -566,6 +567,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         alpha <- xx$alpha
         nalpha <- xx$nalpha
         s <- xx$s
+        if(is.na(s) | is.nan(s)) s <- 0
         nprime <- xx$n
         ## If it didn't fail, update the above quantities
         if(s==1){
@@ -583,8 +585,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                 r.plus <- yy$r.plus
             }
             ## This isn't in the paper but if both slice variables failed,
-            ## then you get 0/0. So I skip this test
+            ## then you get 0/0. So I skip this test. Likewise if model
+            ## throwing errors, don't keep that theta.
             nprime <- yy$n+ xx$n
+            if(!is.finite(nprime)) nprime <- 0
             if(nprime!=0){
                 ## choose whether to keep this theta
                 if(runif(n=1, min=0, max=1) <= yy$n/nprime)
