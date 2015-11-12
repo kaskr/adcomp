@@ -455,6 +455,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
             }
             n <- n+res$n
             s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
+            ## Stop trajectory if there are any problems, probably happens
+            ## when jumping way too far into the tails and the model isn't
+            ## defined
+            if(!is.finite(s) | is.na(s) | is.nan(s))  s <- 0
             j <- j+1
             ## Stop doubling if too many or it's diverged enough
             if(j>max_doublings & s) {
