@@ -294,7 +294,11 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
             ## Do the adapting of eps.
             if(m <= Madapt){
                 Hbar[m+1] <-
-                    (1-1/(m+t0))*Hbar[m] + (delta-min(1,exp(logalpha)))/(m+t0)
+                    (1-1/(m+t0))*Hbar[m] +
+                        (delta-min(1,exp(logalpha)))/(m+t0)
+                ## If logalpha not defined, skip this updating step and use
+                ## the last one.
+                if(is.nan(Hbar[m+1])) Hbar[m+1] <- Hbar[m]
                 logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
                 epsvec[m+1] <- exp(logeps)
                 logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
@@ -444,9 +448,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                 r.minus <- res$r.minus
             }
             ## test whether to accept this state
-            if(is.na(res$s)){
-                stop(paste('stopping condition (s) undefined in NUTS for params:', paste(res$theta, collapse=" ")))
-            }
+            if(is.na(res$s) | is.nan(res$s))  res$s <- 0
             if(res$s==1) {
                 if(runif(n=1, min=0,max=1) <= res$n/n){
                     theta.cur <- res$theta.prime
@@ -458,7 +460,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
             ## Stop trajectory if there are any problems, probably happens
             ## when jumping way too far into the tails and the model isn't
             ## defined
-            if(!is.finite(s) | is.na(s) | is.nan(s))  s <- 0
+            if(is.na(s) | is.nan(s))  s <- 0
             j <- j+1
             ## Stop doubling if too many or it's diverged enough
             if(j>max_doublings & s) {
@@ -470,8 +472,12 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         if(useDA){
             ## Do the adapting of eps.
             if(m <= Madapt){
-                Hbar[m+1] <-
-                    (1-1/(m+t0))*Hbar[m] + (delta-res$alpha/res$nalpha)/(m+t0)
+                Hbar[m+1] <- (1-1/(m+t0))*Hbar[m] +
+                    (delta-res$alpha/res$nalpha)/(m+t0)
+                ## If logalpha not defined, skip this updating step and use
+                ## the last one.
+                if(is.nan(Hbar[m+1])) Hbar[m+1] <- Hbar[m]
+
                 logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
                 epsvec[m+1] <- exp(logeps)
                 logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
