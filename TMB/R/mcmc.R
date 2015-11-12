@@ -58,7 +58,7 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=
         z <- -as.vector(obj$gr(x))
         if(any(is.nan(z))){
             warning(paste("NaN gradient at:", paste(x, collapse=" ")))
-            z <- 0
+            z <- rep(0, length(x))
            }
         return(z)
     }
