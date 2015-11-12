@@ -75,6 +75,7 @@ namespace CppAD{
 #include "distributions_R.hpp"
 #include "tmbutils/tmbutils_extra.hpp"
 #include "tmbutils/R_inla.hpp"
+#include "precompile.hpp" // Must come last
 using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;

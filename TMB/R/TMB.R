@@ -873,7 +873,7 @@ openmp <- function(n=NULL){
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
-                    openmp=isParallelTemplate(file),libtmb=TRUE,...){
+                    openmp=isParallelTemplate(file[1]),libtmb=TRUE,...){
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
@@ -882,10 +882,18 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
     }
   }
   ## libtmb existence
-  libtmb <- libtmb &&
-    file.exists(system.file(if(!openmp) dynlib("libs/libTMB")
-			    else        dynlib("libs/libTMBomp"),
-			    package="TMB"))
+  debug <-
+      length(grep("-O0", flags)) &&
+      length(grep("-g",  flags))
+  fpath <- system.file(paste0("libs", Sys.getenv("R_ARCH")),
+                       package="TMB")
+  f <- paste0(fpath,
+              "/libTMB",
+              if      (openmp) "omp"
+              else if (debug)  "dbg",
+              ".cpp")
+  libtmb <- libtmb && file.exists(f)
+  if(libtmb) file <- c(file, f)
   ## Function to create temporary makevars, Note:
   ## * R_MAKEVARS_USER overrules all other Makevars in tools:::.shlib_internal
   oldmvuser <- mvuser <- Sys.getenv("R_MAKEVARS_USER",NA)
@@ -913,7 +921,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
     file
   }
   ## Check that libname is valid C entry.
-  libname <- sub("\\.[^\\.]*$","",basename(file))
+  libname <- sub("\\.[^\\.]*$","",basename(file[1]))
   if(safeunload){
     valid <- c(letters[1:26],LETTERS[1:26],0:9,"_")
     invalid <- setdiff(unique(strsplit(libname,"")[[1]]),valid)
@@ -941,9 +949,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
                      PKG_LIBS=paste(
-                       "$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
-                       system.file(dynlib("libs/libTMB"),package="TMB")[libtmb && !openmp],
-                       system.file(dynlib("libs/libTMBomp"),package="TMB")[libtmb && openmp] ),
+                       "$(SHLIB_OPENMP_CXXFLAGS)"[openmp] ),
                      PKG_CXXFLAGS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
                      CXXFLAGS=flags[flags!=""], ## Optionally override cxxflags
                      ...
@@ -956,32 +962,61 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 
 ##' Precompile the TMB library
 ##'
-##' The precompilation should only be run once, typically right after installation of TMB.
-##' Note that the precompilation requires write access to the TMB package folder.
-##' Two versions of the library - with/without the openmp flag - will be generated. After this,
-##' compilation times of templates should be reduced.
-##' \itemize{
-##' \item To precompile on Linux run \code{precompile()}.
-##' \item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@@")}.
-##' \item Precompiling is not supported on Windows at present.
-##' }
-##' Note that precompilation has side effects: It is not possible to work with more than one
-##' model at a time for a single R instance.
+##' Precompilation can be used to speed up compilation of
+##' templates. It is only necessary to run \code{precompile()} once,
+##' typically right after installation of TMB. The function
+##' \emph{prepares} TMB for precompilation, while the actual
+##' pre-compilation takes place the first time you compile a model
+##' after running \code{precompile()}.
+##'
+##' Note that the precompilation requires write access to the TMB
+##' package folder. Three versions of the library will be prepared:
+##' Normal, parallel and a debugable version.
+##'
+##' Precompilation works the same way on all platforms. The only known
+##' side-effect of precompilation is that it increases the file size
+##' of the generated binaries.
 ##' @title Precompile the TMB library in order to speed up compilation of templates.
-##' @param ... Passed to \code{\link{compile}}.
-precompile <- function(...){
+##' @param all Precompile all or just the core parts of TMB ?
+##' @param clean Remove precompiled libraries ?
+##' @param trace Trace precompilation process ?
+##' @param ... Not used.
+##' @examples
+##' \dontrun{
+##' ## Prepare precompilation
+##' precompile()
+##' ## Perform precompilation by running a model
+##' runExample(all = TRUE)
+##' }
+precompile <- function(all=TRUE, clean=FALSE, trace=TRUE,...){
   owdir <- getwd()
   on.exit(setwd(owdir))
-  folder <- system.file("libs",package="TMB")
+  folder <- system.file(paste0("libs", Sys.getenv("R_ARCH")), package="TMB")
   setwd(folder)
-  writeLines("#include <TMB.hpp>","libTMB.cpp")
-  cat("Compiling serial version\n")
-  compile("libTMB.cpp",safeunload=FALSE,libtmb=FALSE,...)
-  file.remove("libTMB.cpp")
-  writeLines("#include <TMB.hpp>","libTMBomp.cpp")
-  cat("Compiling parallel version\n")
-  compile("libTMBomp.cpp",openmp=TRUE,safeunload=FALSE,libtmb=FALSE,...)
-  file.remove("libTMBomp.cpp")
+  if(clean){
+      f <- dir(pattern = "^libTMB")
+      if(length(f) && trace) cat("Removing:", f, "\n")
+      file.remove(f)
+      f <- system.file(paste0("include/precompile.hpp"), package="TMB")
+      file.create(f)
+      return(NULL)
+  }
+  ## Cleanup before applying changes:
+  precompile(clean = TRUE)
+  ## Precompile frequently used classes:
+  if(all) precompileSource()
+  code <- c(
+      "#undef  LIB_UNLOAD",
+      "#undef  WITH_LIBTMB",
+      "#undef  TMB_PRECOMPILE",
+      "#define TMB_PRECOMPILE 1",
+      "#pragma message \"Running TMB precompilation...\""[trace],
+      "#include <TMB.hpp>"
+      )
+  writeLines(code, "libTMB.cpp")
+  writeLines(code, "libTMBomp.cpp")
+  writeLines(code, "libTMBdbg.cpp")
+  if(trace) message("Precompilation sources generated")
 }
 
 ##' Add the platform dependent dynlib extension. In order for examples
