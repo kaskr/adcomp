@@ -11,11 +11,11 @@
 #' @param zLab The label to use in plotting for the objective function.  Default is "Neg. Log-likelihood".
 #' @param nx Dimension of output grid in x direction given to the \code{akima::interp()} function. Default is 50.
 #' @param ny Dimension of output grid in y direction given to the \code{akima::interp()} function. Default is 50.
-#' @param colPersp Color(s) used for the \code{rgl:persp3d()} plot(s). Colors will be cycled through if needed.  Defalut is \code{"green"} for a single plot or grDevices::rainbow() for the pairs plotting.
+#' @param colPersp Color(s) used for the \code{rgl:persp3d()} plot(s). Colors will be cycled through if needed.  Defalut is \code{"green"} for a single plot or \code{grDevices::rainbow()} for the pairs plotting.
 #' @param addMf Logical - add a plot to the current multi-figure array.  Default is \code{FALSE}.
 #' @param sharedMouse  If a subscene receives a mouse event, the same action will be carried out on all subscenes in this list. Passed to function \code{rgl::mfrow3d()}.  Default is \code{TRUE}.
 #' @param alpha Vector of alpha values between 0.0 (fully transparent) .. 1.0 (opaque). Passed indirectly to \code{rgl::rgl.material()}. Default is \code{0.75}.
-#' @param Plot Logical - create a plot.  If FALSE}, \code{mcmcOut} will still be invisibly returned with objective values added to a new column (see below).  Default is \code{TRUE}.
+#' @param Plot Logical - create a plot.  If FALSE, \code{mcmcOut} will still be invisibly returned with objective values added to a new column (see below).  Default is \code{TRUE}.
 #' @details \code{Plot3d} and \code{Persp3d} are interactive plots from the \code{rgl} package.  \code{Image}, \code{Contour}, and \code{Persp3d} require z values on a regular x,y grid; this is achieved 
 #' using the \code{interp} function from the \code{akima} package. If the \code{par} matrix within the output list from the \code{mcmc} function has been thinned and labeled \code{parThin} within the same list, 
 #' this thinned matrix will be used instead of the \code{par} matrix. 
@@ -33,14 +33,15 @@
 #' # Rotation with mouse movement and zooming with the mouse wheel are available for the rgl graphics.
 #' hmc <- plot.mcmc3DSurface(hmc, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4])) 
 #' 
-#' hmc$parThin[1:4,] # objective function value as been added for each row.
+#' hmc$parThin[1:4,] # objective function value has been added for each row.
 #' 
 #' plot.mcmc3DSurface(hmc, "Persp3d", varX = 1, varY = 4) # beta(1) and logsd0 with Persp3d only
 #' 
-#' plot.mcmc3DSurface(hmc, "Persp3d", pairwise = T, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4]))  # Rotation and zooming will happen to all subscenes simultaneously. 
+#' # All pairwise plots:
+#' plot.mcmc3DSurface(hmc, "Persp3d", pairwise = T, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4]))  # With sharedMouse being TRUE, rotation and zooming will happen to all subscenes simultaneously. 
 #'
 #' nuts <- mcmc(obj=obj, nsim=500, algorithm='NUTS', params.init=opt$par, diagnostic=TRUE, eps=0.1)
-#' nuts <- plot.mcmc3DSurface(nuts, Plot = F) # Only the objective function values have been added to a new column of par.
+#' nuts <- plot.mcmc3DSurface(nuts, Plot = F) # Plot is FALSE so only the objective function values have been added to a new column of par.
 #' nuts$par[1:4,]  # No parThin, so par was used.
 #' 
 #' ## End(Not run)
@@ -56,7 +57,7 @@ plot.mcmc3DSurface <- function(mcmcOut, plots = c("Plot3d", "Image", "Contour", 
                 "|\r", sep = "")
         flush.console()
         if(i == n) 
-          cat("\n\r")  # "Fixes leaving the cursor toward the right
+          cat("\n\r")  # "Fixes leaving the cursor toward the right (most of the time)
     }
 
     mfrow.skip <- function() {
