@@ -23,6 +23,7 @@
 #' }
 #' @param ... Additional parameters passed to \code{rgl:persp3d()}.
 #' @return \code{mcmcOut} will be invisibly returned with objective values added to a new column of \code{mcmcOut$parThin}, if it exists, or to \code{mcmcOut$par} otherwise.
+#' @author John R. Wallace \url{https://github.com/John-R-Wallace}
 #' @examples
 #' ## Not run:
 #' ## Run the simple example, so that obj and opt are loaded into workspace
