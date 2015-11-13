@@ -4,21 +4,23 @@
 #' @param plots Which plot(s) to render: \code{Plot3d}, \code{Image}, \code{Contour}, or \code{Persp3d}. Default is to produce all four when \code{pairwise} is \code{FALSE}.
 #' @param pairwise Logical - return a matrix of paired plots.  Default is \code{FALSE}.
 #' @param objct A TMB model object.
-#' @param opt A list object with the best set of parameters found labeled 'par', such as returned by stats::nlminb() and stats::optim().
+#' @param optim A list object with the best set of parameters found labeled 'par', such as returned by \code{stats::nlminb()} and \code{stats::optim()}.
 #' @param namesPar A vector of user provided names of the parameters for use in plotting. The default is \code{colnames(mcmcOut$parThin)} if it exists or \code{colnames(mcmcOut$par)}, otherwise.
 #' @param varX Which parameter to use for the 'X' axis.  Default is 1.
 #' @param varY Which parameter to use for the 'Y' axis.  Default is 2.
 #' @param zLab The label to use in plotting for the objective function.  Default is "Neg. Log-likelihood".
 #' @param nx Dimension of output grid in x direction given to the \code{akima::interp()} function. Default is 50.
 #' @param ny Dimension of output grid in y direction given to the \code{akima::interp()} function. Default is 50.
-#' @param colPersp Color(s) used for the \code{rgl:persp3d()} plot(s). Colors will be cycled through if needed.  Defalut is \code{"green"} for a single plot or \code{grDevices::rainbow()} for the pairs plotting.
+#' @param colPersp Color(s) used for the \code{rgl::persp3d()} plot(s). Colors will be cycled through if necessary.  Defalut is \code{"green"} for a single plot or \code{grDevices::rainbow()} for the pairs plotting.
 #' @param addMf Logical - add a plot to the current multi-figure array.  Default is \code{FALSE}.
 #' @param sharedMouse  If a subscene receives a mouse event, the same action will be carried out on all subscenes in this list. Passed to function \code{rgl::mfrow3d()}.  Default is \code{TRUE}.
 #' @param alpha Vector of alpha values between 0.0 (fully transparent) .. 1.0 (opaque). Passed indirectly to \code{rgl::rgl.material()}. Default is \code{0.75}.
-#' @param Plot Logical - create a plot.  If FALSE, \code{mcmcOut} will still be invisibly returned with objective values added to a new column (see below).  Default is \code{TRUE}.
-#' @details \code{Plot3d} and \code{Persp3d} are interactive plots from the \code{rgl} package.  \code{Image}, \code{Contour}, and \code{Persp3d} require z values on a regular x,y grid; this is achieved 
-#' using the \code{interp} function from the \code{akima} package. If the \code{par} matrix within the output list from the \code{mcmc} function has been thinned and labeled \code{parThin} within the same list, 
-#' this thinned matrix will be used instead of the \code{par} matrix. 
+#' @param Plot Logical - create a plot.  If FALSE, \code{mcmcOut} will still be invisibly returned with objective values added to a new column.  Default is \code{TRUE}.
+#' @details \itemize{
+#' \item{}{\code{Plot3d} and \code{Persp3d} are interactive plots from the \code{rgl} package.}
+#' \item{}{\code{Image}, \code{Contour}, and \code{Persp3d} require z values on a regular x,y grid; this is achieved using the \code{interp} function from the \code{akima} package.}
+#' \item{}{If the \code{par} matrix within the output list from the \code{mcmc} function has been thinned and labeled \code{parThin} within the same list, this thinned matrix will be used instead of the \code{par} matrix.}
+#' }
 #' @param ... Additional parameters passed to \code{rgl:persp3d()}.
 #' @return \code{mcmcOut} will be invisibly returned with objective values added to a new column of \code{mcmcOut$parThin}, if it exists, or to \code{mcmcOut$par} otherwise.
 #' @examples
