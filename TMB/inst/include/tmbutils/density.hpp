@@ -13,7 +13,7 @@ typedef vector<scalartype> vectortype;		\
 typedef matrix<scalartype> matrixtype;		\
 typedef array<scalartype> arraytype
 
-#define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){}
+#define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){vectortype y; return y;}
 
 /** \brief Multivariate normal distribution with user supplied covariance matrix
 
@@ -674,7 +674,7 @@ private:
     return ans;
   }
 public:
-  GMRF_t(){};
+  GMRF_t(){}
   GMRF_t(Eigen::SparseMatrix<scalartype> Q_, int order_=1){
     setQ(Q_,order_);
   }

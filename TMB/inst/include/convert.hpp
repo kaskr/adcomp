@@ -5,11 +5,19 @@
   \brief  Convert vector/matrix-Types to double SEXP types 
 */
 
+#ifdef WITH_LIBTMB
+double asDouble(int x);
+double asDouble(double x);
+double asDouble(AD<double> x);
+double asDouble(AD<AD<double> > x);
+double asDouble(AD<AD<AD<double> > > x);
+#else
 double asDouble(int x){return double(x);}
 double asDouble(double x){return x;}
 double asDouble(AD<double> x){return CppAD::Value(x);}
 double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
 double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+#endif
 
 /** \brief Convert TMB matrix, vector, scalar or int to R style */
 template<class Type>
@@ -34,7 +42,7 @@ SEXP asSEXP(const matrix<Type> &a)
 
 // Report vector of numeric types: Make R-vector
 #define asSEXP_VECTOR_OF_NUMERIC(Type)			\
-SEXP asSEXP(const vector<Type> &a)			\
+SEXP asSEXP(const vector<Type> &a) CSKIP(		\
 {							\
   int size = a.size();					\
   SEXP val;						\
@@ -43,7 +51,7 @@ SEXP asSEXP(const vector<Type> &a)			\
   for (int i = 0; i < size; i++) p[i] = asDouble(a[i]);	\
   UNPROTECT(1);						\
   return val;						\
-}
+})
 asSEXP_VECTOR_OF_NUMERIC(int)
 asSEXP_VECTOR_OF_NUMERIC(double)
 template<class Type>
@@ -61,22 +69,22 @@ SEXP asSEXP(const vector<Type> &a)
    return val;
 }
 
-SEXP asSEXP(const double &a)
+SEXP asSEXP(const double &a) CSKIP(
 {
    SEXP val;
    PROTECT(val=allocVector(REALSXP,1));
    REAL(val)[0]=a;
    UNPROTECT(1);
    return val;
-}
-SEXP asSEXP(const int &a)
+})
+SEXP asSEXP(const int &a) CSKIP(
 {
    SEXP val;
    PROTECT(val=allocVector(INTSXP,1));
    INTEGER(val)[0]=a;
    UNPROTECT(1);
    return val;
-}
+})
 // EXPERIMENT
 template<class Type>
 SEXP asSEXP(const AD<Type> &a){

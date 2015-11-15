@@ -8,6 +8,11 @@
 */
 #ifdef _OPENMP
 #include <omp.h>
+#ifdef WITH_LIBTMB
+bool in_parallel();
+size_t thread_num();
+void start_parallel();
+#else
 bool in_parallel(){
   return static_cast<bool>(omp_in_parallel());
 }
@@ -24,6 +29,7 @@ void start_parallel(){
   CppAD::parallel_ad<AD<double> >();
   CppAD::parallel_ad<double >();
 }
+#endif
 #endif
 
 

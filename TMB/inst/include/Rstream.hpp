@@ -63,5 +63,5 @@ template <> inline int Rstreambuf<false>::sync(){
   //::R_FlushConsole() ;
   return 0 ;
 }
-Rostream<true>  Rcout;
-Rostream<false> Rcerr;
+TMB_EXTERN Rostream<true>  Rcout;
+TMB_EXTERN Rostream<false> Rcerr;

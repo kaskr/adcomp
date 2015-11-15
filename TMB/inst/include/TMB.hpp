@@ -8,6 +8,16 @@
 #define TMB_DEBUG 0
 #define TMB_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
 
+/* Conditionally skip compilation */
+#ifdef WITH_LIBTMB
+#define CSKIP(x) ;
+#define TMB_EXTERN extern
+#endif
+#ifndef WITH_LIBTMB
+#define CSKIP(x) x
+#define TMB_EXTERN
+#endif
+
 /* Early inclusion of Rprintf and REprintf */
 #include <R_ext/Print.h>
 #include "Rstream.hpp"
@@ -41,7 +51,7 @@ void eigen_REprintf(const char* x);
    CppAD when compiling with '-std=c++11'. */
 #include <R.h>
 #include <Rinternals.h>
-void eigen_REprintf(const char* x){REprintf(x);}
+void eigen_REprintf(const char* x)CSKIP({REprintf(x);})
 
 #include "tmbutils/tmbutils.hpp"
 using tmbutils::matrix;
@@ -50,7 +60,7 @@ using CppAD::AD;
 using CppAD::ADFun;
 namespace CppAD{
   /* Add to CppAD so that 'Variable' works for any 'Type' */
-  bool Variable(double x){ return false; }
+  bool Variable(double x)CSKIP({ return false; })
 }
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"

@@ -99,9 +99,9 @@ namespace atomic{
     return multi_forrev(forrev(padf, x_), x_);
   }
   template <>
-  CppAD::ADFun<double>* multi_forrev<double>(CppAD::ADFun<double>* padf, vector<double> x_){
+  CppAD::ADFun<double>* multi_forrev<double>(CppAD::ADFun<double>* padf, vector<double> x_) CSKIP({
     return padf;
-  }
+  })
   /** \brief Tape symbol up to any order */
   template<class Func>
   CppAD::ADFun<double>* tape_symbol(Func f, vector<double> x){

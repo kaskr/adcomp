@@ -47,9 +47,9 @@ If it is one, a trace of every forward0sweep computation is printed.
 (Note that forward0sweep is not used if CPPAD_USE_FORWARD0SWEEP is zero).
 */
 # define CPPAD_FORWARD0SWEEP_TRACE 0
-void traceforward0sweep(int trace){
+void traceforward0sweep(int trace)CSKIP({
   // CPPAD_FORWARD0SWEEP_TRACE=trace;
-}
+})
 
 /*!
 Compute zero order forward mode Taylor coefficients.

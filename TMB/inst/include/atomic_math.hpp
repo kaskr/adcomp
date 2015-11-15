@@ -37,6 +37,12 @@ namespace Rmath {
   #undef ppois
 
   #include <R_ext/Applic.h>
+#ifdef WITH_LIBTMB
+  void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex);
+  double D_incpl_gamma_shape(double x, double shape, double n, double logc);
+  double inv_incpl_gamma(double y, double shape, double logc);
+  double D_lgamma(double x, double n);
+#else
   void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex){
     double* parms=(double*)ex;
     double shape = parms[0];
@@ -99,18 +105,17 @@ namespace Rmath {
     free(work);
     return result1 + result2;
   }
-
   double inv_incpl_gamma(double y, double shape, double logc){
     double logp = log(y) - lgammafn(shape) - logc;
     double scale = 1.0;
     return qgamma(exp(logp), shape, scale, 1, 0);
   }
-
   /* n'th order derivative of log gamma function */
   double D_lgamma(double x, double n){
     if(n<.5)return lgammafn(x);
     else return psigamma(x,n-1.0);
   }
+#endif // #ifdef WITH_LIBTMB
 
 }
 
