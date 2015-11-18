@@ -249,10 +249,10 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
         ## Initialize the dual-averaging algorithm.
         message(paste("MCMC HMC: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
-        eps <- epsvec[1] <-
+        eps <- epsvec[1] <- epsbar[1] <-
             .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
         mu <- log(10*eps)
-        epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+        Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
         ## dummy values to return
         epsvec <- epsbar <- Hbar <- NULL
@@ -414,10 +414,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         ## Initialize the dual-averaging algorithm.
         message(paste("MCMC NUTS: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
-        eps <- epsvec[1] <-
+        eps <- epsvec[1] <- epsbar[1] <-
             .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
         mu <- log(10*eps)
-        epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+        Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
         ## dummy values to return
         epsvec <- epsbar <- Hbar <- NULL
