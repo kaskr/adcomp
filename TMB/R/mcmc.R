@@ -499,7 +499,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                    paste(j.stats, collapse=","), ")"))
     if(diagnostic){
         return(list(par=theta.out, steps.taken= 2^j.results,
-                    n.calls=info$n.calls, epsbar=epsbar))
+                    n.calls=info$n.calls, epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
     } else {
         return(theta.out)
     }
