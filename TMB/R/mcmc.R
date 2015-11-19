@@ -298,7 +298,7 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
                         (delta-min(1,exp(logalpha)))/(m+t0)
                 ## If logalpha not defined, skip this updating step and use
                 ## the last one.
-                if(is.nan(Hbar[m+1])) Hbar[m+1] <- Hbar[m]
+                if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
                 logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
                 epsvec[m+1] <- exp(logeps)
                 logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
@@ -476,7 +476,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                     (delta-res$alpha/res$nalpha)/(m+t0)
                 ## If logalpha not defined, skip this updating step and use
                 ## the last one.
-                if(is.nan(Hbar[m+1])) Hbar[m+1] <- Hbar[m]
+                if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
 
                 logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
                 epsvec[m+1] <- exp(logeps)
