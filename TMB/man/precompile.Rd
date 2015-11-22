@@ -4,25 +4,42 @@
 \alias{precompile}
 \title{Precompile the TMB library in order to speed up compilation of templates.}
 \usage{
-precompile(...)
+precompile(all = TRUE, clean = FALSE, trace = TRUE, ...)
 }
 \arguments{
-\item{...}{Passed to \code{\link{compile}}.}
+\item{all}{Precompile all or just the core parts of TMB ?}
+
+\item{clean}{Remove precompiled libraries ?}
+
+\item{trace}{Trace precompilation process ?}
+
+\item{...}{Not used.}
 }
 \description{
 Precompile the TMB library
 }
 \details{
-The precompilation should only be run once, typically right after installation of TMB.
-Note that the precompilation requires write access to the TMB package folder.
-Two versions of the library - with/without the openmp flag - will be generated. After this,
-compilation times of templates should be reduced.
-\itemize{
-\item To precompile on Linux run \code{precompile()}.
-\item To precompile on OS X run \code{precompile(PKG_LIBS = "-install_name `pwd`/$@")}.
-\item Precompiling is not supported on Windows at present.
+Precompilation can be used to speed up compilation of
+templates. It is only necessary to run \code{precompile()} once,
+typically right after installation of TMB. The function
+\emph{prepares} TMB for precompilation, while the actual
+pre-compilation takes place the first time you compile a model
+after running \code{precompile()}.
+
+Note that the precompilation requires write access to the TMB
+package folder. Three versions of the library will be prepared:
+Normal, parallel and a debugable version.
+
+Precompilation works the same way on all platforms. The only known
+side-effect of precompilation is that it increases the file size
+of the generated binaries.
 }
-Note that precompilation has side effects: It is not possible to work with more than one
-model at a time for a single R instance.
+\examples{
+\dontrun{
+## Prepare precompilation
+precompile()
+## Perform precompilation by running a model
+runExample(all = TRUE)
+}
 }
 
