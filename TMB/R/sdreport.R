@@ -49,6 +49,29 @@
 ##' matrix. Note, that the parameter order will follow the original
 ##' order (i.e. \code{obj$env$par}).
 ##'
+##' Using \eqn{\phi(\hat u,\theta)} as estimator of
+##' \eqn{\phi(u,\theta)} may result in substantial bias. This may be
+##' the case if either \eqn{\phi} is non-linear or if the distribution
+##' of \eqn{u} given \eqn{x} (data) is sufficiently non-symmetric.  A
+##' generic correction is enabled with \code{bias.correct=TRUE}. It is
+##' based on the identity
+##' \deqn{E_{\theta}[\phi(u,\theta)|x] =
+##' \partial_\varepsilon\left(\log \int \exp(-f(u,\theta) +
+##' \varepsilon \phi(u,\theta))\:du\right)_{|\varepsilon=0}}
+##' stating that the conditional expectation can be written as a
+##' marginal likelihood gradient wrt. a nuisance parameter
+##' \eqn{\varepsilon}.
+##' The marginal likelihood is replaced by its Laplace approximation.
+##'
+##' If \code{bias.correct.control$sd=TRUE} the variance of the
+##' estimator is calculated using
+##' \deqn{V_{\theta}[\phi(u,\theta)|x] =
+##' \partial_\varepsilon^2\left(\log \int \exp(-f(u,\theta) +
+##' \varepsilon \phi(u,\theta))\:du\right)_{|\varepsilon=0}}
+##' A further correction is added to this variance to account for the
+##' effect of replacing \eqn{\theta} by the MLE \eqn{\hat\theta}
+##' (unless \code{ignore.theta.uncertainty=TRUE}).
+##'
 ##' @title General sdreport function.
 ##' @param obj Object returned by \code{MakeADFun}
 ##' @param par.fixed Optional. Parameter estimate (will be known to \code{obj} when an optimization has been carried out).
@@ -61,23 +84,42 @@
 ##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}
 ##' @examples
 ##' \dontrun{
-##' runExample("linreg_parallel",thisR=TRUE) ## Non-random effect example
-##' sdreport(obj)
-##' }
-##' runExample("simple",thisR=TRUE)          ## Random effect example
+##' runExample("linreg_parallel", thisR = TRUE) ## Non-random effect example
+##' sdreport(obj) }
+##'
+##' runExample("simple", thisR = TRUE)          ## Random effect example
 ##' rep <- sdreport(obj)
-##' summary(rep,"random")                    ## Only random effects
-##' summary(rep,"fixed",p.value=TRUE)        ## Only non-random effects
-##' summary(rep,"report")                    ## Only report
+##' summary(rep, "random")                      ## Only random effects
+##' summary(rep, "fixed", p.value = TRUE)       ## Only non-random effects
+##' summary(rep, "report")                      ## Only report
+##'
+##' ## Bias correction
+##' rep <- sdreport(obj, bias.correct = TRUE)
+##' summary(rep, "report")                      ## Include bias correction
+##'
+##' \dontrun{
+##' ## Verify bias correction using mcmc with parameters fixed at MLE
+##' obj2 <- MakeADFun(
+##'   data = obj$env$data,
+##'   parameters = obj$env$parList(),
+##'   map = list(beta   = factor(c(NA, NA)),
+##'              logsdu = factor(NA),
+##'              logsd0 = factor(NA) )
+##' )
+##' s <- mcmc(obj2, 1000, "NUTS")
+##' plot(rowSums(exp(s)))
+##' mean(rowSums(exp(s))) }
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
-  obj2 <- MakeADFun(obj$env$data,obj$env$parameters,type="ADFun",ADreport=TRUE,DLL=obj$env$DLL)
-  obj2$env$tracemgc <- obj$env$tracemgc
-  obj2$env$inner.control$trace <- obj$env$inner.control$trace
-  obj2$env$silent <- obj$env$silent
+  obj2 <- MakeADFun(obj$env$data,
+                    obj$env$parameters,
+                    type = "ADFun",
+                    ADreport = TRUE,
+                    DLL = obj$env$DLL,
+                    silent = obj$env$silent)
   r <- obj$env$random
   ## Get full parameter (par), Fixed effects parameter (par.fixed)
   ## and fixed effect gradient (gradient.fixed)
@@ -169,9 +211,10 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       parameters[[length(parameters)+1]] <- epsilon
       obj3 <- MakeADFun(obj$env$data,
                         parameters,
-                        random=obj$env$random,
-                        checkParameterOrder=FALSE,
-                        DLL=obj$env$DLL)
+                        random = obj$env$random,
+                        checkParameterOrder = FALSE,
+                        DLL = obj$env$DLL,
+                        silent = obj$env$silent)
       ## Get good initial parameters
       obj3$env$start <- c(par, epsilon)
       obj3$env$random.start <- expression(start[random])
@@ -181,7 +224,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       pattern.unchanged <- identical(h@i,h3@i) & identical(h@p,h3@p)
       ## If pattern un-changed we can re-use symbolic Cholesky:
       if(pattern.unchanged){
-          cat("Re-using symbolic Cholesky\n")
+          if(!obj$env$silent)
+              cat("Re-using symbolic Cholesky\n")
           obj3$env$L.created.by.newton <- L
       } else {
           if( .Call("have_tmb_symbolic", PACKAGE = "TMB") )
@@ -252,7 +296,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
 }
 
 ##' Extract parameters, random effects and reported variables along
-##' with uncertainties and optionally Chi-square statistics.
+##' with uncertainties and optionally Chi-square statistics. Bias
+##' corrected quantities are added as additional columns if available.
 ##'
 ##' @title summary tables of model parameters
 ##' @param object Output from \code{\link{sdreport}}
@@ -276,8 +321,14 @@ summary.sdreport <- function(object, select = c("all", "fixed", "random", "repor
   if(s.has("random")) ans2 <- cbind(object$par.random, sqrt(as.numeric(object$diag.cov.random)))
   if(s.has("report")) ans3 <- cbind(object$value,      object$sd)
   ans <- rbind(ans1, ans2, ans3)
-  if(length(ans) && ncol(ans) == 2) {
-    colnames(ans) <- c("Estimate", "Std. Error")
+  if(s.has("report")) {
+      ans4 <- cbind("Est. (bias.correct)" = object$unbiased$value,
+                    "Std. (bias.correct)" = object$unbiased$sd)
+      if(!is.null(ans4))
+          ans <- cbind(ans, rbind(NA * ans1, NA * ans2, ans4))
+  }
+  if(length(ans) && ncol(ans) > 0) {
+    colnames(ans)[1:2] <- c("Estimate", "Std. Error")
     if(p.value) {
       ans <- cbind(ans, "z value"    = (z <- ans[,"Estimate"] / ans[,"Std. Error"]))
       ans <- cbind(ans, "Pr(>|z^2|)" = pchisq(z^2, df=1, lower.tail=FALSE))

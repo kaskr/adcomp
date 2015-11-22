@@ -21,7 +21,10 @@ Type objective_function<Type>::operator() ()
   ans -= dnorm(x, y, exp(logsd0), true).sum();
 
   // Apply delta method on sd0:
-  ADREPORT(exp(logsd0));
+  ADREPORT( exp(logsd0) );
+
+  // Report posterior mode and mean of sum(exp(u))
+  ADREPORT( sum(exp(u)) );
 
   return ans;
 }

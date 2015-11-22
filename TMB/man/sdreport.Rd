@@ -75,17 +75,57 @@ output. This matrix must be manually inverted using
 \code{solve(jointPrecision)} in order to get the joint covariance
 matrix. Note, that the parameter order will follow the original
 order (i.e. \code{obj$env$par}).
+
+Using \eqn{\phi(\hat u,\theta)} as estimator of
+\eqn{\phi(u,\theta)} may result in substantial bias. This may be
+the case if either \eqn{\phi} is non-linear or if the distribution
+of \eqn{u} given \eqn{x} (data) is sufficiently non-symmetric.  A
+generic correction is enabled with \code{bias.correct=TRUE}. It is
+based on the identity
+\deqn{E_{\theta}[\phi(u,\theta)|x] =
+\partial_\varepsilon\left(\log \int \exp(-f(u,\theta) +
+\varepsilon \phi(u,\theta))\:du\right)_{|\varepsilon=0}}
+stating that the conditional expectation can be written as a
+marginal likelihood gradient wrt. a nuisance parameter
+\eqn{\varepsilon}.
+The marginal likelihood is replaced by its Laplace approximation.
+
+If \code{bias.correct.control$sd=TRUE} the variance of the
+estimator is calculated using
+\deqn{V_{\theta}[\phi(u,\theta)|x] =
+\partial_\varepsilon^2\left(\log \int \exp(-f(u,\theta) +
+\varepsilon \phi(u,\theta))\:du\right)_{|\varepsilon=0}}
+A further correction is added to this variance to account for the
+effect of replacing \eqn{\theta} by the MLE \eqn{\hat\theta}
+(unless \code{ignore.theta.uncertainty=TRUE}).
 }
 \examples{
 \dontrun{
-runExample("linreg_parallel",thisR=TRUE) ## Non-random effect example
-sdreport(obj)
-}
-runExample("simple",thisR=TRUE)          ## Random effect example
+runExample("linreg_parallel", thisR = TRUE) ## Non-random effect example
+sdreport(obj) }
+
+runExample("simple", thisR = TRUE)          ## Random effect example
 rep <- sdreport(obj)
-summary(rep,"random")                    ## Only random effects
-summary(rep,"fixed",p.value=TRUE)        ## Only non-random effects
-summary(rep,"report")                    ## Only report
+summary(rep, "random")                      ## Only random effects
+summary(rep, "fixed", p.value = TRUE)       ## Only non-random effects
+summary(rep, "report")                      ## Only report
+
+## Bias correction
+rep <- sdreport(obj, bias.correct = TRUE)
+summary(rep, "report")                      ## Include bias correction
+
+\dontrun{
+## Verify bias correction using mcmc with parameters fixed at MLE
+obj2 <- MakeADFun(
+  data = obj$env$data,
+  parameters = obj$env$parList(),
+  map = list(beta   = factor(c(NA, NA)),
+             logsdu = factor(NA),
+             logsd0 = factor(NA) )
+)
+s <- mcmc(obj2, 1000, "NUTS")
+plot(rowSums(exp(s)))
+mean(rowSums(exp(s))) }
 }
 \seealso{
 \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}

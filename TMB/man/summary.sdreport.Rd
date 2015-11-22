@@ -24,6 +24,7 @@ matrix
 }
 \description{
 Extract parameters, random effects and reported variables along
-with uncertainties and optionally Chi-square statistics.
+with uncertainties and optionally Chi-square statistics. Bias
+corrected quantities are added as additional columns if available.
 }
 
