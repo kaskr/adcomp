@@ -11,6 +11,13 @@
 #include <cstdio>
 #include <streambuf>
 
+#ifdef _OPENMP
+#include <omp.h>
+#define THREAD_SAFE if(!omp_in_parallel())
+#else
+#define THREAD_SAFE /* nothing */
+#endif
+
 template <bool OUTPUT>
 class Rstreambuf : public std::streambuf {
 public:
@@ -40,19 +47,19 @@ public:
 };
 
 template <> inline std::streamsize Rstreambuf<true>::xsputn(const char *s, std::streamsize num ) {
-  Rprintf( "%.*s", num, s ) ;
+  THREAD_SAFE Rprintf( "%.*s", num, s ) ;
   return num ;
 }
 template <> inline std::streamsize Rstreambuf<false>::xsputn(const char *s, std::streamsize num ) {
-  REprintf( "%.*s", num, s ) ; 
+  THREAD_SAFE REprintf( "%.*s", num, s ) ;
   return num ;
 }
 template <> inline int Rstreambuf<true>::overflow(int c ) {
-  if (c != EOF) Rprintf( "%.1s", &c ) ;
+  if (c != EOF) THREAD_SAFE Rprintf( "%.1s", &c ) ;
   return c ;
 }
 template <> inline int Rstreambuf<false>::overflow(int c ) {
-  if (c != EOF) REprintf( "%.1s", &c ) ;
+  if (c != EOF) THREAD_SAFE REprintf( "%.1s", &c ) ;
   return c ;
 }
 template <> inline int Rstreambuf<true>::sync(){
@@ -65,3 +72,5 @@ template <> inline int Rstreambuf<false>::sync(){
 }
 TMB_EXTERN Rostream<true>  Rcout;
 TMB_EXTERN Rostream<false> Rcerr;
+
+#undef THREAD_SAFE
