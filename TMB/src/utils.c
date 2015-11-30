@@ -36,3 +36,25 @@ SEXP setxslot(SEXP x, SEXP y){
 SEXP isNullPointer(SEXP pointer) {
   return ScalarLogical(!R_ExternalPtrAddr(pointer));
 }
+
+/* Mark factor with numerical values of hessian */
+SEXP tmb_mark_factor(SEXP L, SEXP H){
+  setAttrib(L,
+	    install("Hx"),
+	    duplicate(getAttrib(H, install("x"))));
+  return R_NilValue;
+}
+
+/* Check if L already contains the factorization of H */
+SEXP tmb_match_factor(SEXP L, SEXP H){
+  SEXP Hx = getAttrib(H, install("x"));
+  SEXP Lx = getAttrib(L, install("Hx"));
+  if(Lx == R_NilValue)return ScalarLogical(0);
+  int n = LENGTH(Lx);
+  if(n != LENGTH(Hx)) error("'tmb_match_factor' unequal lengths");
+  for(int i=0; i < n; i++){
+    if (REAL(Lx)[i] != REAL(Hx)[i])
+      return ScalarLogical(0);
+  }
+  return ScalarLogical(1);
+}

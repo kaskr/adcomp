@@ -36,6 +36,15 @@ destructive_Chol_update <- get("destructive_Chol_update", envir = asNamespace("M
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
+  ## Check if L already contains factorization of H (case t=0 only).
+  have.match <- .Call("tmb_match_factor", L, H, PACKAGE="TMB")
+  have.match <- have.match && (t == 0)
+  if(have.match) return(L)
+  ## No match - must update:
+  if(t == 0)
+    .Call("tmb_mark_factor", L, H, PACKAGE="TMB")
+  else
+    .Call("tmb_mark_factor", L, NULL, PACKAGE="TMB")
   destructive_Chol_update(L, H, t) ## Was: Matrix:::destructive_Chol_update(L, H, t)
   ## TODO: Ask MM to export from Matrix!
 }
