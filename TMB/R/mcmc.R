@@ -58,7 +58,7 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=
         z <- -as.vector(obj$gr(x))
         if(any(is.nan(z))){
             warning(paste("NaN gradient at:", paste(x, collapse=" ")))
-            z <- 0
+            z <- rep(0, length(x))
            }
         return(z)
     }
@@ -249,10 +249,10 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
         ## Initialize the dual-averaging algorithm.
         message(paste("MCMC HMC: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
-        eps <- epsvec[1] <-
+        eps <- epsvec[1] <- epsbar[1] <-
             .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
         mu <- log(10*eps)
-        epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+        Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
         ## dummy values to return
         epsvec <- epsbar <- Hbar <- NULL
@@ -294,7 +294,11 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
             ## Do the adapting of eps.
             if(m <= Madapt){
                 Hbar[m+1] <-
-                    (1-1/(m+t0))*Hbar[m] + (delta-min(1,exp(logalpha)))/(m+t0)
+                    (1-1/(m+t0))*Hbar[m] +
+                        (delta-min(1,exp(logalpha)))/(m+t0)
+                ## If logalpha not defined, skip this updating step and use
+                ## the last one.
+                if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
                 logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
                 epsvec[m+1] <- exp(logeps)
                 logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
@@ -410,10 +414,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         ## Initialize the dual-averaging algorithm.
         message(paste("MCMC NUTS: No eps given so using dual averaging during first", Madapt, "steps."))
         epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
-        eps <- epsvec[1] <-
+        eps <- epsvec[1] <- epsbar[1] <-
             .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
         mu <- log(10*eps)
-        epsbar[1] <- 1; Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
+        Hbar[1] <- 0; gamma <- 0.05; t0 <- 10; kappa <- 0.75
     } else {
         ## dummy values to return
         epsvec <- epsbar <- Hbar <- NULL
@@ -444,9 +448,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                 r.minus <- res$r.minus
             }
             ## test whether to accept this state
-            if(is.na(res$s)){
-                stop(paste('stopping condition (s) undefined in NUTS for params:', paste(res$theta, collapse=" ")))
-            }
+            if(is.na(res$s) | is.nan(res$s))  res$s <- 0
             if(res$s==1) {
                 if(runif(n=1, min=0,max=1) <= res$n/n){
                     theta.cur <- res$theta.prime
@@ -455,6 +457,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
             }
             n <- n+res$n
             s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
+            ## Stop trajectory if there are any problems, probably happens
+            ## when jumping way too far into the tails and the model isn't
+            ## defined
+            if(is.na(s) | is.nan(s))  s <- 0
             j <- j+1
             ## Stop doubling if too many or it's diverged enough
             if(j>max_doublings & s) {
@@ -466,8 +472,12 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         if(useDA){
             ## Do the adapting of eps.
             if(m <= Madapt){
-                Hbar[m+1] <-
-                    (1-1/(m+t0))*Hbar[m] + (delta-res$alpha/res$nalpha)/(m+t0)
+                Hbar[m+1] <- (1-1/(m+t0))*Hbar[m] +
+                    (delta-res$alpha/res$nalpha)/(m+t0)
+                ## If logalpha not defined, skip this updating step and use
+                ## the last one.
+                if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
+
                 logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
                 epsvec[m+1] <- exp(logeps)
                 logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
@@ -489,7 +499,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                    paste(j.stats, collapse=","), ")"))
     if(diagnostic){
         return(list(par=theta.out, steps.taken= 2^j.results,
-                    n.calls=info$n.calls, epsbar=epsbar))
+                    n.calls=info$n.calls, epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
     } else {
         return(theta.out)
     }
@@ -532,6 +542,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         ## verify valid trajectory
         H <- .calculate.H(theta=theta, r=r, fn=fn)
         s <- H-log(u) + delta.max > 0
+        if(is.na(s) | is.nan(s)) s <- 0
         n <- log(u) <= H
         ## ## Useful code for debugging. Returns entire path to global env.
         ## if(!exists('theta.trajectory'))
@@ -556,6 +567,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         alpha <- xx$alpha
         nalpha <- xx$nalpha
         s <- xx$s
+        if(is.na(s) | is.nan(s)) s <- 0
         nprime <- xx$n
         ## If it didn't fail, update the above quantities
         if(s==1){
@@ -573,8 +585,10 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
                 r.plus <- yy$r.plus
             }
             ## This isn't in the paper but if both slice variables failed,
-            ## then you get 0/0. So I skip this test
+            ## then you get 0/0. So I skip this test. Likewise if model
+            ## throwing errors, don't keep that theta.
             nprime <- yy$n+ xx$n
+            if(!is.finite(nprime)) nprime <- 0
             if(nprime!=0){
                 ## choose whether to keep this theta
                 if(runif(n=1, min=0, max=1) <= yy$n/nprime)
@@ -624,8 +638,12 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
     H1 <- .calculate.H(theta=theta, r=r, fn=fn)
     H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
     a <- 2*(exp(H2)/exp(H1)>.5)-1
+    ## If jumped into bad region, a can be NaN so setup algorithm to keep
+    ## halving eps instead of throwing error
+    if(!is.finite(a)) a <- -1
     k <- 1
-    while( (exp(H2)/exp(H1))^a > 2^(-a) ){
+    ## Similarly, keep going if there are infinite values
+    while (!is.finite(H1) | !is.finite(H2) | a*H2-a*H1 > -a*log(2)) {
         eps <- (2^a)*eps
         ## Do one leapfrog step
         r.new <- r+(eps/2)*gr(theta)
@@ -634,8 +652,7 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         H2 <- .calculate.H(theta=theta.new, r=r.new, fn=fn)
         k <- k+1
         if(k>50) {
-            warning("more than 50 iterations to find initial epsilon, stopping")
-            break
+            stop("More than 50 iterations to find reasonable eps. Model is likely misspecified or some other issue.")
         }
     }
     if(verbose) message(paste("Reasonable epsilon=", eps, "found after", k, "steps"))
