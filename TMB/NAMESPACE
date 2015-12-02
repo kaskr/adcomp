@@ -5,7 +5,7 @@
 importFrom("graphics", abline, legend, matplot, plot)
 importFrom("methods", as, is, new,
 	   cbind2, rbind2)
-importFrom("stats", approx, confint, integrate, nlminb,
+importFrom("stats", approx, confint, integrate, median, nlminb,
 	   optim, optimHess, pchisq, qchisq, qnorm, rnorm,
 	   runif, sd, splinefun)
 importFrom("utils", as.relistable, relist,
