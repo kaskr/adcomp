@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+TMB 1.6.5 (2015-12-02)
+------------------------------------------------------------------------
+
+o Fix bug that caused sdreport to fail for models using the 'profile'
+  argument to MakeADFun.
+
+o Robustify marginal likelihood for extreme parameters (to help MCMC).
+
+o MCMC: Improved stability of adaptive step size algorithm.
+
+o Bias correction documentation and test example. Results are now part
+  of the summary output.
+
+------------------------------------------------------------------------
 TMB 1.6.4 (2015-11-22)
 ------------------------------------------------------------------------
 
