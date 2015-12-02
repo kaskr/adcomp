@@ -555,7 +555,8 @@ MakeADFun <- function(data, parameters, map=list(),
                                  inner.control)
                           ), silent=silent
                  )
-      if(is.character(opt)) return(NaN) ## Rather at least return error message ?
+      if(!is.list(opt)         ||
+         !is.finite(opt$value)) return(NaN)
     } else {
       opt <- optim(eval(random.start),fn=f0,gr=function(x)f0(x,order=1),
                    method=inner.method,control=inner.control)
