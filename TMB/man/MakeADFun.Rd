@@ -5,13 +5,13 @@
 \title{Construct objective functions with derivatives based on a compiled C++ template.}
 \usage{
 MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
-  "ADGrad"[!is.null(random)]), random = NULL, profile = NULL,
-  random.start = expression(last.par.best[random]), hessian = FALSE,
-  method = "BFGS", inner.method = "newton", inner.control = list(maxit =
-  1000), MCcontrol = list(doMC = FALSE, seed = 123, n = 100),
-  ADreport = FALSE, atomic = TRUE, LaplaceNonZeroGradient = FALSE,
-  DLL = getUserDLL(), checkParameterOrder = TRUE, regexp = FALSE,
-  silent = FALSE, ...)
+  "ADGrad"[!is.null(random) || !is.null(profile)]), random = NULL,
+  profile = NULL, random.start = expression(last.par.best[random]),
+  hessian = FALSE, method = "BFGS", inner.method = "newton",
+  inner.control = list(maxit = 1000), MCcontrol = list(doMC = FALSE, seed =
+  123, n = 100), ADreport = FALSE, atomic = TRUE,
+  LaplaceNonZeroGradient = FALSE, DLL = getUserDLL(),
+  checkParameterOrder = TRUE, regexp = FALSE, silent = FALSE, ...)
 }
 \arguments{
 \item{data}{List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).}
