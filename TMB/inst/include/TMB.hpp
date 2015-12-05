@@ -12,8 +12,7 @@
 #ifdef WITH_LIBTMB
 #define CSKIP(x) ;
 #define TMB_EXTERN extern
-#endif
-#ifndef WITH_LIBTMB
+#else
 #define CSKIP(x) x
 #define TMB_EXTERN
 #endif
@@ -79,3 +78,7 @@ namespace CppAD{
 using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;
+
+/* Cleanup  */
+#undef CSKIP        // Nothing more to precompile. Must disable
+#define CSKIP(x) x  // to not confuse REGISTER_ATOMIC etc.
