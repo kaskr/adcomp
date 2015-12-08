@@ -86,9 +86,11 @@ On recent versions of gcc the following problem may be encountered: When the use
 
 * readelf -s mymodel.so | grep UNIQUE
 
-If this gives a lot of output it is not possible to unload the library, and R will have to be restarted every time the model is re-compiled.
+If this gives any output it is not possible to unload the library, and R will have to be restarted every time the model is re-compiled.
 There are at least two alternative solutions to this problem:
 
-1. Use the clang compiler instead of gcc
+1. Use gcc with compilation flag ```-fno-gnu-unique``` (version 4.8.3 and newer): Add ```CXX = g++ -fno-gnu-unique``` to a file ```~/.R/Makevars``` (create it if it doesn't exist).
 
-2. Use gcc with compilation flag ```-fno-gnu-unique``` (version 4.8.3 and newer)
+2. Use the clang compiler instead of gcc: Install clang and add ```CXX = clang++``` to a file ```~/.R/Makevars``` (create it if it doesn't exist).
+
+Note: If you have precompiled TMB using ```precompile()``` prior to (1) or (2) you must repeat the precompilation with the new compiler settings.
