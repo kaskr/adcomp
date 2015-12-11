@@ -170,9 +170,11 @@ See \ref matrix_arrays.cpp "matrix_arrays.cpp" for examples of use.
 
 
 \section Relation_Eigen Relationship to Eigen
-The TMB types \c matrix and \c array inherits from the the Eigen
+The TMB types \c matrix and \c array (in dimension 2) inherits directly from the the Eigen
 types Matrix and Array. The advanced user of TMB will benefit from familiarity with
 the <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen documentation</a>.
+Note: Arrays of dimension 3 or higher are specially implemented in TMB, i.e. are 
+not directly inherited from Eigen.
 
 */
 
