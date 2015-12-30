@@ -23,19 +23,39 @@
 */
 namespace atomic {
 /**
-   \brief Namespace with double versions of R special math library
+   \brief Namespace with double versions of some R special math
+   functions
 */
 namespace Rmath {
-  #include <Rmath.h>
-  // Macros do not respect the namespace limits.
-  // Some of them will conflict with other TMB functions.
-  #undef dnorm
-  #undef pnorm
-  #undef qnorm
-  #undef dnbinom
-  #undef dgamma
-  #undef ppois
+  /*
+    Was:
 
+    #include <Rmath.h>
+
+    However, Rmath defines a large number of macros that do not
+    respect the namespace limits. Some of them will conflict with
+    other TMB functions or mess up symbols in the users template
+    (e.g. change 'dt' to 'Rf_dt').
+
+    Therefore, explicitly select the few function headers (from
+    /usr/share/R/include/Rmath.h) rather than including them all.
+  */
+
+  extern "C" {
+    /* See 'R-API: entry points to C-code' (Writing R-extensions) */
+    double	Rf_pnorm5(double, double, double, int, int);
+    double	Rf_qnorm5(double, double, double, int, int);
+    double	Rf_ppois(double, double, int, int);
+    double	Rf_bessel_k(double, double, double);
+    double	Rf_pgamma(double, double, double, int, int);
+    double	Rf_qgamma(double, double, double, int, int);
+    double	Rf_lgammafn(double);
+    double	Rf_psigamma(double, double);
+    double	Rf_fmin2(double, double);
+  }
+
+  /* Non-standard TMB special functions based on numerical
+     integration: */
   #include <R_ext/Applic.h>
 #ifdef WITH_LIBTMB
   void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex);
@@ -55,7 +75,7 @@ namespace Rmath {
   /* n'th order derivative of (scaled) incomplete gamma wrt. shape parameter */
   double D_incpl_gamma_shape(double x, double shape, double n, double logc){
     if(n<.5){
-      return exp(logc + lgammafn(shape)) * pgamma(x, shape, 1.0, 1, 0);
+      return exp(logc + Rf_lgammafn(shape)) * Rf_pgamma(x, shape, 1.0, 1, 0);
     }
     double epsabs=1e-10;
     double epsrel=1e-10;
@@ -75,7 +95,7 @@ namespace Rmath {
     ex[2] = logc; /* Scale integrand with exp(logc) */
     double bound; /* For indefinite integration */
     int inf=-1;   /* corresponds to (-Inf, bound) */
-    bound = log(fmin2(x,shape));
+    bound = log(Rf_fmin2(x,shape));
     /* integrate -Inf...min(log(x),log(shape)) */
     Rdqagi(integrand_D_incpl_gamma_shape, ex, &bound, &inf,
 	   &epsabs, &epsrel,
@@ -106,14 +126,14 @@ namespace Rmath {
     return result1 + result2;
   }
   double inv_incpl_gamma(double y, double shape, double logc){
-    double logp = log(y) - lgammafn(shape) - logc;
+    double logp = log(y) - Rf_lgammafn(shape) - logc;
     double scale = 1.0;
-    return qgamma(exp(logp), shape, scale, 1, 0);
+    return Rf_qgamma(exp(logp), shape, scale, 1, 0);
   }
   /* n'th order derivative of log gamma function */
   double D_lgamma(double x, double n){
-    if(n<.5)return lgammafn(x);
-    else return psigamma(x,n-1.0);
+    if(n<.5)return Rf_lgammafn(x);
+    else return Rf_psigamma(x,n-1.0);
   }
 #endif // #ifdef WITH_LIBTMB
 
@@ -187,7 +207,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   ty[0] = Rmath::pnorm5(tx[0],0,1,1,0);
+			   ty[0] = Rmath::Rf_pnorm5(tx[0],0,1,1,0);
 			   ,
 			   // ATOMIC_REVERSE
 			   px[0] = dnorm1(tx[0]) * py[0];
@@ -205,7 +225,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   // OUTPUT_DIM
 			   1,
 			   // ATOMIC_DOUBLE
-			   ty[0] = Rmath::qnorm5(tx[0],0,1,1,0);
+			   ty[0] = Rmath::Rf_qnorm5(tx[0],0,1,1,0);
 			   ,
 			   // ATOMIC_REVERSE
 			   px[0] = Type(1) / dnorm1(ty[0]) * py[0];
