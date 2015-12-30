@@ -121,6 +121,17 @@ namespace Rmath {
 
 #include "atomic_macro.hpp"
 
+template<class Type>
+struct TypeDefs{
+  /* The following typedefs allow us to construct matrices based on
+     already allocated memory (pointers). 'MapMatrix' gives write access
+     to the pointers while 'ConstMapMatrix' is read-only.
+  */
+  typedef Eigen::Map<Eigen::Matrix<Type,Eigen::Dynamic,Eigen::Dynamic> > MapMatrix;
+  typedef Eigen::Map<const Eigen::Matrix<Type,Eigen::Dynamic,Eigen::Dynamic> > ConstMapMatrix;
+  typedef Eigen::LDLT<Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> > LDLT;
+};
+
 /** \name Interface to atomic functions.
     @{
 */
@@ -131,9 +142,9 @@ namespace Rmath {
     \param offset Segment offset.
 */
 template<class Type>
-matrix<Type> vec2mat(CppAD::vector<Type> x, int m, int n, int offset=0){
-  matrix<Type> res(m,n);
-  for(int i=0;i<m*n;i++)res(i)=x[i+offset];
+typename TypeDefs<Type>::ConstMapMatrix vec2mat(const CppAD::vector<Type> &x, int m, int n, int offset=0){
+  typedef typename TypeDefs<Type>::ConstMapMatrix ConstMapMatrix_t;
+  ConstMapMatrix_t res(&x[offset], m, n);
   return res;
 }
 
@@ -367,26 +378,29 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   CppAD::Integer(tx[0]) * CppAD::Integer(tx[1])
 			   ,
 			   // ATOMIC_DOUBLE
+			   typedef TypeDefs<double>::MapMatrix MapMatrix_t;
+			   typedef TypeDefs<double>::ConstMapMatrix ConstMapMatrix_t;
 			   int n1 = CppAD::Integer(tx[0]);
 			   int n3 = CppAD::Integer(tx[1]);
 			   int n2 = (tx.size() - 2) / (n1 + n3);
-			   matrix<double> X = vec2mat(tx, n1, n2, 2);
-			   matrix<double> Y = vec2mat(tx, n2, n3, 2 + n1*n2);
-			   matrix<double> res = X * Y;       // Use Eigen matrix multiply
-			   for(int i=0;i<n1*n3;i++)ty[i] = res(i);
+			   ConstMapMatrix_t X(&tx[2      ], n1, n2);
+			   ConstMapMatrix_t Y(&tx[2+n1*n2], n2, n3);
+			   MapMatrix_t      Z(&ty[0      ], n1, n3);
+			   Z = X * Y;
 			   ,
 			   // ATOMIC_REVERSE (W*Y^T, X^T*W)
+			   typedef typename TypeDefs<Type>::MapMatrix MapMatrix_t;
 			   int n1 = CppAD::Integer(tx[0]);
 			   int n3 = CppAD::Integer(tx[1]);
 			   int n2 = (tx.size() - 2) / (n1 + n3);
 			   matrix<Type> Xt = vec2mat(tx, n1, n2, 2).transpose();
 			   matrix<Type> Yt = vec2mat(tx, n2, n3, 2 + n1*n2).transpose();
 			   matrix<Type> W = vec2mat(py, n1, n3);
-			   matrix<Type> res1 = matmul(W, Yt); // W*Y^T
-			   matrix<Type> res2 = matmul(Xt, W); // X^T*W
+			   MapMatrix_t res1(&px[2      ], n1, n2);
+			   MapMatrix_t res2(&px[2+n1*n2], n2, n3);
+			   res1 = matmul(W, Yt); // W*Y^T
+			   res2 = matmul(Xt, W); // X^T*W
 			   px[0] = 0; px[1] = 0;
-			   for(int i=0;i<n1*n2;i++)px[i+2] = res1(i);
-			   for(int i=0;i<n2*n3;i++)px[i+2+n1*n2] = res2(i);
 			   )
 
 /** \brief Atomic version of matrix inversion.
@@ -402,20 +416,22 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   tx.size()
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt((double)tx.size());
-			   matrix<double> X(n,n);
-			   for(int i=0;i<n*n;i++){X(i)=tx[i];}
-			   matrix<double> res=X.inverse();   // Use Eigen matrix inverse (LU)
-			   for(int i=0;i<n*n;i++)ty[i]=res(i);
+			   typedef TypeDefs<double>::MapMatrix MapMatrix_t;
+			   typedef TypeDefs<double>::ConstMapMatrix ConstMapMatrix_t;
+			   int n = sqrt((double)tx.size());
+			   ConstMapMatrix_t X(&tx[0], n, n);
+			   MapMatrix_t      Y(&ty[0], n, n);
+			   Y = X.inverse();   // Use Eigen matrix inverse (LU)
 			   ,
 			   // ATOMIC_REVERSE  (-f(X)^T*W*f(X)^T)
-			   int n=sqrt((double)ty.size());
-			   matrix<Type> W=vec2mat(py,n,n);   // Range direction
-			   matrix<Type> Y=vec2mat(ty,n,n);   // f(X)
-			   matrix<Type> Yt=Y.transpose();    // f(X)^T
-			   matrix<Type> tmp=matmul(W,Yt);    // W*f(X)^T
-			   matrix<Type> res=-matmul(Yt,tmp); // -f(X)^T*W*f(X)^T
-			   px=mat2vec(res);
+			   typedef typename TypeDefs<Type>::MapMatrix MapMatrix_t;
+			   int n = sqrt((double)ty.size());
+			   MapMatrix_t res(&px[0], n, n);
+			   matrix<Type> W = vec2mat(py, n, n); // Range direction
+			   matrix<Type> Y = vec2mat(ty, n, n); // f(X)
+			   matrix<Type> Yt = Y.transpose();    // f(X)^T
+			   matrix<Type> tmp = matmul(W, Yt);   // W*f(X)^T
+			   res = -matmul(Yt, tmp);             // -f(X)^T*W*f(X)^T
 			   )
 
 /** \brief Atomic version of log determinant of positive definite n-by-n matrix.
@@ -442,7 +458,6 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
 
-typedef Eigen::LDLT<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> > LDLT_t;
 /** \brief Atomic version of log determinant *and* inverse of positive definite n-by-n matrix.
     Calculated by Cholesky decomposition.
     \param x Input vector of length n*n.
@@ -456,6 +471,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1 + tx.size()
 			   ,
 			   // ATOMIC_DOUBLE
+			   typedef TypeDefs<double>::LDLT LDLT_t;
 			   using namespace Eigen;
 			   int n=sqrt((double)tx.size());
 			   matrix<double> X=vec2mat(tx,n,n);
@@ -498,7 +514,9 @@ matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
   arg[0] = x.rows(); arg[1] = y.cols();
   for(int i=0;i<x.size();i++){arg[2+i]=x(i);}
   for(int i=0;i<y.size();i++){arg[2+i+x.size()]=y(i);}
-  return vec2mat(matmul(arg),x.rows(),y.cols());
+  CppAD::vector<Type> res(x.rows()*y.cols());
+  matmul(arg,res);
+  return vec2mat(res,x.rows(),y.cols());
 }
 
 template<class Type>

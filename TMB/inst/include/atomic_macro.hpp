@@ -6,13 +6,18 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP( = false; )
 
 /** \brief Construct atomic vector function based on known derivatives */
 #define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_REVERSE) \
-CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx)CSKIP({	\
-  CppAD::vector<double> ty(OUTPUT_DIM);					\
+void ATOMIC_NAME(const CppAD::vector<double> &tx, CppAD::vector<double> &ty)CSKIP({			\
   ATOMIC_DOUBLE;							\
+})									\
+CppAD::vector<double> ATOMIC_NAME(const CppAD::vector<double> &tx)CSKIP({	\
+  CppAD::vector<double> ty(OUTPUT_DIM);					\
+  ATOMIC_NAME(tx, ty);							\
   return ty;								\
 })									\
 template <class Type>							\
-CppAD::vector<AD<Type > > ATOMIC_NAME(CppAD::vector<AD<Type> > x);	\
+void ATOMIC_NAME(const CppAD::vector<AD<Type> > &tx, CppAD::vector<AD<Type > > &ty);				\
+template <class Type>							\
+CppAD::vector<AD<Type > > ATOMIC_NAME(const CppAD::vector<AD<Type> > &tx);	\
 template <class Type>							\
 class atomic##ATOMIC_NAME : public CppAD::atomic_base<Type> {		\
 public:									\
@@ -37,7 +42,7 @@ private:								\
       for(size_t i=0;i<vx.size();i++)anyvx |= vx[i];			\
       for(size_t i=0;i<vy.size();i++)vy[i] = anyvx;			\
     }									\
-    ty = ATOMIC_NAME(tx);	       					\
+    ATOMIC_NAME(tx,ty);							\
     return true;							\
   }									\
   virtual bool reverse(size_t q,					\
@@ -68,10 +73,14 @@ private:								\
   }									\
 };									\
 template<class Type> 							\
-CppAD::vector<AD<Type > > ATOMIC_NAME(CppAD::vector<AD<Type > > tx){	\
+ void ATOMIC_NAME(const CppAD::vector<AD<Type > > &tx, CppAD::vector<AD<Type > > &ty){			\
   static atomic##ATOMIC_NAME<Type > afun##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
+  afun##ATOMIC_NAME(tx, ty);						\
+}									\
+template<class Type> 							\
+CppAD::vector<AD<Type > > ATOMIC_NAME(const CppAD::vector<AD<Type > > &tx){	\
   CppAD::vector<AD<Type > > ty(OUTPUT_DIM);				\
-  afun##ATOMIC_NAME(tx,ty);						\
+  ATOMIC_NAME(tx, ty);							\
   return ty;								\
 }
 
