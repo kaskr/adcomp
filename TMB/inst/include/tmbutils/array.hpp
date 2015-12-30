@@ -12,6 +12,11 @@
     dynamic length with a dimension attribute. The implementation
     closely follows the way arrays work in R.
     Vectorized operations are inherited from the Eigen library.
+
+    \warning Methods that are not documented here are inherited from
+    the Eigen library and applied on the underlying n-by-1 array. In
+    general this will yield surprising results for 2D specific
+    array methods.
 */
 template<class Type>
 struct array:Map< Array<Type,Dynamic,1> >{
@@ -137,7 +142,22 @@ struct array:Map< Array<Type,Dynamic,1> >{
     return *this;
   }
 
-  
+  /* Assign array from any other object. First convert other object to
+     1D object (because we assign to underlying 1D array data).
+
+     Example:
+     a = m         (assign from matrix)
+     a.col(0) = m; (assign from matrix)
+     a = m*m       (assign from unevaluated expression template)
+     a = v         (assign from vector)
+  */
+  template <class T>
+  array<Type> operator=(T y){
+    Array<Type, Dynamic, Dynamic> a = y;
+    a.resize(a.size(),1);
+    return array(MapBase::operator=(a), dim);
+  }
+
   void print(){
     std::cout << "Array dim: ";
     for(int i=0;i<dim.size();i++)std::cout << dim[i] << " ";
@@ -267,8 +287,18 @@ struct array:Map< Array<Type,Dynamic,1> >{
   INHERIT(operator-)
   INHERIT(operator*)
   INHERIT(operator/)
-  INHERIT(operator=)
 #undef INHERIT
+
+  /** \brief Convert TMB array to matrix by keeping the first
+      dimension and collapsing remaining dimensions.
+
+      E.g. if array dimension is (n1,n2,n3) the resulting matrix
+      dimension is (n1, n2*n3). */
+  tmbutils::matrix<Type> matrix(){
+    tmbutils::matrix<Type> ans = this->MapBase::matrix();
+    ans.resize(this->rows(), ans.size() / this->rows() );
+    return ans;
+  }
 
   /* Methods this class should *not* inherit (generate compile time error if used) */
   private:

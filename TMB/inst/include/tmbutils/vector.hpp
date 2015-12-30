@@ -101,8 +101,8 @@ struct matrix : Matrix<Type,Dynamic,Dynamic>
      The vec operator stacks the matrix columns into a single vector.
   */
   vector<Type> vec(){
-    vector<Type> x(this->size());
-    for(int i=0;i<x.size();i++)x[i]=this->operator()(i);
-    return x;
+    Array<Type,Dynamic,Dynamic> a = this->array();
+    a.resize(a.size(), 1);
+    return a;
   }
 };
