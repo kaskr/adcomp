@@ -9,7 +9,7 @@
 
 /* openmp controller */
 SEXP omp_num_threads(SEXP x) {
-#ifdef SUPPORT_OPENMP
+#ifdef _OPENMP
   if(!isNull(x)){
     int n=INTEGER(x)[0];
     omp_set_num_threads(n);
