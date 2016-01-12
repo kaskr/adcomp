@@ -474,8 +474,8 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   ty[0] = res;
 			   ,
 			   // ATOMIC_REVERSE  (X^-1*W[0])
-			   CppAD::vector<Type> invX=matinv(tx);
-			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
+			   CppAD::vector<Type> invX = matinv(tx);
+			   for(size_t i=0; i<tx.size(); i++) px[i] = invX[i] * py[0];
 			   )
 
 /** \brief Atomic version of log determinant *and* inverse of positive definite n-by-n matrix.
