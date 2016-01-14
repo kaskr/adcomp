@@ -110,7 +110,9 @@
 ##' @param parallel Run in parallel using the \code{parallel} package?
 ##' @param trace Trace progress?
 ##' @param ... Control parameters for OSA method
-##' @return \code{data.frame} with OSA residuals in column \code{residual}.
+##' @return \code{data.frame} with OSA \emph{standardized} residuals
+##' in column \code{residual}. Depending on the method the output may
+##' also include OSA expected observation in column \code{mean}.
 ##' @examples
 ##' ######################## Gaussian case
 ##' runExample("simple")
@@ -351,7 +353,7 @@ oneStepPredict <- function(obj,
             g <- function(y){
                 newobj$gr(observation(k, y))[obs.pointer[k]]
             }
-            c(nll = f(obs[index]), grad = g(obs[index]))
+            c(observation=obs[index], nll = f(obs[index]), grad = g(obs[index]))
         }
         pred <- do.call("rbind", lapply(1:length(subset), oneStepGaussian))
         pred <- as.data.frame(pred)
@@ -376,7 +378,10 @@ oneStepPredict <- function(obj,
             R <- sign(grad) * Rabs
             R
         }
-        pred$residual <- getResid( diff( c(nll0, pred$nll) ), pred$grad )
+        R <- getResid( diff( c(nll0, pred$nll) ), pred$grad )
+        M <- pred$observation - ifelse(pred$grad != 0, R * (R / pred$grad), 0)
+        pred$mean <- M
+        pred$residual <- R
     }
 
     ## ######################### CASE: oneStepGeneric
@@ -428,12 +433,15 @@ oneStepPredict <- function(obj,
                 F2 <- integrate(function(x)exp(-(spline(x) - nll)),
                                 obs[index] + discrete,
                                 spline.range[2])$value
+                mean <- integrate(function(x)exp(-(spline(x) - nll)) * x,
+                                  spline.range[1],
+                                  spline.range[2])$value / (F1 + F2)
                 ## Was:
                 ##  F1 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), -Inf, obs[index])$value
                 ##  F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
                 nlcdf.lower = nll - log(F1)
                 nlcdf.upper = nll - log(F2)
-                c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper)
+                c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper, mean=mean)
             })
             if(is(ans, "try-error")) ans <- NaN
             ans
