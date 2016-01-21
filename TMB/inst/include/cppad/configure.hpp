@@ -75,7 +75,7 @@ C++11: Does compiler support std::erf(double)
 \def CPPAD_HAS_HIGH_RESOLUTION_CLOCK
 C++11: Does compiler support std::chrono::high_resolution_clock
 */
-# define CPPAD_HAS_HIGH_RESOLUTION_CLOCK @cppad_has_high_resolution_clock@
+# define CPPAD_HAS_HIGH_RESOLUTION_CLOCK 0
 # endif
 
 /*!
