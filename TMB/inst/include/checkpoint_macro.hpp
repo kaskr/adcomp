@@ -144,16 +144,16 @@ namespace atomic{
       m=f(x).size();
       UserFunctor<AD<double> > f0;
       UserFunctor<AD<AD<double> > > f1;
-      UserFunctor<AD<AD<AD<double> > > > f2;
-      UserFunctor<AD<AD<AD<AD<double> > > > > f3;
+      //UserFunctor<AD<AD<AD<double> > > > f2;
+      //UserFunctor<AD<AD<AD<AD<double> > > > > f3;
       vpf.resize(NTHREADS);
       for(int thread=0;thread<NTHREADS;thread++){
         vpf[thread].resize(4);
       }
       cpyADfunPointer(tape_symbol(f0,x), 0);
       cpyADfunPointer(tape_symbol(f1,x), 1);
-      cpyADfunPointer(tape_symbol(f2,x), 2);
-      cpyADfunPointer(tape_symbol(f3,x), 3);
+      //cpyADfunPointer(tape_symbol(f2,x), 2);
+      //cpyADfunPointer(tape_symbol(f3,x), 3);
     }
     void init(vector<double> x){
       if(!initialized){
