@@ -121,10 +121,11 @@ namespace atomic{
      generalized symbol. */
   template<template<class> class UserFunctor>
   struct forrev_derivatives{
-    bool initialized;
+    vector<bool> initialized;
     int n,m;
     forrev_derivatives(){
-      initialized=false;
+      initialized.resize(4);
+      for(int i=0; i<4; i++)initialized(i)=false;
     }
     /* ADFun pointers used by the double versions 
        indexed as vpf[thread][level] */
@@ -138,27 +139,30 @@ namespace atomic{
 	vpf[thread][i]->operator=(*padf);
       }
     }
-    void do_init(vector<double> x){
-      UserFunctor<double> f;
-      n=x.size();
-      m=f(x).size();
-      UserFunctor<AD<double> > f0;
-      UserFunctor<AD<AD<double> > > f1;
-      UserFunctor<AD<AD<AD<double> > > > f2;
-      UserFunctor<AD<AD<AD<AD<double> > > > > f3;
-      vpf.resize(NTHREADS);
-      for(int thread=0;thread<NTHREADS;thread++){
-        vpf[thread].resize(4);
+    template<int N, class ADNdouble>
+    void do_init(vector<ADNdouble> x_){
+      vector<double> x(x_.size());
+      for(int i=0; i<x.size(); i++)x(i) = asDouble(x_(i));
+      // Only needed once (double call is first call):
+      if (N==0) {
+	UserFunctor<double> f;
+	n=x.size();
+	m=f(x).size();
+	vpf.resize(NTHREADS);
+	for(int thread=0;thread<NTHREADS;thread++){
+	  vpf[thread].resize(4);
+	}
       }
-      cpyADfunPointer(tape_symbol(f0,x), 0);
-      cpyADfunPointer(tape_symbol(f1,x), 1);
-      cpyADfunPointer(tape_symbol(f2,x), 2);
-      cpyADfunPointer(tape_symbol(f3,x), 3);
+      //
+      UserFunctor<AD<ADNdouble> > f;
+      cpyADfunPointer(tape_symbol(f,x), N);
+
     }
-    void init(vector<double> x){
-      if(!initialized){
-	do_init(x);
-	initialized=true;
+    template<int N, class ADNdouble>
+    void init(vector<ADNdouble> x){
+      if(!initialized(N)){
+	do_init<N, ADNdouble>(x);
+	initialized(N)=true;
       }
     }
     int get_output_dim(int input_dim){
@@ -225,16 +229,19 @@ namespace USERFUNCTION##NAMESPACE{					\
   }									\
 }									\
 vector<double> USERFUNCTION(vector<double> x){				\
-  USERFUNCTION##NAMESPACE::double_version.init(x);			\
+  USERFUNCTION##NAMESPACE::double_version.init<0,double>(x);			\
   return USERFUNCTION##NAMESPACE::generalized_symbol(x);		\
 }									\
 vector<AD<double> > USERFUNCTION(vector<AD<double> > x){		\
+  USERFUNCTION##NAMESPACE::double_version.init<1,AD<double> >(x);	\
   return USERFUNCTION##NAMESPACE::generalized_symbol(x);		\
 }									\
 vector<AD<AD<double> > > USERFUNCTION(vector<AD<AD<double> > > x){	\
+  USERFUNCTION##NAMESPACE::double_version.init<2,AD<AD<double> > >(x);	\
   return USERFUNCTION##NAMESPACE::generalized_symbol(x);		\
 }									\
 vector<AD<AD<AD<double> > > > USERFUNCTION(vector<AD<AD<AD<double> > > > x){ \
+  USERFUNCTION##NAMESPACE::double_version.init<3,AD<AD<AD<double> > > >(x); \
   return USERFUNCTION##NAMESPACE::generalized_symbol(x);		\
 }
 
