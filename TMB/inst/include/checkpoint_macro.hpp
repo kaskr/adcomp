@@ -153,9 +153,12 @@ namespace atomic{
 	  vpf[thread].resize(4);
 	}
       }
+
       //
+      std::cout << "m=" << m << " n=" << n << " x.size()=" << x.size() << " N=" << N << "\n";
       UserFunctor<AD<ADNdouble> > f;
       cpyADfunPointer(tape_symbol(f,x), N);
+
 
     }
     template<int N, class ADNdouble>
@@ -188,6 +191,7 @@ namespace atomic{
     // Evaluate
     CppAD::vector<double> operator()(CppAD::vector<double> tx){
       int level = get_level(tx.size());
+      std::cout << tx.size() << " " << level << "\n";
       return vpf[THREAD][level]->Forward(0,tx);
     }
   }; /* end class forrev_derivatives */
