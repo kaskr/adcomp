@@ -1,4 +1,26 @@
 ------------------------------------------------------------------------
+TMB 1.6.6 (2016-01-28)
+------------------------------------------------------------------------
+
+o oneStepPredict: Add one-step mean to output for methods
+  'oneStepGaussianOffMode' and 'oneStepGeneric'.
+
+o Array class changes:
+  - More explicit array assignment from other class:
+  Can now assign from matrix and un-evaluated expression template
+  E.g. a = a.matrix() * a.matrix();
+  - Documentation: warning about the 2D case
+  - Re-implement vec() operator (avoid loop)
+  - Add method matrix() to array class: Keeps first dimension and
+    collapses remaining dimensions.
+
+o Clean up potential naming conflicts caused by Rmath macros
+
+o Atomic functions general speedup
+
+o bugfix: precompile broke REGISTER_ATOMIC
+
+------------------------------------------------------------------------
 TMB 1.6.5 (2015-12-02)
 ------------------------------------------------------------------------
 
