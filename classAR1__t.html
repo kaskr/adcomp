@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -95,6 +95,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>Stationary AR1 process.  
  <a href="classAR1__t.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="density_8hpp_source.html">density.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -146,22 +148,22 @@ class AR1_t&lt; distribution &gt;</h3>
 <img class="formulaDsp" alt="\[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\]" src="form_25.png"/>
 </p>
 <p> where <img class="formulaInl" alt="$\sigma=\sqrt{1-\phi^2}$" src="form_26.png"/>. Then <img class="formulaInl" alt="$E(x_i)=0$" src="form_27.png"/>, <img class="formulaInl" alt="$V(x_i)=\Sigma$" src="form_28.png"/> and the covariance is <img class="formulaInl" alt="$E(x_ix_j')=\phi^{|i-j|}\Sigma$" src="form_29.png"/>. We refer to this process as a stationary 1st order autoregressive process with multivariate increments with parameter phi and marginal distribution f. Compactly denoted AR1(phi,f).</p>
-<p>Note that the construction can be carried out recursively, as "AR1(phi,f)" is itself a distribution that can be used as input to <a class="el" href="density_8cpp.html#a65620999261cc95feb42ebc39b406d72">AR1()</a>. See example below: </p>
-<div class="fragment"><div class="line">\\ Construct negative log density of standard <a class="code" href="density_8cpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a> process on a line:</div>
+<p>Note that the construction can be carried out recursively, as "AR1(phi,f)" is itself a distribution that can be used as input to <a class="el" href="density_8hpp.html#a65620999261cc95feb42ebc39b406d72">AR1()</a>. See example below: </p>
+<div class="fragment"><div class="line">\\ Construct negative log density of standard <a class="code" href="density_8hpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a> process on a line:</div>
 <div class="line">Type phi1=0.8;</div>
 <div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;N01&lt;Type&gt;</a> &gt; f1(phi1);</div>
 <div class="line">\\ Can be evaluated on a <a class="code" href="structvector.html">vector</a>:</div>
 <div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10);</div>
 <div class="line">Type ans=f1(x);</div>
 </div><!-- fragment --><p>Now use f1 as marginal in a new AR1 process with parameter phi2:</p>
-<div class="fragment"><div class="line">\\ Construct negative log density of standard <a class="code" href="density_8cpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a> process on a line:</div>
+<div class="fragment"><div class="line">\\ Construct negative log density of standard <a class="code" href="density_8hpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a> process on a line:</div>
 <div class="line">Type phi2=0.5;</div>
 <div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;AR1_t&lt;N01&lt;Type&gt;</a> &gt; &gt; f2(phi1,f1);</div>
 <div class="line">\\ Can be evaluated on a 2-dimensional <a class="code" href="structarray.html">array</a>:</div>
 <div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10,20);</div>
 <div class="line">Type ans=f2(x);</div>
 </div><!-- fragment --> 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00274">274</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00274">274</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a9cbf372d5521aafcebe40daf72bfc3be"></a>
 <div class="memitem">
@@ -186,7 +188,7 @@ template&lt;class distribution&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00280">280</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00280">280</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -224,7 +226,7 @@ template&lt;class distribution&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00281">281</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00281">281</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +255,7 @@ template&lt;class distribution&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00309">309</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00309">309</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -280,7 +282,7 @@ template&lt;class distribution&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00322">322</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00322">322</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +312,7 @@ template&lt;class distribution&gt; </div>
 
 <p>Evaluate the negative log density. </p>
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00283">283</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00283">283</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -338,7 +340,7 @@ template&lt;class distribution&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00296">296</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00296">296</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -355,12 +357,12 @@ template&lt;class distribution&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="density_8cpp_source.html#l00323">323</a> of file <a class="el" href="density_8cpp_source.html">density.cpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00323">323</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="density_8cpp_source.html">density.cpp</a></li>
+<li><a class="el" href="density_8hpp_source.html">density.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

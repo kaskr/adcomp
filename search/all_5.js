@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['e',['E',['../splines_8cpp.html#a07484107e6d9fdf38b53edf631d6511d',1,'E():&#160;splines.cpp'],['../tmbutils__extra_8cpp.html#a07484107e6d9fdf38b53edf631d6511d',1,'E():&#160;tmbutils_extra.cpp']]],
+  ['e',['E',['../splines_8hpp.html#a07484107e6d9fdf38b53edf631d6511d',1,'E():&#160;splines.hpp'],['../tmbutils__extra_8hpp.html#a07484107e6d9fdf38b53edf631d6511d',1,'E():&#160;tmbutils_extra.hpp']]],
   ['e0',['E0',['../structR__inla_1_1spde__aniso__t.html#a1bb103da626b009d7a5e48b11db0f211',1,'R_inla::spde_aniso_t']]],
   ['e1',['E1',['../structR__inla_1_1spde__aniso__t.html#a29aac6b29e8db4e44a8c86930f36227c',1,'R_inla::spde_aniso_t']]],
   ['e2',['E2',['../structR__inla_1_1spde__aniso__t.html#a1931b0a7342c0ac1d436501265be516a',1,'R_inla::spde_aniso_t']]],

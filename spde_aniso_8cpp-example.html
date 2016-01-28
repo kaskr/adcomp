@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(time);</div>
 <div class="line">  <a name="a2"></a><a class="code" href="tmb__core_8hpp.html#a7889208e14a95d21cf630157cf0e2c80">DATA_IVECTOR</a>(notcens);</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#a7889208e14a95d21cf630157cf0e2c80">DATA_IVECTOR</a>(meshidxloc);</div>
-<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(<a name="a4"></a><a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>);</div>
+<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(<a name="a4"></a><a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>);</div>
 <div class="line">  <a name="a5"></a><a class="code" href="tmb__core_8hpp.html#af9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>(spde,<a name="_a6"></a><a class="code" href="structR__inla_1_1spde__aniso__t.html">spde_aniso_t</a>);</div>
 <div class="line">  <a name="a7"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(beta);</div>
 <div class="line">  <a name="a8"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(log_tau);</div>
@@ -119,10 +119,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  SparseMatrix&lt;Type&gt; Q = <a name="a10"></a><a class="code" href="namespaceR__inla.html#aafe00b097cadc9ab1c0262dda13599de">Q_spde</a>(spde,kappa,H);</div>
 <div class="line">  <a name="a11"></a><a class="code" href="tmb__core_8hpp.html#ac2d7888f4e0385930448f992de53079b">REPORT</a>(H)</div>
 <div class="line"></div>
-<div class="line">  nll = <a name="a12"></a><a class="code" href="density_8cpp.html#ab290ba244619df01db9f48570dbbf91a">GMRF</a>(Q)(x);                              <span class="comment">// Negative log likelihood</span></div>
+<div class="line">  nll = <a name="a12"></a><a class="code" href="density_8hpp.html#ab290ba244619df01db9f48570dbbf91a">GMRF</a>(Q)(x);                              <span class="comment">// Negative log likelihood</span></div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// Weibull likelihood with cencoring</span></div>
-<div class="line">  <a name="_a13"></a><a class="code" href="structvector.html">vector&lt;Type&gt;</a> Xbeta = <a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>*beta;  </div>
+<div class="line">  <a name="_a13"></a><a class="code" href="structvector.html">vector&lt;Type&gt;</a> Xbeta = <a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>*beta;  </div>
 <div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;time.size(); i++){    </div>
 <div class="line">    Type eta = Xbeta(i) + x(meshidxloc(i))/tau;</div>
 <div class="line">    Type lambda = exp(eta);</div>

@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -117,20 +117,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// Cholesky factor of Sigma</span></div>
-<div class="line">  <a name="_a8"></a><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a name="a9"></a><a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(p,p);</div>
+<div class="line">  <a name="_a8"></a><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a name="a9"></a><a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(p,p);</div>
 <div class="line">  L.setIdentity();</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordtype">int</span> k=0;</div>
 <div class="line">  <span class="keywordflow">for</span>(i=1;i&lt;p;i++)</div>
 <div class="line">  {</div>
-<div class="line">    Type Norm2=<a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,i);</div>
+<div class="line">    Type Norm2=<a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,i);</div>
 <div class="line">    <span class="keywordflow">for</span>(j=0;j&lt;=i-1;j++)</div>
 <div class="line">    {</div>
-<div class="line">      <a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j) = off_diag_x(k++);</div>
-<div class="line">      Norm2 += <a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j)*<a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j); </div>
+<div class="line">      <a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j) = off_diag_x(k++);</div>
+<div class="line">      Norm2 += <a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j)*<a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j); </div>
 <div class="line">    }</div>
 <div class="line">    <span class="keywordflow">for</span>(j=0;j&lt;=i;j++)</div>
-<div class="line">      <a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j) /= sqrt(Norm2);</div>
+<div class="line">      <a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(i,j) /= sqrt(Norm2);</div>
 <div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma = L * L.transpose();</div>

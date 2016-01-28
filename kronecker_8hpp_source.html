@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: kronecker.cpp Source File</title>
+<title>TMB Documentation: kronecker.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,14 +88,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">kronecker.cpp</div>  </div>
+<div class="title">kronecker.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="kronecker_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
+<a href="kronecker_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// License: GPL-2</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> scalartype, <span class="keywordtype">int</span> n1, <span class="keywordtype">int</span> n2, <span class="keywordtype">int</span> n3, <span class="keywordtype">int</span> n4&gt;</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="kronecker_8cpp.html#ae60698df2a94c3d6d723bb26acab48ac">   10</a></span>&#160;Matrix&lt;scalartype,n1*n3,n2*n4&gt; <a class="code" href="kronecker_8cpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a>(Matrix&lt;scalartype,n1,n2&gt; x, Matrix&lt;scalartype,n3,n4&gt; y){</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="kronecker_8hpp.html#ae60698df2a94c3d6d723bb26acab48ac">   10</a></span>&#160;Matrix&lt;scalartype,n1*n3,n2*n4&gt; <a class="code" href="kronecker_8hpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a>(Matrix&lt;scalartype,n1,n2&gt; x, Matrix&lt;scalartype,n3,n4&gt; y){</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  Matrix&lt;scalartype,n1*n3,n2*n4&gt; ans;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;n1;i++)</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=0;j&lt;n2;j++)</div>
@@ -106,7 +106,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;}</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> scalartype&gt;</div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="kronecker_8cpp.html#a7efc2ac68f24b405b44177a381b6d27c">   22</a></span>&#160;<a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> <a class="code" href="kronecker_8cpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a>(<a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> x, <a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> y){</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="kronecker_8hpp.html#a7efc2ac68f24b405b44177a381b6d27c">   22</a></span>&#160;<a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> <a class="code" href="kronecker_8hpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a>(<a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> x, <a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> y){</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">int</span> n1 = x.rows(), n2 = x.cols(), n3 = y.rows(), n4 = y.cols();</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;scalartype&gt;</a> ans(n1 * n3, n2 * n4);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;n1;i++)</div>
@@ -116,7 +116,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;          ans(i*n3+k,j*n4+l)=x(i,j)*y(k,l);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordflow">return</span> ans;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
-<div class="ttc" id="structmatrix_html"><div class="ttname"><a href="structmatrix.html">matrix</a></div><div class="ttdoc">Matrix class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8cpp_source.html#l00084">vector.cpp:84</a></div></div>
-<div class="ttc" id="kronecker_8cpp_html_ae60698df2a94c3d6d723bb26acab48ac"><div class="ttname"><a href="kronecker_8cpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a></div><div class="ttdeci">Matrix&lt; scalartype, n1 *n3, n2 *n4 &gt; kronecker(Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)</div><div class="ttdoc">Kronecker product of two matrices. </div><div class="ttdef"><b>Definition:</b> <a href="kronecker_8cpp_source.html#l00010">kronecker.cpp:10</a></div></div>
+<div class="ttc" id="structmatrix_html"><div class="ttname"><a href="structmatrix.html">matrix</a></div><div class="ttdoc">Matrix class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8hpp_source.html#l00084">vector.hpp:84</a></div></div>
+<div class="ttc" id="kronecker_8hpp_html_ae60698df2a94c3d6d723bb26acab48ac"><div class="ttname"><a href="kronecker_8hpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a></div><div class="ttdeci">Matrix&lt; scalartype, n1 *n3, n2 *n4 &gt; kronecker(Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)</div><div class="ttdoc">Kronecker product of two matrices. </div><div class="ttdef"><b>Definition:</b> <a href="kronecker_8hpp_source.html#l00010">kronecker.hpp:10</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

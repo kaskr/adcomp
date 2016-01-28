@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kronecker_2ecpp',['kronecker.cpp',['../kronecker_8cpp.html',1,'']]]
+  ['kronecker_2ehpp',['kronecker.hpp',['../kronecker_8hpp.html',1,'']]]
 ];

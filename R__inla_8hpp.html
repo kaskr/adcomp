@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: kronecker.cpp File Reference</title>
+<title>TMB Documentation: R_inla.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,99 +88,43 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">kronecker.cpp File Reference</div>  </div>
+<div class="title">R_inla.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Kronecker product of two matrices.  
-<a href="#details">More...</a></p>
-
-<p><a href="kronecker_8cpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="R__inla_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structR__inla_1_1spde__t.html">R_inla::spde_t&lt; Type &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object containing all elements of an SPDE object, i.e. eqn (10) in Lindgren et al.  <a href="structR__inla_1_1spde__t.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structR__inla_1_1spde__aniso__t.html">R_inla::spde_aniso_t&lt; Type &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object containing all elements of an anisotropic SPDE object, i.e. eqn (20) in Lindgren et al.  <a href="structR__inla_1_1spde__aniso__t.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceR__inla"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceR__inla.html">R_inla</a></td></tr>
+<tr class="memdesc:namespaceR__inla"><td class="mdescLeft">&#160;</td><td class="mdescRight">SPDE methods from INLA R-package . <br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae60698df2a94c3d6d723bb26acab48ac"><td class="memTemplParams" colspan="2">template&lt;class scalartype , int n1, int n2, int n3, int n4&gt; </td></tr>
-<tr class="memitem:ae60698df2a94c3d6d723bb26acab48ac"><td class="memTemplItemLeft" align="right" valign="top">Matrix&lt; scalartype, n1 *n3, n2 <br class="typebreak"/>
-*n4 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="kronecker_8cpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a> (Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)</td></tr>
-<tr class="memdesc:ae60698df2a94c3d6d723bb26acab48ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kronecker product of two matrices.  <a href="#ae60698df2a94c3d6d723bb26acab48ac">More...</a><br/></td></tr>
-<tr class="separator:ae60698df2a94c3d6d723bb26acab48ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7efc2ac68f24b405b44177a381b6d27c"><td class="memTemplParams" colspan="2">template&lt;class scalartype &gt; </td></tr>
-<tr class="memitem:a7efc2ac68f24b405b44177a381b6d27c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="kronecker_8cpp.html#a7efc2ac68f24b405b44177a381b6d27c">kronecker</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt; x, <a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt; y)</td></tr>
-<tr class="memdesc:a7efc2ac68f24b405b44177a381b6d27c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kronecker product of two matrices.  <a href="#a7efc2ac68f24b405b44177a381b6d27c">More...</a><br/></td></tr>
-<tr class="separator:a7efc2ac68f24b405b44177a381b6d27c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafe00b097cadc9ab1c0262dda13599de"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:aafe00b097cadc9ab1c0262dda13599de"><td class="memTemplItemLeft" align="right" valign="top">SparseMatrix&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceR__inla.html#aafe00b097cadc9ab1c0262dda13599de">R_inla::Q_spde</a> (spde_t&lt; Type &gt; spde, Type kappa)</td></tr>
+<tr class="separator:aafe00b097cadc9ab1c0262dda13599de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab91af51de6ea66726e54a7a0694718f5"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:ab91af51de6ea66726e54a7a0694718f5"><td class="memTemplItemLeft" align="right" valign="top">SparseMatrix&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceR__inla.html#ab91af51de6ea66726e54a7a0694718f5">R_inla::Q_spde</a> (spde_aniso_t&lt; Type &gt; spde, Type kappa, <a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt; H)</td></tr>
+<tr class="separator:ab91af51de6ea66726e54a7a0694718f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Kronecker product of two matrices. </p>
+<div class="textblock"><p>Makes SPDE methods from INLA R-package available in TMB. </p>
 
-<p>Definition in file <a class="el" href="kronecker_8cpp_source.html">kronecker.cpp</a>.</p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ae60698df2a94c3d6d723bb26acab48ac"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class scalartype , int n1, int n2, int n3, int n4&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">Matrix&lt;scalartype,n1*n3,n2*n4&gt; kronecker </td>
-          <td>(</td>
-          <td class="paramtype">Matrix&lt; scalartype, n1, n2 &gt;&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Matrix&lt; scalartype, n3, n4 &gt;&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Kronecker product of two matrices. </p>
-
-<p>Definition at line <a class="el" href="kronecker_8cpp_source.html#l00010">10</a> of file <a class="el" href="kronecker_8cpp_source.html">kronecker.cpp</a>.</p>
-
-<p>Referenced by <a class="el" href="classcontAR2__t.html#a516cc4f86299c831ebb6721b5cfd8a21">contAR2_t&lt; scalartype_ &gt;::contAR2_t()</a>, and <a class="el" href="classcontAR2__t.html#a14db90cc4013696c4d89b0edea31ac79">contAR2_t&lt; scalartype_ &gt;::expB()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7efc2ac68f24b405b44177a381b6d27c"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class scalartype &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structmatrix.html">matrix</a>&lt;scalartype&gt; kronecker </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Kronecker product of two matrices. </p>
-
-<p>Definition at line <a class="el" href="kronecker_8cpp_source.html#l00022">22</a> of file <a class="el" href="kronecker_8cpp_source.html">kronecker.cpp</a>.</p>
-
-</div>
-</div>
-</div><!-- contents -->
+<p>Definition in file <a class="el" href="R__inla_8hpp_source.html">R_inla.hpp</a>.</p>
+</div></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(n);</div>
 <div class="line">  <a name="a2"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(t);</div>
-<div class="line">  <a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(<a name="a3"></a><a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>);</div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(<a name="a3"></a><a class="code" href="splines_8hpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>);</div>
 <div class="line">  <a name="a4"></a><a class="code" href="tmb__core_8hpp.html#ace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>(ngroup);</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(multiply);</div>
 <div class="line">  <a name="a5"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(beta);</div>
@@ -112,10 +112,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="keywordflow">for</span>(k=0;k&lt; multiply;k++)</div>
 <div class="line">  {</div>
 <div class="line">    ii = 0;</div>
-<div class="line">    <span class="keywordflow">for</span>(i=0;i&lt; <a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>;i++)</div>
+<div class="line">    <span class="keywordflow">for</span>(i=0;i&lt; <a class="code" href="splines_8hpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>;i++)</div>
 <div class="line">    {</div>
 <div class="line">      <span class="comment">// Random effects contribution</span></div>
-<div class="line">      Type u1 = u[i+k*<a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>];</div>
+<div class="line">      Type u1 = u[i+k*<a class="code" href="splines_8hpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>];</div>
 <div class="line">      g -= -(log_sigma_u);</div>
 <div class="line">      g -= -.5*pow(u1/sigma_u,2);</div>
 <div class="line"></div>

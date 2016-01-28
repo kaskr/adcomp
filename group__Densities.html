@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespacedensity"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedensity.html">density</a></td></tr>
-<tr class="memdesc:namespacedensity"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of multivariate Gaussian distributions (members listed in <a class="el" href="density_8cpp.html">density.cpp</a>) <br/></td></tr>
+<tr class="memdesc:namespacedensity"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of multivariate Gaussian distributions (members listed in <a class="el" href="density_8hpp.html">density.hpp</a>) <br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -122,7 +122,7 @@ Namespaces</h2></td></tr>
 <div class="fragment"><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> your_dmnorm(Sigma);</div>
 <div class="line">res = your_dmnorm(x);                </div>
 </div><!-- fragment --><p> in which <code>your_dmnorm</code> is a variable that holds the "density".</p>
-<p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of these freely (modulo the positive definite constraint) you can use <a class="el" href="density_8cpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a> to specify the correlation matrix, and <a class="el" href="density_8cpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a> to specify variances. <a class="el" href="density_8cpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a> takes as input a vector a dummy parameters that internally is used to build the correlation matrix via its cholesky factor. </p>
+<p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of these freely (modulo the positive definite constraint) you can use <a class="el" href="density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a> to specify the correlation matrix, and <a class="el" href="density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a> to specify variances. <a class="el" href="density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a> takes as input a vector a dummy parameters that internally is used to build the correlation matrix via its cholesky factor. </p>
 <div class="fragment"><div class="line"><span class="keyword">using namespace </span>density;</div>
 <div class="line"><span class="keywordtype">int</span> n = 10;</div>
 <div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> unconstrained_params(n*(n-1)/2);  <span class="comment">// Dummy parameterization of correlation matrix         </span></div>
@@ -130,7 +130,7 @@ Namespaces</h2></td></tr>
 <div class="line">res = <a class="code" href="namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>(<a class="code" href="namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</div>
 </div><!-- fragment --><p> If all elements of <code>dummy_params</code> are estimated we are in effect estimating a full correlation matrix without any constraints on its elements (except for the mandatory positive definiteness). The actual value of the correlation matrix, but not the full covariance matrix, can easily be assessed using the <code>".cov()"</code> operator </p>
 <div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(n,n);      </div>
-<div class="line">Sigma = <a class="code" href="density_8cpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).cov();</div>
+<div class="line">Sigma = <a class="code" href="density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).cov();</div>
 <div class="line"><a class="code" href="tmb__core_8hpp.html#ac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="comment">// Report back to R session</span></div>
 </div><!-- fragment --><h2>Autoregressive processes</h2>
 <p>Consider a stationary univariate Gaussian AR1 process <em>x(t), t=0,...,n-1</em>. The stationary distribution is choosen so that:</p>
@@ -152,7 +152,7 @@ Namespaces</h2></td></tr>
 <p>Note that <em>cor[x(t),x(t-1)] = rho</em>.</p>
 <p>The <code>SCALE</code> function can be used to set the standard deviation. </p>
 <div class="fragment"><div class="line">Type sigma = 2.1;            <span class="comment">// standard deviation of x</span></div>
-<div class="line">res = <a class="code" href="density_8cpp.html#adb89a5b22d8790cef917f8eec210bfc6">SCALE</a>(<a class="code" href="density_8cpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a>(rho),sigma)(x);  </div>
+<div class="line">res = <a class="code" href="density_8hpp.html#adb89a5b22d8790cef917f8eec210bfc6">SCALE</a>(<a class="code" href="density_8hpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a>(rho),sigma)(x);  </div>
 </div><!-- fragment --><p> Now, <em>var[x(t)] = sigma^2</em>. Because all elements of <code>x</code> are scaled by the same constant we use SCALE rather than VECSCALE.</p>
 <h4>Multivariate AR1 processes</h4>
 <p>This is the first real illustrations of how distributions can be used as building blocks to obtain more complex distributions. Consider the <em>p</em> dimensional AR1 process </p>
@@ -162,7 +162,7 @@ Namespaces</h2></td></tr>
 </div><!-- fragment --><p> The columns in <code>x</code> refer to the different time points. We then evaluate the (negative log) joint density of the time series. </p>
 <div class="fragment"><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> your_dmnorm(Sigma);  <span class="comment">// Density of x(t) </span></div>
 <div class="line">Type phi;                           <span class="comment">// Correlation parameter</span></div>
-<div class="line">res = <a class="code" href="density_8cpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a>(phi,your_dmnorm)(x);</div>
+<div class="line">res = <a class="code" href="density_8hpp.html#a65620999261cc95feb42ebc39b406d72">AR1</a>(phi,your_dmnorm)(x);</div>
 </div><!-- fragment --><p> Note the following:</p>
 <ul>
 <li>We have introduced an intermediate variable <code>your_dmnorm</code>, which holds the p-dim density marginal density of <em>x(t)</em>. This is a zero-mean normal density with covariance matrix <code>Sigma</code>.</li>
@@ -193,6 +193,6 @@ Namespaces</h2></td></tr>
 <div class="line">x.setZero();                    <span class="comment">// x = 0</span></div>
 <div class="line"></div>
 <div class="line">res = <a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(<a class="code" href="namespacedensity.html#a74cd095b6502e658b9e9f0c58da1c60d">AR1</a>(rho_t),<a class="code" href="namespacedensity.html#a74cd095b6502e658b9e9f0c58da1c60d">AR1</a>(rho_s))(x);</div>
-</div><!-- fragment --><p>Note that the arguments to <code><a class="el" href="density_8cpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE()</a></code> are given in the opposite order to the dimensions of <code>x</code>. </p>
+</div><!-- fragment --><p>Note that the arguments to <code><a class="el" href="density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE()</a></code> are given in the opposite order to the dimensions of <code>x</code>. </p>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: vector.cpp File Reference</title>
+<title>TMB Documentation: romberg.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,30 +88,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">vector.cpp File Reference</div>  </div>
+<div class="title">romberg.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Defines TMB vectors.  
-<a href="#details">More...</a></p>
-
-<p><a href="vector_8cpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="romberg_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvector.html">vector&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector class used by TMB.  <a href="structvector.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structromberg_1_1slicefun.html">romberg::slicefun&lt; Type, F &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmatrix.html">matrix&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix class used by TMB.  <a href="structmatrix.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structromberg_1_1multivariate__integrand.html">romberg::multivariate_integrand&lt; Type &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structromberg_1_1integratelast.html">romberg::integratelast&lt; Type &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceromberg"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceromberg.html">romberg</a></td></tr>
+<tr class="memdesc:namespaceromberg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Univariate and multivariate numerical integration. <br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a980bb141c963b1cf20da450063c5c7d1"><td class="memTemplParams" colspan="2">template&lt;class Type , class F &gt; </td></tr>
+<tr class="memitem:a980bb141c963b1cf20da450063c5c7d1"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceromberg.html#a980bb141c963b1cf20da450063c5c7d1">romberg::integrate</a> (F f, Type a, Type b, int n=7, int p=2)</td></tr>
+<tr class="memdesc:a980bb141c963b1cf20da450063c5c7d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">1D numerical integration using Romberg's method.  <a href="#a980bb141c963b1cf20da450063c5c7d1">More...</a><br/></td></tr>
+<tr class="separator:a980bb141c963b1cf20da450063c5c7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d36e4248902ad63db1dbe35edd53a4f"><td class="memTemplParams" colspan="2">template&lt;class Type , class F &gt; </td></tr>
+<tr class="memitem:a8d36e4248902ad63db1dbe35edd53a4f"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceromberg.html#a8d36e4248902ad63db1dbe35edd53a4f">romberg::integrate_slice</a> (F &amp;f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x, int i, Type a, Type b, int n=7, int p=2)</td></tr>
+<tr class="separator:a8d36e4248902ad63db1dbe35edd53a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cfaa7e3c3f417fd4d29cde072dba544"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a9cfaa7e3c3f417fd4d29cde072dba544"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceromberg.html#a9cfaa7e3c3f417fd4d29cde072dba544">romberg::integrate_multi</a> (multivariate_integrand&lt; Type &gt; &amp;f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; a, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; b, int n=7, int p=2)</td></tr>
+<tr class="separator:a9cfaa7e3c3f417fd4d29cde072dba544"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71c323cd2dce5c8915428493518820f0"><td class="memTemplParams" colspan="2">template&lt;class Type , class F &gt; </td></tr>
+<tr class="memitem:a71c323cd2dce5c8915428493518820f0"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceromberg.html#a71c323cd2dce5c8915428493518820f0">romberg::integrate</a> (F f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; a, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; b, int n=7, int p=2)</td></tr>
+<tr class="memdesc:a71c323cd2dce5c8915428493518820f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-dimensional numerical integration using Romberg's method. Dimension need not be known at compile time.  <a href="#a71c323cd2dce5c8915428493518820f0">More...</a><br/></td></tr>
+<tr class="separator:a71c323cd2dce5c8915428493518820f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Defines TMB vectors. </p>
-<p>Array templates using inheritance.</p>
-
-<p>Definition in file <a class="el" href="vector_8cpp_source.html">vector.cpp</a>.</p>
-</div></div><!-- contents -->
+</div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

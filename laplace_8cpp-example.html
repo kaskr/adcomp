@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -113,8 +113,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">};</div>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type, <span class="keyword">class</span> Functor&gt;</div>
 <div class="line">Type laplace(Functor f, <a class="code" href="structvector.html">vector&lt;Type&gt;</a> &amp;u, <span class="keywordtype">int</span> niter){</div>
-<div class="line">  laplace_t&lt;Type, Functor&gt; <a name="a6"></a><a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(f, u, niter);</div>
-<div class="line">  <span class="keywordflow">return</span> <a class="code" href="splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>();</div>
+<div class="line">  laplace_t&lt;Type, Functor&gt; <a name="a6"></a><a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>(f, u, niter);</div>
+<div class="line">  <span class="keywordflow">return</span> <a class="code" href="splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53">L</a>();</div>
 <div class="line">}</div>
 <div class="line"></div>
 <div class="line"><span class="comment">/* The following is (almost) copy-pasted from the &#39;spatial&#39; example */</span></div>
@@ -123,7 +123,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  <span class="comment">/* Data and parameter objects for spatial example: */</span></div>
 <div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> y;</div>
-<div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a name="a7"></a><a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>;</div>
+<div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a name="a7"></a><a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>;</div>
 <div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> dd;</div>
 <div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> b;</div>
 <div class="line">  Type a;</div>
@@ -136,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">            <a class="code" href="structvector.html">vector&lt;Type&gt;</a> b_,</div>
 <div class="line">            Type a_,</div>
 <div class="line">            Type log_sigma_) :</div>
-<div class="line">    y(y_), <a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(X_), dd(dd_), b(b_),</div>
+<div class="line">    y(y_), <a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(X_), dd(dd_), b(b_),</div>
 <div class="line">    a(a_), log_sigma(log_sigma_) {}</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">/* Evaluate the negative joint log-likelihood as function of the</span></div>
@@ -146,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    <span class="keywordtype">int</span> n = u.size();</div>
 <div class="line">    T res=0;</div>
 <div class="line">    <a class="code" href="structvector.html">vector&lt;T&gt;</a> eta = T(exp(log_sigma)) * u;</div>
-<div class="line">    <a class="code" href="structvector.html">vector&lt;Type&gt;</a> mu = <a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a> * b;</div>
+<div class="line">    <a class="code" href="structvector.html">vector&lt;Type&gt;</a> mu = <a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a> * b;</div>
 <div class="line">    eta = eta + <a class="code" href="structvector.html">vector&lt;T&gt;</a>(mu);</div>
 <div class="line">    <a class="code" href="structmatrix.html">matrix&lt;T&gt;</a> cov(n,n); </div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0; i&lt;n; i++)</div>
@@ -173,7 +173,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">Type <a name="a9"></a><a class="code" href="classobjective__function.html#a789a65f93df89fa5bc1d992cd56d5c87">objective_function&lt;Type&gt;::operator() </a>()</div>
 <div class="line">{</div>
 <div class="line">  <a name="a10"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);</div>
-<div class="line">  <a name="a11"></a><a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(<a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>)</div>
+<div class="line">  <a name="a11"></a><a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(<a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>)</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(dd)</div>
 <div class="line">  <a name="a12"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(b);</div>
 <div class="line">  <a name="a13"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);</div>
@@ -181,7 +181,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  <span class="keywordtype">int</span> n = dd.rows();</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// Construct joint negative log-likelihood</span></div>
-<div class="line">  joint_nll&lt;Type&gt; jnll(y, <a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>, dd, b, a, log_sigma);</div>
+<div class="line">  joint_nll&lt;Type&gt; jnll(y, <a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>, dd, b, a, log_sigma);</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// Random effect initial guess</span></div>
 <div class="line">  <a class="code" href="structvector.html">vector</a>&lt;Type&gt; u(n);</div>

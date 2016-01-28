@@ -14,7 +14,7 @@ var searchData=
   ['integratelast',['integratelast',['../structromberg_1_1integratelast.html#aa2bab0acee972e3a1898e66e1c2bbc40',1,'romberg::integratelast']]],
   ['inv_5fincpl_5fgamma',['inv_incpl_gamma',['../namespaceatomic_1_1Rmath.html#a9c1a0bc7748a8034c82bec1b31b41670',1,'atomic::Rmath::inv_incpl_gamma()'],['../namespaceatomic.html#aca6bfb1722819752d1ad1084a6de6f27',1,'atomic::inv_incpl_gamma()']]],
   ['inverse',['inverse',['../structatomic_1_1Block.html#af0f4d2c08d11a281cd801bb50ca89bd6',1,'atomic::Block::inverse()'],['../structatomic_1_1Triangle.html#aa7fb925811a36ec3968e41dddc268f02',1,'atomic::Triangle::inverse()']]],
-  ['invertsparsematrix',['invertSparseMatrix',['../spmat_8cpp.html#a2c0d7d14234bc82952b502b16e7b0d2c',1,'invertSparseMatrix():&#160;spmat.cpp'],['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils::invertSparseMatrix()']]],
+  ['invertsparsematrix',['invertSparseMatrix',['../spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c',1,'invertSparseMatrix():&#160;spmat.hpp'],['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils::invertSparseMatrix()']]],
   ['invlogit',['invlogit',['../convenience_8hpp.html#a2dc0f0009cd46180a4d5ae56a6a45cfa',1,'convenience.hpp']]],
   ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]],
   ['isnumericscalar',['isNumericScalar',['../tmb__core_8hpp.html#a97ad962955cf39f52a021681cd0914c7',1,'tmb_core.hpp']]],

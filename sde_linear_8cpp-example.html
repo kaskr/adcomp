@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -103,9 +103,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">{</div>
 <div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(tsim);     <span class="comment">// Time points where X is simulated </span></div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(iobs);     <span class="comment">// Indeces into tsim where X is observed</span></div>
-<div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a name="a2"></a><a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>);        <span class="comment">// Observations taken. Must have same length as iobs.</span></div>
+<div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a name="a2"></a><a class="code" href="splines_8hpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>);        <span class="comment">// Observations taken. Must have same length as iobs.</span></div>
 <div class="line"></div>
-<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(<a name="a4"></a><a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>);   <span class="comment">// States at tsim. Length = length(tsim)</span></div>
+<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(<a name="a4"></a><a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>);   <span class="comment">// States at tsim. Length = length(tsim)</span></div>
 <div class="line">  <a name="a5"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(lambda);     <span class="comment">// Rate parameter in the SDE                                </span></div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logsX);      <span class="comment">// log(sigmaX) where sigmaX is noise intensity in the SDE   </span></div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logsY);      <span class="comment">// log(sigmaY) where sigmaY is std.dev. on measurement error</span></div>
@@ -122,13 +122,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"></div>
 <div class="line">  <span class="comment">// Include likelihood contributions from state transitions</span></div>
 <div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;<a class="code" href="group__R__style__distribution.html#ga77949bc788f3e51913c2257e65f6f4b4">dt</a>.size();i++){</div>
-<div class="line">    ans -= <a name="a8"></a><a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(i+1),<a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(i) + lambda*<a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(i)*<a class="code" href="group__R__style__distribution.html#ga77949bc788f3e51913c2257e65f6f4b4">dt</a>(i),sX*sqrt(<a class="code" href="group__R__style__distribution.html#ga77949bc788f3e51913c2257e65f6f4b4">dt</a>(i)),1);</div>
+<div class="line">    ans -= <a name="a8"></a><a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(i+1),<a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(i) + lambda*<a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(i)*<a class="code" href="group__R__style__distribution.html#ga77949bc788f3e51913c2257e65f6f4b4">dt</a>(i),sX*sqrt(<a class="code" href="group__R__style__distribution.html#ga77949bc788f3e51913c2257e65f6f4b4">dt</a>(i)),1);</div>
 <div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  <span class="comment">// Include likelihood contributions from measurements</span></div>
-<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;<a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>.size(); ++i){</div>
+<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;<a class="code" href="splines_8hpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>.size(); ++i){</div>
 <div class="line">    <span class="keywordtype">int</span> j=CppAD::Integer(iobs(i));</div>
-<div class="line">    ans-=<a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>(i),<a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(j),sY,1);</div>
+<div class="line">    ans-=<a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8hpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>(i),<a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>(j),sY,1);</div>
 <div class="line">  }</div>
 <div class="line"></div>
 <div class="line">  <span class="keywordflow">return</span> ans;</div>

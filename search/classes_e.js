@@ -10,6 +10,6 @@ var searchData=
   ['spde_5faniso_5ft',['spde_aniso_t',['../structR__inla_1_1spde__aniso__t.html',1,'R_inla']]],
   ['spde_5ft',['spde_t',['../structR__inla_1_1spde__t.html',1,'R_inla']]],
   ['sphess_5ft',['sphess_t',['../structsphess__t.html',1,'']]],
-  ['splinefun',['splinefun',['../classtmbutils_1_1splinefun.html',1,'tmbutils']]],
-  ['splinefun',['splinefun',['../classsplinefun.html',1,'']]]
+  ['splinefun',['splinefun',['../classsplinefun.html',1,'']]],
+  ['splinefun',['splinefun',['../classtmbutils_1_1splinefun.html',1,'tmbutils']]]
 ];

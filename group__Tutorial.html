@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
 <div class="line">Type <a class="code" href="classobjective__function.html#a789a65f93df89fa5bc1d992cd56d5c87">objective_function&lt;Type&gt;::operator() </a>()</div>
 <div class="line">{</div>
-<div class="line">.... Here goes your <a class="code" href="splines_8cpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a>++ code ..... </div>
+<div class="line">.... Here goes your <a class="code" href="splines_8hpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a>++ code ..... </div>
 <div class="line">}</div>
 </div><!-- fragment --><p> The first line includes the source code for the whole TMB package (and all its dependencies). The objective function is a templated class where <code>&lt;Type&gt;</code> is the data type of both the input values and the return value of the objective function. This allows us to evaluate both the objective function and its derivatives using the same chunk of C++ code (via the AD package <a href="http://www.coin-or.org/CppAD/Doc/doxydoc/html/index.html">CppAD</a>). The technical aspects of this are hidden from the user. There is however one aspect that surprises the new TMB user. When a constant like "1.2" is used in a calculation that affects the return value it must be "cast" to Type: </p>
 <div class="fragment"><div class="line">Type nll;            <span class="comment">// Define variable that holds the return value (neg. log. lik)</span></div>

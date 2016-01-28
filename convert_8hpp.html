@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -142,9 +142,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a5365728c1cfe93bc2e66da0afa22ccc7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert_8hpp.html#a5365728c1cfe93bc2e66da0afa22ccc7">asMatrix</a> (SEXP x)</td></tr>
 <tr class="memdesc:a5365728c1cfe93bc2e66da0afa22ccc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct c++-matrix from SEXP object.  <a href="#a5365728c1cfe93bc2e66da0afa22ccc7">More...</a><br/></td></tr>
 <tr class="separator:a5365728c1cfe93bc2e66da0afa22ccc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cfb8af8da3197cb4f2b0841eec1e6da"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
-<tr class="memitem:a0cfb8af8da3197cb4f2b0841eec1e6da"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structvector.html">vector</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert_8hpp.html#a0cfb8af8da3197cb4f2b0841eec1e6da">asVector</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
-<tr class="separator:a0cfb8af8da3197cb4f2b0841eec1e6da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1fa4dc7facc0003e3436604a0ab2d87"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:ab1fa4dc7facc0003e3436604a0ab2d87"><td class="memTemplItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert_8hpp.html#ab1fa4dc7facc0003e3436604a0ab2d87">asSEXP</a> (const <a class="el" href="structtmbutils_1_1array.html">tmbutils::array</a>&lt; Type &gt; &amp;a)</td></tr>
 <tr class="separator:ab1fa4dc7facc0003e3436604a0ab2d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,7 +167,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">SEXP <a class="code" href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">vector&lt;Type&gt;</a> &amp;a)                      \</div>
+<b>Value:</b><div class="fragment"><div class="line">SEXP <a class="code" href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP</a>(<span class="keyword">const</span> <a class="code" href="structvector.html">vector&lt;Type&gt;</a> &amp;a) <a class="code" href="TMB_8hpp.html#a771c631455493302399deab7ac2fd072">CSKIP</a>(               \</div>
 <div class="line">{                                                       \</div>
 <div class="line">  int size = a.size();                                  \</div>
 <div class="line">  SEXP val;                                             \</div>
@@ -179,12 +176,13 @@ Functions</h2></td></tr>
 <div class="line">  for (<span class="keywordtype">int</span> i = 0; i &lt; size; i++) p[i] = <a class="code" href="convert_8hpp.html#a5358c4894e89c852d7d13e0f465406e7">asDouble</a>(a[i]); \</div>
 <div class="line">  UNPROTECT(1);                                         \</div>
 <div class="line">  return val;                                           \</div>
-<div class="line">}</div>
-<div class="ttc" id="structvector_html"><div class="ttname"><a href="structvector.html">vector</a></div><div class="ttdoc">Vector class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8cpp_source.html#l00017">vector.cpp:17</a></div></div>
-<div class="ttc" id="convert_8hpp_html_a5358c4894e89c852d7d13e0f465406e7"><div class="ttname"><a href="convert_8hpp.html#a5358c4894e89c852d7d13e0f465406e7">asDouble</a></div><div class="ttdeci">double asDouble(int x)</div><div class="ttdef"><b>Definition:</b> <a href="convert_8hpp_source.html#l00008">convert.hpp:8</a></div></div>
-<div class="ttc" id="convert_8hpp_html_a6f1c440f99cb8ec0ea3a65dfe5778a70"><div class="ttname"><a href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP</a></div><div class="ttdeci">SEXP asSEXP(const matrix&lt; Type &gt; &amp;a)</div><div class="ttdoc">Convert TMB matrix, vector, scalar or int to R style. </div><div class="ttdef"><b>Definition:</b> <a href="convert_8hpp_source.html#l00016">convert.hpp:16</a></div></div>
+<div class="line">})</div>
+<div class="ttc" id="structvector_html"><div class="ttname"><a href="structvector.html">vector</a></div><div class="ttdoc">Vector class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8hpp_source.html#l00017">vector.hpp:17</a></div></div>
+<div class="ttc" id="TMB_8hpp_html_a771c631455493302399deab7ac2fd072"><div class="ttname"><a href="TMB_8hpp.html#a771c631455493302399deab7ac2fd072">CSKIP</a></div><div class="ttdeci">#define CSKIP(x)</div><div class="ttdef"><b>Definition:</b> <a href="TMB_8hpp_source.html#l00084">TMB.hpp:84</a></div></div>
+<div class="ttc" id="convert_8hpp_html_a5358c4894e89c852d7d13e0f465406e7"><div class="ttname"><a href="convert_8hpp.html#a5358c4894e89c852d7d13e0f465406e7">asDouble</a></div><div class="ttdeci">double asDouble(int x)</div><div class="ttdef"><b>Definition:</b> <a href="convert_8hpp_source.html#l00015">convert.hpp:15</a></div></div>
+<div class="ttc" id="convert_8hpp_html_a6f1c440f99cb8ec0ea3a65dfe5778a70"><div class="ttname"><a href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP</a></div><div class="ttdeci">SEXP asSEXP(const matrix&lt; Type &gt; &amp;a)</div><div class="ttdoc">Convert TMB matrix, vector, scalar or int to R style. </div><div class="ttdef"><b>Definition:</b> <a href="convert_8hpp_source.html#l00024">convert.hpp:24</a></div></div>
 </div><!-- fragment -->
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00036">36</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00044">44</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -203,7 +201,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00008">8</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00015">15</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP()</a>.</p>
 
@@ -223,7 +221,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00009">9</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00016">16</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -241,7 +239,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00010">10</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00017">17</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +257,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00011">11</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00018">18</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +275,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00012">12</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00019">19</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -315,7 +313,7 @@ template&lt;class Type &gt; </div>
 
 <p>Vector &lt;-&gt; Matrix conversion (for row-major matrices) </p>
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00099">99</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00107">107</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="tmb__core_8hpp.html#a792d73c7234029877e68b869ce4312b7">EvalADFunObjectTemplate()</a>, <a class="el" href="tmb__core_8hpp.html#a8891e29375f43f9aa9d8a91db9604417">HessianSparsityPattern()</a>, <a class="el" href="structautodiff_1_1hessian__t.html#a19a62d4612a1d5bc14ae05a244532227">autodiff::hessian_t&lt; Functor, Type &gt;::operator()()</a>, and <a class="el" href="structautodiff_1_1jacobian__t.html#af04e9d848a936ddfa95bace94e8a613c">autodiff::jacobian_t&lt; Functor, Type &gt;::operator()()</a>.</p>
 
@@ -339,7 +337,7 @@ template&lt;class Type &gt; </div>
 
 <p>Construct c++-matrix from SEXP object. </p>
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00112">112</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00120">120</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -361,9 +359,9 @@ template&lt;class Type &gt; </div>
 
 <p>Convert TMB matrix, vector, scalar or int to R style. </p>
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00016">16</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00024">24</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="convert_8hpp.html#a798f4453cb80f4850404b2ef20360fa4">asSEXP()</a>, <a class="el" href="convert_8hpp.html#a63250c2b56f8a8968f566e00c6e2e048">asSEXP_VECTOR_OF_NUMERIC()</a>, and <a class="el" href="structconfig__struct.html#a05b93db6d0ebfc12277020baa2825c4f">config_struct::set()</a>.</p>
+<p>Referenced by <a class="el" href="convert_8hpp.html#a798f4453cb80f4850404b2ef20360fa4">asSEXP()</a>, and <a class="el" href="convert_8hpp.html#a63250c2b56f8a8968f566e00c6e2e048">asSEXP_VECTOR_OF_NUMERIC()</a>.</p>
 
 </div>
 </div>
@@ -381,8 +379,6 @@ template&lt;class Type &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00064">64</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="ae0d83773e8faff946e92e426ddee3d74"></a>
@@ -398,8 +394,6 @@ template&lt;class Type &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00072">72</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +413,7 @@ template&lt;class Type &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00082">82</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00090">90</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +433,7 @@ template&lt;class Type &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00138">138</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00133">133</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -460,7 +454,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Create R-triplet sparse matrix from Eigen sparse matrix </p>
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00154">154</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00149">149</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -478,7 +472,7 @@ template&lt;class Type &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00047">47</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00055">55</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>
@@ -500,27 +494,7 @@ template&lt;class Type &gt; </div>
 
 <p>Construct c++-vector from SEXP object. </p>
 
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00088">88</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a0cfb8af8da3197cb4f2b0841eec1e6da"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class Type &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structvector.html">vector</a>&lt;Type&gt; asVector </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00126">126</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00096">96</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>

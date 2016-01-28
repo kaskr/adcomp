@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: spmat.cpp Source File</title>
+<title>TMB Documentation: spmat.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,14 +88,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">spmat.cpp</div>  </div>
+<div class="title">spmat.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="spmat_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
+<a href="spmat_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// License: GPL-2</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="spmat_8cpp.html#aa2a5e7ae910861355b49de4aff129f3d">   10</a></span>&#160;Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="spmat_8cpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(SEXP <a class="code" href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>){</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="spmat_8hpp.html#aa2a5e7ae910861355b49de4aff129f3d">   10</a></span>&#160;Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="spmat_8hpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(SEXP <a class="code" href="splines_8hpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a>){</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keywordtype">int</span> *i=INTEGER(R_do_slot(M,install(<span class="stringliteral">&quot;i&quot;</span>)));</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keywordtype">int</span> *j=INTEGER(R_do_slot(M,install(<span class="stringliteral">&quot;j&quot;</span>)));</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <span class="keywordtype">double</span> *x=REAL(R_do_slot(M,install(<span class="stringliteral">&quot;x&quot;</span>)));</div>
@@ -112,7 +112,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;}</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="spmat_8cpp.html#adb9cbaba054f25f5c89bed309b073043">   28</a></span>&#160;Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="spmat_8cpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> x){</div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="spmat_8hpp.html#adb9cbaba054f25f5c89bed309b073043">   28</a></span>&#160;Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="spmat_8hpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> x){</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">typedef</span> Eigen::Triplet&lt;Type&gt; T;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  std::vector&lt;T&gt; tripletList;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;x.rows();i++)</div>
@@ -125,7 +125,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="spmat_8cpp.html#a0b7fcb06e66a327cd6d643751fc0105f">   42</a></span>&#160;Eigen::SparseVector&lt;Type&gt; <a class="code" href="spmat_8cpp.html#a0b7fcb06e66a327cd6d643751fc0105f">asSparseVector</a>(<a class="code" href="structvector.html">vector&lt;Type&gt;</a> x){</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="spmat_8hpp.html#a0b7fcb06e66a327cd6d643751fc0105f">   42</a></span>&#160;Eigen::SparseVector&lt;Type&gt; <a class="code" href="spmat_8hpp.html#a0b7fcb06e66a327cd6d643751fc0105f">asSparseVector</a>(<a class="code" href="structvector.html">vector&lt;Type&gt;</a> x){</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">typedef</span> Eigen::Triplet&lt;Type&gt; T;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  std::vector&lt;T&gt; tripletList;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  Eigen::SparseVector&lt;Type&gt; mat(x.rows());</div>
@@ -136,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="spmat_8cpp.html#af43dbf52967d09b7f44a4f3b4236db60">   54</a></span>&#160;Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="spmat_8cpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a>(Eigen::SparseMatrix&lt;Type&gt; x,</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60">   54</a></span>&#160;Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a>(Eigen::SparseMatrix&lt;Type&gt; x,</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                                    Eigen::SparseMatrix&lt;Type&gt; y){</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">typedef</span> Eigen::Triplet&lt;Type&gt; T;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> Eigen::SparseMatrix&lt;Type&gt;::InnerIterator Iterator;</div>
@@ -162,23 +162,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="spmat_8cpp.html#a6a009c282b3344fdf5e03a09d22e6673">   81</a></span>&#160;<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a class="code" href="spmat_8cpp.html#a6a009c282b3344fdf5e03a09d22e6673">discrLyap</a>(<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> A_){</div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="spmat_8hpp.html#a6a009c282b3344fdf5e03a09d22e6673">   81</a></span>&#160;<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a class="code" href="spmat_8hpp.html#a6a009c282b3344fdf5e03a09d22e6673">discrLyap</a>(<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> A_){</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> I_(A_.rows(),A_.cols());</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  I_.setIdentity();</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="comment">/* Sparse representations */</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="splines_8cpp.html#a955f504eccf76b4eb2489c0adab03121">A</a>=<a class="code" href="spmat_8cpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(A_);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; I=<a class="code" href="spmat_8cpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(I_);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="splines_8hpp.html#a955f504eccf76b4eb2489c0adab03121">A</a>=<a class="code" href="spmat_8hpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(A_);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; I=<a class="code" href="spmat_8hpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a>(I_);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="comment">/* Kronecker */</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; AxA=<a class="code" href="spmat_8cpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a>(A,A);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; IxI=<a class="code" href="spmat_8cpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a>(I,I);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; AxA=<a class="code" href="spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a>(A,A);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; IxI=<a class="code" href="spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a>(I,I);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> vecI=I_.<a class="code" href="structmatrix.html#aff2bcb64bc91137b9635369a6cee82b6">vec</a>().matrix();</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="splines_8cpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a>=IxI-AxA;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="splines_8hpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a>=IxI-AxA;</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="comment">/* Solve system C*vecV=vecI.</span></div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">     Note: No assumptions on symmetry or eigenvalue-range of C. Therefore </span></div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">     rewrite it as (C&#39;*C)*vecV=(C*vecI). Since (C&#39;*C) is symmetric, the </span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">     LDL&#39;-factorization can be applied.</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">   */</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  Eigen::SimplicialLDLT&lt; Eigen::SparseMatrix&lt;Type&gt; &gt; ldlt(C.transpose()*<a class="code" href="splines_8cpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a>);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  Eigen::SimplicialLDLT&lt; Eigen::SparseMatrix&lt;Type&gt; &gt; ldlt(C.transpose()*<a class="code" href="splines_8hpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a>);</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> z = ldlt.solve(C.transpose()*vecI);</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> V(A_.rows(),A_.cols());</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;z.size();i++)V(i)=z(i);</div>
@@ -186,24 +186,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="line"><a name="l00106"></a><span class="lineno"><a class="line" href="spmat_8cpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">  106</a></span>&#160;<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a class="code" href="spmat_8cpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">invertSparseMatrix</a>(Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="splines_8cpp.html#a955f504eccf76b4eb2489c0adab03121">A</a>){</div>
+<div class="line"><a name="l00106"></a><span class="lineno"><a class="line" href="spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">  106</a></span>&#160;<a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> <a class="code" href="spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">invertSparseMatrix</a>(Eigen::SparseMatrix&lt;Type&gt; <a class="code" href="splines_8hpp.html#a955f504eccf76b4eb2489c0adab03121">A</a>){</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> I(A.rows(),A.cols());</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  I.setIdentity();</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  Eigen::SimplicialLDLT&lt; Eigen::SparseMatrix&lt;Type&gt; &gt; ldlt(A);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> ans = ldlt.solve(I);</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">return</span> ans;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
-<div class="ttc" id="structvector_html"><div class="ttname"><a href="structvector.html">vector</a></div><div class="ttdoc">Vector class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8cpp_source.html#l00017">vector.cpp:17</a></div></div>
-<div class="ttc" id="splines_8cpp_html_ac4cf4b2ab929bd23951a8676eeac086b"><div class="ttname"><a href="splines_8cpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a></div><div class="ttdeci">#define C</div></div>
-<div class="ttc" id="spmat_8cpp_html_aa2a5e7ae910861355b49de4aff129f3d"><div class="ttname"><a href="spmat_8cpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a></div><div class="ttdeci">Eigen::SparseMatrix&lt; Type &gt; asSparseMatrix(SEXP M)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8cpp_source.html#l00010">spmat.cpp:10</a></div></div>
-<div class="ttc" id="structmatrix_html"><div class="ttname"><a href="structmatrix.html">matrix</a></div><div class="ttdoc">Matrix class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8cpp_source.html#l00084">vector.cpp:84</a></div></div>
-<div class="ttc" id="spmat_8cpp_html_a0b7fcb06e66a327cd6d643751fc0105f"><div class="ttname"><a href="spmat_8cpp.html#a0b7fcb06e66a327cd6d643751fc0105f">asSparseVector</a></div><div class="ttdeci">Eigen::SparseVector&lt; Type &gt; asSparseVector(vector&lt; Type &gt; x)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8cpp_source.html#l00042">spmat.cpp:42</a></div></div>
-<div class="ttc" id="spmat_8cpp_html_a6a009c282b3344fdf5e03a09d22e6673"><div class="ttname"><a href="spmat_8cpp.html#a6a009c282b3344fdf5e03a09d22e6673">discrLyap</a></div><div class="ttdeci">matrix&lt; Type &gt; discrLyap(matrix&lt; Type &gt; A_)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8cpp_source.html#l00081">spmat.cpp:81</a></div></div>
-<div class="ttc" id="splines_8cpp_html_a52037c938e3c1b126c6277da5ca689d0"><div class="ttname"><a href="splines_8cpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a></div><div class="ttdeci">#define M</div></div>
-<div class="ttc" id="splines_8cpp_html_a955f504eccf76b4eb2489c0adab03121"><div class="ttname"><a href="splines_8cpp.html#a955f504eccf76b4eb2489c0adab03121">A</a></div><div class="ttdeci">#define A</div></div>
-<div class="ttc" id="namespaceCppAD_html_ac0341bc688bd2855d425a6355221e6c5"><div class="ttname"><a href="namespaceCppAD.html#ac0341bc688bd2855d425a6355221e6c5">CppAD::Variable</a></div><div class="ttdeci">bool Variable(double x)</div><div class="ttdef"><b>Definition:</b> <a href="TMB_8hpp_source.html#l00050">TMB.hpp:50</a></div></div>
-<div class="ttc" id="spmat_8cpp_html_a2c0d7d14234bc82952b502b16e7b0d2c"><div class="ttname"><a href="spmat_8cpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">invertSparseMatrix</a></div><div class="ttdeci">matrix&lt; Type &gt; invertSparseMatrix(Eigen::SparseMatrix&lt; Type &gt; A)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8cpp_source.html#l00106">spmat.cpp:106</a></div></div>
-<div class="ttc" id="spmat_8cpp_html_af43dbf52967d09b7f44a4f3b4236db60"><div class="ttname"><a href="spmat_8cpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a></div><div class="ttdeci">Eigen::SparseMatrix&lt; Type &gt; kronecker(Eigen::SparseMatrix&lt; Type &gt; x, Eigen::SparseMatrix&lt; Type &gt; y)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8cpp_source.html#l00054">spmat.cpp:54</a></div></div>
-<div class="ttc" id="structmatrix_html_aff2bcb64bc91137b9635369a6cee82b6"><div class="ttname"><a href="structmatrix.html#aff2bcb64bc91137b9635369a6cee82b6">matrix::vec</a></div><div class="ttdeci">vector&lt; Type &gt; vec()</div><div class="ttdef"><b>Definition:</b> <a href="vector_8cpp_source.html#l00103">vector.cpp:103</a></div></div>
+<div class="ttc" id="structvector_html"><div class="ttname"><a href="structvector.html">vector</a></div><div class="ttdoc">Vector class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8hpp_source.html#l00017">vector.hpp:17</a></div></div>
+<div class="ttc" id="splines_8hpp_html_a955f504eccf76b4eb2489c0adab03121"><div class="ttname"><a href="splines_8hpp.html#a955f504eccf76b4eb2489c0adab03121">A</a></div><div class="ttdeci">#define A</div></div>
+<div class="ttc" id="splines_8hpp_html_a52037c938e3c1b126c6277da5ca689d0"><div class="ttname"><a href="splines_8hpp.html#a52037c938e3c1b126c6277da5ca689d0">M</a></div><div class="ttdeci">#define M</div></div>
+<div class="ttc" id="spmat_8hpp_html_a6a009c282b3344fdf5e03a09d22e6673"><div class="ttname"><a href="spmat_8hpp.html#a6a009c282b3344fdf5e03a09d22e6673">discrLyap</a></div><div class="ttdeci">matrix&lt; Type &gt; discrLyap(matrix&lt; Type &gt; A_)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8hpp_source.html#l00081">spmat.hpp:81</a></div></div>
+<div class="ttc" id="structmatrix_html"><div class="ttname"><a href="structmatrix.html">matrix</a></div><div class="ttdoc">Matrix class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="vector_8hpp_source.html#l00084">vector.hpp:84</a></div></div>
+<div class="ttc" id="spmat_8hpp_html_a2c0d7d14234bc82952b502b16e7b0d2c"><div class="ttname"><a href="spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">invertSparseMatrix</a></div><div class="ttdeci">matrix&lt; Type &gt; invertSparseMatrix(Eigen::SparseMatrix&lt; Type &gt; A)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8hpp_source.html#l00106">spmat.hpp:106</a></div></div>
+<div class="ttc" id="spmat_8hpp_html_af43dbf52967d09b7f44a4f3b4236db60"><div class="ttname"><a href="spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a></div><div class="ttdeci">Eigen::SparseMatrix&lt; Type &gt; kronecker(Eigen::SparseMatrix&lt; Type &gt; x, Eigen::SparseMatrix&lt; Type &gt; y)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8hpp_source.html#l00054">spmat.hpp:54</a></div></div>
+<div class="ttc" id="namespaceCppAD_html_ac0341bc688bd2855d425a6355221e6c5"><div class="ttname"><a href="namespaceCppAD.html#ac0341bc688bd2855d425a6355221e6c5">CppAD::Variable</a></div><div class="ttdeci">bool Variable(double x)</div></div>
+<div class="ttc" id="spmat_8hpp_html_a0b7fcb06e66a327cd6d643751fc0105f"><div class="ttname"><a href="spmat_8hpp.html#a0b7fcb06e66a327cd6d643751fc0105f">asSparseVector</a></div><div class="ttdeci">Eigen::SparseVector&lt; Type &gt; asSparseVector(vector&lt; Type &gt; x)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8hpp_source.html#l00042">spmat.hpp:42</a></div></div>
+<div class="ttc" id="splines_8hpp_html_ac4cf4b2ab929bd23951a8676eeac086b"><div class="ttname"><a href="splines_8hpp.html#ac4cf4b2ab929bd23951a8676eeac086b">C</a></div><div class="ttdeci">#define C</div></div>
+<div class="ttc" id="spmat_8hpp_html_aa2a5e7ae910861355b49de4aff129f3d"><div class="ttname"><a href="spmat_8hpp.html#aa2a5e7ae910861355b49de4aff129f3d">asSparseMatrix</a></div><div class="ttdeci">Eigen::SparseMatrix&lt; Type &gt; asSparseMatrix(SEXP M)</div><div class="ttdef"><b>Definition:</b> <a href="spmat_8hpp_source.html#l00010">spmat.hpp:10</a></div></div>
+<div class="ttc" id="structmatrix_html_aff2bcb64bc91137b9635369a6cee82b6"><div class="ttname"><a href="structmatrix.html#aff2bcb64bc91137b9635369a6cee82b6">matrix::vec</a></div><div class="ttdeci">vector&lt; Type &gt; vec()</div><div class="ttdef"><b>Definition:</b> <a href="vector_8hpp_source.html#l00103">vector.hpp:103</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

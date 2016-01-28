@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -149,24 +149,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordflow">return</span> c ;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div>
 <div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="classRstreambuf.html#ab4c14fe65c18c33d7bfaa5f7f68a8aad">   58</a></span>&#160;<span class="keyword">template</span> &lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">int</span> <a class="code" href="classRstreambuf.html#a575776d918201a31332462a150eae7b9">Rstreambuf&lt;true&gt;::sync</a>(){</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  ::R_FlushConsole() ;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">//::R_FlushConsole() ;</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="keywordflow">return</span> 0 ;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;}</div>
 <div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classRstreambuf.html#aa3d46fc2912555daa8f23e05fc824c33">   62</a></span>&#160;<span class="keyword">template</span> &lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">int</span> <a class="code" href="classRstreambuf.html#a575776d918201a31332462a150eae7b9">Rstreambuf&lt;false&gt;::sync</a>(){</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  ::R_FlushConsole() ;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">//::R_FlushConsole() ;</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordflow">return</span> 0 ;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;}</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="Rstream_8hpp.html#a9e88e81b80878667a7808988c0e8ee2c">   66</a></span>&#160;<a class="code" href="classRostream.html">Rostream&lt;true&gt;</a>  <a class="code" href="Rstream_8hpp.html#a9e88e81b80878667a7808988c0e8ee2c">Rcout</a>;</div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="Rstream_8hpp.html#a7246be3aae342730334dc3251f75ce9e">   67</a></span>&#160;<a class="code" href="classRostream.html">Rostream&lt;false&gt;</a> <a class="code" href="Rstream_8hpp.html#a7246be3aae342730334dc3251f75ce9e">Rcerr</a>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="Rstream_8hpp.html#a6b633fa19d0213c323961f42355058af">   66</a></span>&#160;<a class="code" href="TMB_8hpp.html#a148f6b931612eca11ce455b94b2a498b">TMB_EXTERN</a> <a class="code" href="classRostream.html">Rostream&lt;true&gt;</a>  <a class="code" href="Rstream_8hpp.html#a6b633fa19d0213c323961f42355058af">Rcout</a>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="Rstream_8hpp.html#ae9a464ed8e332f2bbf2b174a86832715">   67</a></span>&#160;<a class="code" href="TMB_8hpp.html#a148f6b931612eca11ce455b94b2a498b">TMB_EXTERN</a> <a class="code" href="classRostream.html">Rostream&lt;false&gt;</a> <a class="code" href="Rstream_8hpp.html#ae9a464ed8e332f2bbf2b174a86832715">Rcerr</a>;</div>
 <div class="ttc" id="classRstreambuf_html_a575776d918201a31332462a150eae7b9"><div class="ttname"><a href="classRstreambuf.html#a575776d918201a31332462a150eae7b9">Rstreambuf::sync</a></div><div class="ttdeci">virtual int sync()</div></div>
+<div class="ttc" id="Rstream_8hpp_html_ae9a464ed8e332f2bbf2b174a86832715"><div class="ttname"><a href="Rstream_8hpp.html#ae9a464ed8e332f2bbf2b174a86832715">Rcerr</a></div><div class="ttdeci">TMB_EXTERN Rostream&lt; false &gt; Rcerr</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00067">Rstream.hpp:67</a></div></div>
+<div class="ttc" id="Rstream_8hpp_html_a6b633fa19d0213c323961f42355058af"><div class="ttname"><a href="Rstream_8hpp.html#a6b633fa19d0213c323961f42355058af">Rcout</a></div><div class="ttdeci">TMB_EXTERN Rostream&lt; true &gt; Rcout</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00066">Rstream.hpp:66</a></div></div>
 <div class="ttc" id="classRstreambuf_html_ae44703998613f9ab93657debf0bd6d14"><div class="ttname"><a href="classRstreambuf.html#ae44703998613f9ab93657debf0bd6d14">Rstreambuf::xsputn</a></div><div class="ttdeci">virtual std::streamsize xsputn(const char *s, std::streamsize n)</div></div>
 <div class="ttc" id="classRstreambuf_html_a55571d104659fab7868f8ee596f92aeb"><div class="ttname"><a href="classRstreambuf.html#a55571d104659fab7868f8ee596f92aeb">Rstreambuf::overflow</a></div><div class="ttdeci">virtual int overflow(int c=EOF)</div></div>
 <div class="ttc" id="classRostream_html_a4272ef1621c5ee5eedfbb55aec561d11"><div class="ttname"><a href="classRostream.html#a4272ef1621c5ee5eedfbb55aec561d11">Rostream::Rostream</a></div><div class="ttdeci">Rostream()</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00030">Rstream.hpp:30</a></div></div>
 <div class="ttc" id="classRostream_html_a242f26b5709952b7b8805bb076f4f306"><div class="ttname"><a href="classRostream.html#a242f26b5709952b7b8805bb076f4f306">Rostream::~Rostream</a></div><div class="ttdeci">~Rostream()</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00034">Rstream.hpp:34</a></div></div>
-<div class="ttc" id="Rstream_8hpp_html_a7246be3aae342730334dc3251f75ce9e"><div class="ttname"><a href="Rstream_8hpp.html#a7246be3aae342730334dc3251f75ce9e">Rcerr</a></div><div class="ttdeci">Rostream&lt; false &gt; Rcerr</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00067">Rstream.hpp:67</a></div></div>
 <div class="ttc" id="classRstreambuf_html"><div class="ttname"><a href="classRstreambuf.html">Rstreambuf</a></div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00015">Rstream.hpp:15</a></div></div>
 <div class="ttc" id="classRstreambuf_html_a190f2652407a135feabfe977635d92db"><div class="ttname"><a href="classRstreambuf.html#a190f2652407a135feabfe977635d92db">Rstreambuf::Rstreambuf</a></div><div class="ttdeci">Rstreambuf()</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00017">Rstream.hpp:17</a></div></div>
-<div class="ttc" id="Rstream_8hpp_html_a9e88e81b80878667a7808988c0e8ee2c"><div class="ttname"><a href="Rstream_8hpp.html#a9e88e81b80878667a7808988c0e8ee2c">Rcout</a></div><div class="ttdeci">Rostream&lt; true &gt; Rcout</div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00066">Rstream.hpp:66</a></div></div>
+<div class="ttc" id="TMB_8hpp_html_a148f6b931612eca11ce455b94b2a498b"><div class="ttname"><a href="TMB_8hpp.html#a148f6b931612eca11ce455b94b2a498b">TMB_EXTERN</a></div><div class="ttdeci">#define TMB_EXTERN</div><div class="ttdef"><b>Definition:</b> <a href="TMB_8hpp_source.html#l00017">TMB.hpp:17</a></div></div>
 <div class="ttc" id="classRostream_html"><div class="ttname"><a href="classRostream.html">Rostream</a></div><div class="ttdef"><b>Definition:</b> <a href="Rstream_8hpp_source.html#l00026">Rstream.hpp:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

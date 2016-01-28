@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: tmbutils_extra.cpp Source File</title>
+<title>TMB Documentation: tmbutils_extra.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,26 +88,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">tmbutils_extra.cpp</div>  </div>
+<div class="title">tmbutils_extra.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="tmbutils__extra_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
+<a href="tmbutils__extra_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2013-2015 Kasper Kristensen</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// License: GPL-2</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="keyword">namespace </span>tmbutils{</div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// Convenience utilites</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="spmat_8cpp.html">spmat.cpp</a>&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="kronecker_8cpp.html">kronecker.cpp</a>&quot;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="matexp_8cpp.html">matexp.cpp</a>&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="splines_8cpp.html">splines.cpp</a>&quot;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="density_8cpp.html#a169e667abcb74d3c7ecd5a7b1784217b">   10</a></span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="order_8cpp.html">order.cpp</a>&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="spmat_8hpp.html">spmat.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="kronecker_8hpp.html">kronecker.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="matexp_8hpp.html">matexp.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="splines_8hpp.html">splines.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="density_8hpp.html#a169e667abcb74d3c7ecd5a7b1784217b">   10</a></span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="order_8hpp.html">order.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="namespacetmbutils.html#a8c968627c02f3bc076ae767e726d2221">   11</a></span>&#160;</div>
 <div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="structtmbutils_1_1matexp.html">   12</a></span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Type, <span class="keyword">class</span> T1, <span class="keyword">class</span> T2&gt;</div>
 <div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="namespacetmbutils.html#a0e8cedd4650787dd2c86f44bf5d04331">   13</a></span>&#160;<a class="code" href="structtmbutils_1_1vector.html">vector&lt;Type&gt;</a> <a class="code" href="namespacetmbutils.html#a0e8cedd4650787dd2c86f44bf5d04331">dnorm</a>(<a class="code" href="structtmbutils_1_1vector.html">vector&lt;Type&gt;</a> x, T1 mean, T2 sd, <span class="keywordtype">int</span> give_log=0)</div>
 <div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="structtmbutils_1_1matexp.html#adaf1a628e2e05ca5712ee30f3e055418">   14</a></span>&#160;{</div>
 <div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structtmbutils_1_1matexp.html#abbc4d37eaa5c1f69f64737a161acf1dc">   15</a></span>&#160;  <a class="code" href="structtmbutils_1_1vector.html">vector&lt;Type&gt;</a> logres;</div>
 <div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structtmbutils_1_1matexp.html#ab9d8d47ec88aab500d964b07eafa5e6f">   16</a></span>&#160;  x=(x-mean)/sd;</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="density_8cpp.html#a7556f14c984e15e48d54a25ca8b6b53a">   17</a></span>&#160;  logres=-log(Type(sqrt(2*M_PI))*sd)-Type(.5)*x*x;</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="density_8hpp.html#a7556f14c984e15e48d54a25ca8b6b53a">   17</a></span>&#160;  logres=-log(Type(sqrt(2*M_PI))*sd)-Type(.5)*x*x;</div>
 <div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="structtmbutils_1_1matexp.html#a9afe07191c4f6d202a6e1094eec02d83">   18</a></span>&#160;  <span class="keywordflow">if</span>(give_log)<span class="keywordflow">return</span> logres; <span class="keywordflow">else</span> <span class="keywordflow">return</span> exp(logres);</div>
 <div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classtmbutils_1_1order.html#aabdc21f70c1d6d7a9324f59a8ad390da">   19</a></span>&#160;}</div>
 <div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classtmbutils_1_1order.html#aac72a0434bef79bb909c02f3574ee600">   20</a></span>&#160;</div>
@@ -115,20 +115,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
 <div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="namespacedensity.html">   30</a></span>&#160;<span class="keyword">namespace </span>density{</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">using namespace </span>tmbutils;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="density_8cpp.html">density.cpp</a>&quot;</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="density_8hpp.html">density.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;} <span class="comment">// End namespace</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="romberg_8cpp.html">romberg.cpp</a>&quot;</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classdensity_1_1MVNORM__t.html">   36</a></span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="autodiff_8cpp.html">autodiff.cpp</a>&quot;</span></div>
-<div class="ttc" id="romberg_8cpp_html"><div class="ttname"><a href="romberg_8cpp.html">romberg.cpp</a></div></div>
-<div class="ttc" id="splines_8cpp_html"><div class="ttname"><a href="splines_8cpp.html">splines.cpp</a></div></div>
-<div class="ttc" id="matexp_8cpp_html"><div class="ttname"><a href="matexp_8cpp.html">matexp.cpp</a></div><div class="ttdoc">Matrix exponential. </div></div>
-<div class="ttc" id="namespacetmbutils_html_a0e8cedd4650787dd2c86f44bf5d04331"><div class="ttname"><a href="namespacetmbutils.html#a0e8cedd4650787dd2c86f44bf5d04331">tmbutils::dnorm</a></div><div class="ttdeci">vector&lt; Type &gt; dnorm(vector&lt; Type &gt; x, T1 mean, T2 sd, int give_log=0)</div><div class="ttdef"><b>Definition:</b> <a href="tmbutils__extra_8cpp_source.html#l00013">tmbutils_extra.cpp:13</a></div></div>
-<div class="ttc" id="order_8cpp_html"><div class="ttname"><a href="order_8cpp.html">order.cpp</a></div><div class="ttdoc">&quot;Differentiable&quot; sorting of a vector. </div></div>
-<div class="ttc" id="density_8cpp_html"><div class="ttname"><a href="density_8cpp.html">density.cpp</a></div><div class="ttdoc">Classes to construct multivariate Gaussian density objects. </div></div>
-<div class="ttc" id="structtmbutils_1_1vector_html"><div class="ttname"><a href="structtmbutils_1_1vector.html">tmbutils::vector</a></div><div class="ttdoc">Vector class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="tmbutils_8cpp_source.html#l00018">tmbutils.cpp:18</a></div></div>
-<div class="ttc" id="autodiff_8cpp_html"><div class="ttname"><a href="autodiff_8cpp.html">autodiff.cpp</a></div></div>
-<div class="ttc" id="spmat_8cpp_html"><div class="ttname"><a href="spmat_8cpp.html">spmat.cpp</a></div><div class="ttdoc">Extends Eigen::SparseMatrix class. </div></div>
-<div class="ttc" id="kronecker_8cpp_html"><div class="ttname"><a href="kronecker_8cpp.html">kronecker.cpp</a></div><div class="ttdoc">Kronecker product of two matrices. </div></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="romberg_8hpp.html">romberg.hpp</a>&quot;</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classdensity_1_1MVNORM__t.html">   36</a></span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="autodiff_8hpp.html">autodiff.hpp</a>&quot;</span></div>
+<div class="ttc" id="romberg_8hpp_html"><div class="ttname"><a href="romberg_8hpp.html">romberg.hpp</a></div></div>
+<div class="ttc" id="splines_8hpp_html"><div class="ttname"><a href="splines_8hpp.html">splines.hpp</a></div></div>
+<div class="ttc" id="matexp_8hpp_html"><div class="ttname"><a href="matexp_8hpp.html">matexp.hpp</a></div><div class="ttdoc">Matrix exponential. </div></div>
+<div class="ttc" id="namespacetmbutils_html_a0e8cedd4650787dd2c86f44bf5d04331"><div class="ttname"><a href="namespacetmbutils.html#a0e8cedd4650787dd2c86f44bf5d04331">tmbutils::dnorm</a></div><div class="ttdeci">vector&lt; Type &gt; dnorm(vector&lt; Type &gt; x, T1 mean, T2 sd, int give_log=0)</div><div class="ttdef"><b>Definition:</b> <a href="tmbutils__extra_8hpp_source.html#l00013">tmbutils_extra.hpp:13</a></div></div>
+<div class="ttc" id="order_8hpp_html"><div class="ttname"><a href="order_8hpp.html">order.hpp</a></div><div class="ttdoc">Taped sorting of a vector. </div></div>
+<div class="ttc" id="density_8hpp_html"><div class="ttname"><a href="density_8hpp.html">density.hpp</a></div><div class="ttdoc">Classes to construct multivariate Gaussian density objects. </div></div>
+<div class="ttc" id="structtmbutils_1_1vector_html"><div class="ttname"><a href="structtmbutils_1_1vector.html">tmbutils::vector</a></div><div class="ttdoc">Vector class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="tmbutils_8hpp_source.html#l00018">tmbutils.hpp:18</a></div></div>
+<div class="ttc" id="autodiff_8hpp_html"><div class="ttname"><a href="autodiff_8hpp.html">autodiff.hpp</a></div></div>
+<div class="ttc" id="spmat_8hpp_html"><div class="ttname"><a href="spmat_8hpp.html">spmat.hpp</a></div><div class="ttdoc">Extends Eigen::SparseMatrix class. </div></div>
+<div class="ttc" id="kronecker_8hpp_html"><div class="ttname"><a href="kronecker_8hpp.html">kronecker.hpp</a></div><div class="ttdoc">Kronecker product of two matrices. </div></div>
 </div><!-- fragment --></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

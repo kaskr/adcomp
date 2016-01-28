@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -150,21 +150,18 @@ Public Attributes</h2></td></tr>
 <div class="textblock"><p>Configuration variables of a user template. </p>
 <p>Configuration variables can either be set from R with config(..., DLL="mymodel") or from the user template after the include statement: </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="TMB_8hpp.html">TMB.hpp</a>&gt;</span></div>
-<div class="line"><a class="code" href="config_8hpp.html#a8161c5c91cc1290e2278704d0f8940bd">config</a>.<a class="code" href="structconfig__struct.html#a953ca9dae88bd4fc432b5de53c29e5d0">trace</a>.<a class="code" href="structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48">parallel</a>     = <span class="keyword">true</span>;</div>
-<div class="line"><a class="code" href="config_8hpp.html#a8161c5c91cc1290e2278704d0f8940bd">config</a>.<a class="code" href="structconfig__struct.html#a953ca9dae88bd4fc432b5de53c29e5d0">trace</a>.<a class="code" href="structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c">optimize</a>     = <span class="keyword">true</span>;</div>
-<div class="line"><a class="code" href="config_8hpp.html#a8161c5c91cc1290e2278704d0f8940bd">config</a>.<a class="code" href="structconfig__struct.html#a953ca9dae88bd4fc432b5de53c29e5d0">trace</a>.<a class="code" href="structconfig__struct.html#a8c79291139cc892ef39fc1cfdf1c590b">atomic</a>       = <span class="keyword">true</span>;</div>
-<div class="line"><a class="code" href="config_8hpp.html#a8161c5c91cc1290e2278704d0f8940bd">config</a>.<a class="code" href="structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c">optimize</a>.instantly = <span class="keyword">true</span>;</div>
-<div class="line"><a class="code" href="config_8hpp.html#a8161c5c91cc1290e2278704d0f8940bd">config</a>.<a class="code" href="structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c">optimize</a>.parallel  = <span class="keyword">false</span>;</div>
-<div class="line"><a class="code" href="config_8hpp.html#a8161c5c91cc1290e2278704d0f8940bd">config</a>.<a class="code" href="structconfig__struct.html#a596e1ae9fc0aee52563b26df6f99d167">tape</a>.<a class="code" href="structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48">parallel</a>      = <span class="keyword">true</span>;</div>
+<div class="line"><a class="code" href="config_8hpp.html#a11dd1666ae50209c40f466d1e6913677">config</a>.<a class="code" href="structconfig__struct.html#a953ca9dae88bd4fc432b5de53c29e5d0">trace</a>.<a class="code" href="structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48">parallel</a>     = <span class="keyword">true</span>;</div>
+<div class="line"><a class="code" href="config_8hpp.html#a11dd1666ae50209c40f466d1e6913677">config</a>.<a class="code" href="structconfig__struct.html#a953ca9dae88bd4fc432b5de53c29e5d0">trace</a>.<a class="code" href="structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c">optimize</a>     = <span class="keyword">true</span>;</div>
+<div class="line"><a class="code" href="config_8hpp.html#a11dd1666ae50209c40f466d1e6913677">config</a>.<a class="code" href="structconfig__struct.html#a953ca9dae88bd4fc432b5de53c29e5d0">trace</a>.<a class="code" href="structconfig__struct.html#a8c79291139cc892ef39fc1cfdf1c590b">atomic</a>       = <span class="keyword">true</span>;</div>
+<div class="line"><a class="code" href="config_8hpp.html#a11dd1666ae50209c40f466d1e6913677">config</a>.<a class="code" href="structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c">optimize</a>.instantly = <span class="keyword">true</span>;</div>
+<div class="line"><a class="code" href="config_8hpp.html#a11dd1666ae50209c40f466d1e6913677">config</a>.<a class="code" href="structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c">optimize</a>.parallel  = <span class="keyword">false</span>;</div>
+<div class="line"><a class="code" href="config_8hpp.html#a11dd1666ae50209c40f466d1e6913677">config</a>.<a class="code" href="structconfig__struct.html#a596e1ae9fc0aee52563b26df6f99d167">tape</a>.<a class="code" href="structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48">parallel</a>      = <span class="keyword">true</span>;</div>
 </div><!-- fragment --> 
 <p>Definition at line <a class="el" href="config_8hpp_source.html#l00023">23</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a770979f63e5e08ef76b9695fcffbfa88"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">config_struct::config_struct </td>
@@ -173,14 +170,7 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="config_8hpp_source.html#l00065">65</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
 
 </div>
 </div>
@@ -188,9 +178,6 @@ Public Attributes</h2></td></tr>
 <a class="anchor" id="a05b93db6d0ebfc12277020baa2825c4f"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void config_struct::set </td>
@@ -216,25 +203,13 @@ Public Attributes</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="config_8hpp_source.html#l00046">46</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
-
-<p>Referenced by <a class="el" href="config_8hpp.html#a6ccbe23796e1e02c9b06744b8ac53f4b">TMBconfig()</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a7f76fb919aad737b724686d03574127a"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void config_struct::set </td>
@@ -243,16 +218,7 @@ Public Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="config_8hpp_source.html#l00055">55</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
-
-<p>Referenced by <a class="el" href="structconfig__struct.html#a770979f63e5e08ef76b9695fcffbfa88">config_struct()</a>.</p>
 
 </div>
 </div>
@@ -285,8 +251,6 @@ Public Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="config_8hpp_source.html#l00044">44</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="structconfig__struct.html#a770979f63e5e08ef76b9695fcffbfa88">config_struct()</a>, <a class="el" href="structconfig__struct.html#a05b93db6d0ebfc12277020baa2825c4f">set()</a>, and <a class="el" href="config_8hpp.html#a6ccbe23796e1e02c9b06744b8ac53f4b">TMBconfig()</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="a6e4eab047420be63cef20aac5068ae7a"></a>
@@ -299,7 +263,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Referenced by <a class="el" href="tmb__core_8hpp.html#af04bfc92750159a7d5dd616231cee0da">getListElement()</a>, and <a class="el" href="structconfig__struct.html#a7f76fb919aad737b724686d03574127a">set()</a>.</p>
+<p>Referenced by <a class="el" href="tmb__core_8hpp.html#af04bfc92750159a7d5dd616231cee0da">getListElement()</a>.</p>
 
 </div>
 </div>
@@ -314,8 +278,6 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Definition at line <a class="el" href="config_8hpp_source.html#l00045">45</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
-
-<p>Referenced by <a class="el" href="structconfig__struct.html#a05b93db6d0ebfc12277020baa2825c4f">set()</a>, and <a class="el" href="config_8hpp.html#a6ccbe23796e1e02c9b06744b8ac53f4b">TMBconfig()</a>.</p>
 
 </div>
 </div>
@@ -365,7 +327,7 @@ Public Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="config_8hpp_source.html#l00030">30</a> of file <a class="el" href="config_8hpp_source.html">config.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="tmb__core_8hpp.html#ab0ccdbc50d01566e4cc2eb6040df89b4">MakeADFunObject()</a>, <a class="el" href="tmb__core_8hpp.html#ae78061cb64118ded4a52ff2780206f60">MakeADGradObject()</a>, <a class="el" href="tmb__core_8hpp.html#a9c7794cec09f769c5a4f672e4e6f56d2">MakeADHessObject2()</a>, <a class="el" href="structparallelADFun.html#a43f3f823127829c378bc40b6fe827e8b">parallelADFun&lt; Type &gt;::optimize()</a>, <a class="el" href="tmb__core_8hpp.html#af16ceca62ce40eb3e0cc802178a968ea">optimizeTape()</a>, and <a class="el" href="structconfig__struct.html#a7f76fb919aad737b724686d03574127a">set()</a>.</p>
+<p>Referenced by <a class="el" href="tmb__core_8hpp.html#ab0ccdbc50d01566e4cc2eb6040df89b4">MakeADFunObject()</a>, <a class="el" href="tmb__core_8hpp.html#ae78061cb64118ded4a52ff2780206f60">MakeADGradObject()</a>, <a class="el" href="tmb__core_8hpp.html#a9c7794cec09f769c5a4f672e4e6f56d2">MakeADHessObject2()</a>, <a class="el" href="structparallelADFun.html#a43f3f823127829c378bc40b6fe827e8b">parallelADFun&lt; Type &gt;::optimize()</a>, and <a class="el" href="tmb__core_8hpp.html#af16ceca62ce40eb3e0cc802178a968ea">optimizeTape()</a>.</p>
 
 </div>
 </div>
@@ -411,8 +373,6 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Referenced by <a class="el" href="structconfig__struct.html#a7f76fb919aad737b724686d03574127a">set()</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="a953ca9dae88bd4fc432b5de53c29e5d0"></a>
@@ -425,7 +385,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Referenced by <a class="el" href="tmb__core_8hpp.html#ab0ccdbc50d01566e4cc2eb6040df89b4">MakeADFunObject()</a>, <a class="el" href="tmb__core_8hpp.html#ae78061cb64118ded4a52ff2780206f60">MakeADGradObject()</a>, <a class="el" href="structparallelADFun.html#a43f3f823127829c378bc40b6fe827e8b">parallelADFun&lt; Type &gt;::optimize()</a>, <a class="el" href="tmb__core_8hpp.html#af16ceca62ce40eb3e0cc802178a968ea">optimizeTape()</a>, <a class="el" href="structparallelADFun.html#a27459029d50909f9aaa1e6037a3e4376">parallelADFun&lt; Type &gt;::parallelADFun()</a>, <a class="el" href="structconfig__struct.html#a7f76fb919aad737b724686d03574127a">set()</a>, and <a class="el" href="structparallelADFun.html#a7b18b8e618c4a62bdc51707491c7539d">parallelADFun&lt; Type &gt;::~parallelADFun()</a>.</p>
+<p>Referenced by <a class="el" href="tmb__core_8hpp.html#ab0ccdbc50d01566e4cc2eb6040df89b4">MakeADFunObject()</a>, <a class="el" href="tmb__core_8hpp.html#ae78061cb64118ded4a52ff2780206f60">MakeADGradObject()</a>, <a class="el" href="structparallelADFun.html#a43f3f823127829c378bc40b6fe827e8b">parallelADFun&lt; Type &gt;::optimize()</a>, <a class="el" href="tmb__core_8hpp.html#af16ceca62ce40eb3e0cc802178a968ea">optimizeTape()</a>, <a class="el" href="structparallelADFun.html#a27459029d50909f9aaa1e6037a3e4376">parallelADFun&lt; Type &gt;::parallelADFun()</a>, and <a class="el" href="structparallelADFun.html#a7b18b8e618c4a62bdc51707491c7539d">parallelADFun&lt; Type &gt;::~parallelADFun()</a>.</p>
 
 </div>
 </div>

@@ -4,8 +4,18 @@ var searchData=
   ['registercfinalizer',['RegisterCFinalizer',['../structmemory__manager__struct.html#abad1601b37663e05816054a1fa7690f9',1,'memory_manager_struct']]],
   ['reportnames',['reportnames',['../structreport__stack.html#abb092d175b44833fd3732c3e0326672b',1,'report_stack']]],
   ['reverse',['Reverse',['../structparallelADFun.html#add94e8266fed6e000ca94ebebaa885bd',1,'parallelADFun']]],
+  ['rf_5fbessel_5fk',['Rf_bessel_k',['../namespaceatomic_1_1Rmath.html#a85f43a5e10bf2cb898e6737486ec50ed',1,'atomic::Rmath']]],
+  ['rf_5ffmin2',['Rf_fmin2',['../namespaceatomic_1_1Rmath.html#a1875a0a39a99eb55920ba05dbbab14a9',1,'atomic::Rmath']]],
+  ['rf_5flgammafn',['Rf_lgammafn',['../namespaceatomic_1_1Rmath.html#a95eab4cfe0f6953bb19fa233afdbd413',1,'atomic::Rmath']]],
+  ['rf_5fpgamma',['Rf_pgamma',['../namespaceatomic_1_1Rmath.html#a55dda9accc3e58397aa0f0ec750d24b7',1,'atomic::Rmath']]],
+  ['rf_5fpnorm5',['Rf_pnorm5',['../namespaceatomic_1_1Rmath.html#a3e1c684c64ee8e03dd31ec1035601936',1,'atomic::Rmath']]],
+  ['rf_5fppois',['Rf_ppois',['../namespaceatomic_1_1Rmath.html#a9656bab6f040b484b5b9558286c08b25',1,'atomic::Rmath']]],
+  ['rf_5fpsigamma',['Rf_psigamma',['../namespaceatomic_1_1Rmath.html#a803d0a8e4500bbfeef661698d268e7be',1,'atomic::Rmath']]],
+  ['rf_5fqgamma',['Rf_qgamma',['../namespaceatomic_1_1Rmath.html#acca57bdd56c269558f528b324c95c25a',1,'atomic::Rmath']]],
+  ['rf_5fqnorm5',['Rf_qnorm5',['../namespaceatomic_1_1Rmath.html#abe0dedba40f53e70e896f9ab3e160374',1,'atomic::Rmath']]],
   ['robjecttestexpectedtype',['RObjectTestExpectedType',['../tmb__core_8hpp.html#ae842370b6391666215fed36e060e746f',1,'tmb_core.hpp']]],
   ['rostream',['Rostream',['../classRostream.html#a4272ef1621c5ee5eedfbb55aec561d11',1,'Rostream']]],
   ['rotate',['rotate',['../structarray.html#abb991ca87f1bcf63068affa08db51b81',1,'array::rotate()'],['../structtmbutils_1_1array.html#a1b01dd3c11ea14f37b8db1ff18364da1',1,'tmbutils::array::rotate()']]],
+  ['rows',['rows',['../structarray.html#addd5d17ec312d77a1aa7e701089224b9',1,'array::rows()'],['../structtmbutils_1_1array.html#acb5b2b5cc97e59ab32636cff1f017fe3',1,'tmbutils::array::rows()']]],
   ['rstreambuf',['Rstreambuf',['../classRstreambuf.html#a190f2652407a135feabfe977635d92db',1,'Rstreambuf']]]
 ];

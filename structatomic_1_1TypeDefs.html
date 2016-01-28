@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: piecewice&lt; Type &gt; Class Template Reference</title>
+<title>TMB Documentation: atomic::TypeDefs&lt; Type &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -82,132 +82,94 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespaceatomic.html">atomic</a></li><li class="navelem"><a class="el" href="structatomic_1_1TypeDefs.html">TypeDefs</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="classpiecewice-members.html">List of all members</a>  </div>
+<a href="#pub-types">Public Types</a> &#124;
+<a href="structatomic_1_1TypeDefs-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">piecewice&lt; Type &gt; Class Template Reference</div>  </div>
+<div class="title">atomic::TypeDefs&lt; Type &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="Vectorize_8hpp_source.html">Vectorize.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:ad95ffe80286aa85704d060322b822b8f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpiecewice.html#ad95ffe80286aa85704d060322b822b8f">piecewice</a> (const <a class="el" href="structvector.html">vector</a>&lt; Type &gt; &amp;x_, const <a class="el" href="structvector.html">vector</a>&lt; Type &gt; &amp;y, bool leftcontinuous_=true)</td></tr>
-<tr class="separator:ad95ffe80286aa85704d060322b822b8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dcc77e63d1aa5f9461a4866dad9a859"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpiecewice.html#a5dcc77e63d1aa5f9461a4866dad9a859">operator()</a> (const Type &amp;t)</td></tr>
-<tr class="separator:a5dcc77e63d1aa5f9461a4866dad9a859"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:aabc28310c2096632fdfb16c2cc34271d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classpiecewice.html#aabc28310c2096632fdfb16c2cc34271d">leftcontinuous</a></td></tr>
-<tr class="separator:aabc28310c2096632fdfb16c2cc34271d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aa6d36f66069c712a9e06fd9b6f2e68da"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Map<br class="typebreak"/>
+&lt; Eigen::Matrix&lt; Type, <br class="typebreak"/>
+Eigen::Dynamic, Eigen::Dynamic &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structatomic_1_1TypeDefs.html#aa6d36f66069c712a9e06fd9b6f2e68da">MapMatrix</a></td></tr>
+<tr class="separator:aa6d36f66069c712a9e06fd9b6f2e68da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95d77f18349edeadaf324dd72f727dc0"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Map&lt; const <br class="typebreak"/>
+Eigen::Matrix&lt; Type, <br class="typebreak"/>
+Eigen::Dynamic, Eigen::Dynamic &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structatomic_1_1TypeDefs.html#a95d77f18349edeadaf324dd72f727dc0">ConstMapMatrix</a></td></tr>
+<tr class="separator:a95d77f18349edeadaf324dd72f727dc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72ccb0e8531fa99ab4b31a81cf79a821"><td class="memItemLeft" align="right" valign="top">typedef Eigen::LDLT<br class="typebreak"/>
+&lt; Eigen::Matrix&lt; Type, <br class="typebreak"/>
+Eigen::Dynamic, Eigen::Dynamic &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structatomic_1_1TypeDefs.html#a72ccb0e8531fa99ab4b31a81cf79a821">LDLT</a></td></tr>
+<tr class="separator:a72ccb0e8531fa99ab4b31a81cf79a821"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class Type&gt;<br/>
-class piecewice&lt; Type &gt;</h3>
+struct atomic::TypeDefs&lt; Type &gt;</h3>
 
 
-<p>Definition at line <a class="el" href="Vectorize_8hpp_source.html#l00230">230</a> of file <a class="el" href="Vectorize_8hpp_source.html">Vectorize.hpp</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ad95ffe80286aa85704d060322b822b8f"></a>
+<p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00145">145</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="a95d77f18349edeadaf324dd72f727dc0"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class Type &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
+template&lt;class Type&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classpiecewice.html">piecewice</a>&lt; Type &gt;::<a class="el" href="classpiecewice.html">piecewice</a> </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structvector.html">vector</a>&lt; Type &gt; &amp;&#160;</td>
-          <td class="paramname"><em>x_</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structvector.html">vector</a>&lt; Type &gt; &amp;&#160;</td>
-          <td class="paramname"><em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>leftcontinuous_</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="Vectorize_8hpp_source.html#l00237">237</a> of file <a class="el" href="Vectorize_8hpp_source.html">Vectorize.hpp</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a5dcc77e63d1aa5f9461a4866dad9a859"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class Type &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Type <a class="el" href="classpiecewice.html">piecewice</a>&lt; Type &gt;::operator() </td>
-          <td>(</td>
-          <td class="paramtype">const Type &amp;&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="Vectorize_8hpp_source.html#l00246">246</a> of file <a class="el" href="Vectorize_8hpp_source.html">Vectorize.hpp</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="aabc28310c2096632fdfb16c2cc34271d"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class Type &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classpiecewice.html">piecewice</a>&lt; Type &gt;::leftcontinuous</td>
+          <td class="memname">typedef Eigen::Map&lt;const Eigen::Matrix&lt;Type,Eigen::Dynamic,Eigen::Dynamic&gt; &gt; <a class="el" href="structatomic_1_1TypeDefs.html">atomic::TypeDefs</a>&lt; Type &gt;::<a class="el" href="structatomic_1_1TypeDefs.html#a95d77f18349edeadaf324dd72f727dc0">ConstMapMatrix</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="Vectorize_8hpp_source.html#l00236">236</a> of file <a class="el" href="Vectorize_8hpp_source.html">Vectorize.hpp</a>.</p>
-
-<p>Referenced by <a class="el" href="classpiecewice.html#a5dcc77e63d1aa5f9461a4866dad9a859">piecewice&lt; Type &gt;::operator()()</a>.</p>
+<p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00151">151</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="Vectorize_8hpp_source.html">Vectorize.hpp</a></li>
+<a class="anchor" id="a72ccb0e8531fa99ab4b31a81cf79a821"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Eigen::LDLT&lt;Eigen::Matrix&lt;Type, Eigen::Dynamic, Eigen::Dynamic&gt; &gt; <a class="el" href="structatomic_1_1TypeDefs.html">atomic::TypeDefs</a>&lt; Type &gt;::<a class="el" href="structatomic_1_1TypeDefs.html#a72ccb0e8531fa99ab4b31a81cf79a821">LDLT</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00152">152</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa6d36f66069c712a9e06fd9b6f2e68da"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Eigen::Map&lt;Eigen::Matrix&lt;Type,Eigen::Dynamic,Eigen::Dynamic&gt; &gt; <a class="el" href="structatomic_1_1TypeDefs.html">atomic::TypeDefs</a>&lt; Type &gt;::<a class="el" href="structatomic_1_1TypeDefs.html#aa6d36f66069c712a9e06fd9b6f2e68da">MapMatrix</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00150">150</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li><a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: tmbutils.cpp File Reference</title>
+<title>TMB Documentation: matexp.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,48 +88,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#nested-classes">Classes</a>  </div>
   <div class="headertitle">
-<div class="title">tmbutils.cpp File Reference</div>  </div>
+<div class="title">matexp.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Namespace of utility functions for TMB.  
+<p>Matrix exponential.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="vector_8cpp_source.html">vector.cpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="array_8cpp_source.html">array.cpp</a>&quot;</code><br/>
-</div>
-<p><a href="tmbutils_8cpp_source.html">Go to the source code of this file.</a></p>
+
+<p><a href="matexp_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1vector.html">tmbutils::vector&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector class used by TMB.  <a href="structtmbutils_1_1vector.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmatexp.html">matexp&lt; scalartype, dim &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix exponential: matrix of arbitrary dimension.  <a href="structmatexp.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1matrix.html">tmbutils::matrix&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix class used by TMB.  <a href="structtmbutils_1_1matrix.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmatexp_3_01scalartype_00_012_01_4.html">matexp&lt; scalartype, 2 &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix exponential: 2x2 case which can be handled efficiently.  <a href="structmatexp_3_01scalartype_00_012_01_4.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1array.html">tmbutils::array&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array class used by TMB.  <a href="structtmbutils_1_1array.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:namespacetmbutils"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html">tmbutils</a></td></tr>
-<tr class="memdesc:namespacetmbutils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility functions for TMB (automatically included) <br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:aa2880f04e636a8a928f972bc83725163"><td class="memTemplParams" colspan="2">template&lt;class Type , class From &gt; </td></tr>
-<tr class="memitem:aa2880f04e636a8a928f972bc83725163"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structvector.html">vector</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#aa2880f04e636a8a928f972bc83725163">tmbutils::asVector</a> (From *px, int n)</td></tr>
-<tr class="separator:aa2880f04e636a8a928f972bc83725163"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Namespace of utility functions for TMB. </p>
+<div class="textblock"><p>Matrix exponential. </p>
 
-<p>Definition in file <a class="el" href="tmbutils_8cpp_source.html">tmbutils.cpp</a>.</p>
+<p>Definition in file <a class="el" href="matexp_8hpp_source.html">matexp.hpp</a>.</p>
 </div></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

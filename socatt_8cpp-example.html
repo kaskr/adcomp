@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -90,7 +90,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">  </div>
 <div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>(y); <span class="comment">//categorical response vector</span></div>
 <div class="line">  <a name="a2"></a><a class="code" href="tmb__core_8hpp.html#ae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(S); <span class="comment">//number of response categories</span></div>
-<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(<a name="a4"></a><a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>); <span class="comment">// Fixed effects design matrix</span></div>
+<div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#ada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(<a name="a4"></a><a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>); <span class="comment">// Fixed effects design matrix</span></div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#ace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>(group);</div>
 <div class="line">  <a name="a5"></a><a class="code" href="tmb__core_8hpp.html#a6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(b); <span class="comment">// Fixed effects</span></div>
 <div class="line">  <a name="a6"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logsigma);</div>
@@ -102,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">    alpha(s) = alpha(s-1) + exp(tmpk(s));</div>
 <div class="line">  Type ans=0;</div>
 <div class="line">  ans -= <a name="a8"></a><a class="code" href="convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(<a name="a9"></a><a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(u,Type(0),Type(1),<span class="keyword">true</span>));</div>
-<div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> eta = <a class="code" href="splines_8cpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>*b;</div>
+<div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> eta = <a class="code" href="splines_8hpp.html#a207fd5507206d307cd63f95374fcd00d">X</a>*b;</div>
 <div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;y.size(); i++){</div>
 <div class="line">    eta(i) += sigma*u(group(i));</div>
 <div class="line">    Type P;</div>

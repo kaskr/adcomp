@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['p',['P',['../classorder.html#a5a4497d32e9e7b49af7185b0d2798d63',1,'order::P()'],['../classtmbutils_1_1order.html#aabdc21f70c1d6d7a9324f59a8ad390da',1,'tmbutils::order::P()'],['../structromberg_1_1integratelast.html#ae82a1588966c4785db7c2d09d31bad73',1,'romberg::integratelast::p()']]],
+  ['p',['p',['../structromberg_1_1integratelast.html#ae82a1588966c4785db7c2d09d31bad73',1,'romberg::integratelast::p()'],['../classorder.html#a5a4497d32e9e7b49af7185b0d2798d63',1,'order::P()'],['../classtmbutils_1_1order.html#aabdc21f70c1d6d7a9324f59a8ad390da',1,'tmbutils::order::P()']]],
   ['parallel',['parallel',['../structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48',1,'config_struct']]],
   ['parallel_5fignore_5fstatements',['parallel_ignore_statements',['../classobjective__function.html#a353fc5321e738a657b0d0cd6d9f85b0d',1,'objective_function']]],
   ['parameters',['parameters',['../classobjective__function.html#a58df009883ddf79175e31d73426c8f62',1,'objective_function']]],

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ldlt_5ft',['LDLT_t',['../namespaceatomic.html#a6dd8f490d3ca65864095d40de4f9fa85',1,'atomic']]]
+  ['ldlt',['LDLT',['../structatomic_1_1TypeDefs.html#a72ccb0e8531fa99ab4b31a81cf79a821',1,'atomic::TypeDefs']]]
 ];

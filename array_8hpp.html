@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: autodiff.cpp File Reference</title>
+<title>TMB Documentation: array.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -89,44 +89,67 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
-<div class="title">autodiff.cpp File Reference</div>  </div>
+<div class="title">array.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><a href="autodiff_8cpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="array_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structautodiff_1_1gradient__t.html">autodiff::gradient_t&lt; Functor, Type &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structautodiff_1_1hessian__t.html">autodiff::hessian_t&lt; Functor, Type &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structautodiff_1_1jacobian__t.html">autodiff::jacobian_t&lt; Functor, Type &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarray.html">array&lt; Type &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array class used by TMB.  <a href="structarray.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:namespaceautodiff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html">autodiff</a></td></tr>
-<tr class="memdesc:namespaceautodiff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Automatic differentiation (gradient, hessian, jacobian) <br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Type &gt; </td></tr>
-<tr class="memitem:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structvector.html">vector</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html#a9726ba5efee905cf45ff8a16ed2ce35d">autodiff::gradient</a> (Functor F, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
-<tr class="memdesc:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate gradient of vector function with scalar values.  <a href="#a9726ba5efee905cf45ff8a16ed2ce35d">More...</a><br/></td></tr>
-<tr class="separator:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aece87159d1d7bc9099eff6b751143db4"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Type &gt; </td></tr>
-<tr class="memitem:aece87159d1d7bc9099eff6b751143db4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">autodiff::hessian</a> (Functor f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
-<tr class="memdesc:aece87159d1d7bc9099eff6b751143db4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate hessian of vector function with scalar values.  <a href="#aece87159d1d7bc9099eff6b751143db4">More...</a><br/></td></tr>
-<tr class="separator:aece87159d1d7bc9099eff6b751143db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafec6d83cf272ad8af0c578e9bb91091"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Type &gt; </td></tr>
-<tr class="memitem:aafec6d83cf272ad8af0c578e9bb91091"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html#aafec6d83cf272ad8af0c578e9bb91091">autodiff::jacobian</a> (Functor f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
-<tr class="memdesc:aafec6d83cf272ad8af0c578e9bb91091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate jacobian of vector function with vector values.  <a href="#aafec6d83cf272ad8af0c578e9bb91091">More...</a><br/></td></tr>
-<tr class="separator:aafec6d83cf272ad8af0c578e9bb91091"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array_8hpp.html#a8bbbfd8d914ae09a3ebf5b55437d399f">INHERIT</a>(OP)</td></tr>
+<tr class="separator:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tmbutils_8hpp.html#a8bbbfd8d914ae09a3ebf5b55437d399f">INHERIT</a>(OP)</td></tr>
+<tr class="separator:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="a8bbbfd8d914ae09a3ebf5b55437d399f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define INHERIT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">OP</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;                                      \</div>
+<div class="line">  array&lt;Type&gt; OP(T y){<span class="keywordflow">return</span> <a class="code" href="structarray.html">array</a>(MapBase::OP(y),dim);}</div>
+<div class="ttc" id="structarray_html"><div class="ttname"><a href="structarray.html">array</a></div><div class="ttdoc">Array class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="array_8hpp_source.html#l00022">array.hpp:22</a></div></div>
+</div><!-- fragment -->
+<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00284">284</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8bbbfd8d914ae09a3ebf5b55437d399f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define INHERIT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">OP</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;                                      \</div>
+<div class="line">  array&lt;Type&gt; OP(T y){<span class="keywordflow">return</span> <a class="code" href="structarray.html">array</a>(MapBase::OP(y),dim);}</div>
+<div class="ttc" id="structarray_html"><div class="ttname"><a href="structarray.html">array</a></div><div class="ttdoc">Array class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="array_8hpp_source.html#l00022">array.hpp:22</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

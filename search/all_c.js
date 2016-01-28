@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['l',['L',['../splines_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53',1,'L():&#160;splines.cpp'],['../tmbutils__extra_8cpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53',1,'L():&#160;tmbutils_extra.cpp']]],
+  ['l',['L',['../splines_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53',1,'L():&#160;splines.hpp'],['../tmbutils__extra_8hpp.html#aa73214aa5f2f94f63d90bb4e3d99fe53',1,'L():&#160;tmbutils_extra.hpp']]],
   ['lambda',['lambda',['../structmatexp.html#a2c5ec7437684cec924974305bc188c35',1,'matexp::lambda()'],['../structmatexp_3_01scalartype_00_012_01_4.html#a3ba3c842a24c81de2e897049dd28db78',1,'matexp&lt; scalartype, 2 &gt;::lambda()'],['../structtmbutils_1_1matexp.html#a9afe07191c4f6d202a6e1094eec02d83',1,'tmbutils::matexp::lambda()'],['../structtmbutils_1_1matexp_3_01scalartype_00_012_01_4.html#a52b9648078c9f738b124618d75b870f2',1,'tmbutils::matexp&lt; scalartype, 2 &gt;::lambda()']]],
-  ['ldlt_5ft',['LDLT_t',['../namespaceatomic.html#a6dd8f490d3ca65864095d40de4f9fa85',1,'atomic']]],
-  ['leftcontinuous',['leftcontinuous',['../classpiecewice.html#aabc28310c2096632fdfb16c2cc34271d',1,'piecewice']]],
+  ['ldlt',['LDLT',['../structatomic_1_1TypeDefs.html#a72ccb0e8531fa99ab4b31a81cf79a821',1,'atomic::TypeDefs']]],
   ['lgamma',['lgamma',['../lgamma_8hpp.html#a177b023eb871927fcfc90259e9f00382',1,'lgamma.hpp']]],
   ['lgamma_2ehpp',['lgamma.hpp',['../lgamma_8hpp.html',1,'']]],
   ['lgamma_5fapprox',['lgamma_approx',['../lgamma_8hpp.html#ae580716b3378fa33cecf47fb99ed17f1',1,'lgamma.hpp']]],

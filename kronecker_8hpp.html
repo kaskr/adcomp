@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>TMB Documentation: array.cpp File Reference</title>
+<title>TMB Documentation: kronecker.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -88,67 +88,98 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#define-members">Macros</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">array.cpp File Reference</div>  </div>
+<div class="title">kronecker.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><a href="array_8cpp_source.html">Go to the source code of this file.</a></p>
+<p>Kronecker product of two matrices.  
+<a href="#details">More...</a></p>
+
+<p><a href="kronecker_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarray.html">array&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array class used by TMB.  <a href="structarray.html#details">More...</a><br/></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="array_8cpp.html#a8bbbfd8d914ae09a3ebf5b55437d399f">INHERIT</a>(OP)</td></tr>
-<tr class="separator:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="tmbutils_8cpp.html#a8bbbfd8d914ae09a3ebf5b55437d399f">INHERIT</a>(OP)</td></tr>
-<tr class="separator:a8bbbfd8d914ae09a3ebf5b55437d399f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae60698df2a94c3d6d723bb26acab48ac"><td class="memTemplParams" colspan="2">template&lt;class scalartype , int n1, int n2, int n3, int n4&gt; </td></tr>
+<tr class="memitem:ae60698df2a94c3d6d723bb26acab48ac"><td class="memTemplItemLeft" align="right" valign="top">Matrix&lt; scalartype, n1 *n3, n2 <br class="typebreak"/>
+*n4 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="kronecker_8hpp.html#ae60698df2a94c3d6d723bb26acab48ac">kronecker</a> (Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)</td></tr>
+<tr class="memdesc:ae60698df2a94c3d6d723bb26acab48ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kronecker product of two matrices.  <a href="#ae60698df2a94c3d6d723bb26acab48ac">More...</a><br/></td></tr>
+<tr class="separator:ae60698df2a94c3d6d723bb26acab48ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7efc2ac68f24b405b44177a381b6d27c"><td class="memTemplParams" colspan="2">template&lt;class scalartype &gt; </td></tr>
+<tr class="memitem:a7efc2ac68f24b405b44177a381b6d27c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="kronecker_8hpp.html#a7efc2ac68f24b405b44177a381b6d27c">kronecker</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt; x, <a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt; y)</td></tr>
+<tr class="memdesc:a7efc2ac68f24b405b44177a381b6d27c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kronecker product of two matrices.  <a href="#a7efc2ac68f24b405b44177a381b6d27c">More...</a><br/></td></tr>
+<tr class="separator:a7efc2ac68f24b405b44177a381b6d27c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="a8bbbfd8d914ae09a3ebf5b55437d399f"></a>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Kronecker product of two matrices. </p>
+
+<p>Definition in file <a class="el" href="kronecker_8hpp_source.html">kronecker.hpp</a>.</p>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ae60698df2a94c3d6d723bb26acab48ac"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class scalartype , int n1, int n2, int n3, int n4&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">#define INHERIT</td>
+          <td class="memname">Matrix&lt;scalartype,n1*n3,n2*n4&gt; kronecker </td>
           <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">OP</td><td>)</td>
+          <td class="paramtype">Matrix&lt; scalartype, n1, n2 &gt;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">Matrix&lt; scalartype, n3, n4 &gt;&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;                                      \</div>
-<div class="line">  array&lt;Type&gt; OP(T y){<span class="keywordflow">return</span> <a class="code" href="structarray.html">array</a>(MapBase::OP(y),dim);}</div>
-<div class="ttc" id="structarray_html"><div class="ttname"><a href="structarray.html">array</a></div><div class="ttdoc">Array class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="array_8cpp_source.html#l00017">array.cpp:17</a></div></div>
-</div><!-- fragment -->
-<p>Definition at line <a class="el" href="tmbutils_8cpp_source.html#l00255">255</a> of file <a class="el" href="tmbutils_8cpp_source.html">tmbutils.cpp</a>.</p>
+
+<p>Kronecker product of two matrices. </p>
+
+<p>Definition at line <a class="el" href="kronecker_8hpp_source.html#l00010">10</a> of file <a class="el" href="kronecker_8hpp_source.html">kronecker.hpp</a>.</p>
+
+<p>Referenced by <a class="el" href="classcontAR2__t.html#a516cc4f86299c831ebb6721b5cfd8a21">contAR2_t&lt; scalartype_ &gt;::contAR2_t()</a>, and <a class="el" href="classcontAR2__t.html#a14db90cc4013696c4d89b0edea31ac79">contAR2_t&lt; scalartype_ &gt;::expB()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8bbbfd8d914ae09a3ebf5b55437d399f"></a>
+<a class="anchor" id="a7efc2ac68f24b405b44177a381b6d27c"></a>
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;class scalartype &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">#define INHERIT</td>
+          <td class="memname"><a class="el" href="structmatrix.html">matrix</a>&lt;scalartype&gt; kronecker </td>
           <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">OP</td><td>)</td>
+          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;                                      \</div>
-<div class="line">  array&lt;Type&gt; OP(T y){<span class="keywordflow">return</span> <a class="code" href="structarray.html">array</a>(MapBase::OP(y),dim);}</div>
-<div class="ttc" id="structarray_html"><div class="ttname"><a href="structarray.html">array</a></div><div class="ttdoc">Array class used by TMB. </div><div class="ttdef"><b>Definition:</b> <a href="array_8cpp_source.html#l00017">array.cpp:17</a></div></div>
-</div><!-- fragment -->
+
+<p>Kronecker product of two matrices. </p>
+
+<p>Definition at line <a class="el" href="kronecker_8hpp_source.html#l00022">22</a> of file <a class="el" href="kronecker_8hpp_source.html">kronecker.hpp</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->

@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -85,14 +85,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div>
 <div class="line">Type <a name="a0"></a><a class="code" href="classobjective__function.html#a789a65f93df89fa5bc1d992cd56d5c87">objective_function&lt;Type&gt;::operator() </a>()</div>
 <div class="line">{</div>
-<div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a name="a2"></a><a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>);</div>
+<div class="line">  <a name="a1"></a><a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a name="a2"></a><a class="code" href="splines_8hpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>);</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#ad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</div>
 <div class="line">  <a name="a3"></a><a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);</div>
 <div class="line">  <a class="code" href="tmb__core_8hpp.html#a70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logSigma);</div>
 <div class="line">  Type sigmasq=exp(2*logSigma);</div>
 <div class="line">  <a name="a4"></a><a class="code" href="tmb__core_8hpp.html#a43a13c435127491364e4a167478f4992">ADREPORT</a>(sigmasq);</div>
-<div class="line">  Type nll=-<a name="a5"></a><a class="code" href="convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(<a name="a6"></a><a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8cpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>,a+b*x,exp(logSigma),<span class="keyword">true</span>));</div>
+<div class="line">  Type nll=-<a name="a5"></a><a class="code" href="convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(<a name="a6"></a><a class="code" href="dnorm_8hpp.html#a5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="splines_8hpp.html#a798e4073d613ca5ba9618e1b3253df14">Y</a>,a+b*x,exp(logSigma),<span class="keyword">true</span>));</div>
 <div class="line">  <span class="keywordflow">return</span> nll;</div>
 <div class="line">}</div>
 <div class="line"></div>

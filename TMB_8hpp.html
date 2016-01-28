@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.6.2</span>
+   &#160;<span id="projectnumber">v1.6.6</span>
    </div>
   </td>
  </tr>
@@ -98,13 +98,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>Includes and sets all stuff needed to compile the user defined objective function.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;Eigen/Dense&gt;</code><br/>
+<div class="textblock"><code>#include &lt;R_ext/Print.h&gt;</code><br/>
+<code>#include &quot;<a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a>&quot;</code><br/>
+<code>#include &lt;Eigen/Dense&gt;</code><br/>
 <code>#include &lt;Eigen/Sparse&gt;</code><br/>
 <code>#include &quot;cppad/cppad.hpp&quot;</code><br/>
 <code>#include &lt;R.h&gt;</code><br/>
 <code>#include &lt;Rinternals.h&gt;</code><br/>
-<code>#include &quot;<a class="el" href="Rstream_8hpp_source.html">Rstream.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="tmbutils_8cpp_source.html">tmbutils/tmbutils.cpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="tmbutils_8hpp_source.html">tmbutils/tmbutils.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="convert_8hpp_source.html">convert.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="config_8hpp_source.html">config.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>&quot;</code><br/>
@@ -116,8 +117,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;<a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="convenience_8hpp_source.html">convenience.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="tmbutils__extra_8cpp_source.html">tmbutils/tmbutils_extra.cpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="R__inla_8cpp_source.html">tmbutils/R_inla.cpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils/tmbutils_extra.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="R__inla_8hpp_source.html">tmbutils/R_inla.hpp</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="precompile_8hpp_source.html">precompile.hpp</a>&quot;</code><br/>
 </div>
 <p><a href="TMB_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -130,12 +132,18 @@ Namespaces</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:a0220cb44477f57a56ddff1c5987741fe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a0220cb44477f57a56ddff1c5987741fe">TMB_DEBUG</a>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:a0220cb44477f57a56ddff1c5987741fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c06b27137cb557d18c35f75349e995d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a3c06b27137cb557d18c35f75349e995d">TMB_PRINT</a>(x)&#160;&#160;&#160;std::cout &lt;&lt; #x &lt;&lt; &quot;: &quot; &lt;&lt; x &lt;&lt; &quot;\n&quot;; std::cout.flush();</td></tr>
+<tr class="memitem:a3c06b27137cb557d18c35f75349e995d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a3c06b27137cb557d18c35f75349e995d">TMB_PRINT</a>(x)&#160;&#160;&#160;<a class="el" href="Rstream_8hpp.html#a6b633fa19d0213c323961f42355058af">Rcout</a> &lt;&lt; #x &lt;&lt; &quot;: &quot; &lt;&lt; x &lt;&lt; &quot;\n&quot;; Rcout.flush();</td></tr>
 <tr class="separator:a3c06b27137cb557d18c35f75349e995d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a771c631455493302399deab7ac2fd072"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a771c631455493302399deab7ac2fd072">CSKIP</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="separator:a771c631455493302399deab7ac2fd072"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a148f6b931612eca11ce455b94b2a498b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a148f6b931612eca11ce455b94b2a498b">TMB_EXTERN</a></td></tr>
+<tr class="separator:a148f6b931612eca11ce455b94b2a498b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8de3ed741dadc9c979a4ff17c0a9116e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a8de3ed741dadc9c979a4ff17c0a9116e">NDEBUG</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:a8de3ed741dadc9c979a4ff17c0a9116e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8de3ed741dadc9c979a4ff17c0a9116e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a8de3ed741dadc9c979a4ff17c0a9116e">NDEBUG</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:a8de3ed741dadc9c979a4ff17c0a9116e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a771c631455493302399deab7ac2fd072"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TMB_8hpp.html#a771c631455493302399deab7ac2fd072">CSKIP</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="separator:a771c631455493302399deab7ac2fd072"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -149,17 +157,39 @@ Functions</h2></td></tr>
 
 <p>Definition in file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a class="anchor" id="a8de3ed741dadc9c979a4ff17c0a9116e"></a>
+<a class="anchor" id="a771c631455493302399deab7ac2fd072"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define NDEBUG&#160;&#160;&#160;1</td>
+          <td class="memname">#define CSKIP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;x</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00031">31</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00084">84</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a771c631455493302399deab7ac2fd072"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CSKIP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00084">84</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
 
 </div>
 </div>
@@ -173,7 +203,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00031">31</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00044">44</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8de3ed741dadc9c979a4ff17c0a9116e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NDEBUG&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00044">44</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
 
 </div>
 </div>
@@ -191,6 +235,20 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a148f6b931612eca11ce455b94b2a498b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TMB_EXTERN</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00017">17</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a3c06b27137cb557d18c35f75349e995d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -200,7 +258,7 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">x</td><td>)</td>
-          <td>&#160;&#160;&#160;std::cout &lt;&lt; #x &lt;&lt; &quot;: &quot; &lt;&lt; x &lt;&lt; &quot;\n&quot;; std::cout.flush();</td>
+          <td>&#160;&#160;&#160;<a class="el" href="Rstream_8hpp.html#a6b633fa19d0213c323961f42355058af">Rcout</a> &lt;&lt; #x &lt;&lt; &quot;: &quot; &lt;&lt; x &lt;&lt; &quot;\n&quot;; Rcout.flush();</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -223,8 +281,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="TMB_8hpp_source.html#l00041">41</a> of file <a class="el" href="TMB_8hpp_source.html">TMB.hpp</a>.</p>
 
 </div>
 </div>
