@@ -397,7 +397,6 @@ mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Mada
         fn2 <- fn; gr2 <- gr
         theta.cur <- params.init
     }
-    theta.cur <- params.init
     theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
     ## how many steps were taken at each iteration, useful for tuning
     j.results <- rep(NA, len=nsim)
