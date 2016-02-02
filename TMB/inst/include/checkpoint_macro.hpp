@@ -117,6 +117,26 @@ namespace atomic{
 #define NTHREADS 1
 #define THREAD 0
 #endif
+
+
+  // Use CppAD threads to make new tape while taping.
+  // Give each thread an additional 'helper thread':
+  bool local_taping_phase;
+  bool in_parallel(){
+    return true;
+  }
+  size_t thread_num(){
+    return static_cast<size_t>(THREAD + local_taping_phase * NTHREADS);
+  }
+  void start_parallel(){
+    int nthreads = 2 * NTHREADS;
+    CppAD::thread_alloc::parallel_setup(nthreads, in_parallel, thread_num);
+    CppAD::parallel_ad<AD<AD<AD<double> > > >();
+    CppAD::parallel_ad<AD<AD<double> > >();
+    CppAD::parallel_ad<AD<double> >();
+    CppAD::parallel_ad<double >();
+  }
+
   /** \brief General class to construct 'double versions' of the 
      generalized symbol. */
   template<template<class> class UserFunctor>
@@ -127,6 +147,7 @@ namespace atomic{
       initialized.resize(4);
       for(int i=0; i<4; i++)initialized(i)=false;
     }
+
     /* ADFun pointers used by the double versions 
        indexed as vpf[thread][level] */
     CppAD::vector<CppAD::vector<CppAD::ADFun<double>* > > vpf;
@@ -145,6 +166,7 @@ namespace atomic{
       for(int i=0; i<x.size(); i++)x(i) = asDouble(x_(i));
       // Only needed once (double call is first call):
       if (N==0) {
+	start_parallel();
 	UserFunctor<double> f;
 	n=x.size();
 	m=f(x).size();
@@ -156,9 +178,10 @@ namespace atomic{
 
       //
       std::cout << "m=" << m << " n=" << n << " x.size()=" << x.size() << " N=" << N << "\n";
+      local_taping_phase = true;
       UserFunctor<AD<ADNdouble> > f;
       cpyADfunPointer(tape_symbol(f,x), N);
-
+      local_taping_phase = false;
 
     }
     template<int N, class ADNdouble>
