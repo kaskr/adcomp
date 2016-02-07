@@ -1,5 +1,14 @@
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
+/* Utility: Compile time test for Type=double */
+template<class Type>
+struct isDouble{
+  enum{value=false};
+};
+template<>
+struct isDouble<double>{
+  enum{value=true};
+};
 
 /** \file 
 * \brief Includes and sets all stuff needed to compile the user defined objective function.

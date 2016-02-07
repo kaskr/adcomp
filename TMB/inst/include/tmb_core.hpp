@@ -147,16 +147,6 @@ void optimizeTape(ADFunPointer pf){
     }
 }
 
-/* Utility: Compile time test for Type=double */
-template<class Type>
-struct isDouble{
-  enum{value=false};
-};
-template<>
-struct isDouble<double>{
-  enum{value=true};
-};
-
 /* Helpers, to check that data and parameters are of the right types.
    "RObjectTester" denotes the type of a pointer to a test function.
    Examples of test functions are "isMatrix", "isArray", "isNumeric",
