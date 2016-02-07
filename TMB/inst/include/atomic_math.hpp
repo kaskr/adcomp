@@ -380,6 +380,10 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 /** \cond */
 template<class Type> /* Header of matmul interface */
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y);
+template<>
+matrix<double> matmul(matrix<double> x, matrix<double> y)CSKIP({
+    return x*y;
+})
 /** \endcond */
 
 /** \brief Atomic version of matrix multiply.
