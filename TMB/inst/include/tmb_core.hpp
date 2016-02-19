@@ -16,6 +16,7 @@
   * Special attention must be payed to parallel code, as each thread
     is responsible for catching its own exceptions.
 */
+
 #define TMB_TRY try
 #define TMB_CATCH catch(std::bad_alloc& ba)
 #define TMB_ERROR_BAD_ALLOC error("Memory allocation fail in function '%s'\n", \
@@ -192,15 +193,19 @@ Rboolean isNumericScalar(SEXP x){
 
 /* Macros to obtain data and parameters from R */
 
-/** \brief Get parameter matrix from R and declare it as matrix<Type> */
+/** \brief Get parameter matrix from R and declare it as matrix<Type>
+\ingroup macros */
 #define PARAMETER_MATRIX(name) tmbutils::matrix<Type> name(objective_function::fillShape(asMatrix<Type>(objective_function::getShape(#name,&isMatrix)),#name));
-/** \brief Get parameter vector from R and declare it as vector<Type> */
+/** \brief Get parameter vector from R and declare it as vector<Type> 
+\ingroup macros*/
 #define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumeric)),#name));
-/** \brief Get parameter scalar from R and declare it as Type */
+/** \brief Get parameter scalar from R and declare it as Type
+\ingroup macros */
 #define PARAMETER(name) Type name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumericScalar)),#name)[0]);
 /** \brief Get data vector from R and declare it as vector<Type>
     \note If name is found in the parameter list it will be read as a
-    parameter vector. */
+    parameter vector.
+\ingroup macros */
 #define DATA_VECTOR(name)						\
 vector<Type> name;							\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -210,13 +215,16 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
   name = asVector<Type>(getListElement(					\
          objective_function::data,#name,&isNumeric));			\
 }
-/** \brief Get data matrix from R and declare it as matrix<Type> */
+/** \brief Get data matrix from R and declare it as matrix<Type>
+\ingroup macros */
 #define DATA_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
 	getListElement(objective_function::data,#name,&isMatrix)));
-/** \brief Get data scalar from R and declare it as Type */
+/** \brief Get data scalar from R and declare it as Type
+\ingroup macros */
 #define DATA_SCALAR(name) Type name(asVector<Type>(		\
 	getListElement(objective_function::data,#name,&isNumericScalar))[0]);
-/** \brief Get data scalar from R and declare it as int */
+/** \brief Get data scalar from R and declare it as int
+\ingroup macros */
 #define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(	\
 	getListElement(objective_function::data,#name,&isNumericScalar))[0]));
 /** \brief Get data vector of type "factor" from R and declare it as a zero-based integer vector.
@@ -233,29 +241,31 @@ Levels: d e f g h i j
 > unclass(x) - 1
 [1] 0 1 2 3 4 5 6
    \endverbatim
-*/
+\ingroup macros*/
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
 	getListElement(objective_function::data,#name,&isNumeric)));
-/** \brief Get data vector of type "integer" from R and declare it vector<int>. (DATA_INTEGER is for a scalar integer)*/
+/** \brief Get data vector of type "integer" from R and declare it vector<int>. (DATA_INTEGER is for a scalar integer) \ingroup macros*/
 #define DATA_IVECTOR(name) vector<int> name(asVector<int>(	\
 	getListElement(objective_function::data,#name,&isNumeric)));
-/** \brief Get the number of levels of a data factor from R */
+/** \brief Get the number of levels of a data factor from R \ingroup macros */
 #define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
-/** \brief Get sparse matrix from R and declare it as Eigen::SparseMatrix<Type> */
+/** \brief Get sparse matrix from R and declare it as Eigen::SparseMatrix<Type>  \ingroup macros*/
 #define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>( \
 	getListElement(objective_function::data,#name,&isValidSparseMatrix)));
 // NOTE: REPORT() constructs new SEXP so never report in parallel!
-/** \brief Report scalar, vector or array back to R without derivative information. Important: \c REPORT(name) must not be used before \c name has been assigned a value */
+/** \brief Report scalar, vector or array back to R without derivative information. Important: \c REPORT(name) must not be used before \c name has been assigned a value \ingroup macros */
 #define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
                         defineVar(install(#name),asSEXP(name),objective_function::report);}
 /** \brief Report scalar, vector or array back to R with derivative information. 
  The result is retrieved in R via the R function \c sdreport().
- Important: \c ADREPORT(name) must not be used before \c name has been assigned a value*/
+ Important: \c ADREPORT(name) must not be used before \c name has been assigned a value \ingroup macros*/
 #define ADREPORT(name) objective_function::reportvector.push(name,#name);
 #define PARALLEL_REGION if(this->parallel_region())
 /** \brief Get data array from R and declare it as array<Type>
     \note If name is found in the parameter list it will be read as a
-    parameter array. */
+    parameter array.  
+
+\ingroup macros*/
 #define DATA_ARRAY(name)						\
 tmbutils::array<Type> name;						\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -265,12 +275,12 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
   name = tmbutils::asArray<Type>(getListElement(			\
          objective_function::data,#name,&isArray));			\
 }
-/** \brief Get parameter array from R and declare it as array<Type> */
+/** \brief Get parameter array from R and declare it as array<Type> \ingroup macros */
 #define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name,&isArray)),#name));
-/** \brief Get data matrix from R and declare it as matrix<int> */
+/** \brief Get data matrix from R and declare it as matrix<int> \ingroup macros */
 #define DATA_IMATRIX(name) matrix<int> name(asMatrix<int>(	\
 	getListElement(objective_function::data,#name,&isMatrix)));
-/** \brief Get data array from R and declare it as array<int> */
+/** \brief Get data array from R and declare it as array<int> \ingroup macros */
 #define DATA_IARRAY(name) tmbutils::array<int> name(tmbutils::asArray<int>(	\
 	getListElement(objective_function::data,#name,&isArray)));
 /** \brief Get data list object from R and makes it available in C++
@@ -305,6 +315,7 @@ Type objective_function<Type>::operator() ()
   return 0;
 }
 \endverbatim
+\ingroup macros
 */ 
 #define DATA_STRUCT(name, struct)struct<Type> name(getListElement(this->data,#name));
 
@@ -328,7 +339,7 @@ struct data_indicator : VT{
 };
 
 /** \brief Declare an indicator array 'name' of same shape as 'obs'.
- */
+ \ingroup macros */
 #define DATA_ARRAY_INDICATOR(name, obs)					\
 data_indicator<tmbutils::array<Type>, Type > name(obs);			\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -337,7 +348,7 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
 }
 
 /** \brief Declare an indicator vector 'name' of same shape as 'obs'.
- */
+ \ingroup macros */
 #define DATA_VECTOR_INDICATOR(name, obs)				\
 data_indicator<tmbutils::vector<Type>, Type > name(obs);		\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -346,7 +357,9 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
 }
 
 // kasper: Not sure used anywhere
-/** \brief Get the hessian sparsity pattern of ADFun object pointer */
+/** \brief Get the hessian sparsity pattern of ADFun object pointer
+\deprecated Kasper is not sure that this code is used anywhere? 
+*/
 template<class Type>
 matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
   int n=pf->Domain();
@@ -584,10 +597,20 @@ public:
   
   /* FIXME: "Value" should be "var2par" I guess 
      kasper: Why not use asDouble defined previously? */
+  /** @name Value Functions
+      Overloaded functions to extract the value from objects of various types;
+      generally wrappers for CppAD::Value(x).
+      @{
+   */
+  /** Extracts the value of from TMB objects.
+  \param x The variable to be extracted.
+  \return Object of type double containing the value of the argument.
+  */
   double value(double x){return x;}
   double value(AD<double> x){return CppAD::Value(x);}
   double value(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
   double value(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+  /** @} */
 
   /** \brief Find the length of theta, i.e. in application obj=parameters */
   int nparms(SEXP obj)
