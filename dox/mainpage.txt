@@ -12,7 +12,7 @@ These pages describes the C++ part of TMB. The R part is documented via the ordi
   <li> \b Modules: Introduction and summary of TMB (start here if you are new).</li>
   <li> \b Namespaces: TMB's package system</li>
   <li> \b Classes: The C++ classes used in TMB</li>
-  <li> \b Macros: The C++ macros used in TMB</li>
+  <li> \b Macros: The C++ Macros used in TMB</li>
   <li> \b Files: The C++ files that constitute TMB</li>
   <li> \b Examples: List of pre built models that comes with TMB</li>
   <li> \b Search \b field: Start typing a keyword, and all matching keywords will be listed. Very useful!</li>
@@ -593,9 +593,7 @@ TMB specific C++ include:
  
 */
 
-/** \defgroup macros C++ macros
-\brief C++ macros used in TMB code.
-
-Macros inserted into C++ code to enable transfers of data structures 
+/** \defgroup macros C++ Macros
+\brief C++ macros used to enable interchange of data structures 
 between R and C++.
 */
