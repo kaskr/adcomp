@@ -1,6 +1,6 @@
 excludes = lr_test spde_aniso spde
-rfiles = $(basename $(wildcard *.R))
-cppfiles = $(basename $(wildcard *.cpp))
+rfiles = $(basename $(wildcard *.R)) $(basename $(wildcard */*.R))
+cppfiles = $(basename $(wildcard *.cpp)) $(basename $(wildcard */*.cpp))
 all_examples = $(filter $(rfiles), $(cppfiles))
 examples = $(filter-out $(excludes), $(all_examples))
 outputfiles = $(examples:=.output.RData)
@@ -19,7 +19,8 @@ report:
 	R --slave < tools/unittest.R
 
 clean :
-	rm -rf *.o *.so *~ core *.output.RData Rplots.pdf *.profile
+	rm -rf *.o *.so *~ core *.output.RData *.pdf *.profile
+	rm -rf */*.o */*.so */*~ core */*.output.RData */*.pdf */*.profile
 
 %.profile : %.R %.cpp
 	example=$(basename $<) R --slave < tools/profiler.R
