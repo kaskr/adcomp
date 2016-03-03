@@ -54,7 +54,9 @@ Type objective_function<Type>::operator() ()
   std::cout << "First element of v1= "			<< v1.head(1) 				<< "\n";
   std::cout << "Last element of v1= "			<< v1.tail(1) 				<< "\n";
   std::cout << "Block of m1 consisting of m1(1,1)= "	<< m1.block(0,0,1,1)			<< "\n";
-  
+
+  // Subsetting arrays
+  // See R help pages for "template", i.e. "help(template)" in R  
   
 
   // Generic matrix operations that we must ensure compiles

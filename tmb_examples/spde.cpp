@@ -1,4 +1,7 @@
+// Illustration SPDE/INLA approach to spatial modelling via Matern correlation function
 // Leukemia example from Lindgren et al 2011, JRSS-B
+// http://www.r-inla.org/examples/case-studies/lindgren-rue-and-lindstrom-rss-paper-2011
+
 #include <TMB.hpp>
 
 template<class Type>
@@ -12,7 +15,9 @@ Type objective_function<Type>::operator() ()
   DATA_IVECTOR(notcens);
   DATA_IVECTOR(meshidxloc);
   DATA_MATRIX(X);    
+  
   DATA_STRUCT(spde,spde_t);
+  
   PARAMETER_VECTOR(beta);      
   PARAMETER(log_tau);
   PARAMETER(log_kappa);

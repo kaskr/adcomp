@@ -1,12 +1,12 @@
+# Illustration SPDE/INLA approach to spatial modelling via Matern correlation function
 # Leukemia example from Lindgren et al 2011, JRSS-B
 # http://www.r-inla.org/examples/case-studies/lindgren-rue-and-lindstrom-rss-paper-2011
-# Uses INLA to set up grid but use TMB to fit model
 
 library(TMB)
 compile("spde.cpp")
 dyn.load(dynlib("spde"))
 
-# Sets INLA mesh. Read R-INLA documentation about how to do this
+# Sets INLA mesh. Please refer to R-INLA documentation
 require(splancs)
 require(rgl)
 require(INLA)
@@ -18,38 +18,36 @@ loc = cbind(Leuk$xcoord, Leuk$ycoord)
 bnd1 = inla.nonconvex.hull(loc, convex=0.05)
 bnd2 = inla.nonconvex.hull(loc, convex=0.25)
 mesh = inla.mesh.2d(
-                  ## Data locations to use as location seeds:
                   loc=cbind(Leuk$xcoord, Leuk$ycoord),
-                  ## Encapsulate data region:
                   boundary=list(bnd1, bnd2),
-                  ## Refined triangulation,
-                  ## minimal angles >=26 degrees,
-                  ## interior maximal edge lengths 0.05,
-                  ## exterior maximal edge lengths 0.2,
-                  ## don't add input points closer than 0.05:
                   min.angle=24,
                   max.edge=c(0.05, 0.2),
                   cutoff=0.005,
-                  ## Set to >=0 for visual (no effect Windows):
                   plot.delay=0.5
                   )
+#------ End INLA setup
      
 # Fixed effects part of model
 X = model.matrix(~1+sex+age+wbc+tpi,data=Leuk)
 data <- list(time=Leuk$time,notcens=Leuk$cens,meshidxloc=mesh$idx$loc-1,X=as.matrix(X))
 
-# SPDE part
-data$spde <- (inla.spde2.matern(mesh, alpha=2)$param.inla)[c("M0","M1","M2")]	# Objects to be
-n_s = nrow(data$spde$M0)
+# SPDE part: builds 3 components of Q (precission matrix)
+data$spde <- (inla.spde2.matern(mesh, alpha=2)$param.inla)[c("M0","M1","M2")]	# Encapsulation of 3 matrices
+n_s = nrow(data$spde$M0)														# Number of points in mesh (including supporting points)
 
 parameters <- list(beta=c(-5.0,0,0,0,0),log_tau=-2.0,log_kappa=2.5,log_alpha=-1,x=rep(0.0,n_s))
 
-# Phase 1: Fit model non-spatial model first to get good starting values
-obj <- MakeADFun(data,parameters,map=list(x=factor(rep(NA,n_s))),DLL="spde")
-L=c(-7,-1,-1,-1,-1,-3.0,2.0,log(0.1))
-U=c(-4,1,1,1,1,-1.0,3.0,log(10.0))
-opt1 <- nlminb(obj$par,obj$fn,obj$gr,lower=L,upper=U)
+# Phase 1: Fit non-spatial part first to get good starting values for fixed effects
+not_phase1 = list(log_tau=as.factor(NA),log_kappa=as.factor(NA),x=factor(rep(NA,n_s)))
+obj <- MakeADFun(data,parameters,map=not_phase1,DLL="spde")
+#opt1 <- nlminb(obj$par,obj$fn,obj$gr,lower=L,upper=U)
+opt1 <- nlminb(obj$par,obj$fn,obj$gr)
+
+# Modify starting values after phase 1
+parameters <- list(beta=opt1$par[1:5],log_tau=-2.0,log_kappa=2.5,log_alpha=opt1$par["log_alpha"],x=rep(0.0,n_s))
 
 # Phase 2: Include spatial part. Use starting values from phase 1
 obj <- MakeADFun(data,parameters,random="x",DLL="spde")
-opt <- nlminb(opt1$par,obj$fn,obj$gr,lower=L,upper=U)
+L=c(-7,-1,-1,-1,-1,-3.0,2.0,log(0.1))
+U=c(-4,1,1,1,1,-1.0,3.0,log(10.0))
+opt <- nlminb(obj$par,obj$fn,obj$gr,lower=L,upper=U)
