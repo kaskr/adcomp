@@ -81,7 +81,7 @@
 ##' @param bias.correct.control a \code{list} of bias correction options; currently only \code{sd} is used.
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of parameters?
 ##' @return Object of class \code{sdreport}
-##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}
+##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 ##' @examples
 ##' \dontrun{
 ##' runExample("linreg_parallel", thisR = TRUE) ## Non-random effect example
@@ -291,6 +291,12 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       warning("Could not report sd's of full randomeffect vector.")
     }
   }
+  ## Copy a few selected members of the environment 'env'. In
+  ## particular we need the 'skeleton' objects that allow us to put
+  ## results back in same shape as original parameter list.
+  ans$env <- new.env()
+  ans$env$parameters <- obj$env$parameters
+  ans$env$random <- obj$env$random
   class(ans) <- "sdreport"
   ans
 }
@@ -357,4 +363,68 @@ print.sdreport <- function(x, ...)
   }
   cat("Maximum gradient component:", max(abs(x$gradient.fixed)),"\n")
   invisible(x)
+}
+
+##' Get estimated parameters or standard errors in the same shape as
+##' the original parameter list.
+##'
+##' This function converts the selected column \code{what} of
+##' \code{summary(x, select = c("fixed", "random"), ...)} to the same
+##' format as the original parameter list (re-ordered as the template
+##' parameter order). The argument \code{what} is partially matched
+##' among the column names of the summary table. The actual match is
+##' added as an attribute to the output.
+##'
+##' @title Convert estimates to original list format.
+##' @param x Output from \code{\link{sdreport}}.
+##' @param what Select what to convert.
+##' @param ... Passed to \code{\link{summary.sdreport}}.
+##' @return List of same shape as original parameter list.
+##' @method as.list sdreport
+##' @S3method as.list sdreport
+##' @examples
+##' \dontrun{
+##' example(sdreport)
+##' as.list(rep, "Est")
+##' as.list(rep, "Std")
+##' as.list(rep, "Pr", p.value=TRUE)
+##' }
+as.list.sdreport <- function(x, what = "", ...){
+    ans <- x$env$parameters
+    random <- x$env$random
+    par <- numeric(length(x$par.fixed) +
+                   length(x$par.random))
+    fixed <- rep(TRUE, length(par))
+    if(length(random)>0)
+        fixed[random] <- FALSE
+    ## Possible choices
+    opts <- colnames( summary(x, select = c("fixed", "random"), ...) )
+    what <- match.arg(what, opts)
+    if( any( fixed ) )
+        par[ fixed ] <- summary(x, select = "fixed",  ...)[ , what]
+    if( any(!fixed ) )
+        par[!fixed ] <- summary(x, select = "random", ...)[ , what]
+    ## Workaround utils::relist bug (?) for empty list items
+    nonemp <- sapply(ans, function(x)length(x) > 0)
+    nonempindex <- which(nonemp)
+    skeleton <- as.relistable(ans[nonemp])
+    li <- relist(par, skeleton)
+    reshape <- function(x){
+        if(is.null(attr(x,"map")))
+            return(x)
+        y <- attr(x,"shape")
+        f <- attr(x,"map")
+        i <- which(f >= 0)
+        y[i] <- x[f[i] + 1L]
+        y
+    }
+    for(i in seq(skeleton)){
+        ans[[nonempindex[i]]][] <- as.vector(li[[i]])
+    }
+    for(i in seq(ans)){
+        ans[[i]] <- reshape(ans[[i]])
+    }
+    attr(ans, "check.passed") <- NULL
+    attr(ans, "what") <- what
+    ans
 }
