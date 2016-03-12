@@ -47,7 +47,17 @@ if(example!=""){
   report <- function(f1,f2,full.timings=FALSE,full.diff=FALSE){
     if(!(file.exists(f1)&file.exists(f2)))return(c("NA"=NA))
     diff <- function(x,y){
-      if(is.list(x)&is.list(y))Map(diff,x,y)
+      if(is.list(x)&is.list(y)){
+          x <- unclass(x) ## avoid as.list.sdreport
+          y <- unclass(y) ## avoid as.list.sdreport
+          ## Allow to compare with old expected output (that did not
+          ## have 'env' as part of sdreport output):
+          keep <- function(x)
+              !is.environment(x)
+          keepx <- sapply(x,keep)
+          keepy <- sapply(y,keep)
+          Map(diff, x[keepx], y[keepy])
+      }
       else if((!is.integer(x))&(is.numeric(x)|is.matrix(y))&length(x)>0)max(abs(x-y))
       else NULL
     }
