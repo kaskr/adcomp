@@ -104,7 +104,8 @@
 ##'   parameters = obj$env$parList(),
 ##'   map = list(beta   = factor(c(NA, NA)),
 ##'              logsdu = factor(NA),
-##'              logsd0 = factor(NA) )
+##'              logsd0 = factor(NA) ),
+##'   DLL = "simple"
 ##' )
 ##' s <- run_mcmc(obj2, 1000, "NUTS")
 ##' plot(rowSums(exp(s)))
