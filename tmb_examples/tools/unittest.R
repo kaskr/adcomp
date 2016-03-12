@@ -31,7 +31,7 @@ if(example!=""){
   optim <- addHook(stats::optim,timer=TRUE,result=TRUE)
   nlminb <- addHook(stats::nlminb,timer=TRUE,result=TRUE)
   
-  runExample(basename(example),exfolder=dirname(example),thisR=TRUE)
+  runExample(basename(example),exfolder=dirname(example),thisR=TRUE,subarch=FALSE)
   
   if(!file.exists(paste0(example,".expected.RData"))){
     outfile <- paste0(example,".expected.RData")
@@ -67,7 +67,7 @@ if(example!=""){
   }
   sink("REPORT.md")
   cat("Example overview:\n-----------------\n")
-  runExample(exfolder=".")
+  runExample(exfolder=".",subarch=FALSE)
   cat("\n")
   mat <- do.call("rbind",Map(report,f1,f2))
   rownames(mat) <- sub(".expected.RData","",rownames(mat))
