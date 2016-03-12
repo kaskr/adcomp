@@ -106,7 +106,7 @@
 ##'              logsdu = factor(NA),
 ##'              logsd0 = factor(NA) )
 ##' )
-##' s <- mcmc(obj2, 1000, "NUTS")
+##' s <- run_mcmc(obj2, 1000, "NUTS")
 ##' plot(rowSums(exp(s)))
 ##' mean(rowSums(exp(s))) }
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,

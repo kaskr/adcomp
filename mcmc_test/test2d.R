@@ -16,9 +16,9 @@ plotSurface <- function(model){
 getOneSample <- function(method, plot = FALSE, covar=NULL){
     sim <-
      switch(method,
-       "HMC" =mcmc(model, 1000,  method, L=5, diagnostic=TRUE, covar=covar),
-       "NUTS"=mcmc(model, 100,   method, diagnostic=TRUE, covar=covar),
-       "RWM" =mcmc(model, 10000, method, diagnostic=TRUE, covar=covar))
+       "HMC" =run_mcmc(model, 1000,  method, L=5, diagnostic=TRUE, covar=covar),
+       "NUTS"=run_mcmc(model, 100,   method, diagnostic=TRUE, covar=covar),
+       "RWM" =run_mcmc(model, 10000, method, diagnostic=TRUE, covar=covar))
     ans <- tail(sim$par,1)
     if(plot) points(ans)
     eps <- if(method=="RWM") 0 else tail(sim$epsbar,1)
@@ -29,7 +29,7 @@ getOneSample <- function(method, plot = FALSE, covar=NULL){
 set.seed(123)
 nsim <- 200
 
-## xx <- mcmc(model, nsim=200, algorithm='HMC', L=5, params.init=c(5,5), covar=covar)
+## xx <- run_mcmc(model, nsim=200, algorithm='HMC', L=5, params.init=c(5,5), covar=covar)
 
 
 ## Tests all the mcmc algorithms with a specified covariance

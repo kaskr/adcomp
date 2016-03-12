@@ -61,4 +61,4 @@ S3method(plot, parallelBenchmark)
 S3method(print, backtrace)
 
 ## MCMC :
-export(mcmc)
+export(run_mcmc)

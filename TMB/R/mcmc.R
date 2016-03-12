@@ -42,8 +42,8 @@
 #' and properties of the sampler useful for diagnosing behavior and
 #' efficiency.
 #' @example inst/examples/mcmc_examples.R
-#' @seealso \code{\link{mcmc.hmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.rwm}}
-mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=FALSE, ...){
+#' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.rwm}}
+run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=FALSE, ...){
     ## Initialization for all algorithms
     algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
     fn <- function(x) {
@@ -72,15 +72,15 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=
     ## Select and run the chain.
     if(algorithm=="HMC")
         time <- system.time(mcmc.out <-
-            mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar,
+            run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar,
                      diagnostic=diagnostic, ...))
     else if(algorithm=="NUTS")
         time <- system.time(mcmc.out <-
-            mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar,
+            run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar,
                       diagnostic=diagnostic, ...))
     else if(algorithm=="RWM")
         time <- system.time(mcmc.out <-
-            mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar,
+            run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar,
                       diagnostic=diagnostic, ...))
     ## Clean up returned output, a matrix if diag is FALSE, otherwise a list
     if(!diagnostic){
@@ -122,8 +122,8 @@ mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, diagnostic=
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
 #' which proposals were accepted ('accepted'), and the total function calls
 #' ('n.calls'), which for this algorithm is \code{nsim}
-#' @seealso \code{\link{mcmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.hmc}}
-mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALSE){
+#' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.hmc}}
+run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALSE){
     accepted <- rep(0, length=nsim)
     n.params <- length(params.init)
     theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
@@ -215,13 +215,13 @@ mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALS
 #' setting path lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res.
 #' 15:1593-1623.}
 #' }
-#' @seealso \code{\link{mcmc}}, \code{\link{mcmc.nuts}}, \code{\link{mcmc.rwm}}
+#' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.rwm}}
 #' @return If \code{diagnostic} is FALSE (default), returns a matrix of
 #' \code{nsim} samples from the posterior. Otherwise returns a list
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
 #' which were accepted ('accepted'), and the total function and gradient
 #' calls ('n.calls'), which for this algorithm is \code{nsim*(L+2)}.
-mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
+run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
                      delta=0.5, Madapt=NULL, diagnostic=FALSE){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
@@ -381,8 +381,8 @@ mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' ('n.calls'), which in the case of NUTS is dynamic, and finally the
 #' average \code{eps} ('epsbar') from the dual averaging algorithm if
 #' used (otherwise NULL).
-#' @seealso \code{\link{mcmc}}, \code{\link{mcmc.hmc}}, \code{\link{mcmc.rwm}}
-mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Madapt=NULL,
+#' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.rwm}}
+run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Madapt=NULL,
                       delta=0.5, covar=NULL, diagnostic=FALSE){
     ## If using covariance matrix and Cholesky decomposition, redefine
     ## these functions to include this transformation. The algorithm will
