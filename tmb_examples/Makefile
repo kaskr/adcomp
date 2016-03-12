@@ -19,8 +19,8 @@ report:
 	R --slave < tools/unittest.R
 
 clean :
-	rm -rf *.o *.so *~ core *.output.RData *.pdf *.profile
-	rm -rf */*.o */*.so */*~ core */*.output.RData */*.pdf */*.profile
+	rm -rf *.o *.so *.dll *~ core *.output.RData *.pdf *.profile
+	rm -rf */*.o */*.so */*.dll */*~ core */*.output.RData */*.pdf */*.profile
 
 %.profile : %.R %.cpp
 	example=$(basename $<) R --slave < tools/profiler.R
