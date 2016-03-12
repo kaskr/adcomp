@@ -10,17 +10,14 @@
 /* openmp controller */
 SEXP omp_num_threads(SEXP x) {
 #ifdef _OPENMP
-  if(!isNull(x)){
-    int n=INTEGER(x)[0];
-    omp_set_num_threads(n);
+  if( !isNull(x) ){
+    int n = INTEGER(x)[0];
+    omp_set_num_threads( n );
   }
-  SEXP ans;
-  PROTECT(ans = allocVector(INTSXP,1));
-  INTEGER(ans)[0]=omp_get_max_threads();
-  UNPROTECT(1);
-  return ans;
+  return ScalarInteger( omp_get_max_threads() );
 #else
-  error("Openmp not supported.");
+  warning("OpenMP not supported.");
+  return ScalarInteger( 0 );
 #endif
 }
 
