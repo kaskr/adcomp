@@ -10,16 +10,18 @@
 ##' @param clean Cleanup before compile?
 ##' @param exfolder Alternative folder with examples.
 ##' @param dontrun Build only (don't run) and remove temporary object files ?
+##' @param subarch Build in sub-architecture specific folder ?
 ##' @param ... Passed to \code{\link{compile}}.
 runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
                        clean=FALSE,exfolder=NULL,
-                       dontrun=FALSE,...){
+                       dontrun=FALSE,
+                       subarch=TRUE,...){
   cwd <- getwd()
   on.exit(setwd(cwd))
   if(is.null(exfolder))exfolder <- system.file("examples",package="TMB")
   setwd(exfolder)
   arch <- Sys.getenv("R_ARCH")
-  if(arch != ""){
+  if(arch != "" && subarch){
     arch <- sub("/", "", arch)
     if( !file.exists(arch) ){
       dir.create(arch)
