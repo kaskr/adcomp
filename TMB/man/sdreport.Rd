@@ -123,11 +123,11 @@ obj2 <- MakeADFun(
              logsdu = factor(NA),
              logsd0 = factor(NA) )
 )
-s <- mcmc(obj2, 1000, "NUTS")
+s <- run_mcmc(obj2, 1000, "NUTS")
 plot(rowSums(exp(s)))
 mean(rowSums(exp(s))) }
 }
 \seealso{
-\code{\link{summary.sdreport}}, \code{\link{print.sdreport}}
+\code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 }
 

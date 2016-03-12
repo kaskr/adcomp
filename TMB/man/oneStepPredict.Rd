@@ -38,7 +38,9 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 \item{...}{Control parameters for OSA method}
 }
 \value{
-\code{data.frame} with OSA residuals in column \code{residual}.
+\code{data.frame} with OSA \emph{standardized} residuals
+in column \code{residual}. Depending on the method the output may
+also include OSA expected observation in column \code{mean}.
 }
 \description{
 Calculate one-step-ahead (OSA) residuals for a latent variable

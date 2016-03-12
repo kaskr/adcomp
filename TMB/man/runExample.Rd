@@ -5,7 +5,7 @@
 \title{Run one of the test examples.}
 \usage{
 runExample(name = NULL, all = FALSE, thisR = TRUE, clean = FALSE,
-  exfolder = NULL, dontrun = FALSE, ...)
+  exfolder = NULL, dontrun = FALSE, subarch = TRUE, ...)
 }
 \arguments{
 \item{name}{Character name of example.}
@@ -19,6 +19,8 @@ runExample(name = NULL, all = FALSE, thisR = TRUE, clean = FALSE,
 \item{exfolder}{Alternative folder with examples.}
 
 \item{dontrun}{Build only (don't run) and remove temporary object files ?}
+
+\item{subarch}{Build in sub-architecture specific folder ?}
 
 \item{...}{Passed to \code{\link{compile}}.}
 }
