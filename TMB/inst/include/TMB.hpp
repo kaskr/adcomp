@@ -74,6 +74,7 @@ namespace CppAD{
 #include "config.hpp"
 #include "atomic_math.hpp"
 #include "expm.hpp"
+#include "atomic_convolve.hpp"
 #include "Vectorize.hpp"
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
