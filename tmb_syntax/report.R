@@ -1,4 +1,5 @@
 ## Demonstrate how to pass objects back to R using the REPORT macro
+library(Matrix)
 library(TMB)
 
 ## Compile and load example

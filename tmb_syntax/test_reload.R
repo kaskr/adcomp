@@ -43,5 +43,7 @@ dyn.load(dynlib("mymodel"))
 obj <- MakeADFun(list(),list(a=0))
 ok <- obj$fn() == 2  ## OK ?
 
+## Cleanup
+file.remove("mymodel.cpp")
 cat("\n")
 cat("OK?",ok,"\n")

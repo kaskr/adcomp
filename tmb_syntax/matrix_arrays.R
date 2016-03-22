@@ -1,8 +1,6 @@
-require(TMB)
 library(TMB)
-compile("matrix_arrays.cpp",CXX="clang++")
-dyn.load("matrix_arrays.so")
+compile("matrix_arrays.cpp")
+dyn.load(dynlib("matrix_arrays"))
 obj <- MakeADFun(data=list(i=1),
                  parameters=list(p = 0)
 		 )
-
