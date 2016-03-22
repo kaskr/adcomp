@@ -1,4 +1,17 @@
 ------------------------------------------------------------------------
+TMB 1.7.0 (2016-03-22)
+------------------------------------------------------------------------
+
+o CITATION update with JSS publication.
+
+o New function 'as.list.sdreport' converts from sdreport format to
+  original parameter list structure.
+
+o MCMC:
+  - Fix small bug in transforming intial values in NUTS.
+  - Rename mcmc -> run_mcmc to avoid conflict with coda package.
+
+------------------------------------------------------------------------
 TMB 1.6.6 (2016-01-28)
 ------------------------------------------------------------------------
 
