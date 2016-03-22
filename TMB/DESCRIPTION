@@ -1,8 +1,8 @@
 Package: TMB
 Type: Package
 Title: Template Model Builder: A General Random Effect Tool Inspired by ADMB
-Version: 1.6.6
-Date: 2016-01-28
+Version: 1.7.0
+Date: 2016-03-22
 Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr@dtu.dk"),
              person("Brad","Bell",role="cph"),
              person("Hans","Skaug",role="ctb"),
@@ -15,15 +15,15 @@ Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr
              person("Cole","Monnahan",role="ctb") )
 Maintainer: Kasper Kristensen <kaskr@dtu.dk>
 Author: Kasper Kristensen [aut, cre, cph],
-        Brad Bell [cph],
-        Hans Skaug [ctb],
-        Arni Magnusson [ctb],
-        Casper Berg [ctb],
-        Anders Nielsen [ctb],
-        Martin Maechler [ctb],
-        Theo Michelot [ctb],
-        Mollie Brooks [ctb],
-        Cole Monnahan [ctb]
+    Brad Bell [cph],
+    Hans Skaug [ctb],
+    Arni Magnusson [ctb],
+    Casper Berg [ctb],
+    Anders Nielsen [ctb],
+    Martin Maechler [ctb],
+    Theo Michelot [ctb],
+    Mollie Brooks [ctb],
+    Cole Monnahan [ctb]
 Copyright: See the file COPYRIGHTS
 Description: With this tool, a user should be able to quickly implement complex
     random effect models through simple C++ templates. The package combines
@@ -35,7 +35,16 @@ Description: With this tool, a user should be able to quickly implement complex
 License: GPL-2
 URL: http://tmb-project.org
 BugReports: https://github.com/kaskr/adcomp/issues
-Depends: R (>= 3.0.0)
-Imports: graphics, methods, stats, utils, Matrix (>= 1.0-12)
+Depends:
+    R (>= 3.0.0)
+Imports:
+    graphics,
+    methods,
+    stats,
+    utils,
+    Matrix (>= 1.0-12)
 LinkingTo: Matrix
-Suggests: numDeriv, parallel
+Suggests:
+    numDeriv,
+    parallel
+RoxygenNote: 5.0.1
