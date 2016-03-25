@@ -343,6 +343,7 @@ MakeADFun <- function(data, parameters, map=list(),
         tmp <- lapply(parameters,function(x)x*0)
         tmp[random] <- lapply(tmp[random],function(x)x*0+1)
         random <<- which(as.logical(unlist(tmp)))
+        if(length(random)==0) random <<- NULL
       }
       if(regexp){ ## Original regular expression match
         random <<- grepRandomParameters(parameters,random)
@@ -357,6 +358,7 @@ MakeADFun <- function(data, parameters, map=list(),
           tmp <- lapply(parameters,function(x)x*0)
           tmp[profile] <- lapply(tmp[profile],function(x)x*0+1)
           profile <<- match( which(as.logical(unlist(tmp))) , random )
+          if(length(profile)==0) random <<- NULL
           if(any(duplicated(profile))) stop("Profile parameter vector not unique.")
           tmp <- rep(0L, length(random))
           tmp[profile] <- 1L
