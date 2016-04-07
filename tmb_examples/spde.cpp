@@ -21,12 +21,12 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(beta);      
   PARAMETER(log_tau);
   PARAMETER(log_kappa);
-  PARAMETER(log_alpha);  
+  PARAMETER(log_omega);  
   PARAMETER_VECTOR(x);  
 
   Type tau = exp(log_tau);
   Type kappa = exp(log_kappa);
-  Type alpha = exp(log_alpha);
+  Type omega = exp(log_omega);  // Parameter of Weibull distribution
 
   Type nll = 0.0;
 
@@ -38,9 +38,9 @@ Type objective_function<Type>::operator() ()
   for(int i=0; i<time.size(); i++){    
     Type eta = Xbeta(i) + x(meshidxloc(i))/tau;
     Type lambda = exp(eta);
-    Type t_alpha = pow(time(i),alpha);
-    Type S = exp(-lambda*t_alpha);               // Survival function
-    Type f = lambda*alpha*t_alpha/time(i)*S;     // Densities
+    Type t_omega = pow(time(i),omega);
+    Type S = exp(-lambda*t_omega);               // Survival function
+    Type f = lambda*omega*t_omega/time(i)*S;     // Weibull density
 
     // Likelihood contribution depends on truncation status
     if(notcens(i))
@@ -48,6 +48,10 @@ Type objective_function<Type>::operator() ()
     else
       nll -= log(S); 
   }
+ 
+  double nu = 1.0;            // nu = alpha-d/2 = 2-1 by eqn (2) in Lindgren 
+  Type rho = sqrt(8*nu)/kappa;  // Distance at which correlation has dropped to 0.1 (p.  4 in Lindgren)
+  ADREPORT(rho);
     
   return nll;
 }
