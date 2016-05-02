@@ -20,6 +20,11 @@
 ##' \eqn{\theta}. Then \deqn{V(\phi(\hat\theta))\approx \nabla\phi
 ##' V(\hat\theta) \nabla\phi'}
 ##'
+##' The covariance matrix of reported variables
+##' \eqn{V(\phi(\hat\theta))} is returned by default. This can cause
+##' high memory usage if many variables are ADREPORTed. Use
+##' \code{getReportCovariance=FALSE} to only return standard errors.
+##'
 ##' For random effect models a generalized delta-method is used. First
 ##' the joint covariance of random effects and parameters is estimated
 ##' by
@@ -80,6 +85,7 @@
 ##' @param bias.correct logical indicating if bias correction should be applied
 ##' @param bias.correct.control a \code{list} of bias correction options; currently only \code{sd} is used.
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of parameters?
+##' @param getReportCovariance Get full covariance matrix of ADREPORTed variables?
 ##' @return Object of class \code{sdreport}
 ##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 ##' @examples
@@ -111,7 +117,8 @@
 ##' plot(rowSums(exp(s)))
 ##' mean(rowSums(exp(s))) }
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
-                     bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE){
+                     bias.correct.control=list(sd=FALSE), ignore.parm.uncertainty = FALSE,
+                     getReportCovariance=TRUE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -161,47 +168,70 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   simpleCase <- is.null(r)
   ## Get ADreport vector (phi)
   phi <- try(obj2$fn(par),silent=TRUE)
-  if(is.character(phi) | length(phi)==0){ ## Nothing to report
-    simpleCase <- TRUE
-    phi <- numeric(0)
-  } else { ## Something to report - get derivatives
-    Dphi <- obj2$gr(par)
-    if(!is.null(r)){
-      Dphi.random <- Dphi[,r,drop=FALSE]
-      Dphi.fixed <- Dphi[,-r,drop=FALSE]
-      if(all(Dphi.random==0)){ ## Fall back to simple case
-        simpleCase <- TRUE
-        Dphi <- Dphi.fixed
+  doDeltaMethod <- function(chunk=NULL){
+      if(is.character(phi) | length(phi)==0){ ## Nothing to report
+          simpleCase <- TRUE
+          phi <- numeric(0)
+      } else { ## Something to report - get derivatives
+          if(is.null(chunk)){ ## Do all at once
+              Dphi <- obj2$gr(par)
+          } else {
+              ## Do *chunk* only
+              ## Reduce to Dphi[chunk,] and phi[chunk]
+              w <- rep(0, length(phi))
+              phiDeriv <- function(i){
+                  w[i] <- 1
+                  obj2$env$f(par, order=1, rangeweight=w)
+              }
+              Dphi <- t( sapply(chunk, phiDeriv) )
+              phi <- phi[chunk]
+          }
+          if(!is.null(r)){
+              Dphi.random <- Dphi[,r,drop=FALSE]
+              Dphi.fixed <- Dphi[,-r,drop=FALSE]
+              if(all(Dphi.random==0)){ ## Fall back to simple case
+                  simpleCase <- TRUE
+                  Dphi <- Dphi.fixed
+              }
+          }
       }
-    }
+      ## ======== Do delta method
+      ## Get covariance (cov)
+      if(simpleCase){
+          if(length(phi)>0){
+              cov <- Dphi %*% Vtheta %*% t(Dphi)
+          } else cov <- matrix(,0,0)
+      } else {
+          tmp <- solve(hessian.random,t(Dphi.random))
+          tmp <- as.matrix(tmp)
+          term1 <- Dphi.random%*%tmp ## first term.
+          if(ignore.parm.uncertainty){
+              term2 <- 0
+          } else {
+              ## Use columns of tmp as direction for reverse mode sweep
+              f <- obj$env$f
+              w <- rep(0, length(par))
+              reverse.sweep <- function(i){
+                  w[r] <- tmp[,i]
+                  -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
+              }
+              A <- t(do.call("cbind",lapply(seq_along(phi), reverse.sweep))) + Dphi.fixed
+              term2 <- A %*% (Vtheta %*% t(A)) ## second term
+          }
+          cov <- term1 + term2
+      }
+      ##list(phi=phi, cov=cov)
+      cov
   }
-  ## ======== Do delta method
-  ## Get covariance (cov)
-  if(simpleCase){
-    if(length(phi)>0){
-      cov <- Dphi %*% Vtheta %*% t(Dphi)
-    } else cov <- matrix(,0,0)
+  if(getReportCovariance){ ## Get all
+      cov <- doDeltaMethod()
+      sd <- sqrt(diag(cov))
   } else {
-    tmp <- solve(hessian.random,t(Dphi.random))
-    tmp <- as.matrix(tmp)
-    term1 <- Dphi.random%*%tmp ## first term.
-    if(ignore.parm.uncertainty){
-        term2 <- 0
-    } else {
-        ## Use columns of tmp as direction for reverse mode sweep
-        f <- obj$env$f
-        w <- rep(0, length(par))
-        reverse.sweep <- function(i){
-            w[r] <- tmp[,i]
-            -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
-        }
-        A <- t(do.call("cbind",lapply(seq_along(phi), reverse.sweep))) + Dphi.fixed
-        term2 <- A %*% (Vtheta %*% t(A)) ## second term
-    }
-    cov <- term1 + term2
+      tmp <- lapply(seq_along(phi), doDeltaMethod)
+      sd <- sqrt(unlist(tmp))
+      cov <- NA
   }
   ## Output
-  sd <- sqrt(diag(cov))
   ans <- list(value=phi,sd=sd,cov=cov,par.fixed=par.fixed,
               cov.fixed=Vtheta,pdHess=pdHess,
               gradient.fixed=gradient.fixed)
