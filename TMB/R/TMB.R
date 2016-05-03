@@ -395,7 +395,7 @@ MakeADFun <- function(data, parameters, map=list(),
   f <- function(theta=par, order=0, type="ADdouble",
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
-                dumpstack=0) {
+                dumpstack=0, doforward=1) {
     if(isNullPointer(ADFun$ptr)) {
         if(silent)beSilent()
         retape()
@@ -410,7 +410,8 @@ MakeADFun <- function(data, parameters, map=list(),
                                  sparsitypattern=as.integer(sparsitypattern),
                                  rangecomponent=as.integer(rangecomponent),
                                  rangeweight=rangeweight,
-                                 dumpstack=as.integer(dumpstack)
+                                 dumpstack=as.integer(dumpstack),
+                                 doforward=as.integer(doforward)
                                ),
                        PACKAGE=DLL
                        )
@@ -432,7 +433,8 @@ MakeADFun <- function(data, parameters, map=list(),
                                     sparsitypattern=as.integer(sparsitypattern),
                                     rangecomponent=as.integer(rangecomponent),
                                     rangeweight=rangeweight,
-                                    dumpstack=as.integer(dumpstack)),PACKAGE=DLL)
+                                    dumpstack=as.integer(dumpstack),
+                                    doforward=as.integer(doforward)),PACKAGE=DLL)
         },
         stop("invalid 'type'")) # end{ switch() }
     res
@@ -524,7 +526,8 @@ MakeADFun <- function(data, parameters, map=list(),
                         sparsitypattern=as.integer(0),
                         rangecomponent=as.integer(1),
                         rangeweight=as.double(w),
-                        dumpstack=as.integer(0)
+                        dumpstack=as.integer(0),
+                        doforward=as.integer(1)
                       ),
               PACKAGE=DLL)
     }## order == 1
@@ -1387,8 +1390,9 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                             hessianrows = integer(0),
                             sparsitypattern = as.integer(0),
                             rangecomponent = as.integer(1),
-                            dumpstack=as.integer(0)),
-		PACKAGE=obj$env$DLL)
+                            dumpstack=as.integer(0),
+                            doforward=as.integer(1)
+                ), PACKAGE=obj$env$DLL)
   n <- as.integer(length(obj$env$par))
   M <- new("dsTMatrix",
            i = as.integer(attr(ADHess$ptr,"i")),

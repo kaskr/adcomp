@@ -805,6 +805,8 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   int n=pf->Domain();
   int m=pf->Range();
   if(LENGTH(theta)!=n)error("Wrong parameter length.");
+  // Do forwardsweep ?
+  int doforward=INTEGER(getListElement(control,"doforward"))[0];
   //R-index -> C-index
   int rangecomponent=INTEGER(getListElement(control,"rangecomponent"))[0]-1;
   if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
@@ -837,7 +839,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   SEXP rangeweight=getListElement(control,"rangeweight");
   if(rangeweight!=R_NilValue){
     if(LENGTH(rangeweight)!=m)error("rangeweight must have length equal to range dimension");
-    pf->Forward(0,x);
+    if(doforward)pf->Forward(0,x);
     res=asSEXP(pf->Reverse(1,asVector<double>(rangeweight)));
     UNPROTECT(3);
     return res;
@@ -860,7 +862,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   }
   if(order==1){
     //PROTECT(res=asSEXP(asMatrix(pf->Jacobian(x),m,n)));
-    pf->Forward(0,x);
+    if(doforward)pf->Forward(0,x);
     vector<double> jac(n*m);
     vector<double> u(n);
     vector<double> v(m);
