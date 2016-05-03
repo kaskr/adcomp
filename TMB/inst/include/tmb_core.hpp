@@ -833,8 +833,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
       if(nrows>0)rows[i]=INTEGER(hessianrows)[i]-1; //R-index -> C-index
     }
   }
-  vector<double> x(n);
-  for(int i=0;i<n;i++)x[i]=REAL(theta)[i];
+  vector<double> x = asVector<double>(theta);
   SEXP res=R_NilValue;
   SEXP rangeweight=getListElement(control,"rangeweight");
   if(rangeweight!=R_NilValue){

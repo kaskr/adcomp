@@ -95,10 +95,11 @@ SEXP asSEXP(const AD<Type> &a){
 template <class Type>
 vector<Type> asVector(SEXP x)
 {
-   if(!isReal(x))error("NOT A VECTOR!");
-   int n=length(x);
-   vector<Type> y(n);
-   for(int i=0;i<n;i++) y[i]=Type(REAL(x)[i]);
+   if(!isReal(x)) error("NOT A VECTOR!");
+   int n = length(x);
+   typedef Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,1> > MapVector;
+   MapVector tmp(REAL(x), n);
+   vector<Type> y = tmp.cast<Type>();
    return y;
 }
 
