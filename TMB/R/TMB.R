@@ -392,7 +392,7 @@ MakeADFun <- function(data, parameters, map=list(),
   ## Has atomic functions been generated for the tapes ?
   usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
 
-  f <- function(theta=par, order=0, type=c("ADdouble","double","ADGrad"),
+  f <- function(theta=par, order=0, type="ADdouble",
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
                 dumpstack=0) {
@@ -400,7 +400,7 @@ MakeADFun <- function(data, parameters, map=list(),
         if(silent)beSilent()
         retape()
     }
-    switch(match.arg(type),
+    switch(type,
            "ADdouble" = {
           res <- .Call("EvalADFunObject", ADFun$ptr, theta,
                        control=list(
