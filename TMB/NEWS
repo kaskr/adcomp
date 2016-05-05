@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+TMB 1.7.1 (2016-05-05)
+------------------------------------------------------------------------
+
+o Lots of minor performance optimizations.
+
+o sdreport: New argument getReportCovariance.
+  - Reduces memory usage when many variables are ADREPORTed.
+
+o bugfix: numeric(0) in random list of MakeADFun caused wrong
+  parameter list.
+
+o New atomic: convol2d
+
+------------------------------------------------------------------------
 TMB 1.7.0 (2016-03-22)
 ------------------------------------------------------------------------
 
