@@ -167,7 +167,12 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ## If no random effects use standard delta method
   simpleCase <- is.null(r)
   ## Get ADreport vector (phi)
-  phi <- try(obj2$fn(par),silent=TRUE)
+  phi <- try(obj2$fn(par), silent=TRUE)    ## NOTE_1: obj2 forward sweep now initialized !
+  ADGradForward0Initialized <- FALSE
+  ADGradForward0Initialize <- function() { ## NOTE_2: ADGrad forward sweep now initialized !
+      obj$env$f(par, order = 0, type = "ADGrad")
+      ADGradForward0Initialized <<- TRUE
+  }
   doDeltaMethod <- function(chunk=NULL){
       if(is.character(phi) | length(phi)==0){ ## Nothing to report
           simpleCase <- TRUE
@@ -181,7 +186,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               w <- rep(0, length(phi))
               phiDeriv <- function(i){
                   w[i] <- 1
-                  obj2$env$f(par, order=1, rangeweight=w)
+                  obj2$env$f(par, order=1, rangeweight=w, doforward=0) ## See NOTE_1
               }
               Dphi <- t( sapply(chunk, phiDeriv) )
               phi <- phi[chunk]
@@ -211,9 +216,10 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               ## Use columns of tmp as direction for reverse mode sweep
               f <- obj$env$f
               w <- rep(0, length(par))
+              if(!ADGradForward0Initialized) ADGradForward0Initialize()
               reverse.sweep <- function(i){
                   w[r] <- tmp[,i]
-                  -f(par, order = 1, type = "ADGrad",rangeweight = w)[-r]
+                  -f(par, order = 1, type = "ADGrad", rangeweight = w, doforward=0)[-r]
               }
               A <- t(do.call("cbind",lapply(seq_along(phi), reverse.sweep))) + Dphi.fixed
               term2 <- A %*% (Vtheta %*% t(A)) ## second term
@@ -287,9 +293,10 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       } else {
           f <- obj$env$f
           w <- rep(0, length(par))
+          if(!ADGradForward0Initialized) ADGradForward0Initialize()
           reverse.sweep <- function(i){
               w[i] <- 1
-              f(par, order = 1, type = "ADGrad", rangeweight = w)[r]
+              f(par, order = 1, type = "ADGrad", rangeweight = w, doforward=0)[r]
           }
           nonr <- setdiff(seq_along(par), r)
           tmp <- sapply(nonr,reverse.sweep)
