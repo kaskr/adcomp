@@ -5,7 +5,8 @@
 \title{Compile a C++ template to DLL suitable for MakeADFun.}
 \usage{
 compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
-  openmp = isParallelTemplate(file[1]), libtmb = TRUE, ...)
+  openmp = isParallelTemplate(file[1]), libtmb = TRUE, libinit = TRUE,
+  ...)
 }
 \arguments{
 \item{file}{C++ file.}
@@ -19,6 +20,8 @@ compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
 \item{openmp}{Turn on openmp flag? Auto detected for parallel templates.}
 
 \item{libtmb}{Use precompiled TMB library if available (to speed up compilation)?}
+
+\item{libinit}{Turn on preprocessor flag to register native routines?}
 
 \item{...}{Passed as Makeconf variables.}
 }
