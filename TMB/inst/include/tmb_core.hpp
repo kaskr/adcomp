@@ -1466,3 +1466,22 @@ extern "C"
 }
 
 #endif /* #ifdef WITH_LIBTMB */
+
+/* Register native routines (see 'Writing R extensions'). Especially
+   relevant to avoid symbol lookup overhead for those routines that
+   are called many times e.g. EvalADFunObject. */
+extern "C"{
+#ifdef TMB_LIB_INIT
+#include <R_ext/Rdynload.h>
+#define CALLDEF(name, n) {#name, (DL_FUNC) &name, n}
+static R_CallMethodDef CallEntries[] = {
+  CALLDEF(EvalADFunObject, 3),
+  CALLDEF(EvalDoubleFunObject, 3),
+  {NULL, NULL, 0}
+};
+void TMB_LIB_INIT(DllInfo *dll){
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+}
+#undef CALLDEF
+#endif /* #ifdef  */
+}

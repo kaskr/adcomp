@@ -873,10 +873,12 @@ openmp <- function(n=NULL){
 ##' @param safeunload Turn on preprocessor flag for safe DLL unloading?
 ##' @param openmp Turn on openmp flag? Auto detected for parallel templates.
 ##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
+##' @param libinit Turn on preprocessor flag to register native routines?
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
-                    openmp=isParallelTemplate(file[1]),libtmb=TRUE,...){
+                    openmp=isParallelTemplate(file[1]),libtmb=TRUE,
+                    libinit=TRUE,...){
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
@@ -947,7 +949,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                    paste0("-I",system.file("include",package="RcppEigen"))[useRcppEigen],
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
-                   "-DWITH_LIBTMB"[libtmb]
+                   "-DWITH_LIBTMB"[libtmb],
+                   paste0("-DTMB_LIB_INIT=R_init_",libname)[libinit]
                    )
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
@@ -1009,6 +1012,7 @@ precompile <- function(all=TRUE, clean=FALSE, trace=TRUE,...){
   ## Precompile frequently used classes:
   if(all) precompileSource()
   code <- c(
+      "#undef  TMB_LIB_INIT",
       "#undef  LIB_UNLOAD",
       "#undef  WITH_LIBTMB",
       "#undef  TMB_PRECOMPILE",
