@@ -693,14 +693,9 @@ public:
        If not, we assume that the "epsilon method" has been requested from R, I.e.
        that the un-used theta parameters are reserved for an inner product contribution
        with the numbers reported via ADREPORT. */
-    if(index!=theta.size()){
-      if( index + reportvector.size() != theta.size() )
-	error("evalUserTemplate: Invalid parameter length.");
-      if( reportvector.size() > 0 ){
-	vector<Type> epsilon(reportvector.size());
-	this->fill(epsilon,"epsilon"); /* Assume theta has been sufficiently augmented */
-	ans += ( this->reportvector.result * epsilon ).sum();
-      }
+    if(index != theta.size()){
+      PARAMETER_VECTOR( TMB_epsilon_ );
+      ans += ( this->reportvector.result * TMB_epsilon_ ).sum();
     }
     return ans;
   }

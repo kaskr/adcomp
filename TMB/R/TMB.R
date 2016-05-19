@@ -19,6 +19,22 @@ grepRandomParameters <- function(parameters,random){
     x
 }
 
+## Associate a 'map' with *one* entry in a parameter list
+updateMap <- function(parameter.entry, map.entry) {
+    ## Shortened parameter
+    ans <- tapply(parameter.entry, map.entry, mean)
+    if(length(ans) == 0) ans <- as.numeric(ans) ## (zero-length case)
+    ## Integer code used to fill short into original shape
+    fnew <- unclass(map.entry)
+    fnew[!is.finite(fnew)] <- 0L
+    fnew <- fnew - 1L
+    ## Output
+    attr(ans,"shape") <- parameter.entry
+    attr(ans,"map") <- fnew
+    attr(ans,"nlevels") <- length(ans)
+    ans
+}
+
 ## Guess name of user's loaded DLL code
 getUserDLL <- function(){
     dlls <- getLoadedDLLs()
@@ -237,18 +253,7 @@ MakeADFun <- function(data, parameters, map=list(),
     param.map <- lapply(names(map),
                         function(nam)
                         {
-                          ## Shortened parameter
-                          ans <- tapply(parameters[[nam]],map[[nam]],mean)
-                          if(length(ans)==0)ans <- as.numeric(ans) ## (zero-length case)
-                          ## Integer code used to fill short into original shape
-                          fnew <- unclass(map[[nam]])
-                          fnew[!is.finite(fnew)] <- 0L
-                          fnew <- fnew-1L
-                          ## Output
-                          attr(ans,"shape") <- parameters[[nam]]
-                          attr(ans,"map") <- fnew
-                          attr(ans,"nlevels") <- length(ans)
-                          ans
+                            updateMap(parameters[[nam]], map[[nam]])
                         })
     ## Now do the change:
     keepAttrib( parameters[names(map)] ) <- param.map
