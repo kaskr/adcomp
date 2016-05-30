@@ -163,20 +163,22 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       hessian.random@factors <- list(SPdCholesky=L)
     }
   }
-  ## ======== Determine case
-  ## If no random effects use standard delta method
-  simpleCase <- is.null(r)
   ## Get ADreport vector (phi)
   phi <- try(obj2$fn(par), silent=TRUE)    ## NOTE_1: obj2 forward sweep now initialized !
+  if(is.character(phi) | length(phi)==0){
+      phi <- numeric(0)
+  }
   ADGradForward0Initialized <- FALSE
   ADGradForward0Initialize <- function() { ## NOTE_2: ADGrad forward sweep now initialized !
       obj$env$f(par, order = 0, type = "ADGrad")
       ADGradForward0Initialized <<- TRUE
   }
   doDeltaMethod <- function(chunk=NULL){
-      if(is.character(phi) | length(phi)==0){ ## Nothing to report
+      ## ======== Determine case
+      ## If no random effects use standard delta method
+      simpleCase <- is.null(r)
+      if(length(phi)==0){ ## Nothing to report
           simpleCase <- TRUE
-          phi <- numeric(0)
       } else { ## Something to report - get derivatives
           if(is.null(chunk)){ ## Do all at once
               Dphi <- obj2$gr(par)
