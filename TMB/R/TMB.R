@@ -948,8 +948,10 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   }
   ## Includes and preprocessor flags specific for the template
   useRcppEigen <- !file.exists( system.file("include/Eigen",package="TMB") )
+  useContrib   <-  file.exists( system.file("include/contrib",package="TMB") )
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
                    paste0("-I",system.file("include",package="RcppEigen"))[useRcppEigen],
+                   paste0("-I",system.file("include/contrib",package="TMB"))[useContrib],
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb],
@@ -1452,4 +1454,17 @@ runSymbolicAnalysis <- function(obj){
   L <- .Call("tmb_symbolic",h,PACKAGE="TMB")
   obj$env$L.created.by.newton <- L
   NULL
+}
+
+install.contrib <- function(url){
+    contrib.folder <- paste0(system.file("include",package="TMB"), "/contrib" )
+    if( !file.exists( contrib.folder ) ) {
+        dir.create(contrib.folder)
+    }
+    zipfile <- tempfile(fileext = ".zip")
+    download.file(url, destfile = zipfile)
+    unzip(zipfile, exdir = contrib.folder, junkpaths = TRUE) ## FIXME: subfolders
+    file.remove(zipfile)
+    cat("NOTE:",contrib.folder,"\n")
+    dir(contrib.folder)
 }
