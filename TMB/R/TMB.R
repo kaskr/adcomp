@@ -1232,6 +1232,12 @@ newton <- function (par,fn,gr,he,
   nam <- names(par)
   par <- as.vector(par)
   g <- h <- NULL
+  ## Disable CHOLMOD warings
+  if(silent) {
+    oldWarn <- getOption("warn")
+    options(warn = -1)
+    on.exit(options(warn = oldWarn))
+  }
   ## pd.check: Quick test for hessian being positive definite
   iterate <- function(par,pd.check=FALSE) {
     if(file.exists(".Rbreakpoint"))browser() ## secret backdoor to poke around...
