@@ -151,7 +151,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
           hessian.fixed <- optimHess(par.fixed,obj$fn,obj$gr) ## Marginal precision of theta.
       }
       pdHess <- !is.character(try(chol(hessian.fixed),silent=TRUE))
-      Vtheta <- solve(hessian.fixed)
+      Vtheta <- try(solve(hessian.fixed),silent=TRUE)
+      if(is(Vtheta, "try-error")) Vtheta <- hessian.fixed * NaN
   }
   ## Get random effect block of the full joint Hessian (hessian.random) and its
   ## Cholesky factor (L)
