@@ -208,14 +208,8 @@ if(PlotToFile) dev.off()
 ### One-step predictions
 
 ## Generate one step predictions with the models fitted under H0 and H1
-predict0  <- oneStepPredict(obj0,observation.name="y",data.term.indicator="keep",
-                         method="oneStepGeneric",discrete=TRUE,range=c(0,Inf),
-                         parallel=TRUE)
-
-predict1  <- oneStepPredict(obj1,observation.name="y",data.term.indicator="keep",
-                         method="oneStepGeneric",discrete=TRUE,range=c(0,Inf),
-                         parallel=TRUE)
-
+predict0  <- oneStepPredict(obj0,observation.name="y",method="fullGaussian")
+predict1  <- oneStepPredict(obj1,observation.name="y",method="fullGaussian")
 
 ## Plot both prediction residuals in one plote
 if(PlotToFile)  pdf(file="Pred-resid.pdf",width=figwidth,height=figheight) else dev.new()
