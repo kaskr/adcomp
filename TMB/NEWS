@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+TMB 1.7.2 (2016-08-09)
+------------------------------------------------------------------------
+
+o sdreport: Allow bias correct in chunks to reduce memory.
+
+o Experimental TMB:::install.contrib to install user contributed cpp
+  code from github.
+
+o Disable CHOLMOD warnings from inner problem when silent=TRUE.
+
+o sdreport: Keep running when solve(hessian) fails.
+
+o sdreport: Fix bug that caused summary(sdreport(.)) to fail when
+  nothing was ADREPORTed.
+
+------------------------------------------------------------------------
 TMB 1.7.1 (2016-05-05)
 ------------------------------------------------------------------------
 
