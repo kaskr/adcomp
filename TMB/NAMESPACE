@@ -14,6 +14,8 @@ importFrom("utils", as.relistable, relist,
 if(.Platform$OS.type == "windows"){
     importFrom("utils", shortPathName)
 }
+## TMB:::install.contrib
+importFrom("utils", download.file, file_test, unzip)
 
 ## Recommended R - packages ----------------------
 importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMatrix, dpoMatrix)
