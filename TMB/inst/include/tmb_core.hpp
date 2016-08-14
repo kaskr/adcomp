@@ -28,7 +28,7 @@
    the library.
 */
 
-/** \brief TMB: SEXP type */
+/** \internal \brief TMB: SEXP type */
 struct SEXP_t{
   SEXP value;				/**< \brief SEXP_t: data entry*/
   SEXP_t(SEXP x)CSKIP({value=x;})	/**< \brief SEXP_t: assignment*/
@@ -36,7 +36,7 @@ struct SEXP_t{
   operator SEXP()CSKIP({return value;})	/**< \brief SEXP_t:*/
 };
 bool operator<(SEXP_t x, SEXP_t y)CSKIP({return (size_t(x.value)<size_t(y.value));})
-/** \brief Controls the life span of objects created in the C++ template (jointly R/C++)*/
+/** \internal \brief Controls the life span of objects created in the C++ template (jointly R/C++)*/
 struct memory_manager_struct{
   int counter;  /**< \brief Number of objects alive that "memory_manager_struct" has allocated */
   std::map<SEXP_t,SEXP_t> alive;
@@ -71,7 +71,7 @@ memory_manager_struct::memory_manager_struct(){
 #endif
 TMB_EXTERN memory_manager_struct memory_manager;
 
-/** \brief Convert x to TMB-format for R/C++ communication
+/** \internal \brief Convert x to TMB-format for R/C++ communication
 
    All external pointers returned from TMB should be placed in a 
    list container of length one. Additional information should be set
@@ -122,7 +122,7 @@ TMB_EXTERN bool _openmp CSKIP( =true; )
 TMB_EXTERN bool _openmp CSKIP( =false; )
 #endif
 
-/** \brief Call the optimize method of an ADFun object pointer. */
+/** \internal \brief Call the optimize method of an ADFun object pointer. */
 template<class ADFunPointer>
 void optimizeTape(ADFunPointer pf){
   if(!config.optimize.instantly){
@@ -347,7 +347,7 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
 }
 
 // kasper: Not sure used anywhere
-/** \brief Get the hessian sparsity pattern of ADFun object pointer
+/** \internal \brief Get the hessian sparsity pattern of ADFun object pointer
 \deprecated Kasper is not sure that this code is used anywhere? 
 */
 template<class Type>
@@ -366,7 +366,7 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
 }
 
 
-/** \brief Get list element named "str", or return NULL */ 
+/** \internal \brief Get list element named "str", or return NULL */
 #ifdef WITH_LIBTMB
 SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL);
 #else
@@ -388,10 +388,10 @@ SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
 }
 #endif
 
-/** \brief Do nothing if we are trying to tape non AD-types */
+/** \internal \brief Do nothing if we are trying to tape non AD-types */
 void Independent(vector<double> x)CSKIP({})
 
-/** \brief Used by ADREPORT */
+/** \internal \brief Used by ADREPORT */
 template <class Type>
 struct report_stack{
   vector<const char*> names;
@@ -450,7 +450,7 @@ struct report_stack{
   EIGEN_DEFAULT_DENSE_INDEX_TYPE size(){return result.size();}
 };  // report_stack
 
-/** \brief Type definition of user-provided objective function (i.e. neg. log. like) */
+/** \internal \brief Type definition of user-provided objective function (i.e. neg. log. like) */
 template <class Type>
 class objective_function
 {
@@ -756,7 +756,7 @@ struct parallel_accumulator{
 
 #ifndef WITH_LIBTMB
 
-/** \brief Evaluates an ADFun object from R
+/** \internal \brief Evaluates an ADFun object from R
 
    Template argument can be "ADFun" or an object extending
    "ADFun" such as "parallelADFun".
@@ -887,7 +887,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   return res;
 } // EvalADFunObjectTemplate
 
-/** \brief Garbage collect an ADFun or parallelADFun object pointer */
+/** \internal \brief Garbage collect an ADFun or parallelADFun object pointer */
 template <class ADFunType>
 void finalize(SEXP x)
 {
@@ -897,7 +897,7 @@ void finalize(SEXP x)
 }
 
 
-/** \brief Construct ADFun object */
+/** \internal \brief Construct ADFun object */
 ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
@@ -928,7 +928,7 @@ ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
 extern "C"
 {
 
-  /** \brief Garbage collect an ADFun object pointer */
+  /** \internal \brief Garbage collect an ADFun object pointer */
   void finalizeADFun(SEXP x)
   {
     ADFun<double>* ptr=(ADFun<double>*)R_ExternalPtrAddr(x);
@@ -942,7 +942,7 @@ extern "C"
     memory_manager.CallCFinalizer(x);
   }
 
-  /** \brief Construct ADFun object */
+  /** \internal \brief Construct ADFun object */
   SEXP MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
   {
@@ -1040,7 +1040,7 @@ extern "C"
     return ans;
   }
 
-  /** \brief Call tape optimization function in CppAD */
+  /** \internal \brief Call tape optimization function in CppAD */
   SEXP optimizeADFunObject(SEXP f)
   {
     SEXP tag=R_ExternalPtrTag(f);
@@ -1057,7 +1057,7 @@ extern "C"
     return R_NilValue;
   }
 
-  /** \brief Get tag of external pointer */
+  /** \internal \brief Get tag of external pointer */
   SEXP getTag(SEXP f){
     return R_ExternalPtrTag(f);
   }
@@ -1145,7 +1145,7 @@ extern "C"
     }
   }
 
-  /** \brief Gets parameter order by running the user template
+  /** \internal \brief Gets parameter order by running the user template
 
    We spend a function evaluation on getting the parameter order (!) */
   SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report)
@@ -1190,7 +1190,7 @@ ADFun< double >* MakeADGradObject(SEXP data, SEXP parameters, SEXP report, int p
 extern "C"
 {
 
-  /** \brief Tape the gradient using nested AD types */
+  /** \internal \brief Tape the gradient using nested AD types */
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
     ADFun<double>* pf = NULL;
@@ -1260,7 +1260,7 @@ extern "C"
 }
 
 
-/** \brief Tape the hessian[cbind(i,j)] using nested AD types.
+/** \internal \brief Tape the hessian[cbind(i,j)] using nested AD types.
 
     skip: integer vector of columns to skip from the hessian (will not
           change dimension - only treat h[:,skip] and h[skip,:] as
@@ -1351,7 +1351,7 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
 
 // kasper: Move to new file e.g. "convert.hpp"
 template <class ADFunType>
-/** \brief Convert sparse matrix H to SEXP format that can be returned to R */
+/** \internal \brief Convert sparse matrix H to SEXP format that can be returned to R */
 SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
 {
     SEXP par;

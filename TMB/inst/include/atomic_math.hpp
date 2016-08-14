@@ -23,7 +23,7 @@
 */
 namespace atomic {
 /**
-   \brief Namespace with double versions of some R special math
+   \internal \brief Namespace with double versions of some R special math
    functions
 */
 namespace Rmath {
@@ -155,7 +155,7 @@ struct TypeDefs{
 /** \name Interface to atomic functions.
     @{
 */
-/** \brief Convert segment of CppAD::vector to Eigen::Matrix 
+/** \internal \brief Convert segment of CppAD::vector to Eigen::Matrix
     \param x Input vector.
     \param m Number of rows in result.
     \param n Number of columns in result.
@@ -168,7 +168,7 @@ typename TypeDefs<Type>::ConstMapMatrix vec2mat(const CppAD::vector<Type> &x, in
   return res;
 }
 
-/** \brief Convert Eigen::Matrix to CppAD::vector by stacking the matrix columns.
+/** \internal \brief Convert Eigen::Matrix to CppAD::vector by stacking the matrix columns.
     \param x Input matrix.
 */
 template<class Type>
@@ -186,7 +186,7 @@ CppAD::vector<Type> mat2vec(matrix<Type> x){
     @{
 */
 
-/** \brief Standard normal density function 'dnorm1'. 
+/** \internal \brief Standard normal density function 'dnorm1'.
     Needed to define derivative of 'pnorm1'.
 */
 template<class Type>

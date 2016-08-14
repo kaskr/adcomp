@@ -97,7 +97,7 @@ namespace atomic{
     }
   };
   
-  /** \brief Representation of 'block-binomial' matrix
+  /** \internal \brief Representation of 'block-binomial' matrix
 
     \verbatim
     Representation of 'block-binomial' matrix of the form
