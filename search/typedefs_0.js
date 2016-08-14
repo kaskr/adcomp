@@ -1,5 +1,0 @@
-var searchData=
-[
-  ['base',['Base',['../structatomic_1_1nestedTriangle.html#a7a84d3042e728b9c3d5bd8a56d4cde52',1,'atomic::nestedTriangle::Base()'],['../structatomic_1_1nestedTriangle_3_010_01_4.html#a6ebc8317ed0eeec172bf81b8fc62cee4',1,'atomic::nestedTriangle&lt; 0 &gt;::Base()'],['../structparallelADFun.html#a950712a192e5ac7dafe0b371eedd8deb',1,'parallelADFun::Base()'],['../structarray.html#a4f47999f4ffbc351a9512a80b3f86288',1,'array::Base()'],['../structtmbutils_1_1vector.html#aee3c1d505427edfd0adbe70564330694',1,'tmbutils::vector::Base()'],['../structtmbutils_1_1matrix.html#a1908a51fb4a4c0b682d9c773a1d74b79',1,'tmbutils::matrix::Base()'],['../structtmbutils_1_1array.html#ae73eabdc1228a43e9dbb6c55a68e6b5c',1,'tmbutils::array::Base()'],['../structvector.html#a859cfbef98012ee557331ba56c841afd',1,'vector::Base()'],['../structmatrix.html#a7d2bfd8ce667d8f8a3e2acaa90759ed0',1,'matrix::Base()']]],
-  ['blocktype',['BlockType',['../structatomic_1_1nestedTriangle.html#ae9e6cc03d3255d163439988bda396159',1,'atomic::nestedTriangle']]]
-];

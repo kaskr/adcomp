@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['mainpage_2etxt',['mainpage.txt',['../mainpage_8txt.html',1,'']]],
-  ['matexp_2ehpp',['matexp.hpp',['../matexp_8hpp.html',1,'']]]
+  ['r_5finla_2ehpp',['R_inla.hpp',['../R__inla_8hpp.html',1,'']]]
 ];

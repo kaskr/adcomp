@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['jacobian_5ft',['jacobian_t',['../structautodiff_1_1jacobian__t.html',1,'autodiff']]]
+  ['unstructured_5fcorr_5ft',['UNSTRUCTURED_CORR_t',['../classdensity_1_1UNSTRUCTURED__CORR__t.html',1,'density']]],
+  ['unstructured_5fcorr_5ft',['UNSTRUCTURED_CORR_t',['../classUNSTRUCTURED__CORR__t.html',1,'']]]
 ];

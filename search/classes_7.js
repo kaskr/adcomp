@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['integratelast',['integratelast',['../structromberg_1_1integratelast.html',1,'romberg']]],
-  ['isdouble',['isDouble',['../structisDouble.html',1,'']]],
-  ['isdouble_3c_20double_20_3e',['isDouble&lt; double &gt;',['../structisDouble_3_01double_01_4.html',1,'']]]
+  ['scale_5ft',['SCALE_t',['../classSCALE__t.html',1,'']]],
+  ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
+  ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],
+  ['separable_5ft',['SEPARABLE_t',['../classSEPARABLE__t.html',1,'']]],
+  ['spde_5faniso_5ft',['spde_aniso_t',['../structR__inla_1_1spde__aniso__t.html',1,'R_inla']]],
+  ['spde_5ft',['spde_t',['../structR__inla_1_1spde__t.html',1,'R_inla']]]
 ];

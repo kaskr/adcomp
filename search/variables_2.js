@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['b',['b',['../structromberg_1_1integratelast.html#aecea56c879129b47180da421b88d37c5',1,'romberg::integratelast::b()'],['../structatomic_1_1Triangle.html#a1f7c67a4eff9fea5d2ffae18941bab35',1,'atomic::Triangle::B()']]]
+  ['optimize',['optimize',['../structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c',1,'config_struct']]]
 ];

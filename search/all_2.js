@@ -1,11 +1,16 @@
 var searchData=
 [
-  ['b',['b',['../structromberg_1_1integratelast.html#aecea56c879129b47180da421b88d37c5',1,'romberg::integratelast::b()'],['../structatomic_1_1Triangle.html#a1f7c67a4eff9fea5d2ffae18941bab35',1,'atomic::Triangle::B()'],['../splines_8hpp.html#a111da81ae5883147168bbb8366377b10',1,'B():&#160;splines.hpp'],['../tmbutils__extra_8hpp.html#a111da81ae5883147168bbb8366377b10',1,'B():&#160;tmbutils_extra.hpp']]],
-  ['base',['Base',['../structatomic_1_1nestedTriangle.html#a7a84d3042e728b9c3d5bd8a56d4cde52',1,'atomic::nestedTriangle::Base()'],['../structatomic_1_1nestedTriangle_3_010_01_4.html#a6ebc8317ed0eeec172bf81b8fc62cee4',1,'atomic::nestedTriangle&lt; 0 &gt;::Base()'],['../structparallelADFun.html#a950712a192e5ac7dafe0b371eedd8deb',1,'parallelADFun::Base()'],['../structarray.html#a4f47999f4ffbc351a9512a80b3f86288',1,'array::Base()'],['../structtmbutils_1_1vector.html#aee3c1d505427edfd0adbe70564330694',1,'tmbutils::vector::Base()'],['../structtmbutils_1_1matrix.html#a1908a51fb4a4c0b682d9c773a1d74b79',1,'tmbutils::matrix::Base()'],['../structtmbutils_1_1array.html#ae73eabdc1228a43e9dbb6c55a68e6b5c',1,'tmbutils::array::Base()'],['../structvector.html#a859cfbef98012ee557331ba56c841afd',1,'vector::Base()'],['../structmatrix.html#a7d2bfd8ce667d8f8a3e2acaa90759ed0',1,'matrix::Base()']]],
-  ['besselk',['besselK',['../namespaceatomic.html#acf82cfa85fbc2864a8b8d583144cb333',1,'atomic::besselK()'],['../convenience_8hpp.html#a5db7378b0391ca8feaece5d7026202bc',1,'besselK():&#160;convenience.hpp']]],
-  ['block',['Block',['../structatomic_1_1Block.html#a601c456facdc89189e1c012f64cb986b',1,'atomic::Block::Block()'],['../structatomic_1_1Block.html#a8a010e2f5cc7164f2c706173309ef93a',1,'atomic::Block::Block(matrix&lt; Type &gt; A_)']]],
-  ['block',['Block',['../structatomic_1_1Block.html',1,'atomic']]],
-  ['block_3c_20double_20_3e',['Block&lt; double &gt;',['../structatomic_1_1Block.html',1,'atomic']]],
-  ['blocktype',['BlockType',['../structatomic_1_1nestedTriangle.html#ae9e6cc03d3255d163439988bda396159',1,'atomic::nestedTriangle']]],
-  ['bottomleftcorner',['bottomLeftCorner',['../structatomic_1_1nestedTriangle.html#aae7ff94ad4ea8f99afb014857f8bd255',1,'atomic::nestedTriangle::bottomLeftCorner()'],['../structatomic_1_1nestedTriangle_3_010_01_4.html#a323c673b44d9c6b87667871e2818535b',1,'atomic::nestedTriangle&lt; 0 &gt;::bottomLeftCorner()']]]
+  ['col',['col',['../structarray.html#a4fd607c3b000df567725bbf4a846139e',1,'array::col()'],['../structtmbutils_1_1array.html#a4b09b981825d16f0b6254e53ae18f15d',1,'tmbutils::array::col()']]],
+  ['cols',['cols',['../structarray.html#af29c9b168b60fe0b0de91073875d7300',1,'array::cols()'],['../structtmbutils_1_1array.html#ab8995d3f6459685cfddd466420865946',1,'tmbutils::array::cols()']]],
+  ['config_2ehpp',['config.hpp',['../config_8hpp.html',1,'']]],
+  ['config_5fstruct',['config_struct',['../structconfig__struct.html',1,'']]],
+  ['contar2_5ft',['contAR2_t',['../classcontAR2__t.html',1,'']]],
+  ['contar2_5ft',['contAR2_t',['../classdensity_1_1contAR2__t.html',1,'density']]],
+  ['convenience_2ehpp',['convenience.hpp',['../convenience_8hpp.html',1,'']]],
+  ['convert_2ehpp',['convert.hpp',['../convert_8hpp.html',1,'']]],
+  ['cov',['cov',['../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc',1,'MVNORM_t::cov()'],['../classARk__t.html#ac2ec7808cbff3f5a0b554c1fa9daf2e6',1,'ARk_t::cov()'],['../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202',1,'density::MVNORM_t::cov()'],['../classdensity_1_1ARk__t.html#aaebe57b632f9f457ebff2e3a7f159292',1,'density::ARk_t::cov()']]],
+  ['c_2b_2b_20tutorial',['C++ tutorial',['../group__CppTutorial.html',1,'']]],
+  ['compilation_20and_20run_20time_20errors',['Compilation and run time errors',['../group__Errors.html',1,'']]],
+  ['comprehensive_20documentation_20of_20c_2b_2b_20functions_20and_20classes_20_28api_29',['Comprehensive Documentation of C++ Functions and Classes (API)',['../index.html',1,'']]],
+  ['c_2b_2b_20macros',['C++ Macros',['../group__macros.html',1,'']]]
 ];

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['block',['Block',['../structatomic_1_1Block.html',1,'atomic']]],
-  ['block_3c_20double_20_3e',['Block&lt; double &gt;',['../structatomic_1_1Block.html',1,'atomic']]]
+  ['config_5fstruct',['config_struct',['../structconfig__struct.html',1,'']]],
+  ['contar2_5ft',['contAR2_t',['../classdensity_1_1contAR2__t.html',1,'density']]],
+  ['contar2_5ft',['contAR2_t',['../classcontAR2__t.html',1,'']]]
 ];

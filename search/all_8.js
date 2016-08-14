@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['h_5f',['H_',['../structparallelADFun.html#acc93df054c29f46f2aa9c042e273cb79',1,'parallelADFun']]],
-  ['hessian',['Hessian',['../structparallelADFun.html#a2fc5c710a212a6a0f7e4ae278c78fe88',1,'parallelADFun::Hessian()'],['../namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4',1,'autodiff::hessian()']]],
-  ['hessian_5ft',['hessian_t',['../structautodiff_1_1hessian__t.html#a78734395402e43c60b928ffba7ee0cd7',1,'autodiff::hessian_t']]],
-  ['hessian_5ft',['hessian_t',['../structautodiff_1_1hessian__t.html',1,'autodiff']]],
-  ['hessiansparsitypattern',['HessianSparsityPattern',['../tmb__core_8hpp.html#a8891e29375f43f9aa9d8a91db9604417',1,'tmb_core.hpp']]]
+  ['instantly',['instantly',['../structconfig__struct.html#aeaa43c0da604f200b9718624420ff46b',1,'config_struct']]],
+  ['integrate',['integrate',['../namespaceromberg.html#a980bb141c963b1cf20da450063c5c7d1',1,'romberg::integrate(F f, Type a, Type b, int n=7, int p=2)'],['../namespaceromberg.html#a71c323cd2dce5c8915428493518820f0',1,'romberg::integrate(F f, vector&lt; Type &gt; a, vector&lt; Type &gt; b, int n=7, int p=2)']]],
+  ['inv_5fincpl_5fgamma',['inv_incpl_gamma',['../namespaceatomic.html#aca6bfb1722819752d1ad1084a6de6f27',1,'atomic']]],
+  ['invertsparsematrix',['invertSparseMatrix',['../spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c',1,'invertSparseMatrix():&#160;spmat.hpp'],['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils::invertSparseMatrix()']]],
+  ['invlogit',['invlogit',['../convenience_8hpp.html#a2dc0f0009cd46180a4d5ae56a6a45cfa',1,'convenience.hpp']]],
+  ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]]
 ];
