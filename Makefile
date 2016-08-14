@@ -39,9 +39,22 @@ check:
 unlock:
 	rm -rf `Rscript --vanilla -e 'writeLines(.Library)'`/00LOCK-TMB
 
+## Doxygen for developer
 .PHONY: dox
 dox:
 	sed -i s/^PROJECT_NUMBER.*/PROJECT_NUMBER=v$(VERSION)/g dox/Doxyfile
+	cd dox; doxygen
+
+## Doxygen for user
+.PHONY: dox-user
+dox-user:
+	sed -i s/^PROJECT_NUMBER.*/PROJECT_NUMBER=v$(VERSION)/g dox/Doxyfile
+	sed -i s/^EXTRACT_ALL.*/EXTRACT_ALL=NO/g dox/Doxyfile
+	sed -i s/^HIDE_UNDOC_MEMBERS.*/HIDE_UNDOC_MEMBERS=YES/g dox/Doxyfile
+	sed -i s/^HIDE_UNDOC_CLASSES.*/HIDE_UNDOC_CLASSES=YES/g dox/Doxyfile
+	sed -i s/^INTERNAL_DOCS.*/INTERNAL_DOCS=NO/g dox/Doxyfile
+	sed -i s/^SORT_BRIEF_DOCS.*/SORT_BRIEF_DOCS=YES/g dox/Doxyfile
+	sed -i s/^.*called_from_R.cpp//g dox/mainpage.txt
 	cd dox; doxygen
 
 dox-clean:
