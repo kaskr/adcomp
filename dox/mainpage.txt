@@ -434,6 +434,11 @@ opposite order to the dimensions of \c x.
 \example spatial.cpp
 \example thetalog.cpp
 \example transform.cpp
+\example MVRandomWalkValidation.cpp
+\example randomwalkvalidation.cpp
+\example rickervalidation.cpp
+\example hmm.cpp
+\example hmm_filter.hpp
 
 */
 

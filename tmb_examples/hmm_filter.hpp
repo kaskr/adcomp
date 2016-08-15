@@ -61,7 +61,7 @@ struct hmm_filter{
      dt: Timestep between measurements
   */
   void init(matrix<Type> A, vector<Type> grid, Type dt){
-    P = expm(matrix<Type>(A*dt));
+    P = atomic::expm(matrix<Type>(A*dt));
     int n = A.rows();
     P0 = matrix<Type>(n, n);
     P0.setIdentity(); // Default: no obs error

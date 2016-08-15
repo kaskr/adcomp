@@ -635,6 +635,7 @@ EXCLUDE_SYMBOLS        =
 # the \include command).
 
 EXAMPLE_PATH           =	../tmb_examples \
+				../tmb_examples/validation \
 				../TMB/inst/examples \
 				../tmb_syntax
 
