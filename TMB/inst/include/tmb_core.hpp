@@ -184,18 +184,28 @@ Rboolean isNumericScalar(SEXP x){
 /* Macros to obtain data and parameters from R */
 
 /** \brief Get parameter matrix from R and declare it as matrix<Type>
-\ingroup macros */
-#define PARAMETER_MATRIX(name) tmbutils::matrix<Type> name(objective_function::fillShape(asMatrix<Type>(objective_function::getShape(#name,&isMatrix)),#name));
+    \ingroup macros */
+#define PARAMETER_MATRIX(name)						\
+tmbutils::matrix<Type> name(objective_function::fillShape(		\
+asMatrix<Type>(objective_function::getShape(#name,&isMatrix)),#name));
+
 /** \brief Get parameter vector from R and declare it as vector<Type> 
-\ingroup macros*/
-#define PARAMETER_VECTOR(name) vector<Type> name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumeric)),#name));
+    \ingroup macros*/
+#define PARAMETER_VECTOR(name)						\
+vector<Type> name(objective_function::fillShape(			\
+asVector<Type>(objective_function::getShape(#name,&isNumeric)),#name));
+
 /** \brief Get parameter scalar from R and declare it as Type
-\ingroup macros */
-#define PARAMETER(name) Type name(objective_function::fillShape(asVector<Type>(objective_function::getShape(#name,&isNumericScalar)),#name)[0]);
+    \ingroup macros */
+#define PARAMETER(name)							\
+Type name(objective_function::fillShape(				\
+asVector<Type>(objective_function::getShape(#name,&isNumericScalar)),	\
+#name)[0]);
+
 /** \brief Get data vector from R and declare it as vector<Type>
     \note If name is found in the parameter list it will be read as a
     parameter vector.
-\ingroup macros */
+    \ingroup macros */
 #define DATA_VECTOR(name)						\
 vector<Type> name;							\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -205,57 +215,91 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
   name = asVector<Type>(getListElement(					\
          objective_function::data,#name,&isNumeric));			\
 }
+
 /** \brief Get data matrix from R and declare it as matrix<Type>
-\ingroup macros */
-#define DATA_MATRIX(name) matrix<Type> name(asMatrix<Type>(	\
-	getListElement(objective_function::data,#name,&isMatrix)));
+    \ingroup macros */
+#define DATA_MATRIX(name)					\
+matrix<Type> name(asMatrix<Type>(				\
+getListElement(objective_function::data,#name,&isMatrix)));
+
 /** \brief Get data scalar from R and declare it as Type
-\ingroup macros */
-#define DATA_SCALAR(name) Type name(asVector<Type>(		\
-	getListElement(objective_function::data,#name,&isNumericScalar))[0]);
+    \ingroup macros */
+#define DATA_SCALAR(name)						\
+Type name(asVector<Type>(getListElement(objective_function::data,	\
+#name,&isNumericScalar))[0]);
+
 /** \brief Get data scalar from R and declare it as int
-\ingroup macros */
+    \ingroup macros */
 #define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(	\
-	getListElement(objective_function::data,#name,&isNumericScalar))[0]));
-/** \brief Get data vector of type "factor" from R and declare it as a zero-based integer vector.
+getListElement(objective_function::data,#name,&isNumericScalar))[0]));
 
-The following example (R code) shows what you have on the R side and what is
-being received by the C++ template:
-   \verbatim
-> x=factor(letters[4:10])
-> x
-[1] d e f g h i j
-Levels: d e f g h i j
+/** \brief Get data vector of type "factor" from R and declare it as a
+    zero-based integer vector.
 
-# The zero-based integer vector that the C++ template sees
-> unclass(x) - 1
-[1] 0 1 2 3 4 5 6
-   \endverbatim
-\ingroup macros*/
+    The following example (R code) shows what you have on the R side
+    and what is being received by the C++ template:
+
+    \verbatim
+    > x=factor(letters[4:10])
+    > x
+    [1] d e f g h i j
+    Levels: d e f g h i j
+
+    # The zero-based integer vector that the C++ template sees
+    > unclass(x) - 1
+    [1] 0 1 2 3 4 5 6
+    \endverbatim
+    \ingroup macros */
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(	\
-	getListElement(objective_function::data,#name,&isNumeric)));
-/** \brief Get data vector of type "integer" from R and declare it vector<int>. (DATA_INTEGER is for a scalar integer) \ingroup macros*/
+getListElement(objective_function::data,#name,&isNumeric)));
+
+/** \brief Get data vector of type "integer" from R and declare it
+    vector<int>. (DATA_INTEGER() is for a scalar integer)
+    \ingroup macros */
 #define DATA_IVECTOR(name) vector<int> name(asVector<int>(	\
-	getListElement(objective_function::data,#name,&isNumeric)));
-/** \brief Get the number of levels of a data factor from R \ingroup macros */
-#define NLEVELS(name) LENGTH(getAttrib(getListElement(this->data,#name),install("levels")))
-/** \brief Get sparse matrix from R and declare it as Eigen::SparseMatrix<Type>  \ingroup macros*/
-#define DATA_SPARSE_MATRIX(name) Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>( \
-	getListElement(objective_function::data,#name,&isValidSparseMatrix)));
+getListElement(objective_function::data,#name,&isNumeric)));
+
+/** \brief Get the number of levels of a data factor from R
+    \ingroup macros */
+#define NLEVELS(name) LENGTH(getAttrib(			\
+getListElement(this->data,#name),install("levels")))
+
+/** \brief Get sparse matrix from R and declare it as
+    Eigen::SparseMatrix<Type>
+    \ingroup macros */
+#define DATA_SPARSE_MATRIX(name)					\
+Eigen::SparseMatrix<Type> name(tmbutils::asSparseMatrix<Type>(		\
+getListElement(objective_function::data,#name,&isValidSparseMatrix)));
+
 // NOTE: REPORT() constructs new SEXP so never report in parallel!
-/** \brief Report scalar, vector or array back to R without derivative information. Important: \c REPORT(name) must not be used before \c name has been assigned a value \ingroup macros */
-#define REPORT(name) if(isDouble<Type>::value && this->current_parallel_region<0){          \
-                        defineVar(install(#name),asSEXP(name),objective_function::report);}
-/** \brief Report scalar, vector or array back to R with derivative information. 
- The result is retrieved in R via the R function \c sdreport().
- Important: \c ADREPORT(name) must not be used before \c name has been assigned a value \ingroup macros*/
+/** \brief Report scalar, vector or array back to R without derivative
+    information.
+
+    \warning \c REPORT(name) must not be used before \c name has been
+    assigned a value.
+    \note REPORT() does nothing in parallel mode (construction of
+    R-objects is not allowed in parallel).
+    \ingroup macros */
+#define REPORT(name)							\
+if(isDouble<Type>::value && this->current_parallel_region<0) {		\
+  defineVar(install(#name),asSEXP(name),objective_function::report);	\
+}
+
+/** \brief Report scalar, vector or array back to R with derivative
+    information.
+
+    The result is retrieved in R via the R function \c sdreport().
+    \warning \c ADREPORT(name) must not be used before \c name has
+    been assigned a value.
+    \ingroup macros */
 #define ADREPORT(name) objective_function::reportvector.push(name,#name);
+
 #define PARALLEL_REGION if(this->parallel_region())
+
 /** \brief Get data array from R and declare it as array<Type>
     \note If name is found in the parameter list it will be read as a
-    parameter array.  
-
-\ingroup macros*/
+    parameter array.
+    \ingroup macros*/
 #define DATA_ARRAY(name)						\
 tmbutils::array<Type> name;						\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -265,26 +309,37 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
   name = tmbutils::asArray<Type>(getListElement(			\
          objective_function::data,#name,&isArray));			\
 }
-/** \brief Get parameter array from R and declare it as array<Type> \ingroup macros */
-#define PARAMETER_ARRAY(name) tmbutils::array<Type> name(objective_function::fillShape(tmbutils::asArray<Type>(objective_function::getShape(#name,&isArray)),#name));
-/** \brief Get data matrix from R and declare it as matrix<int> \ingroup macros */
+
+/** \brief Get parameter array from R and declare it as array<Type>
+    \ingroup macros */
+#define PARAMETER_ARRAY(name)					\
+tmbutils::array<Type> name(objective_function::fillShape(	\
+tmbutils::asArray<Type>(objective_function::getShape(		\
+#name,&isArray)),#name));
+
+/** \brief Get data matrix from R and declare it as matrix<int>
+    \ingroup macros */
 #define DATA_IMATRIX(name) matrix<int> name(asMatrix<int>(	\
-	getListElement(objective_function::data,#name,&isMatrix)));
-/** \brief Get data array from R and declare it as array<int> \ingroup macros */
-#define DATA_IARRAY(name) tmbutils::array<int> name(tmbutils::asArray<int>(	\
+getListElement(objective_function::data,#name,&isMatrix)));
+
+/** \brief Get data array from R and declare it as array<int>
+    \ingroup macros */
+#define DATA_IARRAY(name) tmbutils::array<int> name(tmbutils::asArray<int>( \
 	getListElement(objective_function::data,#name,&isArray)));
-/** \brief Get data list object from R and makes it available in C++
+
+/** \brief Get data list object from R and make it available in C++
 
 Example (incomplete) of use:
+
 In R: 
-\verbatim
+\code
 data <- list()
 data$object <- list(a=1:10, b=matrix(1:6,2))
 obj <- MakeADFun(data,........) 
-\endverbatim
+\endcode
 
 In C++: 
-\verbatim
+\code
 // Corresponding list object on the C++ side
 template<class Type>
 struct my_list {
@@ -304,12 +359,13 @@ Type objective_function<Type>::operator() ()
   REPORT(object.b);
   return 0;
 }
-\endverbatim
+\endcode
 \ingroup macros
 */ 
-#define DATA_STRUCT(name, struct)struct<Type> name(getListElement(this->data,#name));
+#define DATA_STRUCT(name, struct)			\
+struct<Type> name(getListElement(this->data,#name));
 
-/* Utilities for OSA residuals */
+/** \brief Utilities for OSA residuals */
 template<class VT, class Type>
 struct data_indicator : VT{
   VT cdf_lower, cdf_upper;
@@ -329,7 +385,10 @@ struct data_indicator : VT{
 };
 
 /** \brief Declare an indicator array 'name' of same shape as 'obs'.
- \ingroup macros */
+
+    This is used in conjunction with one-step-ahead residuals - see
+    ?oneStepPredict
+    \ingroup macros */
 #define DATA_ARRAY_INDICATOR(name, obs)					\
 data_indicator<tmbutils::array<Type>, Type > name(obs);			\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -338,7 +397,10 @@ if (!isNull(getListElement(objective_function::parameters,#name))) {	\
 }
 
 /** \brief Declare an indicator vector 'name' of same shape as 'obs'.
- \ingroup macros */
+
+    This is used in conjunction with one-step-ahead residuals - see
+    ?oneStepPredict
+    \ingroup macros */
 #define DATA_VECTOR_INDICATOR(name, obs)				\
 data_indicator<tmbutils::vector<Type>, Type > name(obs);		\
 if (!isNull(getListElement(objective_function::parameters,#name))) {	\
@@ -364,7 +426,6 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
   vector<bool> Py(1); Py[0]=true;
   return asMatrix(vector<int>(pf->RevSparseHes(n,Py)),n,n);
 }
-
 
 /** \internal \brief Get list element named "str", or return NULL */
 #ifdef WITH_LIBTMB
