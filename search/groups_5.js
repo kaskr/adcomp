@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['statistical_20toolbox',['Statistical toolbox',['../group__Toolbox.html',1,'']]]
+  ['r_20style_20probability_20distributions',['R style probability distributions',['../group__R__style__distribution.html',1,'']]]
 ];

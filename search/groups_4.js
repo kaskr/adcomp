@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['r_20style_20probability_20distributions',['R style probability distributions',['../group__R__style__distribution.html',1,'']]]
+  ['parallel_20computations',['Parallel computations',['../group__parallel.html',1,'']]]
 ];

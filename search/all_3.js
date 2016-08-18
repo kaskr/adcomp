@@ -7,6 +7,7 @@ var searchData=
   ['data_5ffactor',['DATA_FACTOR',['../group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6',1,'tmb_core.hpp']]],
   ['data_5fiarray',['DATA_IARRAY',['../group__macros.html#gaf5fe8a4b8a5134f341fa63844abb6fdc',1,'tmb_core.hpp']]],
   ['data_5fimatrix',['DATA_IMATRIX',['../group__macros.html#gabccf17ca4aa07b903113927821f80cda',1,'tmb_core.hpp']]],
+  ['data_5findicator',['data_indicator',['../structdata__indicator.html',1,'']]],
   ['data_5finteger',['DATA_INTEGER',['../group__macros.html#gae361b76344dbd1c7cbf5073949211641',1,'tmb_core.hpp']]],
   ['data_5fivector',['DATA_IVECTOR',['../group__macros.html#ga7889208e14a95d21cf630157cf0e2c80',1,'tmb_core.hpp']]],
   ['data_5fmatrix',['DATA_MATRIX',['../group__macros.html#gada5d1729c6988c1060cfa456b56c8d8c',1,'tmb_core.hpp']]],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['parallel',['parallel',['../structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48',1,'config_struct']]],
+  ['parallel',['parallel',['../structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48',1,'config_struct::parallel()'],['../group__parallel.html',1,'(Global Namespace)']]],
   ['parallel_5faccumulator',['parallel_accumulator',['../structparallel__accumulator.html',1,'']]],
   ['parameter',['PARAMETER',['../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0',1,'tmb_core.hpp']]],
   ['parameter_5farray',['PARAMETER_ARRAY',['../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e',1,'tmb_core.hpp']]],

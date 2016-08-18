@@ -103,22 +103,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html">data_indicator&lt; VT, Type &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utilities for OSA residuals.  <a href="structdata__indicator.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structparallel__accumulator.html">parallel_accumulator&lt; Type &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to manage parallel accumulation.  <a href="structparallel__accumulator.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ga43a13c435127491364e4a167478f4992"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga43a13c435127491364e4a167478f4992">ADREPORT</a>(name)&#160;&#160;&#160;objective_function::reportvector.push(name,#name);</td></tr>
-<tr class="memdesc:ga43a13c435127491364e4a167478f4992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report scalar, vector or array back to R with derivative information. The result is retrieved in R via the R function <code>sdreport()</code>. Important: <code><a class="el" href="group__macros.html#ga43a13c435127491364e4a167478f4992" title="Report scalar, vector or array back to R with derivative information. The result is retrieved in R vi...">ADREPORT(name)</a></code> must not be used before <code>name</code> has been assigned a value. <br /></td></tr>
+<tr class="memitem:ga43a13c435127491364e4a167478f4992"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga43a13c435127491364e4a167478f4992">ADREPORT</a>(name)&#160;&#160;&#160;objective_function::reportvector.push(name,#name);</td></tr>
+<tr class="memdesc:ga43a13c435127491364e4a167478f4992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report scalar, vector or array back to R with derivative information.  <a href="group__macros.html#ga43a13c435127491364e4a167478f4992">More...</a><br /></td></tr>
 <tr class="separator:ga43a13c435127491364e4a167478f4992"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga97c14a26ca75571090d332f15130ae4b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga97c14a26ca75571090d332f15130ae4b">DATA_ARRAY</a>(name)</td></tr>
 <tr class="memdesc:ga97c14a26ca75571090d332f15130ae4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data array from R and declare it as array&lt;Type&gt;  <a href="group__macros.html#ga97c14a26ca75571090d332f15130ae4b">More...</a><br /></td></tr>
 <tr class="separator:ga97c14a26ca75571090d332f15130ae4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga46f0c242d77def762f139a97210d59dc"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga46f0c242d77def762f139a97210d59dc">DATA_ARRAY_INDICATOR</a>(name,  obs)</td></tr>
-<tr class="memdesc:ga46f0c242d77def762f139a97210d59dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare an indicator array 'name' of same shape as 'obs'. <br /></td></tr>
+<tr class="memitem:ga46f0c242d77def762f139a97210d59dc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga46f0c242d77def762f139a97210d59dc">DATA_ARRAY_INDICATOR</a>(name,  obs)</td></tr>
+<tr class="memdesc:ga46f0c242d77def762f139a97210d59dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare an indicator array 'name' of same shape as 'obs'.  <a href="group__macros.html#ga46f0c242d77def762f139a97210d59dc">More...</a><br /></td></tr>
 <tr class="separator:ga46f0c242d77def762f139a97210d59dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gace5461529127e9c6f01c0b76b4fda2e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>(name)</td></tr>
 <tr class="memdesc:gace5461529127e9c6f01c0b76b4fda2e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data vector of type "factor" from R and declare it as a zero-based integer vector.  <a href="group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6">More...</a><br /></td></tr>
@@ -137,7 +138,7 @@ Macros</h2></td></tr>
 <tr class="separator:gae361b76344dbd1c7cbf5073949211641"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7889208e14a95d21cf630157cf0e2c80"><td class="memItemLeft" align="right" valign="top">
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga7889208e14a95d21cf630157cf0e2c80">DATA_IVECTOR</a>(name)</td></tr>
-<tr class="memdesc:ga7889208e14a95d21cf630157cf0e2c80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data vector of type "integer" from R and declare it <a class="el" href="structtmbutils_1_1vector.html">vector&lt;int&gt;</a>. (DATA_INTEGER is for a scalar integer) <br /></td></tr>
+<tr class="memdesc:ga7889208e14a95d21cf630157cf0e2c80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data vector of type "integer" from R and declare it <a class="el" href="structtmbutils_1_1vector.html">vector&lt;int&gt;</a>. (<a class="el" href="group__macros.html#gae361b76344dbd1c7cbf5073949211641" title="Get data scalar from R and declare it as int. ">DATA_INTEGER()</a> is for a scalar integer) <br /></td></tr>
 <tr class="separator:ga7889208e14a95d21cf630157cf0e2c80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gada5d1729c6988c1060cfa456b56c8d8c"><td class="memItemLeft" align="right" valign="top">
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>(name)</td></tr>
@@ -152,38 +153,36 @@ Macros</h2></td></tr>
 <tr class="memdesc:ga75dbde3f78d762602b7ffc0f19a99e1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get sparse matrix from R and declare it as Eigen::SparseMatrix&lt;Type&gt; <br /></td></tr>
 <tr class="separator:ga75dbde3f78d762602b7ffc0f19a99e1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>(name,  struct)&#160;&#160;&#160;struct&lt;Type&gt; name(getListElement(this-&gt;data,#name));</td></tr>
-<tr class="memdesc:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data list object from R and makes it available in C++.  <a href="group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">More...</a><br /></td></tr>
+<tr class="memdesc:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data list object from R and make it available in C++.  <a href="group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">More...</a><br /></td></tr>
 <tr class="separator:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad334262a7679f343bdc919ae35810161"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(name)</td></tr>
 <tr class="memdesc:gad334262a7679f343bdc919ae35810161"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data vector from R and declare it as vector&lt;Type&gt;  <a href="group__macros.html#gad334262a7679f343bdc919ae35810161">More...</a><br /></td></tr>
 <tr class="separator:gad334262a7679f343bdc919ae35810161"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga572dab4f17d676ac36bc8e92f3c9a4c0"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga572dab4f17d676ac36bc8e92f3c9a4c0">DATA_VECTOR_INDICATOR</a>(name,  obs)</td></tr>
-<tr class="memdesc:ga572dab4f17d676ac36bc8e92f3c9a4c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare an indicator vector 'name' of same shape as 'obs'. <br /></td></tr>
+<tr class="memitem:ga572dab4f17d676ac36bc8e92f3c9a4c0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga572dab4f17d676ac36bc8e92f3c9a4c0">DATA_VECTOR_INDICATOR</a>(name,  obs)</td></tr>
+<tr class="memdesc:ga572dab4f17d676ac36bc8e92f3c9a4c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare an indicator vector 'name' of same shape as 'obs'.  <a href="group__macros.html#ga572dab4f17d676ac36bc8e92f3c9a4c0">More...</a><br /></td></tr>
 <tr class="separator:ga572dab4f17d676ac36bc8e92f3c9a4c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga504bc706acd806509d7f324dfeb114f1"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga504bc706acd806509d7f324dfeb114f1">NLEVELS</a>(name)&#160;&#160;&#160;LENGTH(getAttrib(getListElement(this-&gt;data,#name),install(&quot;levels&quot;)))</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga504bc706acd806509d7f324dfeb114f1">NLEVELS</a>(name)</td></tr>
 <tr class="memdesc:ga504bc706acd806509d7f324dfeb114f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of levels of a data factor from R. <br /></td></tr>
 <tr class="separator:ga504bc706acd806509d7f324dfeb114f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga70b2d449f7c53e87abee7d5fb71dc4c0"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(name)&#160;&#160;&#160;Type name(objective_function::fillShape(<a class="el" href="convert_8hpp.html#adc8961faf80b653a6990357580dcd67c">asVector</a>&lt;Type&gt;(objective_function::getShape(#name,&amp;isNumericScalar)),#name)[0]);</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(name)</td></tr>
 <tr class="memdesc:ga70b2d449f7c53e87abee7d5fb71dc4c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get parameter scalar from R and declare it as Type. <br /></td></tr>
 <tr class="separator:ga70b2d449f7c53e87abee7d5fb71dc4c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6ac3eddb1dd503ceaf4c6ac91546b23e"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(name)&#160;&#160;&#160;<a class="el" href="structtmbutils_1_1array.html">tmbutils::array</a>&lt;Type&gt; name(objective_function::fillShape(tmbutils::asArray&lt;Type&gt;(objective_function::getShape(#name,&amp;isArray)),#name));</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(name)</td></tr>
 <tr class="memdesc:ga6ac3eddb1dd503ceaf4c6ac91546b23e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get parameter array from R and declare it as array&lt;Type&gt; <br /></td></tr>
 <tr class="separator:ga6ac3eddb1dd503ceaf4c6ac91546b23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabcad2a3c2d238178707c6c45de2d3bec"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gabcad2a3c2d238178707c6c45de2d3bec">PARAMETER_MATRIX</a>(name)&#160;&#160;&#160;<a class="el" href="structtmbutils_1_1matrix.html">tmbutils::matrix</a>&lt;Type&gt; name(objective_function::fillShape(<a class="el" href="convert_8hpp.html#a5365728c1cfe93bc2e66da0afa22ccc7">asMatrix</a>&lt;Type&gt;(objective_function::getShape(#name,&amp;isMatrix)),#name));</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gabcad2a3c2d238178707c6c45de2d3bec">PARAMETER_MATRIX</a>(name)</td></tr>
 <tr class="memdesc:gabcad2a3c2d238178707c6c45de2d3bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get parameter matrix from R and declare it as matrix&lt;Type&gt; <br /></td></tr>
 <tr class="separator:gabcad2a3c2d238178707c6c45de2d3bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6b8a70eeee38fe896e89e0a9c6bef84a"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(name)&#160;&#160;&#160;<a class="el" href="structvector.html">vector</a>&lt;Type&gt; name(objective_function::fillShape(<a class="el" href="convert_8hpp.html#adc8961faf80b653a6990357580dcd67c">asVector</a>&lt;Type&gt;(objective_function::getShape(#name,&amp;isNumeric)),#name));</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(name)</td></tr>
 <tr class="memdesc:ga6b8a70eeee38fe896e89e0a9c6bef84a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get parameter vector from R and declare it as vector&lt;Type&gt; <br /></td></tr>
 <tr class="separator:ga6b8a70eeee38fe896e89e0a9c6bef84a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac2d7888f4e0385930448f992de53079b"><td class="memItemLeft" align="right" valign="top">
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(name)</td></tr>
-<tr class="memdesc:gac2d7888f4e0385930448f992de53079b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report scalar, vector or array back to R without derivative information. Important: <code><a class="el" href="group__macros.html#gac2d7888f4e0385930448f992de53079b" title="Report scalar, vector or array back to R without derivative information. Important: REPORT(name) must...">REPORT(name)</a></code> must not be used before <code>name</code> has been assigned a value. <br /></td></tr>
+<tr class="memitem:gac2d7888f4e0385930448f992de53079b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(name)</td></tr>
+<tr class="memdesc:gac2d7888f4e0385930448f992de53079b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report scalar, vector or array back to R without derivative information.  <a href="group__macros.html#gac2d7888f4e0385930448f992de53079b">More...</a><br /></td></tr>
 <tr class="separator:gac2d7888f4e0385930448f992de53079b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>

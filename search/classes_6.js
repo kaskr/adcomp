@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['parallel_5faccumulator',['parallel_accumulator',['../structparallel__accumulator.html',1,'']]],
-  ['proj_5ft',['PROJ_t',['../classPROJ__t.html',1,'']]],
-  ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]]
+  ['n01',['N01',['../classdensity_1_1N01.html',1,'density']]],
+  ['n01',['N01',['../classN01.html',1,'']]]
 ];
