@@ -224,10 +224,7 @@ namespace atomic{
   }
 
 
-/** \name Atomic functions.
-    @{
-*/
-  /** \brief Atomic version of generalized matrix exponential (closed under reverse mode differentiation).
+  /** \internal \brief Atomic version of generalized matrix exponential (closed under reverse mode differentiation).
   \verbatim
      Generalized matrix exponential:
      
@@ -282,15 +279,12 @@ namespace atomic{
 			       }
 			     }
 			     )
-/**
-    @}
-*/
 
+  /** \brief Matrix exponential
 
-/** \name Interface to atomic functions.
-    @{
-*/
-  /** \brief Matrix exponential  */
+      Calculate the matrix exponential of a dense matrix.
+      \ingroup matrix_functions
+  */
   template<class Type>
   matrix<Type> expm(matrix<Type> x){
     vector<matrix<Type> > args(1);
@@ -298,10 +292,6 @@ namespace atomic{
     int n=x.rows();
     return vec2mat(expm(args2vector(args)),n,n);
   }
-/**
-    @}
-*/
-
 
 } // end namespace atomic
 

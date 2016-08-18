@@ -152,9 +152,6 @@ struct TypeDefs{
   typedef Eigen::LDLT<Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> > LDLT;
 };
 
-/** \name Interface to atomic functions.
-    @{
-*/
 /** \internal \brief Convert segment of CppAD::vector to Eigen::Matrix
     \param x Input vector.
     \param m Number of rows in result.
@@ -178,13 +175,6 @@ CppAD::vector<Type> mat2vec(matrix<Type> x){
   for(int i=0;i<n;i++)res[i]=x(i);
   return res;
 }
-/**
-    @}
-*/
-
-/** \name Atomic functions.
-    @{
-*/
 
 /** \internal \brief Standard normal density function 'dnorm1'.
     Needed to define derivative of 'pnorm1'.
@@ -520,18 +510,27 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px=mat2vec(res);
 			   )
 
-/**
-    @}
-*/
-
 /* ================================== INTERFACES
 */
 
-/** \name Interface to atomic functions.
-    @{
-*/
+/** \brief Matrix multiply
 
-/** \brief Matrix multiply */
+    Matrix multiplication of large dense matrices.
+
+    \code
+    matrix<Type> x;
+    matrix<Type> y;
+    atomic::matmul(x, y);
+    \endcode
+
+    For small matrices use
+
+    \code
+    x * y;
+    \endcode
+
+    \ingroup matrix_functions
+*/
 template<class Type>
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
   CppAD::vector<Type> arg(2+x.size()+y.size());
@@ -543,12 +542,36 @@ matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
   return vec2mat(res,x.rows(),y.cols());
 }
 
+/** \brief Matrix inverse
+
+    Invert a matrix by LU-decomposition.
+
+    \code
+    matrix<Type> x;
+    atomic::matinv(x);
+    \endcode
+
+    For small matrices use
+
+    \code
+    x.inverse();
+    \endcode
+
+    \ingroup matrix_functions
+*/
 template<class Type>
 matrix<Type> matinv(matrix<Type> x){
   int n=x.rows();
   return vec2mat(matinv(mat2vec(x)),n,n);
 }
 
+/** \brief Matrix inverse and determinant
+
+    Calculate matrix inverse *and* log-determinant of a positive
+    definite matrix.
+
+    \ingroup matrix_functions
+*/
 template<class Type>
 matrix<Type> matinvpd(matrix<Type> x, Type &logdet){
   int n=x.rows();
@@ -557,6 +580,9 @@ matrix<Type> matinvpd(matrix<Type> x, Type &logdet){
   return vec2mat(res,n,n,1);
 }
 
+/** \brief Log-determinant of positive definite matrix
+    \ingroup matrix_functions
+*/
 template<class Type>
 Type logdet(matrix<Type> x){
   return logdet(mat2vec(x))[0];
@@ -572,10 +598,6 @@ Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
   Type quadform = (x*(Q*x)).sum();
   return -Type(.5)*logdetQ + Type(.5)*quadform + x.size()*Type(log(sqrt(2.0*M_PI)));
 }
-
-/**
-    @}
-*/
 
 } /* End namespace atomic */
 

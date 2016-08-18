@@ -214,6 +214,13 @@ but not \c array or \c matrix arguments.
     \brief Special mathematical functions for which derivatives are implemented
 */
 
+/** \defgroup matrix_functions Special matrix functions
+    \brief Special matrix functions for which derivatives are implemented
+
+    These matrix operations are designed to work with automatic
+    differentiation for large dense matrices.
+*/
+
 /** \defgroup Densities Multivariate distributions
 
 \brief Multivariate normal distributions, AR-processes, GMRF's, separable covariance functions, etc.
