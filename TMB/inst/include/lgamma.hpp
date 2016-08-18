@@ -6,6 +6,7 @@
 */
 
 /** \brief Logarithm of gamma function (following R argument convention).
+    \ingroup special_functions
 */
 template<class Type>
 Type lgamma(Type x){

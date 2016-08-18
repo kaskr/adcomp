@@ -210,6 +210,10 @@ but not \c array or \c matrix arguments.
 - To sum over elements in the vector returned use \code sum(dexp(x,rate));\endcode 
 */
 
+/** \defgroup special_functions Special mathematical functions
+    \brief Special mathematical functions for which derivatives are implemented
+*/
+
 /** \defgroup Densities Multivariate distributions
 
 \brief Multivariate normal distributions, AR-processes, GMRF's, separable covariance functions, etc.

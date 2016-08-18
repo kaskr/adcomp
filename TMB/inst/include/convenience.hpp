@@ -108,6 +108,7 @@ VECTORIZE1_t(invlogit)
 
     Same as besselK from R.
     \note Differentiation wrt. second argument currently not allowed (will throw an error at run time).
+    \ingroup special_functions
 */
 template<class Type>
 Type besselK(Type x, Type nu){
@@ -126,6 +127,7 @@ Type besselK(Type x, Type nu){
     \param phi Range parameter.
     \param kappa Smoothness parameter.
     \note Differentiation wrt. kappa currently not allowed (will throw an error at run time).
+    \ingroup special_functions
 */
 template<class Type>
 Type matern(Type u, Type phi, Type kappa){
