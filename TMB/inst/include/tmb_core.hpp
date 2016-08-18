@@ -790,6 +790,7 @@ public:
     substantially more difficult with parallel accumulation turned
     on).
 
+    \ingroup parallel
 */
 template<class Type>
 struct parallel_accumulator{

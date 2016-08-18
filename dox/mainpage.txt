@@ -581,6 +581,10 @@ is referred to section \ref  Densities for details and examples.
 
 */
 
+/** \defgroup parallel Parallel computations
+\brief How to parallelize the likelihood function using TMB.
+*/
+
 /** \defgroup CppTutorial C++ tutorial
 \brief Help for R users to write the C++ user template \b and for C++ programmers about
   TMB specifics
