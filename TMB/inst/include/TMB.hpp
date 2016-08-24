@@ -25,6 +25,11 @@ struct isDouble<double>{
 #define CSKIP(x) x
 #define TMB_EXTERN
 #endif
+#ifdef TMB_PRECOMPILE
+#define IF_TMB_PRECOMPILE(x) x
+#else
+#define IF_TMB_PRECOMPILE(x)
+#endif
 
 /* Early inclusion of Rprintf and REprintf */
 #include <R_ext/Print.h>

@@ -7,15 +7,25 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
 /** \brief Construct atomic vector function based on known derivatives */
 #define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME, OUTPUT_DIM, ATOMIC_DOUBLE,    \
                                    ATOMIC_REVERSE)                            \
-  void ATOMIC_NAME(const CppAD::vector<double>& tx,                           \
-                   CppAD::vector<double>& ty) CSKIP({                         \
+                                                                              \
+  template<class Double>                                                      \
+  void ATOMIC_NAME(const CppAD::vector<Double>& tx,                           \
+                   CppAD::vector<Double>& ty) CSKIP({                         \
     ATOMIC_DOUBLE;                                                            \
   })                                                                          \
-  CppAD::vector<double> ATOMIC_NAME(const CppAD::vector<double>& tx) CSKIP({  \
+  template<class Double>                                                      \
+  CppAD::vector<double> ATOMIC_NAME(const CppAD::vector<Double>& tx) CSKIP({  \
     CppAD::vector<double> ty(OUTPUT_DIM);                                     \
     ATOMIC_NAME(tx, ty);                                                      \
     return ty;                                                                \
   })                                                                          \
+  IF_TMB_PRECOMPILE(                                                          \
+  template                                                                    \
+  void ATOMIC_NAME<double>(const CppAD::vector<double>& tx,                   \
+                           CppAD::vector<double>& ty);                        \
+  template                                                                    \
+  CppAD::vector<double> ATOMIC_NAME<double>(const CppAD::vector<double>& tx); \
+  )                                                                           \
   template <class Type>                                                       \
   void ATOMIC_NAME(const CppAD::vector<AD<Type> >& tx,                        \
                    CppAD::vector<AD<Type> >& ty);                             \
