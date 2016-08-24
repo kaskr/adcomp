@@ -47,6 +47,7 @@ namespace Rmath {
     double	Rf_qnorm5(double, double, double, int, int);
     double	Rf_ppois(double, double, int, int);
     double	Rf_bessel_k(double, double, double);
+    double	Rf_bessel_i(double, double, double);
     double	Rf_pgamma(double, double, double, int, int);
     double	Rf_qgamma(double, double, double, int, int);
     double	Rf_lgammafn(double);
@@ -341,13 +342,13 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 
 /** \brief Atomic version of \f$besselK(x,\nu)\f$.
     Valid parameter range: \f$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}\f$.
-    \note Derivative wrt. \f$\nu\f$ is currently not implemented.
+    \note This atomic function does not handle the derivative wrt. \f$\nu\f$.
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
-			   besselK
+			   bessel_k_10
 			   ,
 			   // OUTPUT_DIM
 			   1
@@ -362,10 +363,38 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   CppAD::vector<Type> arg(2);
 			   arg[0] = x;
 			   arg[1] = nu + Type(1);
-			   px[0] = ( -besselK(arg)[0] + value * (nu / x) ) * py[0];
-			   px[1] = Type(0); /* Not yet implemented (!) */
+			   px[0] = ( -bessel_k_10(arg)[0] + value * (nu / x) ) * py[0];
+			   px[1] = Type(0); /* Not implemented (!) */
 			   )
 
+/** \brief Atomic version of \f$besselI(x,\nu)\f$.
+    Valid parameter range: \f$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}\f$.
+    \note This atomic function does not handle the derivative wrt. \f$\nu\f$.
+    \param x Input vector of length 2.
+    \return Vector of length 1.
+*/
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   bessel_i_10
+			   ,
+			   // OUTPUT_DIM
+			   1
+			   ,
+			   // ATOMIC_DOUBLE
+			   ty[0] = Rmath::Rf_bessel_i(tx[0], tx[1], 1.0 /* Not scaled */);
+			   ,
+			   // ATOMIC_REVERSE
+			   Type x =  tx[0];
+			   Type nu = tx[1];
+			   CppAD::vector<Type> arg(2);
+			   arg[0] = x;
+			   arg[1] = nu + Type(1);
+			   Type B_right = bessel_i_10(arg)[0];
+			   arg[1] = nu - Type(1);
+			   Type B_left  = bessel_i_10(arg)[0];
+			   px[0] = Type(0.5) * ( B_left + B_right ) * py[0];
+			   px[1] = Type(0); /* Not implemented (!) */
+)
 
 /** \cond */
 template<class Type> /* Header of matmul interface */

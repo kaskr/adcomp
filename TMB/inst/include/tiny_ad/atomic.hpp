@@ -40,6 +40,22 @@ TMB_BIND_ATOMIC(bessel_i,
 		bessel_utils::bessel_i(x[0], x[1], 1.) )
 
 /********************************************************************
+ * Adding 'bessel_j'
+ ********************************************************************/
+#include "bessel/bessel.hpp" // Get namespace 'bessel_utils'
+TMB_BIND_ATOMIC(bessel_j,
+		11,
+		bessel_utils::bessel_j(x[0], x[1]) )
+
+/********************************************************************
+ * Adding 'bessel_y'
+ ********************************************************************/
+#include "bessel/bessel.hpp" // Get namespace 'bessel_utils'
+TMB_BIND_ATOMIC(bessel_y,
+		11,
+		bessel_utils::bessel_y(x[0], x[1]) )
+
+/********************************************************************
  * Adding 'dtweedie'
  ********************************************************************/
 #include "tweedie/tweedie.hpp"
@@ -87,91 +103,3 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 } // End namespace atomic
 
 
-/********************************************************************
- * Interfaces
- ********************************************************************/
-
-/** \brief Distribution function of the beta distribution (following R
-    argument convention).
-    \note Non-centrality parameter (ncp) not implemented.
-    \ingroup R_style_distribution
-*/
-template<class Type>
-Type pbeta(Type q, Type shape1, Type shape2){
-  CppAD::vector<Type> tx(4);
-  tx[0] = q;
-  tx[1] = shape1;
-  tx[2] = shape2;
-  tx[3] = 0; // order
-  Type ans = atomic::pbeta(tx)[0];
-  return ans;
-}
-
-/** \brief Quantile function of the beta distribution (following R
-    argument convention).
-    \note Non-centrality parameter (ncp) not implemented.
-    \ingroup R_style_distribution
-*/
-template<class Type>
-Type qbeta(Type p, Type shape1, Type shape2){
-  CppAD::vector<Type> tx(3);
-  tx[0] = p;
-  tx[1] = shape1;
-  tx[2] = shape2;
-  Type ans = atomic::qbeta(tx)[0];
-  return ans;
-}
-
-/** \brief bessel_k function (same as besselK from R).
-    \note Derivatives wrt. both arguments are implemented
-    \ingroup special_functions
-*/
-template<class Type>
-Type bessel_k(Type x, Type nu){
-  CppAD::vector<Type> tx(3);
-  tx[0] = x;
-  tx[1] = nu;
-  tx[2] = 0;
-  Type ans = atomic::bessel_k(tx)[0];
-  return ans;
-}
-
-/** \brief bessel_i function (same as besselI from R).
-    \note Derivatives wrt. both arguments are implemented
-    \ingroup special_functions
-*/
-template<class Type>
-Type bessel_i(Type x, Type nu){
-  CppAD::vector<Type> tx(3);
-  tx[0] = x;
-  tx[1] = nu;
-  tx[2] = 0;
-  Type ans = atomic::bessel_i(tx)[0];
-  return ans;
-}
-
-/** \brief dtweedie function (same as dtweedie.series from R package
-    'tweedie').
-
-    Silently returns NaN if not within the valid parameter range:
-    \f[ (0 \leq y) \land (0 < \mu) \land (0 < \phi) \land (1 < p) \land (p < 2) \f] .
-
-    \note Parameter order differs from the R version.
-
-    \warning The derivative wrt. the y argument is disabled
-    (zero). Hence the tweedie distribution can only be used for *data*
-    (not random effects).
-
-    \ingroup R_style_distribution
-*/
-template<class Type>
-Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
-  CppAD::vector<Type> tx(5);
-  tx[0] = y;
-  tx[1] = mu;
-  tx[2] = phi;
-  tx[3] = p;
-  tx[4] = 0;
-  Type ans = atomic::log_dtweedie(tx)[0];
-  return ( give_log ? ans : exp(ans) );
-}

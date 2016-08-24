@@ -104,21 +104,6 @@ Type invlogit(Type x){
 }
 VECTORIZE1_t(invlogit)
 
-/** Bessel K function
-
-    Same as besselK from R.
-    \note Differentiation wrt. second argument currently not allowed (will throw an error at run time).
-    \ingroup special_functions
-*/
-template<class Type>
-Type besselK(Type x, Type nu){
-  if (CppAD::Variable(nu)) error("besselK(x,nu) does not yet allow 'nu' to be a PARAMETER.");
-  CppAD::vector<Type> tx(2);
-  tx[0] = x;
-  tx[1] = nu;
-  return atomic::besselK(tx)[0];
-}
-
 /** Matern correlation function
 
     Compute values of the Matern correlation function for given distances and parameters. Same as 'matern' from the geoR package.
@@ -126,7 +111,6 @@ Type besselK(Type x, Type nu){
     \param u Distance.
     \param phi Range parameter.
     \param kappa Smoothness parameter.
-    \note Differentiation wrt. kappa currently not allowed (will throw an error at run time).
     \ingroup special_functions
 */
 template<class Type>

@@ -24,9 +24,7 @@ namespace gauss_kronrod {
   to ensure that fmin2, fmax2 etc, are never used elsewhere.
 */
 template<class T>
-double value(T x){ return value(x.value);}
-template<>
-double value(double x){ return x;}
+double value(T x){ return ((double*) &x)[0]; }
 template<class S, class T> // FIXME: Would imin2(int,int) conflict with Rf_imin2 ?
 int imin2(S x, T y) {return (x < y) ? x : y;}
 template<class S, class T>
