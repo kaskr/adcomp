@@ -277,7 +277,7 @@ void rdqagie(integr_fn f, void *ex, Float *bound, int *inf, Float *
     bool extrap;
     Float ertest = 0.0, errsum;
 
-/**begin prologue  dqagie
+/* begin prologue  dqagie
 ***date written   800101   (yymmdd)
 ***revision date  830518   (yymmdd)
 ***category no.  h2a3a1,h2a4a1

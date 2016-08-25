@@ -409,36 +409,41 @@ opposite order to the dimensions of \c x.
 - For each example there is both a \c .cpp is a \c .R
 - To run an example, e.g. \c ar1_4D, use the R command \code source("ar1_4D.R") \endcode.
 
+\example nan_error_ex.cpp
+\example matrix_arrays.cpp
+\example multivariate_distributions.cpp
+
+\example adaptive_integration.cpp
 \example ar1_4D.cpp
-\example called_from_R.cpp
+\example hmm.cpp
+\example hmm_filter.hpp
 \example laplace.cpp
 \example linreg.cpp
 \example linreg_parallel.cpp
 \example longlinreg.cpp
 \example lr_test.cpp
-\example matrix_arrays.cpp
-\example multivariate_distributions.cpp
+\example matern.cpp
 \example mvrw.cpp
 \example mvrw_sparse.cpp
-\example nan_error_ex.cpp
 \example nmix.cpp
 \example orange_big.cpp
-\example rw_parallel.cpp
 \example sam.cpp
 \example sde_linear.cpp
 \example sdv_multi_compact.cpp
 \example sdv_multi.cpp
 \example socatt.cpp
-\example spde.cpp
-\example spde_aniso.cpp
 \example spatial.cpp
+\example spde_aniso.cpp
+\example spde.cpp
 \example thetalog.cpp
+\example transform2.cpp
 \example transform.cpp
+\example transform_parallel.cpp
+\example tweedie.cpp
+
 \example MVRandomWalkValidation.cpp
 \example randomwalkvalidation.cpp
 \example rickervalidation.cpp
-\example hmm.cpp
-\example hmm_filter.hpp
 
 */
 

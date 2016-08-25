@@ -8,6 +8,11 @@ using std::vector;
 #include <float.h>  // INFINITY etc
 #endif
 
+/**
+   \brief Namespace with utility functions for adaptive numerical integration
+
+   Interfaces to R's integrator that can be used with forward mode AD.
+*/
 namespace gauss_kronrod {
 // Fake that Rmath.h is included - and take explicitly what we need
 // #ifndef RMATH_H
