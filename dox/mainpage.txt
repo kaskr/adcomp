@@ -140,7 +140,7 @@ See \ref Toolbox for more about statistical modelling.
 /** \defgroup Structure_TMB The structure of TMB
 \brief An overview of the components that constitute TMB
 
-This documentation only covers the "native" TMB code, not
+This documentation only covers the TMB specific code, not
 [CppAD](http://www.coin-or.org/CppAD/Doc/doxydoc/html/index.html)
 or 
 [Eigen](http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html)
@@ -149,7 +149,7 @@ In particular, some of the standard functions like \c sin() and \c cos()
 are part of CppAD, and are hence not documented through TMB.
 
 
-![test](TMB_components.png)
+![TMB components](TMB_components.png)
 */
 
 /** \defgroup matrix_arrays Matrices and arrays
