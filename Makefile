@@ -54,7 +54,6 @@ dox-user:
 	sed -i s/^HIDE_UNDOC_CLASSES.*/HIDE_UNDOC_CLASSES=YES/g dox/Doxyfile
 	sed -i s/^INTERNAL_DOCS.*/INTERNAL_DOCS=NO/g dox/Doxyfile
 	sed -i s/^SORT_BRIEF_DOCS.*/SORT_BRIEF_DOCS=YES/g dox/Doxyfile
-	sed -i s/^.*called_from_R.cpp//g dox/mainpage.txt
 	cd dox; doxygen
 
 dox-clean:
