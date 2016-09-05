@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.7.2</span>
+   &#160;<span id="projectnumber">v1.7.3</span>
    </div>
   </td>
  </tr>
@@ -120,13 +120,13 @@ class UNSTRUCTURED_CORR_t&lt; scalartype_ &gt;</h3>
 <p>Multivariate normal distribution with unstructered correlation matrix. </p>
 <p>Class to evaluate the negative log density of a multivariate Gaussian variable with <b>unstructured</b> symmetric positive definite correlation matrix (<em>Sigma</em>). The typical application of this is that you want to estimate all the elements of <em>Sigma</em>, in such a way that the symmetry and positive definiteness constraint is respected. We parameterize <em>S</em> via a lower triangular matrix <em>L</em> with unit diagonal i.e. we need (n*n-n)/2 parameters to describe an n dimensional correlation matrix.</p>
 <p>For instance in the case n=4 the correlation matrix is given by </p><p class="formulaDsp">
-<img class="formulaDsp" alt="\[\Sigma = D^{-\frac{1}{2}}LL'D^{-\frac{1}{2}}\]" src="form_17.png"/>
+<img class="formulaDsp" alt="\[\Sigma = D^{-\frac{1}{2}}LL'D^{-\frac{1}{2}}\]" src="form_19.png"/>
 </p>
 <p> where </p><p class="formulaDsp">
-<img class="formulaDsp" alt="\[ L=\begin{pmatrix} 1 \\ x_0 &amp; 1 \\ x_1 &amp; x_3 &amp; 1 \\ x_2 &amp; x_4 &amp; x_5 &amp; 1 \end{pmatrix} \]" src="form_18.png"/>
+<img class="formulaDsp" alt="\[ L=\begin{pmatrix} 1 \\ x_0 &amp; 1 \\ x_1 &amp; x_3 &amp; 1 \\ x_2 &amp; x_4 &amp; x_5 &amp; 1 \end{pmatrix} \]" src="form_20.png"/>
 </p>
 <p> and </p><p class="formulaDsp">
-<img class="formulaDsp" alt="\[ D=diag(LL') \]" src="form_19.png"/>
+<img class="formulaDsp" alt="\[ D=diag(LL') \]" src="form_21.png"/>
 </p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Construct density object of dimension 4</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> Lx(6);</div><div class="line"><a class="code" href="classUNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t&lt;Type&gt;</a> nll(Lx);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(4);</div><div class="line">res = nll(x);               <span class="comment">// Evaluate neg. log density</span></div></div><!-- fragment --><dl class="section remark"><dt>Remarks</dt><dd><em>Sigma</em> is available via <a class="el" href="classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">MVNORM_t::cov</a> , e.g. <div class="fragment"><div class="line">nll.cov();</div></div><!-- fragment --></dd>
 <dd>

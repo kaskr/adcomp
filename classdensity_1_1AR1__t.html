@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.7.2</span>
+   &#160;<span id="projectnumber">v1.7.3</span>
    </div>
   </td>
  </tr>
@@ -126,18 +126,18 @@ class density::AR1_t&lt; distribution &gt;</h3>
   </table>
   </dd>
 </dl>
-<p>Let <img class="formulaInl" alt="$f(x)$" src="form_20.png"/> denote a multivariate Gaussian mean-zero negative log density represented by its covariance matrix <img class="formulaInl" alt="$\Sigma$" src="form_21.png"/>. Define recursively the vectors </p><p class="formulaDsp">
-<img class="formulaDsp" alt="\[x_0\sim N(0,\Sigma)\]" src="form_22.png"/>
+<p>Let <img class="formulaInl" alt="$f(x)$" src="form_22.png"/> denote a multivariate Gaussian mean-zero negative log density represented by its covariance matrix <img class="formulaInl" alt="$\Sigma$" src="form_23.png"/>. Define recursively the vectors </p><p class="formulaDsp">
+<img class="formulaDsp" alt="\[x_0\sim N(0,\Sigma)\]" src="form_24.png"/>
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp" alt="\[x_1 = \phi x_0 + \sigma\varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\Sigma)\]" src="form_23.png"/>
+<img class="formulaDsp" alt="\[x_1 = \phi x_0 + \sigma\varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\Sigma)\]" src="form_25.png"/>
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp" alt="\[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\]" src="form_24.png"/>
+<img class="formulaDsp" alt="\[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\]" src="form_26.png"/>
 </p>
-<p> where <img class="formulaInl" alt="$\sigma=\sqrt{1-\phi^2}$" src="form_25.png"/>. Then <img class="formulaInl" alt="$E(x_i)=0$" src="form_26.png"/>, <img class="formulaInl" alt="$V(x_i)=\Sigma$" src="form_27.png"/> and the covariance is <img class="formulaInl" alt="$E(x_ix_j')=\phi^{|i-j|}\Sigma$" src="form_28.png"/>. We refer to this process as a stationary 1st order autoregressive process with multivariate increments with parameter phi and marginal distribution f. Compactly denoted AR1(phi,f).</p>
+<p> where <img class="formulaInl" alt="$\sigma=\sqrt{1-\phi^2}$" src="form_27.png"/>. Then <img class="formulaInl" alt="$E(x_i)=0$" src="form_28.png"/>, <img class="formulaInl" alt="$V(x_i)=\Sigma$" src="form_29.png"/> and the covariance is <img class="formulaInl" alt="$E(x_ix_j')=\phi^{|i-j|}\Sigma$" src="form_30.png"/>. We refer to this process as a stationary 1st order autoregressive process with multivariate increments with parameter phi and marginal distribution f. Compactly denoted AR1(phi,f).</p>
 <p>Note that the construction can be carried out recursively, as "AR1(phi,f)" is itself a distribution that can be used as input to AR1(). See example below: </p><div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi1=0.8;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;N01&lt;Type&gt;</a> &gt; f1(phi1);</div><div class="line">\\ Can be evaluated on a <a class="code" href="structvector.html">vector</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10);</div><div class="line">Type ans=f1(x);</div></div><!-- fragment --><p>Now use f1 as marginal in a new AR1 process with parameter phi2:</p>
-<div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi2=0.5;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;AR1_t&lt;N01&lt;Type&gt;</a> &gt; &gt; f2(phi1,f1);</div><div class="line">\\ Can be evaluated on a 2-dimensional <a class="code" href="structarray.html">array</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10,20);</div><div class="line">Type ans=f2(x);</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="multivariate_distributions_8cpp-example.html#_a10">multivariate_distributions.cpp</a>.</dd>
+<div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi2=0.5;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;AR1_t&lt;N01&lt;Type&gt;</a> &gt; &gt; f2(phi1,f1);</div><div class="line">\\ Can be evaluated on a 2-dimensional <a class="code" href="structarray.html">array</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10,20);</div><div class="line">Type ans=f2(x);</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="multivariate_distributions_8cpp-example.html#_a9">multivariate_distributions.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00275">275</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>

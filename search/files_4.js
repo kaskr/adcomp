@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['matexp_2ehpp',['matexp.hpp',['../matexp_8hpp.html',1,'']]]
+  ['lgamma_2ehpp',['lgamma.hpp',['../lgamma_8hpp.html',1,'']]]
 ];

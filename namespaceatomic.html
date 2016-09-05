@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.7.2</span>
+   &#160;<span id="projectnumber">v1.7.3</span>
    </div>
   </td>
  </tr>
@@ -103,10 +103,14 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acf82cfa85fbc2864a8b8d583144cb333"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
-<tr class="memitem:acf82cfa85fbc2864a8b8d583144cb333"><td class="memTemplItemLeft" align="right" valign="top">CppAD::vector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceatomic.html#acf82cfa85fbc2864a8b8d583144cb333">besselK</a> (CppAD::vector&lt; Type &gt; x)</td></tr>
-<tr class="memdesc:acf82cfa85fbc2864a8b8d583144cb333"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomic version of <img class="formulaInl" alt="$besselK(x,\nu)$" src="form_14.png"/>. Valid parameter range: <img class="formulaInl" alt="$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}$" src="form_15.png"/>.  <a href="#acf82cfa85fbc2864a8b8d583144cb333">More...</a><br /></td></tr>
-<tr class="separator:acf82cfa85fbc2864a8b8d583144cb333"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67c15c0dfea98b3f79f7f0660e2abe95"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a67c15c0dfea98b3f79f7f0660e2abe95"><td class="memTemplItemLeft" align="right" valign="top">CppAD::vector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceatomic.html#a67c15c0dfea98b3f79f7f0660e2abe95">bessel_i_10</a> (CppAD::vector&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:a67c15c0dfea98b3f79f7f0660e2abe95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomic version of <img class="formulaInl" alt="$besselI(x,\nu)$" src="form_17.png"/>. Valid parameter range: <img class="formulaInl" alt="$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}$" src="form_15.png"/>.  <a href="#a67c15c0dfea98b3f79f7f0660e2abe95">More...</a><br /></td></tr>
+<tr class="separator:a67c15c0dfea98b3f79f7f0660e2abe95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad076f1600730946b58fdcd239cc25b61"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:ad076f1600730946b58fdcd239cc25b61"><td class="memTemplItemLeft" align="right" valign="top">CppAD::vector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceatomic.html#ad076f1600730946b58fdcd239cc25b61">bessel_k_10</a> (CppAD::vector&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:ad076f1600730946b58fdcd239cc25b61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomic version of <img class="formulaInl" alt="$besselK(x,\nu)$" src="form_14.png"/>. Valid parameter range: <img class="formulaInl" alt="$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}$" src="form_15.png"/>.  <a href="#ad076f1600730946b58fdcd239cc25b61">More...</a><br /></td></tr>
+<tr class="separator:ad076f1600730946b58fdcd239cc25b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab86d10e39e1b3aebc1fbd26aa26346d4"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:ab86d10e39e1b3aebc1fbd26aa26346d4"><td class="memTemplItemLeft" align="right" valign="top">CppAD::vector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceatomic.html#ab86d10e39e1b3aebc1fbd26aa26346d4">D_incpl_gamma_shape</a> (CppAD::vector&lt; Type &gt; x)</td></tr>
 <tr class="memdesc:ab86d10e39e1b3aebc1fbd26aa26346d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomic version of scaled incomplete gamma function differentiated to any order wrt. shape parameter </p><p class="formulaDsp">
@@ -233,14 +237,44 @@ template&lt;class Func &gt; </td></tr>
 <li>New symbols can be added by advanced users. First option is to code the reverse mode derivatives by hand using the TMB_ATOMIC_VECTOR_FUNCTION macro, see source code for examples. Second option is to generate reverse mode derivatives automatically using the macro REGISTER_ATOMIC. </li>
 </ul>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="acf82cfa85fbc2864a8b8d583144cb333"></a>
+<a class="anchor" id="a67c15c0dfea98b3f79f7f0660e2abe95"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class Type &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">CppAD::vector&lt;Type&gt; atomic::besselK </td>
+          <td class="memname">CppAD::vector&lt;Type&gt; atomic::bessel_i_10 </td>
+          <td>(</td>
+          <td class="paramtype">CppAD::vector&lt; Type &gt;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Atomic version of <img class="formulaInl" alt="$besselI(x,\nu)$" src="form_17.png"/>. Valid parameter range: <img class="formulaInl" alt="$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}$" src="form_15.png"/>. </p>
+<dl class="section note"><dt>Note</dt><dd>This atomic function does not handle the derivative wrt. <img class="formulaInl" alt="$\nu$" src="form_16.png"/>. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>Input vector of length 2. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Vector of length 1. </dd></dl>
+
+<p>Referenced by <a class="el" href="group__special__functions.html#ga02daab4fe5ba235c112967ef99ad67c4">besselI()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad076f1600730946b58fdcd239cc25b61"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">CppAD::vector&lt;Type&gt; atomic::bessel_k_10 </td>
           <td>(</td>
           <td class="paramtype">CppAD::vector&lt; Type &gt;&#160;</td>
           <td class="paramname"><em>x</em></td><td>)</td>
@@ -250,7 +284,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Atomic version of <img class="formulaInl" alt="$besselK(x,\nu)$" src="form_14.png"/>. Valid parameter range: <img class="formulaInl" alt="$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}$" src="form_15.png"/>. </p>
-<dl class="section note"><dt>Note</dt><dd>Derivative wrt. <img class="formulaInl" alt="$\nu$" src="form_16.png"/> is currently not implemented. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This atomic function does not handle the derivative wrt. <img class="formulaInl" alt="$\nu$" src="form_16.png"/>. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>Input vector of length 2. </td></tr>

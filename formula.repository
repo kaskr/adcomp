@@ -15,17 +15,19 @@
 \form#14:$besselK(x,\nu)$
 \form#15:$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}$
 \form#16:$\nu$
-\form#17:\[\Sigma = D^{-\frac{1}{2}}LL'D^{-\frac{1}{2}}\]
-\form#18:\[ L=\begin{pmatrix} 1 \\ x_0 & 1 \\ x_1 & x_3 & 1 \\ x_2 & x_4 & x_5 & 1 \end{pmatrix} \]
-\form#19:\[ D=diag(LL') \]
-\form#20:$f(x)$
-\form#21:$\Sigma$
-\form#22:\[x_0\sim N(0,\Sigma)\]
-\form#23:\[x_1 = \phi x_0 + \sigma\varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\Sigma)\]
-\form#24:\[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\]
-\form#25:$\sigma=\sqrt{1-\phi^2}$
-\form#26:$E(x_i)=0$
-\form#27:$V(x_i)=\Sigma$
-\form#28:$E(x_ix_j')=\phi^{|i-j|}\Sigma$
-\form#29:$2^{n-1}+1$
-\form#30:$(2^{n-1}+1)^d$
+\form#17:$besselI(x,\nu)$
+\form#18:\[ (0 \leq y) \land (0 < \mu) \land (0 < \phi) \land (1 < p) \land (p < 2) \]
+\form#19:\[\Sigma = D^{-\frac{1}{2}}LL'D^{-\frac{1}{2}}\]
+\form#20:\[ L=\begin{pmatrix} 1 \\ x_0 & 1 \\ x_1 & x_3 & 1 \\ x_2 & x_4 & x_5 & 1 \end{pmatrix} \]
+\form#21:\[ D=diag(LL') \]
+\form#22:$f(x)$
+\form#23:$\Sigma$
+\form#24:\[x_0\sim N(0,\Sigma)\]
+\form#25:\[x_1 = \phi x_0 + \sigma\varepsilon_1\:,\:\:\: \varepsilon_1 \sim N(0,\Sigma)\]
+\form#26:\[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\]
+\form#27:$\sigma=\sqrt{1-\phi^2}$
+\form#28:$E(x_i)=0$
+\form#29:$V(x_i)=\Sigma$
+\form#30:$E(x_ix_j')=\phi^{|i-j|}\Sigma$
+\form#31:$2^{n-1}+1$
+\form#32:$(2^{n-1}+1)^d$

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['pbeta',['pbeta',['../group__R__style__distribution.html#ga1a2f7c79b991f6e572c367437744483e',1,'distributions_R.hpp']]],
   ['perm',['perm',['../structarray.html#aa988a50c76d83b902943c6bed416c508',1,'array::perm()'],['../structtmbutils_1_1array.html#a650887d44a84400ec6d728411ff64abb',1,'tmbutils::array::perm()']]],
   ['pexp',['pexp',['../group__R__style__distribution.html#ga670e9f9da96ce456915870f60f48877c',1,'distributions_R.hpp']]],
   ['pgamma',['pgamma',['../group__R__style__distribution.html#gaa242d798beb9de104780857a90b32a65',1,'distributions_R.hpp']]],

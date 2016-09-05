@@ -1,6 +1,7 @@
 var searchData=
 [
   ['q_5fspde',['Q_spde',['../namespaceR__inla.html#aafe00b097cadc9ab1c0262dda13599de',1,'R_inla::Q_spde(spde_t&lt; Type &gt; spde, Type kappa)'],['../namespaceR__inla.html#ab91af51de6ea66726e54a7a0694718f5',1,'R_inla::Q_spde(spde_aniso_t&lt; Type &gt; spde, Type kappa, matrix&lt; Type &gt; H)']]],
+  ['qbeta',['qbeta',['../group__R__style__distribution.html#ga8a00b4c3d72a410b787990a8087efd23',1,'distributions_R.hpp']]],
   ['qexp',['qexp',['../group__R__style__distribution.html#gaba6d35f7cc5d9a8452344ebde87728b0',1,'distributions_R.hpp']]],
   ['qgamma',['qgamma',['../group__R__style__distribution.html#gae9f8112d1f1ee80879c8e91b7bffac55',1,'distributions_R.hpp']]],
   ['qnorm',['qnorm',['../group__R__style__distribution.html#ga5fe727a0b7c4861fbab1f2a374a9fed2',1,'distributions_R.hpp']]],

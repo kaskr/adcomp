@@ -36,6 +36,7 @@ var searchData=
   ['dshasho',['dSHASHo',['../group__R__style__distribution.html#ga6260e3730befbe071b8f0f4b27485868',1,'distributions_R.hpp']]],
   ['dsn',['dsn',['../group__R__style__distribution.html#gabd423200dbd32faa8abc12a645c90dd3',1,'distributions_R.hpp']]],
   ['dt',['dt',['../group__R__style__distribution.html#ga77949bc788f3e51913c2257e65f6f4b4',1,'distributions_R.hpp']]],
+  ['dtweedie',['dtweedie',['../group__R__style__distribution.html#ga262f3c2d1cf36f322a62d902a608aae0',1,'distributions_R.hpp']]],
   ['dweibull',['dweibull',['../group__R__style__distribution.html#ga9cf310b4a536899f7a4588fd702408d5',1,'distributions_R.hpp']]],
   ['dzinbinom',['dzinbinom',['../group__R__style__distribution.html#ga9445db03dc2b615915babfa8b790b8ce',1,'lgamma.hpp']]],
   ['dzinbinom2',['dzinbinom2',['../group__R__style__distribution.html#ga0ae940da06fcf68630caea2fdd9025a4',1,'lgamma.hpp']]],
