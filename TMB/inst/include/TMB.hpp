@@ -25,6 +25,11 @@ struct isDouble<double>{
 #define CSKIP(x) x
 #define TMB_EXTERN
 #endif
+#ifdef TMB_PRECOMPILE
+#define IF_TMB_PRECOMPILE(x) x
+#else
+#define IF_TMB_PRECOMPILE(x)
+#endif
 
 /* Early inclusion of Rprintf and REprintf */
 #include <R_ext/Print.h>
@@ -75,13 +80,15 @@ namespace CppAD{
 #include "atomic_math.hpp"
 #include "expm.hpp"
 #include "atomic_convolve.hpp"
+#include "tiny_ad/atomic.hpp"
+#include "tiny_ad/integrate/integrate.hpp"
 #include "Vectorize.hpp"
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
 #include "start_parallel.hpp"
 #include "tmb_core.hpp"
-#include "convenience.hpp"
 #include "distributions_R.hpp"
+#include "convenience.hpp"    // Requires besselK
 #include "tmbutils/tmbutils_extra.hpp"
 #include "tmbutils/R_inla.hpp"
 #include "precompile.hpp" // Must come last
