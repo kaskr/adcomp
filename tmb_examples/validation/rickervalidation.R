@@ -33,6 +33,7 @@ S <- 50      # Sample volume controlling measurement uncertainty
 X=numeric(N)
 
 ## Generate data with Poisson noise
+set.seed(1)
 Y <- rpois(length(x),S*x)
 
 ## TMB Data
@@ -62,8 +63,9 @@ sd <- sdreport(obj)
 
 ## Generate one step predictions
 pred  <- oneStepPredict(obj,observation.name="Y",data.term.indicator="keep",
-                         method="oneStepGeneric",discrete=TRUE,range=c(0,Inf),
-                         parallel=TRUE)
+                        method="oneStepGeneric",discrete=TRUE,range=c(0,Inf),
+                        conditional=1, ## Skip first residual
+                        parallel=FALSE)
 
 
 ### Plots
@@ -81,7 +83,7 @@ if(PlotToFile) dev.off()
 ## Plot residual against previous observation:
 if(PlotToFile) pdf(file="Resid.pdf",width=width,height=height) else dev.new()
 
-res <- pred$res[-1]
+res <- pred$res
 obs <- head(Y, -1)
 plot(obs, res,
      xlab=expression(y[i]),ylab=expression(u[i+1]))

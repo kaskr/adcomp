@@ -1,3 +1,7 @@
+library(TMB)
+compile("matern.cpp")
+dyn.load(dynlib("matern"))
+
 ## From package 'geoR':
 matern <- function (u, phi, kappa) 
 {
@@ -24,13 +28,9 @@ data <- list(x=x, D=D)
 parameters <- list(phi=.5, kappa=.5)
 map <- NULL
 
-require(TMB)
-compile('matern.cpp')
-dyn.load(dynlib('matern'))
-
 ################################################################################
 
-model <- MakeADFun(data, parameters, map=map)
-system.time( fit <- nlminb(model$par, model$fn, model$gr) )
-system.time( rep <- sdreport(model) )
+model <- MakeADFun(data, parameters, map=map, DLL="matern")
+system.time( fit <- nlminb(model$par, model$fn, model$gr, model$he) )
+system.time( rep <- sdreport(model, fit$par, model$he(fit$par)) )
 print(rep)

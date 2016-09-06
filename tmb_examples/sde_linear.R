@@ -15,8 +15,11 @@
 #
 # The code first simulates a data set, then reestimates parameters and states
 
-set.seed(1);  # For reproducible results
 library(TMB)
+compile("sde_linear.cpp")
+dyn.load(dynlib("sde_linear"))
+
+set.seed(1);  # For reproducible results
 
 lambda <- -1   # Rate parameter in the SDE				     
 sigmaX <- 0.1  # log(sigmaX) where sigmaX is noise intensity in the SDE   
@@ -32,33 +35,31 @@ T <- 50         # Duration of simulation
 Tobs <- 1       # Sample time interval. Should be divisible with Tsim
 
 # "Generic" function to sample a sample path of an SDE using Euler
-euler <- function(x,f,g,tvec,dB=NULL){
+euler <- function(x, f, g, tvec, dB=NULL){
   X <- numeric(length(tvec))
   X[1] <- x0
   dt <- diff(tvec)
-  if(is.null(dB)) dB <- rnorm(length(dt),sd=sqrt(dt))
+  if(is.null(dB)) dB <- rnorm(length(dt), sd=sqrt(dt))
   for(i in 1:(length(tvec)-1))
     X[i+1] <- X[i] + f(X[i])*dt[i] + g(X[i])*dB[i]
   return(X)
 }
 
 # Simulate trajectory
-tsim <- seq(0,T,Tsim)
-Xsim <- euler(x0,f,g,tsim)
+tsim <- seq(0, T, Tsim)
+Xsim <- euler(x0, f, g, tsim)
 
 # Measurements with sample interval Tobs
-iobs <- seq(1,length(tsim),round(Tobs/Tsim))
+iobs <- seq(1, length(tsim), round(Tobs/Tsim))
 
 # Generate random measurements
-Y <- rnorm(length(iobs),mean=(Xsim[iobs]),sd = sigmaY)
-
-dyn.load(dynlib("sde_linear"))
+Y <- rnorm(length(iobs), mean=(Xsim[iobs]), sd = sigmaY)
 
 # Data for TMB
-data <- list(tsim=tsim,iobs=iobs-1,Y=Y)
+data <- list(tsim=tsim, iobs=iobs-1, Y=Y)
 
 # Initial geuess on latent variables
-X <- euler(x0,f,g,tsim,dB=numeric(length(tsim)-1))
+X <- euler(x0, f, g, tsim, dB=numeric(length(tsim)-1))
 dB <- numeric(length(tsim)-1)
 
 parameters <- list(
@@ -68,10 +69,10 @@ parameters <- list(
                    logsY=log(sigmaY)
                    )
 
-obj <- MakeADFun(data,parameters,random=c("X"),DLL="sde_linear")
+obj <- MakeADFun(data, parameters, random=c("X"), DLL="sde_linear")
 
 # The inner problem is quadratic
-newtonOption(obj,smartsearch=FALSE)
+newtonOption(obj, smartsearch=FALSE)
 
 # Estimate parameters and latent variables
 system.time(opt <- nlminb(obj$par,obj$fn,obj$gr))
@@ -83,13 +84,13 @@ Xpred <- pred[,1]
 Xsd <- pred[,2]
 
 # Setup plot
-plot(tsim,Xsim,type="n",xlab="Time t",ylab="State x")
+plot(tsim, Xsim, type="n", xlab="Time t", ylab="State x")
 
 # Confidence region for states
-polygon(c(tsim,rev(tsim)),c(Xpred+1.96*Xsd,rev(Xpred-1.96*Xsd)),col="grey",border=NA)
+polygon(c(tsim, rev(tsim)), c(Xpred+1.96*Xsd,rev(Xpred-1.96*Xsd)), col="grey", border=NA)
 
 # Plot true path
-lines(tsim,Xsim,type="l")
+lines(tsim, Xsim, type="l")
 
 # Add predictions
 lines(tsim,Xpred,pch=16,col="red")

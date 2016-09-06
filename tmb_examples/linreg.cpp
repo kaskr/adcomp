@@ -1,3 +1,4 @@
+// Simple linear regression.
 #include <TMB.hpp>
 template<class Type>
 Type objective_function<Type>::operator() ()
@@ -8,7 +9,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER(b);
   PARAMETER(logSigma);
   ADREPORT(exp(2*logSigma));
-  Type nll=-sum(dnorm(Y,a+b*x,exp(logSigma),true));
+  Type nll = -sum(dnorm(Y, a+b*x, exp(logSigma), true));
   return nll;
 }
 

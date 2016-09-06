@@ -1,5 +1,7 @@
 require(TMB)
 compile("ar1_4D.cpp")
+dyn.load(dynlib("ar1_4D"))
+
 set.seed(123)
 n <- 8 ## Size of problem = n*n
 
@@ -26,29 +28,23 @@ simgmrf4 <- function(n,phi){
 phi=exp(-1/(.2*n)) ## Correlation range=20% of grid size second dimension
 eta <- simgmrf4(n,phi)
 N <- rpois(length(eta),exp(eta))
-##d <- expand.grid(x=factor(1:n),y=factor(1:n))
-##d$N <- N
 
 ## ======================= Parameterization of phi
 f <- function(x) 2/(1 + exp(-2 * x)) - 1
 invf <- function(y) -0.5 * log(2/(y + 1) - 1)
 
 ## ======================= Fit model
-dyn.load(dynlib("ar1_4D"))
 obj <- MakeADFun(data=list(N=N),
                  parameters=list(
                    eta=array(0,c(n,n,n,n)),
                    transf_phi=invf(0.5)
                    ),
-                 random=c("eta")
+                 random=c("eta"),
+                 DLL="ar1_4D"
                  )
 runSymbolicAnalysis(obj)
 obj$control <- list(trace=1,parscale=c(1)*1e-2,REPORT=1,reltol=1e-12)
-obj$hessian <- TRUE
-##Rprof();opt <- do.call("optim",obj);Rprof(NULL)
-newtonOption(obj,smartsearch=FALSE)
+newtonOption(obj, smartsearch=FALSE)
 system.time(opt <- do.call("optim",obj))
-##obj$gr()
-#c(phi1,phi2)
-#f(opt$par)
 rep <- sdreport(obj)
+rep

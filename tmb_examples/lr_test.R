@@ -1,5 +1,7 @@
 ## Illustrate map feature of TMB to perform likelihood ratio tests on a ragged array dataset.
 library(TMB)
+compile("lr_test.cpp")
+dyn.load(dynlib("lr_test"))
 
 ngroup <- 5
 nrep <- c(5,8,11,13,2)  ## Number of samples per group
@@ -13,9 +15,6 @@ raggedArray <- lapply(1:ngroup,function(i)rnorm(nrep[i],mu[i],sd[i]))
 ## Prepare data for TMB (ragged array not available):
 obs <- unlist(raggedArray)
 group <- factor( rep(1:length(raggedArray),sapply(raggedArray,length)) )
-
-compile("lr_test.cpp")
-dyn.load(dynlib("lr_test"))
 
 ## Both mu's and sd's un-restricted.
 full.model <- MakeADFun(data=list(obs=obs,group=group),

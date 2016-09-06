@@ -43,10 +43,8 @@ Type square(Type x){return x*x;}
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
-  DATA_INTEGER(noFleets);
   DATA_VECTOR(fleetTypes); 
   DATA_VECTOR(sampleTimes);
-  DATA_INTEGER(noYears);
   DATA_VECTOR(years);
   DATA_INTEGER(nobs);
   DATA_VECTOR(idx1);
@@ -62,17 +60,14 @@ Type objective_function<Type>::operator() ()
   DATA_ARRAY(propF);
   DATA_ARRAY(propM);
   DATA_INTEGER(minAge);
-  DATA_INTEGER(maxAge);
   DATA_INTEGER(maxAgePlusGroup);
   DATA_IARRAY(keyLogFsta);
-  DATA_INTEGER(corFlag);
   DATA_ARRAY(keyLogFpar);
   DATA_ARRAY(keyQpow);
   DATA_ARRAY(keyVarF);
   DATA_ARRAY(keyVarLogN); 
   DATA_ARRAY(keyVarObs); 
   DATA_INTEGER(stockRecruitmentModelCode);
-  DATA_INTEGER(noScaledYears);
   DATA_VECTOR(fbarRange);
 
   PARAMETER_VECTOR(logFpar); 
@@ -82,14 +77,11 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(logSdLogObs); 
   PARAMETER(rec_loga); 
   PARAMETER(rec_logb); 
-  //PARAMETER(logit_rho); 
   PARAMETER(rho); 
   PARAMETER_VECTOR(logScale); 
   PARAMETER_VECTOR(logScaleSSB); 
   PARAMETER_VECTOR(logPowSSB); 
   PARAMETER_VECTOR(logSdSSB); 
-  // PARAMETER_ARRAY(logF); 
-  // PARAMETER_ARRAY(logN);
   PARAMETER_ARRAY(U);
   DATA_INTEGER(nlogF);
   DATA_INTEGER(nlogN);
@@ -183,7 +175,7 @@ Type objective_function<Type>::operator() ()
   // Now finally match to observations
   int f, ft, a, y; 
   int minYear=CppAD::Integer((obs(0,0)));
-  Type predObs, zz, var;
+  Type predObs=0, zz, var;
   for(int i=0;i<nobs;i++){
     y=CppAD::Integer(obs(i,0))-minYear;
     f=CppAD::Integer(obs(i,1));

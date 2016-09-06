@@ -1,6 +1,6 @@
 require(TMB)
-compile('adaptive_integration.cpp')
-dyn.load(dynlib('adaptive_integration'))
+compile("adaptive_integration.cpp")
+dyn.load(dynlib("adaptive_integration"))
 
 ## Simulate data
 set.seed(123)
@@ -20,7 +20,7 @@ data <- list(x=x, n=n, A=A)
 parameters <- list(b = rep(0,ncol(A)), logsd=0)
 
 ## Fit model
-model <- MakeADFun(data, parameters)
+model <- MakeADFun(data, parameters, DLL="adaptive_integration")
 system.time( fit <- nlminb(model$par, model$fn, model$gr) )
 rep <- sdreport(model)
 print(rep)

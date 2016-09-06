@@ -1,3 +1,7 @@
+library(TMB)
+compile("transform2.cpp")
+dyn.load(dynlib("transform2"))
+
 ## Generate AR1 variables
 set.seed(123)
 n <- 1000
@@ -18,10 +22,6 @@ x <- qbeta(pnorm(u), shape1 = shape1, shape2 = shape2)
 ## Laplace approximation to work for this problem):
 sd <- .005
 y <- x + rnorm(n, sd=sd)
-
-library(TMB)
-compile("transform2.cpp")
-dyn.load(dynlib("transform2"))
 
 data=list(y=y)
 parameters=list(phi=0, shape1=1, shape2=1, sd=1, u=u*0)

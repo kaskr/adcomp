@@ -1,3 +1,4 @@
+// Gaussian process with Matern covariance.
 #include <TMB.hpp>
 
 template<class Type>

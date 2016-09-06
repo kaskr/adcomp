@@ -1,3 +1,4 @@
+// Estimating parameters in a Tweedie distribution.
 #include <TMB.hpp>
 
 template<class Type>

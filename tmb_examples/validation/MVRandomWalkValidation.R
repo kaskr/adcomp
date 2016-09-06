@@ -8,8 +8,10 @@
 ## Casper W. Berg and Kasper Kristensen, 2016
 
 library(TMB)
-library(MASS)
+compile("MVRandomWalkValidation.cpp")
+dyn.load(dynlib("MVRandomWalkValidation"))
 
+library(MASS)
 simdata <- function(stateDim = 8, timeSteps = 100, rho = 0.9, rho2 = 0.9, sds = seq(0.5, 
     0.51, length = stateDim), sdObs = rep(2, stateDim), plot = FALSE, seed = 143) {
     set.seed(seed)
@@ -43,12 +45,20 @@ simdata <- function(stateDim = 8, timeSteps = 100, rho = 0.9, rho2 = 0.9, sds = 
 
 stateDim <- 4
 timeSteps <- 100
-sim <- simdata(stateDim, timeSteps, seed = 12345)
+
+## Note: For reproducibility across machines ('mvrnorm' uses eigen
+## decompostion)
+if(TRUE) {
+    ## Use cached data
+    sim <- dget("MVRandomWalkValidation_data.R")
+} else {
+    ## Simulate data
+    sim <- simdata(stateDim, timeSteps, seed = 12345)
+}
+
 d <- sim$d
 obs <- sim$obs
 
-compile("MVRandomWalkValidation.cpp")
-dyn.load(dynlib("MVRandomWalkValidation"))
 data <- list(obs = t(obs))
 parameters <- list(transf_rho = 0.1, transf_rhoObs = 0.1, logsds = sim$sds * 0, logsdObs = sim$sdObs * 
     0, u = data$obs * 0)

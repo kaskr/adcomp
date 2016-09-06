@@ -1,10 +1,9 @@
-// Scaled up version of the Orange Tree example (50,000 latent random variables)
+// Scaled up version of the Orange Tree example (5000 latent random variables)
 #include <TMB.hpp>
 
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
-  DATA_INTEGER(n);
   DATA_VECTOR(y);
   DATA_VECTOR(t);
   DATA_INTEGER(M);

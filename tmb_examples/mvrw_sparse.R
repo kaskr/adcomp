@@ -1,4 +1,8 @@
-set.seed(1);
+library(TMB)
+compile("mvrw_sparse.cpp")
+dyn.load(dynlib("mvrw_sparse"))
+
+set.seed(1)
 library(MASS)
 
 simdata <- function(){
@@ -30,8 +34,6 @@ simdata <- function(){
 stateDim=3
 timeSteps=100
 simdata()
-library(TMB)
-dyn.load(dynlib("mvrw_sparse"))
 data <- list(obs=t(obs))
 parameters <- list(
   u=data$obs*0,

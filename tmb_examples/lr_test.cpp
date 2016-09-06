@@ -1,3 +1,4 @@
+// Illustrate map feature of TMB to perform likelihood ratio tests on a ragged array dataset.
 #include <TMB.hpp>
 
 template<class Type>
@@ -13,4 +14,3 @@ Type objective_function<Type>::operator() ()
   }
   return res;
 }
-
