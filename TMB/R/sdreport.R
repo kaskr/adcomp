@@ -348,6 +348,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
           }
           nonr <- setdiff(seq_along(par), r)
           tmp <- sapply(nonr,reverse.sweep)
+          if(!is.matrix(tmp)) ## Happens if length(r)==1
+              tmp <- matrix(tmp, ncol=length(nonr) )
           A <- solve(hessian.random, tmp)
           diag.term2 <- rowSums((A %*% Vtheta)*A)
       }
