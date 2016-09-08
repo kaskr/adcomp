@@ -380,7 +380,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ## Copy a few selected members of the environment 'env'. In
   ## particular we need the 'skeleton' objects that allow us to put
   ## results back in same shape as original parameter list.
-  ans$env <- new.env()
+  ans$env <- new.env(parent = emptyenv())
   ans$env$parameters <- obj$env$parameters
   ans$env$random <- obj$env$random
   class(ans) <- "sdreport"
