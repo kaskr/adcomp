@@ -148,7 +148,7 @@ isNullPointer <- function(pointer) {
 ##' @param ADreport Calculate derivatives of macro ADREPORT(vector) instead of objective_function return value?
 ##' @param atomic Allow tape to contain atomic functions?
 ##' @param LaplaceNonZeroGradient Allow Taylor expansion around non-stationary point?
-##' @param DLL Name of shared object file compiled by user.
+##' @param DLL Name of shared object file compiled by user (without the conventional extension, \file{.so}, \file{.dll}, \dots).
 ##' @param checkParameterOrder Optional check for correct parameter order.
 ##' @param regexp Match random effects by regular expressions?
 ##' @param silent Disable all tracing information?
