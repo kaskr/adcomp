@@ -76,6 +76,9 @@ public:
   }
   /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
+    if(Q.rows() != x.size())
+      error("MVNORM_t: Expected evaluation vector length=%i (=dimension of covariance). Got length=%i.",
+	    Q.rows(), x.size());
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
   /** \brief Evaluate _projected_ negative log density
@@ -176,8 +179,9 @@ class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
   UNSTRUCTURED_CORR_t(vectortype x){
     // (n*n-n)/2=nx  ==>  n*n-n-2*nx=0 ==> n=(1+sqrt(1+8*nx))/2
     int nx=x.size();
-    int n=int((1.0+sqrt(1.0+8*nx))/2.0);
-    if((n*n-n)/2!=nx)std::cout << "vector does not specify an UNSTRUCTERED_CORR\n";
+    int n = int( (1.0 + sqrt(1.0 + 8 * nx)) / 2.0 );
+    if( (n * n - n) / 2 != nx )
+      error("Vector length=%i does not specify a valid UNSTRUCTERED_CORR.", nx);
     matrixtype L(n,n);
     L.setIdentity();
     int i,j,k=0;
@@ -713,6 +717,9 @@ public:
     return (x*(Q*x.matrix()).array()).sum();
   }
   scalartype operator()(vectortype x){
+    if(Q.rows() != x.size())
+      error("GMRF_t: Expected evaluation vector length=%i (=dimension of precision). Got length=%i.",
+	    Q.rows(), x.size());
     return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
   }
   /* jacobian */
@@ -924,7 +931,9 @@ public:
     return arraytype(x,revnewdim.reverse());
   }
   scalartype operator()(arraytype x){
-    if(this->ndim() != x.dim.size())std::cout << "Wrong dimension in SEPARABLE_t\n";
+    if(this->ndim() != x.dim.size())
+      error("SEPARABLE_t: Expected %i-dimensional array. Got %i-dimensional array.",
+	    this->ndim(), x.dim.size());
     /* Calculate quadform */
     arraytype y(x.dim);
     y=jacobian(x);
@@ -955,7 +964,6 @@ public:
      with i running through the _outer_dimension_ of x.
   */
   scalartype operator()(arraytype x, int i){
-    if(this->ndim() != x.dim.size())std::cout << "Wrong dimension in SEPARABLE_t\n";
     /* Calculate quadform */
     arraytype y(x.dim);
     y=jacobian(x);
