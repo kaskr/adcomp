@@ -104,10 +104,10 @@ public:
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
 
-/** \brief Evaluates multivariate zero-mean normal density with user supplied covariance matrix
+/** \brief Construct object to evaluate multivariate zero-mean normal density with user supplied covariance matrix
 
-    \param x Point (vector) at which the density will be evaluated.
-    \param use_atomic Determines if "atomic macros" are used (default).
+    \param Sigma Positive definite covariance matrix.
+    \param use_atomic Determines if "atomic functions" are used for the linear algebra (default).
     
     Shortform version for working with the density of the \ref MVNORM_t 
     distribution (C++ class). Typical use:
@@ -118,8 +118,8 @@ public:
     an object of MVNORM_t, which is then evaluated by the part \c (x).
 */
 template <class scalartype>
-MVNORM_t<scalartype> MVNORM(matrix<scalartype> x, bool use_atomic=true){
-  return MVNORM_t<scalartype>(x, use_atomic);
+MVNORM_t<scalartype> MVNORM(matrix<scalartype> Sigma, bool use_atomic = true){
+  return MVNORM_t<scalartype>(Sigma, use_atomic);
 }
 
 /** \brief Multivariate normal distribution with unstructered correlation matrix
@@ -196,7 +196,7 @@ class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
     this->setSigma(Sigma); /* Call MVNORM_t initializer */
   }
 };
-/** \brief Evaluates the density with unstructure correlation matrix. 
+/** \brief Construct object to evaluate the density with unstructured correlation matrix.
      See UNSTRUCTURED_CORR_t for details */
 template <class scalartype>
 UNSTRUCTURED_CORR_t<scalartype> UNSTRUCTURED_CORR(vector<scalartype> x){
@@ -733,7 +733,7 @@ public:
     return ans;
   }
 };
-/** \brief Evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
+/** \brief Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
 
   For detailed explanation of GMRFs see the class definition @ref GMRF_t
   \param Q precision matrix
@@ -839,7 +839,7 @@ public:
   int ndim(){return f.ndim();}
   VARIANCE_NOT_YET_IMPLEMENTED;
 };
-/** \brief Evaluates a scaled density. See VECSCALE_t for details */
+/** \brief Construct object to evaluate a scaled density. See VECSCALE_t for details */
 template <class vectortype, class distribution>
 VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
   return VECSCALE_t<distribution>(f_,scale_);
@@ -979,6 +979,26 @@ public:
 
 };
 
+/** \brief Construct object to evaluate the separable extension of two
+    multivariate zero-mean normal densities. See SEPARABLE_t for
+    details.
+
+    \param f_ First density object.
+    \param g_ Second density object.
+
+    Shortform version to combine two densities using the class \ref SEPARABLE_t .
+    Typical use:
+    \code
+      PARAMETER_ARRAY(x); // 2D array
+      SEPARABLE(AR1(phi), MVNORM(Sigma))(x);
+    \endcode
+    where \c MVNORM(Sigma) acts in the first dimension of x and \c
+    AR1(phi) acts in the second dimension of x.
+    \note The order of array dimensions is reversed in the sense that
+    f_ acts in the *second* dimension and g_ acts in the *first*
+    dimension (This order is consistent with how Kronecker products
+    work in R).
+*/
 template <class distribution1, class distribution2>
 SEPARABLE_t<distribution1,distribution2> SEPARABLE(distribution1 f_, distribution2 g_){
   return SEPARABLE_t<distribution1,distribution2>(f_,g_);
