@@ -30,17 +30,36 @@ if(example!=""){
   sdreport <- addHook(TMB::sdreport,timer=TRUE,result=TRUE)
   optim <- addHook(stats::optim,timer=TRUE,result=TRUE)
   nlminb <- addHook(stats::nlminb,timer=TRUE,result=TRUE)
+  compile <- addHook(TMB::compile,timer=TRUE)
+  oneStepPredict <- addHook(TMB::oneStepPredict,timer=TRUE,result=TRUE)
   
-  runExample(basename(example),exfolder=dirname(example),thisR=TRUE,subarch=FALSE)
-  
-  if(!file.exists(paste0(example,".expected.RData"))){
-    outfile <- paste0(example,".expected.RData")
+  setwd(dirname(example))
+  source(paste0(basename(example), ".R"), echo=TRUE)
+
+  ## Strip off large irrelevant output
+  strip.off <- function(x) {
+      if(is.list(x)) {
+          x[] <- lapply(unclass(x), strip.off)
+      }
+      else if (is.environment(x)) {
+          x <- new.env() ## empty
+      } else {
+          ## Do nothing
+      }
+      x
+  }
+  .results <- strip.off(.results)
+
+  if(!file.exists(paste0(basename(example),".expected.RData"))){
+    outfile <- paste0(basename(example),".expected.RData")
     save(.timings,.results,file=outfile)
   }
-  outfile <- paste0(example,".output.RData")
+  outfile <- paste0(basename(example),".output.RData")
   save(.timings,.results,file=outfile)
   
 } else {
+  report.level <- Sys.getenv("report_level")
+  report.full <- (report.level == "1")
   ## Report of diffs
   f1 <- dir(pattern = ".expected.RData$", recursive=TRUE)
   f2 <- sub("\\.expected\\.RData$","\\.output\\.RData",f1)
@@ -70,34 +89,86 @@ if(example!=""){
     if(full.timings){
       return( sapply(e2$.timings,function(x)x["elapsed"]) )
     }
-    totaltime <- function(x)sum(sapply(x,function(x)x["elapsed"]))
+    ## Total runtime (exclude TMB::compile)
+    totaltime <- function(x){
+        x <- x[names(x) != "TMB::compile"]
+        sum(sapply(x,function(x)x["elapsed"]))
+    }
     t1 <- totaltime(e1$.timings)
     t2 <- totaltime(e2$.timings)
-    c(summary(as.numeric(d))[c("Min.","Median","Max.")],totaltime=t2,timeindex=t2/t1)
+    ## Total compilation time
+    compilationtime <- function(x){
+        x <- x[names(x) == "TMB::compile"]
+        sum(sapply(x,function(x)x["elapsed"]))
+    }
+    tc1 <- compilationtime(e1$.timings)
+    tc2 <- compilationtime(e2$.timings)
+    c(summary(as.numeric(d))[c("Min.","Median","Max.")],  ## Results
+      totaltime=t2, timeindex=t2/t1,                      ## Runtime
+      ctime=tc2, ctimeindex=tc2/tc1)                      ## Compilation time
   }
   sink("REPORT.md")
+  options(width = 100)
   cat("Example overview:\n-----------------\n")
   runExample(exfolder=".",subarch=FALSE)
   cat("\n")
   mat <- do.call("rbind",Map(report,f1,f2))
   rownames(mat) <- sub(".expected.RData","",rownames(mat))
-  cat("\nResults and timings:\n--------------------\n")
-  print(mat)
-  cat("\nTiming details:\n---------------\n")
+  if (TRUE) {
+      cat("\nResults (absolute error):\n-------------------------\n")
+      print(mat[ , c("Min.", "Median", "Max.")])
+  }
+  if (TRUE) {
+      cat("\nTimings:\n--------\n")
+      print(mat[ , c("totaltime", "timeindex")])
+  }
+  if (report.full) {
+      cat("\nCompilation time:\n-----------------\n")
+      print(mat[ , c("ctime", "ctimeindex")])
+  }
+  if (report.full) cat("\nTiming details:\n---------------\n")
   res <- Map(report,f1,f2,full.timings=TRUE)
   Example <- sub(".expected.RData","",rep(names(res),sapply(res,length)))
   Function <- sub(".*::(.*).elapsed","\\1",unlist(lapply(res,names)))
   tab <- xtabs(unlist(res)~Example+Function)
   names(dimnames(tab)) <- NULL
-  print(tab)
-  cat("\nResult details:\n---------------\n")
+  if (report.full) print(tab)
+  if (report.full) cat("\nResult details:\n---------------\n")
   res <- Map(report,f1,f2,full.diff=TRUE)
   Example <- sub(".expected.RData","",rep(names(res),sapply(res,length)))
   Function <- sub(".*::(.*)","\\1",unlist(lapply(res,names)))
   Function <- formatC(Function,width=max(nchar(Function)))
   tab <- xtabs(unlist(res)~Example+Function)
   names(dimnames(tab)) <- NULL
-  print(tab)
+  if (report.full) print(tab)
+  ## Tolerances (default = 1e-8 - modify for selected slots)
+  abs.tol <- structure(rep(1e-8, ncol(tab)),
+                       .Names=gsub(" ","",colnames(tab)))
+  abs.tol["nlminb.objective"] <- 1e-04
+  abs.tol["nlminb.par"] <- 1e-05
+  abs.tol["optim.par"] <- 1e-06
+  abs.tol["optim.value"] <- 1e-07
+  abs.tol["sdreport.cov.fixed"] <- 1e-04
+  abs.tol["sdreport.diag.cov.random"] <- 1e-07
+  abs.tol["sdreport.gradient.fixed"] <- 1e-04
+  abs.tol["sdreport.par.fixed"] <- 1e-05
+  abs.tol["sdreport.par.random"] <- 1e-06
+  abs.tol["sdreport.value"] <- 1e-06
+  abs.tol <- abs.tol[gsub(" ","",colnames(tab))]
+  passed <- t(t(tab) < abs.tol)
+  all.passed <- t(t(apply(passed, 1, all)))
+  colnames(all.passed) <- "passed"
+  cat("\nAccuracy tests:\n---------------\n")
+  print(all.passed)
+  ## What not passed ?
+  if(!all(all.passed)) {
+    names(dimnames(tab)) <- c("Example", "Slot")
+    df <- as.data.frame(t(tab), responseName="Error")
+    df <- df[c("Example", "Slot", "Error")]
+    df$tol <- abs.tol
+    cat("\nNot passed:\n-----------\n")
+    print(df[!(t(tab) < abs.tol),,drop=FALSE])
+  }
   sink()
   ## Markdown
   md <- function(file){

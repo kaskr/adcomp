@@ -16,7 +16,10 @@ $(all_examples) : % : %.output.RData
 	
 
 report:
-	R --slave < tools/unittest.R
+	report_level=0 R --slave < tools/unittest.R
+
+report-full:
+	report_level=1 R --slave < tools/unittest.R
 
 clean :
 	rm -rf *.o *.so *.dll *~ core *.output.RData *.pdf *.profile
