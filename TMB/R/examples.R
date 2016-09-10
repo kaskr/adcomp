@@ -46,7 +46,9 @@ runExample <- function(name=NULL,all=FALSE,thisR=TRUE,
   info <- strwrap(info, width = 60, exdent = M+4)
   info <- gsub("@"," ",info)
   if(all){
-    lapply(exnames,runExample,thisR=thisR,clean=clean,...)
+    lapply(exnames,runExample,
+           thisR=thisR,clean=clean,exfolder=exfolder,
+           dontrun=dontrun,subarch=subarch,...)
     return(NULL)
   }
   if(is.null(name)){
