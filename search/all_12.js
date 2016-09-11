@@ -3,6 +3,7 @@ var searchData=
   ['special_20matrix_20functions',['Special matrix functions',['../group__matrix__functions.html',1,'']]],
   ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
   ['scale_5ft',['SCALE_t',['../classSCALE__t.html',1,'']]],
+  ['separable',['SEPARABLE',['../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57',1,'SEPARABLE():&#160;density.hpp'],['../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5',1,'density::SEPARABLE()']]],
   ['separable_5ft',['SEPARABLE_t',['../classSEPARABLE__t.html',1,'']]],
   ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],
   ['spde_5faniso_5ft',['spde_aniso_t',['../structR__inla_1_1spde__aniso__t.html',1,'R_inla']]],

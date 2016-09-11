@@ -9,5 +9,5 @@ var searchData=
   ['min',['min',['../convenience_8hpp.html#a6ced780585902c59301c9e0e80044dd2',1,'convenience.hpp']]],
   ['multi_5fforrev',['multi_forrev',['../namespaceatomic.html#add38af63d55c1d476da416ee12ea2955',1,'atomic']]],
   ['mvintegrate',['mvIntegrate',['../namespacegauss__kronrod.html#a4d70d01b00bd9d461e54f17766187a3c',1,'gauss_kronrod']]],
-  ['mvnorm',['MVNORM',['../density_8hpp.html#ac5bcde03d9eb705e5c1ec95ac74781c8',1,'MVNORM():&#160;density.hpp'],['../namespacedensity.html#a23773434ee2f7409f18752071fac2468',1,'density::MVNORM()']]]
+  ['mvnorm',['MVNORM',['../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07',1,'MVNORM():&#160;density.hpp'],['../namespacedensity.html#a0721aacc998f4cbd0290626073c19763',1,'density::MVNORM()']]]
 ];
