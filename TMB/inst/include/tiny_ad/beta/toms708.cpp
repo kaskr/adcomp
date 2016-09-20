@@ -22,7 +22,7 @@ double max_fabs(Float x) {
   double ans = 0;
   for(int i=0; i<n; i++) ans = max(ans, fabs(px[i]));
   return ans;
-};
+}
 
 #include "nmath.h"
 #include "dpq.h"

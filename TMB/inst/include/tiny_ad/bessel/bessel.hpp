@@ -95,7 +95,7 @@ Float R_pow_di(Float x, int n)
 template<class Float>
 Float ldexp (Float x, int expo) {
   return exp( log(x) + expo * log(2.0) );
-};
+}
 
 #include "bessel_i.cpp"
 #undef MATHLIB_STANDALONE
