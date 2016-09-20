@@ -40,7 +40,6 @@ double max_fabs(Float x) {
 #ifdef DEBUG_bratio
 # define R_ifDEBUG_printf(...) REprintf(__VA_ARGS__)
 #else
-# define R_ifDEBUG_printf(...)
 #endif
 
 /* MM added R_D_LExp, so redefine here in terms of rexpm1 */
@@ -157,8 +156,6 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 
     if (fabs(z) > eps * 3.) { *ierr = 5; return; }
 
-    R_ifDEBUG_printf("bratio(a=%g, b=%g, x=%9g, y=%9g, .., log_p=%d): ",
-		     a,b,x,y, log_p);
     *ierr = 0;
     bool a_lt_b;
     if (x == 0.) goto L200;
@@ -185,7 +182,7 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 	    *w1 = a / (a + b);
 	}
 
-	R_ifDEBUG_printf("a & b very small -> simple ratios (%g,%g)\n", *w,*w1);
+
 	return;
     }
 
@@ -207,24 +204,24 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 	}
 	/* now have  x0 <= 1/2 <= y0  (still  x0+y0 == 1) */
 
-	R_ifDEBUG_printf(" min(a,b) <= 1, do_swap=%d;", do_swap);
+
 
 	if (b0 < min(eps, eps * a0)) { /* L80: */
 	    *w = fpser(a0, b0, x0, eps, log_p);
 	    *w1 = log_p ? R_Log1_Exp(*w) : 0.5 - *w + 0.5;
-	    R_ifDEBUG_printf("  b0 small -> w := fpser(*) = %.15g\n", *w);
+
 	    goto L_end;
 	}
 
 	if (a0 < min(eps, eps * b0) && b0 * x0 <= 1.) { /* L90: */
 	    *w1 = apser(a0, b0, x0, eps);
-	    R_ifDEBUG_printf("  a0 small -> w1 := apser(*) = %.15g\n", *w1);
+
 	    goto L_end_from_w1;
 	}
 
 	bool did_bup = FALSE;
 	if (max(a0,b0) > 1.) { /* L20:  min(a,b) <= 1 < max(a,b)  */
-	    R_ifDEBUG_printf("\n L20:  min(a,b) <= 1 < max(a,b); ");
+
 	    if (b0 <= 1.) goto L_w_bpser;
 
 	    if (x0 >= 0.29) /* was 0.3, PR#13786 */	goto L_w1_bpser;
@@ -236,7 +233,7 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 		goto L131;
 	    }
 	} else { /*  a, b <= 1 */
-	    R_ifDEBUG_printf("\n      both a,b <= 1; ");
+
 	    if (a0 >= min(0.2, b0))	goto L_w_bpser;
 
 	    if (pow(x0, a0) <= 0.9) 	goto L_w_bpser;
@@ -245,10 +242,10 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 	}
 	n = 20; /* goto L130; */
 	*w1 = bup(b0, a0, y0, x0, n, eps, FALSE); did_bup = TRUE;
-	R_ifDEBUG_printf("  ... n=20 and *w1 := bup(*) = %.15g; ", *w1);
+
 	b0 += n;
     L131:
-	R_ifDEBUG_printf(" L131: bgrat(*, w1=%.15g) ", *w1);
+
 	bgrat<Float>(b0, a0, y0, x0, w1, 15*eps, &ierr1, FALSE);
 #ifdef DEBUG_bratio
 	REprintf(" ==> new w1=%.15g", *w1);
@@ -258,7 +255,7 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 	    // "almost surely" from underflow, try more: [2013-03-04]
 // FIXME: it is even better to do this in bgrat *directly* at least for the case
 //  !did_bup, i.e., where *w1 = (0 or -Inf) on entry
-	    R_ifDEBUG_printf(" denormalized or underflow (?) -> retrying: ");
+
 	    if(did_bup) { // re-do that part on log scale:
 		*w1 = bup<Float>(b0-n, a0, y0, x0, n, eps, TRUE);
 	    }
@@ -293,11 +290,9 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 	    SET_0_noswap;
 	}
 
-	R_ifDEBUG_printf("  L30:  both  a, b > 1; |lambda| = %#g, do_swap = %d\n",
-			 lambda, do_swap);
 
 	if (b0 < 40.) {
-	    R_ifDEBUG_printf("  b0 < 40;");
+
 	    if (b0 * x0 <= 0.7
 		|| (log_p && lambda > 650.)) // << added 2010-03; svn r51327
 		goto L_w_bpser;
@@ -305,24 +300,22 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 		goto L140;
 	}
 	else if (a0 > b0) { /* ----  a0 > b0 >= 40  ---- */
-	    R_ifDEBUG_printf("  a0 > b0 >= 40;");
+
 	    if (b0 <= 100. || lambda > b0 * 0.03)
 		goto L_bfrac;
 
 	} else if (a0 <= 100.) {
-	    R_ifDEBUG_printf("  a0 <= 100; a0 <= b0 >= 40;");
+
 	    goto L_bfrac;
 	}
 	else if (lambda > a0 * 0.03) {
-	    R_ifDEBUG_printf("  b0 >= a0 > 100; lambda > a0 * 0.03 ");
+
 	    goto L_bfrac;
 	}
 
 	/* else if none of the above    L180: */
 	*w = basym<Float>(a0, b0, lambda, eps * 100., log_p);
 	*w1 = log_p ? R_Log1_Exp(*w) : 0.5 - *w + 0.5;
-	R_ifDEBUG_printf("  b0 >= a0 > 100; lambda <= a0 * 0.03: *w:= basym(*) =%.15g\n",
-			 *w);
 	goto L_end;
 
     } /* else: a, b > 1 */
@@ -332,19 +325,19 @@ bratio(Float a, Float b, Float x, Float y, Float *w, Float *w1,
 L_w_bpser: // was L100
     *w = bpser(a0, b0, x0, eps, log_p);
     *w1 = log_p ? R_Log1_Exp(*w) : 0.5 - *w + 0.5;
-    R_ifDEBUG_printf(" L_w_bpser: *w := bpser(*) = %.15g\n", *w);
+
     goto L_end;
 
 L_w1_bpser:  // was L110
     *w1 = bpser(b0, a0, y0, eps, log_p);
     *w  = log_p ? R_Log1_Exp(*w1) : 0.5 - *w1 + 0.5;
-    R_ifDEBUG_printf(" L_w1_bpser: *w1 := bpser(*) = %.15g\n", *w1);
+
     goto L_end;
 
 L_bfrac:
     *w = bfrac<Float>(a0, b0, x0, y0, lambda, eps * 15., log_p);
     *w1 = log_p ? R_Log1_Exp(*w) : 0.5 - *w + 0.5;
-    R_ifDEBUG_printf(" L_bfrac: *w := bfrac(*) = %g\n", *w);
+
     goto L_end;
 
 L140:
@@ -358,26 +351,26 @@ L140:
     *w = bup(b0, a0, y0, x0, n, eps, FALSE);
 
     if(*w < DBL_MIN && log_p) { /* do not believe it; try bpser() : */
-	R_ifDEBUG_printf(" L140: bup(b0=%g,..)=%.15g < DBL_MIN - not used; ", b0, *w);
+
 	/*revert: */ b0 += n;
 	/* which is only valid if b0 <= 1 || b0*x0 <= 0.7 */
 	goto L_w_bpser;
     }
-    R_ifDEBUG_printf(" L140: *w := bup(b0=%g,..) = %.15g; ", b0, *w);
+
     if (x0 <= 0.7) {
 	/* log_p :  TODO:  w = bup(.) + bpser(.)  -- not so easy to use log-scale */
 	*w += bpser(a0, b0, x0, eps, /* log_p = */ FALSE);
-	R_ifDEBUG_printf(" x0 <= 0.7: *w := *w + bpser(*) = %.15g\n", *w);
+
 	goto L_end_from_w;
     }
     /* L150: */
     if (a0 <= 15.) {
 	n = 20;
 	*w += bup(a0, b0, x0, y0, n, eps, FALSE);
-	R_ifDEBUG_printf("\n a0 <= 15: *w := *w + bup(*) = %.15g;", *w);
+
 	a0 += n;
     }
-    R_ifDEBUG_printf(" bgrat(*, w=%.15g) ", *w);
+
     bgrat<Float>(a0, b0, x0, y0, w, 15*eps, &ierr1, FALSE);
     if(ierr1) *ierr = 10 + ierr1;
 #ifdef DEBUG_bratio
@@ -611,8 +604,6 @@ template<class Float> static Float bpser(Float a, Float b, Float x, Float eps, i
 		ans = a0 / a * exp(z);
 	}
     }
-    R_ifDEBUG_printf(" bpser(a=%g, b=%g, x=%g, log=%d): prelim.ans = %.14g;\n",
-		     a,b,x, log_p, ans);
     if (ans == R_D__0 || (!log_p && a <= eps * 0.1)) {
 	return ans;
     }
@@ -638,9 +629,6 @@ template<class Float> static Float bpser(Float a, Float b, Float x, Float eps, i
 		" bpser(a=%g, b=%g, x=%g,...) did not converge (n=1e7, |w|/tol=%g > 1; A=%g)",
 		a,b,x, fabs(w)/tol, ans);
     }
-    R_ifDEBUG_printf("  -> n=%.0f iterations, |w|=%g %s %g=tol:=eps/a ==> a*sum=%g\n",
-		     n, fabs(w), (fabs(w) > tol) ? ">!!>" : "<=",
-		     tol, a*sum);
     if(log_p) {
 	if (a*sum > -1.) ans += log1p(a * sum);
 	else {
@@ -748,15 +736,13 @@ static Float bfrac(Float a, Float b, Float x, Float y, Float lambda,
 	beta, alpha, brc;
 
     if(!R_FINITE(lambda)) return ML_NAN;// TODO: can return 0 or 1 (?)
-    R_ifDEBUG_printf(" bfrac(a=%g, b=%g, x=%g, y=%g, lambda=%g, eps=%g, log_p=%d):",
-		     a,b,x,y, lambda, eps, log_p);
     brc = brcomp(a, b, x, y, log_p);
     if(ISNAN(brc)) { // e.g. from   L <- 1e308; pnbinom(L, L, mu = 5)
-	R_ifDEBUG_printf(" --> brcomp(a,b,x,y) = NaN\n");
+
 	ML_ERR_return_NAN; // TODO: could we know better?
     }
     if (!log_p && brc == 0.) {
-	R_ifDEBUG_printf(" --> brcomp(a,b,x,y) underflowed to 0.\n");
+
 	return 0.;
     }
 #ifdef DEBUG_bratio
@@ -799,8 +785,6 @@ static Float bfrac(Float a, Float b, Float x, Float y, Float lambda,
 	r0 = r;
 	r = anp1 / bnp1;
 #ifdef _not_normally_DEBUG_bfrac
-	R_ifDEBUG_printf(" n=%5.0f, a_{n,n+1}= (%12g,%12g),  b_{n,n+1} = (%12g,%12g) => r0,r = (%14g,%14g)\n",
-			 n, an,anp1, bn,bnp1, r0, r);
 #endif
 	if (fabs(r - r0) <= eps * r)
 	    break;
@@ -812,8 +796,6 @@ static Float bfrac(Float a, Float b, Float x, Float y, Float lambda,
 	anp1 = r;
 	bnp1 = 1.;
     } while (n < 10000);// arbitrary; had '1' --> infinite loop for  lambda = Inf
-    R_ifDEBUG_printf("  in bfrac(): n=%.0f terms cont.frac.; brc=%g, r=%g\n",
-		     n, brc, r);
     if(n >= 10000)
 	MATHLIB_WARNING5(
 	    " bfrac(a=%g, b=%g, x=%g, y=%g, lambda=%g) did *not* converge (in 10000 steps)\n",
@@ -1000,7 +982,7 @@ template<class Float> static Float brcmp1(int mu, Float a, Float b, Float x, Flo
 	if (b0 >= 8.) {
 	/* L80:                  ALGORITHM FOR b0 >= 8 */
 	    u = gamln1(a0) + algdiv(a0, b0);
-	    R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1, b0 >= 8;  z=%.15g\n", z);
+
 	    return give_log
 		? log(a0) + esum(mu, z - u, TRUE)
 		:     a0  * esum(mu, z - u, FALSE);
@@ -1023,7 +1005,7 @@ template<class Float> static Float brcmp1(int mu, Float a, Float b, Float x, Flo
 	    c = give_log
 		? log1p(gam1(a)) + log1p(gam1(b)) - log(z)
 		: (gam1(a) + 1.) * (gam1(b) + 1.) / z;
-	    R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1, b0 <= 1;  c=%.15g\n", c);
+
 	    return give_log
 		? ans + log(a0) + c - log1p(a0 / b0)
 		: ans * (a0 * c) / (a0 / b0 + 1.);
@@ -1051,7 +1033,7 @@ template<class Float> static Float brcmp1(int mu, Float a, Float b, Float x, Flo
 	} else {
 	    t = gam1(apb) + 1.;
 	}
-	R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1 < b0 < 8;  t=%.15g\n", t);
+
 	// L72:
 	return give_log
 	    ? log(a0)+ esum(mu, z, TRUE) + log1p(gam1(b0)) - log(t) // TODO? log(t) = log1p(..)
@@ -1078,8 +1060,6 @@ template<class Float> static Float brcmp1(int mu, Float a, Float b, Float x, Flo
 	}
 	Float lx0 = -log1p(b/a); // in both cases
 
-	R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a,b >= 8;	x0=%.15g, lx0=log(x0)=%.15g\n",
-			 x0, lx0);
 	// L110:
 	Float e = -lambda / a;
 	if (fabs(e) > 0.6) {
@@ -1158,8 +1138,6 @@ template<class Float> static void bgrat(Float a, Float b, Float x, Float y, Floa
 	u = exp(log_u);
 
     if (log_u == ML_NEGINF) {
-	R_ifDEBUG_printf(" bgrat(*): underflow log_u = -Inf  = log_r -u', log_r = %g ",
-			 log_r);
 	/* L_Error:    THE EXPANSION CANNOT BE COMPUTED */ *ierr = 2; return;
     }
 
@@ -1169,8 +1147,6 @@ template<class Float> static void bgrat(Float a, Float b, Float x, Float y, Floa
 	? ((*w == ML_NEGINF) ? 0. : exp(  *w    - log_u))
 	: ((*w == 0.)        ? 0. : exp(log(*w) - log_u));
 
-    R_ifDEBUG_printf(" bgrat(a=%g, b=%g, x=%g, *)\n -> u=%g, l='w/u'=%g, ",
-		     a,b,x, u, l);
     Float
 	q_r = grat_r(b, z, log_r, eps), // = q/r of former grat1(b,z, r, &p, &q)
 	v = 0.25 / (nu * nu),
@@ -1198,7 +1174,7 @@ template<class Float> static void bgrat(Float a, Float b, Float x, Float y, Floa
 	Float dj = d[nm1] * j;
 	sum += dj;
 	if (sum <= 0.) {
-	    R_ifDEBUG_printf(" bgrat(*): sum_n(..) <= 0; should not happen (n=%d)\n", n);
+
 	    /* L_Error:    THE EXPANSION CANNOT BE COMPUTED */ *ierr = 3; return;
 	}
 	if (fabs(dj) <= eps * (sum + l)) {
@@ -1246,15 +1222,11 @@ template<class Float> static Float grat_r(Float a, Float x, Float log_r, Float e
 	/* L120: */
 	if (x < 0.25) {
 	    Float p = erf__(sqrt(x));
-	    R_ifDEBUG_printf(" grat_r(a=%g, x=%g ..)): a=1/2 --> p=erf__(.)= %g\n",
-			     a, x, p);
 	    return (0.5 - p + 0.5)*exp(-log_r);
 
         } else { // 2013-02-27: improvement for "large" x: direct computation of q/r:
 	    Float sx = sqrt(x),
 		q_r = erfc1(1, sx)/sx * M_SQRT_PI;
-	    R_ifDEBUG_printf(" grat_r(a=%g, x=%g ..)): a=1/2 --> q_r=erfc1(..)/r= %g\n",
-			     a,x, q_r);
 	    return q_r;
 	}
 
@@ -1271,8 +1243,6 @@ template<class Float> static Float grat_r(Float a, Float x, Float log_r, Float e
 	    sum += t;
 	} while (max_fabs(t) > tol);
 
-	R_ifDEBUG_printf(" grat_r(a=%g, x=%g, log_r=%g): sum=%g; Taylor w/ %.0f terms",
-			 a,x,log_r, sum, an-3.);
 	Float j = a * x * ((sum/6. - 0.5/(a + 2.)) * x + 1./(a + 1.)),
 	    z = a * log(x),
 	    h = gam1(a),
@@ -1283,16 +1253,16 @@ template<class Float> static Float grat_r(Float a, Float x, Float log_r, Float e
 	    Float l = rexpm1(z),
 		q = ((l + 0.5 + 0.5) * j - l) * g - h;
 	    if (q <= 0.) {
-		R_ifDEBUG_printf(" => q_r= 0.\n");
+
 		/* L110:*/ return 0.;
 	    } else {
-		R_ifDEBUG_printf(" => q_r=%.15g\n", q * exp(-log_r));
+
 		return q * exp(-log_r);
 	    }
 
 	} else {
 	    Float p = exp(z) * g * (0.5 - j + 0.5);
-	    R_ifDEBUG_printf(" => q_r=%.15g\n", (0.5 - p + 0.5) * exp(-log_r));
+
 	    return /* q/r = */ (0.5 - p + 0.5) * exp(-log_r);
 	}
 
@@ -1316,8 +1286,6 @@ template<class Float> static Float grat_r(Float a, Float x, Float log_r, Float e
 	    an0 = a2n / b2n;
 	} while (max_fabs(an0 - am0) >= eps * max_fabs(an0));
 
-	R_ifDEBUG_printf(" grat_r(a=%g, x=%g, log_r=%g): Cont.frac. %.0f terms => q_r=%.15g\n",
-			 a,x, log_r, c-1., an0);
 	return /* q/r = (r * an0)/r = */ an0;
     }
 } /* grat_r */
@@ -1754,7 +1722,7 @@ template<class Float> static Float gam1(Float a)
 		     ) * t + r[3]) * t + r[2]) * t + r[1]) * t + r[0];
 	bot = (s2 * t + s1) * t + 1.;
 	w = top / bot;
-	R_ifDEBUG_printf("  gam1(a = %.15g): t < 0: w=%.15g\n", a, w);
+
 	if (d > 0.)
 	    return t * w / a;
 	else
@@ -1776,8 +1744,6 @@ template<class Float> static Float gam1(Float a)
 		   ) * t + p[1]) * t + p[0];
 	bot = (((q[4] * t + q[3]) * t + q[2]) * t + q[1]) * t + 1.;
 	w = top / bot;
-	R_ifDEBUG_printf("  gam1(a = %.15g): t > 0: (is a < 1.5 ?)  w=%.15g\n",
-			 a, w);
 	if (d > 0.) /* L21: */
 	    return t / a * (w - 0.5 - 0.5);
 	else
