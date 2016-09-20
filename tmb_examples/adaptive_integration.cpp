@@ -23,7 +23,7 @@ namespace my_atomic {
       // Avoid NaNs in the gradient:
       if (ans == 0) ans = 0;
       // Avoid NaNs in the tail of the distribution:
-      using std::isfinite;
+      using atomic::tiny_ad::isfinite;
       if (!isfinite(ans)) ans = 0;
       return ans;
     }

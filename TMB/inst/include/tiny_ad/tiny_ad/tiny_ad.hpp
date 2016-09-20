@@ -142,7 +142,7 @@ namespace tiny_ad {
   UNARY_MATH_ZERO_DERIV(round)
   template<class T>
   double sign(const T &x){return (x > 0) - (x < 0);}
-  using std::isfinite;
+  bool isfinite(const double &x)CSKIP( {return std::isfinite(x);} )
   template<class T, class V>
   bool isfinite(const ad<T, V> &x){return isfinite(x.value);}
 #undef UNARY_MATH_ZERO_DERIV
