@@ -1436,7 +1436,7 @@ template<class Float> static Float basym(Float a, Float b, Float lambda, Float e
 } /* basym_ */
 
 
-static double exparg(int l)
+static inline double exparg(int l)
 {
 /* --------------------------------------------------------------------
  *     If l = 0 then  exparg(l) = The largest positive W for which
