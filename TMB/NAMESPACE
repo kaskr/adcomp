@@ -16,6 +16,8 @@ if(.Platform$OS.type == "windows"){
 }
 ## TMB:::install.contrib
 importFrom("utils", download.file, file_test, unzip)
+## TMB:::.onLoad
+importFrom("utils", packageVersion)
 
 ## Recommended R - packages ----------------------
 importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMatrix, dpoMatrix)
