@@ -1,4 +1,17 @@
 ------------------------------------------------------------------------
+TMB 1.7.4 (2016-09-21)
+------------------------------------------------------------------------
+
+o Add onLoad check on 'Matrix' package version.
+
+o runExample: Fixed bug when running all examples from a specified
+  example folder.
+
+o sdreport: Fixed bug in the case with exactly one random effect.
+
+o sdreport: Reduced size of output.
+
+------------------------------------------------------------------------
 TMB 1.7.3 (2016-09-05)
 ------------------------------------------------------------------------
 
