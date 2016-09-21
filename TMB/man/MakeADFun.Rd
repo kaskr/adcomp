@@ -44,7 +44,7 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 
 \item{LaplaceNonZeroGradient}{Allow Taylor expansion around non-stationary point?}
 
-\item{DLL}{Name of shared object file compiled by user.}
+\item{DLL}{Name of shared object file compiled by user (without the conventional extension, \file{.so}, \file{.dll}, \dots).}
 
 \item{checkParameterOrder}{Optional check for correct parameter order.}
 
