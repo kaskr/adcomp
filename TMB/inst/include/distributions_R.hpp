@@ -533,3 +533,57 @@ Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
   Type ans = atomic::log_dtweedie(tx)[0];
   return ( give_log ? ans : exp(ans) );
 }
+
+/********************************************************************/
+/* SIMULATON CODE                                                   */
+/********************************************************************/
+
+extern "C" {
+  double Rf_rnorm(double mu, double sigma);
+}
+template<class Type>
+Type rnorm(Type mu, Type sigma)
+{
+  return Rf_rnorm(asDouble(mu), asDouble(sigma));
+}
+VECTORIZE2_tt(rnorm)
+
+extern "C" {
+  double Rf_rpois(double mu);
+}
+template<class Type>
+Type rpois(Type mu)
+{
+  return Rf_rpois(asDouble(mu));
+}
+VECTORIZE1_t(rpois)
+
+extern "C" {
+  double Rf_runif(double a, double b);
+}
+template<class Type>
+Type runif(Type a, Type b)
+{
+  return Rf_runif(asDouble(a), asDouble(b));
+}
+VECTORIZE2_tt(runif)
+
+extern "C" {
+  double Rf_rbinom(double size, double prob);
+}
+template<class Type>
+Type rbinom(Type size, Type prob)
+{
+  return Rf_rbinom(asDouble(size), asDouble(prob));
+}
+VECTORIZE2_tt(rbinom)
+
+extern "C" {
+  double Rf_rgamma(double shape, double scale);
+}
+template<class Type>
+Type rgamma(Type shape, Type scale)
+{
+  return Rf_rgamma(asDouble(shape), asDouble(scale));
+}
+VECTORIZE2_tt(rgamma)
