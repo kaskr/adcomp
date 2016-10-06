@@ -285,6 +285,14 @@ if(isDouble<Type>::value && this->current_parallel_region<0) {		\
   defineVar(install(#name),asSEXP(name),objective_function::report);	\
 }
 
+/** \brief Mark code that is only executed during simulation.
+
+    \note SIMULATE() does nothing in parallel mode.
+    \ingroup macros
+*/
+#define SIMULATE							\
+if(isDouble<Type>::value && objective_function::do_simulate)
+
 /** \brief Report scalar, vector or array back to R with derivative
     information.
 
@@ -511,6 +519,11 @@ struct report_stack{
   EIGEN_DEFAULT_DENSE_INDEX_TYPE size(){return result.size();}
 };  // report_stack
 
+extern "C" {
+  void GetRNGstate(void);
+  void PutRNGstate(void);
+}
+
 /** \internal \brief Type definition of user-provided objective function (i.e. neg. log. like) */
 template <class Type>
 class objective_function
@@ -579,6 +592,12 @@ public:
     parallel_ignore_statements=false;
   }
 
+  bool do_simulate;   /** \brief Flag set when in simulation mode */
+  void toggle_simulate() {
+    do_simulate = !do_simulate;
+    if(do_simulate) GetRNGstate();
+    else PutRNGstate();
+  }
 
   /* data_ and parameters_ are R-lists containing R-vectors or R-matrices.
      report_ is an R-environment.  
@@ -613,6 +632,7 @@ public:
     selected_parallel_region=-1;
     max_parallel_regions=-1;
     reversefill=false;
+    do_simulate = false;
   }
 
   /** \brief Extract theta vector from objetive function object */
@@ -1184,6 +1204,7 @@ extern "C"
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
+      int do_simulate = INTEGER(getListElement(control, "do_simulate"))[0];
       objective_function<double>* pf;
       pf = (objective_function<double>*) R_ExternalPtrAddr(f);
       PROTECT( theta=coerceVector(theta,REALSXP) );
@@ -1198,7 +1219,9 @@ extern "C"
       pf->parnames.resize(0); // To avoid mem leak.
       pf->reportvector.clear();
       SEXP res;
+      if(do_simulate) pf->toggle_simulate();
       res = asSEXP( pf->operator()() );
+      if(do_simulate) pf->toggle_simulate();
       UNPROTECT(1);
       return res;
     }
