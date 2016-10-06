@@ -13,7 +13,7 @@ typedef vector<scalartype> vectortype;		\
 typedef matrix<scalartype> matrixtype;		\
 typedef array<scalartype> arraytype
 
-#define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){vectortype y; return y;}
+#define VARIANCE_NOT_YET_IMPLEMENTED private: vectortype variance(){} public:
 
 /** \brief Multivariate normal distribution with user supplied covariance matrix
 
@@ -102,7 +102,7 @@ public:
     return y;
   }
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
   vectortype simulate() {
     if(L_Sigma.rows() == 0) {
       Eigen::LLT<Eigen::Matrix<scalartype,Dynamic,Dynamic> > llt(Sigma);
@@ -238,7 +238,7 @@ public:
   }
   arraytype jacobian(arraytype x){return x;}
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 };
 
 /** \brief Stationary AR1 process
@@ -331,7 +331,7 @@ public:
     return y;
   }
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class distribution>
 AR1_t<distribution> AR1(scalartype phi_, distribution f_){
@@ -490,7 +490,7 @@ public:
     return y;
   }
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 };
 
 
@@ -611,7 +611,7 @@ public:
     return y;
   } 
   int ndim(){return 2;} /* Number of dimensions this structure occupies in total array */
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class vectortype>
 contAR2_t<scalartype> contAR2(vectortype grid_, scalartype shape_, scalartype scale_=1){
@@ -848,7 +848,7 @@ public:
     return y;
   }
   int ndim(){return f.ndim();}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 };
 /** \brief Construct object to evaluate a scaled density. See VECSCALE_t for details */
 template <class vectortype, class distribution>
@@ -954,7 +954,7 @@ public:
     return q;
   }
   int ndim(){return f.ndim()+g.ndim();}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 
   /* For parallel accumulation:
      ==========================
@@ -1169,7 +1169,7 @@ public:
     return tmp-tmp0;
   }
   int ndim(){return f.ndim();}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 };
 
 template <class distribution>
