@@ -126,7 +126,10 @@ Type objective_function<Type>::operator() ()
   MVNORM_t<Type> neg_log_densityF(fvar);
   Type ans=0;
   for(int i=1;i<timeSteps;i++){    
-     ans+=neg_log_densityF(logF.col(i)-logF.col(i-1)); // F-Process likelihood 
+     ans+=neg_log_densityF(logF.col(i)-logF.col(i-1)); // F-Process likelihood
+     SIMULATE {
+       logF.col(i) = logF.col(i-1) + neg_log_densityF.simulate();
+     }
   }
  
   for(int i=0;i<timeSteps;i++){ // calc ssb
@@ -168,7 +171,10 @@ Type objective_function<Type>::operator() ()
       predN(stateDimN-1)=log(exp(logN(stateDimN-2,i-1)-exp(logF((keyLogFsta(0,stateDimN-2)),i-1))-natMor(i-1,stateDimN-2))+
                              exp(logN(stateDimN-1,i-1)-exp(logF((keyLogFsta(0,stateDimN-1)),i-1))-natMor(i-1,stateDimN-1))); 
     }
-    ans+=neg_log_densityN(logN.col(i)-predN); // N-Process likelihood 
+    ans+=neg_log_densityN(logN.col(i)-predN); // N-Process likelihood
+    SIMULATE {
+      logN.col(i) = predN + neg_log_densityN.simulate();
+    }
   }
 
 
@@ -213,6 +219,15 @@ Type objective_function<Type>::operator() ()
     }      
     var=varLogObs(CppAD::Integer(keyVarObs(f-1,a)));
     ans+=-dnorm(log(obs(i,3)),predObs,sqrt(var),true);
+    SIMULATE {
+      obs(i,3) = exp( rnorm(predObs, sqrt(var)) ) ;
+    }
+  }
+
+  SIMULATE {
+    REPORT(logF);
+    REPORT(logN);
+    REPORT(obs);
   }
   // ADREPORT(logN);
   // ADREPORT(logF);
