@@ -577,3 +577,13 @@ Type rbinom(Type size, Type prob)
   return Rf_rbinom(asDouble(size), asDouble(prob));
 }
 VECTORIZE2_tt(rbinom)
+
+extern "C" {
+  double Rf_rgamma(double shape, double scale);
+}
+template<class Type>
+Type rgamma(Type shape, Type scale)
+{
+  return Rf_rgamma(asDouble(shape), asDouble(scale));
+}
+VECTORIZE2_tt(rgamma)
