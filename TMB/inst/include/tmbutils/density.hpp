@@ -13,7 +13,65 @@ typedef vector<scalartype> vectortype;		\
 typedef matrix<scalartype> matrixtype;		\
 typedef array<scalartype> arraytype
 
-#define VARIANCE_NOT_YET_IMPLEMENTED vectortype variance(){vectortype y; return y;}
+#define VARIANCE_NOT_YET_IMPLEMENTED            \
+private:                                        \
+vectortype variance(){return vectortype();}     \
+public:
+
+/**
+  Conventions for simulation:
+
+  \internal
+
+  - The simulate method is pass by reference and modifies the
+    input. So `Foo.simulate.(x);` fills `x` with a simulation. This is
+    implemented for *all* classes.
+
+  - For classes with unambiguous dimension (e.g. MVNORM, GMRF, ...)
+    there is a simulate method with void input. It can be used as
+    `x=Foo.simulate();`. Other classes (e.g. AR1, ARk) does not have
+    this void argument version (attempt of use results in a compile
+    time error). It follows that e.g. `SEPARABLE(AR1(phi),
+    MVNORM(Sigma))` only has the void argument method whereas
+    `SEPARABLE(MVNORM(Sigma), MVNORM(Sigma))` has both methods.
+
+  - All classes must have a method `cov_sqrt_scale` that applied to a
+    vector u returns "Sigma^(1/2) * u" for *some* square root. It is
+    natural that this method is used by the simulate methods. This
+    method is crucial for `SEPARABLE`.
+
+  - All classes must have a `dim()` member. Attempt to call for
+    un-supported classes gives compile time error.
+*/
+#define SIMULATE_NOT_YET_IMPLEMENTED            \
+private:                                        \
+vectortype sqrt_cov_scale(vectortype x){}       \
+void simulate(vectortype &u){}                  \
+vectortype simulate(){}                         \
+public:
+
+/* Add this macro to all classes with *dynamic* dimension (e.g. AR1) */
+#define SIMULATE_IMPLEMENTED_UNKNOWN_SIZE       \
+void simulate(vectortype &x) {                  \
+  rnorm_fill(x);                                \
+  x = sqrt_cov_scale(x);                        \
+}
+/* Add this macro to all classes with *fixed* dimension (e.g. MVNORM) */
+#define SIMULATE_IMPLEMENTED_KNOWN_SIZE(SIZE)   \
+SIMULATE_IMPLEMENTED_UNKNOWN_SIZE               \
+vectortype simulate() {                         \
+  vectortype x(SIZE);                           \
+  simulate(x);                                  \
+  return x;                                     \
+}
+
+
+/* Utility function */
+template<class arraytype>
+void rnorm_fill(arraytype &x) {
+  for(int i=0; i<x.size(); i++)
+    x(i) = Rf_rnorm(0., 1.);
+}
 
 /** \brief Multivariate normal distribution with user supplied covariance matrix
 
@@ -37,6 +95,7 @@ class MVNORM_t{
   matrixtype Q;       /* Inverse covariance matrix */
   scalartype logdetQ; /* log-determinant of Q */
   matrixtype Sigma;   /* Keep for convenience - not used */
+  matrixtype L_Sigma; /* Used by simulate() */
 public:
   MVNORM_t(){}
   MVNORM_t(matrixtype Sigma_, bool use_atomic=true){
@@ -101,7 +160,16 @@ public:
     return y;
   }
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+  vectortype sqrt_cov_scale(vectortype u) {
+    if(L_Sigma.rows() == 0) {
+      Eigen::LLT<Eigen::Matrix<scalartype,Dynamic,Dynamic> > llt(Sigma);
+      L_Sigma = llt.matrixL();
+    }
+    vectortype ans = L_Sigma * u;
+    return ans;
+  }
+  SIMULATE_IMPLEMENTED_KNOWN_SIZE(Sigma.rows());
 };
 
 /** \brief Construct object to evaluate multivariate zero-mean normal density with user supplied covariance matrix
@@ -227,7 +295,21 @@ public:
   }
   arraytype jacobian(arraytype x){return x;}
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+  // FIXME: 1D will not suffice for e.g. SEPARABLE(N01, OTHER);
+  vectortype simulate() {
+    vectortype x(1);
+    x[0] = rnorm(0.0, 1.0);
+    return x;
+  }
+  // Inplace simulate
+  void simulate(vectortype &x) {
+    rnorm_fill(x);
+  }
+  vectortype sqrt_cov_scale(vectortype u) {
+    return u;
+  }
+
 };
 
 /** \brief Stationary AR1 process
@@ -278,7 +360,7 @@ private:
   distribution MARGINAL;
 public:
   AR1_t(){/*phi=phi_;MARGINAL=f_;*/}
-  AR1_t(scalartype phi_, distribution f_){phi=phi_;MARGINAL=f_;}
+  AR1_t(scalartype phi_, distribution f_) : phi(phi_), MARGINAL(f_) {}
   /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
     scalartype value;
@@ -320,15 +402,47 @@ public:
     return y;
   }
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+
+  /* Simulation */
+  arraytype sqrt_cov_scale(arraytype u) {
+    if(u.dim.size() == 1) {
+      // FIXME: This entire class should be reconsidered with this
+      // special case in mind !
+      u.dim.resize(2); u.dim << 1, u.size();
+    }
+    int n = u.cols();
+    arraytype x(u.dim);
+    scalartype sigma = sqrt(1.0 - phi * phi); /* Steady-state standard deviation */
+    x.col(0) = MARGINAL.sqrt_cov_scale(u.col(0));
+    for(int i=1; i<n; i++)
+      x.col(i) = phi * x.col(i-1) + sigma * MARGINAL.sqrt_cov_scale(u.col(i));
+    return x;
+  }
+  vectortype sqrt_cov_scale(vectortype u) {
+    vector<int> dim(2);
+    dim << 1, u.size();
+    arraytype u_array(u, dim);
+    return sqrt_cov_scale(u_array);
+  }
+  /** \brief Draw a simulation from the process */
+  void simulate(vectortype &x) {
+    rnorm_fill(x);
+    sqrt_cov_scale(x);
+  }
+  void simulate(arraytype &x) {
+    rnorm_fill(x);
+    sqrt_cov_scale(x);
+  }
+
 };
 template <class scalartype, class distribution>
 AR1_t<distribution> AR1(scalartype phi_, distribution f_){
-  return AR1_t<distribution>(phi_,f_);
+  return AR1_t<distribution>(phi_, f_);
 }
 template <class scalartype>
 AR1_t<N01<scalartype> > AR1(scalartype phi_){
-  return AR1_t<N01<scalartype> >(phi_,N01<scalartype>());
+  return AR1_t<N01<scalartype> >(phi_, N01<scalartype>());
 }
 
 
@@ -479,8 +593,38 @@ public:
     return y;
   }
   int ndim(){return 1;}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+  /* Simulate - copy paste from evaluation operator */
+  vectortype sqrt_cov_scale(vectortype u){
+    vectortype x(u.size());
+    scalartype mu, sd;
+    int col;
+    for (int i = 0; (i < k) & (i < x.size()); i++) {
+      mu = scalartype(0);
+      col = k - 1 - i; /* reversed index */
+      for (int j = col + 1; j < k; j++)
+        mu -= L0(j, col) * x(k - 1 - j);
+      mu /= L0(col, col);
+      sd = scalartype(1) / L0(col, col);
+      x(i) = sd * u(i) + mu;
+    }
+    scalartype tmp;
+    for (int i = k; i < x.size(); i++) {
+      tmp = scalartype(0);
+      for (int j = 0; j < k; j++) {
+        tmp += phi[j] * x[i - 1 - j];
+      }
+      x(i) = sigma * u(i) + tmp;
+    }
+    return x;
+  }
+  SIMULATE_IMPLEMENTED_UNKNOWN_SIZE
 };
+
+template <class scalartype>
+ARk_t<scalartype> ARk(vector<scalartype> phi){
+  return ARk_t<scalartype>(phi);
+}
 
 
 /** \brief Continuous AR(2) process
@@ -600,7 +744,8 @@ public:
     return y;
   } 
   int ndim(){return 2;} /* Number of dimensions this structure occupies in total array */
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class vectortype>
 contAR2_t<scalartype> contAR2(vectortype grid_, scalartype shape_, scalartype scale_=1){
@@ -732,6 +877,21 @@ public:
     for(int i=0;i<n;i++)ans[i]=C(i,i);
     return ans;
   }
+  /* Simulation */
+  Eigen::SparseMatrix<scalartype> L;
+  Eigen::PermutationMatrix<Dynamic,Dynamic> Pinv;
+  vectortype sqrt_cov_scale(vectortype u) {
+    if(L.rows() == 0) {
+      Eigen::SimplicialLLT<Eigen::SparseMatrix<scalartype> > solver(Q);
+      L = solver.matrixL();
+      Pinv = solver.permutationPinv();
+    }
+    // L*L^T = P*Q*Pinv => Q^-1 = A*A^T where A:=P^-1*L^T^-1
+    matrixtype x = L.transpose().template triangularView<Eigen::Upper>().solve(u.matrix());
+    x = Pinv * x;
+    return x.vec();
+  }
+  SIMULATE_IMPLEMENTED_KNOWN_SIZE(Q.rows())
 };
 /** \brief Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
 
@@ -784,6 +944,10 @@ public:
   vectortype variance(){
     return (scale*scale)*f.variance();
   }
+  vectortype sqrt_cov_scale(vectortype u){
+    return scale * f.sqrt_cov_scale(u);
+  }
+  SIMULATE_IMPLEMENTED_UNKNOWN_SIZE
 };
 template <class scalartype, class distribution>
 SCALE_t<distribution> SCALE(distribution f_, scalartype scale_){
@@ -837,7 +1001,11 @@ public:
     return y;
   }
   int ndim(){return f.ndim();}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+  vectortype sqrt_cov_scale(vectortype u){
+    return scale * f.sqrt_cov_scale(u);
+  }
+  SIMULATE_IMPLEMENTED_UNKNOWN_SIZE
 };
 /** \brief Construct object to evaluate a scaled density. See VECSCALE_t for details */
 template <class vectortype, class distribution>
@@ -943,7 +1111,7 @@ public:
     return q;
   }
   int ndim(){return f.ndim()+g.ndim();}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
 
   /* For parallel accumulation:
      ==========================
@@ -976,6 +1144,36 @@ public:
     return q;
   }
 
+  arraytype sqrt_cov_scale(arraytype u) {
+    vector<int> u_dim = u.dim;
+    vector<int> f_dim = u_dim.tail(f.ndim());
+    vector<int> g_dim = u_dim.head(g.ndim());
+    int f_size = f_dim.prod();
+    int g_size = g_dim.prod();
+    // Collapse f dimension to a single dimension:
+    vector<int> new_dim(g.ndim() + 1);
+    new_dim << g_dim, f_size;
+    u.dim = new_dim;
+    for(int i=0; i<f_size; i++) {
+      u.col(i) = g.sqrt_cov_scale( u.col(i) );
+    }
+    u = u.rotate(1); // u.dim = (f_size, g_dim)
+    // Collapse g dimension to a single dimension:
+    new_dim.resize(f.ndim() + 1);
+    new_dim << f_dim, g_size;
+    u.dim = new_dim;
+    for(int i=0; i<g_size; i++) {
+      u.col(i) = f.sqrt_cov_scale( u.col(i) );
+    }
+    u = u.rotate(1);
+    u.dim = u_dim;
+    return u;
+  }
+
+  void simulate(arraytype &x) {
+    rnorm_fill(x);
+    x = sqrt_cov_scale(x);
+  }
 
 };
 
@@ -1158,7 +1356,8 @@ public:
     return tmp-tmp0;
   }
   int ndim(){return f.ndim();}
-  VARIANCE_NOT_YET_IMPLEMENTED;
+  VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 
 template <class distribution>
