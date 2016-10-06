@@ -567,3 +567,13 @@ Type runif(Type a, Type b)
   return Rf_runif(asDouble(a), asDouble(b));
 }
 VECTORIZE2_tt(runif)
+
+extern "C" {
+  double Rf_rbinom(double size, double prob);
+}
+template<class Type>
+Type rbinom(Type size, Type prob)
+{
+  return Rf_rbinom(asDouble(size), asDouble(prob));
+}
+VECTORIZE2_tt(rbinom)
