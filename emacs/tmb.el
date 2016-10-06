@@ -184,6 +184,9 @@ The secondary window shows compilation and model runs, among other things."
              "DATA_FACTOR"  "DATA_STRUCT"
              "DATA_MATRIX"  "DATA_SPARSE_MATRIX"
              "DATA_VECTOR_INDICATOR" "DATA_ARRAY_INDICATOR"))
+	  (SPECIAL
+           '("SIMULATE"
+             "PARALLEL_REGION"))
           (PARAMETERS
            '("PARAMETER" "PARAMETER_VECTOR"
              "PARAMETER_ARRAY" "PARAMETER_MATRIX"))
@@ -227,6 +230,7 @@ The secondary window shows compilation and model runs, among other things."
       (list
        (cons (regexp-opt TYPE 'words) font-lock-type-face)
        (cons (regexp-opt DATA 'words) 'tmb-data-face)
+       (cons (regexp-opt SPECIAL 'words) 'tmb-report-face)
        (cons (regexp-opt PARAMETERS 'words) 'tmb-parameter-face)
        (cons (regexp-opt REPORT 'words) 'tmb-report-face)
        (cons (regexp-opt FUNCTIONS 'words) font-lock-keyword-face)
