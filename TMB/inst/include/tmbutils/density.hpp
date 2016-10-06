@@ -37,6 +37,7 @@ class MVNORM_t{
   matrixtype Q;       /* Inverse covariance matrix */
   scalartype logdetQ; /* log-determinant of Q */
   matrixtype Sigma;   /* Keep for convenience - not used */
+  matrixtype L_Sigma; /* Used by simulate() */
 public:
   MVNORM_t(){}
   MVNORM_t(matrixtype Sigma_, bool use_atomic=true){
@@ -102,6 +103,16 @@ public:
   }
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED;
+  vectortype simulate() {
+    if(L_Sigma.rows() == 0) {
+      Eigen::LLT<Eigen::Matrix<scalartype,Dynamic,Dynamic> > llt(Sigma);
+      L_Sigma = llt.matrixL();
+    }
+    vectortype mu(Sigma.rows()); mu.setZero();
+    vectortype u = rnorm(mu, scalartype(1));
+    vectortype ans = L_Sigma * u;
+    return ans;
+  }
 };
 
 /** \brief Construct object to evaluate multivariate zero-mean normal density with user supplied covariance matrix
