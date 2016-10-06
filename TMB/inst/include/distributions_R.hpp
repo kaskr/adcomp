@@ -533,3 +533,17 @@ Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
   Type ans = atomic::log_dtweedie(tx)[0];
   return ( give_log ? ans : exp(ans) );
 }
+
+/********************************************************************/
+/* SIMULATON CODE                                                   */
+/********************************************************************/
+
+extern "C" {
+  double Rf_rnorm(double mu, double sigma);
+}
+template<class Type>
+Type rnorm(Type mu, Type sigma)
+{
+  return Rf_rnorm(asDouble(mu), asDouble(sigma));
+}
+VECTORIZE2_tt(rnorm)
