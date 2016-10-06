@@ -547,3 +547,13 @@ Type rnorm(Type mu, Type sigma)
   return Rf_rnorm(asDouble(mu), asDouble(sigma));
 }
 VECTORIZE2_tt(rnorm)
+
+extern "C" {
+  double Rf_rpois(double mu);
+}
+template<class Type>
+Type rpois(Type mu)
+{
+  return Rf_rpois(asDouble(mu));
+}
+VECTORIZE1_t(rpois)
