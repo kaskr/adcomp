@@ -557,3 +557,13 @@ Type rpois(Type mu)
   return Rf_rpois(asDouble(mu));
 }
 VECTORIZE1_t(rpois)
+
+extern "C" {
+  double Rf_runif(double a, double b);
+}
+template<class Type>
+Type runif(Type a, Type b)
+{
+  return Rf_runif(asDouble(a), asDouble(b));
+}
+VECTORIZE2_tt(runif)
