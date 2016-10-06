@@ -14,6 +14,7 @@ typedef matrix<scalartype> matrixtype;		\
 typedef array<scalartype> arraytype
 
 #define VARIANCE_NOT_YET_IMPLEMENTED private: vectortype variance(){} public:
+#define SIMULATE_NOT_YET_IMPLEMENTED private: vectortype simulate(){} public:
 
 /** \brief Multivariate normal distribution with user supplied covariance matrix
 
@@ -239,6 +240,7 @@ public:
   arraytype jacobian(arraytype x){return x;}
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 
 /** \brief Stationary AR1 process
@@ -332,6 +334,7 @@ public:
   }
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class distribution>
 AR1_t<distribution> AR1(scalartype phi_, distribution f_){
@@ -491,6 +494,7 @@ public:
   }
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 
 
@@ -612,6 +616,7 @@ public:
   } 
   int ndim(){return 2;} /* Number of dimensions this structure occupies in total array */
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class vectortype>
 contAR2_t<scalartype> contAR2(vectortype grid_, scalartype shape_, scalartype scale_=1){
@@ -743,6 +748,7 @@ public:
     for(int i=0;i<n;i++)ans[i]=C(i,i);
     return ans;
   }
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 /** \brief Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q
 
@@ -795,6 +801,7 @@ public:
   vectortype variance(){
     return (scale*scale)*f.variance();
   }
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class distribution>
 SCALE_t<distribution> SCALE(distribution f_, scalartype scale_){
@@ -849,6 +856,7 @@ public:
   }
   int ndim(){return f.ndim();}
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 /** \brief Construct object to evaluate a scaled density. See VECSCALE_t for details */
 template <class vectortype, class distribution>
@@ -955,6 +963,7 @@ public:
   }
   int ndim(){return f.ndim()+g.ndim();}
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 
   /* For parallel accumulation:
      ==========================
@@ -1170,6 +1179,7 @@ public:
   }
   int ndim(){return f.ndim();}
   VARIANCE_NOT_YET_IMPLEMENTED
+  SIMULATE_NOT_YET_IMPLEMENTED
 };
 
 template <class distribution>
