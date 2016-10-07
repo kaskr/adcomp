@@ -22,6 +22,15 @@ Type objective_function<Type>::operator() ()
   // logdpois = N log lam - lam
   for(int i=0;i<N.size();i++)res-=N[i]*eta[i]-exp(eta[i]);
 
+  SIMULATE {
+    int n = eta.dim[0];
+    eta = AR1(phi,AR1(phi,AR1(phi,AR1(phi,n),n),n),n).simulate();
+    vector<Type> lam = exp(eta);
+    N = rpois(lam);
+    REPORT(eta);
+    REPORT(N);
+  }
+
   return res;
 
 }
