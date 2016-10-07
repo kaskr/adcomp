@@ -240,7 +240,12 @@ public:
   arraytype jacobian(arraytype x){return x;}
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED
-  SIMULATE_NOT_YET_IMPLEMENTED
+  // FIXME: 1D will not suffice for e.g. SEPARABLE(N01, OTHER);
+  vectortype simulate() {
+    vectortype x(1);
+    x[0] = rnorm(0.0, 1.0);
+    return x;
+  }
 };
 
 /** \brief Stationary AR1 process
@@ -289,9 +294,10 @@ class AR1_t{
 private:
   scalartype phi;
   distribution MARGINAL;
+  int n; /* Number of 'times' - needed by simulate method only */
 public:
   AR1_t(){/*phi=phi_;MARGINAL=f_;*/}
-  AR1_t(scalartype phi_, distribution f_){phi=phi_;MARGINAL=f_;}
+  AR1_t(scalartype phi_, distribution f_, int n_ = 0) : phi(phi_), MARGINAL(f_), n(n_) {}
   /** \brief Evaluate the negative log density */
   scalartype operator()(vectortype x){
     scalartype value;
@@ -303,6 +309,17 @@ public:
     for(int i=1;i<n;i++)value+=MARGINAL((x(i)-x(i-1)*phi)/sigma);/* x(i)-phi*x(i-1) ~ N(0,sigma^2) */
     value+=scalartype((n-1)*m)*log(sigma);
     return value;
+  }
+
+  /** \brief Draw a simulation from the process */
+  vectortype simulate() {
+    vectortype x0 = MARGINAL.simulate();
+    arraytype x(x0.size(), n);
+    scalartype sigma = sqrt(1.0 - phi * phi); /* Steady-state standard deviation */
+    x.col(0) = x0;
+    for(int i=1; i<n; i++)
+      x.col(i) = phi * x.col(i-1) + sigma * MARGINAL.simulate();
+    return x;
   }
 
   /* Copied vector version - apply over outermost dimension */
@@ -334,15 +351,20 @@ public:
   }
   int ndim(){return 1;}
   VARIANCE_NOT_YET_IMPLEMENTED
-  SIMULATE_NOT_YET_IMPLEMENTED
 };
 template <class scalartype, class distribution>
-AR1_t<distribution> AR1(scalartype phi_, distribution f_){
-  return AR1_t<distribution>(phi_,f_);
+AR1_t<distribution> AR1(scalartype phi_, distribution f_, int n=0){
+  return AR1_t<distribution>(phi_, f_, n);
 }
 template <class scalartype>
-AR1_t<N01<scalartype> > AR1(scalartype phi_){
-  return AR1_t<N01<scalartype> >(phi_,N01<scalartype>());
+AR1_t<N01<scalartype> > AR1(scalartype phi_, int n=0){
+  return AR1_t<N01<scalartype> >(phi_, N01<scalartype>(), n);
+}
+/* Workaround: Previous doesn't match if called with n = x.size() */
+template <class scalartype>
+AR1_t<N01<scalartype> > AR1(scalartype phi_,
+			    EIGEN_DEFAULT_DENSE_INDEX_TYPE n=0){
+  return AR1_t<N01<scalartype> >(phi_, N01<scalartype>(), n);
 }
 
 
