@@ -363,7 +363,7 @@ AR1_t<N01<scalartype> > AR1(scalartype phi_, int n=0){
 /* Workaround: Previous doesn't match if called with n = x.size() */
 template <class scalartype>
 AR1_t<N01<scalartype> > AR1(scalartype phi_,
-			    EIGEN_DEFAULT_DENSE_INDEX_TYPE n=0){
+			    EIGEN_DEFAULT_DENSE_INDEX_TYPE n){
   return AR1_t<N01<scalartype> >(phi_, N01<scalartype>(), n);
 }
 
