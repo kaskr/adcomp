@@ -823,7 +823,9 @@ public:
   vectortype variance(){
     return (scale*scale)*f.variance();
   }
-  SIMULATE_NOT_YET_IMPLEMENTED
+  vectortype simulate(){
+    return scale*f.simulate();
+  }
 };
 template <class scalartype, class distribution>
 SCALE_t<distribution> SCALE(distribution f_, scalartype scale_){
