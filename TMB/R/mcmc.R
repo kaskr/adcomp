@@ -236,7 +236,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     fn2 <- fn; gr2 <- gr
     theta.cur <- params.init
   }
-  accepted <- rep(NA, nsim)
+  accepted <- divergence <- rep(NA, nsim)
   theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
   adaptation <- matrix(NA, nrow=nsim, ncol=5) # holds DA info by iteration
   ## A NULL value for eps signifies to use the dual averaging algorithm
@@ -284,10 +284,10 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     ## want to reject the proposal, mark the divergence, and adjust the
     ## step size down if still adapting (see below).
     if(is.nan(logalpha)){
-      divergence <- 1
+      divergence[m] <- 1
       logalpha <- -Inf
     } else {
-      divergence <- 0
+      divergence[m] <- 0
     }
     ## Test whether to accept or reject proposed state
     if(log(runif(1)) < logalpha){
@@ -323,8 +323,12 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     if(diagnostic)
       theta.proposed <- t(apply(theta.proposed, 1, function(x) chd %*% x))
   }
-  message(paste("MCMC HMC: Acceptance rate = ", round(mean(accepted),1)))
-  if(useDA) message(paste("MCMC HMC: Dual averaging final average eps =", round(epsbar[Madapt], 3)))
+  message(paste0("There were ", sum(divergence[-(1:Madapt)],
+                 " divergent transitions after warmup"))
+  message(paste0("Final acceptance ratio = ", round(mean(accepted),3),
+                  " and target is ", adapt_delta))
+  if(useDA) message(paste0("Final step size=", round(epsbar[Madapt], 3),
+                           "; after", Madapt, " warmup iterations"))
   if(diagnostic){
     return(list(par=theta.out, par.proposed=theta.proposed, accepted=accepted,
                 n.calls=nsim*(L+2), epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
