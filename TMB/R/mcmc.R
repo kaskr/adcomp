@@ -512,32 +512,32 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
   }
 }
 
-                                        # Draw a slice sample for given position and momentum variables
+#' Draw a slice sample for given position and momentum variables
 .sample.u <- function(theta, r, fn)
   runif(n=1, min=0, max=exp(.calculate.H(theta=theta,r=r, fn=fn)))
-                                        # Calculate the Hamiltonian value for position and momentum variables.
+#' Calculate the Hamiltonian value for position and momentum variables.
                                         #
-                                        # @details This function currently assumes iid standard normal momentum
-                                        # variables.
+#' @details This function currently assumes iid standard normal momentum
+#' variables.
 .calculate.H <- function(theta, r, fn) fn(theta)-(1/2)*sum(r^2)
-                                        # Test whether a "U-turn" has occured in a branch of the binary tree
-                                        # created by \ref\code{.buildtree} function.
+#' Test whether a "U-turn" has occured in a branch of the binary tree
+#' created by \ref\code{.buildtree} function.
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
   theta.temp <- (theta.plus-theta.minus)
   as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
 }
 
-                                        # A recursive function that builds a leapfrog trajectory using a balanced
-                                        # binary tree.
+#' A recursive function that builds a leapfrog trajectory using a balanced
+#' binary tree.
                                         #
-                                        # @references This is from the No-U-Turn sampler with dual averaging
-                                        # (algorithm 6) of Hoffman and Gelman (2014).
+#' @references This is from the No-U-Turn sampler with dual averaging
+#' (algorithm 6) of Hoffman and Gelman (2014).
                                         #
-                                        # @details The function repeatedly doubles (in a random direction) until
-                                        # either a U-turn occurs or the trajectory becomes unstable. This is the
-                                        # 'efficient' version that samples uniformly from the path without storing
-                                        # it. Thus the function returns a single proposed value and not the whole
-                                        # trajectory.
+#' @details The function repeatedly doubles (in a random direction) until
+#' either a U-turn occurs or the trajectory becomes unstable. This is the
+#' 'efficient' version that samples uniformly from the path without storing
+#' it. Thus the function returns a single proposed value and not the whole
+#' trajectory.
 .buildtree <- function(theta, r, u, v, j, eps, theta0, r0, fn, gr,
                        delta.max=1000, info = environment() ){
   if(j==0){
@@ -616,26 +616,26 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
   }
 }
 
-                                        # Estimate a reasonable starting value for epsilon (step size) for a given
-                                        # model, for use with Hamiltonian MCMC algorithms.
+#' Estimate a reasonable starting value for epsilon (step size) for a given
+#' model, for use with Hamiltonian MCMC algorithms.
                                         #
-                                        # This is Algorithm 4 from Hoffman and Gelman (2010) and is used in the
-                                        # dual-averaging algorithms for both HMC and NUTS to find a reasonable
-                                        # starting value.
-                                        # @title Estimate step size for Hamiltonian MCMC algorithms
-                                        # @param theta An initial parameter vector.
-                                        # @param fn A function returning the log-likelihood (not the negative of
-                                        # it) for a given parameter vector.
-                                        # @param gr A function returning the gradient of the log-likelihood of a
-                                        # model.
-                                        # @param eps A value for espilon to initiate the algorithm. Defaults to
-                                        # 1. If this is far too big the algorithm won't work well and an
-                                        # alternative value can be used.
-                                        # @return Returns the "reasonable" espilon invisible, while printing how
-                                        # many steps to reach it.
-                                        # @details The algorithm uses a while loop and will break after 50
-                                        # iterations.
-                                        #
+#' This is Algorithm 4 from Hoffman and Gelman (2010) and is used in the
+#' dual-averaging algorithms for both HMC and NUTS to find a reasonable
+#' starting value.
+#' @title Estimate step size for Hamiltonian MCMC algorithms
+#' @param theta An initial parameter vector.
+#' @param fn A function returning the log-likelihood (not the negative of
+#' it) for a given parameter vector.
+#' @param gr A function returning the gradient of the log-likelihood of a
+#' model.
+#' @param eps A value for espilon to initiate the algorithm. Defaults to
+#' 1. If this is far too big the algorithm won't work well and an
+#' alternative value can be used.
+#' @return Returns the "reasonable" espilon invisible, while printing how
+#' many steps to reach it.
+#' @details The algorithm uses a while loop and will break after 50
+#' iterations.
+#'
 .find.epsilon <- function(theta,  fn, gr, eps=1, verbose=TRUE){
   r <- rnorm(n=length(theta), mean=0, sd=1)
   ## Do one leapfrog step
