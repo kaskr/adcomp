@@ -39,7 +39,7 @@
 #' @example inst/examples/mcmc_examples.R
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, ...){
+run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NULL, ...){
   ## Initialization for all algorithms
   algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
   fn <- function(x) {
@@ -66,9 +66,12 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, ...){
     stop("params.init is wrong length")
   }
   ## Select and run the chain.
-  if(algorithm=="HMC")
-    time <- system.time(mcmc.out <-
-      run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar, , ...))
+  samples <-  array(dim=c(nsim, chains, length(params.init)))
+  if(algorithm=="HMC"){
+    mcmc.out <- lapply(1:chains, function(i)
+      run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+                   covar=covar, ...))
+    }
   else if(algorithm=="NUTS")
     time <- system.time(mcmc.out <-
       run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar , ...))
@@ -76,10 +79,12 @@ run_mcmc <- function(obj, nsim, algorithm, params.init=NULL, covar=NULL, ...){
     time <- system.time(mcmc.out <-
       run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
   ## Clean up returned output
-  mcmc.out$time <- as.numeric(time[3])        # grab the elapsed time
-  mcmc.out$par <- as.data.frame(mcmc.out$par)
-  names(mcmc.out$par) <- names(obj$par)
-  return(invisible(mcmc.out))
+  for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
+  sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
+  result <- list(samples=samples, sampler_params=sampler_params)
+  ## mcmc.out$par <- as.data.frame(mcmc.out$par)
+  ## names(mcmc.out$par) <- names(obj$par)
+  return(invisible(result))
 }
 
 
@@ -171,8 +176,8 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #'   as a thinning rate.
 #' @param eps The step size. If a numeric value is passed, it will be used
 #'   throughout the entire chain. A \code{NULL} value will initiate
-#'   adaptation of \code{eps} using the dual averaging algorithm during the
-#'   first \code{warmup} steps.
+#'   sampler_params of \code{eps} using the dual averaging algorithm during
+#'   the first \code{warmup} steps.
 #' @param warmup How many iterations to use for a warmup, in which the step
 #'   size will be adapted. The default is \code{warmup=nsim/2}.
 #' @param adapt_delta The target acceptance rate if using apative
@@ -197,10 +202,10 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #'   in Hamiltonian Monte Carlo. J. Mach. Learn. Res.  15:1593-1623.}  }
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
-#' @return A list containing samples ('par') and adaptation details
-#'   ('adaptation').
+#' @return A list containing samples ('par') and algorithm details such as
+#'   step size adaptation and acceptance probabilities per iteration ('sampler_params').
 run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
-                         adapt_delta=0.8, warmup=nsim/2, diagnostic=FALSE){
+                         adapt_delta=0.8, warmup=floor(nsim/2), diagnostic=FALSE){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -216,7 +221,9 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   }
   accepted <- divergence <- rep(NA, nsim)
   theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
-  adaptation <- matrix(NA, nrow=nsim, ncol=5) # holds DA info by iteration
+  sampler_params <- matrix(numeric(0), nrow=nsim, ncol=4, # holds DA info by iteration
+                       dimnames=list(NULL, c("accept_stat__",
+                                                "stepsize__", "int_time__", "energy__")))
   ## A NULL value for eps signifies to use the dual averaging algorithm
   useDA <- is.null(eps)
   if(useDA){
@@ -232,7 +239,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   }
   ## Start of MCMC chain
   time.start <- Sys.time()
-  print(paste('Starting static HMC at', start.time))
+  print(paste('Starting static HMC at', time.start))
   eps0 <- eps                         # eps0 is average eps
   for(m in 1:nsim){
     ## Jitter step size to mitigate potential negative autocorrelations,
@@ -288,7 +295,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
       }
     }
     ## Save adaptation info.
-    adaptation[m,] <- c(exp(logalpha), eps, eps*L, 0,  fn2(theta.cur))
+    sampler_params[m,] <- c(min(1,exp(logalpha)), eps, eps*L, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup)
   } ## end of MCMC loop
@@ -300,12 +307,12 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     message(paste0("There were ", sum(divergence[-(1:warmup)]),
                    " divergent transitions after warmup"))
   message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(accepted)),
-                  " and target is ", adapt_delta))
+                 " and target is ", adapt_delta))
   if(useDA) message(paste0("Final step size=", round(epsbar[warmup], 3),
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
-  return(list(par=theta.out, adaptation=adaptation))
+  return(list(par=theta.out, sampler_params=sampler_params))
 }
 
 
@@ -670,9 +677,9 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
 #' @details This function was modeled after the functionality provided by
 #'   the R package \link{rstan}.
 .print.mcmc.timing <- function(time.warmup, time.total){
-  title <- ' Elapsed Time: '
-  message(paste0(title, sprintf("%.1f", time.warmup), ' seconds (Warmup)'))
-  message(paste0(title, sprintf("%.1f", time.total-time.warmup), ' seconds (Sampling)'))
-  message(paste0(title, sprintf("%.1f", time.total), ' seconds (Total)'))
+  x <- ' Elapsed Time: '
+  message(paste0(x, sprintf("%.1f", time.warmup), ' seconds (Warmup)'))
+  message(paste0(x, sprintf("%.1f", time.total-time.warmup), ' seconds (Sampling)'))
+  message(paste0(x, sprintf("%.1f", time.total), ' seconds (Total)'))
 }
 
