@@ -190,8 +190,8 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #' @param Madapt An optional argument for how many iterations to adapt
 #' \code{eps} in the dual averaging algorithm. A value of \code{NULL}
 #' results in a default of \code{Madapt=nsim/2}.
-#' @param delta The target acceptance rate if using apative
-#' \code{eps}. Defaults to 50\%.
+#' @param adapt_delta The target acceptance rate if using apative
+#' \code{eps}. Defaults to 80\%.
 #' @param fn A function that returns the log of the posterior density.
 #' @param gr A function that returns a vector of gradients of the log of
 #' the posterior density (same as \code{fn}).
@@ -222,7 +222,7 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #' which were accepted ('accepted'), and the total function and gradient
 #' calls ('n.calls'), which for this algorithm is \code{nsim*(L+2)}.
 run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
-                         delta=0.5, Madapt=NULL, diagnostic=FALSE){
+                         adapt_delta=0.8, Madapt=NULL, diagnostic=FALSE){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -304,7 +304,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
       if(m <= Madapt){
         Hbar[m+1] <-
           (1-1/(m+t0))*Hbar[m] +
-          (delta-min(1,exp(logalpha)))/(m+t0)
+          (adapt_delta-min(1,exp(logalpha)))/(m+t0)
         logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
         epsvec[m+1] <- exp(logeps)
         logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
@@ -350,8 +350,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' @param Madapt An optional argument for how many iterations to adapt
 #' \code{eps} in the dual averaging algorithm. A value of \code{NULL}
 #' results in a default of \code{Madapt=nsim/2}.
-#' @param delta The target acceptance rate for the dual averaging
-#' algorithm. Defaults to 50\%. NUTS does not include an accept/reject
+#' @param adapt_delta The target acceptance rate for the dual averaging
+#' algorithm. Defaults to 80\%. NUTS does not include an accept/reject
 #' Metropolis step, so this rate can be understood as the "average acceptance
 #' probability that HMC would give to the position-momentum states explored
 #' during the final doubling iteration."
@@ -391,7 +391,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' used (otherwise NULL).
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.rwm}}
 run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, Madapt=NULL,
-                          delta=0.5, covar=NULL, diagnostic=FALSE){
+                          adapt_delta=0.8, covar=NULL, diagnostic=FALSE){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -480,7 +480,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
       ## Do the adapting of eps.
       if(m <= Madapt){
         Hbar[m+1] <- (1-1/(m+t0))*Hbar[m] +
-          (delta-res$alpha/res$nalpha)/(m+t0)
+          (adapt_delta-res$alpha/res$nalpha)/(m+t0)
         ## If logalpha not defined, skip this updating step and use
         ## the last one.
         if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
