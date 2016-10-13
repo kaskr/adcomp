@@ -81,7 +81,11 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   ## Clean up returned output
   for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
-  result <- list(samples=samples, sampler_params=sampler_params)
+  time.warmup <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.warmup)))
+  time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
+  result <- list(samples=samples, sampler_params=sampler_params,
+                 time.warmup=time.warmup, time.total=time.total,
+                 algorithm=algorithm)
   ## mcmc.out$par <- as.data.frame(mcmc.out$par)
   ## names(mcmc.out$par) <- names(obj$par)
   return(invisible(result))
@@ -312,7 +316,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
-  return(list(par=theta.out, sampler_params=sampler_params))
+  return(list(par=theta.out, sampler_params=sampler_params,
+              time.total=time.total, time.warmup=time.warmup))
 }
 
 
