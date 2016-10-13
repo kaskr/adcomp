@@ -70,7 +70,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   if(algorithm=="HMC"){
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
-                   covar=covar, ...))
+                   covar=covar, chain=i, ...))
     }
   else if(algorithm=="NUTS")
     time <- system.time(mcmc.out <-
@@ -200,6 +200,7 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #'   calculations which need to be done at each step. The default of NULL
 #'   specifies to not do this transformation and use a unit diagonal
 #'   matrix.
+#' @param chain The MCMC chain to run. Only used for bookkeeping at the moment.
 #' @references \itemize{ \item{Neal, R. M. (2011). MCMC using Hamiltonian
 #'   dynamics. Handbook of Markov Chain Monte Carlo.}  \item{Hoffman and
 #'   Gelman (2014). The No-U-Turn sampler: Adaptively setting path lengths
@@ -209,7 +210,7 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #' @return A list containing samples ('par') and algorithm details such as
 #'   step size adaptation and acceptance probabilities per iteration ('sampler_params').
 run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
-                         adapt_delta=0.8, warmup=floor(nsim/2), diagnostic=FALSE){
+                         adapt_delta=0.8, warmup=floor(nsim/2), chain=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -243,7 +244,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   }
   ## Start of MCMC chain
   time.start <- Sys.time()
-  print(paste('Starting static HMC at', time.start))
+  message('')
+  message(paste('Starting static HMC at', time.start))
   eps0 <- eps                         # eps0 is average eps
   for(m in 1:nsim){
     ## Jitter step size to mitigate potential negative autocorrelations,
@@ -301,7 +303,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     ## Save adaptation info.
     sampler_params[m,] <- c(min(1,exp(logalpha)), eps, eps*L, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
-    .print.mcmc.progress(m, nsim, warmup)
+    .print.mcmc.progress(m, nsim, warmup, chain)
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
@@ -658,16 +660,17 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
 #' @param iteration The iteration of the MCMC chain.
 #' @param nsim The total iterations.
 #' @param warmup The number of warmup iterations.
+#' @param chain The chain being run (bookkeeping only).
 #' @return Nothing. Prints to message to console.
 #'
 #' @details This function was modeled after the functionality provided by
 # the R package \link{rstan}.
-.print.mcmc.progress <- function(iteration, nsim, warmup){
+.print.mcmc.progress <- function(iteration, nsim, warmup, chain){
   i <- iteration
   refresh <- floor(nsim/10)
   if(i==1 | i==nsim | i %% refresh ==0){
     i.width <- formatC(i, width=nchar(nsim))
-    out <- paste0('Chain 1, Iteration: ', i.width , "/", nsim, " [",
+    out <- paste0('Chain ',chain,', Iteration: ', i.width , "/", nsim, " [",
                   formatC(floor(100*(i/nsim)), width=3), "%]",
                   ifelse(i <= warmup, " (Warmup)", " (Sampling)"))
     message(out)
