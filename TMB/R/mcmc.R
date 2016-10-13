@@ -221,7 +221,6 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   useDA <- is.null(eps)
   if(useDA){
     ## Initialize the dual-averaging algorithm.
-    message(paste("Adapting step size during first", warmup, "steps."))
     epsvec <- Hbar <- epsbar <- rep(NA, length=warmup+1)
     eps <- epsvec[1] <- epsbar[1] <-
       .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
@@ -232,6 +231,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     epsvec <- epsbar <- Hbar <- NULL
   }
   ## Start of MCMC chain
+  time.start <- Sys.time()
+  print(paste('Starting static HMC at', start.time))
   eps0 <- eps                         # eps0 is average eps
   for(m in 1:nsim){
     ## Jitter step size to mitigate potential negative autocorrelations,
@@ -288,17 +289,22 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     }
     ## Save adaptation info.
     adaptation[m,] <- c(exp(logalpha), eps, eps*L, 0,  fn2(theta.cur))
+    if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
+    .print.mcmc.progress(m, nsim, warmup)
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
-  message(paste0("There were ", sum(divergence[-(1:warmup)]),
-                 " divergent transitions after warmup"))
-  message(paste0("Final acceptance ratio = ", round(mean(accepted),3),
+  if(sum(divergence[-(1:warmup)])>0)
+    message(paste0("There were ", sum(divergence[-(1:warmup)]),
+                   " divergent transitions after warmup"))
+  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(accepted)),
                   " and target is ", adapt_delta))
   if(useDA) message(paste0("Final step size=", round(epsbar[warmup], 3),
-                           "; after", warmup, " warmup iterations"))
+                           "; after ", warmup, " warmup iterations"))
+  time.total <- difftime(Sys.time(), time.start, units='secs')
+  .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
   return(list(par=theta.out, adaptation=adaptation))
 }
 
@@ -634,3 +640,39 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
   if(verbose) message(paste("Reasonable epsilon=", eps, "found after", k, "steps"))
   return(invisible(eps))
 }
+
+#' Print MCMC progress to console.
+#'
+#' @param iteration The iteration of the MCMC chain.
+#' @param nsim The total iterations.
+#' @param warmup The number of warmup iterations.
+#' @return Nothing. Prints to message to console.
+#'
+#' @details This function was modeled after the functionality provided by
+# the R package \link{rstan}.
+.print.mcmc.progress <- function(iteration, nsim, warmup){
+  i <- iteration
+  refresh <- floor(nsim/10)
+  if(i==1 | i==nsim | i %% refresh ==0){
+    i.width <- formatC(i, width=nchar(nsim))
+    out <- paste0('Chain 1, Iteration: ', i.width , "/", nsim, " [",
+                  formatC(floor(100*(i/nsim)), width=3), "%]",
+                  ifelse(i <= warmup, " (Warmup)", " (Sampling)"))
+    message(out)
+  }
+}
+
+#' Print MCMC timing to console
+#' @param time.warmup Time of warmup in seconds.
+#' @param time.total Time of total in seconds.
+#' @return Nothing. Prints message to console.
+#'
+#' @details This function was modeled after the functionality provided by
+#'   the R package \link{rstan}.
+.print.mcmc.timing <- function(time.warmup, time.total){
+  title <- ' Elapsed Time: '
+  message(paste0(title, sprintf("%.1f", time.warmup), ' seconds (Warmup)'))
+  message(paste0(title, sprintf("%.1f", time.total-time.warmup), ' seconds (Sampling)'))
+  message(paste0(title, sprintf("%.1f", time.total), ' seconds (Total)'))
+}
+
