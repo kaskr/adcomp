@@ -65,6 +65,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   } else if(length(params.init) != length(obj$par)){
     stop("params.init is wrong length")
   }
+
   ## Select and run the chain.
   samples <-  array(dim=c(nsim, chains, length(params.init)))
   if(algorithm=="HMC"){
@@ -72,12 +73,15 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
       run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
                    covar=covar, chain=i, ...))
     }
-  else if(algorithm=="NUTS")
-    time <- system.time(mcmc.out <-
-      run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init, covar=covar , ...))
+  else if(algorithm=="NUTS"){
+    mcmc.out <- lapply(1:chains, function(i)
+      run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+                   covar=covar, chain=i, ...))
+        }
   else if(algorithm=="RWM")
     time <- system.time(mcmc.out <-
       run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
+
   ## Clean up returned output
   for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
@@ -357,8 +361,6 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' need to be done at each step. The default of NULL specifies to not do
 #' this transformation.
 #' @param params.init A vector of initial parameter values.
-#' @param diagnostic Whether to return a list of diagnostic metrics about
-#' the chain. Useful for assessing efficiency and tuning chain.
 #' @param max_doublings Integer representing the maximum times the path
 #' length should double within an MCMC iteration. Default of 4, so 16
 #' steps. If a U-turn has not occured before this many steps the algorithm
@@ -379,8 +381,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' average \code{eps} ('epsbar') from the dual averaging algorithm if
 #' used (otherwise NULL).
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.rwm}}
-run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, warmup=NULL,
-                          adapt_delta=0.8, covar=NULL, diagnostic=FALSE){
+run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, warmup=floor(nsim/2),
+                          adapt_delta=0.8, covar=NULL, chain=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -394,21 +396,18 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
     fn2 <- fn; gr2 <- gr
     theta.cur <- params.init
   }
+  sampler_params <- matrix(numeric(0), nrow=nsim, ncol=6,
+      dimnames=list(NULL, c("accept_stat__", "stepsize__", "treedepth__",
+                            "n_leapfrog__", "divergent__", "energy__")))
   theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
   ## how many steps were taken at each iteration, useful for tuning
   j.results <- rep(NA, len=nsim)
-  ## count the model calls; updated inside .buildtree. Some subtrees
-  ## wont finish due to exit conditions so this is dynamic and not a
-  ## simple formula like with HMC.
+  ## count the model calls; updated inside .buildtree. Some subtrees wont
+  ## finish due to exit conditions so this is dynamic and not a simple
+  ## formula like with HMC.
   info <- as.environment( list(n.calls = 0) )
   useDA <- is.null(eps)               # whether to use DA algorithm
   if(useDA){
-    if(is.null(warmup)){
-      message("MCMC NUTS: warmup not specified, defaulting to half of nsim")
-      warmup <- floor(nsim/2)
-    }
-    ## Initialize the dual-averaging algorithm.
-    message(paste("MCMC NUTS: No eps given so using dual averaging during first", warmup, "steps."))
     epsvec <- Hbar <- epsbar <- rep(NA, length=warmup+1)
     eps <- epsvec[1] <- epsbar[1] <-
       .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
@@ -419,8 +418,12 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
     epsvec <- epsbar <- Hbar <- NULL
   }
   ## Start of MCMC chain
+  time.start <- Sys.time()
+  message('')
+  message(paste('Starting NUTS at', time.start))
   for(m in 1:nsim){
     ## initialize
+    divergent <- 0
     theta.out[m,] <- theta.minus <- theta.plus <- theta0 <- theta.cur
     r.cur <- r.plus <- r.minus <- r0 <- rnorm(length(theta.cur),0,1)
     ## Draw a slice variable u
@@ -456,7 +459,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
       ## Stop trajectory if there are any problems, probably happens
       ## when jumping way too far into the tails and the model isn't
       ## defined
-      if(is.na(s) | is.nan(s))  s <- 0
+      if(is.na(s) | is.nan(s))  { s <- 0; divergent <- 1}
       j <- j+1
       ## Stop doubling if too many or it's diverged enough
       if(j>max_doublings & s) {
@@ -473,7 +476,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
         ## If logalpha not defined, skip this updating step and use
         ## the last one.
         if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
-
         logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
         epsvec[m+1] <- exp(logeps)
         logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
@@ -483,22 +485,28 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=4, eps=NULL, 
         eps <- epsbar[warmup]*runif(1,.9,1.1)
       }
     }
+    ## Save adaptation info.
+    sampler_params[m,] <- c(min(1,res$alpha), eps, j-1, j-1, divergent, fn2(theta.cur))
+    if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
+    .print.mcmc.progress(m, nsim, warmup, chain)
+
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
-  j.stats <- 2^(c(min(j.results), median(j.results), max(j.results)))
-  if(useDA)
-    message(paste("MCMC NUTS: Dual averaging final average eps =", round(epsbar[warmup], 3)))
-  message(paste0("MCMC NUTS: Approximate leapfrog steps(min, median, max)=(",
-                 paste(j.stats, collapse=","), ")"))
-  if(diagnostic){
-    return(list(par=theta.out, steps.taken= 2^j.results,
-                n.calls=info$n.calls, epsvec=epsvec, epsbar=epsbar, Hbar=Hbar))
-  } else {
-    return(theta.out)
-  }
+
+  ndiv <- sum(sampler_params[-(1:warmup),5])
+  if(ndiv>0)
+    message(paste0("There were ", ndiv, " divergent transitions after warmup"))
+  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(sampler_params[,1])),
+                 " and target is ", adapt_delta))
+  if(useDA) message(paste0("Final step size=", round(epsbar[warmup], 3),
+                           "; after ", warmup, " warmup iterations"))
+  time.total <- difftime(Sys.time(), time.start, units='secs')
+  .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
+  return(list(par=theta.out, sampler_params=sampler_params,
+              time.total=time.total, time.warmup=time.warmup))
 }
 
 #' Draw a slice sample for given position and momentum variables
