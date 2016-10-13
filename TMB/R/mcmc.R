@@ -238,7 +238,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   }
   accepted <- rep(NA, nsim)
   theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
-  if(diagnostic) theta.proposed <- theta.out
+  adaptation <- matrix(NA, nrow=nsim, ncol=5) # holds DA info by iteration
   ## A NULL value for eps signifies to use the dual averaging algorithm
   useDA <- is.null(eps)
   if(useDA){
@@ -247,7 +247,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
       Madapt <- floor(nsim/2)
     }
     ## Initialize the dual-averaging algorithm.
-    message(paste("MCMC HMC: No eps given so using dual averaging during first", Madapt, "steps."))
+    message(paste("Adapting step size during first", Madapt, "steps."))
     epsvec <- Hbar <- epsbar <- rep(NA, length=Madapt+1)
     eps <- epsvec[1] <- epsbar[1] <-
       .find.epsilon(theta=theta.cur, fn=fn2, gr=gr2, eps=.1, verbose=FALSE)
@@ -260,8 +260,9 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   ## Start of MCMC chain
   eps0 <- eps                         # eps0 is average eps
   for(m in 1:nsim){
-    ## Randomize eps if not doing adapation below
-    if(!useDA) eps <- eps0*runif(1,.9,1.1)
+    ## Jitter step size to mitigate potential negative autocorrelations,
+    ## only once fixed though
+    if(useDA & m > Madapt) eps <- eps0*runif(1,.9,1.1)
     r.cur <- r.new <- rnorm(length(params.init),0,1)
     theta.new <- theta.cur
     theta.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
@@ -277,11 +278,19 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     }
     ## half step for momentum at the end
     r.new <- r.new+eps*gr2(theta.new)/2
-    ## negate r to make proposal symmetric
-    r.new <- -r.new
     if(diagnostic) theta.proposed[m,] <- theta.new
     logalpha <- -fn2(theta.cur)+fn2(theta.new)+ sum(r.cur^2)/2-sum(r.new^2)/2
-    if(is.finite(logalpha) & log(runif(1)) < logalpha){
+    ## Numerical divergence is registered as a NaN above. In this case we
+    ## want to reject the proposal, mark the divergence, and adjust the
+    ## step size down if still adapting (see below).
+    if(is.nan(logalpha)){
+      divergence <- 1
+      logalpha <- -Inf
+    } else {
+      divergence <- 0
+    }
+    ## Test whether to accept or reject proposed state
+    if(log(runif(1)) < logalpha){
       ## accept the proposed state
       theta.cur <- theta.new
       accepted[m] <- TRUE
@@ -296,18 +305,17 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
         Hbar[m+1] <-
           (1-1/(m+t0))*Hbar[m] +
           (delta-min(1,exp(logalpha)))/(m+t0)
-        ## If logalpha not defined, skip this updating step and use
-        ## the last one.
-        if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
         logeps <- mu-sqrt(m)*Hbar[m+1]/gamma
         epsvec[m+1] <- exp(logeps)
         logepsbar <- m^(-kappa)*logeps + (1-m^(-kappa))*log(epsbar[m])
         epsbar[m+1] <- exp(logepsbar)
         eps <- epsvec[m+1]
       } else {
-        eps <- epsbar[Madapt]*runif(1,.9,1.1)
+        eps <- epsbar[Madapt]
       }
     }
+    ## Save adaptation info.
+    adaptation[m,] <- c(exp(logalpha), eps, eps*L, H0,  fn2(theta.cur))
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
