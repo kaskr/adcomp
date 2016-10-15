@@ -67,7 +67,6 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   }
 
   ## Select and run the chain.
-  samples <-  array(dim=c(nsim, chains, length(params.init)))
   if(algorithm=="HMC"){
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
@@ -83,11 +82,13 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
       run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
 
   ## Clean up returned output
+  samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
+                    dimnames=list(NULL, NULL, c('lp__', names(obj$par))))
   for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
   time.warmup <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.warmup)))
   time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
-  result <- list(samples=samples, sampler_params=sampler_params,
+  result <- list(samples=samples, lp__=mcmc.out$lp, sampler_params=sampler_params,
                  time.warmup=time.warmup, time.total=time.total,
                  algorithm=algorithm)
   ## mcmc.out$par <- as.data.frame(mcmc.out$par)
@@ -228,7 +229,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     fn2 <- fn; gr2 <- gr
     theta.cur <- params.init
   }
-  accepted <- divergence <- rep(NA, nsim)
+  accepted <- divergence <- lp <- rep(NA, nsim)
   theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
   sampler_params <- matrix(numeric(0), nrow=nsim, ncol=4, # holds DA info by iteration
                        dimnames=list(NULL, c("accept_stat__",
@@ -290,6 +291,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
       accepted[m] <- FALSE
     }
     theta.out[m,] <- theta.cur
+    lp[m] <- fn(theta.cur)
     if(useDA){
       ## Do the adapting of eps.
       if(m <= warmup){
@@ -313,6 +315,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
+  theta.out <- cbind(lp, theta.out)
   if(sum(divergence[-(1:warmup)])>0)
     message(paste0("There were ", sum(divergence[-(1:warmup)]),
                    " divergent transitions after warmup"))
@@ -322,7 +325,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
-  return(list(par=theta.out, sampler_params=sampler_params,
+  return(list(par=theta.out, sampler_params=sampler_params, lp=lp,
               time.total=time.total, time.warmup=time.warmup))
 }
 
@@ -401,7 +404,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
                             "n_leapfrog__", "divergent__", "energy__")))
   theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
   ## how many steps were taken at each iteration, useful for tuning
-  j.results <- rep(NA, len=nsim)
+  j.results <- lp <- rep(NA, len=nsim)
   ## count the model calls; updated inside .buildtree. Some subtrees wont
   ## finish due to exit conditions so this is dynamic and not a simple
   ## formula like with HMC.
@@ -452,6 +455,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
         if(runif(n=1, min=0,max=1) <= res$n/n){
           theta.cur <- res$theta.prime
           theta.out[m,] <- res$theta.prime
+          lp[m] <- fn2(res$theta.prime)
         }
       }
       n <- n+res$n
@@ -495,7 +499,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
-
+  theta.out <- cbind(lp, theta.out)
   ndiv <- sum(sampler_params[-(1:warmup),5])
   if(ndiv>0)
     message(paste0("There were ", ndiv, " divergent transitions after warmup"))
@@ -505,7 +509,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
-  return(list(par=theta.out, sampler_params=sampler_params,
+  return(list(par=theta.out, sampler_params=sampler_params, lp=lp,
               time.total=time.total, time.warmup=time.warmup))
 }
 
