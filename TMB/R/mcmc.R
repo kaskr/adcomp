@@ -66,6 +66,13 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
     stop("params.init is wrong length")
   }
 
+  ## Make parameter names unique if vectors exist
+  par.names <- names(obj$par)
+  par.names <- as.vector(c(sapply(unique(par.names), function(x){
+    temp <- par.names[par.names==x]
+    if(length(temp)>1) paste0(temp,'[',1:length(temp),']') else temp
+  })))
+
   ## Select and run the chain.
   if(algorithm=="HMC"){
     mcmc.out <- lapply(1:chains, function(i)
@@ -83,7 +90,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
 
   ## Clean up returned output
   samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
-                    dimnames=list(NULL, NULL, c('lp__', names(obj$par))))
+                    dimnames=list(NULL, NULL, c('lp__', par.names)))
   for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
   time.warmup <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.warmup)))
@@ -268,6 +275,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
       theta.new <- theta.new+eps*r.new
       ## Full step except at end
       if(i!=L) r.new <- r.new+eps*gr2(theta.new)
+      ## If divergence, stop trajectory earlier to save computation
+##      if(any(is.nan(r.new)) | any(!is.finite(theta.new))) break
     }
     ## half step for momentum at the end
     r.new <- r.new+eps*gr2(theta.new)/2
