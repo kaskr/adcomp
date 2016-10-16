@@ -89,6 +89,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
       run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
 
   ## Clean up returned output
+  ##browser()
   samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
                     dimnames=list(NULL, NULL, c('lp__', par.names)))
   for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
@@ -428,13 +429,14 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
   message('')
   message(paste('Starting NUTS at', time.start))
   for(m in 1:nsim){
-    ## initialize
-    divergent <- 0
+    ## Initialize this iteration from previous in case divergence at first
+    ## treebuilding. If successful trajectory they are overwritten
     theta.out[m,] <- theta.minus <- theta.plus <- theta0 <- theta.cur
+    lp[m] <- if(m==1) fn2(theta.cur) else lp[m-1]
     r.cur <- r.plus <- r.minus <- r0 <- rnorm(length(theta.cur),0,1)
     ## Draw a slice variable u
     u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn2)
-    j <- 0; n <- 1; s <- 1
+    j <- 0; n <- 1; s <- 1; divergent <- 0
     while(s==1) {
       v <- sample(x=c(1,-1), size=1)
       if(v==1){
@@ -454,13 +456,13 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       }
 
       ## If divergence occurs, s will be NaN
-      if(is.na(res$s) | is.nan(res$s))  {browser();res$s <- 0}
+      if(is.na(res$s) | is.nan(res$s))  {res$s <- 0}
       ## test whether to accept this state
       if(res$s==1) {
         if(runif(n=1, min=0,max=1) <= res$n/n){
-          theta.cur <- res$theta.prime
-          theta.out[m,] <- res$theta.prime
-          lp[m] <- fn2(res$theta.prime)
+          theta.cur <- theta.out[m,] <- res$theta.prime
+          lp[m] <- fn2(theta.cur)
+          ## if(any(is.na(theta.cur))) browser()
         }
       }
       n <- n+res$n
