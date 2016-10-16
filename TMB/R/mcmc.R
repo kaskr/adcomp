@@ -44,18 +44,18 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
   fn <- function(x) {
     z <- -obj$fn(x)
-    if(is.nan(z)){
-      warning(paste("replacing NaN w/ Inf at:", paste(x, collapse=" ")))
-      z <- Inf
-    }
+    ## if(is.nan(z)){
+    ##   warning(paste("NaN objective function at:", paste(x, collapse=" ")))
+    ##      z <- Inf
+    ## }
     return(z)
   }
   gr <- function(x) {
     z <- -as.vector(obj$gr(x))
-    if(any(is.nan(z))){
-      warning(paste("NaN gradient at:", paste(x, collapse=" ")))
-      z <- rep(0, length(x))
-    }
+    ## if(any(is.nan(z))){
+    ##   warning(paste("NaN gradient at:", paste(x, collapse=" ")))
+    ##      z <- rep(0, length(x))
+    ##    }
     return(z)
   }
   obj$env$beSilent()                  # silence console output
@@ -258,11 +258,10 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   time.start <- Sys.time()
   message('')
   message(paste('Starting static HMC at', time.start))
-  eps0 <- eps                         # eps0 is average eps
   for(m in 1:nsim){
     ## Jitter step size to mitigate potential negative autocorrelations,
     ## only once fixed though
-    if(useDA & m > warmup) eps <- eps0*runif(1,.9,1.1)
+    if(useDA & m > warmup) eps <- eps*runif(1,.9,1.1)
     r.cur <- r.new <- rnorm(length(params.init),0,1)
     theta.new <- theta.cur
     theta.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
@@ -276,7 +275,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
       ## Full step except at end
       if(i!=L) r.new <- r.new+eps*gr2(theta.new)
       ## If divergence, stop trajectory earlier to save computation
-##      if(any(is.nan(r.new)) | any(!is.finite(theta.new))) break
+      if(any(!is.finite(r.new)) | any(!is.finite(theta.new))) break
     }
     ## half step for momentum at the end
     r.new <- r.new+eps*gr2(theta.new)/2
@@ -284,7 +283,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     ## Numerical divergence is registered as a NaN above. In this case we
     ## want to reject the proposal, mark the divergence, and adjust the
     ## step size down if still adapting (see below).
-    if(is.nan(logalpha)){
+    if(!is.finite(logalpha)){
       divergence[m] <- 1
       logalpha <- -Inf
     } else {
