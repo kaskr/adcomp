@@ -180,8 +180,8 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
   return(theta.out)
 }
 
-#' [BETA VERSION] Draw MCMC samples from a model posterior using a
-#' Hamiltonian sampler.
+#' [BETA VERSION] Draw MCMC samples from a model posterior using a static
+#' HMC sampler.
 #' @details This function implements algorithm 5 of Hoffman and Gelman
 #'   (2014), which includes adaptive step sizes (\code{eps}) via an
 #'   algorithm called dual averaging.
@@ -212,7 +212,8 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #'   calculations which need to be done at each step. The default of NULL
 #'   specifies to not do this transformation and use a unit diagonal
 #'   matrix.
-#' @param chain The MCMC chain to run. Only used for bookkeeping at the moment.
+#' @param chain The MCMC chain to run. Only used for bookkeeping at the
+#'   moment.
 #' @references \itemize{ \item{Neal, R. M. (2011). MCMC using Hamiltonian
 #'   dynamics. Handbook of Markov Chain Monte Carlo.}  \item{Hoffman and
 #'   Gelman (2014). The No-U-Turn sampler: Adaptively setting path lengths
@@ -220,7 +221,8 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
 #' @return A list containing samples ('par') and algorithm details such as
-#'   step size adaptation and acceptance probabilities per iteration ('sampler_params').
+#'   step size adaptation and acceptance probabilities per iteration
+#'   ('sampler_params').
 run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
                          adapt_delta=0.8, warmup=floor(nsim/2), chain=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
@@ -342,57 +344,50 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #' No-U-Turn (NUTS) sampler with dual averaging.
 #'
 #' @details This function implements algorithm 6 of Hoffman and Gelman
-#' (2014), which includes adaptive step sizes (\code{eps}) via an algorithm
-#' called dual averaging. In theory neither the step length nor step size
-#' needs to be input by the user to obtain efficient sampling from the
-#' posterior.
+#'   (2014), which includes adaptive step sizes (\code{eps}) via an
+#'   algorithm called dual averaging. In theory neither the step length nor
+#'   step size needs to be input by the user to obtain efficient sampling
+#'   from the posterior.
 #' @param nsim The number of samples to return.
 #' @param eps The length of the leapfrog steps. If a numeric value is
-#' passed, it will be used throughout the entire chain. A \code{NULL}
-#' value will initiate adaptation of \code{eps} using the dual averaging
-#' algorithm during the first \code{warmup} steps.
+#'   passed, it will be used throughout the entire chain. A \code{NULL}
+#'   value will initiate adaptation of \code{eps} using the dual averaging
+#'   algorithm during the first \code{warmup} steps.
 #' @param warmup An optional argument for how many iterations to adapt
-#' \code{eps} in the dual averaging algorithm. A value of \code{NULL}
-#' results in a default of \code{warmup=nsim/2}.
+#'   \code{eps} in the dual averaging algorithm. A value of \code{NULL}
+#'   results in a default of \code{warmup=nsim/2}.
 #' @param adapt_delta The target acceptance rate for the dual averaging
-#' algorithm. Defaults to 80\%. NUTS does not include an accept/reject
-#' Metropolis step, so this rate can be understood as the "average acceptance
-#' probability that HMC would give to the position-momentum states explored
-#' during the final doubling iteration."
+#'   algorithm. Defaults to 80\%. NUTS does not include an accept/reject
+#'   Metropolis step, so this rate can be understood as the
+#'   "average acceptance probability that HMC would give to the position-momentum states explored during the final doubling iteration."
 #' @param fn A function that returns the log of the posterior density.
 #' @param gr A function that returns a vector of gradients of the log of
-#' the posterior density (same as \code{fn}).
+#'   the posterior density (same as \code{fn}).
 #' @param covar An optional covariance matrix which can be used to improve
-#' the efficiency of sampling. The lower Cholesky decomposition of this
-#' matrix is used to transform the parameter space. If the posterior is
-#' approximately multivariate normal and \code{covar} approximates the
-#' covariance, then the transformed parameter space will be close to
-#' multivariate standard normal. In this case the algorithm will be more
-#' efficient, but there will be overhead in the matrix calculations which
-#' need to be done at each step. The default of NULL specifies to not do
-#' this transformation.
+#'   the efficiency of sampling. The lower Cholesky decomposition of this
+#'   matrix is used to transform the parameter space. If the posterior is
+#'   approximately multivariate normal and \code{covar} approximates the
+#'   covariance, then the transformed parameter space will be close to
+#'   multivariate standard normal. In this case the algorithm will be more
+#'   efficient, but there will be overhead in the matrix calculations which
+#'   need to be done at each step. The default of NULL specifies to not do
+#'   this transformation.
 #' @param params.init A vector of initial parameter values.
 #' @param max_doublings Integer representing the maximum times the path
-#' length should double within an MCMC iteration. Default of 4, so 16
-#' steps. If a U-turn has not occured before this many steps the algorithm
-#' will stop and return a sample from the given tree.
-#' @references
-#'  \itemize{
-#' \item{Neal, R. M. (2011). MCMC using Hamiltonian dynamics. Handbook
-#' of Markov Chain Monte Carlo.}
-#' \item{Hoffman and Gelman (2014). The No-U-Turn sampler: Adaptively
-#' setting path lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res.
-#' 15:1593-1623.}
-#' }
-#' @return If \code{diagnostic} is FALSE (default), returns a matrix
-#' of \code{nsim} samples from the posterior. Otherwise returns a list
-#' containing samples ('par'), vector of steps taken at each iteration
-#' ('steps.taken'), and the total function and gradient calls
-#' ('n.calls'), which in the case of NUTS is dynamic, and finally the
-#' average \code{eps} ('epsbar') from the dual averaging algorithm if
-#' used (otherwise NULL).
-#' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.rwm}}
-run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, warmup=floor(nsim/2),
+#'   length should double within an MCMC iteration. Default of 4, so 16
+#'   steps. If a U-turn has not occured before this many steps the
+#'   algorithm will stop and return a sample from the given tree.
+#' @references \itemize{ \item{Neal, R. M. (2011). MCMC using Hamiltonian
+#'   dynamics. Handbook of Markov Chain Monte Carlo.}  \item{Hoffman and
+#'   Gelman (2014). The No-U-Turn sampler: Adaptively setting path lengths
+#'   in Hamiltonian Monte Carlo. J. Mach. Learn. Res.  15:1593-1623.}  }
+#' @return A list containing samples ('par') and algorithm details such as
+#'   step size adaptation and acceptance probabilities per iteration
+#'   ('sampler_params').
+#' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}},
+#'   \code{\link{run_mcmc.rwm}}
+run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
+                          eps=NULL, warmup=floor(nsim/2),
                           adapt_delta=0.8, covar=NULL, chain=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
@@ -457,8 +452,10 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
         theta.minus <- res$theta.minus
         r.minus <- res$r.minus
       }
+
+      ## If divergence occurs, s will be NaN
+      if(is.na(res$s) | is.nan(res$s))  {browser();res$s <- 0}
       ## test whether to accept this state
-      if(is.na(res$s) | is.nan(res$s))  res$s <- 0
       if(res$s==1) {
         if(runif(n=1, min=0,max=1) <= res$n/n){
           theta.cur <- res$theta.prime
@@ -468,10 +465,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
       }
       n <- n+res$n
       s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
-      ## Stop trajectory if there are any problems, probably happens
-      ## when jumping way too far into the tails and the model isn't
-      ## defined
-      if(is.na(s) | is.nan(s))  { s <- 0; divergent <- 1}
+
+      if(!is.finite(s))  { s <- 0; divergent <- 1}
       j <- j+1
       ## Stop doubling if too many or it's diverged enough
       if(j>max_doublings & s) {
@@ -532,8 +527,9 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
 #' Test whether a "U-turn" has occured in a branch of the binary tree
 #' created by \ref\code{.buildtree} function.
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
-  theta.temp <- (theta.plus-theta.minus)
-  as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
+  theta.temp <- t(theta.plus-theta.minus)
+  res <- as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
+  res
 }
 
 #' A recursive function that builds a leapfrog trajectory using a balanced
@@ -558,7 +554,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
     ## verify valid trajectory
     H <- .calculate.H(theta=theta, r=r, fn=fn)
     s <- H-log(u) + delta.max > 0
-    if(is.na(s) | is.nan(s)) s <- 0
+    ##  if(is.na(s) | is.nan(s)) s <- 0
     n <- log(u) <= H
     ## ## Useful code for debugging. Returns entire path to global env.
     ## if(!exists('theta.trajectory'))
@@ -583,7 +579,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8, eps=NULL, 
     alpha <- xx$alpha
     nalpha <- xx$nalpha
     s <- xx$s
-    if(is.na(s) | is.nan(s)) s <- 0
+    ##  if(is.na(s) | is.nan(s)) s <- 0
     nprime <- xx$n
     ## If it didn't fail, update the above quantities
     if(s==1){
