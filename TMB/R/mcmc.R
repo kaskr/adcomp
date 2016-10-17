@@ -491,7 +491,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
         epsbar[m+1] <- exp(logepsbar)
         eps <- epsvec[m+1]
       } else {
-        eps <- epsbar[warmup]*runif(1,.9,1.1)
+        eps <- epsbar[warmup]
       }
     }
     ## Save adaptation info.
