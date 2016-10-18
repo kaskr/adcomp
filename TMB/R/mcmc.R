@@ -409,10 +409,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
   theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
   ## how many steps were taken at each iteration, useful for tuning
   j.results <- lp <- rep(NA, len=nsim)
-  ## count the model calls; updated inside .buildtree. Some subtrees wont
-  ## finish due to exit conditions so this is dynamic and not a simple
-  ## formula like with HMC.
-  info <- as.environment( list(n.calls = 0) )
   useDA <- is.null(eps)               # whether to use DA algorithm
   if(useDA){
     epsvec <- Hbar <- epsbar <- rep(NA, length=warmup+1)
@@ -437,6 +433,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     ## Draw a slice variable u
     u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn2)
     j <- 0; n <- 1; s <- 1; divergent <- 0
+    ## count the model calls; updated inside .buildtree.
+    info <- as.environment( list(n.calls = 0) )
     while(s==1) {
       v <- sample(x=c(1,-1), size=1)
       if(v==1){
@@ -469,8 +467,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       if(!is.finite(s))  { s <- 0; divergent <- 1}
       j <- j+1
       ## Stop doubling if too many or it's diverged enough
-      if(j>max_doublings & s) {
-        ## warning("j larger than max_doublings, skipping to next m")
+      if(j>max_doublings) {
+       ## warning("j larger than max_doublings, skipping to next m")
         break
       }
     }
@@ -478,8 +476,10 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     if(useDA){
       ## Do the adapting of eps.
       if(m <= warmup){
+        alpha2 <- res$alpha/res$nalpha
+        if(alpha2>1 | !is.finite(alpha2)) browser()
         Hbar[m+1] <- (1-1/(m+t0))*Hbar[m] +
-          (adapt_delta-res$alpha/res$nalpha)/(m+t0)
+          (adapt_delta-alpha2)/(m+t0)
         ## If logalpha not defined, skip this updating step and use
         ## the last one.
         if(is.nan(Hbar[m+1])) Hbar[m+1] <- abs(Hbar[m])
@@ -493,7 +493,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       }
     }
     ## Save adaptation info.
-    sampler_params[m,] <- c(min(1,res$alpha), eps, j-1, j-1, divergent, fn2(theta.cur))
+    sampler_params[m,] <-
+      c(min(1,res$alpha), eps, j-1, info$n.calls, divergent, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup, chain)
   } ## end of MCMC loop
@@ -505,7 +506,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
   ndiv <- sum(sampler_params[-(1:warmup),5])
   if(ndiv>0)
     message(paste0("There were ", ndiv, " divergent transitions after warmup"))
-  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(sampler_params[,1])),
+  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(sampler_params[-(1:warmup),1])),
                  " and target is ", adapt_delta))
   if(useDA) message(paste0("Final step size=", round(epsbar[warmup], 3),
                            "; after ", warmup, " warmup iterations"))
@@ -543,9 +544,13 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
 #' 'efficient' version that samples uniformly from the path without storing
 #' it. Thus the function returns a single proposed value and not the whole
 #' trajectory.
+#'
 .buildtree <- function(theta, r, u, v, j, eps, theta0, r0, fn, gr,
                        delta.max=1000, info = environment() ){
   if(j==0){
+    ## ## Useful code for debugging. Returns entire path to global env.
+    ## if(!exists('theta.trajectory'))
+    ##   theta.trajectory <<- data.frame(step=0, t(theta))
     ## base case, take one step in direction v
     eps <- v*eps
     r <- r+(eps/2)*gr(theta)
@@ -556,15 +561,12 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     s <- H-log(u) + delta.max > 0
     ##  if(is.na(s) | is.nan(s)) s <- 0
     n <- log(u) <= H
-    ## ## Useful code for debugging. Returns entire path to global env.
-    ## if(!exists('theta.trajectory'))
-    ##   theta.trajectory <<- theta
-    ## else
-    ##   theta.trajectory <<- rbind(theta.trajectory, theta)
     temp <- .calculate.H(theta=theta, r=r, fn=fn)-
       .calculate.H(theta=theta0, r=r0, fn=fn)
     alpha <- min(exp(temp),1)
-    info$n.calls <- info$n.calls + 5
+    info$n.calls <- info$n.calls + 1
+    ## theta.trajectory <<-
+    ##   rbind(theta.trajectory, data.frame(step=tail(theta.trajectory$step,1),t(theta)))
     return(list(theta.minus=theta, theta.plus=theta, theta.prime=theta, r.minus=r,
                 r.plus=r, s=s, n=n, alpha=alpha, nalpha=1))
   } else {
@@ -600,24 +602,26 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       ## then you get 0/0. So I skip this test. Likewise if model
       ## throwing errors, don't keep that theta.
       nprime <- yy$n+ xx$n
-      if(!is.finite(nprime)) nprime <- 0
+      if(!is.finite(nprime)) {browser();nprime <- 0}
       if(nprime!=0){
         ## choose whether to keep this theta
         if(runif(n=1, min=0, max=1) <= yy$n/nprime)
           theta.prime <- yy$theta.prime
       }
+      alpha <- xx$alpha+yy$alpha
+      nalpha <- xx$nalpha+yy$nalpha
       ## check for valid proposal
       test <- .test.nuts(theta.plus=theta.plus,
                          theta.minus=theta.minus, r.plus=r.plus,
                          r.minus=r.minus)
-      if(!test) warning(paste("U turn at j=", j))
+      ## if(!test) warning(paste("U turn at j=", j))
       ## check if any of the stopping conditions were met
-      s <- xx$s*yy$s*test
+      s <- yy$s*test
     }
     return(list(theta.minus=theta.minus, theta.plus=theta.plus,
                 theta.prime=theta.prime,
                 r.minus=r.minus, r.plus=r.plus, s=s, n=nprime,
-                alpha=alpha, nalpha=1))
+                alpha=alpha, nalpha=nalpha))
   }
 }
 
