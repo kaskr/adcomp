@@ -91,12 +91,12 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   ## Clean up returned output
   ##browser()
   samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
-                    dimnames=list(NULL, NULL, c('lp__', par.names)))
+                    dimnames=list(NULL, NULL, c(par.names,'lp__')))
   for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
   time.warmup <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.warmup)))
   time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
-  result <- list(samples=samples, lp__=mcmc.out$lp, sampler_params=sampler_params,
+  result <- list(samples=samples, sampler_params=sampler_params,
                  time.warmup=time.warmup, time.total=time.total,
                  algorithm=algorithm, warmup=mcmc.out[[1]]$warmup)
   ## mcmc.out$par <- as.data.frame(mcmc.out$par)
@@ -326,7 +326,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
-  theta.out <- cbind(lp, theta.out)
+  theta.out <- cbind(theta.out, lp)
   if(sum(divergence[-(1:warmup)])>0)
     message(paste0("There were ", sum(divergence[-(1:warmup)]),
                    " divergent transitions after warmup"))
@@ -336,7 +336,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
-  return(list(par=theta.out, sampler_params=sampler_params, lp=lp,
+  return(list(par=theta.out, sampler_params=sampler_params,
               time.total=time.total, time.warmup=time.warmup))
 }
 
@@ -501,7 +501,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
-  theta.out <- cbind(lp, theta.out)
+  theta.out <- cbind(theta.out, lp)
   ndiv <- sum(sampler_params[-(1:warmup),5])
   if(ndiv>0)
     message(paste0("There were ", ndiv, " divergent transitions after warmup"))
@@ -511,7 +511,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
-  return(list(par=theta.out, sampler_params=sampler_params, lp=lp,
+  return(list(par=theta.out, sampler_params=sampler_params,
               time.total=time.total, time.warmup=time.warmup,
               warmup=warmup))
 }
@@ -557,11 +557,10 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     ##  if(is.na(s) | is.nan(s)) s <- 0
     n <- log(u) <= H
     ## ## Useful code for debugging. Returns entire path to global env.
-    if(!exists('theta.trajectory'))
-      theta.trajectory <<- theta
-    else
-      theta.trajectory <<- rbind(theta.trajectory, theta)
-
+    ## if(!exists('theta.trajectory'))
+    ##   theta.trajectory <<- theta
+    ## else
+    ##   theta.trajectory <<- rbind(theta.trajectory, theta)
     temp <- .calculate.H(theta=theta, r=r, fn=fn)-
       .calculate.H(theta=theta0, r=r0, fn=fn)
     alpha <- min(exp(temp),1)
