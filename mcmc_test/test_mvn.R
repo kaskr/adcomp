@@ -7,29 +7,29 @@ dyn.load(dynlib('mvn'))
 
 ## devtools::install('C:/Users/Cole/shinystan')
 
-covar <- diag(10) #matrix(c(1,-.95, -.95,1), nrow=2)
-obj <- MakeADFun(data=list(d=10, covar=covar), parameters=list(X=rnorm(10)))
-
-hmc <- run_mcmc(obj=obj, nsim=1000, algorithm='HMC', chains=3, L=100,
-                covar=NULL, eps=NULL)
-sso <- as.shinystan(hmc$samples, burnin=500,
-                    sampler_params=hmc$sampler_params, algorithm='HMC')
-launch_shinystan(sso)
+d <- 2
+covar <- diag(d) #matrix(c(1,-.95, -.95,1), nrow=2)
+obj <- MakeADFun(data=list(d=d, covar=covar), parameters=list(X=rnorm(d)))
 
 set.seed(4)
-nuts <- run_mcmc(obj=obj, nsim=2000, eps=NULL, algorithm='NUTS', chains=3,
-                covar=NULL, max_doubling=8)
-str(nuts)
-sso <- as.shinystan(nuts$samples, burnin=1000, max_treedepth=8,
-                    sampler_params=nuts$sampler_params, algorithm='NUTS')
+
+rm(theta.trajectory)
+nuts <- run_mcmc(obj=obj, nsim=40, eps=.05, algorithm='NUTS', chains=1,
+                covar=NULL, max_doubling=7)
+xx <- (theta.trajectory)
+plot(xx[,1], xx[,2], type='l')
+
+
+sso <- with(nuts, as.shinystan(samples, burnin=warmup, max_treedepth=6,
+                    sampler_params=sampler_params, algorithm='NUTS'))
 launch_shinystan(sso)
 
 ## Run model in Stan
 library(rstan)
-data <- list(covar=covar, Npar=10, x=rep(0, len=10))
-inits <- lapply(1:3, function(x) list(X=rnorm(10)))
-fit <- stan(file='mvn.stan', data=data, iter=2000, init=inits, chains=3,
-            control=list(metric='unit_e', max_treedepth=8))
+data <- list(covar=covar, Npar=d, x=rep(0, len=d))
+inits <- lapply(1:3, function(x) list(X=rnorm(d)))
+fit <- stan(file='mvn.stan', data=data, iter=1000, init=inits, chains=3,
+            control=list(metric='unit_e', max_treedepth=6))
 sso.stan <- as.shinystan(fit)
 launch_shinystan(sso.stan)
 

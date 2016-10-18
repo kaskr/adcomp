@@ -98,7 +98,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
   result <- list(samples=samples, lp__=mcmc.out$lp, sampler_params=sampler_params,
                  time.warmup=time.warmup, time.total=time.total,
-                 algorithm=algorithm)
+                 algorithm=algorithm, warmup=mcmc.out[[1]]$warmup)
   ## mcmc.out$par <- as.data.frame(mcmc.out$par)
   ## names(mcmc.out$par) <- names(obj$par)
   return(invisible(result))
@@ -454,7 +454,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
         theta.minus <- res$theta.minus
         r.minus <- res$r.minus
       }
-
       ## If divergence occurs, s will be NaN
       if(is.na(res$s) | is.nan(res$s))  {res$s <- 0}
       ## test whether to accept this state
@@ -467,7 +466,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       }
       n <- n+res$n
       s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
-
       if(!is.finite(s))  { s <- 0; divergent <- 1}
       j <- j+1
       ## Stop doubling if too many or it's diverged enough
@@ -498,7 +496,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     sampler_params[m,] <- c(min(1,res$alpha), eps, j-1, j-1, divergent, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup, chain)
-
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
@@ -515,7 +512,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
   return(list(par=theta.out, sampler_params=sampler_params, lp=lp,
-              time.total=time.total, time.warmup=time.warmup))
+              time.total=time.total, time.warmup=time.warmup,
+              warmup=warmup))
 }
 
 #' Draw a slice sample for given position and momentum variables
@@ -559,10 +557,11 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     ##  if(is.na(s) | is.nan(s)) s <- 0
     n <- log(u) <= H
     ## ## Useful code for debugging. Returns entire path to global env.
-    ## if(!exists('theta.trajectory'))
-    ##     theta.trajectory <<- theta
-    ## else
-    ##     theta.trajectory <<- rbind(theta.trajectory, theta)
+    if(!exists('theta.trajectory'))
+      theta.trajectory <<- theta
+    else
+      theta.trajectory <<- rbind(theta.trajectory, theta)
+
     temp <- .calculate.H(theta=theta, r=r, fn=fn)-
       .calculate.H(theta=theta0, r=r0, fn=fn)
     alpha <- min(exp(temp),1)
@@ -612,7 +611,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       test <- .test.nuts(theta.plus=theta.plus,
                          theta.minus=theta.minus, r.plus=r.plus,
                          r.minus=r.minus)
-      ## if(!test) warning(paste("U turn at j=", j))
+      if(!test) warning(paste("U turn at j=", j))
       ## check if any of the stopping conditions were met
       s <- xx$s*yy$s*test
     }
@@ -685,7 +684,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
 # the R package \link{rstan}.
 .print.mcmc.progress <- function(iteration, nsim, warmup, chain){
   i <- iteration
-  refresh <- floor(nsim/10)
+  refresh <- max(10, floor(nsim/10))
   if(i==1 | i==nsim | i %% refresh ==0){
     i.width <- formatC(i, width=nchar(nsim))
     out <- paste0('Chain ',chain,', Iteration: ', i.width , "/", nsim, " [",
