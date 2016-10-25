@@ -494,7 +494,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     }
     ## Save adaptation info.
     sampler_params[m,] <-
-      c(min(1,res$alpha), eps, j, info$n.calls, divergent, fn2(theta.cur))
+      c(res$alpha/res$nalpha, eps, j, info$n.calls, divergent, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup, chain)
   } ## end of MCMC loop
@@ -526,10 +526,13 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
 #' variables.
 .calculate.H <- function(theta, r, fn) fn(theta)-(1/2)*sum(r^2)
 #' Test whether a "U-turn" has occured in a branch of the binary tree
-#' created by \ref\code{.buildtree} function.
+#' created by \ref\code{.buildtree} function. Returns TRUE if no U-turn,
+#' FALSE if one occurred
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
-  theta.temp <- t(theta.plus-theta.minus)
-  as.numeric((theta.temp %*% r.minus >= 0) *( theta.temp %*% r.plus >= 0))
+  theta.temp <- theta.plus-theta.minus
+  res <- drop(crossprod(theta.temp,r.minus)) >= 0 *
+    drop(crossprod(theta.temp, r.plus)) >= 0
+  return(res)
 }
 
 #' A recursive function that builds a leapfrog trajectory using a balanced
@@ -560,7 +563,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     n <- log(u) <= H
     s <- log(u) < delta.max + H
     ##  if(is.na(s) | is.nan(s)) s <- 0
-    ## Acceptance ratio in log space: (Hnew/Hold)
+    ## Acceptance ratio in log space: (Hnew-Hold)
     logalpha <- H-.calculate.H(theta=theta0, r=r0, fn=fn)
     alpha <- min(exp(logalpha),1)
     info$n.calls <- info$n.calls + 1
