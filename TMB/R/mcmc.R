@@ -494,7 +494,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     }
     ## Save adaptation info.
     sampler_params[m,] <-
-      c(min(1,res$alpha), eps, j-1, info$n.calls, divergent, fn2(theta.cur))
+      c(min(1,res$alpha), eps, j, info$n.calls, divergent, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup, chain)
   } ## end of MCMC loop
@@ -520,8 +520,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
 #' Draw a slice sample for given position and momentum variables
 .sample.u <- function(theta, r, fn)
   runif(n=1, min=0, max=exp(.calculate.H(theta=theta,r=r, fn=fn)))
-#' Calculate the Hamiltonian value for position and momentum variables.
-                                        #
+#' Calculate the log joint density (Hamiltonian) value for given position and
+#' momentum variables.
 #' @details This function currently assumes iid standard normal momentum
 #' variables.
 .calculate.H <- function(theta, r, fn) fn(theta)-(1/2)*sum(r^2)
@@ -529,8 +529,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
 #' created by \ref\code{.buildtree} function.
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
   theta.temp <- t(theta.plus-theta.minus)
-  res <- as.numeric( theta.temp %*% r.minus >= 0 | theta.temp %*% r.plus >= 0)
-  res
+  as.numeric((theta.temp %*% r.minus >= 0) *( theta.temp %*% r.plus >= 0))
 }
 
 #' A recursive function that builds a leapfrog trajectory using a balanced
@@ -552,18 +551,18 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     ## if(!exists('theta.trajectory'))
     ##   theta.trajectory <<- data.frame(step=0, t(theta))
     ## base case, take one step in direction v
-    eps <- v*eps
-    r <- r+(eps/2)*gr(theta)
-    theta <- theta+eps*r
-    r <- r+(eps/2)*gr(theta)
+    eps2 <- v*eps
+    r <- r+(eps2/2)*gr(theta)
+    theta <- theta+eps2*r
+    r <- r+(eps2/2)*gr(theta)
     ## verify valid trajectory
     H <- .calculate.H(theta=theta, r=r, fn=fn)
-    s <- H-log(u) + delta.max > 0
-    ##  if(is.na(s) | is.nan(s)) s <- 0
     n <- log(u) <= H
-    temp <- .calculate.H(theta=theta, r=r, fn=fn)-
-      .calculate.H(theta=theta0, r=r0, fn=fn)
-    alpha <- min(exp(temp),1)
+    s <- log(u) < delta.max + H
+    ##  if(is.na(s) | is.nan(s)) s <- 0
+    ## Acceptance ratio in log space: (Hnew/Hold)
+    logalpha <- H-.calculate.H(theta=theta0, r=r0, fn=fn)
+    alpha <- min(exp(logalpha),1)
     info$n.calls <- info$n.calls + 1
     ## theta.trajectory <<-
     ##   rbind(theta.trajectory, data.frame(step=tail(theta.trajectory$step,1),t(theta)))
@@ -602,14 +601,14 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       ## then you get 0/0. So I skip this test. Likewise if model
       ## throwing errors, don't keep that theta.
       nprime <- yy$n+ xx$n
+      alpha <- xx$alpha+yy$alpha
+      nalpha <- xx$nalpha+yy$nalpha
       if(!is.finite(nprime)) {browser();nprime <- 0}
       if(nprime!=0){
         ## choose whether to keep this theta
         if(runif(n=1, min=0, max=1) <= yy$n/nprime)
           theta.prime <- yy$theta.prime
       }
-      alpha <- xx$alpha+yy$alpha
-      nalpha <- xx$nalpha+yy$nalpha
       ## check for valid proposal
       test <- .test.nuts(theta.plus=theta.plus,
                          theta.minus=theta.minus, r.plus=r.plus,
