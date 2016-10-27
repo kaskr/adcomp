@@ -530,8 +530,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
 #' FALSE if one occurred
 .test.nuts <- function(theta.plus, theta.minus, r.plus, r.minus){
   theta.temp <- theta.plus-theta.minus
-  res <- drop(crossprod(theta.temp,r.minus)) >= 0 *
-    drop(crossprod(theta.temp, r.plus)) >= 0
+  res <- (crossprod(theta.temp,r.minus) >= 0) *
+    (crossprod(theta.temp, r.plus) >= 0)
   return(res)
 }
 
