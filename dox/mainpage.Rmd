@@ -1,0 +1,54 @@
+Comprehensive Documentation of C++ Functions and Classes (API) {#mainpage}
+==========================================================================
+
+TMB (Template Model Builder) is an R package for fitting statistical
+latent variable models to data.  It is inspired by
+[ADMB](http://www.admb-project.org). Unlike most other R packages the
+model is formulated in C++. This provides great flexibility, but
+requires some familiarity with the C/C++ programming language.
+
+These pages describes the C++ part of TMB. The R part is documented
+via the ordinary R help system.
+
+- **Related pages**: Introduction to TMB and vignettes (start here if
+  you are new). Alternatively available as a
+  [**book**](_book/Tutorial.html).
+- **Modules**: The C++ documentation is grouped in 'modules'. Here you
+  can get an overview of e.g. all TMB macros or all available
+  distributions etc.
+- **Namespaces**: TMB's package system.
+- **Classes**: The C++ classes used in TMB.
+- **Files**: The C++ files that constitute TMB.
+- **Examples**: List of pre built models that comes with TMB.
+- **Search field**: Start typing a keyword, and all matching keywords
+  will be listed. Very useful!.
+
+\page Tutorial
+\brief Short introduction to TMB
+
+\defgroup R_style_distribution   R style probability distributions
+\brief Probability distributions (discrete and continuous) for use in the likelihood function.
+
+\defgroup special_functions      Special mathematical functions
+\brief Special mathematical functions for which derivatives are implemented
+
+\defgroup matrix_functions       Special matrix functions
+\brief Special matrix functions for which derivatives are implemented
+
+These matrix operations are designed to work with automatic
+differentiation for large dense matrices.
+
+\defgroup Densities              Multivariate distributions
+\brief Multivariate normal distributions, AR-processes, GMRFs, separable covariance functions, etc.
+
+\defgroup parallel               Parallel computations
+\brief How to parallelize the likelihood function using TMB.
+
+\defgroup macros                 C++ Macros
+\brief C++ macros used to enable interchange of data structures between R and C++.
+
+\example nan_error_ex.cpp
+\example matrix_arrays.cpp
+\example multivariate_distributions.cpp
+
+`r paste("\\example", basename(dir("../tmb_examples", pattern=".cpp", recursive=TRUE)), collapse="\n")`

@@ -1,0 +1,18 @@
+--- 
+title: "The comprehensive TMB documentation"
+knit: "bookdown::render_book"
+bibliography: [references.bib]
+biblio-style: apalike
+link-citations: yes
+colorlinks: yes
+always_allow_html: yes
+lot: yes
+lof: yes
+fontsize: 12pt
+monofont: "Source Code Pro"
+monofontoptions: "Scale=0.7"
+description: "Comprehensive documentation of TMB - theory and examples."
+url: 'https\://kaskr.github.io/adcomp/'
+github-repo: kaskr/adcomp
+cover-image: images/cover.png
+---
