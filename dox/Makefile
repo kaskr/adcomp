@@ -45,7 +45,7 @@ inject_links:
 pdf_book:
 	echo ".doxygen<-FALSE; source('layout/utils.R'); bookdown::render_book(dir(pattern='[0-9].*.Rmd'), 'bookdown::pdf_book', clean_envir=FALSE)" | R --slave
 
-refman: dox-user
+refman: dox
 	cd latex; make
 
 ## For quick preview

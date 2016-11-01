@@ -16,13 +16,13 @@
 #### R packages
 
 ```R
-install.packages(c("knitr", "bookdown"))
+install.packages(c("knitr", "bookdown", "rsvg"))
 ```
 
 #### Command line tools
 
 ```shell
-sudo apt-get install pandoc pandoc-citeproc graphviz
+sudo apt-get install pandoc pandoc-citeproc graphviz librsvg2-dev
 ```
 
 ## Export options

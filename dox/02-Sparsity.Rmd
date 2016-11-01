@@ -29,7 +29,7 @@ $$p(x_1,x_2,x_3,x_4) \propto f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)$$
 The separability of factors on the right hand side implies some conditional independence properties. For instance if $x_1$ and $x_3$ are held constant then $x_2$ and $x_4$ varies independently. We say that $x_2$ and $x_4$ are conditionally independent given $x_1$ and $x_3$.
 The conditional independence graph is defined by drawing *undirected* edges between variables occurring in the same factor $f_i$:
 
-```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=1.5}
+```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
 h <- diag(4)
 rownames(h) <- c("X1","X2","X3","X4")
 h[1,2] <-1
@@ -42,7 +42,7 @@ plotGraph(h, DAG=FALSE, group=function(x)x==2|x==3)
 
 Equivalently the graph may be visualized via its adjacency matrix:
 
-```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=3}
+```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
 hh <- as(forceSymmetric(h),"dsCMatrix")
 hh@x[] <- 1
 image(hh)
@@ -50,58 +50,55 @@ image(hh)
 
 This is the **sparsity pattern** of the model.
 
-> The sparsity pattern visualizes the conditional independence structure of the model.
+> The sparsity pattern visualizes the conditional independence structure of the random effects in the model.
 
 ### Node removal properties
 
 Important probabilistic properties can be deduced directly from the graph. This is due to the following *node removal* properties.
 
 1. The conditional distribution given node $X_i$ is found by removing $X_i$ and its edges from the graph. For instance conditional on $X_4$ we get the following graph:
-    ```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=.5}
+    ```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
 	plotGraph(h[-4,-4], DAG=FALSE, nrow=1)
     ```
 
 2. The marginal distribution wrt. a node $X_i$ is found by removing $X_i$ from the graph and connecting *all* $X_i$'s neighbors. For instance when integrating $X_4$ out of the joint density we get the following graph for the remaining nodes:
-    ```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=.8}
+    ```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
 	hm <- h; hm[1,3] <- hm[3,1] <- 1
 	hm <- hm[-4, -4]
 	plotGraph(hm, DAG=FALSE, nrow=1)
     ```
 
-> Important message for large models:
-> Conditioning preserves sparseness. Marginalizing tend to destroy sparseness.
-
-### The effect of adding data
-
-It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that $X_4$ is a data point we would change the graph to:
-
-```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=1.5}
-plotGraph(h, DAG=FALSE, group=function(x)x==2|x==3, shape=c(rep("circle",3), "box"))
-```
-
-Now there are only three variables left. The conditional independence structure of the remaining variables is:
-
-```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=.8}
-plotGraph(hm, DAG=FALSE, nrow=1)
-```
-
-which is the same as one gets when integrating $X_4$ out of the joint distribution.
-
-> Important for large models:
-> Data nodes destroy sparsity the same way as marginalization. Attempt to associate each data point with a single random effect.
+> Conditioning preserves sparseness. Marginalizing tend to destroy sparseness by adding more edges to the graph.
 
 ### Directed acyclic graph
 
 When building models in TMB it is often more natural to specify processes in incremental steps - i.e. through the successive conditional distributions. The previous example could be simulated by drawing the variables $X_1,X_2,X_3,X_4$ one by one in the given order as illustrated by the following *directed* graph:
 
-```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=1.5}
+```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
 plotGraph(h, DAG=TRUE, group=function(x)x==2|x==3)
 ```
 
 The graph shows dependencies of any specific node *given past nodes*. The edge from $X_1$ to $X_3$ was not in the original (undirected) graph. This is a so-called **fill-in**.
 
-> Important message:
 > Order matters. The DAG is different from the conditional independence graph.
+
+### The effect of adding data
+
+It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that $X_4$ is a data point we would illustrate it by:
+
+```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
+plotGraph(h, DAG=TRUE, fill_in=FALSE, group=function(x)x!=4, shape=c(rep("circle",3), "square"))
+```
+
+Here there are only three variables left. The conditional independence structure of the variables is:
+
+```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
+plotGraph(hm, DAG=FALSE, nrow=1)
+```
+
+which is the same graph as was previously found by integrating $X_4$ out of the joint distribution.
+
+> Data nodes destroy sparsity the same way as marginalization. To avoid this, try to associate each data point with a single random effect.
 
 ## The theta logistic example
 
@@ -129,7 +126,7 @@ runExample("thetalog", exfolder="adcomp/tmb_examples")
 
 We demonstrate it in the case $n=5$. Here is the DAG
 
-```{.R, echo=FALSE, eval=TRUE, fig=TRUE, fig.height=1.5}
+```{.R, echo=FALSE, eval=TRUE, fig=TRUE}
 n <- 5
 parameters <- lapply(c(data, parameters), head, n)
 obj <- MakeADFun(data, parameters, random=c("X","Y"), DLL="thetalog")
@@ -137,14 +134,14 @@ h <- obj$env$spHess(random=TRUE)
 rownames(h) <- c(paste0("Y",1:n), paste0("X", 1:n))
 p <- c(1:n + n,1:n)
 h <- h[p, p]
-plotGraph(h, group=function(x)x>n, shape=c(rep("circle", n), rep("box", n)))
+plotGraph(h, group=function(x)x>n, shape=c(rep("circle", n), rep("square", n)))
 ```
 
 This is a standard hidden Markov structure. Each data node is bound to a *single* random effect - hence the data does not introduce additional edges in the random effect structure.
 
 We can use the `image` function from the `Matrix` package to plot the random effect structure (we must first load the Matrix package):
 
-```{R fig=TRUE, fig.height=3.5}
+```{R fig=TRUE}
 library(Matrix)
 obj <- MakeADFun(data, parameters, random=c("X"), DLL="thetalog")
 image(obj$env$spHess(random=TRUE))
