@@ -132,7 +132,7 @@ plotGraph <- function(h, DAG=TRUE, fill_in=DAG, group = function(x)(x-1)%%nrow,
     dotfile <- tempfile(fileext=".dot")
     svgfile <- tempfile(fileext=".svg")
     cat(graph, file=dotfile)
-    cmd <- paste("dot", "-Tsvg", dotfile, ">", svgfile)
+    cmd <- paste("dot", "-Tsvg", dotfile, "-o", svgfile)
     system(cmd)
     class(svgfile) <- "svgfile"
     svgfile

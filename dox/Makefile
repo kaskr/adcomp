@@ -9,6 +9,7 @@ $(shell echo "PROJECT_NUMBER = v$(VERSION)" >> Doxyfile.tmp)
 
 ## Preparations for bookdown. _bookdown.yml seems to be the only way to limit the book to a subset of Rmd files ?
 $(shell Rscript -e "cat(paste('rmd_files : [',paste(shQuote(dir(pattern='[0-9].*.Rmd')), collapse=','),']'), file='_bookdown.yml')")
+$(shell echo "\ndownload : ['pdf']" >> _bookdown.yml)
 
 %.md : %.Rmd
 	echo ".doxygen<-TRUE; source('layout/utils.R'); knitr::knit('$(basename $<).Rmd'); doxy_markdown_tweaks('$(basename $<).md')" | R --slave

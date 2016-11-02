@@ -1,5 +1,6 @@
---- 
+---
 title: "The comprehensive TMB documentation"
+documentclass: layout/krantz
 knit: "bookdown::render_book"
 bibliography: [references.bib]
 biblio-style: apalike

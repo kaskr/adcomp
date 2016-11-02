@@ -1,0 +1,21 @@
+```{.R echo=FALSE, eval=TRUE, results='hide'}
+source("layout/utils.R")
+```
+
+Model object {#ModelObject}
+============
+
+The TMB core *model object* is the object returned by `MakeADFun()`.
+A number of options can be passed to `MakeADFun` to control the
+model. The current section walks you through all the
+options. Additionally we demonstrate some of the methods that can be
+applied to a fitted model object. We shall see how to:
+
+- Fix and collect parameters using the `map` argument.
+- Switch parameters back and forth between the inner and outer optimization problem using the arguments `random` and `profile`.
+- Set options for the inner optimization problem.
+- `sdreport`ing a fitted object.
+- Bias correction if random effect estimates.
+- Likelihood profiling a fitted object.
+
+> FIXME: NOT DONE YET !

@@ -26,6 +26,12 @@ via the ordinary R help system.
 \page Tutorial
 \brief Short introduction to TMB
 
+\page ModelObject
+\brief Options and methods for the TMB model object
+
+\page Sparsity
+\brief Using model sparsity
+
 \defgroup R_style_distribution   R style probability distributions
 \brief Probability distributions (discrete and continuous) for use in the likelihood function.
 
