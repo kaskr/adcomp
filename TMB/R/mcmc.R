@@ -466,6 +466,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     j <- 0; n <- 1; s <- 1; divergent <- 0
     ## count the model calls; updated inside .buildtree.
     info <- as.environment( list(n.calls = 0) )
+    divergent <<- 0
     while(s==1) {
       v <- sample(x=c(1,-1), size=1)
       if(v==1){
@@ -483,8 +484,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
         theta.minus <- res$theta.minus
         r.minus <- res$r.minus
       }
-      ## If divergence occurs, s will be NaN
-      if(is.na(res$s) | is.nan(res$s))  {res$s <- 0}
       ## test whether to accept this state
       if(res$s==1) {
         if(runif(n=1, min=0,max=1) <= res$n/n){
@@ -495,7 +494,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       }
       n <- n+res$n
       s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
-      if(!is.finite(s))  { s <- 0; divergent <- 1}
       j <- j+1
       ## Stop doubling if too many or it's diverged enough
       if(j>max_doublings) {
@@ -529,6 +527,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup, chain)
   } ## end of MCMC loop
+  rm(divergent)
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
@@ -589,11 +588,14 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     r <- r+(eps2/2)*gr(theta)
     theta <- theta+eps2*r
     r <- r+(eps2/2)*gr(theta)
-    ## verify valid trajectory
+    ## verify valid trajectory. Divergences occur if H is NaN, or drifts
+    ## too from from true H.
     H <- .calculate.H(theta=theta, r=r, fn=fn)
     n <- log(u) <= H
     s <- log(u) < delta.max + H
-    ##  if(is.na(s) | is.nan(s)) s <- 0
+    if(!is.finite(H) | s == 0){
+     divergent <<- 1; s <- 0
+    }
     ## Acceptance ratio in log space: (Hnew-Hold)
     logalpha <- H-.calculate.H(theta=theta0, r=r0, fn=fn)
     alpha <- min(exp(logalpha),1)
@@ -614,7 +616,6 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     alpha <- xx$alpha
     nalpha <- xx$nalpha
     s <- xx$s
-    ##  if(is.na(s) | is.nan(s)) s <- 0
     nprime <- xx$n
     ## If it didn't fail, update the above quantities
     if(s==1){
