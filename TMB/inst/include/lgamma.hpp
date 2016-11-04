@@ -161,3 +161,28 @@ inline Type dzinbinom2(const Type &x, const Type &mu, const Type &var, const Typ
   Type n=mu*p/(Type(1)-p);
   return dzinbinom(x,n,p,zip,give_log);
 }
+
+/********************************************************************/
+/* SIMULATON CODE                                                   */
+/********************************************************************/
+
+extern "C" {
+  double Rf_rnbinom(double n, double p);
+}
+template<class Type>
+Type rnbinom(Type n, Type p)
+{
+  return Rf_rnbinom(asDouble(n), asDouble(p));
+}
+VECTORIZE2_tt(rnbinom)
+
+extern "C" {
+  double Rf_rnbinom_mu(double mu, double var);
+}
+template<class Type>
+Type rnbinom2(Type mu, Type var)
+{
+  Type n=mu*mu/(var-mu);
+  return Rf_rnbinom_mu(asDouble(n), asDouble(mu));
+}
+VECTORIZE2_tt(rnbinom2)
