@@ -182,8 +182,7 @@ extern "C" {
 template<class Type>
 Type rnbinom2(Type mu, Type var)
 {
-  Type p=mu/var;
-  Type n=mu*p/(Type(1)-p);
-  return Rf_rnbinom(asDouble(n), asDouble(p));
+  Type n=mu*mu/(var-mu);
+  return Rf_rnbinom_mu(asDouble(n), asDouble(mu));
 }
 VECTORIZE2_tt(rnbinom2)
