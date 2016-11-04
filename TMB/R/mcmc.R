@@ -39,10 +39,11 @@
 #' @example inst/examples/mcmc_examples.R
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NULL, ...){
+run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
+                     covar=NULL, lower=NULL, upper=NULL, ...){
   ## Initialization for all algorithms
   algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
-  fn <- function(x) {
+  fn2 <- function(x) {
     z <- -obj$fn(x)
     ## if(is.nan(z)){
     ##   warning(paste("NaN objective function at:", paste(x, collapse=" ")))
@@ -50,7 +51,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
     ## }
     return(z)
   }
-  gr <- function(x) {
+  gr2 <- function(x) {
     z <- -as.vector(obj$gr(x))
     ## if(any(is.nan(z))){
     ##   warning(paste("NaN gradient at:", paste(x, collapse=" ")))
@@ -59,6 +60,19 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
     return(z)
   }
   obj$env$beSilent()                  # silence console output
+  ## Box constraints, if provided, require the fn and gr functions to be
+  ## modified to account for differents in volume.
+  bounded <- !(is.null(lower) & is.null(upper))
+  if(bounded){
+    fn <- function(y){
+      fn2(.boundp(y, lower,upper)) + sum(log(.ndfboundp(y,lower,upper)))
+    }
+    gr <- function(y) gr2(.boundp(y, lower,upper))* .ndfboundp(y,lower,upper)
+
+  } else {
+    fn <- fn2
+    gr <- gr2
+  }
   ## argument checking
   if(is.null(params.init)){
     params.init <- obj$par
@@ -78,21 +92,31 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
                    covar=covar, chain=i, ...))
-    }
+  }
   else if(algorithm=="NUTS"){
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
-                   covar=covar, chain=i, ...))
-        }
+                    covar=covar, chain=i, ...))
+  }
   else if(algorithm=="RWM")
     time <- system.time(mcmc.out <-
-      run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
+                          run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
 
   ## Clean up returned output
   ##browser()
   samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
                     dimnames=list(NULL, NULL, c(par.names,'lp__')))
-  for(i in 1:chains) samples[,i,] <- mcmc.out[[i]]$par
+  for(i in 1:chains){
+    if(bounded){
+      temp <- mcmc.out[[i]]$par
+      temp[,-ncol(temp)] <-
+        apply(temp[,-ncol(temp)], 2, function(x) .boundp(x, lower, upper))
+      samples[,i,] <- temp
+    } else {
+      samples[,i,] <- mcmc.out[[i]]$par
+    }
+  }
+
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
   time.warmup <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.warmup)))
   time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
@@ -103,6 +127,13 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL, covar=NUL
   ## names(mcmc.out$par) <- names(obj$par)
   return(invisible(result))
 }
+
+#' The logistic transformation function for bounding parameters in MCMC
+.boundp <- function(y, a, b) a+(b-a)/(1+exp(-y))
+#' The inverse of the transformation
+.boundpin <- function(x, a, b) -log( (b-x)/(x-a) )
+#' The derivative of boundp
+.ndfboundp <- function(y, a, b) (b-a)*exp(-y)/(1+exp(-y))^2
 
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a
