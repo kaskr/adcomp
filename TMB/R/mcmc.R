@@ -65,7 +65,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
   bounded <- !(is.null(lower) & is.null(upper))
   if(bounded){
     fn <- function(y){
-      fn2(.boundp(y, lower,upper)) + sum(log(.ndfboundp(y,lower,upper)))
+      fn2(.boundp(y, lower,upper)) + sum(log(abs(.ndfboundp(y,lower,upper))))
     }
     gr <- function(y) gr2(.boundp(y, lower,upper))* .ndfboundp(y,lower,upper)
 
@@ -128,11 +128,11 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
 }
 
 #' The logistic transformation function for bounding parameters in MCMC
-.boundp <- function(y, a, b) a+(b-a)/(1+exp(-y))
+.boundp <- function(x, a, b) a+(b-a)/(1+exp(-x))
 #' The inverse of the transformation
-.boundpin <- function(x, a, b) -log( (b-x)/(x-a) )
+.boundpin <- function(y, a, b) -log( (b-y)/(y-a) )
 #' The derivative of boundp
-.ndfboundp <- function(y, a, b) (b-a)*exp(-y)/(1+exp(-y))^2
+.ndfboundp <- function(x, a, b) (b-a)*exp(x)/(1+exp(x))^2
 
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a
