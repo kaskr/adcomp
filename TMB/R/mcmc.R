@@ -464,9 +464,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     ## Draw a slice variable u
     u <- .sample.u(theta=theta.cur, r=r.cur, fn=fn2)
     j <- 0; n <- 1; s <- 1; divergent <- 0
-    ## count the model calls; updated inside .buildtree.
-    info <- as.environment( list(n.calls = 0) )
-    divergent <<- 0
+    ## Track steps and divergences; updated inside .buildtree
+    info <- as.environment(list(n.calls=0, divergent=0))
     while(s==1) {
       v <- sample(x=c(1,-1), size=1)
       if(v==1){
@@ -523,11 +522,10 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     }
     ## Save adaptation info.
     sampler_params[m,] <-
-      c(res$alpha/res$nalpha, eps, j, info$n.calls, divergent, fn2(theta.cur))
+      c(res$alpha/res$nalpha, eps, j, info$n.calls, info$divergent, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
     .print.mcmc.progress(m, nsim, warmup, chain)
   } ## end of MCMC loop
-  rm(divergent)
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
@@ -594,7 +592,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     n <- log(u) <= H
     s <- log(u) < delta.max + H
     if(!is.finite(H) | s == 0){
-     divergent <<- 1; s <- 0
+     info$divergent <- 1; s <- 0
     }
     ## Acceptance ratio in log space: (Hnew-Hold)
     logalpha <- H-.calculate.H(theta=theta0, r=r0, fn=fn)
