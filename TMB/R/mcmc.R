@@ -82,10 +82,10 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
 
   ## Make parameter names unique if vectors exist
   par.names <- names(obj$par)
-  par.names <- as.vector(c(sapply(unique(par.names), function(x){
+  par.names <- as.vector((unlist(sapply(unique(par.names), function(x){
     temp <- par.names[par.names==x]
     if(length(temp)>1) paste0(temp,'[',1:length(temp),']') else temp
-  })))
+    }))))
 
   ## Select and run the chain.
   if(algorithm=="HMC"){
@@ -103,7 +103,6 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
                           run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
 
   ## Clean up returned output
-  ##browser()
   samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
                     dimnames=list(NULL, NULL, c(par.names,'lp__')))
   for(i in 1:chains){
