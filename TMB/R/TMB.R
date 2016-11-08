@@ -175,7 +175,7 @@ MakeADFun <- function(data, parameters, map=list(),
   if(!is.list(data))
     stop("'data' must be a list")
   ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&is.numeric(x)
-  ok.data <- function(x)ok(x)|is.factor(x)|is(x,"sparseMatrix")|is.list(x)
+  ok.data <- function(x)ok(x)|is.factor(x)|is(x,"sparseMatrix")|is.list(x)|(is.character(x)&length(x)==1)
   check.passed <- function(x){
     y <- attr(x,"check.passed")
     if(is.null(y)) FALSE else y
@@ -185,7 +185,7 @@ MakeADFun <- function(data, parameters, map=list(),
       cat("Problem with these data entries:\n")
       print(which(!sapply(data,ok.data)))
       stop("Only numeric matrices, vectors, arrays, ",
-           "factors or lists ",
+           "factors, lists or length-1-characters ",
            "can be interfaced")
     }
   }
@@ -202,7 +202,13 @@ MakeADFun <- function(data, parameters, map=list(),
       if(is.list(x)) return( lapply(x, dataSanitize) )
       if(is(x,"sparseMatrix")){
         x <- as(x,"dgTMatrix")
-      } else {
+      }
+      else if (is.character(x))
+      {
+        ## Do nothing
+      }
+      else
+      {
         if(is.factor(x))x <- unclass(x)-1L ## Factors are passed as 0-based integers !!!
         storage.mode(x) <- "double"
       }

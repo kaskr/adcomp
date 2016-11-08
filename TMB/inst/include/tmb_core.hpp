@@ -335,6 +335,23 @@ getListElement(objective_function::data,#name,&isMatrix)));
 #define DATA_IARRAY(name) tmbutils::array<int> name(tmbutils::asArray<int>( \
 	getListElement(objective_function::data,#name,&isArray)));
 
+/** \brief Get string from R and declare it as std::string
+
+    Example (incomplete) of use:
+    \code
+    vector<std::string> options(2);
+    options << "apple", "orange";
+    DATA_STRING(choice);
+    if(! (choice == options).any() )
+      error( ("'" + choice + "'" + " not valid").c_str() );
+    \endcode
+
+    \ingroup macros
+*/
+#define DATA_STRING(name)                                                      \
+  std::string name =                                                           \
+      CHAR(STRING_ELT(getListElement(objective_function::data, #name), 0));
+
 /** \brief Get data list object from R and make it available in C++
 
 Example (incomplete) of use:
