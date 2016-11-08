@@ -181,7 +181,7 @@ The secondary window shows compilation and model runs, among other things."
           (DATA
            '("DATA_INTEGER" "DATA_IVECTOR" "DATA_IARRAY"
              "DATA_SCALAR"  "DATA_VECTOR"  "DATA_ARRAY"
-             "DATA_FACTOR"  "DATA_STRUCT"
+             "DATA_FACTOR"  "DATA_STRING"  "DATA_STRUCT"
              "DATA_MATRIX"  "DATA_SPARSE_MATRIX"
              "DATA_VECTOR_INDICATOR" "DATA_ARRAY_INDICATOR"))
           (BLOCK
