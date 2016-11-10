@@ -154,21 +154,43 @@ namespace tiny_ad {
 		    DF(x.value) * x.deriv);	\
   }
   using ::exp;  using ::log;
-  using ::sin;  using ::cos;
-  using ::sinh; using ::cosh;
+  using ::sin;  using ::cos;  using ::tan;
+  using ::sinh; using ::cosh; using ::tanh;
   using ::sqrt; using ::fabs;
+  template<class T> T D_tan(const T &x) {
+    T y = cos(x); return 1. / (y * y);
+  }
+  template<class T> T D_tanh(const T &x) {
+    T y = cosh(x); return 1. / (y * y);
+  }
   UNARY_MATH_DERIVATIVE(exp, exp)
   UNARY_MATH_DERIVATIVE(log, 1.0/)
   UNARY_MATH_DERIVATIVE(sin, cos)
   UNARY_MATH_DERIVATIVE(cos, -sin)
+  UNARY_MATH_DERIVATIVE(tan, D_tan)
   UNARY_MATH_DERIVATIVE(sinh, cosh)
   UNARY_MATH_DERIVATIVE(cosh, sinh)
+  UNARY_MATH_DERIVATIVE(tanh, D_tanh)
   UNARY_MATH_DERIVATIVE(sqrt, 0.5/sqrt)
   UNARY_MATH_DERIVATIVE(fabs, sign)
   using ::expm1; using ::log1p;
   UNARY_MATH_DERIVATIVE(expm1, exp)
   template<class T> T D_log1p(const T &x) {return 1. / (x + 1.);}
   UNARY_MATH_DERIVATIVE(log1p, D_log1p)
+  /* asin, acos, atan */
+  using ::asin; using ::acos; using ::atan;
+  template<class T> T D_asin(const T &x) {
+    return 1. / sqrt(1. - x * x);
+  }
+  template<class T> T D_acos(const T &x) {
+    return -1. / sqrt(1. - x * x);
+  }
+  template<class T> T D_atan(const T &x) {
+    return 1. / (1. + x * x);
+  }
+  UNARY_MATH_DERIVATIVE(asin, D_asin)
+  UNARY_MATH_DERIVATIVE(acos, D_acos)
+  UNARY_MATH_DERIVATIVE(atan, D_atan)
 #undef UNARY_MATH_DERIVATIVE
   /* A few more ... */
   template<class T, class V>
