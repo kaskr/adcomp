@@ -216,6 +216,8 @@ namespace tiny_ad {
   COMPARISON_OPERATOR_FLIP(==,==)
   COMPARISON_OPERATOR_FLIP(!=,!=)
 #undef COMPARISON_OPERATOR_FLIP
+  /* Optional: Additional methods required to tape with tiny_ad */
+  #include "plugin_cppad.hpp"
   /* Print method */
   template<class T, class V>
   std::ostream &operator<<(std::ostream &os, const ad<T, V> &x) {
