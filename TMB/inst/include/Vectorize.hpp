@@ -125,6 +125,25 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
   GVECTORIZE(FUN,V,T,V,T,T,I)			\
   GVECTORIZE(FUN,V,V,V,T,T,I)
 
+/** \brief Add the 'n' integer argument to a simulation method with
+    one argument */
+#define VECTORIZE1_n(FUN)                       \
+template<class Type>                            \
+vector<Type> FUN(int n, Type arg1) {            \
+  vector<Type> ans(n);                          \
+  for(int i=0; i<n; i++) ans(i) = FUN(arg1);    \
+  return ans;                                   \
+}
+
+/** \brief Add the 'n' integer argument to a simulation method with
+    two arguments */
+#define VECTORIZE2_n(FUN)                               \
+template<class Type>                                    \
+vector<Type> FUN(int n, Type arg1, Type arg2) {         \
+  vector<Type> ans(n);                                  \
+  for(int i=0; i<n; i++) ans(i) = FUN(arg1, arg2);      \
+  return ans;                                           \
+}
 
 using CppAD::abs;
 VECTORIZE1_t(abs)

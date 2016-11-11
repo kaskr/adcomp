@@ -547,6 +547,7 @@ Type rnorm(Type mu, Type sigma)
   return Rf_rnorm(asDouble(mu), asDouble(sigma));
 }
 VECTORIZE2_tt(rnorm)
+VECTORIZE2_n(rnorm)
 
 extern "C" {
   double Rf_rpois(double mu);
@@ -557,6 +558,7 @@ Type rpois(Type mu)
   return Rf_rpois(asDouble(mu));
 }
 VECTORIZE1_t(rpois)
+VECTORIZE1_n(rpois)
 
 extern "C" {
   double Rf_runif(double a, double b);
@@ -567,6 +569,7 @@ Type runif(Type a, Type b)
   return Rf_runif(asDouble(a), asDouble(b));
 }
 VECTORIZE2_tt(runif)
+VECTORIZE2_n(runif)
 
 extern "C" {
   double Rf_rbinom(double size, double prob);
@@ -577,6 +580,7 @@ Type rbinom(Type size, Type prob)
   return Rf_rbinom(asDouble(size), asDouble(prob));
 }
 VECTORIZE2_tt(rbinom)
+VECTORIZE2_n(rbinom)
 
 extern "C" {
   double Rf_rgamma(double shape, double scale);
@@ -587,3 +591,4 @@ Type rgamma(Type shape, Type scale)
   return Rf_rgamma(asDouble(shape), asDouble(scale));
 }
 VECTORIZE2_tt(rgamma)
+VECTORIZE2_n(rgamma)

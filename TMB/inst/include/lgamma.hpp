@@ -175,6 +175,7 @@ Type rnbinom(Type n, Type p)
   return Rf_rnbinom(asDouble(n), asDouble(p));
 }
 VECTORIZE2_tt(rnbinom)
+VECTORIZE2_n(rnbinom)
 
 extern "C" {
   double Rf_rnbinom_mu(double mu, double var);
@@ -186,3 +187,4 @@ Type rnbinom2(Type mu, Type var)
   return Rf_rnbinom_mu(asDouble(n), asDouble(mu));
 }
 VECTORIZE2_tt(rnbinom2)
+VECTORIZE2_n(rnbinom2)
