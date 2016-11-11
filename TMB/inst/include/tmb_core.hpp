@@ -610,10 +610,8 @@ public:
   }
 
   bool do_simulate;   /** \brief Flag set when in simulation mode */
-  void toggle_simulate() {
-    do_simulate = !do_simulate;
-    if(do_simulate) GetRNGstate();
-    else PutRNGstate();
+  void set_simulate(bool do_simulate_) {
+    do_simulate = do_simulate_;
   }
 
   /* data_ and parameters_ are R-lists containing R-vectors or R-matrices.
@@ -650,6 +648,14 @@ public:
     max_parallel_regions=-1;
     reversefill=false;
     do_simulate = false;
+    GetRNGstate(); /* Read random seed from R. Note: by default we do
+                      not write the seed back to R *after*
+                      simulation. This ensures that multiple tapes for
+                      one model object get the same seed. When in
+                      simulation mode (enabled when calling
+                      obj$simulate() from R) we *do* write the seed
+                      back after simulation in order to get varying
+                      replicates. */
   }
 
   /** \brief Extract theta vector from objetive function object */
@@ -1236,9 +1242,13 @@ extern "C"
       pf->parnames.resize(0); // To avoid mem leak.
       pf->reportvector.clear();
       SEXP res;
-      if(do_simulate) pf->toggle_simulate();
+      GetRNGstate();   /* Get seed from R */
+      if(do_simulate) pf->set_simulate( true );
       res = asSEXP( pf->operator()() );
-      if(do_simulate) pf->toggle_simulate();
+      if(do_simulate) {
+        pf->set_simulate( false );
+        PutRNGstate(); /* Write seed back to R */
+      }
       UNPROTECT(1);
       return res;
     }
