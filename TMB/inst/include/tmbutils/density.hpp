@@ -55,6 +55,7 @@ public:
 void simulate(vectortype &x) {                  \
   rnorm_fill(x);                                \
   x = sqrt_cov_scale(x);                        \
+  x = zero_derivatives(x);                      \
 }
 /* Add this macro to all classes with *fixed* dimension (e.g. MVNORM) */
 #define SIMULATE_IMPLEMENTED_KNOWN_SIZE(SIZE)   \
@@ -65,6 +66,16 @@ vectortype simulate() {                         \
   return x;                                     \
 }
 
+/* Utility function: The simulators should not track derivatives when
+   running with AD types. A workaround is to zero out the derivatives
+   after simulation (FIXME: there is a minor efficiency loss by
+   tracking the derivatives in the first place...). */
+template<class arraytype>
+arraytype zero_derivatives(arraytype x) {
+  for(int i=0; i<x.size(); i++)
+    x(i) = asDouble(x(i));
+  return x;
+}
 
 /* Utility function */
 template<class arraytype>
@@ -429,10 +440,12 @@ public:
   void simulate(vectortype &x) {
     rnorm_fill(x);
     x = sqrt_cov_scale(x);
+    x = zero_derivatives(x);
   }
   void simulate(arraytype &x) {
     rnorm_fill(x);
     x = sqrt_cov_scale(x);
+    x = zero_derivatives(x);
   }
 
 };
@@ -1173,6 +1186,7 @@ public:
   void simulate(arraytype &x) {
     rnorm_fill(x);
     x = sqrt_cov_scale(x);
+    x = zero_derivatives(x);
   }
 
 };
