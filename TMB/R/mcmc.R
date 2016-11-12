@@ -67,7 +67,8 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
     fn <- function(y){
       fn2(.boundp(y, lower,upper)) + sum(log(abs(.ndfboundp(y,lower,upper))))
     }
-    gr <- function(y) gr2(.boundp(y, lower,upper))* .ndfboundp(y,lower,upper)
+    gr <- function(y)
+      gr2(.boundp(y, lower,upper))* .ndfboundp(y,lower,upper) -1+2/(1+exp(y))
 
   } else {
     fn <- fn2
