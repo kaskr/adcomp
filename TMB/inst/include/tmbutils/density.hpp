@@ -428,11 +428,11 @@ public:
   /** \brief Draw a simulation from the process */
   void simulate(vectortype &x) {
     rnorm_fill(x);
-    sqrt_cov_scale(x);
+    x = sqrt_cov_scale(x);
   }
   void simulate(arraytype &x) {
     rnorm_fill(x);
-    sqrt_cov_scale(x);
+    x = sqrt_cov_scale(x);
   }
 
 };
