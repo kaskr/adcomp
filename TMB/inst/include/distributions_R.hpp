@@ -541,6 +541,7 @@ Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
 extern "C" {
   double Rf_rnorm(double mu, double sigma);
 }
+/** \brief Simulate from a normal distribution  */
 template<class Type>
 Type rnorm(Type mu, Type sigma)
 {
@@ -552,6 +553,7 @@ VECTORIZE2_n(rnorm)
 extern "C" {
   double Rf_rpois(double mu);
 }
+/** \brief Simulate from a Poisson distribution  */
 template<class Type>
 Type rpois(Type mu)
 {
@@ -563,6 +565,7 @@ VECTORIZE1_n(rpois)
 extern "C" {
   double Rf_runif(double a, double b);
 }
+/** \brief Simulate from a uniform distribution  */
 template<class Type>
 Type runif(Type a, Type b)
 {
@@ -574,6 +577,7 @@ VECTORIZE2_n(runif)
 extern "C" {
   double Rf_rbinom(double size, double prob);
 }
+/** \brief Simulate from a binomial distribution  */
 template<class Type>
 Type rbinom(Type size, Type prob)
 {
@@ -585,6 +589,7 @@ VECTORIZE2_n(rbinom)
 extern "C" {
   double Rf_rgamma(double shape, double scale);
 }
+/** \brief Simulate from a gamma distribution  */
 template<class Type>
 Type rgamma(Type shape, Type scale)
 {

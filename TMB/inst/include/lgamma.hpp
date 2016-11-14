@@ -169,6 +169,7 @@ inline Type dzinbinom2(const Type &x, const Type &mu, const Type &var, const Typ
 extern "C" {
   double Rf_rnbinom(double n, double p);
 }
+/** \brief Simulate from a negative binomial distribution  */
 template<class Type>
 Type rnbinom(Type n, Type p)
 {
@@ -180,6 +181,7 @@ VECTORIZE2_n(rnbinom)
 extern "C" {
   double Rf_rnbinom_mu(double mu, double var);
 }
+/** \brief Simulate from a negative binomial distribution  */
 template<class Type>
 Type rnbinom2(Type mu, Type var)
 {
