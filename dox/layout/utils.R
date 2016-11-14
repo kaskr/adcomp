@@ -36,6 +36,13 @@ doxylink <- function(x) {
     ans
 }
 
+## Create new source example
+create_source <- function(code, file) {
+    if(!file.exists(file)) {
+        writeLines(code, file)
+    }
+}
+
 ## Include inline source code
 include_source <- function(x, indent=0) {
     indent <- paste(rep(" ", indent), collapse="")
