@@ -64,21 +64,16 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
   ## bounded below, bounded above, or both (box constraint).
   bounded <- !(is.null(lower) & is.null(upper))
   if(bounded){
-    cases <- .bound.cases(lower, upper)
+    cases <- .transform.cases(lower, upper)
     fn <- function(y){
-      x <- sapply(1:length(y), function(i)
-        .transform(y[i], lower[i], upper[i], cases[i]))
-      scales <- sapply(1:length(y), function(i)
-        ..transform.grad(y[i], lower[i], upper[i], cases[i]))
+      x <- .transform(y, lower, upper, cases)
+      scales <- .transform.grad(y, lower, upper, cases)
       fn2(x) + sum(log(abs(scales)))
     }
     gr <- function(y){
-      x <- sapply(1:length(y), function(i)
-        .transform(y[i], lower[i], upper[i], cases[i]))
-      scales <- sapply(1:length(y), function(i)
-        .transform.grad(y[i], lower[i], upper[i], cases[i]))
-      scales2 <- sapply(1:length(y), function(i)
-        ..transform.grad2(y[i], lower[i], upper[i], cases[i]))
+      x <- .transform(y, lower, upper, cases)
+      scales <- .transform.grad(y, lower, upper, cases)
+      scales2 <- .transform.grad2(y, lower, upper, cases)
       gr2(x)*scales + scales2
     }
   } else {
@@ -139,54 +134,65 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
   return(invisible(result))
 }
 
-#' Determine the appropriate bounding case for each paramter. Returns
-#' vector of cases in 0:3.
-
-  .bound.cases <- function(lower, upper){
+.transform.cases <- function(lower, upper){
   if(length(lower) != length(upper))
     stop("Lengths of lower and upper do not match")
   if(any(is.na(c(lower, upper))) | any(is.nan(c(lower, upper))))
     stop("Bounds must be finite or -Inf/Inf -- NA and NaN not allowed")
-  if(any(lower > upper))
-    stop("Lower bound > upper bound")
-  cases <- rep(0, length(params.init))
+  if(any(lower >= upper))
+    stop("Lower bound >= upper bound")
+  cases <- rep(NA, length(params.init))
+  cases[is.finite(lower) & is.finite(upper)] <- 0
   cases[is.finite(lower) & !is.finite(upper)] <- 1
   cases[!is.finite(lower) & is.finite(upper)] <- 2
   cases[is.finite(lower) & is.finite(upper)] <- 3
-  cases
+  if(any(is.na(cases)))
+    stop("Something unexpected went wrong determining the bounding functions.
+ Check lower and upper.")
+  return(cases)
 }
 #' The transformation function for bounding parameters. The 4 cases are (0)
 #' none, (1) lower only, (2) upper only, and (3) both lower and upper
 #' (box). This function returns the bounded variable, y=f(x).
 .transform <- function(y, a, b, case){
-  if(case==0) return(y)
-  else if(case==1) return(exp(y)+a)
-  else if(case==2) return(b-exp(y))
-  else if(case==3) return(a+(b-a)/(1+exp(-y)))
-  else stop("Invalid case in .transform. Something wrong with lower and upper constraints")
-  }
+  x <- sapply(1:length(y), function(i) {
+    if(case[i]==0) return(y[i])
+    else if(case[i]==1) return(exp(y[i])+a[i])
+    else if(case[i]==2) return(b[i]-exp(y[i]))
+    else if(case[i]==3) return(a[i]+(b[i]-a[i])/(1+exp(-y[i])))
+  })
+  return(x)
+}
 #' The inverse of the transformation
 .transform.inv <- function(x, a, b, case){
-  if(case==0) return(x)
-  else if(case==1) return(log(x-a))
-  else if(case==2) return(log(b-x))
-  else if(case==3) return(-log( (b-x)/(x-a) ))
-  else stop("Invalid case in .transform.inv. Something wrong with lower and upper constraints")
+  if(any(x<a) | any(x>b)) stop("x outside limits provided -- not meaningful")
+  y <- sapply(1:length(x), function(i) {
+    if(case[i]==0) return(x[i])
+    else if(case[i]==1) return(log(x[i]-a[i]))
+    else if(case[i]==2) return(log(b[i]-x[i]))
+    else if(case[i]==3) return(-log( (b[i]-x[i])/(x[i]-a[i]) ))
+  })
+  return(y)
 }
+
 #' The absolute value of the derivative of transformation.
 .transform.grad <- function(y, a, b, case){
-  if(case==0) return(1)
-  else if(case==1) return(exp(y))
-  else if(case==2) return(exp(y))
-  else if(case==3) return( (b-a)*exp(y)/(1+exp(y))^2)
-  else stop("Invalid case in ..transform.grad. Something wrong with lower and upper constraints")
+  x <- sapply(1:length(y), function(i) {
+    if(case[i]==0) return(1)
+    else if(case[i]==1) return(exp(y[i]))
+    else if(case[i]==2) return(exp(y[i]))
+    else if(case[i]==3) return( (b[i]-a[i])*exp(y[i])/(1+exp(y[i]))^2)
+  })
+  return(x)
 }
 .transform.grad2 <- function(y, a, b, case){
-  if(case==0) return(0)
-  else if(case==1) return(1)
-  else if(case==2) return(1)
-  else if(case==3) return(-1+2/(1+exp(y)))
-  else stop("Invalid case in .transform.grad2. Something wrong with lower and upper constraints")
+  x <- sapply(1:length(y), function(i) {
+    if(case[i]==0) return(1)
+    else if(case[i]==1) return(0)
+    else if(case[i]==2) return(1)
+    else if(case[i]==3) return(-1+2/(1+exp(y[i])))
+  })
+  return(x)
 }
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a
