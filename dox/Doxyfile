@@ -814,7 +814,9 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../TMB/inst/include/Eigen ../TMB/inst/include/cppad \
+EXCLUDE                = ../TMB/inst/include/Eigen \
+                         ../TMB/inst/include/unsupported \
+                         ../TMB/inst/include/cppad \
                          layout README.md 00-BookConfig.md
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
