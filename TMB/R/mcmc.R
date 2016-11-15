@@ -40,8 +40,7 @@
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
 run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
-                     covar=NULL, lower=NULL, upper=NULL, ...){
-  ## Initialization for all algorithms
+                     covar=NULL, lower=NULL, upper=NULL, ...){## Initialization for all algorithms
   algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
   fn2 <- function(x) {
     z <- -obj$fn(x)
@@ -60,16 +59,28 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
     return(z)
   }
   obj$env$beSilent()                  # silence console output
-  ## Box constraints, if provided, require the fn and gr functions to be
-  ## modified to account for differents in volume.
+  ## Parameter constraints, if provided, require the fn and gr functions to be
+  ## modified to account for differents in volume. There are four cases: no constraints,
+  ## bounded below, bounded above, or both (box constraint).
   bounded <- !(is.null(lower) & is.null(upper))
   if(bounded){
+    cases <- .bound.cases(lower, upper)
     fn <- function(y){
-      fn2(.boundp(y, lower,upper)) + sum(log(abs(.ndfboundp(y,lower,upper))))
+      x <- sapply(1:length(y), function(i)
+        .transform(y[i], lower[i], upper[i], cases[i]))
+      scales <- sapply(1:length(y), function(i)
+        ..transform.grad(y[i], lower[i], upper[i], cases[i]))
+      fn2(x) + sum(log(abs(scales)))
     }
-    gr <- function(y)
-      gr2(.boundp(y, lower,upper))* .ndfboundp(y,lower,upper) -1+2/(1+exp(y))
-
+    gr <- function(y){
+      x <- sapply(1:length(y), function(i)
+        .transform(y[i], lower[i], upper[i], cases[i]))
+      scales <- sapply(1:length(y), function(i)
+        .transform.grad(y[i], lower[i], upper[i], cases[i]))
+      scales2 <- sapply(1:length(y), function(i)
+        ..transform.grad2(y[i], lower[i], upper[i], cases[i]))
+      gr2(x)*scales + scales2
+    }
   } else {
     fn <- fn2
     gr <- gr2
@@ -110,7 +121,7 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
     if(bounded){
       temp <- mcmc.out[[i]]$par
       temp[,-ncol(temp)] <-
-        apply(temp[,-ncol(temp)], 2, function(x) .boundp(x, lower, upper))
+        apply(temp[,-ncol(temp)], 2, function(x) .transform(x, lower, upper))
       samples[,i,] <- temp
     } else {
       samples[,i,] <- mcmc.out[[i]]$par
@@ -128,13 +139,55 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
   return(invisible(result))
 }
 
-#' The logistic transformation function for bounding parameters in MCMC
-.boundp <- function(x, a, b) a+(b-a)/(1+exp(-x))
-#' The inverse of the transformation
-.boundpin <- function(y, a, b) -log( (b-y)/(y-a) )
-#' The derivative of boundp
-.ndfboundp <- function(x, a, b) (b-a)*exp(x)/(1+exp(x))^2
+#' Determine the appropriate bounding case for each paramter. Returns
+#' vector of cases in 0:3.
 
+  .bound.cases <- function(lower, upper){
+  if(length(lower) != length(upper))
+    stop("Lengths of lower and upper do not match")
+  if(any(is.na(c(lower, upper))) | any(is.nan(c(lower, upper))))
+    stop("Bounds must be finite or -Inf/Inf -- NA and NaN not allowed")
+  if(any(lower > upper))
+    stop("Lower bound > upper bound")
+  cases <- rep(0, length(params.init))
+  cases[is.finite(lower) & !is.finite(upper)] <- 1
+  cases[!is.finite(lower) & is.finite(upper)] <- 2
+  cases[is.finite(lower) & is.finite(upper)] <- 3
+  cases
+}
+#' The transformation function for bounding parameters. The 4 cases are (0)
+#' none, (1) lower only, (2) upper only, and (3) both lower and upper
+#' (box). This function returns the bounded variable, y=f(x).
+.transform <- function(y, a, b, case){
+  if(case==0) return(y)
+  else if(case==1) return(exp(y)+a)
+  else if(case==2) return(b-exp(y))
+  else if(case==3) return(a+(b-a)/(1+exp(-y)))
+  else stop("Invalid case in .transform. Something wrong with lower and upper constraints")
+  }
+#' The inverse of the transformation
+.transform.inv <- function(x, a, b, case){
+  if(case==0) return(x)
+  else if(case==1) return(log(x-a))
+  else if(case==2) return(log(b-x))
+  else if(case==3) return(-log( (b-x)/(x-a) ))
+  else stop("Invalid case in .transform.inv. Something wrong with lower and upper constraints")
+}
+#' The absolute value of the derivative of transformation.
+.transform.grad <- function(y, a, b, case){
+  if(case==0) return(1)
+  else if(case==1) return(exp(y))
+  else if(case==2) return(exp(y))
+  else if(case==3) return( (b-a)*exp(y)/(1+exp(y))^2)
+  else stop("Invalid case in ..transform.grad. Something wrong with lower and upper constraints")
+}
+.transform.grad2 <- function(y, a, b, case){
+  if(case==0) return(0)
+  else if(case==1) return(1)
+  else if(case==2) return(1)
+  else if(case==3) return(-1+2/(1+exp(y)))
+  else stop("Invalid case in .transform.grad2. Something wrong with lower and upper constraints")
+}
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a
 #' Random Walk Metropolis (RWM) sampler.
