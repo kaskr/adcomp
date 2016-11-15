@@ -1441,20 +1441,26 @@ sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int
   Independent(xxx);
   tape2.Forward(0, xxx);
   int k=0;
+  AD<double> zero = 0.;
   for(int i = 0; i < n; i++){
     if (KEEP_COL(i)) {
       tape2.myReverse(1, v, i /*range comp*/, u /*domain*/);
       icol = &tape2.colpattern[i];
       for(int j=0; j<int(icol->size()); j++){
 	if(KEEP_ROW( icol->operator[](j), i )){
-	  rowindex[k] = icol->operator[](j);
-	  colindex[k] = i;
-	  yyy[k] = u[icol->operator[](j)];
-	  k++;
+          if(u[icol->operator[](j)] != zero) {
+            rowindex[k] = icol->operator[](j);
+            colindex[k] = i;
+            yyy[k] = u[icol->operator[](j)];
+            k++;
+          }
 	}
       }
     }
   }
+  yyy.conservativeResize(k);
+  rowindex.conservativeResize(k);
+  colindex.conservativeResize(k);
   ADFun< double >* ptape3 = new ADFun< double >;
   ptape3->Dependent(xxx,yyy);
   sphess ans(ptape3, rowindex, colindex);
