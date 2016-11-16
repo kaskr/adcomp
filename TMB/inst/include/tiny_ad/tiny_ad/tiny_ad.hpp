@@ -217,6 +217,30 @@ namespace tiny_ad {
   COMPARISON_OPERATOR_FLIP(==,==)
   COMPARISON_OPERATOR_FLIP(!=,!=)
 #undef COMPARISON_OPERATOR_FLIP
+  /* R-specific derivatives (rely on Rmath)*/
+#ifdef R_RCONFIG_H
+  extern "C" {
+    /* See 'R-API: entry points to C-code' (Writing R-extensions) */
+    double	Rf_lgammafn(double);
+    double	Rf_psigamma(double, double);
+  }
+  template<int deriv>
+  double lgamma(const double &x) {
+    return Rf_psigamma(x, deriv-1);
+  }
+  template<>
+  double lgamma<0>(const double &x) CSKIP( {return Rf_lgammafn(x);} )
+  double lgamma(const double &x) CSKIP( {return lgamma<0>(x);} )
+  template<int deriv, class T, class V>
+  ad<T, V> lgamma (const ad<T, V> &x){
+    return ad<T, V> (lgamma< deriv >(x.value),
+		     lgamma< deriv + 1 >(x.value) * x.deriv);
+  }
+  template<class T, class V>
+  ad<T, V> lgamma (const ad<T, V> &x){
+    return lgamma<0>(x);
+  }
+#endif
   /* Print method */
   template<class T, class V>
   std::ostream &operator<<(std::ostream &os, const ad<T, V> &x) {
