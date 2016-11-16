@@ -1,12 +1,12 @@
 ;;; tmb.el --- Major mode for creating statistical models with TMB
 
-;; Copyright (C) 2015 Arni Magnusson
+;; Copyright (C) 2015-2016 Arni Magnusson
 
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
 ;; URL:      http://www.hafro.is/~arnima/tmb.html
 
-(defconst tmb-mode-version "3.1" "TMB Mode version number.")
+(defconst tmb-mode-version "3.2" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -33,6 +33,7 @@
 ;; tmb-data-face                 DATA_VECTOR
 ;; tmb-parameter-face            PARAMETER
 ;; tmb-report-face               ADREPORT
+;; tmb-block-face                SIMULATE
 ;; font-lock-builtin-face        error
 ;; font-lock-comment-face        //
 ;; font-lock-constant-face       dim
@@ -71,6 +72,7 @@
 ;; (defun my-tmb-hook ()
 ;;   (setq tmb-compile-args ",'-fno-gnu-unique -O0 -Wall'")
 ;;   (setq tmb-debug-args ",'-fno-gnu-unique -g -O0'")
+;;   (set-face-attribute 'tmb-block-face     nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'tmb-data-face      nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'tmb-parameter-face nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
@@ -92,6 +94,10 @@
 
 ;;; History:
 ;;
+;; 16 Nov 2016  3.2  Added user variable `tmb-block-face'. Added keywords
+;;                   "DATA_STRING", "SIMULATE", "PARALLEL_REGION", "rnorm",
+;;                   "rpois", "rnbinom", "rnbinom2", "rgamma", and "simulate".
+;;                   Improved `tmb-template-mini' so it asks for model name.
 ;; 10 Nov 2015  3.1  Added user function `tmb-toggle-window', internal function
 ;;                   `tmb-split-window', and user variable `tmb-window-right'.
 ;; 01 Oct 2015  3.0  Added user functions `tmb-compile' and `tmb-multi-window'.
@@ -160,6 +166,10 @@
   "Non-nil places secondary window on the right, nil places it below.\n
 The secondary window shows compilation and model runs, among other things."
   :tag "Window right" :type 'boolean)
+(defface tmb-block-face '((t :inherit font-lock-keyword-face))
+  "Font Lock face to highlight TMB block macros." :tag "Block")
+(defvar tmb-block-face 'tmb-block-face
+  "Face name for TMB block macros.")
 (defface tmb-data-face '((t :inherit font-lock-type-face))
   "Font Lock face to highlight TMB data macros." :tag "Data")
 (defvar tmb-data-face 'tmb-data-face
@@ -184,13 +194,13 @@ The secondary window shows compilation and model runs, among other things."
              "DATA_FACTOR"  "DATA_STRING"  "DATA_STRUCT"
              "DATA_MATRIX"  "DATA_SPARSE_MATRIX"
              "DATA_VECTOR_INDICATOR" "DATA_ARRAY_INDICATOR"))
-          (BLOCK
-           '("SIMULATE"
-             "PARALLEL_REGION"))
           (PARAMETERS
            '("PARAMETER" "PARAMETER_VECTOR"
              "PARAMETER_ARRAY" "PARAMETER_MATRIX"))
           (REPORT '("ADREPORT" "REPORT"))
+          (BLOCK
+           '("SIMULATE"
+             "PARALLEL_REGION"))
           (FUNCTIONS
            '(;; I/O
              "cout" "endl"
@@ -210,18 +220,19 @@ The secondary window shows compilation and model runs, among other things."
              ;; Arrays, linear algebra
              "determinant" "expm" "inverse" "norm" "trace"
              ;; Distributions
-             "dnorm" "pnorm" "qnorm"
+             "dnorm" "pnorm" "qnorm" "rnorm"
              "dnorm1" "pnorm1" "qnorm1"
              "pnorm_approx" "qnorm_approx"
              "AR1" "MVNORM"
              "dt" "df"
              "dbinom" "dmultinom"
-             "dpois" "ppois" "dzipois"
-             "dnbinom" "dnbinom2" "dzinbinom" "dzinbinom2"
+             "dpois" "ppois" "rpois" "dzipois"
+             "dnbinom" "rnbinom" "dnbinom2" "rnbinom2" "dzinbinom" "dzinbinom2"
              "dbeta"
              "dexp" "pexp" "qexp"
-             "dgamma" "dlgamma" "pgamma" "qgamma"
+             "dgamma" "dlgamma" "pgamma" "qgamma" "rgamma"
              "dweibull" "pweibull" "qweibull"
+             "simulate"
              ;; Debug
              "feenableexcept"))
           (CONSTANTS
@@ -230,9 +241,9 @@ The secondary window shows compilation and model runs, among other things."
       (list
        (cons (regexp-opt TYPE 'words) font-lock-type-face)
        (cons (regexp-opt DATA 'words) 'tmb-data-face)
-       (cons (regexp-opt BLOCK 'words) 'tmb-report-face)
        (cons (regexp-opt PARAMETERS 'words) 'tmb-parameter-face)
        (cons (regexp-opt REPORT 'words) 'tmb-report-face)
+       (cons (regexp-opt BLOCK 'words) 'tmb-block-face)
        (cons (regexp-opt FUNCTIONS 'words) font-lock-keyword-face)
        (cons (regexp-opt CONSTANTS 'words) font-lock-constant-face)
        (cons (regexp-opt WARNINGS 'words) font-lock-warning-face)))))
@@ -396,11 +407,13 @@ visible."
   "Show R interactive buffer." (interactive)
   (if (null (get-buffer "*R*"))(error "*R* interactive buffer not found")
     (tmb-split-window)(ess-show-buffer "*R*")))
-(defun tmb-template-mini ()
-  "Create minimal TMB files (mini.cpp, mini.R) in current directory.\n
+(defun tmb-template-mini (model)
+  "Create minimal TMB files (*.cpp, *.R) in current directory.\n
 The user variable `tmb-compile-args' is passed to the compile() function."
-  (interactive)(delete-other-windows)(find-file "mini.cpp")
-  (delete-region (point-min)(point-max))(insert "\
+  (interactive (list (read-string "Model (default mini): " nil nil "mini")))
+  (let ((model-cpp (concat model ".cpp"))(model-r (concat model ".R")))
+    (delete-other-windows)(find-file model-cpp)
+    (delete-region (point-min)(point-max))(insert "\
 #include <TMB.hpp>
 
 template<class Type>
@@ -416,16 +429,16 @@ Type objective_function<Type>::operator() ()
   return f;
 }
 ")
-  (goto-char (point-min))(write-file "mini.cpp" t)
-  (save-selected-window
-    (tmb-split-window)(find-file-other-window "mini.R")
-    (delete-region (point-min)(point-max))(insert "\
+    (goto-char (point-min))(write-file model-cpp t)
+    (save-selected-window
+      (tmb-split-window)(find-file-other-window model-r)
+      (delete-region (point-min)(point-max))(insert "\
 data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
 require(TMB)
-compile('mini.cpp'" tmb-compile-args ")
-dyn.load(dynlib('mini'))
+compile('" model-cpp "'" tmb-compile-args ")
+dyn.load(dynlib('" model "'))
 
 ################################################################################
 
@@ -435,7 +448,7 @@ rep <- sdreport(model)
 
 print(rep)
 ")
-    (goto-char (point-min))(write-file "mini.R" t))
+      (goto-char (point-min))(write-file model-r t)))
   (message (concat "Ready to compile R script ("
                    (substitute-command-keys "\\<tmb-mode-map>\\[tmb-compile]")
                    ") or edit code.")))
