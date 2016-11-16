@@ -106,8 +106,9 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
                     covar=covar, chain=i, ...))
   }
   else if(algorithm=="RWM")
-    time <- system.time(mcmc.out <-
-                          run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar , ...))
+    mcmc.out <- lapply(1:chains, function(i)
+      run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar,
+                   ...))
 
   ## Clean up returned output
   samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
@@ -116,7 +117,8 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
     if(bounded){
       temp <- mcmc.out[[i]]$par
       temp[,-ncol(temp)] <-
-        apply(temp[,-ncol(temp)], 2, function(x) .transform(x, lower, upper))
+        apply(temp[,-ncol(temp)], 1, function(x)
+          .transform(x, lower, upper, cases))
       samples[,i,] <- temp
     } else {
       samples[,i,] <- mcmc.out[[i]]$par
@@ -128,7 +130,8 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
   time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
   result <- list(samples=samples, sampler_params=sampler_params,
                  time.warmup=time.warmup, time.total=time.total,
-                 algorithm=algorithm, warmup=mcmc.out[[1]]$warmup)
+                 algorithm=algorithm, warmup=mcmc.out[[1]]$warmup,
+                 model=obj$env$DLL)
   ## mcmc.out$par <- as.data.frame(mcmc.out$par)
   ## names(mcmc.out$par) <- names(obj$par)
   return(invisible(result))
@@ -223,11 +226,11 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
 #' which proposals were accepted ('accepted'), and the total function calls
 #' ('n.calls'), which for this algorithm is \code{nsim}
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.hmc}}
-run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=FALSE){
-  accepted <- rep(0, length=nsim)
+run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, chain=1,
+                         warmup=floor(nsim/2), covar=NULL){
+  lp <- accepted <- rep(0, length=nsim)
   n.params <- length(params.init)
   theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
-  if(diagnostic) theta.proposed <- theta.out
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space.
@@ -241,11 +244,13 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
     theta.cur <- params.init
   }
   fn.cur <- fn2(theta.cur)
+  time.start <- Sys.time()
+  message('')
+  message(paste('Starting RWM at', time.start))
   for(m in 1:nsim){
     ## generate proposal
     theta.new <- theta.cur + alpha*rnorm(n=n.params, mean=0, sd=1)
     fn.new <- fn2(theta.new)
-    if(diagnostic) theta.proposed[m,] <- theta.new
     if(log(runif(1))< fn.new-fn.cur){
       ## accept
       accepted[m] <- 1
@@ -255,20 +260,21 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, covar=NULL, diagnostic=
       ## do not accept
       theta.out[m,] <- theta.cur
     }
-  } # end of MCMC loop
+    lp[m] <- fn.cur
+    if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
+    .print.mcmc.progress(m, nsim, warmup, chain)
+  } ## end of MCMC loop
+
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
-    if(diagnostic)
-      theta.proposed <- t(apply(theta.proposed, 1, function(x) chd %*% x))
   }
-  message(paste("Acceptance rate = ", round(mean(accepted),1)))
-  if(diagnostic){
-    theta.out <- list(par=theta.out, accepted=accepted,
-                      acceptance=mean(accepted), n.calls=nsim,
-                      par.proposed=theta.proposed)
-  }
-  return(theta.out)
+  theta.out <- cbind(theta.out, lp)
+  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(accepted[-(1:warmup)]))))
+  time.total <- difftime(Sys.time(), time.start, units='secs')
+  .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
+  return(list(par=theta.out, sampler_params=NULL,
+              time.total=time.total, time.warmup=time.warmup, warmup=warmup))
 }
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a static
@@ -420,14 +426,14 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
   if(sum(divergence[-(1:warmup)])>0)
     message(paste0("There were ", sum(divergence[-(1:warmup)]),
                    " divergent transitions after warmup"))
-  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(accepted)),
+  message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(accepted[-(1:warmup)])),
                  " and target is ", adapt_delta))
   if(useDA) message(paste0("Final step size=", round(epsbar[warmup], 3),
                            "; after ", warmup, " warmup iterations"))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
   return(list(par=theta.out, sampler_params=sampler_params,
-              time.total=time.total, time.warmup=time.warmup))
+              time.total=time.total, time.warmup=time.warmup, warmup=warmup))
 }
 
 
