@@ -80,6 +80,29 @@ inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
 }
 VECTORIZE4_ttti(dnbinom2)
 
+/** \brief Negative binomial probability function.
+
+    More robust parameterization through \f$log(\mu)\f$ and
+    \f$log(\sigma^2-\mu)\f$ parameters.
+
+    \ingroup R_style_distribution
+*/
+template<class Type>
+inline Type dnbinom_robust(const Type &x,
+                           const Type &log_mu,
+                           const Type &log_var_minus_mu,
+                           int give_log=0)
+{
+  CppAD::vector<Type> tx(4);
+  tx[0] = x;
+  tx[1] = log_mu;
+  tx[2] = log_var_minus_mu;
+  tx[3] = 0;
+  Type ans = atomic::log_dnbinom_robust(tx)[0];
+  return ( give_log ? ans : exp(ans) );
+}
+VECTORIZE4_ttti(dnbinom_robust)
+
 /** \brief Poisson probability function. 
   \ingroup R_style_distribution
 */

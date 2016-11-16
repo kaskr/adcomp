@@ -64,6 +64,14 @@ TMB_BIND_ATOMIC(log_dtweedie,
 		tweedie_utils::dtweedie(x[0], x[1], x[2], x[3], true) )
 
 /********************************************************************
+ * Adding 'dnbinom'
+ ********************************************************************/
+#include "robust/distributions.hpp"
+TMB_BIND_ATOMIC(log_dnbinom_robust,
+                011,
+                robust_utils::dnbinom_robust(x[0], x[1], x[2], true) )
+
+/********************************************************************
  * Adding 'qbeta'
  ********************************************************************/
 extern "C" double Rf_qbeta(double, double, double, int, int);
