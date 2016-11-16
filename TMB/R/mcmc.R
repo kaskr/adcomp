@@ -144,8 +144,8 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
     stop("Bounds must be finite or -Inf/Inf -- NA and NaN not allowed")
   if(any(lower >= upper))
     stop("Lower bound >= upper bound")
-  cases <- rep(NA, length(params.init))
-  cases[is.finite(lower) & is.finite(upper)] <- 0
+  cases <- rep(NA, length(lower))
+  cases[!is.finite(lower) & !is.finite(upper)] <- 0
   cases[is.finite(lower) & !is.finite(upper)] <- 1
   cases[!is.finite(lower) & is.finite(upper)] <- 2
   cases[is.finite(lower) & is.finite(upper)] <- 3
@@ -157,23 +157,23 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
 #' The transformation function for bounding parameters. The 4 cases are (0)
 #' none, (1) lower only, (2) upper only, and (3) both lower and upper
 #' (box). This function returns the bounded variable, y=f(x).
-.transform <- function(y, a, b, case){
+.transform <- function(y, a, b, cases){
   x <- sapply(1:length(y), function(i) {
-    if(case[i]==0) return(y[i])
-    else if(case[i]==1) return(exp(y[i])+a[i])
-    else if(case[i]==2) return(b[i]-exp(y[i]))
-    else if(case[i]==3) return(a[i]+(b[i]-a[i])/(1+exp(-y[i])))
+    if(cases[i]==0) return(y[i])
+    else if(cases[i]==1) return(exp(y[i])+a[i])
+    else if(cases[i]==2) return(b[i]-exp(y[i]))
+    else if(cases[i]==3) return(a[i]+(b[i]-a[i])/(1+exp(-y[i])))
   })
   return(x)
 }
 #' The inverse of the transformation
-.transform.inv <- function(x, a, b, case){
+.transform.inv <- function(x, a, b, cases){
   if(any(x<a) | any(x>b)) stop("x outside limits provided -- not meaningful")
   y <- sapply(1:length(x), function(i) {
-    if(case[i]==0) return(x[i])
-    else if(case[i]==1) return(log(x[i]-a[i]))
-    else if(case[i]==2) return(log(b[i]-x[i]))
-    else if(case[i]==3) return(-log( (b[i]-x[i])/(x[i]-a[i]) ))
+    if(cases[i]==0) return(x[i])
+    else if(cases[i]==1) return(log(x[i]-a[i]))
+    else if(cases[i]==2) return(log(b[i]-x[i]))
+    else if(cases[i]==3) return(-log( (b[i]-x[i])/(x[i]-a[i]) ))
   })
   return(y)
 }
@@ -190,8 +190,8 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
 }
 .transform.grad2 <- function(y, a, b, case){
   x <- sapply(1:length(y), function(i) {
-    if(case[i]==0) return(1)
-    else if(case[i]==1) return(0)
+    if(case[i]==0) return(0)
+    else if(case[i]==1) return(1)
     else if(case[i]==2) return(1)
     else if(case[i]==3) return(-1+2/(1+exp(y[i])))
   })
