@@ -8,6 +8,7 @@
 #ifndef R_RCONFIG_H
 #include <cmath>
 #include <iostream>
+#define CSKIP(x) x
 #endif
 
 /* Select the vector class to use (Default: tiny_vec) */
