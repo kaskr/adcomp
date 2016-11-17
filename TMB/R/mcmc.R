@@ -39,52 +39,38 @@
 #' @example inst/examples/mcmc_examples.R
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
-                     covar=NULL, lower=NULL, upper=NULL, ...){## Initialization for all algorithms
+run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
+                     covar=NULL, lower=NULL, upper=NULL, ...){
+  ## Argument checking
+  if(is.null(params.init)){
+    params.init <- obj$par
+  } else if(length(params.init) != length(obj$par)){
+    stop("params.init is wrong length")
+  }
   algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
-  fn2 <- function(x) {
-    z <- -obj$fn(x)
-    ## if(is.nan(z)){
-    ##   warning(paste("NaN objective function at:", paste(x, collapse=" ")))
-    ##      z <- Inf
-    ## }
-    return(z)
-  }
-  gr2 <- function(x) {
-    z <- -as.vector(obj$gr(x))
-    ## if(any(is.nan(z))){
-    ##   warning(paste("NaN gradient at:", paste(x, collapse=" ")))
-    ##      z <- rep(0, length(x))
-    ##    }
-    return(z)
-  }
   obj$env$beSilent()                  # silence console output
-  ## Parameter constraints, if provided, require the fn and gr functions to be
-  ## modified to account for differents in volume. There are four cases: no constraints,
-  ## bounded below, bounded above, or both (box constraint).
+
+  ## Parameter constraints, if provided, require the fn and gr functions to
+  ## be modified to account for differents in volume. There are four cases:
+  ## no constraints, bounded below, bounded above, or both (box
+  ## constraint).
   bounded <- !(is.null(lower) & is.null(upper))
   if(bounded){
     cases <- .transform.cases(lower, upper)
     fn <- function(y){
       x <- .transform(y, lower, upper, cases)
       scales <- .transform.grad(y, lower, upper, cases)
-      fn2(x) + sum(log(abs(scales)))
+      -obj$fn(x) + sum(log(abs(scales)))
     }
     gr <- function(y){
       x <- .transform(y, lower, upper, cases)
       scales <- .transform.grad(y, lower, upper, cases)
       scales2 <- .transform.grad2(y, lower, upper, cases)
-      gr2(x)*scales + scales2
+      -as.vector(obj$gr(x))*scales + scales2
     }
   } else {
-    fn <- fn2
-    gr <- gr2
-  }
-  ## argument checking
-  if(is.null(params.init)){
-    params.init <- obj$par
-  } else if(length(params.init) != length(obj$par)){
-    stop("params.init is wrong length")
+    fn <- function(x) -obj$fn(x)
+    gr <- function(x) -as.vector(obj$gr(x))
   }
 
   ## Make parameter names unique if vectors exist
@@ -99,13 +85,11 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
                    covar=covar, chain=i, ...))
-  }
-  else if(algorithm=="NUTS"){
+  } else if(algorithm=="NUTS"){
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
                     covar=covar, chain=i, ...))
-  }
-  else if(algorithm=="RWM")
+  } else if(algorithm=="RWM")
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar,
                    ...))
@@ -115,9 +99,10 @@ run_mcmc <- function(obj, nsim, algorithm, chains=1, params.init=NULL,
                     dimnames=list(NULL, NULL, c(par.names,'lp__')))
   for(i in 1:chains){
     if(bounded){
+      browser()
       temp <- mcmc.out[[i]]$par
       temp[,-ncol(temp)] <-
-        apply(temp[,-ncol(temp)], 1, function(x)
+        apply(temp[,-ncol(temp)], 2, function(x)
           .transform(x, lower, upper, cases))
       samples[,i,] <- temp
     } else {
