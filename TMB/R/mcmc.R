@@ -129,7 +129,18 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
   if(algorithm=="NUTS") result$max_treedepth <- mcmc.out[[1]]$max_treedepth
   return(invisible(result))
 }
-
+#' Determine which transformation is to be used for each parameter.
+#'
+#' @details The 4 cases are (0) none, (1) lower only [a,Inf], (2) upper
+#'   only [-Inf, b], and (3) both lower and upper [a,b]. Each case requires
+#'   a different set of transformation functions.
+#' @param lower Vector of lower bounds, potentially -infinity for some
+#' @param upper Vector of upper bounds, potentially infinity for some
+#' @return Vector of cases, in 0:3, to be used in all other transformation
+#'   functions. Error checking is only done here, not in other functions.
+#' @seealso \code{\link{.transform}}, \code{\link{.transform.inv}},
+#'   \code{\link{.transform.grad}}, \code{\link{.transform.grad2}}
+#'
 .transform.cases <- function(lower, upper){
   if(length(lower) != length(upper))
     stop("Lengths of lower and upper do not match")
@@ -147,9 +158,8 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
  Check lower and upper.")
   return(cases)
 }
-#' The transformation function for bounding parameters. The 4 cases are (0)
-#' none, (1) lower only, (2) upper only, and (3) both lower and upper
-#' (box). This function returns the bounded variable, y=f(x).
+#' This function returns the transformed variable, x=f(y).
+#'
 .transform <- function(y, a, b, cases){
   x <- sapply(1:length(y), function(i) {
     if(cases[i]==0) return(y[i])
@@ -159,7 +169,8 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
   })
   return(x)
 }
-#' The inverse of the transformation
+#' The inverse of the transformation, y=f-1(x).
+#'
 .transform.inv <- function(x, a, b, cases){
   if(any(x<a) | any(x>b)) stop("x outside limits provided -- not meaningful")
   y <- sapply(1:length(x), function(i) {
@@ -172,6 +183,7 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
 }
 
 #' The absolute value of the derivative of transformation.
+#'
 .transform.grad <- function(y, a, b, case){
   x <- sapply(1:length(y), function(i) {
     if(case[i]==0) return(1)
@@ -181,6 +193,9 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
   })
   return(x)
 }
+#' The derivative of the log of the derivative of the transformation. I.e.,
+#' d/dy[log(.transform.grad(y,a,b))].
+#'
 .transform.grad2 <- function(y, a, b, case){
   x <- sapply(1:length(y), function(i) {
     if(case[i]==0) return(0)
