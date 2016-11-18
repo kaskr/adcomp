@@ -190,6 +190,29 @@ Type dbinom(Type k, Type size, Type prob, int give_log=0)
 // Vectorize dbinom
 VECTORIZE4_ttti(dbinom)
 
+/** \brief Density of binomial distribution parameterized via logit(prob)
+
+    This version should be preferred when working on the logit scale
+    as it is numerically stable for probabilities close to 0 or 1.
+
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type dbinom_robust(Type k, Type size, Type logit_p, int give_log=0)
+{
+  CppAD::vector<Type> tx(4);
+  tx[0] = k;
+  tx[1] = size;
+  tx[2] = logit_p;
+  tx[3] = 0;
+  Type ans = atomic::log_dbinom_robust(tx)[0]; /* without norm. constant */
+  if (size > 1) {
+    ans += lgamma(size+1.) - lgamma(k+1.) - lgamma(size-k+1.);
+  }
+  return ( give_log ? ans : exp(ans) );
+}
+VECTORIZE4_ttti(dbinom_robust)
+
 /**	\brief Probability density function of the beta distribution.
 	\ingroup R_style_distribution
 	\param shape1 First shape parameter. Must be strictly positive.

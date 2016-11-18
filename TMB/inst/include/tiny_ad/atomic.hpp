@@ -71,6 +71,10 @@ TMB_BIND_ATOMIC(log_dnbinom_robust,
                 011,
                 robust_utils::dnbinom_robust(x[0], x[1], x[2], true) )
 
+TMB_BIND_ATOMIC(log_dbinom_robust,
+                001,
+                robust_utils::dbinom_robust(x[0], x[1], x[2], true) )
+
 /********************************************************************
  * Adding 'qbeta'
  ********************************************************************/
