@@ -13,7 +13,7 @@
 #' @title MCMC sampling of TMB models
 #' @author Cole Monnahan
 #' @param obj A TMB model object.
-#' @param nsim The number of (dependent) samples to draw.
+#' @param iter The number of (dependent) samples to draw.
 #' @param init A list of lists containing the initial parameter vectors,
 #'   one for each chain. It is strongly recommended to initialize multiple
 #'   chains from dispersed points. The default of NULL signifies to use the
@@ -44,7 +44,7 @@
 #' @example inst/examples/mcmc_examples.R
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
+run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
                      covar=NULL, lower=NULL, upper=NULL, thin=1, ...){
   ## Argument checking
   if(is.null(init)){
@@ -58,7 +58,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
   thin <- floor(thin)
   stopifnot(thin >=1)
   stopifnot(chains >= 1)
-  if(nsim < 10 | !is.numeric(nsim)) stop("nsim must be > 10")
+  if(iter < 10 | !is.numeric(iter)) stop("iter must be > 10")
   obj$env$beSilent()                  # silence console output
 
   ## Parameter constraints, if provided, require the fn and gr functions to
@@ -94,15 +94,15 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
   ## Select and run the chain.
   if(algorithm=="HMC"){
     mcmc.out <- lapply(1:chains, function(i)
-      run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, init=init[[i]],
+      run_mcmc.hmc(iter=iter, fn=fn, gr=gr, init=init[[i]],
                    covar=covar, chain=i, thin=thin, ...))
   } else if(algorithm=="NUTS"){
     mcmc.out <- lapply(1:chains, function(i)
-      run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, init=init[[i]],
+      run_mcmc.nuts(iter=iter, fn=fn, gr=gr, init=init[[i]],
                     covar=covar, chain=i, thin=thin, ...))
   } else if(algorithm=="RWM")
     mcmc.out <- lapply(1:chains, function(i)
-      run_mcmc.rwm(nsim=nsim, fn=fn, init=init[[i]], covar=covar,
+      run_mcmc.rwm(iter=iter, fn=fn, init=init[[i]], covar=covar,
                   thin=thin, ...))
 
   ## Clean up returned output
@@ -127,7 +127,6 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
                  algorithm=algorithm, warmup=mcmc.out[[1]]$warmup,
                  model=obj$env$DLL)
   if(algorithm=="NUTS") result$max_treedepth <- mcmc.out[[1]]$max_treedepth
-
   return(invisible(result))
 }
 
@@ -195,7 +194,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a
 #' Random Walk Metropolis (RWM) sampler.
 #'
-#' @param nsim The number of samples to return.
+#' @param iter The number of samples to return.
 #' @param fn A function that returns the log of the posterior density.
 #' @param init A vector of initial parameter values.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
@@ -215,16 +214,16 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
 #' Xnew=Xcur+alpha*Xproposed where Xproposed is generated from a mean-zero
 #' multivariate normal. Varying \code{alpha} varies the acceptance rate.
 #' @return If \code{diagnostic} is FALSE (default), returns a matrix of
-#' \code{nsim} samples from the posterior. Otherwise returns a list
+#' \code{iter} samples from the posterior. Otherwise returns a list
 #' containing samples ('par'), proposed samples ('par.proposed'), vector of
 #' which proposals were accepted ('accepted'), and the total function calls
-#' ('n.calls'), which for this algorithm is \code{nsim}
+#' ('n.calls'), which for this algorithm is \code{iter}
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.hmc}}
-run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
-                         warmup=floor(nsim/2), covar=NULL, thin=1){
-  lp <- accepted <- rep(0, length=nsim)
+run_mcmc.rwm <- function(iter, fn, init, alpha=1, chain=1,
+                         warmup=floor(iter/2), covar=NULL, thin=1){
+  lp <- accepted <- rep(0, length=iter)
   n.params <- length(init)
-  theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
+  theta.out <- matrix(NA, nrow=iter, ncol=n.params)
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space.
@@ -241,7 +240,7 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
   time.start <- Sys.time()
   message('')
   message(paste('Starting RWM at', time.start))
-  for(m in 1:nsim){
+  for(m in 1:iter){
     ## generate proposal
     theta.new <- theta.cur + alpha*rnorm(n=n.params, mean=0, sd=1)
     fn.new <- fn2(theta.new)
@@ -256,7 +255,7 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
     }
     lp[m] <- fn.cur
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
-    .print.mcmc.progress(m, nsim, warmup, chain)
+    .print.mcmc.progress(m, iter, warmup, chain)
   } ## end of MCMC loop
 
   ## Back transform parameters if covar is used
@@ -277,7 +276,7 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
 #' @details This function implements algorithm 5 of Hoffman and Gelman
 #'   (2014), which includes adaptive step sizes (\code{eps}) via an
 #'   algorithm called dual averaging.
-#' @param nsim The number of samples to return.
+#' @param iter The number of samples to return.
 #' @param L The number of leapfrog steps to take. The NUTS algorithm does
 #'   not require this as an input. If \code{L=1} this function will perform
 #'   Langevin sampling. In some contexts \code{L} can roughly be thought of
@@ -287,7 +286,7 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
 #'   sampler_params of \code{eps} using the dual averaging algorithm during
 #'   the first \code{warmup} steps.
 #' @param warmup How many iterations to use for a warmup, in which the step
-#'   size will be adapted. The default is \code{warmup=nsim/2}.
+#'   size will be adapted. The default is \code{warmup=iter/2}.
 #' @param adapt_delta The target acceptance rate if using apative
 #'   \code{eps}. Defaults to 0.8.
 #' @param fn A function that returns the log of the posterior density.
@@ -315,9 +314,10 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
 #' @return A list containing samples ('par') and algorithm details such as
 #'   step size adaptation and acceptance probabilities per iteration
 #'   ('sampler_params').
-run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
-                         adapt_delta=0.8, warmup=floor(nsim/2),
+run_mcmc.hmc <- function(iter, fn, gr, init, L, eps=NULL, covar=NULL,
+                         adapt_delta=0.8, warmup=floor(iter/2),
                          chain=1,thin=1){
+  warning("NUTS should be prefered to sHMC except in rare, specific cases")
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -331,9 +331,9 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
     fn2 <- fn; gr2 <- gr
     theta.cur <- init
   }
-  accepted <- divergence <- lp <- rep(NA, nsim)
-  theta.out <- matrix(NA, nrow=nsim, ncol=length(init))
-  sampler_params <- matrix(numeric(0), nrow=nsim, ncol=4, # holds DA info by iteration
+  accepted <- divergence <- lp <- rep(NA, iter)
+  theta.out <- matrix(NA, nrow=iter, ncol=length(init))
+  sampler_params <- matrix(numeric(0), nrow=iter, ncol=4, # holds DA info by iteration
                        dimnames=list(NULL, c("accept_stat__",
                                                 "stepsize__", "int_time__", "energy__")))
   ## A NULL value for eps signifies to use the dual averaging algorithm
@@ -353,7 +353,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
   time.start <- Sys.time()
   message('')
   message(paste('Starting static HMC at', time.start))
-  for(m in 1:nsim){
+  for(m in 1:iter){
     ## Jitter step size to mitigate potential negative autocorrelations,
     ## only once fixed though
     if(useDA & m > warmup) eps <- eps*runif(1,.9,1.1)
@@ -412,7 +412,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
     ## Save adaptation info.
     sampler_params[m,] <- c(min(1,exp(logalpha)), eps, eps*L, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
-    .print.mcmc.progress(m, nsim, warmup, chain)
+    .print.mcmc.progress(m, iter, warmup, chain)
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
@@ -443,14 +443,14 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
 #'   algorithm called dual averaging. In theory neither the step length nor
 #'   step size needs to be input by the user to obtain efficient sampling
 #'   from the posterior.
-#' @param nsim The number of samples to return.
+#' @param iter The number of samples to return.
 #' @param eps The length of the leapfrog steps. If a numeric value is
 #'   passed, it will be used throughout the entire chain. A \code{NULL}
 #'   value will initiate adaptation of \code{eps} using the dual averaging
 #'   algorithm during the first \code{warmup} steps.
 #' @param warmup An optional argument for how many iterations to adapt
 #'   \code{eps} in the dual averaging algorithm. A value of \code{NULL}
-#'   results in a default of \code{warmup=nsim/2}.
+#'   results in a default of \code{warmup=iter/2}.
 #' @param adapt_delta The target acceptance rate for the dual averaging
 #'   algorithm. Defaults to 80\%. NUTS does not include an accept/reject
 #'   Metropolis step, so this rate can be understood as the
@@ -481,8 +481,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
 #'   ('sampler_params').
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=10,
-                          eps=NULL, warmup=floor(nsim/2),
+run_mcmc.nuts <- function(iter, fn, gr, init, max_treedepth=10,
+                          eps=NULL, warmup=floor(iter/2),
                           adapt_delta=0.8, covar=NULL, chain=1, thin=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
@@ -497,12 +497,12 @@ run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=10,
     fn2 <- fn; gr2 <- gr
     theta.cur <- init
   }
-  sampler_params <- matrix(numeric(0), nrow=nsim, ncol=6,
+  sampler_params <- matrix(numeric(0), nrow=iter, ncol=6,
       dimnames=list(NULL, c("accept_stat__", "stepsize__", "treedepth__",
                             "n_leapfrog__", "divergent__", "energy__")))
-  theta.out <- matrix(NA, nrow=nsim, ncol=length(theta.cur))
+  theta.out <- matrix(NA, nrow=iter, ncol=length(theta.cur))
   ## how many steps were taken at each iteration, useful for tuning
-  j.results <- lp <- rep(NA, len=nsim)
+  j.results <- lp <- rep(NA, len=iter)
   useDA <- is.null(eps)               # whether to use DA algorithm
   if(useDA){
     epsvec <- Hbar <- epsbar <- rep(NA, length=warmup+1)
@@ -518,7 +518,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=10,
   time.start <- Sys.time()
   message('')
   message(paste('Starting NUTS at', time.start))
-  for(m in 1:nsim){
+  for(m in 1:iter){
     ## Initialize this iteration from previous in case divergence at first
     ## treebuilding. If successful trajectory they are overwritten
     theta.out[m,] <- theta.minus <- theta.plus <- theta0 <- theta.cur
@@ -587,7 +587,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=10,
     sampler_params[m,] <-
       c(res$alpha/res$nalpha, eps, j, info$n.calls, info$divergent, fn2(theta.cur))
     if(m==warmup) time.warmup <- difftime(Sys.time(), time.start, units='secs')
-    .print.mcmc.progress(m, nsim, warmup, chain)
+    .print.mcmc.progress(m, iter, warmup, chain)
   } ## end of MCMC loop
   ## Back transform parameters if covar is used
   if(!is.null(covar)) {
@@ -775,20 +775,20 @@ run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=10,
 #' Print MCMC progress to console.
 #'
 #' @param iteration The iteration of the MCMC chain.
-#' @param nsim The total iterations.
+#' @param iter The total iterations.
 #' @param warmup The number of warmup iterations.
 #' @param chain The chain being run (bookkeeping only).
 #' @return Nothing. Prints to message to console.
 #'
 #' @details This function was modeled after the functionality provided by
 # the R package \link{rstan}.
-.print.mcmc.progress <- function(iteration, nsim, warmup, chain){
+.print.mcmc.progress <- function(iteration, iter, warmup, chain){
   i <- iteration
-  refresh <- max(10, floor(nsim/10))
-  if(i==1 | i==nsim | i %% refresh ==0){
-    i.width <- formatC(i, width=nchar(nsim))
-    out <- paste0('Chain ',chain,', Iteration: ', i.width , "/", nsim, " [",
-                  formatC(floor(100*(i/nsim)), width=3), "%]",
+  refresh <- max(10, floor(iter/10))
+  if(i==1 | i==iter | i %% refresh ==0){
+    i.width <- formatC(i, width=nchar(iter))
+    out <- paste0('Chain ',chain,', Iteration: ', i.width , "/", iter, " [",
+                  formatC(floor(100*(i/iter)), width=3), "%]",
                   ifelse(i <= warmup, " (Warmup)", " (Sampling)"))
     message(out)
   }
