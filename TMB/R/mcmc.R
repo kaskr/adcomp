@@ -823,3 +823,31 @@ run_mcmc.nuts <- function(iter, fn, gr, init, max_treedepth=10,
   message(paste0(x, sprintf("%.1f", time.total), ' seconds (Total)'))
 }
 
+#' Convert TMB output from \link{\code{run_mcmc}} into a \code{shinystan}
+#' object.
+#'
+#' @details The shinystan packages provides several conversion functions
+#'   for objects of different types, such as stanfit classes (Stan ouput)
+#'   and simple arrays. For the latter, option NUTS information, such as
+#'   \code{sampler_params} can be passed. This function essentially extends
+#'   the functionality of \code{as.shinystan} to work specifically with TMB
+#'   MCMC lists. The user can thus explore their TMB model with
+#'   \code{launch_shinystan(as.shinystan.tmb(tmb.fit))} in the same way
+#'   that Stan models are examined.
+#' @param tmb.fit Output list from \link{\code{run_mcmc}} for any of the
+#' three algorithms.
+#' @return An S4 object of class shinystan. Depending on the algorithm
+#'   used, this list will have slight differences.
+as.shinystan.tmb <- function(tmb.fit){
+  if(tmb.fit$algorithm=="NUTS"){
+    sso <- with(tmb.fit, as.shinystan(samples, burnin=warmup, max_treedepth=max_treedepth,
+             sampler_params=sampler_params, algorithm='NUTS', model_name=model))
+  } else if(tmb.fit$algorithm=="HMC"){
+    sso <- with(tmb.fit, as.shinystan(samples, burnin=warmup,
+             sampler_params=sampler_params, algorithm='HMC', model_name=model))
+  } else {
+    sso <- with(tmb.fit, as.shinystan(samples, burnin=warmup,
+             algorithm='RWM', model_name=model))
+  }
+  return(sso)
+}
