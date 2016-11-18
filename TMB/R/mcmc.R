@@ -14,9 +14,11 @@
 #' @author Cole Monnahan
 #' @param obj A TMB model object.
 #' @param nsim The number of (dependent) samples to draw.
-#' @param params.init The initial parameter vector. The default of NULL
-#'   signifies to use the starting values present in the model (i.e.,
-#'   \code{obj$par}).
+#' @param init A list of lists containing the initial parameter vectors,
+#'   one for each chain. It is strongly recommended to initialize multiple
+#'   chains from dispersed points. The default of NULL signifies to use the
+#'   starting values present in the model (i.e., \code{obj$par}), but this
+#'   will apply to all chains.
 #' @param covar An optional covariance matrix which can be used to improve
 #'   the efficiency of sampling. The lower Cholesky decomposition of this
 #'   matrix is used to transform the parameter space. If the posterior is
@@ -39,15 +41,17 @@
 #' @example inst/examples/mcmc_examples.R
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
+run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
                      covar=NULL, lower=NULL, upper=NULL, ...){
   ## Argument checking
-  if(is.null(params.init)){
-    params.init <- obj$par
-  } else if(length(params.init) != length(obj$par)){
-    stop("params.init is wrong length")
+  if(is.null(init)){
+    init <- rep(list(obj$par), times=chains)
+  } else if(length(init) != chains){
+    stop("Length of init does not equal number of chains.")
+  } else if(any(unlist(lapply(init, function(x) length(x) != length(obj$par))))){
+    stop("Initial parameter vector is wrong length")
   }
-  algorithm <- match.arg(algorithm, choices=c("HMC", "NUTS", "RWM"))
+  algorithm <- match.arg(algorithm, choices=c("NUTS", "RWM", "HMC"))
   obj$env$beSilent()                  # silence console output
 
   ## Parameter constraints, if provided, require the fn and gr functions to
@@ -83,19 +87,19 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
   ## Select and run the chain.
   if(algorithm=="HMC"){
     mcmc.out <- lapply(1:chains, function(i)
-      run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+      run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, init=init[[i]],
                    covar=covar, chain=i, ...))
   } else if(algorithm=="NUTS"){
     mcmc.out <- lapply(1:chains, function(i)
-      run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, params.init=params.init,
+      run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, init=init[[i]],
                     covar=covar, chain=i, ...))
   } else if(algorithm=="RWM")
     mcmc.out <- lapply(1:chains, function(i)
-      run_mcmc.rwm(nsim=nsim, fn=fn, params.init=params.init, covar=covar,
+      run_mcmc.rwm(nsim=nsim, fn=fn, init=init[[i]], covar=covar,
                    ...))
 
   ## Clean up returned output
-  samples <-  array(NA, dim=c(nsim, chains, 1+length(params.init)),
+  samples <-  array(NA, dim=c(nsim, chains, 1+length(par.names)),
                     dimnames=list(NULL, NULL, c(par.names,'lp__')))
   for(i in 1:chains){
     if(bounded){
@@ -115,9 +119,8 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
   result <- list(samples=samples, sampler_params=sampler_params,
                  time.warmup=time.warmup, time.total=time.total,
                  algorithm=algorithm, warmup=mcmc.out[[1]]$warmup,
-                 model=obj$env$DLL)
-  ## mcmc.out$par <- as.data.frame(mcmc.out$par)
-  ## names(mcmc.out$par) <- names(obj$par)
+                 model=obj$env$DLL, max_treedepth=max_treedepth)
+
   return(invisible(result))
 }
 
@@ -187,7 +190,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
 #'
 #' @param nsim The number of samples to return.
 #' @param fn A function that returns the log of the posterior density.
-#' @param params.init A vector of initial parameter values.
+#' @param init A vector of initial parameter values.
 #' @param diagnostic Whether to return a list of diagnostic metrics about
 #' the chain. Useful for assessing efficiency and tuning chain.
 #' @details This algorithm does not yet contain adaptation of \code{alpha}
@@ -210,10 +213,10 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
 #' which proposals were accepted ('accepted'), and the total function calls
 #' ('n.calls'), which for this algorithm is \code{nsim}
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.hmc}}
-run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, chain=1,
+run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
                          warmup=floor(nsim/2), covar=NULL){
   lp <- accepted <- rep(0, length=nsim)
-  n.params <- length(params.init)
+  n.params <- length(init)
   theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
@@ -222,10 +225,10 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, chain=1,
     fn2 <- function(theta) fn(chd %*% theta)
     chd <- t(chol(covar))               # lower triangular Cholesky decomp.
     chd.inv <- solve(chd)               # inverse
-    theta.cur <- chd.inv %*% params.init
+    theta.cur <- chd.inv %*% init
   } else {
     fn2 <- fn
-    theta.cur <- params.init
+    theta.cur <- init
   }
   fn.cur <- fn2(theta.cur)
   time.start <- Sys.time()
@@ -282,7 +285,7 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, chain=1,
 #' @param fn A function that returns the log of the posterior density.
 #' @param gr A function that returns a vector of gradients of the log of
 #'   the posterior density (same as \code{fn}).
-#' @param params.init A vector of initial parameter values.
+#' @param init A vector of initial parameter values.
 #' @param covar An optional covariance (mass) matrix which can be used to
 #'   improve the efficiency of sampling. The lower Cholesky decomposition
 #'   of this matrix is used to transform the parameter space. If the
@@ -304,7 +307,7 @@ run_mcmc.rwm <- function(nsim, fn, params.init, alpha=1, chain=1,
 #' @return A list containing samples ('par') and algorithm details such as
 #'   step size adaptation and acceptance probabilities per iteration
 #'   ('sampler_params').
-run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
+run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
                          adapt_delta=0.8, warmup=floor(nsim/2), chain=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
@@ -314,13 +317,13 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     gr2 <- function(theta) as.vector( t( gr(chd %*% theta) ) %*% chd )
     chd <- t(chol(covar))               # lower triangular Cholesky decomp.
     chd.inv <- solve(chd)               # inverse
-    theta.cur <- chd.inv %*% params.init
+    theta.cur <- chd.inv %*% init
   } else {
     fn2 <- fn; gr2 <- gr
-    theta.cur <- params.init
+    theta.cur <- init
   }
   accepted <- divergence <- lp <- rep(NA, nsim)
-  theta.out <- matrix(NA, nrow=nsim, ncol=length(params.init))
+  theta.out <- matrix(NA, nrow=nsim, ncol=length(init))
   sampler_params <- matrix(numeric(0), nrow=nsim, ncol=4, # holds DA info by iteration
                        dimnames=list(NULL, c("accept_stat__",
                                                 "stepsize__", "int_time__", "energy__")))
@@ -345,7 +348,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
     ## Jitter step size to mitigate potential negative autocorrelations,
     ## only once fixed though
     if(useDA & m > warmup) eps <- eps*runif(1,.9,1.1)
-    r.cur <- r.new <- rnorm(length(params.init),0,1)
+    r.cur <- r.new <- rnorm(length(init),0,1)
     theta.new <- theta.cur
     theta.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
     r.leapfrog <- matrix(NA, nrow=L, ncol=length(theta.cur))
@@ -453,8 +456,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #'   efficient, but there will be overhead in the matrix calculations which
 #'   need to be done at each step. The default of NULL specifies to not do
 #'   this transformation.
-#' @param params.init A vector of initial parameter values.
-#' @param max_doublings Integer representing the maximum times the path
+#' @param init A vector of initial parameter values.
+#' @param max_treedepth Integer representing the maximum times the path
 #'   length should double within an MCMC iteration. Default of 4, so 16
 #'   steps. If a U-turn has not occured before this many steps the
 #'   algorithm will stop and return a sample from the given tree.
@@ -467,7 +470,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, params.init, L, eps=NULL, covar=NULL,
 #'   ('sampler_params').
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
+run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=8,
                           eps=NULL, warmup=floor(nsim/2),
                           adapt_delta=0.8, covar=NULL, chain=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
@@ -478,10 +481,10 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
     gr2 <- function(theta) as.vector( t( gr(chd %*% theta) ) %*% chd )
     chd <- t(chol(covar))               # lower triangular Cholesky decomp.
     chd.inv <- solve(chd)               # inverse
-    theta.cur <- chd.inv %*% params.init
+    theta.cur <- chd.inv %*% init
   } else {
     fn2 <- fn; gr2 <- gr
-    theta.cur <- params.init
+    theta.cur <- init
   }
   sampler_params <- matrix(numeric(0), nrow=nsim, ncol=6,
       dimnames=list(NULL, c("accept_stat__", "stepsize__", "treedepth__",
@@ -544,8 +547,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, params.init, max_doublings=8,
       s <- res$s*.test.nuts(theta.plus, theta.minus, r.plus, r.minus)
       j <- j+1
       ## Stop doubling if too many or it's diverged enough
-      if(j>max_doublings) {
-       ## warning("j larger than max_doublings, skipping to next m")
+      if(j>max_treedepth) {
+       ## warning("j larger than max_treedepth, skipping to next m")
         break
       }
     }
