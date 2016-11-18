@@ -34,6 +34,9 @@
 #'   \item{"NUTS"}{the No-U-Turn sampler (see Hoffman and Gelman 2014)} }
 #'   These algorithms require different arguments; see their help files for
 #'   more information.
+#' @param thin The thinning rate to apply to samples. The default of 1
+#'   means to not thin (keep all samples). Thinning usually is not
+#'   necessary for NUTS but in some cases may be useful.
 #' @param ... Further arguments to be passed to the algorithm. See help
 #'   files for the samplers for further arguments.
 #' @return A list containing the samples and properties of the sampler
@@ -42,7 +45,7 @@
 #' @seealso \code{\link{run_mcmc.hmc}}, \code{\link{run_mcmc.nuts}},
 #'   \code{\link{run_mcmc.rwm}}
 run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
-                     covar=NULL, lower=NULL, upper=NULL, ...){
+                     covar=NULL, lower=NULL, upper=NULL, thin=1, ...){
   ## Argument checking
   if(is.null(init)){
     init <- rep(list(obj$par), times=chains)
@@ -52,6 +55,10 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
     stop("Initial parameter vector is wrong length")
   }
   algorithm <- match.arg(algorithm, choices=c("NUTS", "RWM", "HMC"))
+  thin <- floor(thin)
+  stopifnot(thin >=1)
+  stopifnot(chains >= 1)
+  if(nsim < 10 | !is.numeric(nsim)) stop("nsim must be > 10")
   obj$env$beSilent()                  # silence console output
 
   ## Parameter constraints, if provided, require the fn and gr functions to
@@ -88,18 +95,18 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
   if(algorithm=="HMC"){
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.hmc(nsim=nsim, fn=fn, gr=gr, init=init[[i]],
-                   covar=covar, chain=i, ...))
+                   covar=covar, chain=i, thin=thin, ...))
   } else if(algorithm=="NUTS"){
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.nuts(nsim=nsim, fn=fn, gr=gr, init=init[[i]],
-                    covar=covar, chain=i, ...))
+                    covar=covar, chain=i, thin=thin, ...))
   } else if(algorithm=="RWM")
     mcmc.out <- lapply(1:chains, function(i)
       run_mcmc.rwm(nsim=nsim, fn=fn, init=init[[i]], covar=covar,
-                   ...))
+                  thin=thin, ...))
 
   ## Clean up returned output
-  samples <-  array(NA, dim=c(nsim, chains, 1+length(par.names)),
+  samples <-  array(NA, dim=c(nrow(mcmc.out[[1]]$par), chains, 1+length(par.names)),
                     dimnames=list(NULL, NULL, c(par.names,'lp__')))
   for(i in 1:chains){
     if(bounded){
@@ -112,14 +119,14 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
       samples[,i,] <- mcmc.out[[i]]$par
     }
   }
-
   sampler_params <- lapply(mcmc.out, function(x) x$sampler_params)
   time.warmup <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.warmup)))
   time.total <- unlist(lapply(mcmc.out, function(x) as.numeric(x$time.total)))
   result <- list(samples=samples, sampler_params=sampler_params,
                  time.warmup=time.warmup, time.total=time.total,
                  algorithm=algorithm, warmup=mcmc.out[[1]]$warmup,
-                 model=obj$env$DLL, max_treedepth=max_treedepth)
+                 model=obj$env$DLL)
+  if(algorithm=="NUTS") result$max_treedepth <- mcmc.out[[1]]$max_treedepth
 
   return(invisible(result))
 }
@@ -214,7 +221,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, init=NULL,
 #' ('n.calls'), which for this algorithm is \code{nsim}
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.nuts}}, \code{\link{run_mcmc.hmc}}
 run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
-                         warmup=floor(nsim/2), covar=NULL){
+                         warmup=floor(nsim/2), covar=NULL, thin=1){
   lp <- accepted <- rep(0, length=nsim)
   n.params <- length(init)
   theta.out <- matrix(NA, nrow=nsim, ncol=n.params)
@@ -257,11 +264,12 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
   theta.out <- cbind(theta.out, lp)
+  theta.out <- theta.out[seq(1, nrow(theta.out), by=thin),]
   message(paste0("Final acceptance ratio=", sprintf("%.2f", mean(accepted[-(1:warmup)]))))
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
   return(list(par=theta.out, sampler_params=NULL,
-              time.total=time.total, time.warmup=time.warmup, warmup=warmup))
+              time.total=time.total, time.warmup=time.warmup, warmup=warmup/thin))
 }
 
 #' [BETA VERSION] Draw MCMC samples from a model posterior using a static
@@ -308,7 +316,8 @@ run_mcmc.rwm <- function(nsim, fn, init, alpha=1, chain=1,
 #'   step size adaptation and acceptance probabilities per iteration
 #'   ('sampler_params').
 run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
-                         adapt_delta=0.8, warmup=floor(nsim/2), chain=1){
+                         adapt_delta=0.8, warmup=floor(nsim/2),
+                         chain=1,thin=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -410,6 +419,8 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
   theta.out <- cbind(theta.out, lp)
+  theta.out <- theta.out[seq(1, nrow(theta.out), by=thin),]
+  sampler_params <- sampler_params[seq(1, nrow(sampler_params), by=thin),]
   if(sum(divergence[-(1:warmup)])>0)
     message(paste0("There were ", sum(divergence[-(1:warmup)]),
                    " divergent transitions after warmup"))
@@ -420,7 +431,7 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
   time.total <- difftime(Sys.time(), time.start, units='secs')
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
   return(list(par=theta.out, sampler_params=sampler_params,
-              time.total=time.total, time.warmup=time.warmup, warmup=warmup))
+              time.total=time.total, time.warmup=time.warmup, warmup=warmup/thin))
 }
 
 
@@ -470,9 +481,9 @@ run_mcmc.hmc <- function(nsim, fn, gr, init, L, eps=NULL, covar=NULL,
 #'   ('sampler_params').
 #' @seealso \code{\link{run_mcmc}}, \code{\link{run_mcmc.hmc}},
 #'   \code{\link{run_mcmc.rwm}}
-run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=8,
+run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=10,
                           eps=NULL, warmup=floor(nsim/2),
-                          adapt_delta=0.8, covar=NULL, chain=1){
+                          adapt_delta=0.8, covar=NULL, chain=1, thin=1){
   ## If using covariance matrix and Cholesky decomposition, redefine
   ## these functions to include this transformation. The algorithm will
   ## work in the transformed space
@@ -583,6 +594,8 @@ run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=8,
     theta.out <- t(apply(theta.out, 1, function(x) chd %*% x))
   }
   theta.out <- cbind(theta.out, lp)
+  theta.out <- theta.out[seq(1, nrow(theta.out), by=thin),]
+  sampler_params <- sampler_params[seq(1, nrow(sampler_params), by=thin),]
   ndiv <- sum(sampler_params[-(1:warmup),5])
   if(ndiv>0)
     message(paste0("There were ", ndiv, " divergent transitions after warmup"))
@@ -594,7 +607,7 @@ run_mcmc.nuts <- function(nsim, fn, gr, init, max_treedepth=8,
   .print.mcmc.timing(time.warmup=time.warmup, time.total=time.total)
   return(list(par=theta.out, sampler_params=sampler_params,
               time.total=time.total, time.warmup=time.warmup,
-              warmup=warmup))
+              warmup=warmup/thin, max_treedepth=max_treedepth))
 }
 
 #' Draw a slice sample for given position and momentum variables
