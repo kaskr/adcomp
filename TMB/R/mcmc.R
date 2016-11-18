@@ -60,7 +60,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
     fn <- function(y){
       x <- .transform(y, lower, upper, cases)
       scales <- .transform.grad(y, lower, upper, cases)
-      -obj$fn(x) + sum(log(abs(scales)))
+      -obj$fn(x) + sum(log(scales))
     }
     gr <- function(y){
       x <- .transform(y, lower, upper, cases)
@@ -99,11 +99,10 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
                     dimnames=list(NULL, NULL, c(par.names,'lp__')))
   for(i in 1:chains){
     if(bounded){
-      browser()
       temp <- mcmc.out[[i]]$par
       temp[,-ncol(temp)] <-
-        apply(temp[,-ncol(temp)], 2, function(x)
-          .transform(x, lower, upper, cases))
+        t(apply(temp[,-ncol(temp)], 1, function(x)
+          .transform(x, lower, upper, cases)))
       samples[,i,] <- temp
     } else {
       samples[,i,] <- mcmc.out[[i]]$par
@@ -169,7 +168,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
     if(case[i]==0) return(1)
     else if(case[i]==1) return(exp(y[i]))
     else if(case[i]==2) return(exp(y[i]))
-    else if(case[i]==3) return( (b[i]-a[i])*exp(y[i])/(1+exp(y[i]))^2)
+    else if(case[i]==3) return((b[i]-a[i])*exp(-y[i])/(1+exp(-y[i]))^2)
   })
   return(x)
 }
@@ -178,7 +177,7 @@ run_mcmc <- function(obj, nsim, algorithm="NUTS", chains=1, params.init=NULL,
     if(case[i]==0) return(0)
     else if(case[i]==1) return(1)
     else if(case[i]==2) return(1)
-    else if(case[i]==3) return(-1+2/(1+exp(y[i])))
+    else if(case[i]==3) return(1-2*exp(y[i])/(1+exp(y[i])))
   })
   return(x)
 }
