@@ -851,3 +851,18 @@ as.shinystan.tmb <- function(tmb.fit){
   }
   return(sso)
 }
+
+#' Extract posterior samples from a TMB MCMC fit list.
+#'
+#' @param fit.tmb A list returned by \code{\link{run_mcmc}}.
+#' @param inc_warmup Whether to extract the warmup samples or not
+#'   (default). Warmup samples should never be used for inference, but may
+#'   be useful for diagnostics.
+#' @return An invisible data.frame containing samples (rows) of each
+#'   parameter (columns).
+extract_samples <- function(fit.tmb, inc_warmup=FALSE){
+  x <- fit.tmb$samples
+  ind <- if(inc_warmup) 1:dim(x)[1] else -(1:fit.tmb$warmup)
+  y <- do.call(rbind, lapply(1:dim(x)[2], function(i) x[ind, i, -ncol(x)]))
+  return(invisible(as.data.frame(y)))
+}
