@@ -859,9 +859,11 @@ as.shinystan.tmb <- function(tmb.fit){
 #'   (default). Warmup samples should never be used for inference, but may
 #'   be useful for diagnostics.
 #' @return An invisible data.frame containing samples (rows) of each
-#'   parameter (columns).
+#'   parameter (columns). If multiple chains exist they will be rbinded
+#'   together.
 extract_samples <- function(fit.tmb, inc_warmup=FALSE){
   x <- fit.tmb$samples
+  if(!is.array(x)) stop("fit.tmb$samples is not an array -- valid TMB output?")
   ind <- if(inc_warmup) 1:dim(x)[1] else -(1:fit.tmb$warmup)
   y <- do.call(rbind, lapply(1:dim(x)[2], function(i) x[ind, i, -ncol(x)]))
   return(invisible(as.data.frame(y)))
