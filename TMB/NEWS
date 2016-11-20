@@ -1,4 +1,22 @@
 ------------------------------------------------------------------------
+TMB 1.7.5 (2016-11-20)
+------------------------------------------------------------------------
+
+o Atomic logspace_add and logspace_sub.
+
+o Numerically robust binomial and negative binomial density functions.
+
+o New macros:
+  - DATA_STRING to pass strings from R.
+  - SIMULATE to mark blocks of simulation code.
+
+o Simulation methods implemented for density classes:
+  - MVNORM, AR1, SCALE, VECSCALE, SEPARABLE, GMRF, ARk.
+
+o R-style simulators now available from the template:
+  - rnorm, runif, rpois, rbinom, rgamma, rnbinom and rnbinom2.
+
+------------------------------------------------------------------------
 TMB 1.7.4 (2016-09-21)
 ------------------------------------------------------------------------
 
