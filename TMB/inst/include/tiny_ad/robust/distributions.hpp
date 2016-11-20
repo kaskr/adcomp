@@ -13,6 +13,15 @@ namespace robust_utils {
              logy + log1p (exp (logx - logy)) :
              logx + log1p (exp (logy - logx)) );
   }
+  // logspace_sub
+  template<class T>
+  T R_Log1_Exp (const T &x) {
+    return ((x) > -M_LN2 ? log(-expm1(x)) : log1p(-exp(x))) ;
+  }
+  template<class T>
+  T logspace_sub (const T &logx, const T &logy) {
+    return logx + R_Log1_Exp(logy - logx);
+  }
 
   /** \brief Robust negative binomial
 

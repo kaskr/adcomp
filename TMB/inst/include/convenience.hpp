@@ -149,3 +149,43 @@ Type min(const vector<Type> &x)
   }
   return res;
 }
+
+/** \brief Addition in log-space
+
+    Calculates \f$log( exp(logx) + exp(logy) )\f$ without causing
+    unnecessary overflows or throwing away too much accuracy (see
+    'writing R-extensions').
+
+    \param logx The logarithm of x.
+    \param logy The logarithm of y.
+
+    \ingroup special_functions
+*/
+template<class Type>
+Type logspace_add(Type logx, Type logy) {
+  CppAD::vector<Type> tx(3);
+  tx[0] = logx;
+  tx[1] = logy;
+  tx[2] = 0; // order
+  return atomic::logspace_add(tx)[0];
+}
+
+/** \brief Subtraction in log-space
+
+    Calculates \f$log( exp(logx) - exp(logy) )\f$ without causing
+    unnecessary overflows or throwing away too much accuracy (see
+    'writing R-extensions').
+
+    \param logx The logarithm of x.
+    \param logy The logarithm of y.
+
+    \ingroup special_functions
+*/
+template<class Type>
+Type logspace_sub(Type logx, Type logy) {
+  CppAD::vector<Type> tx(3);
+  tx[0] = logx;
+  tx[1] = logy;
+  tx[2] = 0; // order
+  return atomic::logspace_sub(tx)[0];
+}
