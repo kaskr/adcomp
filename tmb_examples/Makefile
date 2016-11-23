@@ -7,7 +7,7 @@ outputfiles = $(examples:=.output.RData)
 profiletargets = $(examples:=.profile)
 
 %.output.RData : %.R %.cpp
-	unset MAKEFLAGS; example=$(basename $<) R --slave < tools/unittest.R
+	unset MAKEFLAGS; example=$(basename $<) R --slave < tools/unittest.R > out.txt
 
 all: $(outputfiles)
 	make report

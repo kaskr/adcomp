@@ -1,5 +1,8 @@
 Template Model Builder (TMB)
 ============================
+
+[![Build Status](https://travis-ci.org/kaskr/adcomp.svg?branch=master)](https://travis-ci.org/kaskr/adcomp)
+
 TMB is an R package with functionality similar to ADMB.
 It requires R at least version 3.0.0 and development tools needed to install R packages from source.
 It is recommended to install TMB into your local R package library (if you do not yet have a local R package library, create one by running ```install.packages("")``` from the R prompt and follow the instructions).
