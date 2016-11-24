@@ -201,15 +201,13 @@ Type rnbinom(Type n, Type p)
 VECTORIZE2_tt(rnbinom)
 VECTORIZE2_n(rnbinom)
 
-extern "C" {
-  double Rf_rnbinom_mu(double mu, double var);
-}
 /** \brief Simulate from a negative binomial distribution  */
 template<class Type>
 Type rnbinom2(Type mu, Type var)
 {
-  Type n=mu*mu/(var-mu);
-  return Rf_rnbinom_mu(asDouble(n), asDouble(mu));
+  Type p = mu / var;
+  Type n = mu * p / (Type(1) - p);
+  return Rf_rnbinom(asDouble(n), asDouble(p));
 }
 VECTORIZE2_tt(rnbinom2)
 VECTORIZE2_n(rnbinom2)
