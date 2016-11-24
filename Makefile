@@ -130,3 +130,13 @@ cran-version:
 	make eliminate-cout
 	make doc-update
 	make build-package
+
+##########################################################
+## For travis tests
+test:
+	R --version
+	cd tmb_syntax; make test
+	cd tmb_examples; make test
+
+cran-check:
+	R CMD check --as-cran $(TARBALL)

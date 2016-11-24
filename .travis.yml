@@ -1,36 +1,29 @@
-## Sample .travis.yml file for use with metacran/r-builder
-## See https://github.com/metacran/r-builder for details.
 language: r
+r:
+  - 3.1
+##  - release
+  - devel
+
+sudo: false
+
 cache: packages
 
-sudo: required
+os:
+  - linux
+##  - osx
 
-before_install:
-  - curl -OL https://raw.githubusercontent.com/metacran/r-builder/master/pkg-build.sh
-  - chmod 755 pkg-build.sh
-  - ./pkg-build.sh bootstrap
-
-## http://www.olmjo.com/blog/2014/01/05/r-pkgs-on-travis/
 install:
-  - cd ./TMB
-  - ../pkg-build.sh install_deps
-  - cd ..
-  - make install
+  - Rscript -e 'pkg <- c("roxygen2", "RcppEigen", "numDeriv", "parallel"); if(!all(pkg%in%installed.packages())) install.packages(pkg)'
 
 script:
+  - make cran-version
+  - make cran-check
+  - make install
   - echo "library(TMB);precompile();runExample(all=TRUE)" | R --slave
-  - cd tmb_examples; make
-
-after_failure:
-  - ../pkg-build.sh dump_logs
+  - make test
 
 notifications:
   email:
-    on_success: change
-    on_failure: change
+    on_success: never
+    on_failure: never
 
-env:
-  matrix:
-    - RVERSION=3.1.3
-##    - RVERSION=release
-##    - RVERSION=devel

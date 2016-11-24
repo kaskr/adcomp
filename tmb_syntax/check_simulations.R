@@ -15,6 +15,7 @@ checkSimulation <- function(obj) {
     ans <- data.frame(distribution=obj$env$data$distr,
                       p.value=p.value, PASSED = p.value>.05 )
     .GlobalEnv$.results <- rbind(.GlobalEnv$.results, ans)
+    stopifnot(ans$PASSED)
     ans
 }
 

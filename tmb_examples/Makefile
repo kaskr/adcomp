@@ -7,7 +7,7 @@ outputfiles = $(examples:=.output.RData)
 profiletargets = $(examples:=.profile)
 
 %.output.RData : %.R %.cpp
-	unset MAKEFLAGS; example=$(basename $<) R --slave < tools/unittest.R > out.txt
+	unset MAKEFLAGS; example=$(basename $<) R --slave < tools/unittest.R
 
 all: $(outputfiles)
 	make report
@@ -33,3 +33,10 @@ clean :
 
 profile_all: $(outputfiles) $(profiletargets)
 
+##########################################################
+## For travis tests
+test:
+	make $(examples) | grep slave
+	make report
+	cat REPORT.md
+	if grep -q FALSE REPORT.md; then exit 1; fi;
