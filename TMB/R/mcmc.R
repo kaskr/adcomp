@@ -839,6 +839,7 @@ run_mcmc.nuts <- function(iter, fn, gr, init, max_treedepth=10,
 #'   that Stan models are examined.
 #' @param tmb.fit Output list from \link{\code{run_mcmc}} for any of the
 #' three algorithms.
+#' @seealso launch_shinystan_tmb
 #' @return An S4 object of class shinystan. Depending on the algorithm
 #'   used, this list will have slight differences.
 as.shinystan.tmb <- function(tmb.fit){
@@ -853,6 +854,14 @@ as.shinystan.tmb <- function(tmb.fit){
              algorithm='RWM', model_name=model))
   }
   return(sso)
+}
+
+#' A high level wrapper to launch shinystan for a TMB MCMC list object.
+#'
+#' @details This function simply calls
+#'   \code{launch_shinystan(as.shinystan.tmb(tmb.fit))}.
+launch_shinystan_tmb <- function(tmb.fit){
+  launch_shinystan(as.shinystan.tmb(tmb.fit))
 }
 
 #' Extract posterior samples from a TMB MCMC fit list.
