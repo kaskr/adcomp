@@ -48,6 +48,7 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
                      covar=NULL, lower=NULL, upper=NULL, thin=1, ...){
   ## Argument checking
   if(is.null(init)){
+    if(chains>1) warning('Using same inits for each chain -- strongly recommended to use dispersed inits')
     init <- rep(list(obj$par), times=chains)
   } else if(length(init) != chains){
     stop("Length of init does not equal number of chains.")
@@ -201,7 +202,7 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
     if(case[i]==0) return(0)
     else if(case[i]==1) return(1)
     else if(case[i]==2) return(1)
-    else if(case[i]==3) return(1-2*exp(y[i])/(1+exp(y[i])))
+    else if(case[i]==3) return(1-2/(1+exp(y[i])))
   })
   return(x)
 }
