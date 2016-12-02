@@ -82,6 +82,7 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
       scales2 <- .transform.grad2(y, lower, upper, cases)
       -as.vector(obj$gr(x))*scales + scales2
     }
+    init <- lapply(init, FUN=.transform.inv, a=lower, b=upper, cases=cases)
   } else {
     fn <- function(x) -obj$fn(x)
     gr <- function(x) -as.vector(obj$gr(x))
