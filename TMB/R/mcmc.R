@@ -878,6 +878,6 @@ extract_samples <- function(fit.tmb, inc_warmup=FALSE){
   x <- fit.tmb$samples
   if(!is.array(x)) stop("fit.tmb$samples is not an array -- valid TMB output?")
   ind <- if(inc_warmup) 1:dim(x)[1] else -(1:fit.tmb$warmup)
-  y <- do.call(rbind, lapply(1:dim(x)[2], function(i) x[ind, i, -ncol(x)]))
+  y <- do.call(rbind, lapply(1:dim(x)[2], function(i) x[ind, i, -dim(x)[3]]))
   return(invisible(as.data.frame(y)))
 }
