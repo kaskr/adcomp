@@ -69,7 +69,7 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
   bounded <- !(is.null(lower) & is.null(upper))
   if(bounded){
     if(is.null(lower)) lower <- rep(-Inf, len=length(upper))
-    if(is.null(upper)) upper <- rep(-Inf, len=length(lower))
+    if(is.null(upper)) upper <- rep(Inf, len=length(lower))
     cases <- .transform.cases(lower, upper)
     fn <- function(y){
       x <- .transform(y, lower, upper, cases)
