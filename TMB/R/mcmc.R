@@ -68,6 +68,8 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
   ## constraint).
   bounded <- !(is.null(lower) & is.null(upper))
   if(bounded){
+    if(is.null(lower)) lower <- rep(-Inf, len=length(upper))
+    if(is.null(upper)) upper <- rep(-Inf, len=length(lower))
     cases <- .transform.cases(lower, upper)
     fn <- function(y){
       x <- .transform(y, lower, upper, cases)
@@ -202,7 +204,7 @@ run_mcmc <- function(obj, iter, algorithm="NUTS", chains=1, init=NULL,
     if(case[i]==0) return(0)
     else if(case[i]==1) return(1)
     else if(case[i]==2) return(1)
-    else if(case[i]==3) return(-1+2*/(1+exp(y[i])))
+    else if(case[i]==3) return(-1+2*exp(y[i])/(1+exp(y[i])))
   })
   return(x)
 }
