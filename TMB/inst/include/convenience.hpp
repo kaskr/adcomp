@@ -13,7 +13,7 @@ template<class Type>
 vector<vector<Type> > split(vector<Type> x,vector<int> fac){
   if(x.size()!=fac.size())error("x and fac must have equal length.");
   int nlevels=0;
-  for(int i=0;i<fac.size();i++)if(fac[i]>=nlevels)nlevels++;
+  for(int i=0;i<fac.size();i++)if(fac[i]>=nlevels)nlevels = fac[i]+1;
   vector<vector<Type> > ans(nlevels);
   vector<int> lngt(nlevels);
   lngt.setZero();
