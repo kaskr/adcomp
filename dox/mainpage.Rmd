@@ -32,6 +32,9 @@ via the ordinary R help system.
 \page Sparsity
 \brief Using model sparsity
 
+\page Simulation
+\brief Adding simulation code to the model template
+
 \defgroup R_style_distribution   R style probability distributions
 \brief Probability distributions (discrete and continuous) for use in the likelihood function.
 

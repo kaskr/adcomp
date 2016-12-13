@@ -2047,12 +2047,14 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             =        VECTORIZE1_t(f)=       \
                                 VECTORIZE2_tt(f)=      \
                                 VECTORIZE3_tti(f)=     \
-				VECTORIZE3_ttt(f)=     \
-				VECTORIZE4_ttti(f)=    \
-				VECTORIZE6_ttttti(f)=  \
-				CSKIP(body)=;          \
-				"TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
-				"TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);"
+                                VECTORIZE3_ttt(f)=     \
+                                VECTORIZE4_ttti(f)=    \
+                                VECTORIZE6_ttttti(f)=  \
+                                VECTORIZE1_n(f)=       \
+                                VECTORIZE2_n(f)=       \
+                                CSKIP(body)=;          \
+                                "TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
+                                "TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -8,28 +8,33 @@ It requires R at least version 3.0.0 and development tools needed to install R p
 It is recommended to install TMB into your local R package library (if you do not yet have a local R package library, create one by running ```install.packages("")``` from the R prompt and follow the instructions).
 The package is installed from the command line by entering the adcomp folder and typing
 
-* make install
+```shell
+make install
+```
 
 To build the user manual type
 
-* make pdf
+```shell
+make pdf
+```
 
 Once the package is successfully installed it can be tested by starting R and running
 
-    library(TMB)
-    runExample(all=TRUE)
+```R
+library(TMB)
+runExample(all=TRUE)
+```
 
-To build API-Function reference (requires that you have "doxygen" installed) type
-
-* make dox
-
+To build API-Function reference see instructions [here](dox/README.md).
 Once the documentation is built open dox/html/index.html in your web browser.
 Use the search field to find functions and their documentation.
 
 It is recommended to test that models can be changed, re-compiled and re-loaded without problems:
 
-    setwd("tmb_syntax")
-    source("test_reload.R")
+```R
+setwd("tmb_syntax")
+source("test_reload.R")
+```
 
 If everything works as intended this script should display "TRUE".
 The script has only been observed to fail for certain combinations of Linux and the gcc compiler, see below.
