@@ -36,6 +36,11 @@ Type objective_function<Type>::operator() ()
     vector<Type> x = rnbinom2(n, mu, var);
     ans -= dnbinom2(x, mu, var, true).sum();
   }
+  else if (distr == "exp") {
+    PARAMETER(rate);
+    vector<Type> x = rexp(n, rate);
+    ans -= dexp(x, rate, true).sum();
+  }
   else if (distr == "AR1") {
     PARAMETER(phi);
     vector<Type> x(n);

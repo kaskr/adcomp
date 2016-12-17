@@ -620,3 +620,16 @@ Type rgamma(Type shape, Type scale)
 }
 VECTORIZE2_tt(rgamma)
 VECTORIZE2_n(rgamma)
+
+extern "C" {
+  double Rf_rexp(double rate);
+}
+/** \brief Simulate from an exponential distribution */
+template<class Type>
+Type rexp(Type rate)
+{
+  return Rf_rexp(asDouble(rate));
+}
+
+VECTORIZE1_t(rexp);
+VECTORIZE1_n(rexp);
