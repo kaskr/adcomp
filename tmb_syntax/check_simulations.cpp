@@ -41,6 +41,35 @@ Type objective_function<Type>::operator() ()
     vector<Type> x = rexp(n, rate);
     ans -= dexp(x, rate, true).sum();
   }
+  else if (distr == "beta") {
+    PARAMETER(shape1);
+    PARAMETER(shape2);
+    vector<Type> x = rbeta(n, shape1, shape2);
+    ans -= dbeta(x, shape1, shape2, true).sum();
+  }
+  else if (distr == "f") {
+    PARAMETER(df1);
+    PARAMETER(df2);
+    vector<Type> x = rf(n, df1, df2);
+    ans -= df(x, df1, df2, true).sum();
+  }
+  else if (distr == "logis") {
+    PARAMETER(location);
+    PARAMETER(scale);
+    vector<Type> x = rlogis(n, location, scale);
+    ans -= dlogis(x, location, scale, true).sum();
+  }
+  else if (distr == "t") {
+    PARAMETER(df);
+    vector<Type> x = rt(n, df);
+    ans -= dt(x, df, true).sum();
+  }
+  else if (distr == "weibull") {
+    PARAMETER(shape);
+    PARAMETER(scale);
+    vector<Type> x = rweibull(n, shape, scale);
+    ans -= dweibull(x, shape, scale, true).sum();
+  }
   else if (distr == "AR1") {
     PARAMETER(phi);
     vector<Type> x(n);
