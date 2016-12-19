@@ -57,6 +57,48 @@ obj <- MakeADFun(data, parameters)
 checkSimulation(obj)
 
 ######################################################################
+
+data <- list(distr="exp", n=n)
+parameters <- list(rate=1)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
+data <- list(distr="beta", n=n)
+parameters <- list(shape1=0.5, shape2=0.5)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
+data <- list(distr="f", n=n)
+parameters <- list(df1=5, df2=5)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
+data <- list(distr="logis", n=n)
+parameters <- list(location=0, scale=1)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
+data <- list(distr="t", n=n)
+parameters <- list(df=5)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
+data <- list(distr="weibull", n=n)
+parameters <- list(shape=1, scale=1)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
 data <- list(distr="AR1", n=n)
 parameters <- list(phi = .2)
 obj <- MakeADFun(data, parameters)

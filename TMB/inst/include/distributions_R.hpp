@@ -274,10 +274,9 @@ VECTORIZE4_ttti(dlogis)
 template <class Type>
 Type dsn(Type x, Type alpha, int give_log=0)
 {
-	// TODO : change pnorm_approx to pnorm when pnorm is written	
 	
-	if(!give_log) return 2 * dnorm(x,Type(0),Type(1),0) * pnorm_approx(alpha*x);
-	else return log(2.0) + log(dnorm(x,Type(0),Type(1),0)) + log(pnorm_approx(alpha*x));
+	if(!give_log) return 2 * dnorm(x,Type(0),Type(1),0) * pnorm(alpha*x);
+	else return log(2.0) + log(dnorm(x,Type(0),Type(1),0)) + log(pnorm(alpha*x));
 }
 
 // Vectorize dsn
@@ -364,11 +363,11 @@ VECTORIZE6_ttttti(dSHASHo)
 template <class Type>
 Type pSHASHo(Type q,Type mu,Type sigma,Type nu,Type tau,int give_log=0)
 {
-	// TODO : Replace pnorm_approx by pnorm when it is written. Replace log(x+sqrt(x^2+1)) by a better approximation for asinh(x).
+	// TODO : Replace log(x+sqrt(x^2+1)) by a better approximation for asinh(x).
 
 	Type z = (q-mu)/sigma;
 	Type r = sinh(tau * log(z+sqrt(z*z+1)) - nu);
-	Type p = pnorm_approx(r);
+	Type p = pnorm(r);
 				  	
 	if (!give_log) return p;
 	else return log(p);
@@ -392,10 +391,10 @@ VECTORIZE6_ttttti(pSHASHo)
 template <class Type>
 Type qSHASHo(Type p, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 {
-	// TODO : Replace qnorm_approx by qnorm when it is written. Replace log(x+sqrt(x^2+1)) by a better approximation for asinh(x).
+	// TODO : Replace log(x+sqrt(x^2+1)) by a better approximation for asinh(x).
 
-   	if(!log_p) return mu + sigma*sinh((1/tau)* log(qnorm_approx(p)+sqrt(qnorm_approx(p)*qnorm_approx(p)+1)) + (nu/tau));
-   	else return mu + sigma*sinh((1/tau)*log(qnorm_approx(exp(p))+sqrt(qnorm_approx(exp(p))*qnorm_approx(exp(p))+1))+(nu/tau));
+   	if(!log_p) return mu + sigma*sinh((1/tau)* log(qnorm(p)+sqrt(qnorm(p)*qnorm(p)+1)) + (nu/tau));
+   	else return mu + sigma*sinh((1/tau)*log(qnorm(exp(p))+sqrt(qnorm(exp(p))*qnorm(exp(p))+1))+(nu/tau));
 }
 
 // Vectorize qSHASHo
@@ -413,9 +412,8 @@ VECTORIZE6_ttttti(qSHASHo)
 template <class Type>
 Type norm2SHASHo(Type x, Type mu, Type sigma, Type nu, Type tau, int log_p = 0)
 {
-	// TODO : Replace pnorm_approx by pnorm when it is written.
 
-	return qSHASHo(pnorm_approx(x),mu,sigma,nu,tau,log_p);
+	return qSHASHo(pnorm(x),mu,sigma,nu,tau,log_p);
 }
 
 // Vectorize norm2SHASHo
@@ -620,3 +618,81 @@ Type rgamma(Type shape, Type scale)
 }
 VECTORIZE2_tt(rgamma)
 VECTORIZE2_n(rgamma)
+
+extern "C" {
+  double Rf_rexp(double rate);
+}
+/** \brief Simulate from an exponential distribution */
+template<class Type>
+Type rexp(Type rate)
+{
+  return Rf_rexp(asDouble(rate));
+}
+
+VECTORIZE1_t(rexp);
+VECTORIZE1_n(rexp);
+
+extern "C" {
+	double Rf_rbeta(double shape1, double shape2);
+}
+/** \brief Simulate from a beta distribution */
+template<class Type>
+Type rbeta(Type shape1, Type shape2)
+{
+	return Rf_rbeta(asDouble(shape1), asDouble(shape2));
+}
+
+VECTORIZE2_tt(rbeta);
+VECTORIZE2_n(rbeta);
+
+extern "C" {
+	double Rf_rf(double df1, double df2);
+}
+/** \brief Simulate from an F distribution */
+template<class Type>
+Type rf(Type df1, Type df2)
+{
+	return Rf_rf(asDouble(df1), asDouble(df2));
+}
+
+VECTORIZE2_tt(rf);
+VECTORIZE2_n(rf);
+
+extern "C" {
+	double Rf_rlogis(double location, double scale);
+}
+/** \brief Simulate from a logistic distribution */
+template<class Type>
+Type rlogis(Type location, Type scale)
+{
+	return Rf_rlogis(asDouble(location), asDouble(scale));
+}
+
+VECTORIZE2_tt(rlogis);
+VECTORIZE2_n(rlogis);
+
+extern "C" {
+	double Rf_rt(double df);
+}
+/** \brief Simulate from a Student's t distribution */
+template<class Type>
+Type rt(Type df)
+{
+	return Rf_rt(asDouble(df));
+}
+
+VECTORIZE1_t(rt);
+VECTORIZE1_n(rt);
+
+extern "C" {
+	double Rf_rweibull(double shape, double scale);
+}
+/** \brief Simulate from a Weibull distribution */
+template<class Type>
+Type rweibull(Type shape, Type scale)
+{
+	return Rf_rweibull(asDouble(shape), asDouble(scale));
+}
+
+VECTORIZE2_tt(rweibull);
+VECTORIZE2_n(rweibull);
