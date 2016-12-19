@@ -13,7 +13,7 @@ os:
 ##  - osx
 
 install:
-  - Rscript -e 'pkg <- c("roxygen2", "RcppEigen", "numDeriv", "parallel"); if(!all(pkg%in%installed.packages())) install.packages(pkg)'
+  - Rscript -e 'pkg <- c("roxygen2", "RcppEigen", "numDeriv", "parallel", "knitr", "bookdown", "rsvg"); if(!all(pkg%in%installed.packages())) install.packages(pkg)'
 
 script:
   - make cran-version
@@ -21,9 +21,17 @@ script:
   - make install
   - echo "library(TMB);precompile();runExample(all=TRUE)" | R --slave
   - make test
+  - make doxygen
 
 notifications:
   email:
     on_success: never
     on_failure: never
 
+addons:
+  apt:
+    packages:
+      - doxygen
+      - pandoc
+      - graphviz
+      - librsvg2-dev

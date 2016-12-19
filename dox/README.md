@@ -22,7 +22,7 @@ install.packages(c("knitr", "bookdown", "rsvg"))
 #### Command line tools
 
 ```shell
-sudo apt-get install pandoc pandoc-citeproc graphviz librsvg2-dev
+sudo apt-get install doxygen pandoc pandoc-citeproc graphviz librsvg2-dev
 ```
 
 ## Export options

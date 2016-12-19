@@ -118,5 +118,8 @@ test:
 	cd tmb_syntax; make test
 	cd tmb_examples; make test
 
+doxygen:
+	cd dox; make all
+
 cran-check:
 	R CMD check --as-cran $(TARBALL)

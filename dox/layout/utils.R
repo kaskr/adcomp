@@ -126,7 +126,7 @@ plotGraph <- function(h, DAG=TRUE, fill_in=DAG, group = function(x)(x-1)%%nrow,
                " fixedsize=true",
                "]"),
         if(!is.null(group))
-            sapply(spl, function(x) paste("{rank=same",  paste(x, collapse=", ") , "}") )
+            sapply(spl, function(x) paste("{rank=same",  paste(x, collapse=" ") , "}") )
         else NULL,
         paste(e[,1] , "->", e[,2]),
         "}")
