@@ -18,6 +18,8 @@ install:
   - Rscript -e 'pkg <- c("roxygen2", "RcppEigen", "numDeriv", "parallel", "knitr", "bookdown", "rsvg"); if(!all(pkg%in%installed.packages())) install.packages(pkg)'
 
 script:
+  - mkdir ~/.R
+  - echo "CXX = g++ -Wall -pedantic -Werror" > ~/.R/Makevars
   - make cran-version
   - make cran-check
   - make install

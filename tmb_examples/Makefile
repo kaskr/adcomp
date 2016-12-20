@@ -40,3 +40,4 @@ test:
 	make report
 	cat REPORT.md
 	if grep -q FALSE REPORT.md; then exit 1; fi;
+	if grep -q NA REPORT.md; then exit 1; fi;
