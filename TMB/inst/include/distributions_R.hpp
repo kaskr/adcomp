@@ -629,8 +629,8 @@ Type rexp(Type rate)
   return Rf_rexp(asDouble(rate));
 }
 
-VECTORIZE1_t(rexp);
-VECTORIZE1_n(rexp);
+VECTORIZE1_t(rexp)
+VECTORIZE1_n(rexp)
 
 extern "C" {
 	double Rf_rbeta(double shape1, double shape2);
@@ -642,8 +642,8 @@ Type rbeta(Type shape1, Type shape2)
 	return Rf_rbeta(asDouble(shape1), asDouble(shape2));
 }
 
-VECTORIZE2_tt(rbeta);
-VECTORIZE2_n(rbeta);
+VECTORIZE2_tt(rbeta)
+VECTORIZE2_n(rbeta)
 
 extern "C" {
 	double Rf_rf(double df1, double df2);
@@ -655,8 +655,8 @@ Type rf(Type df1, Type df2)
 	return Rf_rf(asDouble(df1), asDouble(df2));
 }
 
-VECTORIZE2_tt(rf);
-VECTORIZE2_n(rf);
+VECTORIZE2_tt(rf)
+VECTORIZE2_n(rf)
 
 extern "C" {
 	double Rf_rlogis(double location, double scale);
@@ -668,8 +668,8 @@ Type rlogis(Type location, Type scale)
 	return Rf_rlogis(asDouble(location), asDouble(scale));
 }
 
-VECTORIZE2_tt(rlogis);
-VECTORIZE2_n(rlogis);
+VECTORIZE2_tt(rlogis)
+VECTORIZE2_n(rlogis)
 
 extern "C" {
 	double Rf_rt(double df);
@@ -681,8 +681,8 @@ Type rt(Type df)
 	return Rf_rt(asDouble(df));
 }
 
-VECTORIZE1_t(rt);
-VECTORIZE1_n(rt);
+VECTORIZE1_t(rt)
+VECTORIZE1_n(rt)
 
 extern "C" {
 	double Rf_rweibull(double shape, double scale);
@@ -694,5 +694,5 @@ Type rweibull(Type shape, Type scale)
 	return Rf_rweibull(asDouble(shape), asDouble(scale));
 }
 
-VECTORIZE2_tt(rweibull);
-VECTORIZE2_n(rweibull);
+VECTORIZE2_tt(rweibull)
+VECTORIZE2_n(rweibull)
