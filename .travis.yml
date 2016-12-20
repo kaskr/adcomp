@@ -12,6 +12,8 @@ os:
   - linux
 ##  - osx
 
+dist: trusty
+
 install:
   - Rscript -e 'pkg <- c("roxygen2", "RcppEigen", "numDeriv", "parallel", "knitr", "bookdown", "rsvg"); if(!all(pkg%in%installed.packages())) install.packages(pkg)'
 
@@ -22,6 +24,7 @@ script:
   - echo "library(TMB);precompile();runExample(all=TRUE)" | R --slave
   - make test
   - make doxygen
+  - ./bin/deploy.sh
 
 notifications:
   email:
@@ -35,3 +38,8 @@ addons:
       - pandoc
       - graphviz
       - librsvg2-dev
+
+env:
+  global:
+  - ENCRYPTION_LABEL: "52ee1037b843"
+  - COMMIT_AUTHOR_EMAIL: "kaskr@dtu.dk"
