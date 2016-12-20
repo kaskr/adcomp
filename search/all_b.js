@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['lgamma',['lgamma',['../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382',1,'lgamma(Type x):&#160;lgamma.hpp'],['../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382',1,'lgamma(Type x):&#160;lgamma.hpp']]],
-  ['lgamma_2ehpp',['lgamma.hpp',['../lgamma_8hpp.html',1,'']]],
-  ['logdet',['logdet',['../namespaceatomic.html#af7937bd97f9d5a2e80c00d03faf3a7c2',1,'atomic::logdet(CppAD::vector&lt; Type &gt; x)'],['../group__matrix__functions.html#gae5555ee5c905915a566d47d7f2830424',1,'atomic::logdet(matrix&lt; Type &gt; x)']]],
-  ['logit',['logit',['../convenience_8hpp.html#a3a8a11444e2d064e218d895424d7e12e',1,'convenience.hpp']]]
+  ['kronecker',['kronecker',['../kronecker_8hpp.html#ae60698df2a94c3d6d723bb26acab48ac',1,'kronecker(Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y):&#160;kronecker.hpp'],['../kronecker_8hpp.html#a7efc2ac68f24b405b44177a381b6d27c',1,'kronecker(matrix&lt; scalartype &gt; x, matrix&lt; scalartype &gt; y):&#160;kronecker.hpp'],['../spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60',1,'kronecker(Eigen::SparseMatrix&lt; Type &gt; x, Eigen::SparseMatrix&lt; Type &gt; y):&#160;spmat.hpp'],['../namespacetmbutils.html#abb4de88f7d6fbc4ecdef18f7d161dfe8',1,'tmbutils::kronecker(Eigen::SparseMatrix&lt; Type &gt; x, Eigen::SparseMatrix&lt; Type &gt; y)'],['../namespacetmbutils.html#a8c968627c02f3bc076ae767e726d2221',1,'tmbutils::kronecker(Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)'],['../namespacetmbutils.html#a90d6a17fcd11a84e2eb361b3f64001c8',1,'tmbutils::kronecker(matrix&lt; scalartype &gt; x, matrix&lt; scalartype &gt; y)']]],
+  ['kronecker_2ehpp',['kronecker.hpp',['../kronecker_8hpp.html',1,'']]]
 ];

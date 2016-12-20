@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['multivariate_20distributions',['Multivariate distributions',['../group__Densities.html',1,'']]],
-  ['matrices_20and_20arrays',['Matrices and arrays',['../group__matrix__arrays.html',1,'']]]
+  ['r_20style_20probability_20distributions',['R style probability distributions',['../group__R__style__distribution.html',1,'']]]
 ];

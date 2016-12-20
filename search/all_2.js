@@ -1,17 +1,9 @@
 var searchData=
 [
-  ['col',['col',['../structarray.html#a4fd607c3b000df567725bbf4a846139e',1,'array::col()'],['../structtmbutils_1_1array.html#a4b09b981825d16f0b6254e53ae18f15d',1,'tmbutils::array::col()']]],
-  ['cols',['cols',['../structarray.html#af29c9b168b60fe0b0de91073875d7300',1,'array::cols()'],['../structtmbutils_1_1array.html#ab8995d3f6459685cfddd466420865946',1,'tmbutils::array::cols()']]],
-  ['config_2ehpp',['config.hpp',['../config_8hpp.html',1,'']]],
-  ['config_5fstruct',['config_struct',['../structconfig__struct.html',1,'']]],
-  ['contar2_5ft',['contAR2_t',['../classdensity_1_1contAR2__t.html',1,'density']]],
-  ['contar2_5ft',['contAR2_t',['../classcontAR2__t.html',1,'']]],
-  ['control',['control',['../structgauss__kronrod_1_1control.html',1,'gauss_kronrod']]],
-  ['convenience_2ehpp',['convenience.hpp',['../convenience_8hpp.html',1,'']]],
-  ['convert_2ehpp',['convert.hpp',['../convert_8hpp.html',1,'']]],
-  ['cov',['cov',['../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc',1,'MVNORM_t::cov()'],['../classARk__t.html#ac2ec7808cbff3f5a0b554c1fa9daf2e6',1,'ARk_t::cov()'],['../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202',1,'density::MVNORM_t::cov()'],['../classdensity_1_1ARk__t.html#aaebe57b632f9f457ebff2e3a7f159292',1,'density::ARk_t::cov()']]],
-  ['c_2b_2b_20tutorial',['C++ tutorial',['../group__CppTutorial.html',1,'']]],
-  ['compilation_20and_20run_20time_20errors',['Compilation and run time errors',['../group__Errors.html',1,'']]],
-  ['comprehensive_20documentation_20of_20c_2b_2b_20functions_20and_20classes_20_28api_29',['Comprehensive Documentation of C++ Functions and Classes (API)',['../index.html',1,'']]],
-  ['c_2b_2b_20macros',['C++ Macros',['../group__macros.html',1,'']]]
+  ['bessel_5fi_5f10',['bessel_i_10',['../namespaceatomic.html#a67c15c0dfea98b3f79f7f0660e2abe95',1,'atomic']]],
+  ['bessel_5fk_5f10',['bessel_k_10',['../namespaceatomic.html#ad076f1600730946b58fdcd239cc25b61',1,'atomic']]],
+  ['besseli',['besselI',['../group__special__functions.html#ga02daab4fe5ba235c112967ef99ad67c4',1,'distributions_R.hpp']]],
+  ['besselj',['besselJ',['../group__special__functions.html#ga209f1471c72a54cf4db9b94cac695785',1,'distributions_R.hpp']]],
+  ['besselk',['besselK',['../group__special__functions.html#ga5db7378b0391ca8feaece5d7026202bc',1,'distributions_R.hpp']]],
+  ['bessely',['besselY',['../group__special__functions.html#gae78a5913e9c135aae563bfc94412b64a',1,'distributions_R.hpp']]]
 ];

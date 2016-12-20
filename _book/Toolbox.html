@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>The comprehensive TMB documentation</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
+  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+
+  <meta property="og:title" content="The comprehensive TMB documentation" />
+  <meta property="og:type" content="book" />
+  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
+  <meta property="og:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
+  <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="github-repo" content="kaskr/adcomp" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The comprehensive TMB documentation" />
+  
+  <meta name="twitter:description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="twitter:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="Errors.html">
+<link rel="next" href="CppTutorial.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+</head>
+
+<body>
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>1</b> Tutorial</a><ul>
+<li class="chapter" data-level="1.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>1.1</b> Obtaining data and parameter values from R</a></li>
+<li class="chapter" data-level="1.2" data-path="Tutorial.html"><a href="Tutorial.html#an-extended-c-language"><i class="fa fa-check"></i><b>1.2</b> An extended C++ language</a></li>
+<li class="chapter" data-level="1.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>1.3</b> Statistical modelling</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="Structure-TMB.html"><a href="Structure-TMB.html"><i class="fa fa-check"></i><b>2</b> The structure of TMB</a></li>
+<li class="chapter" data-level="3" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>3</b> Matrices and arrays</a><ul>
+<li class="chapter" data-level="3.1" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>3.1</b> Relationship to R</a></li>
+<li class="chapter" data-level="3.2" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>3.2</b> Relationship to Eigen</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="R-style-distribution.html"><a href="R-style-distribution.html"><i class="fa fa-check"></i><b>4</b> R style probability distributions</a></li>
+<li class="chapter" data-level="5" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>5</b> Multivariate distributions</a><ul>
+<li class="chapter" data-level="5.1" data-path="Densities.html"><a href="Densities.html#multivariate-normal-distributions"><i class="fa fa-check"></i><b>5.1</b> Multivariate normal distributions</a></li>
+<li class="chapter" data-level="5.2" data-path="Densities.html"><a href="Densities.html#autoregressive-processes"><i class="fa fa-check"></i><b>5.2</b> Autoregressive processes</a></li>
+<li class="chapter" data-level="5.3" data-path="Densities.html"><a href="Densities.html#gaussian-markov-random-fields-gmrf"><i class="fa fa-check"></i><b>5.3</b> Gaussian Markov random fields (GMRF)</a></li>
+<li class="chapter" data-level="5.4" data-path="Densities.html"><a href="Densities.html#separable-construction-of-covariance-precision-matrices"><i class="fa fa-check"></i><b>5.4</b> Separable construction of covariance (precision) matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>6</b> Example collection</a><ul>
+<li class="chapter" data-level="6.1" data-path="Examples.html"><a href="Examples.html#example-overview"><i class="fa fa-check"></i><b>6.1</b> Example overview</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>7</b> Compilation and run time errors</a><ul>
+<li class="chapter" data-level="7.1" data-path="Errors.html"><a href="Errors.html#compilation-errors"><i class="fa fa-check"></i><b>7.1</b> Compilation errors</a></li>
+<li class="chapter" data-level="7.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>7.2</b> Run time errors</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="Errors.html"><a href="Errors.html#out-of-bounds-error"><i class="fa fa-check"></i><b>7.2.1</b> Out-of-bounds error</a></li>
+<li class="chapter" data-level="7.2.2" data-path="Errors.html"><a href="Errors.html#floating-point-exception"><i class="fa fa-check"></i><b>7.2.2</b> Floating point exception</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>8</b> Toolbox</a><ul>
+<li class="chapter" data-level="8.0.1" data-path="Toolbox.html"><a href="Toolbox.html#non-normal-latent-variables-random-effects"><i class="fa fa-check"></i><b>8.0.1</b> Non-normal latent variables (random effects)</a></li>
+<li class="chapter" data-level="8.0.2" data-path="Toolbox.html"><a href="Toolbox.html#discrete-latent-variables"><i class="fa fa-check"></i><b>8.0.2</b> Discrete latent variables</a></li>
+<li class="chapter" data-level="8.0.3" data-path="Toolbox.html"><a href="Toolbox.html#mixture-models"><i class="fa fa-check"></i><b>8.0.3</b> Mixture models</a></li>
+<li class="chapter" data-level="8.0.4" data-path="Toolbox.html"><a href="Toolbox.html#time-series"><i class="fa fa-check"></i><b>8.0.4</b> Time series</a></li>
+<li class="chapter" data-level="8.0.5" data-path="Toolbox.html"><a href="Toolbox.html#spatial-models"><i class="fa fa-check"></i><b>8.0.5</b> Spatial models</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>9</b> C++ tutorial</a><ul>
+<li class="chapter" data-level="9.0.1" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-r-but-not-c"><i class="fa fa-check"></i><b>9.0.1</b> I know R but not C++</a></li>
+<li class="chapter" data-level="9.0.2" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-c"><i class="fa fa-check"></i><b>9.0.2</b> I know C++</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ModelObject.html"><a href="ModelObject.html"><i class="fa fa-check"></i><b>10</b> Model object</a></li>
+<li class="chapter" data-level="11" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>11</b> Sparsity</a><ul>
+<li class="chapter" data-level="11.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>11.1</b> Conditional independence graphs and DAGs</a><ul>
+<li class="chapter" data-level="11.1.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence"><i class="fa fa-check"></i><b>11.1.1</b> Conditional independence</a></li>
+<li class="chapter" data-level="11.1.2" data-path="Sparsity.html"><a href="Sparsity.html#node-removal-properties"><i class="fa fa-check"></i><b>11.1.2</b> Node removal properties</a></li>
+<li class="chapter" data-level="11.1.3" data-path="Sparsity.html"><a href="Sparsity.html#directed-acyclic-graph"><i class="fa fa-check"></i><b>11.1.3</b> Directed acyclic graph</a></li>
+<li class="chapter" data-level="11.1.4" data-path="Sparsity.html"><a href="Sparsity.html#the-effect-of-adding-data"><i class="fa fa-check"></i><b>11.1.4</b> The effect of adding data</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="Sparsity.html"><a href="Sparsity.html#the-theta-logistic-example"><i class="fa fa-check"></i><b>11.2</b> The theta logistic example</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>12</b> Simulation</a><ul>
+<li class="chapter" data-level="12.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>12.1</b> Overview of simulation methods in TMB</a><ul>
+<li class="chapter" data-level="12.1.1" data-path="Simulation.html"><a href="Simulation.html#standard-generators"><i class="fa fa-check"></i><b>12.1.1</b> Standard generators</a></li>
+<li class="chapter" data-level="12.1.2" data-path="Simulation.html"><a href="Simulation.html#generators-for-density-objects"><i class="fa fa-check"></i><b>12.1.2</b> Generators for density objects</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>12.2</b> Simulation blocks</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>12.2.1</b> A linear regression example</a></li>
+<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.2</b> Advanced examples</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The comprehensive TMB documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="Toolbox" class="section level1">
+<h1><span class="header-section-number">8</span> Toolbox</h1>
+<p>First read the <em>Statistical Modelling</em> section of <a href="Tutorial.html#Tutorial">Tutorial</a>.</p>
+<div id="non-normal-latent-variables-random-effects" class="section level3">
+<h3><span class="header-section-number">8.0.1</span> Non-normal latent variables (random effects)</h3>
+<p>The underlying latent random variables in TMB must be Gaussian for the Laplace approximation to be accurate. To obtain other distributions, say a gamma distribution, the “transformation trick” can be used. We start out with normally distributed variables <code>u</code> and transform these into new variables <code>w</code> via the <code>pnorm</code> and <code>qgamma</code> functions as follows:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);                             <span class="co">// Underlying latent random variables </span>
+Type nll=Type(<span class="fl">0.</span><span class="dv">0</span>);
+nll -= <a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(u,Type(<span class="dv">0</span>),Type(<span class="dv">1</span>),<span class="kw">true</span>));       <span class="co">// Assign N(0,1) distribution u </span>
+<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; v = <a class="code" href="../group__R__style__distribution.html#gac908a1b293d159f4a8958a694674a4a4">pnorm</a>(u,Type(<span class="dv">0</span>),Type(<span class="dv">1</span>),<span class="kw">true</span>);  <span class="co">// Uniformly distributed variables (on [0,1])</span>
+<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; w = <a class="code" href="../group__R__style__distribution.html#gae9f8112d1f1ee80879c8e91b7bffac55">qgamma</a>(v,shape,scale,<span class="kw">true</span>);</code></pre></div>
+<p><code>w</code> now has a gamma distribution.</p>
+</div>
+<div id="discrete-latent-variables" class="section level3">
+<h3><span class="header-section-number">8.0.2</span> Discrete latent variables</h3>
+<p>The Laplace approximation can not be applied to discrete latent variables that occur in mixture models and HMMs (Hidden Markov models). However, such likelihoods have analytic expressions, and may be coded up in TMB. TMB would still calculate the exact gradient of the HMM likelihood.</p>
+</div>
+<div id="mixture-models" class="section level3">
+<h3><span class="header-section-number">8.0.3</span> Mixture models</h3>
+<p>Although mixture models are a special case of discrete latent variable models, they do deserve special attention. Consider the case that we want a mixture of two zero-mean normal distributions (with different standard deviations). This can be implemented as:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);                         
+<a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(sigma);      <span class="co">// sigma0 og sigma1</span>
+<a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(p);                 <span class="co">// Mixture proportion of model 0</span>
+Type nll=Type(<span class="fl">0.</span><span class="dv">0</span>);
+nll -= <a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>( log(      p  * dnorm(x, Type(<span class="dv">0</span>), sigma(<span class="dv">0</span>), <span class="kw">false</span>)
+               + (<span class="fl">1.</span><span class="dv">0</span>-p) * dnorm(x, Type(<span class="dv">0</span>), sigma(<span class="dv">1</span>), <span class="kw">false</span>) ) );</code></pre></div>
+</div>
+<div id="time-series" class="section level3">
+<h3><span class="header-section-number">8.0.4</span> Time series</h3>
+<p>Autoregressive (AR) processes may be implemented using the compact notation of section <a href="Densities.html#Densities">Densities</a>. The resulting AR process may be applied both in the observational part and in the distribution of a latent variable.</p>
+<p>Nonlinear time must be implemented from scratch, as in the example <a href="../thetalog_8cpp-example.html">thetalog.cpp</a></p>
+</div>
+<div id="spatial-models" class="section level3">
+<h3><span class="header-section-number">8.0.5</span> Spatial models</h3>
+<p>TMB has strong support for spatial model and space-time models via the <code><a class="code" href="../namespacedensity.html#a212a5c9b3678fec10d2e5a3c0c113ae0">GMRF</a>()</code> and <code><a class="code" href="../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>()</code> functions, and the notion of a <code>distribution</code>. The reader is referred to section <a href="Densities.html#Densities">Densities</a> for details and examples.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="Errors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="CppTutorial.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

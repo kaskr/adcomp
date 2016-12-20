@@ -1,27 +1,9 @@
 var searchData=
 [
-  ['multivariate_20distributions',['Multivariate distributions',['../group__Densities.html',1,'']]],
-  ['matern',['matern',['../group__special__functions.html#ga4bdabb9b3e59feb7c552b30c46c8959c',1,'convenience.hpp']]],
-  ['matexp',['matexp',['../structtmbutils_1_1matexp.html',1,'tmbutils']]],
-  ['matexp',['matexp',['../structmatexp.html',1,'']]],
-  ['matexp_2ehpp',['matexp.hpp',['../matexp_8hpp.html',1,'']]],
-  ['matexp_3c_20scalartype_2c_202_20_3e',['matexp&lt; scalartype, 2 &gt;',['../structtmbutils_1_1matexp_3_01scalartype_00_012_01_4.html',1,'tmbutils']]],
-  ['matexp_3c_20scalartype_2c_202_20_3e',['matexp&lt; scalartype, 2 &gt;',['../structmatexp_3_01scalartype_00_012_01_4.html',1,'']]],
-  ['matinv',['matinv',['../namespaceatomic.html#a4991f5af63e94ad38f54c99a81823efc',1,'atomic::matinv(CppAD::vector&lt; Type &gt; x)'],['../group__matrix__functions.html#gacf8e4c3cd2dc2c2859f8c52ad40ccec0',1,'atomic::matinv(matrix&lt; Type &gt; x)']]],
-  ['matinvpd',['matinvpd',['../group__matrix__functions.html#ga06aed041873dea3426da0d0bac628583',1,'atomic']]],
-  ['matmul',['matmul',['../namespaceatomic.html#a1ea1a599dfa8b5b10af52c40be19210e',1,'atomic::matmul(CppAD::vector&lt; Type &gt; x)'],['../group__matrix__functions.html#ga481538cdd18f419396ee65eaec62c0ba',1,'atomic::matmul(matrix&lt; Type &gt; x, matrix&lt; Type &gt; y)']]],
-  ['matrix',['matrix',['../structtmbutils_1_1matrix.html',1,'tmbutils']]],
-  ['matrix',['matrix',['../structmatrix.html',1,'matrix&lt; Type &gt;'],['../structarray.html#accfc8dbb05153041d1d72dbbec388130',1,'array::matrix()'],['../structtmbutils_1_1array.html#a844585ca4d11678cdfe823e4a7a81fb3',1,'tmbutils::array::matrix()']]],
-  ['matrix_3c_20double_20_3e',['matrix&lt; double &gt;',['../structmatrix.html',1,'']]],
-  ['matrix_3c_20int_20_3e',['matrix&lt; int &gt;',['../structtmbutils_1_1matrix.html',1,'tmbutils']]],
-  ['matrices_20and_20arrays',['Matrices and arrays',['../group__matrix__arrays.html',1,'']]],
-  ['max',['max',['../convenience_8hpp.html#afb69053836ddd714014bb5bf321a138c',1,'convenience.hpp']]],
-  ['min',['min',['../convenience_8hpp.html#a6ced780585902c59301c9e0e80044dd2',1,'convenience.hpp']]],
-  ['multi_5fforrev',['multi_forrev',['../namespaceatomic.html#add38af63d55c1d476da416ee12ea2955',1,'atomic']]],
-  ['mvintegral',['mvIntegral',['../structgauss__kronrod_1_1mvIntegral.html',1,'gauss_kronrod']]],
-  ['mvintegrate',['mvIntegrate',['../namespacegauss__kronrod.html#a4d70d01b00bd9d461e54f17766187a3c',1,'gauss_kronrod']]],
-  ['mvnorm',['MVNORM',['../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07',1,'MVNORM():&#160;density.hpp'],['../namespacedensity.html#a0721aacc998f4cbd0290626073c19763',1,'density::MVNORM()']]],
-  ['mvnorm_5ft',['MVNORM_t',['../classdensity_1_1MVNORM__t.html',1,'density']]],
-  ['mvnorm_5ft',['MVNORM_t',['../classMVNORM__t.html',1,'']]],
-  ['mvnorm_5ft_3c_20scalartype_20_3e',['MVNORM_t&lt; scalartype &gt;',['../classdensity_1_1MVNORM__t.html',1,'density']]]
+  ['lgamma',['lgamma',['../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382',1,'lgamma(Type x):&#160;lgamma.hpp'],['../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382',1,'lgamma(Type x):&#160;lgamma.hpp']]],
+  ['lgamma_2ehpp',['lgamma.hpp',['../lgamma_8hpp.html',1,'']]],
+  ['logdet',['logdet',['../namespaceatomic.html#af7937bd97f9d5a2e80c00d03faf3a7c2',1,'atomic::logdet(CppAD::vector&lt; Type &gt; x)'],['../group__matrix__functions.html#gae5555ee5c905915a566d47d7f2830424',1,'atomic::logdet(matrix&lt; Type &gt; x)']]],
+  ['logit',['logit',['../convenience_8hpp.html#a3a8a11444e2d064e218d895424d7e12e',1,'convenience.hpp']]],
+  ['logspace_5fadd',['logspace_add',['../group__special__functions.html#ga2d5a07f1202dc628ba18ee9a2af8b9cd',1,'convenience.hpp']]],
+  ['logspace_5fsub',['logspace_sub',['../group__special__functions.html#ga9789b29ac16e13530fd2cea12950579e',1,'convenience.hpp']]]
 ];

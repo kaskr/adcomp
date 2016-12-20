@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>The comprehensive TMB documentation</title>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
+  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+
+  <meta property="og:title" content="The comprehensive TMB documentation" />
+  <meta property="og:type" content="book" />
+  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
+  <meta property="og:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
+  <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="github-repo" content="kaskr/adcomp" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The comprehensive TMB documentation" />
+  
+  <meta name="twitter:description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="twitter:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="Densities.html">
+<link rel="next" href="Errors.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+</head>
+
+<body>
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>1</b> Tutorial</a><ul>
+<li class="chapter" data-level="1.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>1.1</b> Obtaining data and parameter values from R</a></li>
+<li class="chapter" data-level="1.2" data-path="Tutorial.html"><a href="Tutorial.html#an-extended-c-language"><i class="fa fa-check"></i><b>1.2</b> An extended C++ language</a></li>
+<li class="chapter" data-level="1.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>1.3</b> Statistical modelling</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="Structure-TMB.html"><a href="Structure-TMB.html"><i class="fa fa-check"></i><b>2</b> The structure of TMB</a></li>
+<li class="chapter" data-level="3" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>3</b> Matrices and arrays</a><ul>
+<li class="chapter" data-level="3.1" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>3.1</b> Relationship to R</a></li>
+<li class="chapter" data-level="3.2" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>3.2</b> Relationship to Eigen</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="R-style-distribution.html"><a href="R-style-distribution.html"><i class="fa fa-check"></i><b>4</b> R style probability distributions</a></li>
+<li class="chapter" data-level="5" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>5</b> Multivariate distributions</a><ul>
+<li class="chapter" data-level="5.1" data-path="Densities.html"><a href="Densities.html#multivariate-normal-distributions"><i class="fa fa-check"></i><b>5.1</b> Multivariate normal distributions</a></li>
+<li class="chapter" data-level="5.2" data-path="Densities.html"><a href="Densities.html#autoregressive-processes"><i class="fa fa-check"></i><b>5.2</b> Autoregressive processes</a></li>
+<li class="chapter" data-level="5.3" data-path="Densities.html"><a href="Densities.html#gaussian-markov-random-fields-gmrf"><i class="fa fa-check"></i><b>5.3</b> Gaussian Markov random fields (GMRF)</a></li>
+<li class="chapter" data-level="5.4" data-path="Densities.html"><a href="Densities.html#separable-construction-of-covariance-precision-matrices"><i class="fa fa-check"></i><b>5.4</b> Separable construction of covariance (precision) matrices</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>6</b> Example collection</a><ul>
+<li class="chapter" data-level="6.1" data-path="Examples.html"><a href="Examples.html#example-overview"><i class="fa fa-check"></i><b>6.1</b> Example overview</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>7</b> Compilation and run time errors</a><ul>
+<li class="chapter" data-level="7.1" data-path="Errors.html"><a href="Errors.html#compilation-errors"><i class="fa fa-check"></i><b>7.1</b> Compilation errors</a></li>
+<li class="chapter" data-level="7.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>7.2</b> Run time errors</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="Errors.html"><a href="Errors.html#out-of-bounds-error"><i class="fa fa-check"></i><b>7.2.1</b> Out-of-bounds error</a></li>
+<li class="chapter" data-level="7.2.2" data-path="Errors.html"><a href="Errors.html#floating-point-exception"><i class="fa fa-check"></i><b>7.2.2</b> Floating point exception</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>8</b> Toolbox</a><ul>
+<li class="chapter" data-level="8.0.1" data-path="Toolbox.html"><a href="Toolbox.html#non-normal-latent-variables-random-effects"><i class="fa fa-check"></i><b>8.0.1</b> Non-normal latent variables (random effects)</a></li>
+<li class="chapter" data-level="8.0.2" data-path="Toolbox.html"><a href="Toolbox.html#discrete-latent-variables"><i class="fa fa-check"></i><b>8.0.2</b> Discrete latent variables</a></li>
+<li class="chapter" data-level="8.0.3" data-path="Toolbox.html"><a href="Toolbox.html#mixture-models"><i class="fa fa-check"></i><b>8.0.3</b> Mixture models</a></li>
+<li class="chapter" data-level="8.0.4" data-path="Toolbox.html"><a href="Toolbox.html#time-series"><i class="fa fa-check"></i><b>8.0.4</b> Time series</a></li>
+<li class="chapter" data-level="8.0.5" data-path="Toolbox.html"><a href="Toolbox.html#spatial-models"><i class="fa fa-check"></i><b>8.0.5</b> Spatial models</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>9</b> C++ tutorial</a><ul>
+<li class="chapter" data-level="9.0.1" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-r-but-not-c"><i class="fa fa-check"></i><b>9.0.1</b> I know R but not C++</a></li>
+<li class="chapter" data-level="9.0.2" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-c"><i class="fa fa-check"></i><b>9.0.2</b> I know C++</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ModelObject.html"><a href="ModelObject.html"><i class="fa fa-check"></i><b>10</b> Model object</a></li>
+<li class="chapter" data-level="11" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>11</b> Sparsity</a><ul>
+<li class="chapter" data-level="11.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>11.1</b> Conditional independence graphs and DAGs</a><ul>
+<li class="chapter" data-level="11.1.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence"><i class="fa fa-check"></i><b>11.1.1</b> Conditional independence</a></li>
+<li class="chapter" data-level="11.1.2" data-path="Sparsity.html"><a href="Sparsity.html#node-removal-properties"><i class="fa fa-check"></i><b>11.1.2</b> Node removal properties</a></li>
+<li class="chapter" data-level="11.1.3" data-path="Sparsity.html"><a href="Sparsity.html#directed-acyclic-graph"><i class="fa fa-check"></i><b>11.1.3</b> Directed acyclic graph</a></li>
+<li class="chapter" data-level="11.1.4" data-path="Sparsity.html"><a href="Sparsity.html#the-effect-of-adding-data"><i class="fa fa-check"></i><b>11.1.4</b> The effect of adding data</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="Sparsity.html"><a href="Sparsity.html#the-theta-logistic-example"><i class="fa fa-check"></i><b>11.2</b> The theta logistic example</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>12</b> Simulation</a><ul>
+<li class="chapter" data-level="12.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>12.1</b> Overview of simulation methods in TMB</a><ul>
+<li class="chapter" data-level="12.1.1" data-path="Simulation.html"><a href="Simulation.html#standard-generators"><i class="fa fa-check"></i><b>12.1.1</b> Standard generators</a></li>
+<li class="chapter" data-level="12.1.2" data-path="Simulation.html"><a href="Simulation.html#generators-for-density-objects"><i class="fa fa-check"></i><b>12.1.2</b> Generators for density objects</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>12.2</b> Simulation blocks</a><ul>
+<li class="chapter" data-level="12.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>12.2.1</b> A linear regression example</a></li>
+<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.2</b> Advanced examples</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">The comprehensive TMB documentation</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="Examples" class="section level1">
+<h1><span class="header-section-number">6</span> Example collection</h1>
+<ul>
+<li>A list of all examples is found on the “Examples” tab on the top of the page.</li>
+<li>Locations of example files: <code>adcomp/tmb_examples</code> and <code>adcomp/TMB/inst/examples</code>.</li>
+<li>For each example there is both a <code>.cpp</code> <strong>and</strong> a <code>.R</code> file. Take for instance the linear regression example:</li>
+<li><p><strong>C++ template</strong></p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Simple linear regression.</span>
+<span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
+{
+  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(Y);
+  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logSigma);
+  <a class="code" href="../group__macros.html#ga43a13c435127491364e4a167478f4992">ADREPORT</a>(exp(<span class="dv">2</span>*logSigma));
+  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(Y, a+b*x, exp(logSigma), <span class="kw">true</span>));
+  <span class="kw">return</span> nll;
+}</code></pre></div></li>
+<li><p><strong>Controlling R code</strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(TMB)
+<span class="kw">compile</span>(<span class="st">&quot;linreg.cpp&quot;</span>)
+<span class="kw">dyn.load</span>(<span class="kw">dynlib</span>(<span class="st">&quot;linreg&quot;</span>))
+<span class="kw">set.seed</span>(<span class="dv">123</span>)
+data &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">Y =</span> <span class="kw">rnorm</span>(<span class="dv">10</span>) +<span class="st"> </span><span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">x=</span><span class="dv">1</span>:<span class="dv">10</span>)
+parameters &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>, <span class="dt">logSigma=</span><span class="dv">0</span>)
+obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">DLL=</span><span class="st">&quot;linreg&quot;</span>)
+obj$<a class="code" href="../namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">hessian</a> &lt;-<span class="st"> </span><span class="ot">TRUE</span>
+opt &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;optim&quot;</span>, obj)
+opt
+opt$<a class="code" href="../namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">hessian</a> ## &lt;-- FD <a class="code" href="../namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">hessian</a> from optim
+obj$<span class="kw">he</span>()    ## &lt;-- Analytical <a class="code" href="../namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">hessian</a>
+<span class="kw">sdreport</span>(obj)</code></pre></div></li>
+<li><p>To run this example use the R command</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;linreg.R&quot;</span>)</code></pre></div></li>
+</ul>
+<div id="example-overview" class="section level2">
+<h2><span class="header-section-number">6.1</span> Example overview</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Example</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="../adaptive_integration_8cpp-example.html">adaptive_integration.cpp</a></td>
+<td align="left">Adaptive integration using ‘tiny_ad’</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../ar1_4D_8cpp-example.html">ar1_4D.cpp</a></td>
+<td align="left">Separable covariance on 4D lattice with AR1 structure in each direction.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../hmm_8cpp-example.html">hmm.cpp</a></td>
+<td align="left">Inference in a ‘double-well’ stochastic differential equation using HMM filter.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../laplace_8cpp-example.html">laplace.cpp</a></td>
+<td align="left">Laplace approximation from scratch demonstrated on ‘spatial’ example.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../linreg_8cpp-example.html">linreg.cpp</a></td>
+<td align="left">Simple linear regression.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../linreg_parallel_8cpp-example.html">linreg_parallel.cpp</a></td>
+<td align="left">Parallel linear regression.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../longlinreg_8cpp-example.html">longlinreg.cpp</a></td>
+<td align="left">Linear regression - 10^6 observations.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../lr_test_8cpp-example.html">lr_test.cpp</a></td>
+<td align="left">Illustrate map feature of TMB to perform likelihood ratio tests on a ragged array dataset.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../matern_8cpp-example.html">matern.cpp</a></td>
+<td align="left">Gaussian process with Matern covariance.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../MVRandomWalkValidation_8cpp-example.html">MVRandomWalkValidation.cpp</a></td>
+<td align="left">MVRandomWalkValidation</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../mvrw_8cpp-example.html">mvrw.cpp</a></td>
+<td align="left">Random walk with multivariate correlated increments and measurement noise.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../mvrw_sparse_8cpp-example.html">mvrw_sparse.cpp</a></td>
+<td align="left">Identical with random walk example. Utilizing sparse block structure so efficient when the number of states is high.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../nmix_8cpp-example.html">nmix.cpp</a></td>
+<td align="left">nmix example from <a href="https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix" class="uri">https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../orange_big_8cpp-example.html">orange_big.cpp</a></td>
+<td align="left">Scaled up version of the Orange Tree example (5000 latent random variables)</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../randomwalkvalidation_8cpp-example.html">randomwalkvalidation.cpp</a></td>
+<td align="left">randomwalkvalidation</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../rickervalidation_8cpp-example.html">rickervalidation.cpp</a></td>
+<td align="left">rickervalidation</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../sam_8cpp-example.html">sam.cpp</a></td>
+<td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../sde_linear_8cpp-example.html">sde_linear.cpp</a></td>
+<td align="left">Inference in a linear scalar stochastic differential equation.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../sdv_multi_8cpp-example.html">sdv_multi.cpp</a></td>
+<td align="left">Multivatiate SV model from Skaug and Yu 2013, Comp. Stat &amp; data Analysis (to appear)</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../sdv_multi_compact_8cpp-example.html">sdv_multi_compact.cpp</a></td>
+<td align="left">Compact version of sdv_multi</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../socatt_8cpp-example.html">socatt.cpp</a></td>
+<td align="left">socatt from ADMB example collection.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../spatial_8cpp-example.html">spatial.cpp</a></td>
+<td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../spde_8cpp-example.html">spde.cpp</a></td>
+<td align="left">Illustration SPDE/INLA approach to spatial modelling via Matern correlation function</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../spde_aniso_8cpp-example.html">spde_aniso.cpp</a></td>
+<td align="left">Anisotropic version of “spde.cpp”.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../thetalog_8cpp-example.html">thetalog.cpp</a></td>
+<td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../transform_8cpp-example.html">transform.cpp</a></td>
+<td align="left">Gamma distributed random effects using copulas.</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../transform2_8cpp-example.html">transform2.cpp</a></td>
+<td align="left">Beta distributed random effects using copulas.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../transform_parallel_8cpp-example.html">transform_parallel.cpp</a></td>
+<td align="left">Parallel version of transform</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../tweedie_8cpp-example.html">tweedie.cpp</a></td>
+<td align="left">Estimating parameters in a Tweedie distribution.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="Densities.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="Errors.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

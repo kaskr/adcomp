@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['getting_20started',['Getting started',['../group__Tutorial.html',1,'']]]
+  ['parallel_20computations',['Parallel computations',['../group__parallel.html',1,'']]]
 ];

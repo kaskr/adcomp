@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['example_20collection',['Example collection',['../group__Examples.html',1,'']]]
+  ['multivariate_20distributions',['Multivariate distributions',['../group__Densities.html',1,'']]]
 ];

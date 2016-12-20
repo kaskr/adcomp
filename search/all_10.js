@@ -1,12 +1,21 @@
 var searchData=
 [
-  ['q_5fspde',['Q_spde',['../namespaceR__inla.html#aafe00b097cadc9ab1c0262dda13599de',1,'R_inla::Q_spde(spde_t&lt; Type &gt; spde, Type kappa)'],['../namespaceR__inla.html#ab91af51de6ea66726e54a7a0694718f5',1,'R_inla::Q_spde(spde_aniso_t&lt; Type &gt; spde, Type kappa, matrix&lt; Type &gt; H)']]],
-  ['qbeta',['qbeta',['../group__R__style__distribution.html#ga8a00b4c3d72a410b787990a8087efd23',1,'distributions_R.hpp']]],
-  ['qexp',['qexp',['../group__R__style__distribution.html#gaba6d35f7cc5d9a8452344ebde87728b0',1,'distributions_R.hpp']]],
-  ['qgamma',['qgamma',['../group__R__style__distribution.html#gae9f8112d1f1ee80879c8e91b7bffac55',1,'distributions_R.hpp']]],
-  ['qnorm',['qnorm',['../group__R__style__distribution.html#ga5fe727a0b7c4861fbab1f2a374a9fed2',1,'distributions_R.hpp']]],
-  ['qnorm1',['qnorm1',['../namespaceatomic.html#a6bb7b5e1dbb5ed751e3320b3f07bef77',1,'atomic']]],
-  ['qnorm_5fapprox',['qnorm_approx',['../convenience_8hpp.html#ae081a2d201b4ee42955148af45ab5af0',1,'convenience.hpp']]],
-  ['qshasho',['qSHASHo',['../group__R__style__distribution.html#ga8f23ef215305e3fbbf590c1397820580',1,'distributions_R.hpp']]],
-  ['qweibull',['qweibull',['../group__R__style__distribution.html#ga103558de8f0ce0380d0ba9affe989dd6',1,'distributions_R.hpp']]]
+  ['parallel',['parallel',['../structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48',1,'config_struct::parallel()'],['../group__parallel.html',1,'(Global Namespace)']]],
+  ['parallel_5faccumulator',['parallel_accumulator',['../structparallel__accumulator.html',1,'']]],
+  ['parameter',['PARAMETER',['../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0',1,'tmb_core.hpp']]],
+  ['parameter_5farray',['PARAMETER_ARRAY',['../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e',1,'tmb_core.hpp']]],
+  ['parameter_5fmatrix',['PARAMETER_MATRIX',['../group__macros.html#gabcad2a3c2d238178707c6c45de2d3bec',1,'tmb_core.hpp']]],
+  ['parameter_5fvector',['PARAMETER_VECTOR',['../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a',1,'tmb_core.hpp']]],
+  ['pbeta',['pbeta',['../group__R__style__distribution.html#ga1a2f7c79b991f6e572c367437744483e',1,'distributions_R.hpp']]],
+  ['perm',['perm',['../structarray.html#aa988a50c76d83b902943c6bed416c508',1,'array::perm()'],['../structtmbutils_1_1array.html#a650887d44a84400ec6d728411ff64abb',1,'tmbutils::array::perm()']]],
+  ['pexp',['pexp',['../group__R__style__distribution.html#ga670e9f9da96ce456915870f60f48877c',1,'distributions_R.hpp']]],
+  ['pgamma',['pgamma',['../group__R__style__distribution.html#gaa242d798beb9de104780857a90b32a65',1,'distributions_R.hpp']]],
+  ['pnorm',['pnorm',['../group__R__style__distribution.html#gac908a1b293d159f4a8958a694674a4a4',1,'distributions_R.hpp']]],
+  ['pnorm1',['pnorm1',['../namespaceatomic.html#ae501e991d939deb58f6455904262be81',1,'atomic']]],
+  ['pnorm_5fapprox',['pnorm_approx',['../convenience_8hpp.html#ac425fd96f63e819ea8f12f30058d41b0',1,'convenience.hpp']]],
+  ['ppois',['ppois',['../namespaceatomic.html#a29ad7d7fdc9702c597b6d76d3ef281e3',1,'atomic::ppois()'],['../group__R__style__distribution.html#ga21965e84a53d083256382b7eeb0383e7',1,'ppois():&#160;distributions_R.hpp']]],
+  ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]],
+  ['proj_5ft',['PROJ_t',['../classPROJ__t.html',1,'']]],
+  ['pshasho',['pSHASHo',['../group__R__style__distribution.html#gaf8d16a1e0e699a2b6975b9ce219ea51a',1,'distributions_R.hpp']]],
+  ['pweibull',['pweibull',['../group__R__style__distribution.html#gac33d133f2004957d705de28a4729b0e8',1,'distributions_R.hpp']]]
 ];

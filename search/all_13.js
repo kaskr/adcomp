@@ -1,10 +1,20 @@
 var searchData=
 [
-  ['the_20structure_20of_20tmb',['The structure of TMB',['../group__Structure__TMB.html',1,'']]],
-  ['tape_5fsymbol',['tape_symbol',['../namespaceatomic.html#a8f24dc404dcd4e67da9eb5431af90a25',1,'atomic']]],
-  ['tmb_2ehpp',['TMB.hpp',['../TMB_8hpp.html',1,'']]],
-  ['tmb_5fcore_2ehpp',['tmb_core.hpp',['../tmb__core_8hpp.html',1,'']]],
-  ['tmbutils',['tmbutils',['../namespacetmbutils.html',1,'']]],
-  ['tmbutils_2ehpp',['tmbutils.hpp',['../tmbutils_8hpp.html',1,'']]],
-  ['transpose',['transpose',['../structarray.html#a9f0df57cc5403f71194f2159ec80bd66',1,'array::transpose()'],['../structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050',1,'tmbutils::array::transpose()']]]
+  ['special_20matrix_20functions',['Special matrix functions',['../group__matrix__functions.html',1,'']]],
+  ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
+  ['scale_5ft',['SCALE_t',['../classSCALE__t.html',1,'']]],
+  ['separable',['SEPARABLE',['../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57',1,'SEPARABLE():&#160;density.hpp'],['../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5',1,'density::SEPARABLE()']]],
+  ['separable_5ft',['SEPARABLE_t',['../classSEPARABLE__t.html',1,'']]],
+  ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],
+  ['simulate',['simulate',['../classAR1__t.html#ab50537f15c92d25cc378863c41b63367',1,'AR1_t::simulate()'],['../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca',1,'density::AR1_t::simulate()'],['../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2',1,'SIMULATE():&#160;tmb_core.hpp']]],
+  ['simulate_5fnot_5fyet_5fimplemented',['SIMULATE_NOT_YET_IMPLEMENTED',['../density_8hpp.html#a55f3dd2dbccf00be303b1d76567d2f22',1,'tmbutils_extra.hpp']]],
+  ['simulation',['Simulation',['../Simulation.html',1,'']]],
+  ['sparsity',['Sparsity',['../Sparsity.html',1,'']]],
+  ['spde_5faniso_5ft',['spde_aniso_t',['../structR__inla_1_1spde__aniso__t.html',1,'R_inla']]],
+  ['spde_5ft',['spde_t',['../structR__inla_1_1spde__t.html',1,'R_inla']]],
+  ['special_20mathematical_20functions',['Special mathematical functions',['../group__special__functions.html',1,'']]],
+  ['split',['split',['../convenience_8hpp.html#a6f8b0640162d24d598e3f137ce43e2e8',1,'convenience.hpp']]],
+  ['spmat_2ehpp',['spmat.hpp',['../spmat_8hpp.html',1,'']]],
+  ['squeeze',['squeeze',['../convenience_8hpp.html#a60881c3c25c4c417f502545879c32d5e',1,'convenience.hpp']]],
+  ['sum',['sum',['../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3',1,'convenience.hpp']]]
 ];
