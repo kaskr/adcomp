@@ -96,14 +96,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">               <a name="_a0"></a><a class="code" href="structvector.html">vector&lt;Type&gt;</a> u,<a name="_a1"></a><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> y,<a class="code" href="structvector.html">vector&lt;Type&gt;</a> N, <a class="code" href="structvector.html">vector&lt;Type&gt;</a> x, </div>
 <div class="line">               <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> IDind){</div>
 <div class="line">  <span class="keyword">using</span> CppAD::Integer;</div>
-<div class="line">  <span class="keywordtype">int</span> R=y.rows();</div>
 <div class="line">  <span class="keywordtype">int</span> T=y.cols();</div>
 <div class="line">  <span class="keywordtype">int</span> S=N.size();</div>
 <div class="line">  Type sigma = exp(log_sigma);</div>
 <div class="line">  Type lambda = exp(log_lambda);</div>
 <div class="line">  Type e=1e-12;</div>
 <div class="line">  Type nll=0;</div>
-<div class="line">  <span class="keywordtype">int</span> nIDi=u.size();</div>
 <div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> logf(S);</div>
 <div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> logg(S);</div>
 <div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> fg(S);</div>
@@ -137,9 +135,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line">{</div>
 <div class="line">  <span class="comment">/* data section */</span></div>
 <div class="line">  <a name="a4"></a><a class="code" href="group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(R);              <span class="comment">// Number of sites</span></div>
-<div class="line">  <a class="code" href="group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(T);              <span class="comment">// Number of occasions</span></div>
-<div class="line">  <a class="code" href="group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(S);              <span class="comment">// Number of possible values of N</span></div>
-<div class="line">  <a class="code" href="group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>(nG);             <span class="comment">// Number of groups</span></div>
 <div class="line">  <a name="a5"></a><a class="code" href="group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(N);               <span class="comment">// Possible values of N</span></div>
 <div class="line">  <a class="code" href="group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(nID);             <span class="comment">// Number of observers present at a site</span></div>
 <div class="line">  <a name="a6"></a><a class="code" href="group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>(ID);              <span class="comment">// IDs of observer present at each site</span></div>
