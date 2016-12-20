@@ -12,7 +12,6 @@ Type objective_function<Type>::operator() ()
   PARAMETER(a);
   PARAMETER(log_sigma);
   PARAMETER_VECTOR(u);
-  Type sigma2=exp(2.0*log_sigma);
 
   using namespace density;
   int i,j;

@@ -14,7 +14,6 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(logsds);
   PARAMETER_VECTOR(logsdObs);
   int timeSteps=obs.dim[1];
-  int stateDim=obs.dim[0];
   Type rho=f(transf_rho);
   vector<Type> sds=exp(logsds);
   vector<Type> sdObs=exp(logsdObs);

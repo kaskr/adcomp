@@ -6,14 +6,12 @@ Type nll_group(int i, Type p0,Type p1,Type log_lambda, Type log_sigma,
 	       vector<Type> u,matrix<Type> y,vector<Type> N, vector<Type> x, 
 	       matrix<Type> IDind){
   using CppAD::Integer;
-  int R=y.rows();
   int T=y.cols();
   int S=N.size();
   Type sigma = exp(log_sigma);
   Type lambda = exp(log_lambda);
   Type e=1e-12;
   Type nll=0;
-  int nIDi=u.size();
   vector<Type> logf(S);
   vector<Type> logg(S);
   vector<Type> fg(S);
@@ -47,9 +45,6 @@ Type objective_function<Type>::operator() ()
 {
   /* data section */
   DATA_INTEGER(R);              // Number of sites
-  DATA_INTEGER(T);              // Number of occasions
-  DATA_INTEGER(S);              // Number of possible values of N
-  DATA_INTEGER(nG);             // Number of groups
   DATA_VECTOR(N);               // Possible values of N
   DATA_VECTOR(nID);             // Number of observers present at a site
   DATA_FACTOR(ID);              // IDs of observer present at each site
