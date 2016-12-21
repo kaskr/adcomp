@@ -15,6 +15,10 @@ os:
 dist: trusty
 
 install:
+  - wget http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.12.linux.bin.tar.gz
+  - tar zxf doxygen-1.8.12.linux.bin.tar.gz
+  - export PATH=`pwd`/doxygen-1.8.12/bin:$PATH
+  - doxygen -v
   - Rscript -e 'pkg <- c("roxygen2", "RcppEigen", "numDeriv", "parallel", "knitr", "bookdown", "rsvg"); if(!all(pkg%in%installed.packages())) install.packages(pkg)'
 
 script:
@@ -36,7 +40,7 @@ notifications:
 addons:
   apt:
     packages:
-      - doxygen
+##      - doxygen
       - pandoc
       - graphviz
       - librsvg2-dev
