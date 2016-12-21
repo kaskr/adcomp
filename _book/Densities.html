@@ -176,7 +176,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="Densities" class="section level1">
 <h1><span class="header-section-number">5</span> Multivariate distributions</h1>
 <p>The namespace</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> density;</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</code></pre></div>
 <p>gives access to a variety of multivariate normal distributions:</p>
 <ul>
 <li>Multivariate normal distributions specified via a covariance matrix (structured or unstructured).</li>
@@ -195,23 +195,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point           </span>
 x.fill(<span class="fl">0.</span><span class="dv">0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></code></pre></div>
 <p>The negative log-normal density is evaluated as follows:</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> density;
-<a class="code" href="../structmatrix.html">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
+<a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span>
 <span class="co">// ..... User must assign value to Sigma here</span>
-res = <a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)(x);      <span class="co">// Evaluate negative log likelihod</span></code></pre></div>
-<p>In the last line <code><a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)</code> should be interpreted as a multivariate density, which via the last parenthesis <code>(x)</code> is evaluated at <code>x</code>. A less compact way of expressing this is</p>
+res = <a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(x);      <span class="co">// Evaluate negative log likelihod</span></code></pre></div>
+<p>In the last line <code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)</code> should be interpreted as a multivariate density, which via the last parenthesis <code>(x)</code> is evaluated at <code>x</code>. A less compact way of expressing this is</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../classMVNORM__t.html">MVNORM_t</a>&lt;Type&gt; your_dmnorm(Sigma);
 res = your_dmnorm(x);</code></pre></div>
 <p>in which <code>your_dmnorm</code> is a variable that holds the “density”.</p>
-<p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of these freely (modulo the positive definite constraint) you can use <code><a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>()</code> to specify the correlation matrix, and <code><a class="code" href="../namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>()</code> to specify variances. <code><a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>()</code> takes as input a vector a dummy parameters that internally is used to build the correlation matrix via its cholesky factor.</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> density;
+<p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of these freely (modulo the positive definite constraint) you can use <code><a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>()</code> to specify the correlation matrix, and <code><a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>()</code> to specify variances. <code><a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>()</code> takes as input a vector a dummy parameters that internally is used to build the correlation matrix via its cholesky factor.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
 <span class="dt">int</span> n = <span class="dv">10</span>;
 <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; unconstrained_params(n*(n<span class="dv">-1</span>)/<span class="dv">2</span>);  <span class="co">// Dummy parameterization of correlation matrix</span>
 <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; sds(n);                           <span class="co">// Standard deviations</span>
-res = <a class="code" href="../namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>(<a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</code></pre></div>
+res = <a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>(<a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</code></pre></div>
 <p>If all elements of <code>dummy_params</code> are estimated we are in effect estimating a full correlation matrix without any constraints on its elements (except for the mandatory positive definiteness). The actual value of the correlation matrix, but not the full covariance matrix, can easily be assessed using the <code>.<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>()</code> operator</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../structmatrix.html">matrix</a>&lt;Type&gt; Sigma(n,n);
-Sigma = <a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);
+Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();
 <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to R session</span></code></pre></div>
 </div>
 <div id="autoregressive-processes" class="section level2">
@@ -222,12 +222,12 @@ Sigma = <a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245d
 </ul>
 <p>The multivariate density of the vector <em>x</em> can be evaluated as follows</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = <span class="dv">10</span>;
-<span class="kw">using</span> <span class="kw">namespace</span> density;
+<span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
  
 <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point</span>
 x.fill(<span class="fl">0.</span><span class="dv">0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span>
 Type rho = <span class="fl">0.</span><span class="dv">2</span>;              <span class="co">// Correlation parameter</span>
-res = AR1(rho)(x);           <span class="co">// Evaluate negative log-density of AR1 process at point x </span></code></pre></div>
+res = AR1(rho)(x);           <span class="co">// Evaluate negative log-<a class="code" href="../namespacedensity.html">density</a> of AR1 process at point x </span></code></pre></div>
 <p>Due to the assumed stationarity the correlation parameter must satisfy:</p>
 <ul>
 <li><strong>Stationarity</strong> constraint: -1 &lt; <em>rho</em> &lt; 1</li>
@@ -274,7 +274,7 @@ res = AR1(phi,your_dmnorm)(x);</code></pre></div>
 <p>Assume that we study a quantity <code>x</code> that changes both in space and time. For simplicity we consider only a one-dimensional space. We discretize space and time using equidistant grids, and assume that the distance between grid points is 1 in both dimensions. We then define an <code>AR1(rho_s)</code> process in space and one in time <code>AR1(rho_t)</code>. The separable assumption is that two points <code>x1</code> and <code>x2</code>, separated in space by a distance <code>ds</code> and in time by a distance <code>dt</code>, have correlation given by</p>
 <p><code>rho_s^ds*rho_t^dt</code></p>
 <p>This is implemented as</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> density;
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
 <span class="dt">int</span> n_s = <span class="dv">10</span>;                   <span class="co">// Number of grid points in space</span>
 <span class="dt">int</span> n_t = <span class="dv">10</span>;                   <span class="co">// Number of grid points in time</span>
 Type rho_s = <span class="fl">0.</span><span class="dv">2</span>;               <span class="co">// Correlation in space</span>
@@ -283,8 +283,8 @@ Type rho_t = <span class="fl">0.</span><span class="dv">4</span>;               
 <a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(n_s,n_t);
 x.setZero();                    <span class="co">// x = 0</span>
 
-res = <a class="code" href="../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(rho_t),AR1(rho_s))(x);</code></pre></div>
-<p>Note that the arguments to <code><a class="code" href="../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>()</code> are given in the opposite order to the dimensions of <code>x</code>.</p>
+res = <a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(rho_t),AR1(rho_s))(x);</code></pre></div>
+<p>Note that the arguments to <code><a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>()</code> are given in the opposite order to the dimensions of <code>x</code>.</p>
 </div>
 </div>
             </section>

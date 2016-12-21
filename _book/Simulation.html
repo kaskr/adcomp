@@ -194,8 +194,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3><span class="header-section-number">12.1.2</span> Generators for density objects</h3>
 <p>Objects from the density namespace have their own <code><a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>()</code> method. Taking the multivariate normal distribution as example we have the following ways to draw a simulation:</p>
 <ol style="list-style-type: decimal">
-<li><code><a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>()</code> returns a vector with a simulation from the multivariate normal distribution. The void argument version is only available when there is no ambiguity in the dimension of the output. In the <code>MVNORM</code> case the dimension of the output is known from the dimension of <code>Sigma</code>. In other cases e.g. <code>AR1(phi)</code> the dimension of the output is not known hence the void argument version is not available.</li>
-<li><code><a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>(x)</code> pass <code>x</code> by reference and writes the simulation directly to <code>x</code> without returning anything. This version is available for <em>all</em> the classes because the dimension of the simulation can always be deduced from <code>x</code>.</li>
+<li><code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>()</code> returns a vector with a simulation from the multivariate normal distribution. The void argument version is only available when there is no ambiguity in the dimension of the output. In the <code>MVNORM</code> case the dimension of the output is known from the dimension of <code>Sigma</code>. In other cases e.g. <code>AR1(phi)</code> the dimension of the output is not known hence the void argument version is not available.</li>
+<li><code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>(x)</code> pass <code>x</code> by reference and writes the simulation directly to <code>x</code> without returning anything. This version is available for <em>all</em> the classes because the dimension of the simulation can always be deduced from <code>x</code>.</li>
 </ol>
 </div>
 </div>
@@ -264,7 +264,7 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
   Type phi=f(transf_phi);
   <a class="code" href="../group__macros.html#ga43a13c435127491364e4a167478f4992">ADREPORT</a>(phi);
 
-  <span class="kw">using</span> <span class="kw">namespace</span> density;
+  <span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
   Type res=<span class="dv">0</span>;
 
   res+=AR1(phi,AR1(phi,AR1(phi,AR1(phi))))(eta);
