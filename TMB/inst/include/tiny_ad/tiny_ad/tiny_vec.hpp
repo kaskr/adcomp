@@ -19,6 +19,9 @@ struct tiny_vec {
   tiny_vec(const tiny_vec &other) {
     for(int i=0; i<n; i++) data[i] = other.data[i];
   }
+  tiny_vec(const Type &other) {
+    for(int i=0; i<n; i++) data[i] = other;
+  }
   void resize(size_t length){ /* Ignore - this is fixed size */ }
   int size() const { return n; }
   Type operator[] (size_t i) const { return data[i]; }
@@ -77,9 +80,9 @@ struct tiny_vec {
   #endif
 };
 
-template<class Type, int n, class T>
-tiny_vec<Type, n> operator* (const T &x, const tiny_vec<Type, n> &y) {
-  return y * x;
+template<class Type, int n>
+tiny_vec<Type, n> operator* (const Type &x, const tiny_vec<Type, n> &y) {
+  return y.operator* (x);
 }
 
 template<class Type, int n>
