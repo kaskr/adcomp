@@ -131,20 +131,6 @@ summary(rep, "report")                      ## Only report
 ## Bias correction
 rep <- sdreport(obj, bias.correct = TRUE)
 summary(rep, "report")                      ## Include bias correction
-
-\dontrun{
-## Verify bias correction using mcmc with parameters fixed at MLE
-obj2 <- MakeADFun(
-  data = obj$env$data,
-  parameters = obj$env$parList(),
-  map = list(beta   = factor(c(NA, NA)),
-             logsdu = factor(NA),
-             logsd0 = factor(NA) ),
-  DLL = "simple"
-)
-s <- run_mcmc(obj2, 1000, "NUTS")
-plot(rowSums(exp(s)))
-mean(rowSums(exp(s))) }
 }
 \seealso{
 \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}

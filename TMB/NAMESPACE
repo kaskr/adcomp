@@ -63,6 +63,3 @@ S3method(as.list, sdreport)
 S3method(plot, parallelBenchmark)
 
 S3method(print, backtrace)
-
-## MCMC :
-export(run_mcmc)
