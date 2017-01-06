@@ -555,6 +555,76 @@ Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
   return ( give_log ? ans : exp(ans) );
 }
 
+
+/** \brief Conway-Maxwell-Poisson log normalizing constant.
+
+    \f[ Z(\lambda, \nu) = \sum_{i=0}^{\infty} \frac{\lambda^i}{(i!)^\nu} \f] .
+
+    \param loglambda \f$ \log(\lambda) \f$
+    \param nu \f$ \nu \f$
+
+    \return \f$ \log Z(\lambda, \nu) \f$
+*/
+template<class Type>
+Type compois_calc_logZ(Type loglambda, Type nu) {
+  CppAD::vector<Type> tx(3);
+  tx[0] = loglambda;
+  tx[1] = nu;
+  tx[2] = 0;
+  return atomic::compois_calc_logZ(tx)[0];
+}
+VECTORIZE2_tt(compois_calc_logZ)
+
+/** \brief Conway-Maxwell-Poisson. Calculate log(lambda) from
+    log(mean).
+
+    \param logmean \f$ \log(E[X]) \f$
+    \param nu \f$ \nu \f$
+
+    \return \f$ \log \lambda \f$
+*/
+template<class Type>
+Type compois_calc_loglambda(Type logmean, Type nu) {
+  CppAD::vector<Type> tx(3);
+  tx[0] = logmean;
+  tx[1] = nu;
+  tx[2] = 0;
+  return atomic::compois_calc_loglambda(tx)[0];
+}
+VECTORIZE2_tt(compois_calc_loglambda)
+
+/** \brief Conway-Maxwell-Poisson. Calculate log density.
+
+    Silently returns NaN if not within the valid parameter range:
+    \f[ (0 \leq x) \land (0 < \lambda) \land (0 < \nu) \f] .
+
+    \ingroup R_style_distribution
+*/
+template<class T1, class T2, class T3>
+T1 dcompois(T1 x, T2 lambda, T3 nu, int give_log = 0) {
+  T2 loglambda = log(lambda);
+  T1 ans = x * loglambda - nu * lfactorial(x);
+  ans -= compois_calc_logZ(loglambda, nu);
+  return ( give_log ? ans : exp(ans) );
+}
+
+/** \brief Conway-Maxwell-Poisson. Calculate log density parameterized
+    via the mean.
+
+    Silently returns NaN if not within the valid parameter range:
+    \f[ (0 \leq x) \land (0 < mean) \land (0 < \nu) \f] .
+
+    \ingroup R_style_distribution
+*/
+template<class T1, class T2, class T3>
+T1 dcompois2(T1 x, T2 mean, T3 nu, int give_log = 0) {
+  T2 logmean = log(mean);
+  T2 loglambda = compois_calc_loglambda(logmean, nu);
+  T1 ans = x * loglambda - nu * lfactorial(x);
+  ans -= compois_calc_logZ(loglambda, nu);
+  return ( give_log ? ans : exp(ans) );
+}
+
 /********************************************************************/
 /* SIMULATON CODE                                                   */
 /********************************************************************/

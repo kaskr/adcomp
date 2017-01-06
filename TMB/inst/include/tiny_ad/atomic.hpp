@@ -84,6 +84,18 @@ TMB_BIND_ATOMIC(logspace_sub,
                 robust_utils::logspace_sub(x[0], x[1]) )
 
 /********************************************************************
+ * Adding Conway-Maxwell_poisson distribution
+ ********************************************************************/
+#include "compois/compois.hpp"
+TMB_BIND_ATOMIC(compois_calc_logZ,
+                11,
+                compois_utils::calc_logZ(x[0], x[1]) )
+
+TMB_BIND_ATOMIC(compois_calc_loglambda,
+                11,
+                compois_utils::calc_loglambda(x[0], x[1]) )
+
+/********************************************************************
  * Adding 'qbeta'
  ********************************************************************/
 extern "C" double Rf_qbeta(double, double, double, int, int);
