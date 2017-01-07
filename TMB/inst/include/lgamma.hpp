@@ -17,6 +17,18 @@ Type lgamma(Type x){
 }
 VECTORIZE1_t(lgamma)
 
+/** \brief Logarithm of factorial function (following R argument convention).
+    \ingroup special_functions
+*/
+template<class Type>
+Type lfactorial(Type x){
+  CppAD::vector<Type> tx(2);
+  tx[0] = x + Type(1);
+  tx[1] = Type(0);
+  return atomic::D_lgamma(tx)[0];
+}
+VECTORIZE1_t(lfactorial)
+
 /* Old lgamma approximation */
 template <class Type>
 inline Type lgamma_approx(const Type &y)
