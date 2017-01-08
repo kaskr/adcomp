@@ -85,6 +85,7 @@ $(function() {
 <code>#include &quot;bessel/bessel.hpp&quot;</code><br />
 <code>#include &quot;tweedie/tweedie.hpp&quot;</code><br />
 <code>#include &quot;robust/distributions.hpp&quot;</code><br />
+<code>#include &quot;compois/compois.hpp&quot;</code><br />
 </div>
 <p><a href="atomic_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -96,6 +97,21 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a5004948ab884ea2da84e3fbe0d12f890"><td class="memTemplParams" colspan="2"><a id="a5004948ab884ea2da84e3fbe0d12f890"></a>
+template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a5004948ab884ea2da84e3fbe0d12f890"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="atomic_8hpp.html#a5004948ab884ea2da84e3fbe0d12f890">atomic::compois_utils::calc_loglambda</a> (Type logmean, Type nu)</td></tr>
+<tr class="memdesc:a5004948ab884ea2da84e3fbe0d12f890"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate log(lambda) from log(mean). <br /></td></tr>
+<tr class="separator:a5004948ab884ea2da84e3fbe0d12f890"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc9681115cce142a78d24c37ec0bb7bd"><td class="memTemplParams" colspan="2"><a id="adc9681115cce142a78d24c37ec0bb7bd"></a>
+template&lt;class Type &gt; </td></tr>
+<tr class="memitem:adc9681115cce142a78d24c37ec0bb7bd"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="atomic_8hpp.html#adc9681115cce142a78d24c37ec0bb7bd">atomic::compois_utils::calc_logZ</a> (Type loglambda, Type nu)</td></tr>
+<tr class="memdesc:adc9681115cce142a78d24c37ec0bb7bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate log-normalizing constant. <br /></td></tr>
+<tr class="separator:adc9681115cce142a78d24c37ec0bb7bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13a72cb40293a525ea805b450746bf2b"><td class="memTemplParams" colspan="2"><a id="a13a72cb40293a525ea805b450746bf2b"></a>
+template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a13a72cb40293a525ea805b450746bf2b"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="atomic_8hpp.html#a13a72cb40293a525ea805b450746bf2b">atomic::compois_utils::calc_mean</a> (Type loglambda, Type nu)</td></tr>
+<tr class="memdesc:a13a72cb40293a525ea805b450746bf2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate mean from log(lambda). <br /></td></tr>
+<tr class="separator:a13a72cb40293a525ea805b450746bf2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacf2ed2ae2a9935331b45947fd174c90"><td class="memTemplParams" colspan="2">template&lt;class Float &gt; </td></tr>
 <tr class="memitem:aacf2ed2ae2a9935331b45947fd174c90"><td class="memTemplItemLeft" align="right" valign="top">Float&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="atomic_8hpp.html#aacf2ed2ae2a9935331b45947fd174c90">atomic::robust_utils::dbinom_robust</a> (Float k, Float size, Float logit_p, int give_log=0)</td></tr>
 <tr class="memdesc:aacf2ed2ae2a9935331b45947fd174c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Robust binomial distribution <em>without</em> normalizing constant.  <a href="atomic_8hpp.html#aacf2ed2ae2a9935331b45947fd174c90">More...</a><br /></td></tr>
