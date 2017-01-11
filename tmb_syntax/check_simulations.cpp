@@ -24,6 +24,18 @@ Type objective_function<Type>::operator() ()
     vector<Type> x = rpois(n, lambda);
     ans -= dpois(x, lambda, true).sum();
   }
+  else if (distr == "compois") {
+    PARAMETER(lambda);
+    PARAMETER(nu);
+    vector<Type> x = rcompois(n, lambda, nu);
+    ans -= dcompois(x, lambda, nu, true).sum();
+  }
+  else if (distr == "compois2") {
+    PARAMETER(mean);
+    PARAMETER(nu);
+    vector<Type> x = rcompois2(n, mean, nu);
+    ans -= dcompois2(x, mean, nu, true).sum();
+  }
   else if (distr == "nbinom") {
     PARAMETER(size);
     PARAMETER(prob);
