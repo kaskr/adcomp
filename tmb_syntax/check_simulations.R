@@ -44,6 +44,20 @@ checkSimulation(obj)
 
 ######################################################################
 
+data <- list(distr="compois", n=n)
+parameters <- list(lambda=3, nu=0.5)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
+data <- list(distr="compois2", n=n)
+parameters <- list(mean=3, nu=0.1)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
 data <- list(distr="nbinom", n=n)
 parameters <- list(size=5, prob=.1)
 obj <- MakeADFun(data, parameters)
