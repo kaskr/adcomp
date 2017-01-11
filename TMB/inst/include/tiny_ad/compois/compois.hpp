@@ -132,4 +132,81 @@ Type calc_loglambda(Type logmean, Type nu) {
   return x.value;
 }
 
+extern "C" {
+  double Rf_lgammafn(double);
+  double Rf_psigamma(double, double);
+  double Rf_expm1(double);
+  double Rf_pgeom(double x, double p, int lower_tail, int log_p);
+  double Rf_runif(double a, double b);
+  double Rf_qgeom(double p, double prob, int lower_tail, int log_p);
+  double Rf_rgeom(double p);
+}
+
+/** \brief Conway-Maxwell-Poisson. Rejection sampler using a Piecewise
+    log-linear envelope. Does not require the normalizing constant.
+
+    Gives fairly high acceptance rates - typically around 0.7 even for
+    extreme parameters. The values j0 and j1 (tangent-points for the
+    linear envelope) used here, are the mode plus/minus one standard
+    deviation of the approximating Gaussian. This is 'hand-tuned' thus
+    probably not optimal.
+*/
+#ifdef WITH_LIBTMB
+double simulate(double lambda, double nu);
+#else
+double simulate(double lambda, double nu) {
+#define logf_target(x)  ( nu * ( x * logmu - Rf_lgammafn(x+1) ) )
+#define logf_propose(x) ( x < jhat ? logf0(x) : logf1(x) )
+#define logf0(x) ( v0 + slope0 * (x - j0) )
+#define logf1(x) ( v1 + slope1 * (x - j1) )
+  double logmu = log(lambda) / nu;
+  double mu = exp(logmu);
+  double jhat = mu - .5;
+  double h = 1. / sqrt(nu * Rf_psigamma(jhat, 1));
+  double j0 = fmax(jhat - h, 0); // left tangent point
+  double j1 = jhat + h;          // right tangent point
+  double slope0 = nu * ( logmu - Rf_psigamma(j0+1, 0) );
+  double slope1 = nu * ( logmu - Rf_psigamma(j1+1, 0) );
+  double v0 = nu * ( j0 * logmu - Rf_lgammafn(j0+1) );
+  double v1 = nu * ( j1 * logmu - Rf_lgammafn(j1+1) );
+  // Geometric success probabilities
+  double prob0 = -expm1(-slope0);
+  double prob1 = -expm1(slope1);
+  double mu0 = floor(jhat); // Left offset
+  double mu1 = mu0 + 1;     // right offset
+  double p0 = Rf_pgeom(mu0, prob0, 1, 0); // Left tail is truncated
+  double w0 = p0 * exp(logf0(mu0)) / prob0; // Mass of left tail proposal
+  double w1 = 1  * exp(logf1(mu1)) / prob1; // Mass of right tail proposal
+  double samp = NAN;
+  int i=0, iter_max = 1e4;
+  for ( ; i < iter_max; i++ ) {
+    // Draw proposal sample
+    if( Rf_runif(0, 1) < w0 / (w0 + w1) ) {
+      samp = mu0 - Rf_qgeom(Rf_runif(0, p0), prob0, 1, 0);
+    } else {
+      samp = mu1 + Rf_rgeom(prob1);
+    }
+    double paccept = exp(logf_target(samp) - logf_propose(samp));
+    if(paccept > 1) {
+      samp = NAN;
+      warning("compois sampler failed (probably overflow: paccept = %f)", paccept);
+      break;
+    }
+    if( Rf_runif(0, 1) < paccept ) break;
+  }
+  if (i == iter_max) {
+    samp = NAN;
+    warning("compois sampler failed (iteration limit exceeded)");
+  }
+  if (samp != samp) { // NAN
+    warning("compois sampler returned NaN for mu=%f nu=%f", mu, nu);
+  }
+#undef logf_target
+#undef logf_propose
+#undef logf0
+#undef logf1
+  return samp;
+}
+#endif
+
 } // compois_utils
