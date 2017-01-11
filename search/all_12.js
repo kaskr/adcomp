@@ -5,6 +5,8 @@ var searchData=
   ['r_20style_20probability_20distributions',['R style probability distributions',['../group__R__style__distribution.html',1,'']]],
   ['rbeta',['rbeta',['../distributions__R_8hpp.html#ae5f4590feabf617af4f525518b5802b8',1,'distributions_R.hpp']]],
   ['rbinom',['rbinom',['../distributions__R_8hpp.html#a29a4e821ec4b62567f8b40ab6ae78187',1,'distributions_R.hpp']]],
+  ['rcompois',['rcompois',['../distributions__R_8hpp.html#a8e5557f7412200380110c235cf41b6b2',1,'distributions_R.hpp']]],
+  ['rcompois2',['rcompois2',['../distributions__R_8hpp.html#ae0cee337bb07ffb8593d9fb3fb18b245',1,'distributions_R.hpp']]],
   ['report',['REPORT',['../group__macros.html#gac2d7888f4e0385930448f992de53079b',1,'tmb_core.hpp']]],
   ['rexp',['rexp',['../distributions__R_8hpp.html#ae83ce74738a3b97e3432225a9036c99a',1,'distributions_R.hpp']]],
   ['rf',['rf',['../distributions__R_8hpp.html#afc356ef7a9514c2629dd14de76e7e265',1,'distributions_R.hpp']]],

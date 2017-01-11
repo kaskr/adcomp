@@ -125,6 +125,9 @@ template&lt;class Type &gt; </td></tr>
 <tr class="memitem:ga177b023eb871927fcfc90259e9f00382"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a> (Type x)</td></tr>
 <tr class="memdesc:ga177b023eb871927fcfc90259e9f00382"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logarithm of gamma function (following R argument convention). <br /></td></tr>
 <tr class="separator:ga177b023eb871927fcfc90259e9f00382"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa35013a5da531ade852595a1ff4457cf"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="atomic_8hpp.html#aa35013a5da531ade852595a1ff4457cf">atomic::compois_utils::simulate</a> (double lambda, double nu)</td></tr>
+<tr class="memdesc:aa35013a5da531ade852595a1ff4457cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Rejection sampler using a Piecewise log-linear envelope. Does not require the normalizing constant.  <a href="atomic_8hpp.html#aa35013a5da531ade852595a1ff4457cf">More...</a><br /></td></tr>
+<tr class="separator:aa35013a5da531ade852595a1ff4457cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Special functions depending on 'tiny_ad'. </p>
@@ -231,6 +234,39 @@ template&lt;class Float &gt; </div>
 <p>log_mu := log(mu) log_var_minus_mu := log(var - mu) </p>
 
 <p>Definition at line <a class="el" href="atomic_8hpp_source.html#l00048">48</a> of file <a class="el" href="atomic_8hpp_source.html">atomic.hpp</a>.</p>
+
+</div>
+</div>
+<a id="file_aa35013a5da531ade852595a1ff4457cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#file_aa35013a5da531ade852595a1ff4457cf">&sect;&nbsp;</a></span>simulate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double atomic::compois_utils::simulate </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>lambda</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>nu</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conway-Maxwell-Poisson. Rejection sampler using a Piecewise log-linear envelope. Does not require the normalizing constant. </p>
+<p>Gives fairly high acceptance rates - typically around 0.7 even for extreme parameters. The values j0 and j1 (tangent-points for the linear envelope) used here, are the mode plus/minus one standard deviation of the approximating Gaussian. This is 'hand-tuned' thus probably not optimal. </p>
+
+<p>Definition at line <a class="el" href="atomic_8hpp_source.html#l00158">158</a> of file <a class="el" href="atomic_8hpp_source.html">atomic.hpp</a>.</p>
 
 </div>
 </div>
