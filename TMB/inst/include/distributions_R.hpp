@@ -766,3 +766,32 @@ Type rweibull(Type shape, Type scale)
 
 VECTORIZE2_tt(rweibull)
 VECTORIZE2_n(rweibull)
+
+/** \brief Simulate from a Conway-Maxwell-Poisson distribution  */
+template<class Type>
+Type rcompois(Type lambda, Type nu)
+{
+  return atomic::compois_utils::simulate(asDouble(lambda), asDouble(nu));
+}
+VECTORIZE2_tt(rcompois)
+VECTORIZE2_n(rcompois)
+
+/** \brief Simulate from a Conway-Maxwell-Poisson distribution  */
+template<class Type>
+Type rcompois2(Type mean, Type nu)
+{
+  Type logmean = log(mean);
+  Type loglambda = compois_calc_loglambda(logmean, nu);
+  return rcompois(exp(loglambda), nu);
+}
+VECTORIZE2_tt(rcompois2)
+
+// Note: Vectorize manually to avoid many identical calls to
+// 'calc_loglambda'.
+template<class Type>
+vector<Type> rcompois2(int n, Type mean, Type nu)
+{
+  Type logmean = log(mean);
+  Type loglambda = compois_calc_loglambda(logmean, nu);
+  return rcompois(n, exp(loglambda), nu);
+}
