@@ -152,14 +152,14 @@ extern "C" {
     probably not optimal.
 */
 #ifdef WITH_LIBTMB
-double simulate(double lambda, double nu);
+double simulate(double loglambda, double nu);
 #else
-double simulate(double lambda, double nu) {
+double simulate(double loglambda, double nu) {
 #define logf_target(x)  ( nu * ( x * logmu - Rf_lgammafn(x+1) ) )
 #define logf_propose(x) ( x < jhat ? logf0(x) : logf1(x) )
 #define logf0(x) ( v0 + slope0 * (x - j0) )
 #define logf1(x) ( v1 + slope1 * (x - j1) )
-  double logmu = log(lambda) / nu;
+  double logmu = loglambda / nu;
   double mu = exp(logmu);
   double jhat = mu - .5;
   double h = 1. / sqrt(nu * Rf_psigamma(jhat, 1));

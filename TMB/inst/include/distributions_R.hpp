@@ -593,26 +593,36 @@ Type compois_calc_loglambda(Type logmean, Type nu) {
 }
 VECTORIZE2_tt(compois_calc_loglambda)
 
-/** \brief Conway-Maxwell-Poisson. Calculate log density.
+/** \brief Conway-Maxwell-Poisson. Calculate density.
+
+    \f[ P(X=x) \propto \frac{\lambda^x}{(x!)^\nu}\:,x=0,1,\ldots \f]
 
     Silently returns NaN if not within the valid parameter range:
     \f[ (0 \leq x) \land (0 < \lambda) \land (0 < \nu) \f] .
 
+    \param x Observation
+    \param mode Approximate mode \f$ \lambda^\nu \f$
+    \param nu   \f$ \nu \f$
+
     \ingroup R_style_distribution
 */
 template<class T1, class T2, class T3>
-T1 dcompois(T1 x, T2 lambda, T3 nu, int give_log = 0) {
-  T2 loglambda = log(lambda);
+T1 dcompois(T1 x, T2 mode, T3 nu, int give_log = 0) {
+  T2 loglambda = nu * log(mode);
   T1 ans = x * loglambda - nu * lfactorial(x);
   ans -= compois_calc_logZ(loglambda, nu);
   return ( give_log ? ans : exp(ans) );
 }
 
-/** \brief Conway-Maxwell-Poisson. Calculate log density parameterized
-    via the mean.
+/** \brief Conway-Maxwell-Poisson. Calculate density parameterized via
+    the mean.
 
     Silently returns NaN if not within the valid parameter range:
-    \f[ (0 \leq x) \land (0 < mean) \land (0 < \nu) \f] .
+    \f[ (0 \leq x) \land (0 < E[X]) \land (0 < \nu) \f] .
+
+    \param x Observation
+    \param mean \f$ E[X] \f$
+    \param nu   \f$ \nu \f$
 
     \ingroup R_style_distribution
 */
@@ -769,9 +779,10 @@ VECTORIZE2_n(rweibull)
 
 /** \brief Simulate from a Conway-Maxwell-Poisson distribution  */
 template<class Type>
-Type rcompois(Type lambda, Type nu)
+Type rcompois(Type mode, Type nu)
 {
-  return atomic::compois_utils::simulate(asDouble(lambda), asDouble(nu));
+  Type loglambda = nu * log(mode);
+  return atomic::compois_utils::simulate(asDouble(loglambda), asDouble(nu));
 }
 VECTORIZE2_tt(rcompois)
 VECTORIZE2_n(rcompois)
@@ -782,7 +793,7 @@ Type rcompois2(Type mean, Type nu)
 {
   Type logmean = log(mean);
   Type loglambda = compois_calc_loglambda(logmean, nu);
-  return rcompois(exp(loglambda), nu);
+  return atomic::compois_utils::simulate(asDouble(loglambda), asDouble(nu));
 }
 VECTORIZE2_tt(rcompois2)
 
@@ -793,5 +804,6 @@ vector<Type> rcompois2(int n, Type mean, Type nu)
 {
   Type logmean = log(mean);
   Type loglambda = compois_calc_loglambda(logmean, nu);
-  return rcompois(n, exp(loglambda), nu);
+  Type mode = exp(loglambda / nu);
+  return rcompois(n, mode, nu);
 }
