@@ -45,7 +45,7 @@ checkSimulation(obj)
 ######################################################################
 
 data <- list(distr="compois", n=n)
-parameters <- list(lambda=3, nu=0.5)
+parameters <- list(mode=3, nu=0.5)
 obj <- MakeADFun(data, parameters)
 checkSimulation(obj)
 

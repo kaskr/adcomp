@@ -12,12 +12,11 @@ Type objective_function<Type>::operator() ()
   Type f = 0;
 
   if (parameterization == "mode") {
-    Type lambda = exp(nu * log(mu));
-    f -= sum(dcompois(x, lambda, nu, true));
+    f -= sum(dcompois(x, mu /* mode */, nu, true));
   }
   else
   if (parameterization == "mean") {
-    f -= sum(dcompois2(x, mu, nu, true));
+    f -= sum(dcompois2(x, mu /* mean */, nu, true));
   }
   else
     error("Unknown parameterization");

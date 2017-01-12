@@ -25,10 +25,10 @@ Type objective_function<Type>::operator() ()
     ans -= dpois(x, lambda, true).sum();
   }
   else if (distr == "compois") {
-    PARAMETER(lambda);
+    PARAMETER(mode);
     PARAMETER(nu);
-    vector<Type> x = rcompois(n, lambda, nu);
-    ans -= dcompois(x, lambda, nu, true).sum();
+    vector<Type> x = rcompois(n, mode, nu);
+    ans -= dcompois(x, mode, nu, true).sum();
   }
   else if (distr == "compois2") {
     PARAMETER(mean);
