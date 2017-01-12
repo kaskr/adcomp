@@ -161,23 +161,33 @@ double simulate(double loglambda, double nu) {
 #define logf1(x) ( v1 + slope1 * (x - j1) )
   double logmu = loglambda / nu;
   double mu = exp(logmu);
-  double jhat = mu - .5;
-  double h = 1. / sqrt(nu * Rf_psigamma(jhat, 1));
-  double j0 = fmax(jhat - h, 0); // left tangent point
-  double j1 = jhat + h;          // right tangent point
-  double slope0 = nu * ( logmu - Rf_psigamma(j0+1, 0) );
+  double jhat = (mu > 1 ? mu - .5 : 1);
+  double sd = 1. / sqrt(nu * Rf_psigamma(jhat+1, 1));    // Approx Gaussian
+  double j0 = (mu > 1 ? jhat - fmin(sd, .5 * jhat) : 0); // left tangent point
+  double j1 = jhat + sd;                                 // right tangent point
+  double slope0 = (mu > 1 ? nu * ( logmu - Rf_psigamma(j0+1, 0) ) : 0);
   double slope1 = nu * ( logmu - Rf_psigamma(j1+1, 0) );
   double v0 = nu * ( j0 * logmu - Rf_lgammafn(j0+1) );
   double v1 = nu * ( j1 * logmu - Rf_lgammafn(j1+1) );
   // Geometric success probabilities
-  double prob0 = -expm1(-slope0);
+  double prob0 = (mu > 1 ? -expm1(-slope0) : 1);
   double prob1 = -expm1(slope1);
-  double mu0 = floor(jhat); // Left offset
-  double mu1 = mu0 + 1;     // right offset
+  double mu0 = (mu > 1 ? floor(jhat) : 0); // Left offset
+  double mu1 = mu0 + 1;                    // right offset
   double p0 = Rf_pgeom(mu0, prob0, 1, 0); // Left tail is truncated
   double w0 = p0 * exp(logf0(mu0)) / prob0; // Mass of left tail proposal
   double w1 = 1  * exp(logf1(mu1)) / prob1; // Mass of right tail proposal
   double samp = NAN;
+  if(false) { // Debug
+    // Calculate accept probs
+    double St=0, Sp=0;
+    for(int i=0; i<1e6; i++) {
+      St += exp(logf_target(i));
+      Sp += exp(logf_propose(i));
+    }
+    double paccept = St / Sp;
+    return paccept;
+  }
   int i=0, iter_max = 1e4;
   for ( ; i < iter_max; i++ ) {
     // Draw proposal sample
