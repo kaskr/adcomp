@@ -52,7 +52,7 @@ $(SUITESPARSE).tar.gz :
 $(METIS).tar.gz :
 	$(WGET) http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/$(METIS).tar.gz
 
-install-metis-full: $(SUITESPARSE).tar.gz $(METIS).tar.gz
+SuiteSparse: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 	tar zxfv $(SUITESPARSE).tar.gz
 	cd SuiteSparse; cp ../$(METIS).tar.gz .
 	cd SuiteSparse; tar zxfv $(METIS).tar.gz
@@ -70,6 +70,8 @@ install-metis-full: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 		cd SuiteSparse;							\
 		install_name_tool -id `pwd`/libcholmod.so libcholmod.so;	\
 	fi
+
+install-metis-full: SuiteSparse
 	make build-package
 	LIBCHOLMOD=`pwd`/SuiteSparse/libcholmod.so R CMD INSTALL --preclean $(TARBALL)
 
