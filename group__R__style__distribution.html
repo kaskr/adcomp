@@ -96,13 +96,13 @@ Functions</h2></td></tr>
 <tr class="memitem:gaecb5a18095a320b42e2d20c4b120f5f5"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#gaecb5a18095a320b42e2d20c4b120f5f5">dbinom_robust</a> (Type k, Type size, Type logit_p, int give_log=0)</td></tr>
 <tr class="memdesc:gaecb5a18095a320b42e2d20c4b120f5f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Density of binomial distribution parameterized via logit(prob)  <a href="#gaecb5a18095a320b42e2d20c4b120f5f5">More...</a><br /></td></tr>
 <tr class="separator:gaecb5a18095a320b42e2d20c4b120f5f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad19008d32acff291e1113e3818c8404b"><td class="memTemplParams" colspan="2">template&lt;class T1 , class T2 , class T3 &gt; </td></tr>
-<tr class="memitem:gad19008d32acff291e1113e3818c8404b"><td class="memTemplItemLeft" align="right" valign="top">T1&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#gad19008d32acff291e1113e3818c8404b">dcompois</a> (T1 x, T2 lambda, T3 nu, int give_log=0)</td></tr>
-<tr class="memdesc:gad19008d32acff291e1113e3818c8404b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate log density.  <a href="#gad19008d32acff291e1113e3818c8404b">More...</a><br /></td></tr>
-<tr class="separator:gad19008d32acff291e1113e3818c8404b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7e5f93b19ac31b5772a525717f3d97d4"><td class="memTemplParams" colspan="2">template&lt;class T1 , class T2 , class T3 &gt; </td></tr>
+<tr class="memitem:ga7e5f93b19ac31b5772a525717f3d97d4"><td class="memTemplItemLeft" align="right" valign="top">T1&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#ga7e5f93b19ac31b5772a525717f3d97d4">dcompois</a> (T1 x, T2 mode, T3 nu, int give_log=0)</td></tr>
+<tr class="memdesc:ga7e5f93b19ac31b5772a525717f3d97d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate density.  <a href="#ga7e5f93b19ac31b5772a525717f3d97d4">More...</a><br /></td></tr>
+<tr class="separator:ga7e5f93b19ac31b5772a525717f3d97d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga849a71d69cec5867d485ef28269cb79d"><td class="memTemplParams" colspan="2">template&lt;class T1 , class T2 , class T3 &gt; </td></tr>
 <tr class="memitem:ga849a71d69cec5867d485ef28269cb79d"><td class="memTemplItemLeft" align="right" valign="top">T1&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#ga849a71d69cec5867d485ef28269cb79d">dcompois2</a> (T1 x, T2 mean, T3 nu, int give_log=0)</td></tr>
-<tr class="memdesc:ga849a71d69cec5867d485ef28269cb79d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate log density parameterized via the mean.  <a href="#ga849a71d69cec5867d485ef28269cb79d">More...</a><br /></td></tr>
+<tr class="memdesc:ga849a71d69cec5867d485ef28269cb79d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conway-Maxwell-Poisson. Calculate density parameterized via the mean.  <a href="#ga849a71d69cec5867d485ef28269cb79d">More...</a><br /></td></tr>
 <tr class="separator:ga849a71d69cec5867d485ef28269cb79d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6297091307163f5bb21e1a526fc8044a"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:ga6297091307163f5bb21e1a526fc8044a"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a> (Type x, Type df1, Type df2, int give_log)</td></tr>
@@ -417,8 +417,8 @@ template&lt;class Type &gt; </div>
 
 </div>
 </div>
-<a id="gad19008d32acff291e1113e3818c8404b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad19008d32acff291e1113e3818c8404b">&sect;&nbsp;</a></span>dcompois()</h2>
+<a id="ga7e5f93b19ac31b5772a525717f3d97d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7e5f93b19ac31b5772a525717f3d97d4">&sect;&nbsp;</a></span>dcompois()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -435,7 +435,7 @@ template&lt;class T1 , class T2 , class T3 &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">T2&#160;</td>
-          <td class="paramname"><em>lambda</em>, </td>
+          <td class="paramname"><em>mode</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -457,14 +457,25 @@ template&lt;class T1 , class T2 , class T3 &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Conway-Maxwell-Poisson. Calculate log density. </p>
+<p>Conway-Maxwell-Poisson. Calculate density. </p>
+<p class="formulaDsp">
+\[ P(X=x) \propto \frac{\lambda^x}{(x!)^\nu}\:,x=0,1,\ldots \]
+</p>
 <p>Silently returns NaN if not within the valid parameter range: </p><p class="formulaDsp">
 \[ (0 \leq x) \land (0 &lt; \lambda) \land (0 &lt; \nu) \]
 </p>
-<p> . </p>
+<p> .</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>Observation </td></tr>
+    <tr><td class="paramname">mode</td><td>Approximate mode \( \lambda^\nu \) </td></tr>
+    <tr><td class="paramname">nu</td><td>\( \nu \) </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="compois_8cpp-example.html#a4">compois.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00604">604</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
+<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00610">610</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
 
 </div>
 </div>
@@ -508,14 +519,22 @@ template&lt;class T1 , class T2 , class T3 &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Conway-Maxwell-Poisson. Calculate log density parameterized via the mean. </p>
+<p>Conway-Maxwell-Poisson. Calculate density parameterized via the mean. </p>
 <p>Silently returns NaN if not within the valid parameter range: </p><p class="formulaDsp">
-\[ (0 \leq x) \land (0 &lt; mean) \land (0 &lt; \nu) \]
+\[ (0 \leq x) \land (0 &lt; E[X]) \land (0 &lt; \nu) \]
 </p>
-<p> . </p>
+<p> .</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>Observation </td></tr>
+    <tr><td class="paramname">mean</td><td>\( E[X] \) </td></tr>
+    <tr><td class="paramname">nu</td><td>\( \nu \) </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="compois_8cpp-example.html#a5">compois.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00620">620</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
+<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00630">630</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
 
 </div>
 </div>

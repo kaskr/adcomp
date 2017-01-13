@@ -20,7 +20,7 @@ var searchData=
   ['dbeta',['dbeta',['../group__R__style__distribution.html#ga5324c83759d5211c7c2fbbad37fa8e59',1,'distributions_R.hpp']]],
   ['dbinom',['dbinom',['../group__R__style__distribution.html#gaee11f805f02bc1febc6d7bf0487671be',1,'distributions_R.hpp']]],
   ['dbinom_5frobust',['dbinom_robust',['../group__R__style__distribution.html#gaecb5a18095a320b42e2d20c4b120f5f5',1,'dbinom_robust():&#160;distributions_R.hpp'],['../atomic_8hpp.html#aacf2ed2ae2a9935331b45947fd174c90',1,'atomic::robust_utils::dbinom_robust()']]],
-  ['dcompois',['dcompois',['../group__R__style__distribution.html#gad19008d32acff291e1113e3818c8404b',1,'distributions_R.hpp']]],
+  ['dcompois',['dcompois',['../group__R__style__distribution.html#ga7e5f93b19ac31b5772a525717f3d97d4',1,'distributions_R.hpp']]],
   ['dcompois2',['dcompois2',['../group__R__style__distribution.html#ga849a71d69cec5867d485ef28269cb79d',1,'distributions_R.hpp']]],
   ['density',['density',['../namespacedensity.html',1,'']]],
   ['density_2ehpp',['density.hpp',['../density_8hpp.html',1,'']]],
