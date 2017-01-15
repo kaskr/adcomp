@@ -1,4 +1,19 @@
 ------------------------------------------------------------------------
+TMB 1.7.6 (2017-01-15)
+------------------------------------------------------------------------
+
+o Add Conway-Maxwell-Poisson distribution (dcompois, rcompois).
+
+o Add lfactorial.
+
+o Move MCMC to separate package.
+
+o Add simulators for exponential, beta, F, logistic, Student T, and
+  Weibull distributions.
+
+o Fix a bug in function 'split'.
+
+------------------------------------------------------------------------
 TMB 1.7.5 (2016-11-20)
 ------------------------------------------------------------------------
 
