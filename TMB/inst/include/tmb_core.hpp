@@ -1589,6 +1589,7 @@ static R_CallMethodDef CallEntries[] = {
 };
 void TMB_LIB_INIT(DllInfo *dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, (Rboolean)FALSE);
 }
 #undef CALLDEF
 #endif /* #ifdef  */

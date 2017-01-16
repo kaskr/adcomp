@@ -28,4 +28,5 @@ static R_CallMethodDef CallEntries[] = {
 void R_init_TMB(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, (Rboolean)FALSE);
 }
