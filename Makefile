@@ -101,6 +101,7 @@ cran-version:
 	cd TMB; git clean -xdf
 	sed -i 's/^LinkingTo.*/LinkingTo: Matrix, RcppEigen/' TMB/DESCRIPTION
 	rm -rf TMB/inst/include/Eigen
+	rm -rf TMB/inst/include/unsupported
 	echo "PKG_LIBS = \$$(LAPACK_LIBS) \$$(BLAS_LIBS) \$$(FLIBS) \$$(SHLIB_OPENMP_CFLAGS)" > TMB/src/Makevars
 	echo "PKG_CFLAGS = \$$(SHLIB_OPENMP_CFLAGS)"                                         >> TMB/src/Makevars
 	sed -i /^SystemRequirements.*/d TMB/DESCRIPTION
