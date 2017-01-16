@@ -1003,7 +1003,7 @@ void finalize(SEXP x)
 
 
 /** \internal \brief Construct ADFun object */
-ADFun<double>* MakeADFunObject(SEXP data, SEXP parameters,
+ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
 {
@@ -1085,7 +1085,7 @@ extern "C"
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
-	  pfvec[i] = MakeADFunObject(data, parameters, report, control, i, info);
+	  pfvec[i] = MakeADFunObject_(data, parameters, report, control, i, info);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
@@ -1103,7 +1103,7 @@ extern "C"
       TMB_TRY{
 	/* Actual work: tape creation */
 	pf = NULL;
-	pf = MakeADFunObject(data, parameters, report, control, -1, info);
+	pf = MakeADFunObject_(data, parameters, report, control, -1, info);
 	if (config.optimize.instantly) pf->optimize();
       }
       TMB_CATCH {
@@ -1279,7 +1279,7 @@ extern "C"
 } /* Double interface */
 
 
-ADFun< double >* MakeADGradObject(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
+ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
 {
   /* Create ADFun pointer */
   objective_function< AD<AD<double> > > F(data,parameters,report);
@@ -1332,7 +1332,7 @@ extern "C"
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
-	  pfvec[i] = MakeADGradObject(data, parameters, report, i);
+	  pfvec[i] = MakeADGradObject_(data, parameters, report, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
@@ -1350,7 +1350,7 @@ extern "C"
       /* Actual work: tape creation */
       TMB_TRY {
         pf = NULL;
-        pf = MakeADGradObject(data, parameters, report, -1);
+        pf = MakeADGradObject_(data, parameters, report, -1);
         if(config.optimize.instantly)pf->optimize();
       }
       TMB_CATCH {
@@ -1378,7 +1378,7 @@ extern "C"
           change dimension - only treat h[:,skip] and h[skip,:] as
           zero). Negative subscripts are not allowed.
 */
-sphess MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
+sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
 {
   /* Some type checking */
   if(!isNewList(data))error("'data' must be a list");
@@ -1503,7 +1503,7 @@ extern "C"
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
-	Hvec[i] = new sphess( MakeADHessObject2(data, parameters, report, skip, i) );
+	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, skip, i) );
 	optimizeTape( Hvec[i]->pf );
       }
       TMB_CATCH { bad_thread_alloc = true; }
@@ -1524,7 +1524,7 @@ extern "C"
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     sphess* pH = NULL;
     TMB_TRY {
-      pH = new sphess( MakeADHessObject2(data, parameters, report, skip, -1) );
+      pH = new sphess( MakeADHessObject2_(data, parameters, report, skip, -1) );
       optimizeTape( pH->pf );
       return asSEXP(*pH, "ADFun");
     }
@@ -1583,8 +1583,16 @@ extern "C"{
 #include <R_ext/Rdynload.h>
 #define CALLDEF(name, n) {#name, (DL_FUNC) &name, n}
 static R_CallMethodDef CallEntries[] = {
+  CALLDEF(MakeADFunObject, 4),
+  CALLDEF(InfoADFunObject, 1),
   CALLDEF(EvalADFunObject, 3),
+  CALLDEF(MakeDoubleFunObject, 3),
   CALLDEF(EvalDoubleFunObject, 3),
+  CALLDEF(getParameterOrder, 3),
+  CALLDEF(MakeADGradObject, 3),
+  CALLDEF(MakeADHessObject2, 4),
+  CALLDEF(usingAtomics, 0),
+  CALLDEF(TMBconfig, 2),
   {NULL, NULL, 0}
 };
 void TMB_LIB_INIT(DllInfo *dll){
