@@ -91,6 +91,12 @@ SEXP tmb_symbolic(SEXP Qp){
   return M_chm_factor_to_SEXP(LQ2, 1 /* Free */);
 }
 
+#else
+
+SEXP tmb_symbolic(SEXP Qp) {
+  return R_NilValue;
+}
+
 #endif
 
 SEXP have_tmb_symbolic() {
