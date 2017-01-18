@@ -109,7 +109,7 @@ extern "C"{
       if(memory_manager.counter>0){
 	R_gc();
 	R_RunExitFinalizers();
-      }
+      } else break;
     }
     if(memory_manager.counter>0)error("Failed to clean. Please manually clean up before unloading\n");
   }
@@ -1593,6 +1593,14 @@ static R_CallMethodDef CallEntries[] = {
   CALLDEF(MakeADHessObject2, 4),
   CALLDEF(usingAtomics, 0),
   CALLDEF(TMBconfig, 2),
+  /* User's R_unload_lib function must also be registered: */
+#ifdef LIB_UNLOAD
+#define xstringify(s) stringify(s)
+#define stringify(s) #s
+  {xstringify(LIB_UNLOAD), (DL_FUNC) &LIB_UNLOAD, 1},
+#undef xstringify
+#undef stringify
+#endif
   {NULL, NULL, 0}
 };
 void TMB_LIB_INIT(DllInfo *dll){
