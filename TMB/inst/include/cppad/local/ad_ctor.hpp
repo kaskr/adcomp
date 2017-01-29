@@ -143,14 +143,16 @@ is the Base type value corresponding to this AD object.
 The tape identifier will be an invalid tape identifier,
 so this object is initially a parameter.
 */
-template <class Base>
-inline AD<Base>::AD(const Base &b)
-: value_(b)
-, tape_id_(0)
-, taddr_(0)
-{	// check that this is a parameter
-	CPPAD_ASSERT_UNKNOWN( Parameter(*this) );
-}
+
+// Disabled by Kasper
+// template <class Base>
+// inline AD<Base>::AD(const Base &b)
+// : value_(b)
+// , tape_id_(0)
+// , taddr_(0)
+// {	// check that this is a parameter
+// 	CPPAD_ASSERT_UNKNOWN( Parameter(*this) );
+// }
 
 /*!
 Constructor from an ADVec<Base> element drops the vector information.
@@ -179,6 +181,14 @@ is the object that is being converted from T to AD<Base>.
 template <class Base>
 template <class T>
 inline AD<Base>::AD(const T &t)
+: value_(Base(t))
+, tape_id_(0)
+, taddr_(0)
+{ }
+
+// Added by Kasper
+template <class Base>
+inline AD<Base>::AD(const double &t)
 : value_(Base(t))
 , tape_id_(0)
 , taddr_(0)
