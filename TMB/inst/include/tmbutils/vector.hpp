@@ -53,10 +53,10 @@ struct vector : Array<Type,Dynamic,1>
      1. vector<Type> to CppAD::vector<Type>
      2. vector<int> to CppAD::vector<double>
    */
-  template<template<class> class Vector, class T>
-  operator Vector<T>(){
+  template<class T>
+  operator CppAD::vector<T>(){
     int n = this->size();
-    Vector<T> x(n);
+    CppAD::vector<T> x(n);
     for(int i=0; i<n; i++) x[i] = T(this->operator[](i));
     return x;
   }
