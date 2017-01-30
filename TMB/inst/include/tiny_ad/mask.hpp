@@ -84,6 +84,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(						\
   atomic::mask_t<OCTAL(MASK)>::set_length<NCHAR(MASK)> mask_type;	\
   mask_type mask;							\
   static const int nvar = mask_type::count;				\
+  atomic::tiny_vec_ref<double> tyref(&ty[0], ty.size());                \
   if(order==0) {							\
     typedef double Float;						\
     CppAD::vector<Float> x(tx);						\
@@ -93,19 +94,19 @@ TMB_ATOMIC_VECTOR_FUNCTION(						\
     typedef typename atomic::ADTypes<nvar>::order1 Float;		\
     Float x[NCHAR(MASK)];						\
     mask.activate_derivs(x, tx);					\
-    ty = vector<double>(CALL.getDeriv());				\
+    tyref = CALL.getDeriv();                                            \
   }									\
   else if (order==2) {							\
     typedef typename atomic::ADTypes<nvar>::order2 Float;		\
     Float x[NCHAR(MASK)];						\
     mask.activate_derivs(x, tx);					\
-    ty = vector<double>(CALL.getDeriv());				\
+    tyref = CALL.getDeriv();                                            \
   }									\
   else if (order==3) {							\
     typedef typename atomic::ADTypes<nvar>::order3 Float;		\
     Float x[NCHAR(MASK)];						\
     mask.activate_derivs(x, tx);					\
-    ty = vector<double>(CALL.getDeriv());				\
+    tyref = CALL.getDeriv();                                            \
   }									\
   else									\
     error("Order not implemented");					\

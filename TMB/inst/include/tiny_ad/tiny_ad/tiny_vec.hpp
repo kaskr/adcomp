@@ -6,6 +6,7 @@ template <class Type>
 struct tiny_vec_ref {
   Type *p;
   size_t n;
+  tiny_vec_ref(Type *p_, size_t n_) : p(p_), n(n_) {}
   template<class T>
   tiny_vec_ref &operator=(const T &other) {
     for(size_t i = 0; i < n; i++) p[i] = other[i];
@@ -28,9 +29,7 @@ struct tiny_vec {
   Type &operator[] (size_t i) { return data[i]; }
   void setZero() {for(int i=0; i<n; i++) (*this)[i] = 0;}
   tiny_vec_ref<Type> segment(size_t start, size_t length) {
-    tiny_vec_ref<Type> ans;
-    ans.p = &(data[start]);
-    ans.n = length;
+    tiny_vec_ref<Type> ans(&(data[start]), length);
     return ans;
   }
 #define VBINARY_OPERATOR(OP)						\
