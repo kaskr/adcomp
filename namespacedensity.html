@@ -263,7 +263,7 @@ template&lt;class distribution1 , class distribution2 &gt; </div>
 </dl>
 <p>Shortform version to combine two densities using the class <a class="el" href="classSEPARABLE__t.html">SEPARABLE_t</a> . Typical use: </p><div class="fragment"><div class="line"><a class="code" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(x); <span class="comment">// 2D array</span></div><div class="line"><a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(phi), <a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma))(x);</div></div><!-- fragment --><p> where <code>MVNORM(Sigma)</code> acts in the first dimension of x and <code>AR1(phi)</code> acts in the second dimension of x. </p><dl class="section note"><dt>Note</dt><dd>The order of array dimensions is reversed in the sense that f_ acts in the <em>second</em> dimension and g_ acts in the <em>first</em> dimension (This order is consistent with how Kronecker products work in R). </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01216">1216</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01227">1227</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
