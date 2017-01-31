@@ -950,6 +950,11 @@ public:
     ans+=x.size()*log(scale);
     return ans;
   }
+  scalartype operator()(vectortype x){
+    scalartype ans=f(x/scale);
+    ans+=x.size()*log(scale);
+    return ans;
+  }
   arraytype jacobian(arraytype x){
     return f.jacobian(x/scale)/scale;    
   }
@@ -1000,6 +1005,12 @@ public:
   VECSCALE_t(distribution f_, vectortype scale_){scale=scale_;f=f_;}
   /** \brief Evaluate the negative log density */
   scalartype operator()(arraytype x){
+    // assert that x.size()==scale.size()
+    scalartype ans=f(x/scale);
+    ans+=(log(scale)).sum();
+    return ans;
+  }
+  scalartype operator()(vectortype x){
     // assert that x.size()==scale.size()
     scalartype ans=f(x/scale);
     ans+=(log(scale)).sum();
