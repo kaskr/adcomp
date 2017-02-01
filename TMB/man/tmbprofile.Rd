@@ -48,6 +48,7 @@ determined from \code{name}. Alternatively the linear combination
 may be given directly (\code{lincomb}).
 }
 \examples{
+\dontrun{
 runExample("simple",thisR=TRUE)
 ## Parameter names for this model:
 ## beta   beta   logsdu   logsd0
@@ -57,7 +58,6 @@ prof <- tmbprofile(obj,"logsd0")
 plot(prof)
 confint(prof)
 
-\dontrun{
 ## Profile the difference between the beta parameters (name is optional):
 prof2 <- tmbprofile(obj,name="beta1 - beta2",lincomb = c(1,-1,0,0))
 plot(prof2)

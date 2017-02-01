@@ -27,6 +27,7 @@
 ##' @return data.frame with parameter and function values.
 ##' @seealso \code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
 ##' @examples
+##' \dontrun{
 ##' runExample("simple",thisR=TRUE)
 ##' ## Parameter names for this model:
 ##' ## beta   beta   logsdu   logsd0
@@ -36,7 +37,6 @@
 ##' plot(prof)
 ##' confint(prof)
 ##'
-##' \dontrun{
 ##' ## Profile the difference between the beta parameters (name is optional):
 ##' prof2 <- tmbprofile(obj,name="beta1 - beta2",lincomb = c(1,-1,0,0))
 ##' plot(prof2)
