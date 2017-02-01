@@ -9,6 +9,14 @@ Type objective_function<Type>::operator() ()
   DATA_SPARSE_MATRIX (d);
   PARAMETER          (p);
 
+  // cout is supported (but not recommended)
+  std::cout << a << "\n";
+  std::cout << b << "\n";
+  std::cout << c << "\n";
+  std::cout << d << "\n";
+  std::cout << p << "\n";
+
+  // Report objects back to R:
   REPORT(a);
   REPORT(b);
   REPORT(c);

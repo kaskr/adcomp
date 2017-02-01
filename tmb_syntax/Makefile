@@ -20,5 +20,17 @@ clean :
 
 ##########################################################
 ## For travis tests
+
+## Check that syntax is not broken for projects that depend on TMB
+glmmTMB:
+	wget http://rawgit.com/glmmTMB/glmmTMB/master/glmmTMB/src/glmmTMB.cpp
+	Rscript -e 'TMB:::compile("glmmTMB.cpp")'
+spict:
+	wget http://rawgit.com/mawp/spict/master/spict/src/spict.cpp
+	Rscript -e 'TMB:::compile("spict.cpp")'
+
 test:
 	make check_simulations
+	make report
+	make glmmTMB
+	make spict
