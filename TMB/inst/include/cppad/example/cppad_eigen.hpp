@@ -78,7 +78,7 @@ Eigen needs the following definitions to work properly
 with $codei%AD<%Base%>%$$ scalars:
 $codep */
 namespace Eigen {
-	template <class Base> struct NumTraits< CppAD::AD<Base> >
+	template <class Base> struct NumTraits< CppAD::AD<Base> > : NumTraits<Base>
 	{	// type that corresponds to the real part of an AD<Base> value
 		typedef CppAD::AD<Base>   Real;
 		// type for AD<Base> operations that result in non-integer values
@@ -143,10 +143,26 @@ namespace CppAD {
 		{	return x * x; }
 }
 
-namespace Eigen { 
-	namespace internal {
-
-	}
+namespace Eigen {
+  namespace internal {
+    // Test if version before 3.3
+#if ( ( EIGEN_WORLD_VERSION <= 2 ) || ( EIGEN_WORLD_VERSION == 3 ) && ( EIGEN_MAJOR_VERSION <= 2 ) )
+    template<class Base>
+    struct significant_decimals_default_impl< CppAD::AD<Base>, false>
+    { typedef CppAD::AD<Base> Scalar;
+      typedef typename NumTraits<Scalar>::Real RealScalar;
+      static inline int run()
+      {	Scalar neg_log_eps = - log(
+                                   NumTraits<RealScalar>::epsilon()
+                                   );
+        int ceil_neg_log_eps = Integer( neg_log_eps );
+        if( Scalar(ceil_neg_log_eps) < neg_log_eps )
+          ceil_neg_log_eps++;
+        return ceil_neg_log_eps;
+      }
+    };
+#endif
+  }
 }
 /* $$
 $end
