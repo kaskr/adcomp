@@ -172,6 +172,7 @@ public:
 
 	// Kasper: explicit CTOR does not allow e.g. 'AD<AD<double> > x = 0;'
 	inline AD(const double &t);
+	inline AD(const int &t);
 
 	// assignment from some other type
 	template <class T> inline AD& operator=(const T &right);
