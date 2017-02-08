@@ -153,7 +153,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>12.2</b> Simulation blocks</a><ul>
 <li class="chapter" data-level="12.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>12.2.1</b> A linear regression example</a></li>
-<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.2</b> Advanced examples</a></li>
+<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>12.2.2</b> A simulation study</a></li>
+<li class="chapter" data-level="12.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.3</b> Advanced examples</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -244,9 +245,31 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
 ## 
 ## attr(,&quot;check.passed&quot;)
 ## [1] TRUE</code></pre>
+<p>Here we did not explicitely state the parameter values to use with the simulation. The <code>simulate</code> method takes an additional argument <code>par</code> that can be used for this.</p>
+<blockquote>
+<p>The default parameter values used for the simulation is <code>obj$env$last.par</code>.</p>
+</blockquote>
+</div>
+<div id="a-simulation-study" class="section level3">
+<h3><span class="header-section-number">12.2.2</span> A simulation study</h3>
+<p>Simulating datasets from known parameters and re-estimationg those parameters can be done generically by:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">50</span>, {
+  simdata &lt;-<span class="st"> </span>obj$<span class="kw">simulate</span>(<span class="dt">par=</span>obj$par, <span class="dt">complete=</span><span class="ot">TRUE</span>)
+  obj2 &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(simdata, parameters, <span class="dt">DLL=</span><span class="st">&quot;linreg&quot;</span>, <span class="dt">silent=</span><span class="ot">TRUE</span>)
+  <span class="kw">nlminb</span>(obj2$par, obj2$fn, obj2$gr)$par
+})</code></pre></div>
+<p>We reshape and plot the result:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
+<a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">estimate=</span><span class="kw">as.vector</span>(sim), <span class="dt">parameter=</span><span class="kw">names</span>(obj$par)[<span class="kw">row</span>(sim)])
+<span class="kw">densityplot</span>( ~<span class="st"> </span>estimate |<span class="st"> </span>parameter, <span class="dt">data=</span><a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a>, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-53-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p>Compare with the true parameter values of the simulation:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obj$par</code></pre></div>
+<pre><code>##  a  b sd 
+##  0  0  1</code></pre>
 </div>
 <div id="advanced-examples" class="section level3">
-<h3><span class="header-section-number">12.2.2</span> Advanced examples</h3>
+<h3><span class="header-section-number">12.2.3</span> Advanced examples</h3>
 <p>The examples <a href="../sam_8cpp-example.html">sam.cpp</a> and <a href="../ar1_4D_8cpp-example.html">ar1_4D.cpp</a> includes more advanced simulation code. The latter demonstrates how to simulate from the density objects:</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Separable covariance on 4D lattice with AR1 structure in each direction.</span>
 <span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>

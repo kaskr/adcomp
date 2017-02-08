@@ -153,7 +153,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>12.2</b> Simulation blocks</a><ul>
 <li class="chapter" data-level="12.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>12.2.1</b> A linear regression example</a></li>
-<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.2</b> Advanced examples</a></li>
+<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>12.2.2</b> A simulation study</a></li>
+<li class="chapter" data-level="12.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.3</b> Advanced examples</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -187,6 +188,13 @@ Arrays        x = numeric(<span class="dv">10</span>)    <a class="code" href=".
 Indexing      x[<span class="dv">1</span>]+x[<span class="dv">10</span>]         x(<span class="dv">0</span>)+x(<span class="dv">9</span>);                  <span class="co">// C++ indexing is zero-based</span>
 Loops         <span class="kw">for</span>(i in <span class="dv">1</span>:<span class="dv">10</span>)     <span class="kw">for</span>(i=<span class="dv">1</span>;i&lt;=<span class="dv">10</span>;i++)          <span class="co">// Integer i must be declared in C++</span>
 Increments    x[<span class="dv">1</span>] = x[<span class="dv">1</span>] + <span class="dv">3</span>    x(<span class="dv">0</span>) += <span class="fl">3.</span><span class="dv">0</span>;                <span class="co">// += -= *= /= incremental operators in C++</span></code></pre></div>
+<p>It is important to note the following difference compared to R:</p>
+<blockquote>
+<p>Vectors, matrices and arrays are <strong>not</strong> zero-initialized in C++.</p>
+</blockquote>
+<p>A zero initialized object is created using Eigens <code>setZero()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; m(<span class="dv">4</span>,<span class="dv">5</span>);
+m.setZero();</code></pre></div>
 </div>
 <div id="i-know-c" class="section level3">
 <h3><span class="header-section-number">9.0.2</span> I know C++</h3>

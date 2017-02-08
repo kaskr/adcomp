@@ -153,7 +153,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>12.2</b> Simulation blocks</a><ul>
 <li class="chapter" data-level="12.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>12.2.1</b> A linear regression example</a></li>
-<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.2</b> Advanced examples</a></li>
+<li class="chapter" data-level="12.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>12.2.2</b> A simulation study</a></li>
+<li class="chapter" data-level="12.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.3</b> Advanced examples</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -221,17 +222,16 @@ y(<span class="dv">5</span>);                <span class="co">// 5 is not a vali
 <span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
 Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
 {
-    feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW); <span class="co">// Extra line needed</span>
+  feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW); <span class="co">// Extra line needed</span>
     
-        <a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);
-        <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(x);
-        Type f;
-    
-        f = sqrt(<span class="fl">-1.</span>); <span class="co">// FE_INVALID (sqrt(-1.) returns NaN)</span>
-        <span class="co">//f = 1./0.; // FE_DIVBYZERO (division by zero)</span>
-        <span class="co">//f = exp(100000.); // FE_OVERFLOW (exp(100000.) returns Inf)       [Does not work on all platforms]</span>
-    <span class="co">//f = exp(-100000.); // FE_UNDERFLOW (exp(-100000.) returns 0)</span>
-    <span class="kw">return</span> f;
+  <a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(x);
+  Type f;
+  f = sqrt(<span class="fl">-1.</span>);        <span class="co">// FE_INVALID   ( sqrt(-1.) returns NaN )</span>
+  <span class="co">//f = 1./0.;          // FE_DIVBYZERO ( division by zero )</span>
+  <span class="co">//f = exp(100000.);   // FE_OVERFLOW  ( exp(100000.) returns Inf )   [Does not work on all platforms]</span>
+  <span class="co">//f = exp(-100000.);  // FE_UNDERFLOW ( exp(-100000.) returns 0 )</span>
+  <span class="kw">return</span> f;
 }</code></pre></div>
 <p>a floating point exception will be turned into an actual error that can be picked up by the debugger. There are only two extra lines that need to be included (“//Extra line needed” in the above example).</p>
 <p>When we try to run this program in the usual way, the program crashes:</p>
