@@ -923,7 +923,7 @@ GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1){
 }
 template <class scalartype, class arraytype >
 GMRF_t<scalartype> GMRF(arraytype x, scalartype delta, int order=1){
-  vector<scalartype> d(x.rows());
+  vector<scalartype> d(x.cols());
   for(int i=0;i<d.size();i++)d[i]=delta;
   return GMRF_t<scalartype>(x, d, order);
 }
