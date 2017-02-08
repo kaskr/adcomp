@@ -174,6 +174,7 @@ public:
 	inline AD(const double &t);
 	inline AD(const int &t);
 	inline AD(const long int &t);
+	inline AD(const long unsigned int &t);
 
 	// assignment from some other type
 	template <class T> inline AD& operator=(const T &right);

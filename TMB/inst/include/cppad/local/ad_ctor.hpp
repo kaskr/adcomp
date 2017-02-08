@@ -210,5 +210,13 @@ inline AD<Base>::AD(const long int &t)
 , taddr_(0)
 { }
 
+// Added by Kasper
+template <class Base>
+inline AD<Base>::AD(const long unsigned int &t)
+: value_(Base(t))
+, tape_id_(0)
+, taddr_(0)
+{ }
+
 } // END_CPPAD_NAMESPACE
 # endif
