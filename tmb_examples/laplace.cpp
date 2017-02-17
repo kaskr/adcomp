@@ -64,7 +64,7 @@ struct joint_nll {
     T res=0;
     vector<T> eta = T(exp(log_sigma)) * u;
     vector<Type> mu = X * b;
-    eta = eta + vector<T>(mu);
+    eta = eta + mu.template cast<T>();
     matrix<T> cov(n,n); 
     for (int i=0; i<n; i++)
       {

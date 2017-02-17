@@ -449,7 +449,8 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
     }
   pf->ForSparseJac(n, Px);
   vector<bool> Py(1); Py[0]=true;
-  return asMatrix(vector<int>(pf->RevSparseHes(n,Py)),n,n);
+  vector<int> tmp = (pf->RevSparseHes(n,Py)).template cast<int>();
+  return asMatrix(tmp, n, n);
 }
 
 /** \internal \brief Get list element named "str", or return NULL */
