@@ -1402,6 +1402,7 @@ newtonOption <- function(obj,...){
 
 sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
   r <- obj$env$random
+  if (length(r) == 0) return (NULL)
   skip <-
     if(skipFixedEffects) {
       ## Assuming that random effects comes first in parameter list, we can set
