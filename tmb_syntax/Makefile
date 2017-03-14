@@ -24,7 +24,8 @@ clean :
 ## Check that syntax is not broken for projects that depend on TMB
 glmmTMB:
 	wget http://rawgit.com/glmmTMB/glmmTMB/master/glmmTMB/src/glmmTMB.cpp
-	Rscript -e 'TMB:::compile("glmmTMB.cpp")'
+	wget http://rawgit.com/glmmTMB/glmmTMB/master/glmmTMB/src/init.h
+	Rscript -e 'TMB:::compile("glmmTMB.cpp",libinit=FALSE)'
 spict:
 	wget http://rawgit.com/mawp/spict/master/spict/src/spict.cpp
 	Rscript -e 'TMB:::compile("spict.cpp")'
