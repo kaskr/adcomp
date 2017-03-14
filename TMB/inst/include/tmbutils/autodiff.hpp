@@ -70,18 +70,19 @@ namespace autodiff {
   struct hessian_t
   {
     Functor f;
-    hessian_t(Functor f_) : f(f_) {}
-    AD<Type> userfun(vector<AD<Type> > x){
-      return f(x);
+    gradient_t<Functor,AD<Type> > gr;
+    hessian_t(Functor f_) : f(f_), gr(f_) {}
+    vector<AD<Type> > userfun(vector<AD<Type> > x){
+      return gr(x);
     }
     matrix<Type> operator()(vector<Type> x0){
       CppAD::vector<AD<Type> > x( x0 );
-      CppAD::vector<AD<Type> > y( 1 );
+      CppAD::vector<AD<Type> > y( x0 );
       CppAD::Independent(x);
-      y[0] = userfun(x);
+      y = userfun(x);
       CppAD::ADFun<Type> F(x, y);
       CppAD::vector<Type> x_eval(x0);
-      vector<Type> ans = F.Hessian(x_eval, 0);
+      vector<Type> ans = F.Jacobian(x_eval);
       return asMatrix(ans, x.size(), x.size());
     }
   };
