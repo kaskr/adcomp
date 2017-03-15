@@ -175,6 +175,7 @@ the same:
   same time admits R style element-wise operations.
 
 See the file `r doxylink("matrix_arrays.cpp")` for examples of use.
+See also the file `r doxylink("matrix_array_operations.pdf")` for a quick overview.
 
 ## Relationship to Eigen
 The TMB types `matrix` and `array` (in dimension 2) inherits
