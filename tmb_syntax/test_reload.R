@@ -10,7 +10,7 @@ makeTemplate <- function(output=0){
     txt <-
         "#include <TMB.hpp>
      template<class Type>
-     Type objective_function<Type>::operator() (){PARAMETER(a);return output;}"
+     Type objective_function<Type>::operator() (){PARAMETER(a);REPORT(a);return output;}"
     txt <- sub("output",output,txt)
     writeLines(txt,"mymodel.cpp")
 }
@@ -23,7 +23,7 @@ cat("==============================\n")
 makeTemplate(1)
 compile("mymodel.cpp")
 dyn.load(dynlib("mymodel"))
-obj <- MakeADFun(list(),list(a=0))
+obj <- MakeADFun(list(),list(a=0),DLL="mymodel")
 obj$fn() == 1  ## OK ?
 
 ## Modify function to return "2" and check output.
@@ -40,7 +40,7 @@ cat("==============================================\n")
 makeTemplate(2)
 compile("mymodel.cpp")
 dyn.load(dynlib("mymodel"))
-obj <- MakeADFun(list(),list(a=0))
+obj <- MakeADFun(list(),list(a=0),DLL="mymodel")
 ok <- obj$fn() == 2  ## OK ?
 
 ## Cleanup
