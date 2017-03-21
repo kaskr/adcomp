@@ -228,13 +228,28 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       ##list(phi=phi, cov=cov)
       cov
   }
-  if(getReportCovariance){ ## Get all
+  if( isTRUE(getReportCovariance) ){
+       ## Get all covariances and sds
       cov <- doDeltaMethod()
+      rownames(cov) <- colnames(cov) <- names(phi)
       sd <- sqrt(diag(cov))
   } else {
+      ## Get all sds
       tmp <- lapply(seq_along(phi), doDeltaMethod)
       sd <- sqrt(unlist(tmp))
       cov <- NA
+      ## Get *selected* covariances
+      if( !is.logical(getReportCovariance) ) {
+          if ( is.character(getReportCovariance) )
+              chunk <- which(names(phi) %in% getReportCovariance)
+          else if ( is.numeric(getReportCovariance) )
+              chunk <- getReportCovariance
+          else {
+              stop("'getReportCovariance' must be logical, numeric or character")
+          }
+          cov <- doDeltaMethod(chunk)
+          rownames(cov) <- colnames(cov) <- names(phi)[chunk]
+      }
   }
   ## Output
   ans <- list(value=phi,sd=sd,cov=cov,par.fixed=par.fixed,
