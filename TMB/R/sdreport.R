@@ -24,6 +24,8 @@
 ##' \eqn{V(\phi(\hat\theta))} is returned by default. This can cause
 ##' high memory usage if many variables are ADREPORTed. Use
 ##' \code{getReportCovariance=FALSE} to only return standard errors.
+##' Alternatively, \code{getReportCovariance} can be numeric indices or a
+##' character vector defining a subset of the covariance matrix to report.
 ##'
 ##' For random effect models a generalized delta-method is used. First
 ##' the joint covariance of random effects and parameters is estimated
@@ -95,7 +97,7 @@
 ##' @param bias.correct logical indicating if bias correction should be applied
 ##' @param bias.correct.control a \code{list} of bias correction options; currently \code{sd}, \code{split} and \code{nsplit} are used - see details.
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of parameters?
-##' @param getReportCovariance Get full covariance matrix of ADREPORTed variables?
+##' @param getReportCovariance Logical; Get full covariance matrix of ADREPORTed variables? Can also specify a subset of the covariance matrix to report - see details.
 ##' @return Object of class \code{sdreport}
 ##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 ##' @examples
