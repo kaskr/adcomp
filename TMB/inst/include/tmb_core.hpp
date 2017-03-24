@@ -295,10 +295,13 @@ if(isDouble<Type>::value && this->current_parallel_region<0) {  \
 #define SIMULATE							\
 if(isDouble<Type>::value && objective_function::do_simulate)
 
-/** \brief Report scalar, vector or array back to R with derivative
+/** \brief Report an expression (scalar, vector, matrix or array valued) back to R with derivative
     information.
 
-    The result is retrieved in R via the R function \c sdreport().
+    Typical use: obtain point estimate and standard deviation of the expression
+    via the R function \c sdreport() (see details in R documentation).
+    In the summary, the dimensions of the original expression is lost, and must
+    be retrieved manually. 
     \warning \c ADREPORT(name) must not be used before \c name has
     been assigned a value.
     \ingroup macros */
