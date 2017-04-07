@@ -1247,12 +1247,12 @@ extern "C"
       SEXP res;
       GetRNGstate();   /* Get seed from R */
       if(do_simulate) pf->set_simulate( true );
-      res = asSEXP( pf->operator()() );
+      PROTECT( res = asSEXP( pf->operator()() ) );
       if(do_simulate) {
         pf->set_simulate( false );
         PutRNGstate(); /* Write seed back to R */
       }
-      UNPROTECT(1);
+      UNPROTECT(2);
       return res;
     }
     TMB_CATCH {
@@ -1477,9 +1477,13 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
     R_RegisterCFinalizer(res, finalize<ADFunType>);
     /* Return list */
     SEXP ans;
-    setAttrib(res,install("par"),par);
-    setAttrib(res,install("i"),asSEXP(H.i));
-    setAttrib(res,install("j"),asSEXP(H.j));
+    /* Implicitly protected temporaries */
+    SEXP par_symbol = install("par");
+    SEXP i_symbol = install("i");
+    SEXP j_symbol = install("j");
+    setAttrib(res, par_symbol, par);
+    setAttrib(res, i_symbol, asSEXP(H.i));
+    setAttrib(res, j_symbol, asSEXP(H.j));
     PROTECT(ans=ptrList(res));
     UNPROTECT(2);
     return ans;

@@ -42,15 +42,17 @@ struct config_struct{
   } debug;
 
   int cmd;
-  SEXP envir;
+  SEXP envir; /* PROTECTed because function argument - see
+                 'TMBconfig' */
   void set(const char* name, bool &var, bool default_value) CSKIP(
   {
     // cmd=0: set defaults in this struct.
     // cmd=1: copy from this struct to R.
     // cmd=2: copy from R to this struct.
-    if(cmd==0)var=default_value;
-    if(cmd==1)defineVar(install(name),asSEXP(var),envir);
-    if(cmd==2)var=INTEGER(findVar(install(name),envir))[0];
+    SEXP name_symbol = install(name);
+    if (cmd==0) var = default_value;
+    if (cmd==1) defineVar(name_symbol, asSEXP(var), envir);
+    if (cmd==2) var = INTEGER(findVar(name_symbol, envir))[0];
   })
 #define SET(name,value)set(#name,name,value);
   void set() CSKIP(
