@@ -280,9 +280,11 @@ getListElement(objective_function::data,#name,&isValidSparseMatrix)));
     \note REPORT() does nothing in parallel mode (construction of
     R-objects is not allowed in parallel).
     \ingroup macros */
-#define REPORT(name)							\
-if(isDouble<Type>::value && this->current_parallel_region<0) {		\
-  defineVar(install(#name),asSEXP(name),objective_function::report);	\
+#define REPORT(name)                                            \
+if(isDouble<Type>::value && this->current_parallel_region<0) {  \
+  defineVar(install(#name),                                     \
+            asSEXP_protect(name),objective_function::report);   \
+  UNPROTECT(1);                                                 \
 }
 
 /** \brief Mark code that is only executed during simulation.

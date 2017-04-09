@@ -181,3 +181,14 @@ SEXP asSEXP(Eigen::SparseMatrix<Type> x){
   UNPROTECT(7);
   return ans;
 }
+
+
+/** \brief Convert C++ object to R object and protect the result from garbage collection
+    \note Each call to this function must be followed by UNPROTECT(1)
+*/
+template<class T>
+SEXP asSEXP_protect(const T &x) {
+  SEXP ans;
+  PROTECT( ans = asSEXP(x) );
+  return ans;
+}
