@@ -14,6 +14,9 @@ report:
 test_reload:
 	R --slave < test_reload.R
 
+test_protect:
+	R --slave < test_protect.R
+
 clean :
 	rm -rf *.o *.so *.dll *~ core *.output.RData *.pdf *.profile
 	rm -rf */*.o */*.so */*.dll */*~ core */*.output.RData */*.pdf */*.profile
@@ -31,6 +34,7 @@ spict:
 	Rscript -e 'TMB:::compile("spict.cpp")'
 
 test:
+	make test_protect
 	make check_simulations
 	make report
 	make glmmTMB
