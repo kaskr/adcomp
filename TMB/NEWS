@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+TMB 1.7.9 (2017-04-12)
+------------------------------------------------------------------------
+
+o Fix PROTECT bugs reported by Tomas Kalibera.
+
+o Now possible to use 'autodiff::hessian' in conjunction with atomic
+  functions.
+
+o Fix 'testthat:::expect_equal(obj, obj)' crash for non-random effect
+  models.
+
+o Fix compatibility issues of 'tmbutils::vector' with eigen 3.3.2.
+
+------------------------------------------------------------------------
 TMB 1.7.8 (2017-02-08)
 ------------------------------------------------------------------------
 

@@ -1,8 +1,8 @@
 Package: TMB
 Type: Package
 Title: Template Model Builder: A General Random Effect Tool Inspired by 'ADMB'
-Version: 1.7.8
-Date: 2017-02-08
+Version: 1.7.9
+Date: 2017-04-12
 Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr@dtu.dk"),
              person("Brad","Bell",role="cph"),
              person("Hans","Skaug",role="ctb"),
@@ -13,6 +13,7 @@ Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr
              person("Theo","Michelot",role="ctb"),
              person("Mollie","Brooks",role="ctb"),
              person("Alex","Forrence",role="ctb"),
+             person("Christoffer","Moesgaard Albertsen",role="ctb"),
              person("Cole","Monnahan",role="ctb") )
 Maintainer: Kasper Kristensen <kaskr@dtu.dk>
 Author: Kasper Kristensen [aut, cre, cph],
@@ -25,6 +26,7 @@ Author: Kasper Kristensen [aut, cre, cph],
     Theo Michelot [ctb],
     Mollie Brooks [ctb],
     Alex Forrence [ctb],
+    Christoffer Moesgaard Albertsen [ctb],
     Cole Monnahan [ctb]
 Copyright: See the file COPYRIGHTS
 Description: With this tool, a user should be able to quickly implement complex
