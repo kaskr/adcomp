@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.7.8</span>
+   &#160;<span id="projectnumber">v1.7.9</span>
    </div>
   </td>
  </tr>
@@ -101,6 +101,10 @@ template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a807aa91b8ef91565dc11d797dda50f53"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a807aa91b8ef91565dc11d797dda50f53"><td class="memTemplItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert_8hpp.html#a807aa91b8ef91565dc11d797dda50f53">asSEXP</a> (Eigen::SparseMatrix&lt; Type &gt; x)</td></tr>
 <tr class="separator:a807aa91b8ef91565dc11d797dda50f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5590ef5847b4435b3594ee803ad3de5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ab5590ef5847b4435b3594ee803ad3de5"><td class="memTemplItemLeft" align="right" valign="top">SEXP&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert_8hpp.html#ab5590ef5847b4435b3594ee803ad3de5">asSEXP_protect</a> (const T &amp;x)</td></tr>
+<tr class="memdesc:ab5590ef5847b4435b3594ee803ad3de5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert C++ object to R object and protect the result from garbage collection.  <a href="#ab5590ef5847b4435b3594ee803ad3de5">More...</a><br /></td></tr>
+<tr class="separator:ab5590ef5847b4435b3594ee803ad3de5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc8961faf80b653a6990357580dcd67c"><td class="memTemplParams" colspan="2"><a id="adc8961faf80b653a6990357580dcd67c"></a>
 template&lt;class Type &gt; </td></tr>
 <tr class="memitem:adc8961faf80b653a6990357580dcd67c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structvector.html">vector</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="convert_8hpp.html#adc8961faf80b653a6990357580dcd67c">asVector</a> (SEXP x)</td></tr>
@@ -132,6 +136,31 @@ template&lt;class Type &gt; </div>
 <p>Create R-triplet sparse matrix from Eigen sparse matrix </p>
 
 <p>Definition at line <a class="el" href="convert_8hpp_source.html#l00150">150</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab5590ef5847b4435b3594ee803ad3de5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5590ef5847b4435b3594ee803ad3de5">&sect;&nbsp;</a></span>asSEXP_protect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">SEXP asSEXP_protect </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert C++ object to R object and protect the result from garbage collection. </p>
+<dl class="section note"><dt>Note</dt><dd>Each call to this function must be followed by UNPROTECT(1) </dd></dl>
+
+<p>Definition at line <a class="el" href="convert_8hpp_source.html#l00190">190</a> of file <a class="el" href="convert_8hpp_source.html">convert.hpp</a>.</p>
 
 </div>
 </div>

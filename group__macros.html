@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.7.8</span>
+   &#160;<span id="projectnumber">v1.7.9</span>
    </div>
   </td>
  </tr>
@@ -179,7 +179,7 @@ Macros</h2></td></tr>
 <p>The result is retrieved in R via the R function <code>sdreport()</code>. </p><dl class="section warning"><dt>Warning</dt><dd><code><a class="el" href="group__macros.html#ga43a13c435127491364e4a167478f4992" title="Report scalar, vector or array back to R with derivative information. ">ADREPORT(name)</a></code> must not be used before <code>name</code> has been assigned a value. </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="ar1_4D_8cpp-example.html#a3">ar1_4D.cpp</a>, <a class="el" href="compois_8cpp-example.html#a6">compois.cpp</a>, <a class="el" href="laplace_8cpp-example.html#a12">laplace.cpp</a>, <a class="el" href="linreg_8cpp-example.html#a2">linreg.cpp</a>, <a class="el" href="longlinreg_8cpp-example.html#a2">longlinreg.cpp</a>, <a class="el" href="MVRandomWalkValidation_8cpp-example.html#a8">MVRandomWalkValidation.cpp</a>, <a class="el" href="orange_big_8cpp-example.html#a5">orange_big.cpp</a>, and <a class="el" href="spde_8cpp-example.html#a10">spde.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00303">303</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00305">305</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -204,7 +204,7 @@ Macros</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>If name is found in the parameter list it will be read as a parameter array. </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="matrix_arrays_8cpp-example.html#a2">matrix_arrays.cpp</a>, <a class="el" href="MVRandomWalkValidation_8cpp-example.html#a0">MVRandomWalkValidation.cpp</a>, <a class="el" href="mvrw_8cpp-example.html#a0">mvrw.cpp</a>, <a class="el" href="mvrw_sparse_8cpp-example.html#a0">mvrw_sparse.cpp</a>, <a class="el" href="sam_8cpp-example.html#a2">sam.cpp</a>, <a class="el" href="sdv_multi_8cpp-example.html#a1">sdv_multi.cpp</a>, and <a class="el" href="sdv_multi_compact_8cpp-example.html#a1">sdv_multi_compact.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00311">311</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00313">313</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -233,13 +233,13 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code" href="structdata__indicator.html">data_indicator&lt;tmbutils::array&lt;Type&gt;</a>, Type &gt; name(obs);                 \</div><div class="line">if (!isNull(getListElement(objective_function::parameters,#name))) {    \</div><div class="line">  name.fill( objective_function::fillShape(asVector&lt;Type&gt;(              \</div><div class="line">             objective_function::getShape(#name,&amp;isNumeric)),#name) );  \</div><div class="line">}</div><div class="ttc" id="structdata__indicator_html"><div class="ttname"><a href="structdata__indicator.html">data_indicator</a></div><div class="ttdoc">Utilities for OSA residuals. </div><div class="ttdef"><b>Definition:</b> <a href="tmb__core_8hpp_source.html#l00395">tmb_core.hpp:395</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code" href="structdata__indicator.html">data_indicator&lt;tmbutils::array&lt;Type&gt;</a>, Type &gt; name(obs);                 \</div><div class="line">if (!isNull(getListElement(objective_function::parameters,#name))) {    \</div><div class="line">  name.fill( objective_function::fillShape(asVector&lt;Type&gt;(              \</div><div class="line">             objective_function::getShape(#name,&amp;isNumeric)),#name) );  \</div><div class="line">}</div><div class="ttc" id="structdata__indicator_html"><div class="ttname"><a href="structdata__indicator.html">data_indicator</a></div><div class="ttdoc">Utilities for OSA residuals. </div><div class="ttdef"><b>Definition:</b> <a href="tmb__core_8hpp_source.html#l00397">tmb_core.hpp:397</a></div></div>
 </div><!-- fragment -->
 <p>Declare an indicator array 'name' of same shape as 'obs'. </p>
 <p>This is used in conjunction with one-step-ahead residuals - see ?oneStepPredict </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="MVRandomWalkValidation_8cpp-example.html#a4">MVRandomWalkValidation.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00417">417</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00419">419</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -295,7 +295,7 @@ Levels: d e f g h i j
 <p>Get string from R and declare it as std::string. </p>
 <p>Example (incomplete) of use: </p><div class="fragment"><div class="line"><a class="code" href="structvector.html">vector&lt;std::string&gt;</a> options(2);</div><div class="line">options &lt;&lt; <span class="stringliteral">&quot;apple&quot;</span>, <span class="stringliteral">&quot;orange&quot;</span>;</div><div class="line"><a class="code" href="group__macros.html#gaba52ba9bd5c88f42a0ce96432aa6e688">DATA_STRING</a>(choice);</div><div class="line"><span class="keywordflow">if</span>(! (choice == options).any() )</div><div class="line">  error( (<span class="stringliteral">&quot;&#39;&quot;</span> + choice + <span class="stringliteral">&quot;&#39;&quot;</span> + <span class="stringliteral">&quot; not valid&quot;</span>).c_str() );</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="compois_8cpp-example.html#a2">compois.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00351">351</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00353">353</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +329,7 @@ Levels: d e f g h i j
 <p>Example (incomplete) of use:</p>
 <p>In R: </p><div class="fragment"><div class="line">data &lt;- list()</div><div class="line">data$object &lt;- list(a=1:10, b=<a class="code" href="structmatrix.html">matrix</a>(1:6,2))</div><div class="line">obj &lt;- MakeADFun(data,........) </div></div><!-- fragment --><p>In C++: </p><div class="fragment"><div class="line"><span class="comment">// Corresponding list object on the C++ side</span></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div><div class="line"><span class="keyword">struct </span>my_list {</div><div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> a;</div><div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> b;</div><div class="line">  my_list(SEXP x){ <span class="comment">// Constructor</span></div><div class="line">    a = asVector&lt;Type&gt;(getListElement(x,<span class="stringliteral">&quot;a&quot;</span>));</div><div class="line">    b = asMatrix&lt;Type&gt;(getListElement(x,<span class="stringliteral">&quot;b&quot;</span>));</div><div class="line">  }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div><div class="line">Type objective_function&lt;Type&gt;::operator() ()</div><div class="line">{</div><div class="line">  <a class="code" href="group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>(<span class="keywordtype">object</span>, my_list);</div><div class="line">  <a class="code" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(<span class="keywordtype">object</span>.a); <span class="comment">// Now you can use &quot;a&quot; and &quot;b&quot; as you like</span></div><div class="line">  <a class="code" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(<span class="keywordtype">object</span>.b);</div><div class="line">  <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="spde_8cpp-example.html#a3">spde.cpp</a>, and <a class="el" href="spde_aniso_8cpp-example.html#a3">spde_aniso.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00390">390</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00392">392</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -383,13 +383,13 @@ Levels: d e f g h i j
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code" href="structdata__indicator.html">data_indicator&lt;tmbutils::vector&lt;Type&gt;</a>, Type &gt; name(obs);                \</div><div class="line">if (!isNull(getListElement(objective_function::parameters,#name))) {    \</div><div class="line">  name.fill( objective_function::fillShape(asVector&lt;Type&gt;(              \</div><div class="line">             objective_function::getShape(#name,&amp;isNumeric)),#name) );  \</div><div class="line">}</div><div class="ttc" id="structdata__indicator_html"><div class="ttname"><a href="structdata__indicator.html">data_indicator</a></div><div class="ttdoc">Utilities for OSA residuals. </div><div class="ttdef"><b>Definition:</b> <a href="tmb__core_8hpp_source.html#l00395">tmb_core.hpp:395</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code" href="structdata__indicator.html">data_indicator&lt;tmbutils::vector&lt;Type&gt;</a>, Type &gt; name(obs);                \</div><div class="line">if (!isNull(getListElement(objective_function::parameters,#name))) {    \</div><div class="line">  name.fill( objective_function::fillShape(asVector&lt;Type&gt;(              \</div><div class="line">             objective_function::getShape(#name,&amp;isNumeric)),#name) );  \</div><div class="line">}</div><div class="ttc" id="structdata__indicator_html"><div class="ttname"><a href="structdata__indicator.html">data_indicator</a></div><div class="ttdoc">Utilities for OSA residuals. </div><div class="ttdef"><b>Definition:</b> <a href="tmb__core_8hpp_source.html#l00397">tmb_core.hpp:397</a></div></div>
 </div><!-- fragment -->
 <p>Declare an indicator vector 'name' of same shape as 'obs'. </p>
 <p>This is used in conjunction with one-step-ahead residuals - see ?oneStepPredict </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="randomwalkvalidation_8cpp-example.html#a1">randomwalkvalidation.cpp</a>, and <a class="el" href="rickervalidation_8cpp-example.html#a1">rickervalidation.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00429">429</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00431">431</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -408,7 +408,7 @@ Levels: d e f g h i j
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span>(isDouble&lt;Type&gt;::value &amp;&amp; this-&gt;current_parallel_region&lt;0) {          \</div><div class="line">  defineVar(install(#name),<a class="code" href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP</a>(name),objective_function::report);    \</div><div class="line">}</div><div class="ttc" id="convert_8hpp_html_a6f1c440f99cb8ec0ea3a65dfe5778a70"><div class="ttname"><a href="convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70">asSEXP</a></div><div class="ttdeci">SEXP asSEXP(const matrix&lt; Type &gt; &amp;a)</div><div class="ttdoc">Convert TMB matrix, vector, scalar or int to R style. </div><div class="ttdef"><b>Definition:</b> <a href="convert_8hpp_source.html#l00024">convert.hpp:24</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span>(isDouble&lt;Type&gt;::value &amp;&amp; this-&gt;current_parallel_region&lt;0) {  \</div><div class="line">  defineVar(install(#name),                                     \</div><div class="line">            <a class="code" href="convert_8hpp.html#ab5590ef5847b4435b3594ee803ad3de5">asSEXP_protect</a>(name),objective_function::report);   \</div><div class="line">  UNPROTECT(1);                                                 \</div><div class="line">}</div><div class="ttc" id="convert_8hpp_html_ab5590ef5847b4435b3594ee803ad3de5"><div class="ttname"><a href="convert_8hpp.html#ab5590ef5847b4435b3594ee803ad3de5">asSEXP_protect</a></div><div class="ttdeci">SEXP asSEXP_protect(const T &amp;x)</div><div class="ttdoc">Convert C++ object to R object and protect the result from garbage collection. </div><div class="ttdef"><b>Definition:</b> <a href="convert_8hpp_source.html#l00190">convert.hpp:190</a></div></div>
 </div><!-- fragment -->
 <p>Report scalar, vector or array back to R without derivative information. </p>
 <dl class="section warning"><dt>Warning</dt><dd><code><a class="el" href="group__macros.html#gac2d7888f4e0385930448f992de53079b" title="Report scalar, vector or array back to R without derivative information. ">REPORT(name)</a></code> must not be used before <code>name</code> has been assigned a value. </dd></dl>
@@ -435,7 +435,7 @@ Levels: d e f g h i j
 <dl class="section note"><dt>Note</dt><dd><a class="el" href="group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2" title="Mark code that is only executed during simulation. ">SIMULATE()</a> does nothing in parallel mode. </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="ar1_4D_8cpp-example.html#a4">ar1_4D.cpp</a>, and <a class="el" href="sam_8cpp-example.html#a11">sam.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00293">293</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00295">295</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
