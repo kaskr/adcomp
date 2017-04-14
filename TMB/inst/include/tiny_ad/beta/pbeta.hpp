@@ -26,7 +26,6 @@
 namespace toms708 {
 
 /* Selected functions may be called ignoring derivatives */
-template<class T> double asDouble(T x) { return ((double*) &x)[0]; }
 template<class T> int R_finite(T x) { return std::isfinite(asDouble(x)); }
 template<class T> int isnan(T x) { return std::isnan(asDouble(x)); }
 
