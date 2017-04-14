@@ -217,6 +217,24 @@ namespace tiny_ad {
   COMPARISON_OPERATOR_FLIP(==,==)
   COMPARISON_OPERATOR_FLIP(!=,!=)
 #undef COMPARISON_OPERATOR_FLIP
+  /* Utility: Return the value of a tiny_ad type */
+  double asDouble(double x) CSKIP( {return x;} )
+  template<class T, class V>
+  double asDouble (const ad<T, V> &x){
+    return asDouble(x.value);
+  }
+  /* Utility: Return the max absolute value of all members of a
+     tiny_ad type */
+  double max_fabs(double x) CSKIP( {return fabs(x);} )
+  template<class T, class V>
+  double max_fabs (const ad<T, V> &x){
+    double ans = max_fabs(x.value);
+    for(int i=0; i<x.deriv.size(); i++) {
+      double tmp = max_fabs(x.deriv[i]);
+      ans = (tmp > ans ? tmp : ans);
+    }
+    return ans;
+  }
   /* R-specific derivatives (rely on Rmath)*/
 #ifdef R_RCONFIG_H
   extern "C" {
