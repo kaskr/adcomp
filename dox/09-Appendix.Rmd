@@ -1,0 +1,72 @@
+```{r echo=FALSE, eval=TRUE, results='hide'}
+source("layout/utils.R")
+```
+
+Appendix {#Appendix}
+========
+
+## Notation
+
+We use the following notation
+
+| Notation            | Explanation                                          |
+|---------------------|------------------------------------------------------|
+| $u$                 | The random effects vector                            |
+| $\theta$            | Parameter vector (first part)                        |
+| $\beta$             | Parameter vector (second part)                       |
+| $f(u,\beta,\theta)$ | Joint negative log likelihood                        |
+| $x$                 | Data                                                 |
+| $E(u|x)$            | Conditional expectation of random effect given data  |
+| $\hat u$            | The posterior mode $\arg \min_{u} f(u,\beta,\theta)$ |
+
+## Profiling the inner problem
+
+**Theorem 1 (Profiling inner problem)**
+Assume that for any $\beta$ and $\theta$
+
+* **Assumption 1** The partial derivative $\partial_{\beta} f(u,\beta,\theta)$ is a linear function of u.
+* **Assumption 2** The posterior mean is equal to the posterior mode: $E(u|x)=\hat u$
+
+Then the MLE
+
+$$\hat \beta := \arg \max_{\beta} \left( \int \exp(-f(u,\beta,\theta)) \: du \right) $$
+
+is a solution to the augmented system
+
+$$
+\begin{split}
+\partial_{u} f(u,\beta,\theta) &= 0 \\
+\partial_{\beta} f(u,\beta,\theta) &= 0
+\end{split}
+$$
+
+The augmented system defines $\hat \beta$ implicitly as function of the posterior mode $\hat u$.
+
+*Proof*
+
+Differentiation of the negative log marginal likelihood gives
+
+$$
+\begin{split}
+\partial_{\beta} \left( -\log \int \exp(-f(u,\beta,\theta)) \: du \right) &= E(\partial_{\beta}f(u,\beta,\theta) |x) \\
+&= \partial_{\beta} f(u,\beta,\theta)_{|u=\hat u(\beta,\theta)}
+\end{split}
+$$
+
+where the first equality holds in general and the second equality follows from assumptions (1) and (2).
+
+$\square$
+
+## Example
+
+The standard situation for which **assumption 1** holds is when the
+$\beta$s are the linear fixed effects of a mixed model. In this case
+the joint negative log density takes the form
+$$ f(u,\beta,\theta) = \frac{1}{2}(u-A\beta)'\Sigma_{\theta}^{-1}(u-A\beta) + ... $$
+for some design matrix $A$ where ' $...$ ' does not depend on
+$\beta$. The derivative
+$$ \partial_{\beta} f(u,\beta,\theta) = A'\Sigma_{\theta}^{-1}(u-A\beta) $$
+is thus a linear function of the random effect $u$.
+
+In general **assumption 2** holds exact for models with a symmetric
+(e.g. Gaussian) posterior distribution.
