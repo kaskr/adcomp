@@ -105,14 +105,14 @@ class density::UNSTRUCTURED_CORR_t&lt; scalartype_ &gt;</h3>
 \[\Sigma = D^{-\frac{1}{2}}LL&#39;D^{-\frac{1}{2}}\]
 </p>
 <p> where </p><p class="formulaDsp">
-\[ L=\begin{pmatrix} 1 \\ x_0 &amp; 1 \\ x_1 &amp; x_3 &amp; 1 \\ x_2 &amp; x_4 &amp; x_5 &amp; 1 \end{pmatrix} \]
+\[ L=\begin{pmatrix} 1 \\ \theta_0 &amp; 1 \\ \theta_1 &amp; \theta_2 &amp; 1 \\ \theta_3 &amp; \theta_4 &amp; \theta_5 &amp; 1 \end{pmatrix} \]
 </p>
-<p> and </p><p class="formulaDsp">
+<p> (lower triangle filled row-wise) and </p><p class="formulaDsp">
 \[ D=diag(LL&#39;) \]
 </p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Construct density object of dimension 4</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> Lx(6);</div><div class="line"><a class="code" href="classUNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t&lt;Type&gt;</a> nll(Lx);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(4);</div><div class="line">res = nll(x);               <span class="comment">// Evaluate neg. log density</span></div></div><!-- fragment --><dl class="section remark"><dt>Remarks</dt><dd><em>Sigma</em> is available via <a class="el" href="classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202">MVNORM_t::cov</a> , e.g. <div class="fragment"><div class="line">nll.cov();</div></div><!-- fragment --></dd>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Construct density object of dimension 4</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> theta(6);</div><div class="line"><a class="code" href="classUNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t&lt;Type&gt;</a> nll(theta);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(4);</div><div class="line">res = nll(x);               <span class="comment">// Evaluate neg. log density</span></div></div><!-- fragment --><dl class="section remark"><dt>Remarks</dt><dd><em>Sigma</em> is available via <a class="el" href="classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202">MVNORM_t::cov</a> , e.g. <div class="fragment"><div class="line">nll.cov();</div></div><!-- fragment --></dd>
 <dd>
-<em>Sigma</em> 1's on its diagonal. To scale the variances we can use <a class="el" href="classVECSCALE__t.html">VECSCALE_t</a> , e.g. <div class="fragment"><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> sds(4);</div><div class="line">sds.fill(2.0);                            <span class="comment">// Set all standard deviations to 2.0</span></div><div class="line">res = <a class="code" href="classVECSCALE__t.html">VECSCALE_t</a>(nll,sds)(x);</div></div><!-- fragment --> </dd></dl>
+<em>Sigma</em> has 1's on its diagonal. To scale the variances we can use <a class="el" href="classVECSCALE__t.html">VECSCALE_t</a> , e.g. <div class="fragment"><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> sds(4);</div><div class="line">sds.fill(2.0);                            <span class="comment">// Set all standard deviations to 2.0</span></div><div class="line">res = <a class="code" href="classVECSCALE__t.html">VECSCALE_t</a>(nll,sds)(x);</div></div><!-- fragment --> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="multivariate_distributions_8cpp-example.html#_a6">multivariate_distributions.cpp</a>, and <a class="el" href="sdv_multi_compact_8cpp-example.html#_a7">sdv_multi_compact.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00253">253</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
