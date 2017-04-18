@@ -217,12 +217,12 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> Sigma, bool use_atomic = true){
    \f[
    L=\begin{pmatrix}
    1 \\
-   x_0 & 1 \\
-   x_1 & x_3 & 1 \\
-   x_2 & x_4 & x_5 & 1
+   \theta_0 & 1 \\
+   \theta_1 & \theta_2 & 1 \\
+   \theta_3 & \theta_4 & \theta_5 & 1
    \end{pmatrix}
    \f]
-   and
+   (lower triangle filled row-wise) and
    \f[
    D=diag(LL')
    \f]
@@ -230,8 +230,8 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> Sigma, bool use_atomic = true){
    Example:
    \code
    // Construct density object of dimension 4
-   vector<Type> Lx(6);
-   UNSTRUCTURED_CORR_t<Type> nll(Lx);
+   vector<Type> theta(6);
+   UNSTRUCTURED_CORR_t<Type> nll(theta);
    vector<Type> x(4);
    res = nll(x);               // Evaluate neg. log density
    \endcode
@@ -241,7 +241,7 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> Sigma, bool use_atomic = true){
      nll.cov();
    \endcode
    
-   \remarks *Sigma* 1's on its diagonal. To scale the variances we can use \ref VECSCALE_t , e.g.
+   \remarks *Sigma* has 1's on its diagonal. To scale the variances we can use \ref VECSCALE_t , e.g.
    \code
      vector<Type> sds(4);
      sds.fill(2.0);                            // Set all standard deviations to 2.0
