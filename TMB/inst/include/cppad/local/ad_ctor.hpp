@@ -187,36 +187,20 @@ inline AD<Base>::AD(const T &t)
 { }
 
 // Added by Kasper
-template <class Base>
-inline AD<Base>::AD(const double &t)
-: value_(Base(t))
-, tape_id_(0)
-, taddr_(0)
+#define CTOR_FROM(TYPE)                         \
+template <class Base>                           \
+inline AD<Base>::AD(const TYPE &t)              \
+: value_(Base(t))                               \
+, tape_id_(0)                                   \
+, taddr_(0)                                     \
 { }
-
-// Added by Kasper
-template <class Base>
-inline AD<Base>::AD(const int &t)
-: value_(Base(t))
-, tape_id_(0)
-, taddr_(0)
-{ }
-
-// Added by Kasper
-template <class Base>
-inline AD<Base>::AD(const long int &t)
-: value_(Base(t))
-, tape_id_(0)
-, taddr_(0)
-{ }
-
-// Added by Kasper
-template <class Base>
-inline AD<Base>::AD(const long unsigned int &t)
-: value_(Base(t))
-, tape_id_(0)
-, taddr_(0)
-{ }
+  CTOR_FROM(double)
+  CTOR_FROM(int)
+  CTOR_FROM(size_t)
+#ifdef EIGEN_DEFAULT_DENSE_INDEX_TYPE_REDEFINED
+  CTOR_FROM(EIGEN_DEFAULT_DENSE_INDEX_TYPE)
+#endif
+#undef CTOR_FROM
 
 } // END_CPPAD_NAMESPACE
 # endif
