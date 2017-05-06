@@ -20,7 +20,7 @@ matern <- function (u, phi, kappa)
 ## Test:
 n <- 100
 set.seed(123)
-x <- 10 * seq(0, 1, length=n)
+x <- matrix(runif(2*n, 0, 10), n)
 D <- as.matrix(dist(x))
 C <- matern(D, phi=1.3, kappa=2.7)
 x <- t(chol(C)) %*% rnorm(n)
@@ -30,7 +30,7 @@ map <- NULL
 
 ################################################################################
 
-model <- MakeADFun(data, parameters, map=map, DLL="matern")
-system.time( fit <- nlminb(model$par, model$fn, model$gr, model$he) )
-system.time( rep <- sdreport(model, fit$par, model$he(fit$par)) )
+obj <- MakeADFun(data, parameters, map=map, DLL="matern")
+system.time( fit <- nlminb(obj$par, obj$fn, obj$gr, obj$he) )
+system.time( rep <- sdreport(obj, fit$par, obj$he(fit$par)) )
 print(rep)

@@ -1,4 +1,4 @@
-excludes = lr_test spde_aniso spde matern
+excludes = lr_test spde_aniso spde
 rfiles = $(basename $(wildcard *.R)) $(basename $(wildcard */*.R))
 cppfiles = $(basename $(wildcard *.cpp)) $(basename $(wildcard */*.cpp))
 all_examples = $(filter $(rfiles), $(cppfiles))
