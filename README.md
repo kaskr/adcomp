@@ -5,6 +5,10 @@ Template Model Builder (TMB)
 
 TMB is an R package with functionality similar to ADMB.
 It requires R at least version 3.0.0 and development tools needed to install R packages from source.
+Standard install instructions are available [here](https://github.com/kaskr/adcomp/wiki/Download).
+
+# Install the development version (Linux)
+
 It is recommended to install TMB into your local R package library (if you do not yet have a local R package library, create one by running ```install.packages("")``` from the R prompt and follow the instructions).
 The package is installed from the command line by entering the adcomp folder and typing
 
@@ -26,7 +30,7 @@ runExample(all=TRUE)
 ```
 
 To build API-Function reference see instructions [here](dox/README.md).
-Once the documentation is built open dox/html/index.html in your web browser.
+Once the documentation is built open `dox/html/index.html` in your web browser.
 Use the search field to find functions and their documentation.
 
 It is recommended to test that models can be changed, re-compiled and re-loaded without problems:
@@ -39,60 +43,33 @@ source("test_reload.R")
 If everything works as intended this script should display "TRUE".
 The script has only been observed to fail for certain combinations of Linux and the gcc compiler, see below.
 
-Alternative platforms
-=====================
+# Advanced notes
 
-Windows
--------
-Tested to work on 32/64 bit R with latest [Rtools](http://cran.r-project.org/bin/windows/Rtools/). 64 bit R is recommended.
+## Metis orderings
 
-_Install instructions_
+For large 3D random field models the ordering algorithms shipping with R's Matrix package are far from optimal. To get better orderings available run the extended TMB install script (Linux/Mac only):
 
-1. Start 64 bit R and change working directory to the (cloned or unzipped) ```adcomp``` folder.
-
-2. From R run: ```source("install_windows.R")```
-
-The required Rtools will be downloaded and installed. Note that the PATH variable need not be changed by the installer or otherwise edited. The PATH will be automatically set for each TMB session.
-
-_Status_
-
-- Parallel user templates work. However, changing the number of threads from R does not work.
-- Filenames and folders with spaces works _on systems supporting 8.3 filenames_. Systems that do not support 8.3 filenames may have problems running the windows install script, unless R is installed in a folder without spaces.
-- -Wall flag disabled by default.
-
-Mac OS X
---------
-Tested to work with both llvm-gcc-4.2 and clang. Fortran compiler [libraries](http://cran.r-project.org/bin/macosx/tools) must be installed. According to [R admin manual](http://www.cran.r-project.org/doc/manuals/R-admin.html#OS-X) "the OpenMP support in this version of gcc is problematic, and the alternative, clang, has no OpenMP support". So, parallel templates with OS X will require a different compiler installed.
-
-On Mavericks (Mac OS 10.9) the Fortran compiler on the CRAN website does not work. More information and the solution can be found [here](http://www.thecoatlessprofessor.com/programming/rcpp-rcpparmadillo-and-os-x-mavericks-lgfortran-and-lquadmath-error). The easiest solution is to install the appropriate fortran libraries from r.research.att via the command line in Terminal:
-
-```
-curl -O http://r.research.att.com/libs/gfortran-4.8.2-darwin13.tar.bz2
-sudo tar fvxz gfortran-4.8.2-darwin13.tar.bz2 -C /
+```shell
+make install-metis-full
 ```
 
-Linux specific notes
-====================
+The new orderings are available from R through the function `runSymbolicAnalysis()`.
+For a quick example of how to use it try the [ar1_4D](./tmb_examples/ar1_4D.R) example:
 
-Metis orderings
----------------
-For large 3D random field models the ordering algorithms shipping with R's Matrix package are far from optimal. To get better orderings available run the following in the terminal:
+```shell
+cd tmb_examples
+make ar1_4D
+```
 
-* sudo apt-get install libsuitesparse-metis-3.1.0
+You should see a significant speedup.
 
-This will install a more complete version of CHOLMOD with more orderings available. Then install TMB like this:
+## Issues with library unloading
 
-* make install-metis
-
-For a quick example of how to use it start R, load TMB and run
-
-* runExample("ar1xar1")
-
-Issues with library unloading
------------------------------
 On recent versions of gcc the following problem may be encountered: When the user cpp file is changed, re-compiled and re-loaded, the changes do not take place. To see if you are affected by this issue, assuming your compiled DLL is called "mymodel.so", try running:
 
-* readelf -s mymodel.so | grep UNIQUE
+```shell
+readelf -s mymodel.so | grep UNIQUE
+```
 
 If this gives any output it is not possible to unload the library, and R will have to be restarted every time the model is re-compiled.
 There are at least two alternative solutions to this problem:
