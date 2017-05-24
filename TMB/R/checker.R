@@ -39,6 +39,14 @@
 ##' @param n Number of simulations
 ##' @return List with gradient simulations (joint and marginal)
 ##' @seealso \code{\link{summary.checkConsistency}}, \code{\link{print.checkConsistency}}
+##' @examples
+##' \dontrun{
+##' runExample("simple")
+##' chk <- checkConsistency(obj)
+##' chk
+##' ## Get more details
+##' s <- summary(chk)
+##' s$marginal$p.value  ## Laplace exact for Gaussian models }
 checkConsistency <- function(obj,
                              par = NULL,
                              hessian = FALSE,

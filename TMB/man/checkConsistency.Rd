@@ -54,6 +54,15 @@ bias is transformed to parameter scale (using the estimated
 information matrix) to provide an estimate of parameter bias caused
 by the Laplace approximation.
 }
+\examples{
+\dontrun{
+runExample("simple")
+chk <- checkConsistency(obj)
+chk
+## Get more details
+s <- summary(chk)
+s$marginal$p.value  ## Laplace exact for Gaussian models }
+}
 \seealso{
 \code{\link{summary.checkConsistency}}, \code{\link{print.checkConsistency}}
 }
