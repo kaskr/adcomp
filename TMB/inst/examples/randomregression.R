@@ -1,4 +1,5 @@
 require(TMB)
+compile("randomregression.cpp")
 dyn.load(dynlib("randomregression"))
 
 ## Simulate random regression
