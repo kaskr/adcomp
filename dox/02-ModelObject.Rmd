@@ -1,4 +1,4 @@
-```{.R echo=FALSE, eval=TRUE, results='hide'}
+```{r echo=FALSE, eval=TRUE, results='hide'}
 source("layout/utils.R")
 ```
 

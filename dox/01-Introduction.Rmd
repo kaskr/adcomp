@@ -1,4 +1,4 @@
-```{.R echo=FALSE, eval=TRUE, results='hide'}
+```{r echo=FALSE, eval=TRUE, results='hide'}
 source("layout/utils.R")
 ```
 
@@ -436,7 +436,7 @@ Example collection {#Examples}
 - **Controlling R code**
     `r include_source("../tmb_examples/linreg.R", indent=4)`
 - To run this example use the R command
-    ```{.R, eval = FALSE}
+    ```{r, eval = FALSE}
     source("linreg.R")
     ```
 
@@ -492,7 +492,7 @@ This will cause TMB and R to crash with the following error message:
 
 So, you must restart R and give the commands
 
-```{.R eval=FALSE}
+```{r eval=FALSE}
 library(TMB)
 gdbsource("my_project.R")
 ```
@@ -525,7 +525,7 @@ need to be included ("//Extra line needed" in the above example).
 
 When we try to run this program in the usual way, the program crashes:
 
-```{.R eval=FALSE}
+```{r eval=FALSE}
 source("nan_error_ex.R")
 ```
 
@@ -535,7 +535,7 @@ source("nan_error_ex.R")
 At this stage you should run the debugger to find out that the
 floating point exception occurs at line number 14:
 
-```{.R eval=FALSE}
+```{r eval=FALSE}
 library(TMB)
 gdbsource("nan_error_ex.R")
 ```
