@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>The comprehensive TMB documentation</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="ModelObject.html">
 <link rel="next" href="Simulation.html">
-
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -90,6 +88,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -191,9 +190,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>There are various graph representations that are commonly used to visualize probabilistic structure. One such is the <em>conditional independence graph</em>. Say we have a model of four random variables <span class="math inline">\(X_1,...,X_4\)</span> for which the joint density is:</p>
 <p><span class="math display">\[p(x_1,x_2,x_3,x_4) \propto f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)\]</span></p>
 <p>The separability of factors on the right hand side implies some conditional independence properties. For instance if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span> are held constant then <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> varies independently. We say that <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> are conditionally independent given <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span>. The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor <span class="math inline">\(f_i\)</span>:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-35-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /></p>
 <p>Equivalently the graph may be visualized via its adjacency matrix:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-36-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-10-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <p>This is the <strong>sparsity pattern</strong> of the model.</p>
 <blockquote>
 <p>The sparsity pattern visualizes the conditional independence structure of the random effects in the model.</p>
@@ -203,8 +202,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3><span class="header-section-number">11.1.2</span> Node removal properties</h3>
 <p>Important probabilistic properties can be deduced directly from the graph. This is due to the following <em>node removal</em> properties.</p>
 <ol style="list-style-type: decimal">
-<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph: <img src="_main_files/figure-html/unnamed-chunk-37-1.svg" style="display: block; margin: auto;" /></p></li>
-<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes: <img src="_main_files/figure-html/unnamed-chunk-38-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph: <img src="_main_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes: <img src="_main_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /></p></li>
 </ol>
 <blockquote>
 <p>Conditioning preserves sparseness. Marginalizing tend to destroy sparseness by adding more edges to the graph.</p>
@@ -213,7 +212,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="directed-acyclic-graph" class="section level3">
 <h3><span class="header-section-number">11.1.3</span> Directed acyclic graph</h3>
 <p>When building models in TMB it is often more natural to specify processes in incremental steps - i.e. through the successive conditional distributions. The previous example could be simulated by drawing the variables <span class="math inline">\(X_1,X_2,X_3,X_4\)</span> one by one in the given order as illustrated by the following <em>directed</em> graph:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-39-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /></p>
 <p>The graph shows dependencies of any specific node <em>given past nodes</em>. The edge from <span class="math inline">\(X_1\)</span> to <span class="math inline">\(X_3\)</span> was not in the original (undirected) graph. This is a so-called <strong>fill-in</strong>.</p>
 <blockquote>
 <p>Order matters. The DAG is different from the conditional independence graph.</p>
@@ -222,9 +221,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="the-effect-of-adding-data" class="section level3">
 <h3><span class="header-section-number">11.1.4</span> The effect of adding data</h3>
 <p>It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that <span class="math inline">\(X_4\)</span> is a data point we would illustrate it by:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-40-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /></p>
 <p>Here there are only three variables left. The conditional independence structure of the variables is:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-41-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /></p>
 <p>which is the same graph as was previously found by integrating <span class="math inline">\(X_4\)</span> out of the joint distribution.</p>
 <blockquote>
 <p>Data nodes destroy sparsity the same way as marginalization. To avoid this, try to associate each data point with a single random effect.</p>
@@ -242,14 +241,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="dt">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</code></pre></div>
 <p>We demonstrate it in the case <span class="math inline">\(n=5\)</span>. Here is the DAG</p>
 <pre><code>## Optimizing tape... Done</code></pre>
-<p><img src="_main_files/figure-html/unnamed-chunk-43-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /></p>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
 <p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(Matrix)
 obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">random=</span><span class="kw">c</span>(<span class="st">&quot;X&quot;</span>), <span class="dt">DLL=</span><span class="st">&quot;thetalog&quot;</span>)
 <span class="kw">image</span>(obj$env$<span class="kw">spHess</span>(<span class="dt">random=</span><span class="ot">TRUE</span>))</code></pre></div>
 <pre><code>## Optimizing tape... Done</code></pre>
-<p><img src="_main_files/figure-html/unnamed-chunk-44-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-18-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>FIXME: NOT DONE YET !</p>
 </blockquote>
@@ -269,8 +268,9 @@ obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parame
         </div>
       </div>
 <a href="ModelObject.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="Simulation.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
-
+<a href="Simulation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -313,7 +313,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);

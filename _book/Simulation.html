@@ -6,9 +6,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>The comprehensive TMB documentation</title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown 0.3 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
   <meta property="og:title" content="The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -32,7 +31,6 @@
   
   
 <link rel="prev" href="Sparsity.html">
-
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -90,6 +88,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 
 <body>
+
 
 
   <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
@@ -262,7 +261,7 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
 <a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">estimate=</span><span class="kw">as.vector</span>(sim), <span class="dt">parameter=</span><span class="kw">names</span>(obj$par)[<span class="kw">row</span>(sim)])
 <span class="kw">densityplot</span>( ~<span class="st"> </span>estimate |<span class="st"> </span>parameter, <span class="dt">data=</span><a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a>, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-53-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-27-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <p>Compare with the true parameter values of the simulation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obj$par</code></pre></div>
 <pre><code>##  a  b sd 
@@ -326,7 +325,8 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
       </div>
 <a href="Sparsity.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-
+    </div>
+  </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
@@ -369,7 +369,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(script.src))
       script.src  = script.src.replace(/^https?:/, '');
     document.getElementsByTagName("head")[0].appendChild(script);
