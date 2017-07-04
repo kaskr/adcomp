@@ -1,8 +1,4 @@
 language: r
-r:
-  - 3.1
-##  - release
-  - devel
 
 sudo: false
 
@@ -10,30 +6,56 @@ cache: packages
 
 os:
   - linux
-##  - osx
 
-## dist: trusty
+jobs:
+  include:
 
-install:
-  - export OMP_NUM_THREADS=2
-  - wget http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.12.linux.bin.tar.gz
-  - wget https://cran.r-project.org/src/contrib/Archive/roxygen2/roxygen2_5.0.1.tar.gz
-  - tar zxf doxygen-1.8.12.linux.bin.tar.gz
-  - export PATH=`pwd`/doxygen-1.8.12/bin:$PATH
-  - doxygen -v
-  - Rscript -e 'pkg <- c("RcppEigen", "numDeriv", "parallel", "knitr", "bookdown", "rsvg", "brew"); if(!all(pkg%in%installed.packages()))install.packages(pkg)'
-  - Rscript -e 'problemPkg <- "roxygen2_5.0.1.tar.gz"; pkg <- c("roxygen2"); if(!all(pkg%in%installed.packages()))install.packages(problemPkg, repos=NULL)'
+    - stage: Install package dependencies
+      r: 3.1
+      install:
+        - ./bin/install_dependencies.sh
+      script: true
 
-script:
-  - mkdir ~/.R
-  - echo "CXX = g++ -Wall -pedantic -Werror" > ~/.R/Makevars
-  - make cran-version
-  - make cran-check
-  - make install
-  - echo "library(TMB);precompile();runExample(all=TRUE)" | R --slave
-  - make test
-  - make doxygen
-  - ./bin/deploy.sh
+    - stage: Install package dependencies
+      r: devel
+      install:
+        - ./bin/install_dependencies.sh
+      script: true
+
+    - stage: Install and check the package
+      r: 3.1
+      install: true
+      script:
+        - ./bin/install_and_check.sh
+
+    - stage: Install and check the package
+      r: devel
+      install: true
+      script:
+        - ./bin/install_and_check.sh
+
+    - stage: Run full example suite
+      r: 3.1
+      install: true
+      script:
+        - ./bin/run_full_example_suite.sh
+
+    - stage: Run full example suite
+      r: devel
+      install: true
+      script:
+        - ./bin/run_full_example_suite.sh
+
+    - stage: Build and deploy documentation
+      r: devel
+      install:
+        - wget http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.12.linux.bin.tar.gz
+        - tar zxf doxygen-1.8.12.linux.bin.tar.gz
+        - export PATH=`pwd`/doxygen-1.8.12/bin:$PATH
+        - doxygen -v
+      script:
+        - make doxygen
+        - ./bin/deploy.sh
 
 notifications:
   email:
