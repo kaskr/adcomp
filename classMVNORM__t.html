@@ -97,7 +97,7 @@ class MVNORM_t&lt; scalartype_ &gt;</h3>
 
 <p>Multivariate normal distribution with user supplied covariance matrix. </p>
 <p>Class to evaluate the negative log density of a mean zero multivariate Gaussian variable with general covariance matrix Sigma. Intended for small dense covariance matrices. </p><div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(3,3);</div><div class="line">Sigma.fill(0.1);             <span class="comment">// Fill the whole matrix</span></div><div class="line">Sigma.diagonal() *= 10.0;    <span class="comment">// Multiply diagonal by 10 to positive definite Sigma</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x0(3);          <span class="comment">// Point of evaluation</span></div><div class="line">x0.fill(0.0);                <span class="comment">// Initialize x0 to be zero</span></div><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> N_0_Sigma(Sigma);   <span class="comment">// N_0_Sigma is now a Distribution  </span></div><div class="line">res = N_0_Sigma(x0);         <span class="comment">// Evaluates (neg. log) density at x</span></div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l00104">104</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00105">105</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7bd0bc2ecad6f323974b247b81220acc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7bd0bc2ecad6f323974b247b81220acc">&sect;&nbsp;</a></span>cov()</h2>
@@ -127,7 +127,7 @@ template&lt;class scalartype_&gt; </div>
 <p>Covariance matrix extractor. </p>
 <p>Typical use: </p><div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(3,3);</div><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> N_0_Sigma(Sigma);   <span class="comment">// N_0_Sigma is now a Distribution  </span></div><div class="line">N_0_Sigma.cov();                   <span class="comment">// Returns covariance matrix (Sigma in this case)</span></div></div><!-- fragment --><p> Useful for classes such as <a class="el" href="classUNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t</a> that inherits from <a class="el" href="classMVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a>. </p>
 
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l00126">126</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00127">127</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -175,7 +175,7 @@ template&lt;class scalartype_&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l00154">154</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00155">155</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>

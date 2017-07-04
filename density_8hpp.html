@@ -78,7 +78,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Classes to construct multivariate Gaussian density objects.  
+<p>Classes to construct multivariate <b>negative log</b> Gaussian density objects.  
 <a href="#details">More...</a></p>
 
 <p><a href="density_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -150,7 +150,8 @@ template&lt;class vectortype , class distribution &gt; </td></tr>
 <tr class="separator:aae30a0275dafde20092e4c12c6bda61e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Classes to construct multivariate Gaussian density objects. </p>
+<div class="textblock"><p>Classes to construct multivariate <b>negative log</b> Gaussian density objects. </p>
+<dl class="section note"><dt>Note</dt><dd>These density classes return the <b>negative log likelihood</b>. </dd></dl>
 
 <p>Definition in file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -168,7 +169,7 @@ template&lt;class vectortype , class distribution &gt; </td></tr>
 <b>Value:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                        \</div><div class="line">vectortype sqrt_cov_scale(vectortype x){}       \</div><div class="line">void <a class="code" href="atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">simulate</a>(vectortype &amp;u){}                  \</div><div class="line">vectortype <a class="code" href="atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">simulate</a>(){}                         \</div><div class="line">public:</div><div class="ttc" id="atomic_8hpp_html_ad0e80df47530e00880f7396e7fde2782"><div class="ttname"><a href="atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">atomic::compois_utils::simulate</a></div><div class="ttdeci">double simulate(double loglambda, double nu)</div><div class="ttdoc">Conway-Maxwell-Poisson. Rejection sampler using a Piecewise log-linear envelope. Does not require the...</div><div class="ttdef"><b>Definition:</b> <a href="atomic_8hpp_source.html#l00158">atomic.hpp:158</a></div></div>
 </div><!-- fragment --><p>Conventions for simulation: </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00047">47</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00048">48</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
@@ -211,7 +212,7 @@ template&lt;class scalartype &gt; </div>
 </dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="spde_8cpp-example.html#a8">spde.cpp</a>, and <a class="el" href="spde_aniso_8cpp-example.html#a10">spde_aniso.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l00917">917</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00918">918</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -253,7 +254,7 @@ template&lt;class scalartype &gt; </div>
 </dl>
 <p>Shortform version for working with the density of the <a class="el" href="classMVNORM__t.html">MVNORM_t</a> distribution (C++ class). Typical use: </p><div class="fragment"><div class="line"><a class="code" href="density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(x);</div></div><!-- fragment --><p> where <code>Sigma</code> is a covariance matrix. The part <code>MVNORM(Sigma)</code> creates an object of <a class="el" href="classMVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a>, which is then evaluated by the part <code></code>(x). </p>
 
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l00200">200</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00201">201</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -295,7 +296,7 @@ template&lt;class distribution1 , class distribution2 &gt; </div>
 </dl>
 <p>Shortform version to combine two densities using the class <a class="el" href="classSEPARABLE__t.html">SEPARABLE_t</a> . Typical use: </p><div class="fragment"><div class="line"><a class="code" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(x); <span class="comment">// 2D array</span></div><div class="line"><a class="code" href="density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(phi), <a class="code" href="density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma))(x);</div></div><!-- fragment --><p> where <code>MVNORM(Sigma)</code> acts in the first dimension of x and <code>AR1(phi)</code> acts in the second dimension of x. </p><dl class="section note"><dt>Note</dt><dd>The order of array dimensions is reversed in the sense that f_ acts in the <em>second</em> dimension and g_ acts in the <em>first</em> dimension (This order is consistent with how Kronecker products work in R). </dd></dl>
 
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l01226">1226</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l01227">1227</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
