@@ -2,7 +2,8 @@
 // License: GPL-2
 
 /** \file 
-   \brief Classes to construct multivariate Gaussian density objects.
+   \brief Classes to construct multivariate **negative log** Gaussian density objects.
+   \note These density classes return the **negative log likelihood**.
 */
 
 
