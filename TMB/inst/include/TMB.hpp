@@ -89,6 +89,7 @@ namespace CppAD{
 #include "tiny_ad/integrate/integrate.hpp"
 #include "Vectorize.hpp"
 #include "dnorm.hpp"   // harmless
+#include "dbridge.hpp" // harmless
 #include "lgamma.hpp"  // harmless
 #include "start_parallel.hpp"
 #include "tmb_core.hpp"
