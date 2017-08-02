@@ -9,7 +9,7 @@
     \ingroup R_style_distribution
 */
 template<class Type>
-Type pnorm(Type q, Type mean = 0, Type sd = 1){
+Type pnorm(Type q, Type mean = 0., Type sd = 1.){
   CppAD::vector<Type> tx(1);
   tx[0] = (q - mean) / sd;
   return atomic::pnorm1(tx)[0];
@@ -21,7 +21,7 @@ VECTORIZE1_t(pnorm)
     \ingroup R_style_distribution
 */
 template<class Type>
-Type qnorm(Type p, Type mean = 0, Type sd = 1){
+Type qnorm(Type p, Type mean = 0., Type sd = 1.){
   CppAD::vector<Type> tx(1);
   tx[0] = p;
   return sd*atomic::qnorm1(tx)[0] + mean;
@@ -33,7 +33,7 @@ VECTORIZE1_t(qnorm)
     \ingroup R_style_distribution
 */
 template<class Type>
-Type pgamma(Type q, Type shape, Type scale = 1){
+Type pgamma(Type q, Type shape, Type scale = 1.){
   CppAD::vector<Type> tx(4);
   tx[0] = q/scale;
   tx[1] = shape;
@@ -47,7 +47,7 @@ VECTORIZE3_ttt(pgamma)
     \ingroup R_style_distribution
 */
 template<class Type>
-Type qgamma(Type q, Type shape, Type scale = 1){
+Type qgamma(Type q, Type shape, Type scale = 1.){
   CppAD::vector<Type> tx(3);
   tx[0] = q;
   tx[1] = shape;
