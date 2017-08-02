@@ -195,11 +195,6 @@ inline AD<Base>::AD(const TYPE &t)              \
 , taddr_(0)                                     \
 { }
   CTOR_FROM(double)
-  CTOR_FROM(int)
-  CTOR_FROM(size_t)
-#ifdef EIGEN_DEFAULT_DENSE_INDEX_TYPE_REDEFINED
-  CTOR_FROM(EIGEN_DEFAULT_DENSE_INDEX_TYPE)
-#endif
 #undef CTOR_FROM
 
 } // END_CPPAD_NAMESPACE

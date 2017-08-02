@@ -36,11 +36,6 @@ struct isDouble<double>{
 #include "Rstream.hpp"
 
 /* Include the Eigen library. */
-#ifndef EIGEN_DEFAULT_DENSE_INDEX_TYPE
-#define EIGEN_DEFAULT_DENSE_INDEX_TYPE int
-#else
-#define EIGEN_DEFAULT_DENSE_INDEX_TYPE_REDEFINED 1
-#endif
 #ifdef TMB_SAFEBOUNDS
 #undef NDEBUG
 #undef eigen_assert
