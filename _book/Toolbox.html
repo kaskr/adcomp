@@ -182,8 +182,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);                             <span class="co">// Underlying latent random variables </span>
 Type nll=Type(<span class="fl">0.</span><span class="dv">0</span>);
 nll -= <a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(u,Type(<span class="dv">0</span>),Type(<span class="dv">1</span>),<span class="kw">true</span>));       <span class="co">// Assign N(0,1) distribution u </span>
-<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; v = <a class="code" href="../group__R__style__distribution.html#gac908a1b293d159f4a8958a694674a4a4">pnorm</a>(u,Type(<span class="dv">0</span>),Type(<span class="dv">1</span>),<span class="kw">true</span>);  <span class="co">// Uniformly distributed variables (on [0,1])</span>
-<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; w = <a class="code" href="../group__R__style__distribution.html#gae9f8112d1f1ee80879c8e91b7bffac55">qgamma</a>(v,shape,scale,<span class="kw">true</span>);</code></pre></div>
+<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; v = <a class="code" href="../group__R__style__distribution.html#ga2a3cc5a06500670aeaf6eb911a1094d9">pnorm</a>(u,Type(<span class="dv">0</span>),Type(<span class="dv">1</span>),<span class="kw">true</span>);  <span class="co">// Uniformly distributed variables (on [0,1])</span>
+<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; w = <a class="code" href="../group__R__style__distribution.html#ga0e4b623b592b42651357611532e2b912">qgamma</a>(v,shape,scale,<span class="kw">true</span>);</code></pre></div>
 <p><code>w</code> now has a gamma distribution.</p>
 </div>
 <div id="discrete-latent-variables" class="section level3">
