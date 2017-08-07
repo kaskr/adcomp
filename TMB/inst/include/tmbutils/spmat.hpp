@@ -23,28 +23,60 @@ Eigen::SparseMatrix<Type> asSparseMatrix(SEXP M){
   return mat;
 }
 
-/** Create sparse matrix from dense matrix */
+/** \brief Test if a scalar is a structural zero
+
+    A **structural zero** is a scalar taking the value zero for all
+    configurations of the model parameters. If the return value is
+    `true` the input is guarantied to be a structural zero.
+
+    \note Nothing can be deduced if the return value is `false`. For
+    instance complex structural zeros such as
+    \f$1-sin(x)^2-cos(x)^2\f$ won't be detected.
+*/
+template<class Type>
+bool isStructuralZero(Type x) {
+  return (x == Type(0)) && (! CppAD::Variable(x));
+}
+
+/** \brief Create sparse matrix from dense matrix
+
+    This function converts a dense matrix to a sparse matrix based on
+    its numerical values.
+
+    \note Zeros are detected using `isStructuralZero()` ensuring that
+    entries which might become non-zero for certain parameter settings
+    will not be regarded as zeros.
+*/
 template<class Type>
 Eigen::SparseMatrix<Type> asSparseMatrix(matrix<Type> x){
   typedef Eigen::Triplet<Type> T;
   std::vector<T> tripletList;
   for(int i=0;i<x.rows();i++)
     for(int j=0;j<x.cols();j++)
-      if( (x(i,j)!=Type(0)) || CppAD::Variable(x(i,j)) )
+      if( ! isStructuralZero(x(i,j)) )
 	tripletList.push_back(T(i,j,x(i,j)));
   Eigen::SparseMatrix<Type> mat(x.rows(),x.cols());
   mat.setFromTriplets(tripletList.begin(), tripletList.end());
   return mat;  
 }
 
-/** Create sparse vector from dense vector */
+/** \brief Create sparse vector from dense vector
+
+    This function converts a dense vector to a sparse vector based on
+    its numerical values.
+
+    \note Zeros are detected using `isStructuralZero()` ensuring that
+    entries which might become non-zero for certain parameter settings
+    will not be regarded as zeros.
+*/
+
 template<class Type>
 Eigen::SparseVector<Type> asSparseVector(vector<Type> x){
   typedef Eigen::Triplet<Type> T;
   std::vector<T> tripletList;
   Eigen::SparseVector<Type> mat(x.rows());
   for(int i=0;i<x.rows();i++)
-    if( (x(i)!=Type(0)) || CppAD::Variable(x(i)) )
+    if( ! isStructuralZero(x(i)) )
       mat.coeffRef(i)=x(i);
   return mat;  
 }
