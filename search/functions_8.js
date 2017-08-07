@@ -6,5 +6,6 @@ var searchData=
   ['inv_5fincpl_5fgamma',['inv_incpl_gamma',['../namespaceatomic.html#aca6bfb1722819752d1ad1084a6de6f27',1,'atomic']]],
   ['invertsparsematrix',['invertSparseMatrix',['../spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c',1,'invertSparseMatrix():&#160;spmat.hpp'],['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils::invertSparseMatrix()']]],
   ['invlogit',['invlogit',['../convenience_8hpp.html#a2dc0f0009cd46180a4d5ae56a6a45cfa',1,'convenience.hpp']]],
-  ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]]
+  ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]],
+  ['isstructuralzero',['isStructuralZero',['../spmat_8hpp.html#a0ac2b338c4f7f3880b603f5263652a44',1,'isStructuralZero():&#160;spmat.hpp'],['../namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6',1,'tmbutils::isStructuralZero()']]]
 ];

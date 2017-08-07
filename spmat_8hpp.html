@@ -88,9 +88,11 @@ Functions</h2></td></tr>
 <tr class="separator:aa2a5e7ae910861355b49de4aff129f3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb9cbaba054f25f5c89bed309b073043"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:adb9cbaba054f25f5c89bed309b073043"><td class="memTemplItemLeft" align="right" valign="top">Eigen::SparseMatrix&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="spmat_8hpp.html#adb9cbaba054f25f5c89bed309b073043">asSparseMatrix</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:adb9cbaba054f25f5c89bed309b073043"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create sparse matrix from dense matrix.  <a href="#adb9cbaba054f25f5c89bed309b073043">More...</a><br /></td></tr>
 <tr class="separator:adb9cbaba054f25f5c89bed309b073043"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b7fcb06e66a327cd6d643751fc0105f"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a0b7fcb06e66a327cd6d643751fc0105f"><td class="memTemplItemLeft" align="right" valign="top">Eigen::SparseVector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="spmat_8hpp.html#a0b7fcb06e66a327cd6d643751fc0105f">asSparseVector</a> (<a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:a0b7fcb06e66a327cd6d643751fc0105f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create sparse vector from dense vector.  <a href="#a0b7fcb06e66a327cd6d643751fc0105f">More...</a><br /></td></tr>
 <tr class="separator:a0b7fcb06e66a327cd6d643751fc0105f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a009c282b3344fdf5e03a09d22e6673"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a6a009c282b3344fdf5e03a09d22e6673"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="spmat_8hpp.html#a6a009c282b3344fdf5e03a09d22e6673">discrLyap</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; A_)</td></tr>
@@ -98,6 +100,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a2c0d7d14234bc82952b502b16e7b0d2c"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a2c0d7d14234bc82952b502b16e7b0d2c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c">invertSparseMatrix</a> (Eigen::SparseMatrix&lt; Type &gt; A)</td></tr>
 <tr class="separator:a2c0d7d14234bc82952b502b16e7b0d2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ac2b338c4f7f3880b603f5263652a44"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:a0ac2b338c4f7f3880b603f5263652a44"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="spmat_8hpp.html#a0ac2b338c4f7f3880b603f5263652a44">isStructuralZero</a> (Type x)</td></tr>
+<tr class="memdesc:a0ac2b338c4f7f3880b603f5263652a44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test if a scalar is a structural zero.  <a href="#a0ac2b338c4f7f3880b603f5263652a44">More...</a><br /></td></tr>
+<tr class="separator:a0ac2b338c4f7f3880b603f5263652a44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af43dbf52967d09b7f44a4f3b4236db60"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:af43dbf52967d09b7f44a4f3b4236db60"><td class="memTemplItemLeft" align="right" valign="top">Eigen::SparseMatrix&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="spmat_8hpp.html#af43dbf52967d09b7f44a4f3b4236db60">kronecker</a> (Eigen::SparseMatrix&lt; Type &gt; x, Eigen::SparseMatrix&lt; Type &gt; y)</td></tr>
 <tr class="separator:af43dbf52967d09b7f44a4f3b4236db60"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -149,9 +155,12 @@ template&lt;class Type &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create sparse matrix from dense matrix </p>
 
-<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00028">28</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+<p>Create sparse matrix from dense matrix. </p>
+<p>This function converts a dense matrix to a sparse matrix based on its numerical values.</p>
+<dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="spmat_8hpp.html#a0ac2b338c4f7f3880b603f5263652a44" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
+
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00051">51</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -172,9 +181,12 @@ template&lt;class Type &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create sparse vector from dense vector </p>
 
-<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00042">42</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+<p>Create sparse vector from dense vector. </p>
+<p>This function converts a dense vector to a sparse vector based on its numerical values.</p>
+<dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="spmat_8hpp.html#a0ac2b338c4f7f3880b603f5263652a44" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
+
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00074">74</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -197,7 +209,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Solve discrete Lyapunov equation V=AVA'+I </p>
 
-<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00081">81</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00113">113</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -220,7 +232,35 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Inverse of PD sparse matrix </p>
 
-<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00106">106</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00138">138</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0ac2b338c4f7f3880b603f5263652a44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ac2b338c4f7f3880b603f5263652a44">&sect;&nbsp;</a></span>isStructuralZero()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isStructuralZero </td>
+          <td>(</td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Test if a scalar is a structural zero. </p>
+<p>A <b>structural zero</b> is a scalar taking the value zero for all configurations of the model parameters. If the return value is <code>true</code> the input is guarantied to be a structural zero.</p>
+<dl class="section note"><dt>Note</dt><dd>Nothing can be deduced if the return value is <code>false</code>. For instance complex structural zeros such as \(1-sin(x)^2-cos(x)^2\) won't be detected. </dd></dl>
+
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00037">37</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+
+<p>Referenced by <a class="el" href="spmat_8hpp.html#adb9cbaba054f25f5c89bed309b073043">asSparseMatrix()</a>, and <a class="el" href="spmat_8hpp.html#a0b7fcb06e66a327cd6d643751fc0105f">asSparseVector()</a>.</p>
 
 </div>
 </div>
@@ -253,7 +293,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Kronecker product of two sparse matrices </p>
 
-<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00054">54</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00086">86</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="spmat_8hpp.html#a6a009c282b3344fdf5e03a09d22e6673">discrLyap()</a>.</p>
 

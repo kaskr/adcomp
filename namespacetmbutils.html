@@ -101,9 +101,11 @@ Functions</h2></td></tr>
 <tr class="separator:a26ed01f6df8f1e0c4710ad5771d60fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c030f6f404a962e0bfe7efb62cea107"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a6c030f6f404a962e0bfe7efb62cea107"><td class="memTemplItemLeft" align="right" valign="top">Eigen::SparseMatrix&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a6c030f6f404a962e0bfe7efb62cea107">asSparseMatrix</a> (<a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:a6c030f6f404a962e0bfe7efb62cea107"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create sparse matrix from dense matrix.  <a href="#a6c030f6f404a962e0bfe7efb62cea107">More...</a><br /></td></tr>
 <tr class="separator:a6c030f6f404a962e0bfe7efb62cea107"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e791ce6c973be4a3acf8400e842b9c4"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a4e791ce6c973be4a3acf8400e842b9c4"><td class="memTemplItemLeft" align="right" valign="top">Eigen::SparseVector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a4e791ce6c973be4a3acf8400e842b9c4">asSparseVector</a> (<a class="el" href="structtmbutils_1_1vector.html">vector</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:a4e791ce6c973be4a3acf8400e842b9c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create sparse vector from dense vector.  <a href="#a4e791ce6c973be4a3acf8400e842b9c4">More...</a><br /></td></tr>
 <tr class="separator:a4e791ce6c973be4a3acf8400e842b9c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a15c4d4e4e0ef8faaa0d2c9c07a908a"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a7a15c4d4e4e0ef8faaa0d2c9c07a908a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a7a15c4d4e4e0ef8faaa0d2c9c07a908a">discrLyap</a> (<a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt; A_)</td></tr>
@@ -111,6 +113,10 @@ Functions</h2></td></tr>
 <tr class="memitem:adfaef43957936d4f60977d12ae69be82"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:adfaef43957936d4f60977d12ae69be82"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82">invertSparseMatrix</a> (Eigen::SparseMatrix&lt; Type &gt; A)</td></tr>
 <tr class="separator:adfaef43957936d4f60977d12ae69be82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace8c4ebfe135990db4a545c9522141b6"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:ace8c4ebfe135990db4a545c9522141b6"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6">isStructuralZero</a> (Type x)</td></tr>
+<tr class="memdesc:ace8c4ebfe135990db4a545c9522141b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test if a scalar is a structural zero.  <a href="#ace8c4ebfe135990db4a545c9522141b6">More...</a><br /></td></tr>
+<tr class="separator:ace8c4ebfe135990db4a545c9522141b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c968627c02f3bc076ae767e726d2221"><td class="memTemplParams" colspan="2"><a id="a8c968627c02f3bc076ae767e726d2221"></a>
 template&lt;class scalartype , int n1, int n2, int n3, int n4&gt; </td></tr>
 <tr class="memitem:a8c968627c02f3bc076ae767e726d2221"><td class="memTemplItemLeft" align="right" valign="top">Matrix&lt; scalartype, n1 *n3, n2 *n4 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a8c968627c02f3bc076ae767e726d2221">kronecker</a> (Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)</td></tr>
@@ -168,9 +174,12 @@ template&lt;class Type &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create sparse matrix from dense matrix </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00029">29</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Create sparse matrix from dense matrix. </p>
+<p>This function converts a dense matrix to a sparse matrix based on its numerical values.</p>
+<dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
+
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00052">52</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
@@ -191,9 +200,12 @@ template&lt;class Type &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Create sparse vector from dense vector </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00043">43</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Create sparse vector from dense vector. </p>
+<p>This function converts a dense vector to a sparse vector based on its numerical values.</p>
+<dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
+
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00075">75</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
@@ -216,7 +228,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Solve discrete Lyapunov equation V=AVA'+I </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00082">82</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00114">114</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +251,33 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Inverse of PD sparse matrix </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00107">107</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00139">139</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ace8c4ebfe135990db4a545c9522141b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace8c4ebfe135990db4a545c9522141b6">&sect;&nbsp;</a></span>isStructuralZero()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">bool tmbutils::isStructuralZero </td>
+          <td>(</td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Test if a scalar is a structural zero. </p>
+<p>A <b>structural zero</b> is a scalar taking the value zero for all configurations of the model parameters. If the return value is <code>true</code> the input is guarantied to be a structural zero.</p>
+<dl class="section note"><dt>Note</dt><dd>Nothing can be deduced if the return value is <code>false</code>. For instance complex structural zeros such as \(1-sin(x)^2-cos(x)^2\) won't be detected. </dd></dl>
+
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00038">38</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +310,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Kronecker product of two sparse matrices </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00055">55</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00087">87</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
