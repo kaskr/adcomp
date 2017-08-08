@@ -174,7 +174,7 @@ MakeADFun <- function(data, parameters, map=list(),
   env <- environment() ## This environment
   if(!is.list(data))
     stop("'data' must be a list")
-  ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&is.numeric(x)
+  ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&(is.numeric(x)|is.logical(x))
   ok.data <- function(x)ok(x)|is.factor(x)|is(x,"sparseMatrix")|is.list(x)|(is.character(x)&length(x)==1)
   check.passed <- function(x){
     y <- attr(x,"check.passed")
