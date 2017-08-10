@@ -1,4 +1,25 @@
 ------------------------------------------------------------------------
+TMB 1.7.11 (2017-08-09)
+------------------------------------------------------------------------
+
+o Allow logical data objects
+
+o Fix conversion R <-> C++ of long objects
+  - Can now pass long vector (length >= 2^31) as DATA_VECTOR.
+  - Can now REPORT a long vector.
+  - Can now calculate long jacobian matrices (m*n can be greater than
+    2^31 where n is the number of parameters and m the number of
+    ADREPORTed variables).
+
+o Fixed a possible segmentation fault in sparsity detection algorithm.
+
+o New flag to sdreport() reduces memory usage when bias correcting a
+  large number of variables.
+
+o New experimental function checkConsistency() to check the Laplace
+  approximation and correctness of the user template.
+
+------------------------------------------------------------------------
 TMB 1.7.10 (2017-05-03)
 ------------------------------------------------------------------------
 
