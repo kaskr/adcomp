@@ -80,7 +80,9 @@ $(function() {
 <h2>Conditional independence graphs and DAGs</h2>
 <h3>Conditional independence</h3>
 <p>There are various graph representations that are commonly used to visualize probabilistic structure. One such is the <em>conditional independence graph</em>. Say we have a model of four random variables \(X_1,...,X_4\) for which the joint density is:</p>
-<p>$$p(x_1,x_2,x_3,x_4)  f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)$$</p>
+<p class="formulaDsp">
+\[p(x_1,x_2,x_3,x_4) \propto f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)\]
+</p>
 <p>The separability of factors on the right hand side implies some conditional independence properties. For instance if \(x_1\) and \(x_3\) are held constant then \(x_2\) and \(x_4\) varies independently. We say that \(x_2\) and \(x_4\) are conditionally independent given \(x_1\) and \(x_3\). The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor \(f_i\):</p>
 <div class="image">
 <object type="image/svg+xml" data="figure/unnamed-chunk-2-1.svg" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;"></object>
@@ -132,18 +134,22 @@ $(function() {
 </blockquote>
 <h2>The theta logistic example</h2>
 <p>Consider the ``theta logistic'' population model []. This is a state-space model with state equation</p>
-<p>$$u_t = u_{t-1} + r_0(1-({(u_{t-1})}{K})^) + e_t$$</p>
+<p class="formulaDsp">
+\[u_t = u_{t-1} + r_0\left(1-\left(\frac{\exp(u_{t-1})}{K}\right)^\psi\right) + e_t\]
+</p>
 <p>and observation equation</p>
-<p>$$y_t = u_t + v_t$$</p>
+<p class="formulaDsp">
+\[y_t = u_t + v_t\]
+</p>
 <p>where \(e_t \sim N(0,Q)\), \(v_t \sim N(0,R)\) and \(t\in \{0,...,n-1\}\). A uniform prior is implicitly assigned to \(u_0\).</p>
 <p>The joint negative log-likelihood of state vector \(u\) and measurements \(y\) is implemented in the C++ template <a class="el" href="thetalog_8cpp-example.html">thetalog.cpp</a>. The example can be run by:</p>
 <div class="fragment"><div class="line">runExample(&quot;thetalog&quot;, exfolder=&quot;adcomp/tmb_examples&quot;)</div></div><!-- fragment --><p>We demonstrate it in the case \(n=5\). Here is the DAG</p>
-<div class="fragment"><div class="line">## Optimizing tape... Done</div></div><!-- fragment --><div class="image">
+<div class="image">
 <object type="image/svg+xml" data="figure/unnamed-chunk-10-1.svg" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" style="display: block; margin: auto;"></object>
 </div>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
 <p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
-<div class="fragment"><div class="line">library(Matrix)</div><div class="line">obj &lt;- MakeADFun(data, parameters, random=c(&quot;X&quot;), DLL=&quot;thetalog&quot;)</div><div class="line">image(obj$env$spHess(random=TRUE))</div></div><!-- fragment --><div class="fragment"><div class="line">## Optimizing tape... Done</div></div><!-- fragment --><div class="image">
+<div class="fragment"><div class="line">library(Matrix)</div><div class="line">obj &lt;- MakeADFun(data, parameters, random=c(&quot;X&quot;), DLL=&quot;thetalog&quot;)</div><div class="line">image(obj$env$spHess(random=TRUE))</div></div><!-- fragment --><div class="image">
 <object type="image/svg+xml" data="figure/unnamed-chunk-11-1.svg" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" style="display: block; margin: auto;"></object>
 </div>
 <blockquote class="doxtable">

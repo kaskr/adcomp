@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="CppTutorial.html">
-<link rel="next" href="Sparsity.html">
+<link rel="prev" href="Simulation.html">
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -178,29 +178,101 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="ModelObject" class="section level1">
-<h1><span class="header-section-number">10</span> Model object</h1>
-<p>The TMB core <em>model object</em> is the object returned by <code>MakeADFun()</code>. A number of options can be passed to <code>MakeADFun</code> to control the model. The current section walks you through all the options. Additionally we demonstrate some of the methods that can be applied to a fitted model object. We shall see how to:</p>
+<div id="Appendix" class="section level1">
+<h1><span class="header-section-number">13</span> Appendix</h1>
+<div id="notation" class="section level2">
+<h2><span class="header-section-number">13.1</span> Notation</h2>
+<p>We use the following notation</p>
+<table style="width:107%;">
+<colgroup>
+<col width="30%" />
+<col width="76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Notation</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(u\)</span></td>
+<td align="left">The random effects vector</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(\theta\)</span></td>
+<td align="left">Parameter vector (first part)</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\beta\)</span></td>
+<td align="left">Parameter vector (second part)</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(f(u,\beta,\theta)\)</span></td>
+<td align="left">Joint negative log likelihood</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(x\)</span></td>
+<td align="left">Data</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(E(u|x)\)</span></td>
+<td align="left">Conditional expectation of random effect given data</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\hat u\)</span></td>
+<td align="left">The posterior mode <span class="math inline">\(\arg \min_{u} f(u,\beta,\theta)\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="profiling-the-inner-problem" class="section level2">
+<h2><span class="header-section-number">13.2</span> Profiling the inner problem</h2>
+<p><strong>Theorem 1 (Profiling inner problem)</strong> Assume that for any <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\theta\)</span></p>
 <ul>
-<li>Fix and collect parameters using the <code>map</code> argument.</li>
-<li>Switch parameters back and forth between the inner and outer optimization problem using the arguments <code>random</code> and <code>profile</code>.</li>
-<li>Set options for the inner optimization problem.</li>
-<li><code>sdreport</code>ing a fitted object.</li>
-<li>Bias correction if random effect estimates.</li>
-<li>Likelihood profiling a fitted object.</li>
+<li><strong>Assumption 1</strong> The partial derivative <span class="math inline">\(\partial_{\beta} f(u,\beta,\theta)\)</span> is a linear function of u.</li>
+<li><strong>Assumption 2</strong> The posterior mean is equal to the posterior mode: <span class="math inline">\(E(u|x)=\hat u\)</span></li>
 </ul>
-<blockquote>
-<p>FIXME: NOT DONE YET !</p>
-</blockquote>
+<p>Then the MLE</p>
+<p><span class="math display">\[\hat \beta := \arg \max_{\beta} \left( \int \exp(-f(u,\beta,\theta)) \: du \right) \]</span></p>
+<p>is a solution to the augmented system</p>
+<p><span class="math display">\[
+\begin{split}
+\partial_{u} f(u,\beta,\theta) &amp;= 0 \\
+\partial_{\beta} f(u,\beta,\theta) &amp;= 0
+\end{split}
+\]</span></p>
+<p>The augmented system defines <span class="math inline">\(\hat \beta\)</span> implicitly as function of the posterior mode <span class="math inline">\(\hat u\)</span>.</p>
+<p><em>Proof</em></p>
+<p>Differentiation of the negative log marginal likelihood gives</p>
+<p><span class="math display">\[
+\begin{split}
+\partial_{\beta} \left( -\log \int \exp(-f(u,\beta,\theta)) \: du \right) &amp;= E(\partial_{\beta}f(u,\beta,\theta) |x) \\
+&amp;= \partial_{\beta} f(u,\beta,\theta)_{|u=\hat u(\beta,\theta)}
+\end{split}
+\]</span></p>
+<p>where the first equality holds in general and the second equality follows from assumptions (1) and (2).</p>
+<p><span class="math inline">\(\square\)</span></p>
+</div>
+<div id="example" class="section level2">
+<h2><span class="header-section-number">13.3</span> Example</h2>
+<p>The standard situation for which <strong>assumption 1</strong> holds is when the <span class="math inline">\(\beta\)</span>s are the linear fixed effects of a mixed model. In this case the joint negative log density takes the form <span class="math display">\[ f(u,\beta,\theta) = \frac{1}{2}(u-A\beta)&#39;\Sigma_{\theta}^{-1}(u-A\beta) + ... \]</span> for some design matrix <span class="math inline">\(A\)</span> where ‘<span class="math inline">\(...\)</span>’ does not depend on <span class="math inline">\(\beta\)</span>. The derivative <span class="math display">\[ \partial_{\beta} f(u,\beta,\theta) = A&#39;\Sigma_{\theta}^{-1}(u-A\beta) \]</span> is thus a linear function of the random effect <span class="math inline">\(u\)</span>.</p>
+<p>In general <strong>assumption 2</strong> holds exact for models with a symmetric (e.g. Gaussian) posterior distribution.</p>
 
+<div id="refs" class="references">
+<div>
+<p>Pedersen, Martin Wæver, Casper Willestofte Berg, Uffe Høgsbro Thygesen, Anders Nielsen, and Henrik Madsen. 2011. “Estimation Methods for Nonlinear State-Space Models in Ecology.” <em>Ecological Modelling</em> 222 (8). Elsevier: 1394–1400.</p>
+</div>
+</div>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="CppTutorial.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="Sparsity.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="Simulation.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

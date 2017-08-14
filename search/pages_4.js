@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['tutorial',['Tutorial',['../Tutorial.html',1,'']]]
+  ['simulation',['Simulation',['../Simulation.html',1,'']]],
+  ['sparsity',['Sparsity',['../Sparsity.html',1,'']]]
 ];

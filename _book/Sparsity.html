@@ -156,6 +156,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>12.2.3</b> Advanced examples</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="13" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>13</b> Appendix</a><ul>
+<li class="chapter" data-level="13.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>13.1</b> Notation</a></li>
+<li class="chapter" data-level="13.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>13.2</b> Profiling the inner problem</a></li>
+<li class="chapter" data-level="13.3" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>13.3</b> Example</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -240,14 +245,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The joint negative log-likelihood of state vector <span class="math inline">\(u\)</span> and measurements <span class="math inline">\(y\)</span> is implemented in the C++ template <a href="../thetalog_8cpp-example.html">thetalog.cpp</a>. The example can be run by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="dt">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</code></pre></div>
 <p>We demonstrate it in the case <span class="math inline">\(n=5\)</span>. Here is the DAG</p>
-<pre><code>## Optimizing tape... Done</code></pre>
 <p><img src="_main_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /></p>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
 <p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(Matrix)
 obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">random=</span><span class="kw">c</span>(<span class="st">&quot;X&quot;</span>), <span class="dt">DLL=</span><span class="st">&quot;thetalog&quot;</span>)
 <span class="kw">image</span>(obj$env$<span class="kw">spHess</span>(<span class="dt">random=</span><span class="ot">TRUE</span>))</code></pre></div>
-<pre><code>## Optimizing tape... Done</code></pre>
 <p><img src="_main_files/figure-html/unnamed-chunk-18-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>FIXME: NOT DONE YET !</p>
