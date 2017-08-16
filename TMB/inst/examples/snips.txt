@@ -1,0 +1,24 @@
+snippet tmb.rscript
+library(TMB)    
+# Compile the C++ file
+compile(${1:"tutorial.cpp"})
+# Dynamically link the C++ code
+dyn.load(dynlib(${2:"tutorial"}))               
+#set up data object
+data <- list(${3:x = rnorm(100,0,10)})
+#define parameters of the model
+params <- list(${4:mu=0}, ${5:sigma=1})
+#specify the parameters that are random effects
+#if no random effects, specify NULL
+random <- ${6:NULL}
+#make the function
+f <- MakeADFun(data = data, parameters = params, random = random)
+#optimize parameters
+fit <- nlminb( f\$par , f\$fn , f\$gr , lower = ${7:c(-10,0.0)}, upper = ${8:c(10.0,10.0)} )
+#generate the report
+rep <- f\$rep()
+#get standard errors
+sdrep <- sdreport(f)
+#check convergence
+sdrep\$pdHess #TRUE
+f\$gr(fit\$par) #values close to 0
