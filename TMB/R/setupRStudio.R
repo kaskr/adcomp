@@ -52,7 +52,7 @@ if(ans == "yes") {
 
 # call to the function that adds R snippets. Need a similar one to add C++ snippets
 setupRSnippets(snipfile = file.path(system.file("examples",package="TMB"),
-                                    "snipfile.txt"))
+                                    "snips.txt"))
 # GF put the snipfile in the examples folder but there is probably a better place for it.
 
 invisible(NULL)
