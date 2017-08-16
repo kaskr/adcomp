@@ -2,6 +2,22 @@
 source("layout/utils.R")
 ```
 
+Introduction {#Introduction}
+============
+
+TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is strongly inspired by [ADMB](http://www.admb-project.org). Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.
+
+* TMB can calculate first and second order derivatives of the likelihood function by [AD](http://en.wikipedia.org/wiki/Automatic_differentiation), or any objective function written in C++.
+* The objective function (and its derivatives) can be called from R. Hence, parameter estimation via e.g. `nlminb()` is easy.
+* The user can specify that the [Laplace approximation](http://en.wikipedia.org/wiki/Laplace_approximation) should be applied to any subset of the function arguments. 
+  * Yields marginal likelihood in latent variable model.
+* Standard deviations of any parameter, or derived parameter, obtained by the ['delta method'](http://en.wikipedia.org/wiki/Delta_method).
+* Pre and post-processing of data done in R.
+* TMB is based on state-of-the art software: [CppAD](http://www.coin-or.org/CppAD/), [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page), ...
+
+A more general introduction including the underlying theory used in TMB can be found in this [paper](https://www.jstatsoft.org/index.php/jss/article/view/v070i05/v70i05.pdf). 
+
+
 Tutorial {#Tutorial}
 ========
 
