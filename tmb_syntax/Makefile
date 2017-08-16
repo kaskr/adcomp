@@ -39,3 +39,4 @@ test:
 	make report
 	make glmmTMB
 	make spict
+	make matrix_arrays
