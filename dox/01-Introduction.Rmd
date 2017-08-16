@@ -282,6 +282,9 @@ res = your_dmnorm(x);
 ```
 
 in which `your_dmnorm` is a variable that holds the "density". 
+
+Note, that the latter way (using the `MVNORM_t`) is _more efficient_
+when you need to evaluate the density more than once, i.e. for different values of `x`.
     
 _Sigma_ can be parameterized in different ways. Due to the symmetry of
 *Sigma* there are at most *n(n+1)/2* free parameters (*n* variances
