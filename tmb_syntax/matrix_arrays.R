@@ -11,13 +11,11 @@ model_data = list(v1 = c(9,11),
                   a1 = array(c(1,2,3,4),         dim = c(2,2)),
                   a2 = array(c(8,9,10,11,12),    dim = c(7,5)))
 
-parameters = list(p=1.0)
-
 require(TMB)
 compile("matrix_arrays.cpp")
 dyn.load(dynlib("matrix_arrays"))
 
-model = MakeADFun(model_data, parameters,DLL="matrix_arrays")
+model = MakeADFun(data=model_data, parameters=list(p_dummy=1),DLL="matrix_arrays")
 print(model$report())  # Note: order of variables NOT the same as .cpp file
 
 
