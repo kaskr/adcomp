@@ -163,6 +163,5 @@ Type objective_function<Type>::operator() ()
   a2_exp = exp(a2);
   REPORT(a2_exp);
 
-  Type ans;
-  return ans;
+  return 0;
 }
