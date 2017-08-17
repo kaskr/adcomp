@@ -1,3 +1,5 @@
+# Demonstrates use of vectors, matrices and arrays. 
+# Results of operations reported back to R via REPORT()
 
 model_data = list(v1 = c(9,11), 
                   v2 = c(1,2,3,4), 
@@ -15,7 +17,7 @@ require(TMB)
 compile("matrix_arrays.cpp")
 dyn.load(dynlib("matrix_arrays"))
 
-model = MakeADFun(model_data, parameters,dll="matrix_arrays")
-print(model$report())
+model = MakeADFun(model_data, parameters,DLL="matrix_arrays")
+print(model$report())  # Note: order of variables NOT the same as .cpp file
 
 
