@@ -1,7 +1,4 @@
-// rickervalidation
-//
-// Estimate and validate a Ricker model based on data
-// simulated from the logistic map
+// Estimate and validate a Ricker model based on data simulated from the logistic map
 //
 // Compare Thygesen et al (submitted, 2016): Validation of state space models
 // fitted as mixed effects models
