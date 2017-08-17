@@ -15,9 +15,6 @@ Type objective_function<Type>::operator() ()
   DATA_ARRAY(a1);
   DATA_ARRAY(a2);
 
-  PARAMETER(p_dummy);  // Not used
-  REPORT(p_dummy);
-  
   // Vectors ========================================================
 
   int v1_size = v1.size();              // Length of v1

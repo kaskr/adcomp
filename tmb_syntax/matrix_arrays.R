@@ -15,7 +15,8 @@ require(TMB)
 compile("matrix_arrays.cpp")
 dyn.load(dynlib("matrix_arrays"))
 
-model = MakeADFun(data=model_data, parameters=list(p_dummy=1),DLL="matrix_arrays")
+model = MakeADFun(data=model_data, parameters=list(),type="Fun",
+                  checkParameterOrder=FALSE,DLL="matrix_arrays")
 print(model$report())  # Note: order of variables NOT the same as .cpp file
 
 
