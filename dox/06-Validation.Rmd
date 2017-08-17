@@ -1,0 +1,114 @@
+```{r echo=FALSE, eval=TRUE, results='hide'}
+source("layout/utils.R")
+```
+
+Validation {#Validation}
+============
+
+## Residuals
+The underlying framework is the same for all cases listed in this section.
+[ Description of general framework FIXME ]
+
+For models that does not include random effects the calculations can be simplified greatly.
+
+### Models without random effects
+
+#### Normal distribution (Pearson residuals) .
+This example shows how standardized residuals can be calculated within the template code and reported back to R using the `REPORT` function in TMB.
+```{.cpp}
+// linear regression with reporting of residuals
+#include <TMB.hpp>
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+  DATA_VECTOR(Y);
+  DATA_VECTOR(x);
+  PARAMETER(a);
+  PARAMETER(b);
+  PARAMETER(logSigma);
+  Type sigma = exp(logSigma);
+  Vector<Type> pred = a + b*x;
+  Type nll = -sum(dnorm(Y, a+b*x, sigma, true));
+  Vector<Type> residuals = (Y - pred)/sigma;  
+  REPORT(residuals);  
+  return nll;
+}
+```
+Assuming that the model parameters have been fitted, and the model object is called `obj`, the standardized residuals can now be extracted from the model object usinig the `report()` function and inspected for normality as follows:
+```{r, eval = FALSE}
+... 
+rep <- obj$report()
+qqnorm(rep$residuals)
+abline(0,1)
+```
+
+#### Non-normal distributions
+
+##### Continuous
+We now consider situations where the error distribution is continuous but not Gaussian.  
+Residuals that are standard normal distributed given that the model is correct, can be obtained be using the "transformation trick", here illustrated using a model that fits a gamma distribution.
+
+```{r, echo=FALSE}
+create_source("
+#include <TMB.hpp>
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+  DATA_VECTOR(Y);
+  PARAMETER(shape);
+  PARAMETER(scale);
+
+  Type nll=-dgamma(Y,shape,scale,true).sum();
+  vector<Type> residuals = qnorm( pgamma(Y,shape,scale) );
+  REPORT(residuals);
+  return nll;
+}
+", "gamma.cpp")
+```
+
+`r include_source("gamma.cpp")`
+
+##### Discrete
+For discrete probability distributions the transformation trick can also be used, but an element of randomization must be added in order to obtain residuals that are truly Gaussian.
+
+Assume that you have a series of observed counts `y` and you have fitted some TMB model using a Poisson likelihood, and the predicted values from that model have been reported and saved in a vector called `mu`. 
+
+```{r, eval = FALSE}
+... 
+a <- ppois(y - 1, mu)
+b <- ppois(y, mu)
+u <- runif(n = length(y), min = a, max = b)
+residuals <- qnorm(u)
+```
+
+### Models with random effects
+Model validation using residuals is considerably more complicated for random effect models.
+Further information can be found in [@thygesen2017validation] FIXME: not generating reference.
+
+#### One-step-ahead residuals
+
+Other names are one step prediction errors, forecast pseudo-residuals, and recursive residuals.
+These residuals can be computed using the `oneStepPredict` function.
+There are several methods available within this function, and it is the responsibility of the user to ensure that an appropriate method is chosen for a given model.  
+
+The following examples of its use are availabe in the `tmb_examples/validation` folder.
+
+```{R results='asis', echo=FALSE}
+examples <- dir("../tmb_examples/validation", pattern=".cpp$", recursive=TRUE, full.names=TRUE)
+description <- sub("^//[ ]*", "", sapply(paste0(examples), function(x)readLines(x)[1]))
+tab <- cbind(Example=doxylink(basename(examples)), Description=description)
+rownames(tab) <- NULL
+ord <- order(sub(".cpp","",basename(examples)))
+knitr::kable(tab[ord, ])
+```
+
+#### One sample from the posterior
+
+An alternative (and faster) method is based on a single sample of the random effects from the their posterior distribution given the data.
+For state space models we can derive both process- and observation errors from the single sample and the observations, and compare these with the assumptions in the model.
+
+An example can be found at the end of the `randomwalkvalidation.R` file in the `tmb_examples/validation` folder  
+
+## Checking the Laplace approximation
+
+FIXME: 
