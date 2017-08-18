@@ -5,6 +5,5 @@ var searchData=
   ['tmb_5fcore_2ehpp',['tmb_core.hpp',['../tmb__core_8hpp.html',1,'']]],
   ['tmbutils',['tmbutils',['../namespacetmbutils.html',1,'']]],
   ['tmbutils_2ehpp',['tmbutils.hpp',['../tmbutils_8hpp.html',1,'']]],
-  ['transpose',['transpose',['../structarray.html#a9f0df57cc5403f71194f2159ec80bd66',1,'array::transpose()'],['../structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050',1,'tmbutils::array::transpose()']]],
-  ['tutorial',['Tutorial',['../Tutorial.html',1,'']]]
+  ['transpose',['transpose',['../structarray.html#a9f0df57cc5403f71194f2159ec80bd66',1,'array::transpose()'],['../structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050',1,'tmbutils::array::transpose()']]]
 ];

@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="CppTutorial.html">
-<link rel="next" href="Sparsity.html">
+<link rel="prev" href="Simulation.html">
+<link rel="next" href="Appendix.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -186,29 +186,131 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="ModelObject" class="section level1">
-<h1><span class="header-section-number">11</span> Model object</h1>
-<p>The TMB core <em>model object</em> is the object returned by <code>MakeADFun()</code>. A number of options can be passed to <code>MakeADFun</code> to control the model. The current section walks you through all the options. Additionally we demonstrate some of the methods that can be applied to a fitted model object. We shall see how to:</p>
-<ul>
-<li>Fix and collect parameters using the <code>map</code> argument.</li>
-<li>Switch parameters back and forth between the inner and outer optimization problem using the arguments <code>random</code> and <code>profile</code>.</li>
-<li>Set options for the inner optimization problem.</li>
-<li><code>sdreport</code>ing a fitted object.</li>
-<li>Bias correction if random effect estimates.</li>
-<li>Likelihood profiling a fitted object.</li>
-</ul>
-<blockquote>
-<p>FIXME: NOT DONE YET !</p>
-</blockquote>
+<div id="Validation" class="section level1">
+<h1><span class="header-section-number">14</span> Validation</h1>
+<div id="residuals" class="section level2">
+<h2><span class="header-section-number">14.1</span> Residuals</h2>
+<p>The underlying framework is the same for all cases listed in this section. [ Description of general framework FIXME ]</p>
+<p>For models that does not include random effects the calculations can be simplified greatly.</p>
+<div id="models-without-random-effects" class="section level3">
+<h3><span class="header-section-number">14.1.1</span> Models without random effects</h3>
+<div id="normal-distribution-pearson-residuals-." class="section level4">
+<h4><span class="header-section-number">14.1.1.1</span> Normal distribution (Pearson residuals) .</h4>
+<p>This example shows how standardized residuals can be calculated within the template code and reported back to R using the <code>REPORT</code> function in TMB.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// linear regression with reporting of residuals</span>
+<span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
+{
+  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(Y);
+  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logSigma);
+  Type sigma = exp(logSigma);
+  Vector&lt;Type&gt; pred = a + b*x;
+  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(Y, a+b*x, sigma, <span class="kw">true</span>));
+  Vector&lt;Type&gt; residuals = (Y - pred)/sigma;  
+  <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(residuals);  
+  <span class="kw">return</span> nll;
+}</code></pre></div>
+<p>Assuming that the model parameters have been fitted, and the model object is called <code>obj</code>, the standardized residuals can now be extracted from the model object usinig the <code>report()</code> function and inspected for normality as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">... 
+rep &lt;-<span class="st"> </span>obj$<span class="kw">report</span>()
+<span class="kw">qqnorm</span>(rep$residuals)
+<span class="kw">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
+</div>
+<div id="non-normal-distributions" class="section level4">
+<h4><span class="header-section-number">14.1.1.2</span> Non-normal distributions</h4>
+<div id="continuous" class="section level5">
+<h5><span class="header-section-number">14.1.1.2.1</span> Continuous</h5>
+<p>We now consider situations where the error distribution is continuous but not Gaussian.<br />
+Residuals that are standard normal distributed given that the model is correct, can be obtained be using the “transformation trick”, here illustrated using a model that fits a gamma distribution.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">
+<span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
+{
+  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(Y);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(shape);
+  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(scale);
 
+  Type nll=-<a class="code" href="../group__R__style__distribution.html#gab0e2205710a698ad6a0ed39e0652c9a3">dgamma</a>(Y,shape,scale,<span class="kw">true</span>).<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>();
+  <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; residuals = <a class="code" href="../group__R__style__distribution.html#gafde4381db528cb2e6bf410f9cfcdcb52">qnorm</a>( <a class="code" href="../group__R__style__distribution.html#ga3bd06a324f89b21694aac26bfe1aef45">pgamma</a>(Y,shape,scale) );
+  <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(residuals);
+  <span class="kw">return</span> nll;
+}</code></pre></div>
+</div>
+<div id="discrete" class="section level5">
+<h5><span class="header-section-number">14.1.1.2.2</span> Discrete</h5>
+<p>For discrete probability distributions the transformation trick can also be used, but an element of randomization must be added in order to obtain residuals that are truly Gaussian.</p>
+<p>Assume that you have a series of observed counts <code>y</code> and you have fitted some TMB model using a Poisson likelihood, and the predicted values from that model have been reported and saved in a vector called <code>mu</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">... 
+a &lt;-<span class="st"> </span><span class="kw">ppois</span>(y -<span class="st"> </span><span class="dv">1</span>, mu)
+b &lt;-<span class="st"> </span><span class="kw">ppois</span>(y, mu)
+u &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dt">n =</span> <span class="kw">length</span>(y), <span class="dt"><a class="code" href="../convenience_8hpp.html#a6ced780585902c59301c9e0e80044dd2">min</a> =</span> a, <span class="dt"><a class="code" href="../convenience_8hpp.html#afb69053836ddd714014bb5bf321a138c">max</a> =</span> b)
+residuals &lt;-<span class="st"> </span><span class="kw">qnorm</span>(u)</code></pre></div>
+</div>
+</div>
+</div>
+<div id="models-with-random-effects" class="section level3">
+<h3><span class="header-section-number">14.1.2</span> Models with random effects</h3>
+<p>Model validation using residuals is considerably more complicated for random effect models. Further information can be found in <span class="citation">(Thygesen et al. <a href="#ref-thygesen2017validation">2017</a>)</span> FIXME: not generating reference.</p>
+<div id="one-step-ahead-residuals" class="section level4">
+<h4><span class="header-section-number">14.1.2.1</span> One-step-ahead residuals</h4>
+<p>Other names are one step prediction errors, forecast pseudo-residuals, and recursive residuals. These residuals can be computed using the <code>oneStepPredict</code> function. There are several methods available within this function, and it is the responsibility of the user to ensure that an appropriate method is chosen for a given model.</p>
+<p>The following examples of its use are availabe in the <code>tmb_examples/validation</code> folder.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Example</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="../MVRandomWalkValidation_8cpp-example.html">MVRandomWalkValidation.cpp</a></td>
+<td align="left">Estimate and validate a multivariate random walk model with correlated increments and correlated observations.</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="../randomwalkvalidation_8cpp-example.html">randomwalkvalidation.cpp</a></td>
+<td align="left">Estimate and validate a random walk model with and without drift</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="../rickervalidation_8cpp-example.html">rickervalidation.cpp</a></td>
+<td align="left">Estimate and validate a Ricker model based on data simulated from the logistic map</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="one-sample-from-the-posterior" class="section level4">
+<h4><span class="header-section-number">14.1.2.2</span> One sample from the posterior</h4>
+<p>An alternative (and faster) method is based on a single sample of the random effects from the their posterior distribution given the data. For state space models we can derive both process- and observation errors from the single sample and the observations, and compare these with the assumptions in the model.</p>
+<p>An example can be found at the end of the <code>randomwalkvalidation.R</code> file in the <code>tmb_examples/validation</code> folder</p>
+</div>
+</div>
+</div>
+<div id="checking-the-laplace-approximation" class="section level2">
+<h2><span class="header-section-number">14.2</span> Checking the Laplace approximation</h2>
+<p>FIXME:</p>
+
+
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-thygesen2017validation">
+<p>Thygesen, Uffe Høgsbro, Christoffer Moesgaard Albertsen, Casper Willestofte Berg, Kasper Kristensen, and Anders Nielsen. 2017. “Validation of Ecological State Space Models Using the Laplace Approximation.” <em>Environmental and Ecological Statistics</em> 24 (2). Springer US: 317–39.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="CppTutorial.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="Sparsity.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="Simulation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="Appendix.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

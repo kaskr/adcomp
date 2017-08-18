@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="CppTutorial.html">
-<link rel="next" href="Sparsity.html">
+
+<link rel="next" href="Tutorial.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -186,29 +186,30 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="ModelObject" class="section level1">
-<h1><span class="header-section-number">11</span> Model object</h1>
-<p>The TMB core <em>model object</em> is the object returned by <code>MakeADFun()</code>. A number of options can be passed to <code>MakeADFun</code> to control the model. The current section walks you through all the options. Additionally we demonstrate some of the methods that can be applied to a fitted model object. We shall see how to:</p>
+<div id="header">
+<h1 class="title">The comprehensive TMB documentation</h1>
+</div>
+<div id="Introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is strongly inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
 <ul>
-<li>Fix and collect parameters using the <code>map</code> argument.</li>
-<li>Switch parameters back and forth between the inner and outer optimization problem using the arguments <code>random</code> and <code>profile</code>.</li>
-<li>Set options for the inner optimization problem.</li>
-<li><code>sdreport</code>ing a fitted object.</li>
-<li>Bias correction if random effect estimates.</li>
-<li>Likelihood profiling a fitted object.</li>
+<li>TMB can calculate first and second order derivatives of the likelihood function by <a href="http://en.wikipedia.org/wiki/Automatic_differentiation">AD</a>, or any objective function written in C++.</li>
+<li>The objective function (and its derivatives) can be called from R. Hence, parameter estimation via e.g. <code>nlminb()</code> is easy.</li>
+<li>The user can specify that the <a href="http://en.wikipedia.org/wiki/Laplace_approximation">Laplace approximation</a> should be applied to any subset of the function arguments.</li>
+<li>Yields marginal likelihood in latent variable model.</li>
+<li>Standard deviations of any parameter, or derived parameter, obtained by the <a href="http://en.wikipedia.org/wiki/Delta_method">‘delta method’</a>.</li>
+<li>Pre and post-processing of data done in R.</li>
+<li>TMB is based on state-of-the art software: <a href="http://www.coin-or.org/CppAD/">CppAD</a>, <a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a>, …</li>
 </ul>
-<blockquote>
-<p>FIXME: NOT DONE YET !</p>
-</blockquote>
-
+<p>A more general introduction including the underlying theory used in TMB can be found in this <a href="https://www.jstatsoft.org/index.php/jss/article/view/v070i05/v70i05.pdf">paper</a>.</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="CppTutorial.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="Sparsity.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+
+<a href="Tutorial.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

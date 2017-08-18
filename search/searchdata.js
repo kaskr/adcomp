@@ -8,7 +8,7 @@ var indexSectionsWithContent =
   5: "aiop",
   6: "gsv",
   7: "cmprs",
-  8: "0acmst"
+  8: "0acimsv"
 };
 
 var indexSectionNames =
