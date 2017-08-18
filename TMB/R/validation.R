@@ -47,7 +47,7 @@
 ##' \preformatted{
 ##'     DATA_VECTOR(x);
 ##'     ...
-##'     nll -= dnorm(x(i), u(i), 0.0, true);
+##'     nll -= dnorm(x(i), u(i), sd(i), true);
 ##'     ...
 ##' }
 ##'
@@ -57,7 +57,7 @@
 ##'     DATA_VECTOR(x);
 ##'     DATA_VECTOR_INDICATOR(keep, x);
 ##'     ...
-##'     nll -= keep(i) * dnorm(x(i), u(i), 0.0, true);
+##'     nll -= keep(i) * dnorm(x(i), u(i), sd(i), true);
 ##'     ...
 ##' }
 ##'

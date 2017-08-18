@@ -2,6 +2,22 @@
 source("layout/utils.R")
 ```
 
+Introduction {#Introduction}
+============
+
+TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is strongly inspired by [ADMB](http://www.admb-project.org). Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.
+
+* TMB can calculate first and second order derivatives of the likelihood function by [AD](http://en.wikipedia.org/wiki/Automatic_differentiation), or any objective function written in C++.
+* The objective function (and its derivatives) can be called from R. Hence, parameter estimation via e.g. `nlminb()` is easy.
+* The user can specify that the [Laplace approximation](http://en.wikipedia.org/wiki/Laplace_approximation) should be applied to any subset of the function arguments. 
+  * Yields marginal likelihood in latent variable model.
+* Standard deviations of any parameter, or derived parameter, obtained by the ['delta method'](http://en.wikipedia.org/wiki/Delta_method).
+* Pre and post-processing of data done in R.
+* TMB is based on state-of-the art software: [CppAD](http://www.coin-or.org/CppAD/), [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page), ...
+
+A more general introduction including the underlying theory used in TMB can be found in this [paper](https://www.jstatsoft.org/index.php/jss/article/view/v070i05/v70i05.pdf). 
+
+
 Tutorial {#Tutorial}
 ========
 
@@ -282,6 +298,9 @@ res = your_dmnorm(x);
 ```
 
 in which `your_dmnorm` is a variable that holds the "density". 
+
+Note, that the latter way (using the `MVNORM_t`) is _more efficient_
+when you need to evaluate the density more than once, i.e. for different values of `x`.
     
 _Sigma_ can be parameterized in different ways. Due to the symmetry of
 *Sigma* there are at most *n(n+1)/2* free parameters (*n* variances
@@ -348,7 +367,7 @@ Now, *var[x(t)] = sigma^2*. Because all elements of `x` are scaled by
 the same constant we use SCALE rather than VECSCALE.
 
 #### Multivariate AR1 processes
-This is the first real illustrations of how distributions can be used
+This is the first real illustration of how distributions can be used
 as building blocks to obtain more complex distributions. Consider the
 *p* dimensional AR1 process
 
@@ -624,7 +643,7 @@ Constants     3.4                Type(3.4);                  // Explicit casting
 Scalar        x = 5.2            Type x = Type(5.2);         // Variables must have type
 Arrays        x = numeric(10)    vector<Type> x(10);         // C++ code here does NOT initialize to 0
 Indexing      x[1]+x[10]         x(0)+x(9);                  // C++ indexing is zero-based
-Loops         for(i in 1:10)     for(i=1;i<=10;i++)          // Integer i must be declared in C++
+Loops         for(i in 1:10)     for(int i=1;i<=10;i++)      // Integer i must be declared in C++
 Increments    x[1] = x[1] + 3    x(0) += 3.0;                // += -= *= /= incremental operators in C++
 ```
 
