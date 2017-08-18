@@ -65,7 +65,34 @@ nll = Type(1.2);    // Assign value 1.2; a cast is needed.
 ## Obtaining data and parameter values from R
 Obviously, we will need to pass both data and parameter values to the
 objective function.  This is done through a set of macros that TMB
-defines for us. To see which macros are available start typing
+defines for us.
+
+### List of data macros
+
+```{r, results='asis', echo=FALSE}
+tmp <- unlist(lapply(dir("../TMB/inst/include", full=TRUE), readLines))
+tmp <- grep('^#define DATA_', tmp, value=TRUE)
+tmp <- sub("^#define ","",tmp)
+tmp <- sub("\\(.*","",tmp)
+tmp <- tmp[-grep("INDICATOR",tmp)]
+tmp <- sort(tmp)
+tmp <- paste(paste0("`",tmp,"()`"), collapse=", ")
+cat("> ", tmp)
+```
+
+### List of parameter macros
+
+```{r, results='asis', echo=FALSE}
+tmp <- unlist(lapply(dir("../TMB/inst/include", full=TRUE), readLines))
+tmp <- grep('^#define PARAMETER', tmp, value=TRUE)
+tmp <- sub("^#define ","",tmp)
+tmp <- sub("\\(.*","",tmp)
+tmp <- sort(tmp)
+tmp <- paste(paste0("`",tmp,"()`"), collapse=", ")
+cat("> ", tmp)
+```
+
+To see which macros are available start typing
 `DATA_` or `PARAMETER_` in the Doxygen search field of
 your browser (you may need to refresh the browser window between each
 time you make a new search). A simple example if you want to read a
