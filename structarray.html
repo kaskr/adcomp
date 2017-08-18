@@ -143,7 +143,7 @@ struct array&lt; Type &gt;</h3>
 <p>Array class used by TMB. </p>
 <p>The TMB array class is implemented as an Eigen Array of dynamic length with a dimension attribute. The implementation closely follows the way arrays work in R. Vectorized operations are inherited from the Eigen library.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Methods that are not documented here are inherited from the Eigen library and applied on the underlying n-by-1 array. In general this will yield surprising results for 2D specific array methods. </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="matrix_arrays_8cpp-example.html#_a7">matrix_arrays.cpp</a>, <a class="el" href="multivariate_distributions_8cpp-example.html#_a11">multivariate_distributions.cpp</a>, <a class="el" href="sam_8cpp-example.html#_a7">sam.cpp</a>, and <a class="el" href="sdv_multi_compact_8cpp-example.html#_a4">sdv_multi_compact.cpp</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="matrix_arrays_8cpp-example.html#_a9">matrix_arrays.cpp</a>, <a class="el" href="multivariate_distributions_8cpp-example.html#_a11">multivariate_distributions.cpp</a>, <a class="el" href="sam_8cpp-example.html#_a7">sam.cpp</a>, and <a class="el" href="sdv_multi_compact_8cpp-example.html#_a4">sdv_multi_compact.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="array_8hpp_source.html#l00022">22</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
@@ -307,7 +307,7 @@ template&lt;class Type&gt; </div>
 
 <p>Array transpose (Special case of array permutation) </p>
 <p>If e.g. x has dimension [3,4,5,6] then x.transpose() has dimension [6,5,4,3]. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="sdv_multi_compact_8cpp-example.html#a5">sdv_multi_compact.cpp</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="matrix_arrays_8cpp-example.html#a10">matrix_arrays.cpp</a>, and <a class="el" href="sdv_multi_compact_8cpp-example.html#a5">sdv_multi_compact.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="array_8hpp_source.html#l00263">263</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 
