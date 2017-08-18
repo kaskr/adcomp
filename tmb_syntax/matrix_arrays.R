@@ -1,15 +1,22 @@
-# Illustrate use of vector, matrix and array operations
+# Demonstrates use of vectors, matrices and arrays. 
+# Results of operations reported back to R via REPORT()
 
-library(TMB)
+model_data = list(v1 = c(9,11), 
+                  v2 = c(1,2,3,4), 
+                  v3 = c(10,20,30,40,50),
+                  m1 = matrix(c(1,2,3,4),        nrow=2, ncol=2), 
+                  m2 = matrix(c(3,4,5,6,7),      nrow=3, ncol=5),
+                  m3 = matrix(c(8,9,10,11),      nrow=1, ncol=4),
+                  m4 = matrix(c(10,20,30,40,50), nrow=4, ncol=5),
+                  a1 = array(c(1,2,3,4),         dim = c(2,2)),
+                  a2 = array(c(8,9,10,11,12),    dim = c(7,5)))
+
+require(TMB)
 compile("matrix_arrays.cpp")
 dyn.load(dynlib("matrix_arrays"))
 
-v1 = c(3,5)
-m1 = matrix(c(3,9,2,4),nrow=2)
-a1 = matrix(c(1,5,6,7),nrow=2)
-    
-obj <- MakeADFun(data=list(v1=v1,m1=m1,a1=a1),parameters=list(p = 0),DLL="matrix_arrays")
+model = MakeADFun(data=model_data, parameters=list(),type="Fun",
+                  checkParameterOrder=FALSE,DLL="matrix_arrays")
+print(model$report())  # Note: order of variables NOT the same as .cpp file
 
-# Print objects (in alphabetic order) that have been returned by REPORT()
-print(obj$env$report())
 
