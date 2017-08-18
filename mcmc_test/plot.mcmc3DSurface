@@ -1,0 +1,181 @@
+#' Plot 3D surfaces from the output of mcmc
+#' 
+#' @param mcmcOut A list object returned by \code{mcmc()}.
+#' @param plots Which plot(s) to render: \code{Plot3d}, \code{Image}, \code{Contour}, or \code{Persp3d}. Default is to produce all four when \code{pairwise} is \code{FALSE}.
+#' @param pairwise Logical - return a matrix of paired plots.  Default is \code{FALSE}.
+#' @param objct A TMB model object.
+#' @param optim A list object with the best set of parameters found labeled 'par', such as returned by \code{stats::nlminb()} and \code{stats::optim()}.
+#' @param namesPar A vector of user provided names of the parameters for use in plotting. The default is \code{colnames(mcmcOut$parThin)} if it exists or \code{colnames(mcmcOut$par)}, otherwise.
+#' @param varX Which parameter to use for the 'X' axis.  Default is 1.
+#' @param varY Which parameter to use for the 'Y' axis.  Default is 2.
+#' @param zLab The label to use in plotting for the objective function.  Default is "Neg. Log-likelihood".
+#' @param nx Dimension of output grid in x direction given to the \code{akima::interp()} function. Default is 50.
+#' @param ny Dimension of output grid in y direction given to the \code{akima::interp()} function. Default is 50.
+#' @param colPersp Color(s) used for the \code{rgl::persp3d()} plot(s). Colors will be cycled through if necessary.  Defalut is \code{"green"} for a single plot or \code{grDevices::rainbow()} for the pairs plotting.
+#' @param addMf Logical - add a plot to the current multi-figure array.  Default is \code{FALSE}.
+#' @param sharedMouse  If a subscene receives a mouse event, the same action will be carried out on all subscenes in this list. Passed to function \code{rgl::mfrow3d()}.  Default is \code{TRUE}.
+#' @param alpha Vector of alpha values between 0.0 (fully transparent) .. 1.0 (opaque). Passed indirectly to \code{rgl::rgl.material()}. Default is \code{0.75}.
+#' @param Plot Logical - create a plot.  If FALSE, \code{mcmcOut} will still be invisibly returned with objective values added to a new column.  Default is \code{TRUE}.
+#' @details \itemize{
+#' \item{}{\code{Plot3d} and \code{Persp3d} are interactive plots from the \code{rgl} package.}
+#' \item{}{\code{Image}, \code{Contour}, and \code{Persp3d} require z values on a regular x,y grid; this is achieved using the \code{interp} function from the \code{akima} package.}
+#' \item{}{If the \code{par} matrix within the output list from the \code{mcmc} function has been thinned and labeled \code{parThin} within the same list, this thinned matrix will be used instead of the \code{par} matrix.}
+#' }
+#' @param ... Additional parameters passed to \code{rgl:persp3d()}.
+#' @return \code{mcmcOut} will be invisibly returned with objective values added to a new column of \code{mcmcOut$parThin}, if it exists, or to \code{mcmcOut$par} otherwise.
+#' @author John R. Wallace \url{https://github.com/John-R-Wallace}
+#' @examples
+#' ## Not run:
+#' ## Run the simple example, so that obj and opt are loaded into workspace
+#' runExample("simple")
+#'
+#' hmc <- mcmc(obj=obj, nsim=500*20, algorithm='HMC', L=1, params.init=opt$par, diagnostic=TRUE, eps=0.1)
+#' hmc$parThin <- hmc$par[seq(1, nrow(hmc$par), by=20),]
+#' 
+#' # Four different plots are rendered: Plot3d, Image, Contour, and Persp3d; variables 1 & 2 are used by default; since parThin exists it will be used.
+#' # Rotation with mouse movement and zooming with the mouse wheel are available for the rgl graphics.
+#' hmc <- plot.mcmc3DSurface(hmc, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4])) 
+#' 
+#' hmc$parThin[1:4,] # objective function value has been added for each row.
+#' 
+#' plot.mcmc3DSurface(hmc, "Persp3d", varX = 1, varY = 4) # beta(1) and logsd0 with Persp3d only
+#' 
+#' # All pairwise plots:
+#' plot.mcmc3DSurface(hmc, "Persp3d", pairwise = T, names = c(names(hmc$par)[1], "beta2", names(hmc$par)[3:4]))  # With sharedMouse being TRUE, rotation and zooming will happen to all subscenes simultaneously. 
+#'
+#' nuts <- mcmc(obj=obj, nsim=500, algorithm='NUTS', params.init=opt$par, diagnostic=TRUE, eps=0.1)
+#' nuts <- plot.mcmc3DSurface(nuts, Plot = F) # Plot is FALSE so only the objective function values have been added to a new column of par.
+#' nuts$par[1:4,]  # No parThin, so par was used.
+#' 
+#' ## End(Not run)
+
+plot.mcmc3DSurface <- function(mcmcOut, plots = c("Plot3d", "Image", "Contour", "Persp3d"), pairwise = FALSE, objct = obj, optim = opt, namesPar = NULL, 
+             varX = 1, varY = 2, zLab = "Neg. Log-likelihood", nx = 50, ny = 50, colPersp = NULL, addMf = FALSE, sharedMouse = TRUE, alpha = 0.75, Plot = TRUE, ...) {
+
+    require(rgl)
+
+    bar <- function(i, n, size = 60, char = ">", prefix = ifelse(.Platform$OS.type == "windows", memory.size(), i)) {
+        num <- round((size * i)/n)
+        cat(prefix, " |", paste(rep(char, num), collapse = ""), paste(rep(" ", size - num), collapse = ""),
+                "|\r", sep = "")
+        flush.console()
+        if(i == n) 
+          cat("\n\r")  # "Fixes leaving the cursor toward the right (most of the time)
+    }
+
+    mfrow.skip <- function() {
+         Cur <- par()$mfg
+         if(Cur[2] < Cur[4])
+         Cur[2] <- Cur[2] + 1
+         else {
+            Cur[2] <- 1
+            Cur[1] <- Cur[1] + 1
+         }
+         par(mfg = Cur)
+     }
+       
+# ---------------------------------------------------------------------------------------------------------------------------
+
+
+   if(any(names(mcmcOut) == "parThin"))
+      Par <- mcmcOut$parThin
+   else    
+      Par <- mcmcOut$par
+    
+   if(is.null(namesPar))
+     namesPar <- names(Par) 
+
+   if(!any("obj" == names(Par))) {
+
+       Par$obj <- NA
+       for ( i in 1:nrow(Par)) {
+         bar(i, nrow(Par))
+         Par$obj[i] <- nlminb(Par[i, 1:(ncol(Par) - 1)], objct$fn, objct$gr, control = list(step.min = 0.001, eval.max = 1, iter.max =1))$objective  # Perhaps overkill on the control parameters
+       }   
+   }
+
+   if(any(names(mcmcOut) == "parThin"))
+          mcmcOut$parThin <- Par
+      else
+          mcmcOut$par <- Par
+
+   if(Plot) {
+      if(!pairwise) {
+
+         if(is.null(colPersp))
+             colPersp <- "green"
+
+         if(any("Plot3d" == plots)) {
+             if(!addMf)
+                 open3d()
+             plot3d(Par[,varX], Par[,varY], Par$obj, xlab = namesPar[varX], ylab = namesPar[varY], zlab=zLab)
+         }
+
+         if(any("Image" == plots) | any("Contour" == plots) | any("Persp3d" == plots)) {
+             require(akima) 
+             mcmcOut$s <- interp(Par[,varX], Par[,varY], Par$obj, nx = nx, ny = ny, duplicate="mean")
+             names(mcmcOut$s) <- c(namesPar[c(varX, varY)], "obj")
+         }
+
+   
+         if(any("Contour" == plots)) {
+             if(.Platform$OS.type == "windows" & !addMf)  windows()
+             contour(mcmcOut$s[[1]], mcmcOut$s[[2]], mcmcOut$s$obj, xlab = namesPar[varX], ylab = namesPar[varY])
+             abline(v=optim$par[varX], h=optim$par[varY], lty=2)
+         }
+ 
+         if(any("Image" == plots)) {
+             if(.Platform$OS.type == "windows" & !addMf)  windows()
+             image(mcmcOut$s[[1]], mcmcOut$s[[2]], mcmcOut$s$obj, xlab = namesPar[varX], ylab = namesPar[varY])
+             abline(v=optim$par[varX], h=optim$par[varY], lty=2)
+         }
+
+         if(any("Persp3d" == plots)) {
+            if(!addMf)
+               open3d()
+            persp3d(mcmcOut$s[[1]], mcmcOut$s[[2]], mcmcOut$s$obj, xlab = namesPar[varX], ylab = namesPar[varY], zlab=zLab, col = colPersp, alpha = alpha, ...)
+         }
+
+      } else {
+ 
+         N <- ncol(Par) - 1
+         if(any("Plot3d" == plots) | any("Persp3d" == plots)) {
+            open3d()
+            mfrow3d(N - 1, N - 1, sharedMouse = sharedMouse)
+         } else 
+            par(mfrow = c(N - 1, N - 1))
+
+         if(is.null(colPersp))
+              colPersp <- rainbow(sum(1:(N-1)))
+         else
+              colPersp <- rep(colPersp, len=sum(1:(N-1)))
+      
+         for (i in 1:(N-1)) {
+
+            if( i > 1) {
+              if(any("Plot3d" == plots) | any("Persp3d" == plots))
+                    next3d(reuse=F)
+              else
+                    mfrow.skip()
+              for (j in 1:(i - 1)) {
+                if(any("Plot3d" == plots) | any("Persp3d" == plots))
+                    next3d(reuse=F)
+                else
+                    mfrow.skip()
+              }
+            }
+
+            k <- 0
+            for(j in (i + 1):N) {
+               k <- k + 1
+               plot.mcmc3DSurface(mcmcOut, plots, pairwise = FALSE, objct = objct, optim = optim, namesPar = namesPar, varX = i, varY = j, addMf = TRUE, zLab = zLab, colPersp = colPersp[k], alpha = alpha, ...) 
+            }
+         }
+      }
+   }
+
+   invisible(mcmcOut)
+
+}
+
+
