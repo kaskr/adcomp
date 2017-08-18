@@ -99,7 +99,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="Introduction.html"><a href="Introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a><ul>
-<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a></li>
+<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="Tutorial.html"><a href="Tutorial.html#list-of-data-macros"><i class="fa fa-check"></i><b>2.1.1</b> List of data macros</a></li>
+<li class="chapter" data-level="2.1.2" data-path="Tutorial.html"><a href="Tutorial.html#list-of-parameter-macros"><i class="fa fa-check"></i><b>2.1.2</b> List of parameter macros</a></li>
+</ul></li>
 <li class="chapter" data-level="2.2" data-path="Tutorial.html"><a href="Tutorial.html#an-extended-c-language"><i class="fa fa-check"></i><b>2.2</b> An extended C++ language</a></li>
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
@@ -274,7 +277,7 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
 <a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">estimate=</span><span class="kw">as.vector</span>(sim), <span class="dt">parameter=</span><span class="kw">names</span>(obj$par)[<span class="kw">row</span>(sim)])
 <span class="kw">densityplot</span>( ~<span class="st"> </span>estimate |<span class="st"> </span>parameter, <span class="dt">data=</span><a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a>, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-27-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-29-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <p>Compare with the true parameter values of the simulation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obj$par</code></pre></div>
 <pre><code>##  a  b sd 

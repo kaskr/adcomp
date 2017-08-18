@@ -99,7 +99,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="Introduction.html"><a href="Introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a><ul>
-<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a></li>
+<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="Tutorial.html"><a href="Tutorial.html#list-of-data-macros"><i class="fa fa-check"></i><b>2.1.1</b> List of data macros</a></li>
+<li class="chapter" data-level="2.1.2" data-path="Tutorial.html"><a href="Tutorial.html#list-of-parameter-macros"><i class="fa fa-check"></i><b>2.1.2</b> List of parameter macros</a></li>
+</ul></li>
 <li class="chapter" data-level="2.2" data-path="Tutorial.html"><a href="Tutorial.html#an-extended-c-language"><i class="fa fa-check"></i><b>2.2</b> An extended C++ language</a></li>
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
@@ -203,10 +206,23 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
 nll = Type(<span class="fl">1.</span><span class="dv">2</span>);    <span class="co">// Assign value 1.2; a cast is needed.</span></code></pre></div>
 <div id="obtaining-data-and-parameter-values-from-r" class="section level2">
 <h2><span class="header-section-number">2.1</span> Obtaining data and parameter values from R</h2>
-<p>Obviously, we will need to pass both data and parameter values to the objective function. This is done through a set of macros that TMB defines for us. To see which macros are available start typing <code>DATA_</code> or <code>PARAMETER_</code> in the Doxygen search field of your browser (you may need to refresh the browser window between each time you make a new search). A simple example if you want to read a vector of numbers (doubles) is the following</p>
+<p>Obviously, we will need to pass both data and parameter values to the objective function. This is done through a set of macros that TMB defines for us.</p>
+<div id="list-of-data-macros" class="section level3">
+<h3><span class="header-section-number">2.1.1</span> List of data macros</h3>
+<blockquote>
+<p><code><a class="code" href="../group__macros.html#ga97c14a26ca75571090d332f15130ae4b">DATA_ARRAY</a>()</code>, <code><a class="code" href="../group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>()</code>, <code><a class="code" href="../group__macros.html#gaf5fe8a4b8a5134f341fa63844abb6fdc">DATA_IARRAY</a>()</code>, <code>DATA_IMATRIX()</code>, <code><a class="code" href="../group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>()</code>, <code><a class="code" href="../group__macros.html#ga7889208e14a95d21cf630157cf0e2c80">DATA_IVECTOR</a>()</code>, <code><a class="code" href="../group__macros.html#gada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>()</code>, <code><a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>()</code>, <code>DATA_SPARSE_MATRIX()</code>, <code><a class="code" href="../group__macros.html#gaba52ba9bd5c88f42a0ce96432aa6e688">DATA_STRING</a>()</code>, <code><a class="code" href="../group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>()</code>, <code><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>()</code></p>
+</blockquote>
+</div>
+<div id="list-of-parameter-macros" class="section level3">
+<h3><span class="header-section-number">2.1.2</span> List of parameter macros</h3>
+<blockquote>
+<p><code><a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>()</code>, <code><a class="code" href="../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>()</code>, <code>PARAMETER_MATRIX()</code>, <code><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>()</code></p>
+</blockquote>
+<p>To see which macros are available start typing <code>DATA_</code> or <code>PARAMETER_</code> in the Doxygen search field of your browser (you may need to refresh the browser window between each time you make a new search). A simple example if you want to read a vector of numbers (doubles) is the following</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);     <span class="co">// Vector x(0),x(1),...,x(n-1), where n is the length of x</span></code></pre></div>
 <p>Note that all vectors and matrices in TMB uses a <strong>zero-based</strong> indexing scheme. It is not necessary to explicitly pass the dimension of <code>x</code>, as it can be retrieved inside the C++ program:</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = x.size();</code></pre></div>
+</div>
 </div>
 <div id="an-extended-c-language" class="section level2">
 <h2><span class="header-section-number">2.2</span> An extended C++ language</h2>

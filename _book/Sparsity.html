@@ -99,7 +99,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="Introduction.html"><a href="Introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a><ul>
-<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a></li>
+<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="Tutorial.html"><a href="Tutorial.html#list-of-data-macros"><i class="fa fa-check"></i><b>2.1.1</b> List of data macros</a></li>
+<li class="chapter" data-level="2.1.2" data-path="Tutorial.html"><a href="Tutorial.html#list-of-parameter-macros"><i class="fa fa-check"></i><b>2.1.2</b> List of parameter macros</a></li>
+</ul></li>
 <li class="chapter" data-level="2.2" data-path="Tutorial.html"><a href="Tutorial.html#an-extended-c-language"><i class="fa fa-check"></i><b>2.2</b> An extended C++ language</a></li>
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
@@ -203,9 +206,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>There are various graph representations that are commonly used to visualize probabilistic structure. One such is the <em>conditional independence graph</em>. Say we have a model of four random variables <span class="math inline">\(X_1,...,X_4\)</span> for which the joint density is:</p>
 <p><span class="math display">\[p(x_1,x_2,x_3,x_4) \propto f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)\]</span></p>
 <p>The separability of factors on the right hand side implies some conditional independence properties. For instance if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span> are held constant then <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> varies independently. We say that <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> are conditionally independent given <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span>. The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor <span class="math inline">\(f_i\)</span>:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-9-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /></p>
 <p>Equivalently the graph may be visualized via its adjacency matrix:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-10-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-12-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <p>This is the <strong>sparsity pattern</strong> of the model.</p>
 <blockquote>
 <p>The sparsity pattern visualizes the conditional independence structure of the random effects in the model.</p>
@@ -215,8 +218,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3><span class="header-section-number">12.1.2</span> Node removal properties</h3>
 <p>Important probabilistic properties can be deduced directly from the graph. This is due to the following <em>node removal</em> properties.</p>
 <ol style="list-style-type: decimal">
-<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph: <img src="_main_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /></p></li>
-<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes: <img src="_main_files/figure-html/unnamed-chunk-12-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph: <img src="_main_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes: <img src="_main_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /></p></li>
 </ol>
 <blockquote>
 <p>Conditioning preserves sparseness. Marginalizing tend to destroy sparseness by adding more edges to the graph.</p>
@@ -225,7 +228,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="directed-acyclic-graph" class="section level3">
 <h3><span class="header-section-number">12.1.3</span> Directed acyclic graph</h3>
 <p>When building models in TMB it is often more natural to specify processes in incremental steps - i.e. through the successive conditional distributions. The previous example could be simulated by drawing the variables <span class="math inline">\(X_1,X_2,X_3,X_4\)</span> one by one in the given order as illustrated by the following <em>directed</em> graph:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /></p>
 <p>The graph shows dependencies of any specific node <em>given past nodes</em>. The edge from <span class="math inline">\(X_1\)</span> to <span class="math inline">\(X_3\)</span> was not in the original (undirected) graph. This is a so-called <strong>fill-in</strong>.</p>
 <blockquote>
 <p>Order matters. The DAG is different from the conditional independence graph.</p>
@@ -234,9 +237,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="the-effect-of-adding-data" class="section level3">
 <h3><span class="header-section-number">12.1.4</span> The effect of adding data</h3>
 <p>It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that <span class="math inline">\(X_4\)</span> is a data point we would illustrate it by:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /></p>
 <p>Here there are only three variables left. The conditional independence structure of the variables is:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /></p>
 <p>which is the same graph as was previously found by integrating <span class="math inline">\(X_4\)</span> out of the joint distribution.</p>
 <blockquote>
 <p>Data nodes destroy sparsity the same way as marginalization. To avoid this, try to associate each data point with a single random effect.</p>
@@ -253,13 +256,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The joint negative log-likelihood of state vector <span class="math inline">\(u\)</span> and measurements <span class="math inline">\(y\)</span> is implemented in the C++ template <a href="../thetalog_8cpp-example.html">thetalog.cpp</a>. The example can be run by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="dt">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</code></pre></div>
 <p>We demonstrate it in the case <span class="math inline">\(n=5\)</span>. Here is the DAG</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /></p>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
 <p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(Matrix)
 obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">random=</span><span class="kw">c</span>(<span class="st">&quot;X&quot;</span>), <span class="dt">DLL=</span><span class="st">&quot;thetalog&quot;</span>)
 <span class="kw">image</span>(obj$env$<span class="kw">spHess</span>(<span class="dt">random=</span><span class="ot">TRUE</span>))</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-18-1.svg" width="336" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-20-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>FIXME: NOT DONE YET !</p>
 </blockquote>
