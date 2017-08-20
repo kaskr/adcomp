@@ -168,7 +168,7 @@ namespace atomic{
       else if (input_dim == n+m)       output_dim = n;
       else if (input_dim == n+m+n)     output_dim = n+m;
       else if (input_dim == n+m+n+n+m) output_dim = n+m+n;
-      else error("get_output_dim failed");
+      else Rf_error("get_output_dim failed");
       return output_dim;
     }
     // Calculate level from input dimension
@@ -178,7 +178,7 @@ namespace atomic{
       else if (input_dim == n+m)       level = 1;
       else if (input_dim == n+m+n)     level = 2;
       else if (input_dim == n+m+n+n+m) level = 3;
-      else error("get_level failed");
+      else Rf_error("get_level failed");
       return level;
     }
     // Evaluate

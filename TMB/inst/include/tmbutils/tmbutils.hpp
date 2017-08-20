@@ -31,8 +31,8 @@ vector<Type> asVector(From *px, int n){
 template <class Type>
 array<Type> asArray(SEXP x)
 {
-  if(!isArray(x))error("NOT AN ARRAY!");
-  SEXP dim=getAttrib(x,R_DimSymbol);
+  if(!Rf_isArray(x))Rf_error("NOT AN ARRAY!");
+  SEXP dim=Rf_getAttrib(x,R_DimSymbol);
   vector<int> d=asVector<int,int>(INTEGER(dim), LENGTH(dim));
   vector<Type> y=asVector<Type,double>(REAL(x), LENGTH(x));
   return array<Type>(y,d);

@@ -11,7 +11,7 @@ Returns a "vector of vectors".
 */
 template <class Type>
 vector<vector<Type> > split(vector<Type> x, vector<int> fac) {
-  if (x.size() != fac.size()) error("x and fac must have equal length.");
+  if (x.size() != fac.size()) Rf_error("x and fac must have equal length.");
   int nlevels = 0;
   for (int i = 0; i < fac.size(); i++)
     if (fac[i] >= nlevels) nlevels = fac[i] + 1;

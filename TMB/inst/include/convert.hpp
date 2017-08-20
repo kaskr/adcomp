@@ -26,7 +26,7 @@ SEXP asSEXP(const matrix<Type> &a)
    R_xlen_t nr = a.rows();
    R_xlen_t nc = a.cols();
    SEXP val;
-   PROTECT(val = allocMatrix(REALSXP, nr, nc));
+   PROTECT(val = Rf_allocMatrix(REALSXP, nr, nc));
    double *p = REAL(val);
    for(R_xlen_t i=0; i<nr; i++)
      for(R_xlen_t j=0; j<nc; j++)
@@ -41,7 +41,7 @@ SEXP asSEXP(const vector<Type> &a) CSKIP(       \
 {                                               \
   R_xlen_t size = a.size();                     \
   SEXP val;                                     \
-  PROTECT(val = allocVector(REALSXP,size));     \
+  PROTECT(val = Rf_allocVector(REALSXP,size));  \
   double *p = REAL(val);                        \
   for (R_xlen_t i = 0; i < size; i++)           \
     p[i] = asDouble(a[i]);                      \
@@ -59,7 +59,7 @@ SEXP asSEXP(const vector<Type> &a)
 {
    R_xlen_t size = a.size();
    SEXP val;
-   PROTECT(val = allocVector(VECSXP, size));
+   PROTECT(val = Rf_allocVector(VECSXP, size));
    for (R_xlen_t i = 0; i < size; i++)
      SET_VECTOR_ELT(val, i, asSEXP(a[i]));
    UNPROTECT(1);
@@ -69,7 +69,7 @@ SEXP asSEXP(const vector<Type> &a)
 SEXP asSEXP(const double &a) CSKIP(
 {
    SEXP val;
-   PROTECT(val=allocVector(REALSXP,1));
+   PROTECT(val=Rf_allocVector(REALSXP,1));
    REAL(val)[0]=a;
    UNPROTECT(1);
    return val;
@@ -77,7 +77,7 @@ SEXP asSEXP(const double &a) CSKIP(
 SEXP asSEXP(const int &a) CSKIP(
 {
    SEXP val;
-   PROTECT(val=allocVector(INTSXP,1));
+   PROTECT(val=Rf_allocVector(INTSXP,1));
    INTEGER(val)[0]=a;
    UNPROTECT(1);
    return val;
@@ -92,7 +92,7 @@ SEXP asSEXP(const AD<Type> &a){
 template <class Type>
 vector<Type> asVector(SEXP x)
 {
-   if(!isReal(x)) error("NOT A VECTOR!");
+   if(!Rf_isReal(x)) Rf_error("NOT A VECTOR!");
    R_xlen_t n = XLENGTH(x);
    typedef Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,1> > MapVector;
    MapVector tmp(REAL(x), n);
@@ -113,10 +113,10 @@ matrix<Type> asMatrix(const vector<Type> &x, int nr, int nc)
 template <class Type>
 matrix<Type> asMatrix(SEXP x)
 {
-   if (!isMatrix(x))
-     error("x must be a matrix in 'asMatrix(x)'");
-   R_xlen_t nr = nrows(x); // nrows is int
-   R_xlen_t nc = ncols(x); // ncols is int
+   if (!Rf_isMatrix(x))
+     Rf_error("x must be a matrix in 'asMatrix(x)'");
+   R_xlen_t nr = Rf_nrows(x); // nrows is int
+   R_xlen_t nc = Rf_ncols(x); // ncols is int
    matrix<Type> y(nr, nc);
    for(R_xlen_t i=0; i<nr; i++)
      for(R_xlen_t j=0; j<nc; j++)
@@ -128,15 +128,15 @@ template<class Type>
 SEXP asSEXP(const tmbutils::array<Type> &a)
 {
    SEXP val;
-   PROTECT(val = allocVector(REALSXP, a.size()));
+   PROTECT(val = Rf_allocVector(REALSXP, a.size()));
    double *p = REAL(val);
    for(R_xlen_t i=0; i<a.size(); i++)
      p[i] = asDouble(a[i]);
    SEXP dim;
-   PROTECT(dim = allocVector(INTSXP, a.dim.size()));
+   PROTECT(dim = Rf_allocVector(INTSXP, a.dim.size()));
    for(int i=0; i<a.dim.size(); i++)
      INTEGER(dim)[i] = a.dim[i];
-   setAttrib(val, R_DimSymbol, dim);
+   Rf_setAttrib(val, R_DimSymbol, dim);
    UNPROTECT(2);
    return val;
 }
@@ -148,18 +148,18 @@ SEXP asSEXP(Eigen::SparseMatrix<Type> x){
   // Allocate return object
   R_xlen_t nnz = x.nonZeros();
   SEXP ans = PROTECT(R_do_new_object(R_do_MAKE_CLASS("dgTMatrix")));
-  SEXP dim = PROTECT(allocVector(INTSXP, 2));
-  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-  SEXP values = PROTECT(allocVector(REALSXP, nnz));
-  SEXP i = PROTECT(allocVector(INTSXP, nnz));
-  SEXP j = PROTECT(allocVector(INTSXP, nnz));
-  SEXP factors = PROTECT(allocVector(VECSXP, 0));
-  R_do_slot_assign(ans, install("i"), i);
-  R_do_slot_assign(ans, install("j"), j);
-  R_do_slot_assign(ans, install("Dim"), dim);
-  R_do_slot_assign(ans, install("Dimnames"), dimnames);
-  R_do_slot_assign(ans, install("x"), values);
-  R_do_slot_assign(ans, install("factors"), factors);
+  SEXP dim = PROTECT(Rf_allocVector(INTSXP, 2));
+  SEXP dimnames = PROTECT(Rf_allocVector(VECSXP, 2));
+  SEXP values = PROTECT(Rf_allocVector(REALSXP, nnz));
+  SEXP i = PROTECT(Rf_allocVector(INTSXP, nnz));
+  SEXP j = PROTECT(Rf_allocVector(INTSXP, nnz));
+  SEXP factors = PROTECT(Rf_allocVector(VECSXP, 0));
+  R_do_slot_assign(ans, Rf_install("i"), i);
+  R_do_slot_assign(ans, Rf_install("j"), j);
+  R_do_slot_assign(ans, Rf_install("Dim"), dim);
+  R_do_slot_assign(ans, Rf_install("Dimnames"), dimnames);
+  R_do_slot_assign(ans, Rf_install("x"), values);
+  R_do_slot_assign(ans, Rf_install("factors"), factors);
   // Insert
   INTEGER(dim)[0] = x.rows();
   INTEGER(dim)[1] = x.cols();

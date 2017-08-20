@@ -128,7 +128,7 @@ Type calc_loglambda(Type logmean, Type nu) {
       break;
   }
   if (i == iter_max)
-    warning("calc_loglambda: Maximum number of iterations exceeded");
+    Rf_warning("calc_loglambda: Maximum number of iterations exceeded");
   return x.value;
 }
 
@@ -199,17 +199,17 @@ double simulate(double loglambda, double nu) {
     double paccept = exp(logf_target(samp) - logf_propose(samp));
     if(paccept > 1) {
       samp = NAN;
-      warning("compois sampler failed (probably overflow: paccept = %f)", paccept);
+      Rf_warning("compois sampler failed (probably overflow: paccept = %f)", paccept);
       break;
     }
     if( Rf_runif(0, 1) < paccept ) break;
   }
   if (i == iter_max) {
     samp = NAN;
-    warning("compois sampler failed (iteration limit exceeded)");
+    Rf_warning("compois sampler failed (iteration limit exceeded)");
   }
   if (samp != samp) { // NAN
-    warning("compois sampler returned NaN for mu=%f nu=%f", mu, nu);
+    Rf_warning("compois sampler returned NaN for mu=%f nu=%f", mu, nu);
   }
 #undef logf_target
 #undef logf_propose

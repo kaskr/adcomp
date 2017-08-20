@@ -196,7 +196,7 @@ namespace atomic{
     else if (nargs==2) ans=expm(nestedTriangle<1>(args)).bottomLeftCorner();
     else if (nargs==3) ans=expm(nestedTriangle<2>(args)).bottomLeftCorner();
     else if (nargs==4) ans=expm(nestedTriangle<3>(args)).bottomLeftCorner();
-    else error("expm: order not implemented.");
+    else Rf_error("expm: order not implemented.");
     return ans;
   })
 

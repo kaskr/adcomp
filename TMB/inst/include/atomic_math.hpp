@@ -104,7 +104,7 @@ namespace Rmath {
 	   &limit, &lenw, &last, iwork, work);
     if(ier!=0){
 #ifndef _OPENMP
-      warning("incpl_gamma (indef) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
+      Rf_warning("incpl_gamma (indef) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
 #endif
     }
     /* integrate min(log(x),log(shape))...log(x) */
@@ -118,7 +118,7 @@ namespace Rmath {
 	     &limit, &lenw, &last, iwork, work);
       if(ier!=0){
 #ifndef _OPENMP
-	warning("incpl_gamma (def) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
+	Rf_warning("incpl_gamma (def) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
 #endif
       }
     }
