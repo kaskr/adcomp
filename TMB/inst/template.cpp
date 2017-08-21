@@ -4,10 +4,14 @@ template<class Type>
 Type objective_function<Type>::operator() ()
 {
   /* Minimal example */
-  DATA_VECTOR(a);
-  PARAMETER_VECTOR(x);
-  Type res=(a*x*x).sum();
-  return res;
+  DATA_VECTOR(x);
+  PARAMETER(mu);
+  PARAMETER(logSigma);
+
+  Type f = 0;
+  f -= dnorm(x, mu, exp(logSigma), true).sum();
+
+  return f;
 
   /* Quick Reference
      ===============
@@ -64,4 +68,3 @@ Type objective_function<Type>::operator() ()
   */
 
 }
-
