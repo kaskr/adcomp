@@ -1,0 +1,68 @@
+```{r echo=FALSE, eval=TRUE, results='hide'}
+source("layout/utils.R")
+library(TMB)
+library(Matrix)
+```
+
+Atomic functions {#AtomicFunctions}
+================
+
+
+```{r, echo=FALSE}
+create_source("
+#include <TMB.hpp>
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+  PARAMETER_MATRIX(u);
+  u = u * u;
+  return u.sum();
+}
+", "atomic_matmul1.cpp")
+```
+
+`r include_source("atomic_matmul1.cpp")`
+
+```{r, eval=TRUE, include=FALSE}
+library(TMB)
+compile("atomic_matmul1.cpp", "-O0 -g", tracesweep = TRUE)
+dyn.load(dynlib("atomic_matmul1"))
+config(optimize.instantly=0, DLL="atomic_matmul1") ## Disable tape optimizer
+data <- list()
+parameters <- list(u=diag(2))
+obj <- MakeADFun(data, parameters, DLL="atomic_matmul1")
+```
+
+```{r, echo=FALSE, eval=TRUE, fig=TRUE}
+dump <- dumpstack(obj)
+makeDot(dump, filled=quote(c(input,output)) )
+```
+
+
+```{r, echo=FALSE}
+create_source("
+#include <TMB.hpp>
+template<class Type>
+Type objective_function<Type>::operator() ()
+{
+  PARAMETER_MATRIX(u);
+  u = atomic::matmul(u, u);
+  return u.sum();
+}
+", "atomic_matmul2.cpp")
+```
+
+`r include_source("atomic_matmul2.cpp")`
+
+```{r, eval=TRUE, include=FALSE}
+library(TMB)
+compile("atomic_matmul2.cpp", "-O0 -g", tracesweep = TRUE)
+dyn.load(dynlib("atomic_matmul2"))
+config(optimize.instantly=1, DLL="atomic_matmul2") ## Disable tape optimizer
+obj <- MakeADFun(data, parameters, DLL="atomic_matmul2")
+```
+
+```{r, echo=FALSE, eval=TRUE, fig=TRUE}
+dump <- dumpstack(obj)
+makeDot(dump, filled=quote(c(input,output)) )
+```
