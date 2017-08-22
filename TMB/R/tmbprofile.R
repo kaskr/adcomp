@@ -89,7 +89,7 @@ tmbprofile <- function(obj,
 
     ## Re-parameterize to direction plus (n-1)-dim-subspace
     ##   theta = t*direction + C %*% s
-    X <- diag(length(lincomb))
+    X <- Diagonal(length(lincomb))
     i <- which(lincomb != 0)[1]
     X[i,] <- lincomb           ## Linear indep. columns
     invX <- solve(X)
