@@ -685,8 +685,26 @@ matrix<Type> m(4,5);
 m.setZero();
 ```
 
+> Some operations in C++ have special integer versions.
+
+```{.cpp}
+Type x = 11 / 3;    // Integer division
+REPORT(x)           // x=3
+```
+
+When writing a floating point literal such as `11` better use `11.`.
+
+> C++ **literals** may cause surprises.
+
+```{.cpp}
+Type x = 034;       // Octal representation
+REPORT(x);          // x=28
+```
+
 ### I know C++
+
 TMB specific C++ include:
+
 - You should not use `if(x)` statements where `x` is a `PARAMETER`,
   or is derived from a variable of type `PARAMETER`. (It is OK to use
   `if` on `DATA` types, however.)  TMB will remove the `if(x)`
