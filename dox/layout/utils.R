@@ -74,6 +74,17 @@ doxy_markdown_tweaks <- function(file) {
     writeLines(x, file)
 }
 
+## Output graph as svg
+graph2svg <- function(graph) {
+    dotfile <- tempfile(fileext=".dot")
+    svgfile <- tempfile(fileext=".svg")
+    cat(graph, file=dotfile)
+    cmd <- paste("dot", "-Tsvg", dotfile, "-o", svgfile)
+    system(cmd)
+    class(svgfile) <- "svgfile"
+    svgfile
+}
+
 ## plot graph of hessian as either
 ## * Undirected conditinal independence graph
 ## * Directed graph of successive conditional distributions
@@ -141,13 +152,7 @@ plotGraph <- function(h, DAG=TRUE, fill_in=DAG, group = function(x)(x-1)%%nrow,
     }
     graph <- paste(graph, collapse="\n")
     if(debug)return(graph)
-    dotfile <- tempfile(fileext=".dot")
-    svgfile <- tempfile(fileext=".svg")
-    cat(graph, file=dotfile)
-    cmd <- paste("dot", "-Tsvg", dotfile, "-o", svgfile)
-    system(cmd)
-    class(svgfile) <- "svgfile"
-    svgfile
+    graph2svg(graph)
 }
 
 print.svgfile <- function(x) {
