@@ -835,13 +835,14 @@ MakeADFun <- function(data, parameters, map=list(),
            if(is.character(ans))NaN else ans
          },
          gr=function(x=last.par[-random],...){
-           ans <- {
+           ans <- try( {
              if(MCcontrol$doMC){
                ff(x,order=0)
                MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=1)
              } else
                ff(x,order=1)
-           }
+           }, silent=silent)
+           if(is.character(ans)) ans <- rep(NaN, length(x))
            if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
            ans
          },
