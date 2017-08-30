@@ -549,6 +549,48 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px=mat2vec(res);
 			   )
 
+/** \brief Atomic version of *lower* Cholesky decomposition of a positive definite n-by-n matrix.
+    \param x Input vector of length n*n (only lower triangle is used).
+    \return Vector of length n*n.
+*/
+#define _11(X) X.block(j,   j,   1,     1)
+#define _21(X) X.block(j+1, j,   n-j-1, 1)
+#define _12(X) X.block(j,   j+1, 1,     n-j-1)
+#define _22(X) X.block(j+1, j+1, n-j-1, n-j-1)
+TMB_ATOMIC_VECTOR_FUNCTION(
+                           // ATOMIC_NAME
+                           chol
+                           ,
+                           // OUTPUT_DIM
+                           tx.size()
+                           ,
+                           // ATOMIC_DOUBLE
+                           typedef TypeDefs<double>::MapMatrix MapMatrix_t;
+                           typedef TypeDefs<double>::ConstMapMatrix ConstMapMatrix_t;
+                           int n = sqrt( (double) tx.size() );
+                           ConstMapMatrix_t X(&tx[0], n, n);
+                           MapMatrix_t      Y(&ty[0], n, n);
+                           Y = X.llt().matrixL();
+                           ,
+                           // ATOMIC_REVERSE  ( TRIL(S*L) = TRIL(W), py = S - .5 * diag(S) )
+                           typedef TypeDefs<Type>::MapMatrix MapMatrix_t;
+                           typedef TypeDefs<Type>::ConstMapMatrix ConstMapMatrix_t;
+                           int n = sqrt( (double) tx.size() );
+                           ConstMapMatrix_t L(&ty[0], n, n);
+                           ConstMapMatrix_t W(&py[0], n, n);
+                           MapMatrix_t      S(&px[0], n, n);
+                           for (int j = n-1; j>=0; j--) {
+                             _21(S) = ( _21(W) - _22(S) * _21(L) ) * _11(L).inverse();
+                             _12(S) =                                _21(S).transpose();
+                             _11(S) = ( _11(W) - _12(S) * _21(L) ) * _11(L).inverse();
+                           }
+                           S.diagonal() /= Type(.5);
+                           )
+#undef _11
+#undef _21
+#undef _12
+#undef _22
+
 /* ================================== INTERFACES
 */
 
