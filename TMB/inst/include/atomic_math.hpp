@@ -456,6 +456,15 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = 0; px[1] = 0;
 			   )
 
+/** \cond */
+template<class Type> /* Forward declare matinv */
+matrix<Type> matinv(matrix<Type> x);
+template<>
+matrix<double> matinv(matrix<double> x)CSKIP({
+    return x.inverse();
+})
+/** \endcond */
+
 /** \brief Atomic version of matrix inversion.
     Inverts n-by-n matrix by LU-decomposition.
     \param x Input vector of length n*n.
@@ -565,10 +574,12 @@ matrix< typename T1::Scalar > tril_sol(const T1 &L, const T2 &W, int bs = 1) {
   matrix<T> S(n, n);
   bs = ( bs>n ? n : bs);
   for (int j = n-bs; j>=0; j -= bs) {
-    _21(S) = ( _21(W) - _22(S) * _21(L) ) * _11(L).inverse();
-    _12(S) =                                _21(S).transpose();
+    matrix<T> invL11 = matinv(matrix<T>(_11(L)));
+    _21(S) = ( _21(W) - matmul(matrix<T>(_22(S)),
+                               matrix<T>(_21(L))) ) * invL11;
+    _12(S) = _21(S).transpose();
     if( bs == 1 ) {
-      _11(S) = ( _11(W) - _12(S) * _21(L) ) * _11(L).inverse();
+      _11(S) = ( _11(W) - _12(S) * _21(L) ) * invL11;
     } else {
       _11(S) = tril_sol(matrix<T>(_11(L)),
                         matrix<T>(_11(W) - _12(S) * _21(L)),
