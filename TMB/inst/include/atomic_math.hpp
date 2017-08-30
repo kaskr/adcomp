@@ -661,6 +661,19 @@ matrix<Type> matinvpd(matrix<Type> x, Type &logdet){
   return vec2mat(res,n,n,1);
 }
 
+/** \brief Cholesky decomposition
+
+    Calculate Cholesky decomposition of a positive definite matrix.
+
+    \ingroup matrix_functions
+*/
+template<class Type>
+matrix<Type> chol(matrix<Type> x){
+  int n = x.rows();
+  CppAD::vector<Type> res = chol(mat2vec(x));
+  return vec2mat(res, n, n);
+}
+
 /** \brief Log-determinant of positive definite matrix
     \ingroup matrix_functions
 */
