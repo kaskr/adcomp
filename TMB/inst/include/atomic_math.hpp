@@ -573,8 +573,8 @@ TMB_ATOMIC_VECTOR_FUNCTION(
                            Y = X.llt().matrixL();
                            ,
                            // ATOMIC_REVERSE  ( TRIL(S*L) = TRIL(W), py = S - .5 * diag(S) )
-                           typedef TypeDefs<Type>::MapMatrix MapMatrix_t;
-                           typedef TypeDefs<Type>::ConstMapMatrix ConstMapMatrix_t;
+                           typedef typename TypeDefs<Type>::MapMatrix MapMatrix_t;
+                           typedef typename TypeDefs<Type>::ConstMapMatrix ConstMapMatrix_t;
                            int n = sqrt( (double) tx.size() );
                            ConstMapMatrix_t L(&ty[0], n, n);
                            ConstMapMatrix_t W(&py[0], n, n);
