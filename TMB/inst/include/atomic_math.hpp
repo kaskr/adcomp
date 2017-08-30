@@ -553,10 +553,36 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length n*n (only lower triangle is used).
     \return Vector of length n*n.
 */
-#define _11(X) X.block(j,   j,   1,     1)
-#define _21(X) X.block(j+1, j,   n-j-1, 1)
-#define _12(X) X.block(j,   j+1, 1,     n-j-1)
-#define _22(X) X.block(j+1, j+1, n-j-1, n-j-1)
+
+template<class T1, class T2>
+matrix< typename T1::Scalar > tril_sol(const T1 &L, const T2 &W, int bs = 1) {
+#define _11(X) X.block(j,    j,    bs,     bs)
+#define _21(X) X.block(j+bs, j,    n-j-bs, bs)
+#define _12(X) X.block(j,    j+bs, bs,     n-j-bs)
+#define _22(X) X.block(j+bs, j+bs, n-j-bs, n-j-bs)
+  int n = L.rows();
+  typedef typename T1::Scalar T;
+  matrix<T> S(n, n);
+  bs = ( bs>n ? n : bs);
+  for (int j = n-bs; j>=0; j -= bs) {
+    _21(S) = ( _21(W) - _22(S) * _21(L) ) * _11(L).inverse();
+    _12(S) =                                _21(S).transpose();
+    if( bs == 1 ) {
+      _11(S) = ( _11(W) - _12(S) * _21(L) ) * _11(L).inverse();
+    } else {
+      _11(S) = tril_sol(matrix<T>(_11(L)),
+                        matrix<T>(_11(W) - _12(S) * _21(L)),
+                        1 /* bs=1 */);
+    }
+    if ((0 < j) && (j < bs)) bs = j; // Prepare final iteration
+  }
+  return S;
+#undef _11
+#undef _21
+#undef _12
+#undef _22
+}
+
 TMB_ATOMIC_VECTOR_FUNCTION(
                            // ATOMIC_NAME
                            chol
@@ -579,18 +605,10 @@ TMB_ATOMIC_VECTOR_FUNCTION(
                            ConstMapMatrix_t L(&ty[0], n, n);
                            ConstMapMatrix_t W(&py[0], n, n);
                            MapMatrix_t      S(&px[0], n, n);
-                           for (int j = n-1; j>=0; j--) {
-                             _21(S) = ( _21(W) - _22(S) * _21(L) ) * _11(L).inverse();
-                             _12(S) =                                _21(S).transpose();
-                             _11(S) = ( _11(W) - _12(S) * _21(L) ) * _11(L).inverse();
-                           }
+                           S = tril_sol(L, W, TMB_BLK);
                            S.diagonal() *= Type(.5);
                            S. template triangularView<Eigen::StrictlyUpper>().setZero();
                            )
-#undef _11
-#undef _21
-#undef _12
-#undef _22
 
 /* ================================== INTERFACES
 */
