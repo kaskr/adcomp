@@ -584,7 +584,8 @@ TMB_ATOMIC_VECTOR_FUNCTION(
                              _12(S) =                                _21(S).transpose();
                              _11(S) = ( _11(W) - _12(S) * _21(L) ) * _11(L).inverse();
                            }
-                           S.diagonal() /= Type(.5);
+                           S.diagonal() *= Type(.5);
+                           S. template triangularView<Eigen::StrictlyUpper>().setZero();
                            )
 #undef _11
 #undef _21
