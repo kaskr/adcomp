@@ -46,7 +46,9 @@ struct array:Map< Array<Type,Dynamic,1> >{
   void initZeroArray(vector<int> dim_){
     vectorcopy.resize(dim_.prod());
     vectorcopy.setZero();
-    new (this) MapBase(&vectorcopy[0],vectorcopy.size()); /* Eigen manual: Despite appearances, this does not invoke the memory allocator... */
+    if (vectorcopy.size() > 0) {
+      new (this) MapBase(&vectorcopy[0],vectorcopy.size()); /* Eigen manual: Despite appearances, this does not invoke the memory allocator... */
+    }
     setdim(dim_);
   }
 

@@ -163,5 +163,10 @@ Type objective_function<Type>::operator() ()
   a2_exp = exp(a2);
   REPORT(a2_exp);
 
+  // Assignment from empty array (used to crash)
+  DATA_ARRAY(a0);
+  array<Type> a_cpy;
+  a_cpy = a0;
+
   return 0;
 }
