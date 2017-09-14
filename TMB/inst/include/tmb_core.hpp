@@ -1559,6 +1559,38 @@ extern "C"
   }
 }
 
+extern "C"
+{
+  void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y) {
+    SEXP tag=R_ExternalPtrTag(f);
+    if(!strcmp(CHAR(tag), "ADFun")) {
+      ADFun<double>* pf;
+      pf = (ADFun<double>*) R_ExternalPtrAddr(f);
+      y = pf->Forward(0, x);
+    } else
+      if(!strcmp(CHAR(tag), "parallelADFun")) {
+        parallelADFun<double>* pf;
+        pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+        y = pf->Forward(0, x);
+      } else
+        Rf_error("Unknown function pointer");
+  }
+  void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
+    SEXP tag=R_ExternalPtrTag(f);
+    if(!strcmp(CHAR(tag), "ADFun")) {
+      ADFun<double>* pf;
+      pf = (ADFun<double>*) R_ExternalPtrAddr(f);
+      y = pf->Reverse(1, v);
+    } else
+      if(!strcmp(CHAR(tag), "parallelADFun")) {
+        parallelADFun<double>* pf;
+        pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+        y = pf->Reverse(1, v);
+      } else
+        Rf_error("Unknown function pointer");
+  }
+}
+
 #endif /* #ifndef WITH_LIBTMB */
 
 
@@ -1580,6 +1612,8 @@ extern "C"
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip);
   SEXP usingAtomics();
+  void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y);
+  void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y);
 }
 
 #endif /* #ifdef WITH_LIBTMB */
@@ -1588,6 +1622,9 @@ extern "C"
    relevant to avoid symbol lookup overhead for those routines that
    are called many times e.g. EvalADFunObject. */
 extern "C"{
+  /* Some string utilities */
+#define xstringify(s) stringify(s)
+#define stringify(s) #s
   /* May be used as part of custom calldef tables */
 #define TMB_CALLDEFS                                            \
   {"MakeADFunObject",     (DL_FUNC) &MakeADFunObject,     4},   \
@@ -1600,6 +1637,11 @@ extern "C"{
   {"MakeADHessObject2",   (DL_FUNC) &MakeADHessObject2,   4},   \
   {"usingAtomics",        (DL_FUNC) &usingAtomics,        0},   \
   {"TMBconfig",           (DL_FUNC) &TMBconfig,           2}
+  /* May be used as part of custom R_init function
+     C-callable routines (PACKAGE is 'const char*') */
+#define TMB_CCALLABLES(PACKAGE)                                         \
+  R_RegisterCCallable(PACKAGE, "tmb_forward", (DL_FUNC) &tmb_forward);  \
+  R_RegisterCCallable(PACKAGE, "tmb_reverse", (DL_FUNC) &tmb_reverse);
   /* Default (optional) calldef table. */
 #ifdef TMB_LIB_INIT
 #include <R_ext/Rdynload.h>
@@ -1612,11 +1654,7 @@ static R_CallMethodDef CallEntries[] = {
      external pointers without restarting R. Should not be used by TMB
      dependent packages. */
 #ifdef LIB_UNLOAD
-#define xstringify(s) stringify(s)
-#define stringify(s) #s
   {xstringify(LIB_UNLOAD), (DL_FUNC) &LIB_UNLOAD, 1},
-#undef xstringify
-#undef stringify
 #endif
   /* End of table */
   {NULL, NULL, 0}
@@ -1624,6 +1662,10 @@ static R_CallMethodDef CallEntries[] = {
 void TMB_LIB_INIT(DllInfo *dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, (Rboolean)FALSE);
+  // Example: TMB_LIB_INIT = R_init_mypkg
+  TMB_CCALLABLES(&(xstringify(TMB_LIB_INIT)[7]));
 }
-#endif /* #ifdef  */
+#endif /* #ifdef TMB_LIB_INIT */
+#undef xstringify
+#undef stringify
 }
