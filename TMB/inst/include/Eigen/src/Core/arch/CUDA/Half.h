@@ -119,12 +119,14 @@ struct half : public half_impl::half_base {
   EIGEN_DEVICE_FUNC EIGEN_EXPLICIT_CAST(unsigned long) const {
     return static_cast<unsigned long>(half_impl::half_to_float(*this));
   }
+#if EIGEN_HAS_CXX11
   EIGEN_DEVICE_FUNC EIGEN_EXPLICIT_CAST(long long) const {
     return static_cast<long long>(half_impl::half_to_float(*this));
   }
   EIGEN_DEVICE_FUNC EIGEN_EXPLICIT_CAST(unsigned long long) const {
     return static_cast<unsigned long long>(half_to_float(*this));
   }
+#endif
   EIGEN_DEVICE_FUNC EIGEN_EXPLICIT_CAST(float) const {
     return half_impl::half_to_float(*this);
   }
