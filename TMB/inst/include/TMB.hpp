@@ -53,6 +53,9 @@ void eigen_REprintf(const char* x);
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+/* Workaround side effect when -DEIGEN_USE_LAPACKE is set */
+#undef I
+
 /* Include the CppAD library. (Always turn off debug for cppad) */
 #undef NDEBUG
 #define NDEBUG 1
