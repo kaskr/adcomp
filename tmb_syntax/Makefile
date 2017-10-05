@@ -31,7 +31,7 @@ glmmTMB:
 	Rscript -e 'TMB:::compile("glmmTMB.cpp",libinit=FALSE)'
 spict:
 	wget http://rawgit.com/mawp/spict/master/spict/src/spict.cpp
-	Rscript -e 'TMB:::compile("spict.cpp")'
+	Rscript -e 'TMB:::compile("spict.cpp",CXX="g++")'
 
 test:
 	make test_protect
