@@ -363,6 +363,13 @@ public:
 			data_ = thread_alloc::create_array<Type>(length_, capacity_); 
 		}
 	}
+        /// constructor from allocated data
+        inline vector(Type* p,
+                /// number of elements in this vector
+                size_t n
+        ) : capacity_(0), length_(n), data_(p)
+        {
+        }
 	/// copy constructor
 	inline vector(
 		/// the *this vector will be a copy of \c x

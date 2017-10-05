@@ -793,8 +793,9 @@ void forward0sweep(
 			if( user_j == user_n )
 			{	// call users function for this operation
 				user_atom->set_id(user_id);
+                                vector<Base> user_ty2(&taylor[i_var+1], user_m);
 				CPPAD_ATOMIC_CALL(p, q, 
-					user_vx, user_vy, user_tx, user_ty
+					user_vx, user_vy, user_tx, user_ty2
 				);
 				user_state = user_ret;
 			}
@@ -809,8 +810,9 @@ void forward0sweep(
 			if( user_j == user_n )
 			{	// call users function for this operation
 				user_atom->set_id(user_id);
+                                vector<Base> user_ty2(&taylor[i_var+1], user_m);
 				CPPAD_ATOMIC_CALL(p, q, 
-					user_vx, user_vy, user_tx, user_ty
+					user_vx, user_vy, user_tx, user_ty2
 				);
 				user_state = user_ret;
 			}
@@ -835,8 +837,6 @@ void forward0sweep(
 # if CPPAD_FORWARD0SWEEP_TRACE
 			user_iy[user_i] = i_var;
 # endif
-                        for (size_t i = 0; i<user_m; i++)
-                          taylor[ i_var + i ] = user_ty[i];
                         play->fast_forward_next(op, arg, i_op, i_var, user_m);
                         user_i = user_m;
 			if( user_i == user_m )
