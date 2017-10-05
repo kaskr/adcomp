@@ -385,6 +385,22 @@ public:
 		);
 		CPPAD_ASSERT_UNKNOWN( var_index_  < num_var_rec_ );
 	}
+  /* Take n 'forward_next' steps for identical operators */
+  void fast_forward_next(OpCode& op, const addr_t*& op_arg, size_t& op_index, size_t& var_index, int n)
+  {
+    using CppAD::NumRes;
+    using CppAD::NumArg;
+    // index for the next operator
+    op_index_ += (n-1);
+    op_index  =  op_index_ ;
+    // first argument for next operator
+    op_arg_    += (n-1) * NumArg(op_);
+    op_arg      = op_arg_;
+    // index for last result for next operator
+    var_index_ += (n-1) * NumRes(op);
+    var_index   = var_index_;
+  }
+
 	/*!
 	Correct \c forward_next return values when <tt>op == CSumOp</tt>.
 

@@ -835,7 +835,10 @@ void forward0sweep(
 # if CPPAD_FORWARD0SWEEP_TRACE
 			user_iy[user_i] = i_var;
 # endif
-			taylor[ i_var * J + 0 ] = user_ty[user_i++];
+                        for (size_t i = 0; i<user_m; i++)
+                          taylor[ i_var + i ] = user_ty[i];
+                        play->fast_forward_next(op, arg, i_op, i_var, user_m);
+                        user_i = user_m;
 			if( user_i == user_m )
 				user_state = user_end;
 			break;
