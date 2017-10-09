@@ -149,8 +149,6 @@ oneStepPredict <- function(obj,
         stop("'observation.name' must define a data component")
     if (!(observation.name %in% names(obj$env$data)))
         stop("'observation.name' must be in data component")
-    if (is.null(obj$env$random))
-        stop("oneStepPredict is only for random effect models")
     method <- match.arg(method)
     if (is.null(data.term.indicator)){
         if(method != "fullGaussian"){
@@ -192,7 +190,10 @@ oneStepPredict <- function(obj,
     ## Args to construct copy of 'obj'
     args <- as.list(obj$env)[intersect(names(formals(MakeADFun)), ls(obj$env))]
     ## Use the best encountered parameter for new object
-    args$parameters <- obj$env$parList(par = obj$env$last.par.best)
+    if(length(obj$env$random))
+        args$parameters <- obj$env$parList(par = obj$env$last.par.best)
+    else
+        args$parameters <- obj$env$parList(obj$env$last.par.best)
     ## Fix all non-random components of parameter list
     names.random <- unique(names(obj$env$par[obj$env$random]))
     names.all <- names(args$parameters)
