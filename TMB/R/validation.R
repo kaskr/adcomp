@@ -535,7 +535,8 @@ oneSamplePosterior <- function(obj,
                                data.term.indicator = NULL,
                                standardize = TRUE,
                                as.list = TRUE,
-                               perm = FALSE){
+                               perm = FALSE,
+                               fullGaussian = FALSE){
     ## Draw Gaussian posterior sample
     tmp <- obj$env$MC(n=1, keep=TRUE, antithetic=FALSE)
     samp <- as.vector( attr(tmp, "samples") )
@@ -547,7 +548,8 @@ oneSamplePosterior <- function(obj,
         ## Use the best encountered parameter for new object
         args$parameters <- obj$env$parList(par = obj$env$last.par.best)
         ## Make data.term.indicator in parameter list
-        nobs <- length(obj$env$data[[observation.name]])
+        obs <- obj$env$data[[observation.name]]
+        nobs <- length(obs)
         zero <- rep(0, nobs)
         args$parameters[[data.term.indicator]] <- zero
         ## Fix all non-random components of parameter list
@@ -556,6 +558,13 @@ oneSamplePosterior <- function(obj,
         fix <- setdiff(names.all, names.random)
         map <- lapply(args$parameters[fix], function(x)factor(x*NA))
         args$map <- map ## Overwrite map
+        ## If 'fullGaussian == TRUE' turn 'obs' into a random effect
+        if (fullGaussian) {
+            names.random <- c(names.random, observation.name)
+            args$parameters[[observation.name]] <- obs
+            one <- rep(1, nobs)
+            args$parameters[[data.term.indicator]] <- one
+        }
         ## Find randomeffects character
         args$random <- names.random
         args$regexp <- FALSE
@@ -573,6 +582,13 @@ oneSamplePosterior <- function(obj,
             Q <- newobj$env$spHess(mu, random=TRUE)
             L <- Matrix::Cholesky(Q, super=TRUE, perm=FALSE)
         }
+        ## If 'fullGaussian == TRUE' add 'obs' to the sample
+        if (fullGaussian) {
+            tmp <- newobj$env$par * NA
+            tmp[names(tmp) == observation.name] <- obs
+            tmp[names(tmp) != observation.name] <- samp
+            samp <- tmp
+        }
         ## Standardize ( P * Q * P^T = L * L^T )
         r <- samp - mu
         rp <- r[L@perm + 1]
@@ -581,7 +597,8 @@ oneSamplePosterior <- function(obj,
         )
         resid <- as.vector( Lt %*% rp )
     }
-    if(as.list){
+    if (as.list) {
+        if (standardize) obj <- newobj
         par <- obj$env$last.par.best
         asList <- function(samp) {
             par[obj$env$random] <- samp
