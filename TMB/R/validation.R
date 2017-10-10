@@ -528,3 +528,73 @@ oneStepPredict <- function(obj,
 
     pred
 }
+
+oneSamplePosterior <- function(obj,
+                               ## Names of data objects (not all are optional)
+                               observation.name = NULL,
+                               data.term.indicator = NULL,
+                               standardize = TRUE,
+                               as.list = TRUE){
+    ## Draw Gaussian posterior sample
+    tmp <- obj$env$MC(n=1, keep=TRUE, antithetic=FALSE)
+    samp <- as.vector( attr(tmp, "samples") )
+    ## If standardize
+    resid <- NULL
+    if (standardize) {
+        ## Args to construct copy of 'obj'
+        args <- as.list(obj$env)[intersect(names(formals(MakeADFun)), ls(obj$env))]
+        ## Use the best encountered parameter for new object
+        args$parameters <- obj$env$parList(par = obj$env$last.par.best)
+        ## Make data.term.indicator in parameter list
+        nobs <- length(obj$env$data[[observation.name]])
+        zero <- rep(0, length(obs))
+        args$parameters[[data.term.indicator]] <- zero
+        ## Fix all non-random components of parameter list
+        names.random <- unique(names(obj$env$par[obj$env$random]))
+        names.all <- names(args$parameters)
+        fix <- setdiff(names.all, names.random)
+        map <- lapply(args$parameters[fix], function(x)factor(x*NA))
+        args$map <- map ## Overwrite map
+        ## Find randomeffects character
+        args$random <- names.random
+        args$regexp <- FALSE
+        ## New object be silent
+        args$silent <- TRUE
+        ## Create new object
+        newobj <- do.call("MakeADFun", args)
+        ## Construct Hessian and Cholesky
+        newobj$fn()
+        ## Get Cholesky and prior mean
+        L <- newobj$env$L.created.by.newton
+        mu <- newobj$env$last.par
+        ## Standardize ( P * Q * P^T = L * L^T )
+        r <- samp - mu
+        rp <- r[L@perm + 1]
+        Lt <- Matrix::t(
+            as(L, "sparseMatrix")
+        )
+        resid <- as.vector( Lt %*% rp )
+    }
+    if(as.list){
+        par <- obj$env$last.par.best
+        asList <- function(samp) {
+            par[obj$env$random] <- samp
+            samp <- obj$env$parList(par=par)
+            nm <- unique(names(obj$env$par[obj$env$random]))
+            samp[nm]
+        }
+        samp <- asList(samp)
+        if (!is.null(resid))
+            resid <- asList(resid)
+    }
+    ans <- list()
+    ans$sample <- samp
+    ans$residual <- resid
+    ans
+}
+
+if(FALSE) {
+    library(TMB)
+    runExample("MVRandomWalkValidation", exfolder="../../tmb_examples/validation")
+    qw <- oneSamplePosterior(obj, "obs", "keep")
+}
