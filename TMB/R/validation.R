@@ -534,7 +534,8 @@ oneSamplePosterior <- function(obj,
                                observation.name = NULL,
                                data.term.indicator = NULL,
                                standardize = TRUE,
-                               as.list = TRUE){
+                               as.list = TRUE,
+                               perm = FALSE){
     ## Draw Gaussian posterior sample
     tmp <- obj$env$MC(n=1, keep=TRUE, antithetic=FALSE)
     samp <- as.vector( attr(tmp, "samples") )
@@ -567,6 +568,11 @@ oneSamplePosterior <- function(obj,
         ## Get Cholesky and prior mean
         L <- newobj$env$L.created.by.newton
         mu <- newobj$env$last.par
+        ## If perm == FALSE redo Cholesky with natural ordering
+        if ( ! perm ) {
+            Q <- newobj$env$spHess(mu, random=TRUE)
+            L <- Matrix::Cholesky(Q, super=TRUE, perm=FALSE)
+        }
         ## Standardize ( P * Q * P^T = L * L^T )
         r <- samp - mu
         rp <- r[L@perm + 1]
@@ -596,7 +602,15 @@ oneSamplePosterior <- function(obj,
 if(FALSE) {
     library(TMB)
     runExample("MVRandomWalkValidation", exfolder="../../tmb_examples/validation")
-    qw <- oneSamplePosterior(obj, "obs", "keep")
+    set.seed(1)
+    system.time( qw <- TMB:::oneSamplePosterior(obj, "obs", "keep") )
+    qqnorm(as.vector(qw$residual$u)); abline(0,1)
     runExample("rickervalidation", exfolder="../../tmb_examples/validation")
-    qw <- oneSamplePosterior(obj, "Y", "keep")
+    set.seed(1)
+    system.time( qw <- TMB:::oneSamplePosterior(obj, "Y", "keep") )
+    qqnorm(as.vector(qw$residual$X)); abline(0,1)
+    runExample("ar1xar1")
+    set.seed(1)
+    system.time( qw <- TMB:::oneSamplePosterior(obj, "N", "keep") )
+    qqnorm(as.vector(qw$residual$eta)); abline(0,1)
 }
