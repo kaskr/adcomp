@@ -547,7 +547,7 @@ oneSamplePosterior <- function(obj,
         args$parameters <- obj$env$parList(par = obj$env$last.par.best)
         ## Make data.term.indicator in parameter list
         nobs <- length(obj$env$data[[observation.name]])
-        zero <- rep(0, length(obs))
+        zero <- rep(0, nobs)
         args$parameters[[data.term.indicator]] <- zero
         ## Fix all non-random components of parameter list
         names.random <- unique(names(obj$env$par[obj$env$random]))
@@ -597,4 +597,6 @@ if(FALSE) {
     library(TMB)
     runExample("MVRandomWalkValidation", exfolder="../../tmb_examples/validation")
     qw <- oneSamplePosterior(obj, "obs", "keep")
+    runExample("rickervalidation", exfolder="../../tmb_examples/validation")
+    qw <- oneSamplePosterior(obj, "Y", "keep")
 }
