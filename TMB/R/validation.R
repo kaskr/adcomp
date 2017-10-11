@@ -551,7 +551,8 @@ oneSamplePosterior <- function(obj,
         obs <- obj$env$data[[observation.name]]
         nobs <- length(obs)
         zero <- rep(0, nobs)
-        args$parameters[[data.term.indicator]] <- zero
+        if ( ! fullGaussian )
+            args$parameters[[data.term.indicator]] <- zero
         ## Fix all non-random components of parameter list
         names.random <- unique(names(obj$env$par[obj$env$random]))
         names.all <- names(args$parameters)
@@ -562,8 +563,6 @@ oneSamplePosterior <- function(obj,
         if (fullGaussian) {
             names.random <- c(names.random, observation.name)
             args$parameters[[observation.name]] <- obs
-            one <- rep(1, nobs)
-            args$parameters[[data.term.indicator]] <- one
         }
         ## Find randomeffects character
         args$random <- names.random
