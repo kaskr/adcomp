@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      http://www.hafro.is/~arnima/tmb.html
 
-(defconst tmb-mode-version "3.2" "TMB Mode version number.")
+(defconst tmb-mode-version "3.3" "TMB Mode version number.")
 
 ;; This file is not part of GNU Emacs.
 
@@ -94,6 +94,7 @@
 
 ;;; History:
 ;;
+;; 14 Oct 2017  3.3  Tweaks by KK.
 ;; 16 Nov 2016  3.2  Added user variable `tmb-block-face'. Added keywords
 ;;                   "DATA_STRING", "SIMULATE", "PARALLEL_REGION", "rnorm",
 ;;                   "rpois", "rnbinom", "rnbinom2", "rgamma", and "simulate".
@@ -149,7 +150,7 @@
 
 (defcustom tmb-compile-args
   ;; Platform-specific: -O1 in Windows, -O0 otherwise
-  (concat ",'-O" (if (tmb-windows-os-p) "1" "0") " -Wall'")
+  (concat ",'-g -O" (if (tmb-windows-os-p) "1" "0") " -Wall'")
   "Arguments for compile() function in `tmb-compile'  and `tmb-template-mini'."
   :tag "Compile args" :type 'string)
 (defcustom tmb-compile-command "R --quiet --vanilla"
@@ -423,8 +424,8 @@ Type objective_function<Type>::operator() ()
   PARAMETER(mu);
   PARAMETER(logSigma);
 
-  Type f;
-  f = -sum(dnorm(x, mu, exp(logSigma), true));
+  Type f = 0;
+  f -= dnorm(x, mu, exp(logSigma), true).sum();
 
   return f;
 }
@@ -433,20 +434,25 @@ Type objective_function<Type>::operator() ()
     (save-selected-window
       (tmb-split-window)(find-file-other-window model-r)
       (delete-region (point-min)(point-max))(insert "\
+library(TMB)
+
+## Compile and load the model
+compile(\"" model-cpp "\")
+dyn.load(dynlib(\"" model "\"))
+
+## Data and parameters
 data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
-require(TMB)
-compile('" model-cpp "'" tmb-compile-args ")
-dyn.load(dynlib('" model "'))
+## Make a function object
+obj <- MakeADFun(data, parameters, DLL=\"" model "\")
 
-################################################################################
+## Call function minimizer
+fit <- nlminb(obj$par, obj$fn, obj$gr)
 
-model <- MakeADFun(data, parameters)
-fit <- nlminb(model$par, model$fn, model$gr)
-rep <- sdreport(model)
-
-print(rep)
+## Get parameter uncertainties and convergence diagnostics
+sdr <- sdreport(obj)
+sdr
 ")
       (goto-char (point-min))(write-file model-r t)))
   (message (concat "Ready to compile R script ("
