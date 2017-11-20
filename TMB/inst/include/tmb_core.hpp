@@ -1476,20 +1476,18 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
   if(!Rf_isNewList(data))Rf_error("'data' must be a list");
   if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
   if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
-  
+
   /* Prepare stuff */
   objective_function< AD<AD<AD<double> > > > F(data,parameters,report);
   F.set_parallel_region(parallel_region);
   int n = F.theta.size();
   vector<bool> keepcol(n); // Scatter for fast lookup 
-  for(int i=0; i<n; i++){
-    keepcol[i]=true;
+  for(int i = 0; i < n; i++) {
+    keepcol[i] = true;
   }
-  for(int i=0; i<LENGTH(skip); i++){
-    keepcol[INTEGER(skip)[i]-1]=false; // skip is R-index !
+  for(int i = 0; i < LENGTH(skip); i++) {
+    keepcol[INTEGER(skip)[i]-1] = false; // skip is R-index !
   }
-#define KEEP_COL(col) (keepcol[col])
-#define KEEP_ROW(row,col) ( KEEP_COL(row) & (row>=col) )
 
   /* Tape 1: Function R^n -> R */
   Independent(F.theta);
@@ -1499,53 +1497,76 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
 
   /* Tape 2: Gradient R^n -> R^n   (and optimize) */
   vector<AD<AD<double> > > xx(n);
-  for(int i=0; i<n; i++) xx[i] = CppAD::Value(F.theta[i]);
+  for(int i = 0; i < n; i++)
+    xx[i] = CppAD::Value( F.theta[i] );
   vector<AD<AD<double> > > yy(n);
   Independent(xx);
   yy = tape1.Jacobian(xx);
-  ADFun<AD<double > > tape2(xx,yy);
+  ADFun<AD<double > > tape2(xx, yy);
   if (config.optimize.instantly) tape2.optimize();
 
   /* Tape 3: Hessian  R^n -> R^m   (optimize later) */
-  tape2.my_init(keepcol);
-  int colisize;
-  int m=0; // Count number of non-zeros (m)
-  for(int i=0; i<int(tape2.colpattern.size()); i++){
-    colisize = tape2.colpattern[i].size();
-    if(KEEP_COL(i)){
-      for(int j=0; j<colisize; j++){
-	m += KEEP_ROW( tape2.colpattern[i][j] , i);
-      }
+  typedef vector<int> SizeVector;
+  typedef CppAD::sparse_rc<SizeVector> sparsity;
+  bool transpose = false;
+  sparsity pattern_out;
+  // Get sparsity pattern
+  tape2.subgraph_sparsity(keepcol,
+                          keepcol,
+                          transpose,
+                          pattern_out);
+  // Get nnz of lower triangle
+  const SizeVector& row( pattern_out.row() );
+  const SizeVector& col( pattern_out.col() );
+  SizeVector col_major = pattern_out.col_major();
+  size_t nnz = pattern_out.nnz();
+  size_t ndiag = 0;
+  for (size_t i = 0; i < nnz; i++) {
+    ndiag += ( row[i] == col[i] ? 1 : 0 );
+  }
+  size_t nnz_lower = (nnz - ndiag) / 2 + ndiag; // Count nnz in lower triangle
+  if ( nnz_lower + nnz_lower - ndiag != nnz )
+    Rf_error("nnz_lower + nnz_lower - ndiag != nnz");
+  // Allocate index vector pairs of lower triangle
+  vector<int> rowindex(nnz_lower);
+  vector<int> colindex(nnz_lower);
+  // Get lower triangle
+  int k = 0;
+  for (size_t i = 0; i < nnz; i++) {
+    int r = row[ col_major[i] ];
+    int c = col[ col_major[i] ];
+    if ( c <= r ) {
+      colindex[k] = c;
+      rowindex[k] = r;
+      k++;
     }
   }
-  // Allocate index vectors of non-zero pairs
-  vector<int> rowindex(m);
-  vector<int> colindex(m);
   // Prepare reverse sweep for Hessian columns
   vector<AD<double> > u(n);
-  vector<AD<double> > v(n);
-  for(int i = 0; i < n; i++) v[i] = 0.0;
   vector<AD<double> > xxx(n);
-  for(int i=0; i<n; i++) xxx[i]=CppAD::Value(CppAD::Value(F.theta[i]));
-  vector<AD<double> > yyy(m);
-  CppAD::vector<int>* icol;
-  // Do sweeps and fill in non-zero index pairs
+  for(int i = 0; i < n; i++)
+    xxx[i] = CppAD::Value( CppAD::Value( F.theta[i] ) );
+  vector<AD<double> > yyy(nnz_lower);
+  // Do sweeps
   Independent(xxx);
   tape2.Forward(0, xxx);
-  int k=0;
-  for(int i = 0; i < n; i++){
-    if (KEEP_COL(i)) {
-      tape2.myReverse(1, v, i /*range comp*/, u /*domain*/);
-      icol = &tape2.colpattern[i];
-      for(int j=0; j<int(icol->size()); j++){
-	if(KEEP_ROW( icol->operator[](j), i )){
-	  rowindex[k] = icol->operator[](j);
-	  colindex[k] = i;
-	  yyy[k] = u[icol->operator[](j)];
-	  k++;
-	}
-      }
+  k = 0;
+  int c_previous = -1;
+  SizeVector dummy_col(0);
+  tape2.subgraph_reverse(keepcol);
+  for(size_t i = 0; i < nnz_lower; i++) {
+    int r = rowindex[i];
+    int c = colindex[i];
+    // New column ?
+    if (c != c_previous) {
+      tape2.subgraph_reverse(1,          // order
+                             c,          // range component
+                             dummy_col,  // valid columns (not used)
+                             u);         // domain vector
     }
+    yyy[k] = u[r];
+    k++;
+    c_previous = c;
   }
   ADFun< double >* ptape3 = new ADFun< double >;
   ptape3->Dependent(xxx,yyy);
