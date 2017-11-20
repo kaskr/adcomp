@@ -997,7 +997,8 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   if((order!=0) & (order!=1) & (order!=2) & (order!=3))
     Rf_error("order can be 0, 1, 2 or 3");
   int sparsitypattern=INTEGER(getListElement(control,"sparsitypattern"))[0];
-  int dumpstack=INTEGER(getListElement(control,"dumpstack"))[0];
+  // FIXME: Disable for now
+  // int dumpstack=INTEGER(getListElement(control,"dumpstack"))[0];
   SEXP hessiancols; // Hessian columns
   PROTECT(hessiancols=getListElement(control,"hessiancols"));
   int ncols=Rf_length(hessiancols);
@@ -1033,9 +1034,11 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     PROTECT(res=asSEXP(asMatrix(pf->Reverse(3,w),n,3)));
   }
   if(order==0){
-    if(dumpstack)CppAD::traceforward0sweep(1);
+    // FIXME: Disable for now
+    // if(dumpstack)CppAD::traceforward0sweep(1);
     PROTECT(res=asSEXP(pf->Forward(0,x)));
-    if(dumpstack)CppAD::traceforward0sweep(0);
+    // FIXME: Disable for now
+    // if(dumpstack)CppAD::traceforward0sweep(0);
     SEXP rangenames=Rf_getAttrib(f,Rf_install("range.names"));
     if(LENGTH(res)==LENGTH(rangenames)){
       Rf_setAttrib(res,R_NamesSymbol,rangenames);
