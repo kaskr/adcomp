@@ -24,7 +24,7 @@ checkMatrixPackageVersion <- function() {
             cur.Matrix.version,
             "\n",
             "Please re-install 'TMB' from source ",
-            "or restore original 'Matrix' package"
+            "or ask CRAN for a binary version of 'TMB' matching CRAN's 'Matrix' package"
         )
     }
 }
