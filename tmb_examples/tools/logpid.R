@@ -16,4 +16,5 @@ logpid PID >> FILE &\n"
 }
 logpid()
 example <- Sys.getenv("example")
-source(paste0(example,".R"))
+setwd(dirname(example))
+source(paste0(basename(example), ".R"))

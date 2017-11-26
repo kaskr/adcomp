@@ -5,6 +5,7 @@ all_examples = $(filter $(rfiles), $(cppfiles))
 examples = $(filter-out $(excludes), $(all_examples))
 outputfiles = $(examples:=.output.RData)
 profiletargets = $(examples:=.profile)
+logpidtargets = $(examples:=.logpid)
 
 %.output.RData : %.R %.cpp
 	unset MAKEFLAGS; example=$(basename $<) R --slave < tools/unittest.R
@@ -32,6 +33,8 @@ clean :
 	example=$(basename $<) R --slave < tools/logpid.R
 
 profile_all: $(outputfiles) $(profiletargets)
+
+logpid_all: $(outputfiles) $(logpidtargets)
 
 ##########################################################
 ## For travis tests
