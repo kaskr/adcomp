@@ -148,6 +148,7 @@ if(example!=""){
   abs.tol["nlminb.par"] <- 1e-05
   abs.tol["optim.par"] <- 1e-06
   abs.tol["optim.value"] <- 1e-07
+  abs.tol["optim.hessian"] <- 1.5e-06
   abs.tol["sdreport.cov.fixed"] <- 1e-04
   abs.tol["sdreport.diag.cov.random"] <- 1e-07
   abs.tol["sdreport.gradient.fixed"] <- 2e-04
