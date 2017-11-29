@@ -1507,69 +1507,43 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
 
   /* Tape 3: Hessian  R^n -> R^m   (optimize later) */
   typedef vector<int> SizeVector;
-  typedef CppAD::sparse_rc<SizeVector> sparsity;
-  bool transpose = false;
-  sparsity pattern_out;
-  // Get sparsity pattern
-  tape2.subgraph_sparsity(keepcol,
-                          keepcol,
-                          transpose,
-                          pattern_out);
-  // Get nnz of lower triangle
-  const SizeVector& row( pattern_out.row() );
-  const SizeVector& col( pattern_out.col() );
-  SizeVector col_major = pattern_out.col_major();
-  size_t nnz = pattern_out.nnz();
-  size_t ndiag = 0;
-  for (size_t i = 0; i < nnz; i++) {
-    ndiag += ( row[i] == col[i] ? 1 : 0 );
-  }
-  size_t nnz_lower = (nnz - ndiag) / 2 + ndiag; // Count nnz in lower triangle
-  if ( nnz_lower + nnz_lower - ndiag != nnz )
-    Rf_error("nnz_lower + nnz_lower - ndiag != nnz");
-  // Allocate index vector pairs of lower triangle
-  vector<int> rowindex(nnz_lower);
-  vector<int> colindex(nnz_lower);
-  // Get lower triangle
-  int k = 0;
-  for (size_t i = 0; i < nnz; i++) {
-    int r = row[ col_major[i] ];
-    int c = col[ col_major[i] ];
-    if ( c <= r ) {
-      colindex[k] = c;
-      rowindex[k] = r;
-      k++;
-    }
-  }
+  vector<int> rowindex(0);
+  vector<int> colindex(0);
   // Prepare reverse sweep for Hessian columns
   vector<AD<double> > u(n);
   vector<AD<double> > xxx(n);
   for(int i = 0; i < n; i++)
     xxx[i] = CppAD::Value( CppAD::Value( F.theta[i] ) );
-  vector<AD<double> > yyy(nnz_lower);
+  vector<AD<double> > yyy(0);
   // Do sweeps
   Independent(xxx);
   tape2.Forward(0, xxx);
-  k = 0;
-  int c_previous = -1;
-  SizeVector dummy_col(0);
+  SizeVector col_pattern(0);
+  // Mark domain dependencies and initialize
   tape2.subgraph_reverse(keepcol);
-  for(size_t i = 0; i < nnz_lower; i++) {
-    int r = rowindex[i];
-    int c = colindex[i];
-    // New column ?
-    if (c != c_previous) {
-      tape2.subgraph_reverse(1,          // order
-                             c,          // range component
-                             dummy_col,  // valid columns (not used)
-                             u);         // domain vector
+  for(int c = 0; c < n; c++) {
+    // Skip this column if not a random effect
+    if( ! keepcol[c] ) continue;
+    // Do reverse sub sweep
+    tape2.subgraph_reverse(1,           // order
+                           c,           // range component
+                           col_pattern, // valid columns (not used)
+                           u);          // domain vector
+    // Append value and integer pairs
+    for (int i=0; i < col_pattern.size(); i++) {
+      int r = col_pattern[i];
+      // Skip if upper triangle entry
+      if (r < c) continue;
+      yyy.conservativeResize(yyy.size() + 1);
+      rowindex.conservativeResize(rowindex.size() + 1);
+      colindex.conservativeResize(colindex.size() + 1);
+      yyy[ yyy.size() - 1 ] = u[r];
+      rowindex[ rowindex.size() - 1 ] = r;
+      colindex[ colindex.size() - 1 ] = c;
     }
-    yyy[k] = u[r];
-    k++;
-    c_previous = c;
   }
   ADFun< double >* ptape3 = new ADFun< double >;
-  ptape3->Dependent(xxx,yyy);
+  ptape3->Dependent(xxx, yyy);
   sphess ans(ptape3, rowindex, colindex);
   return ans;
 } // MakeADHessObject2
