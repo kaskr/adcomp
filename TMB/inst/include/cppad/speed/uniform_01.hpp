@@ -1,13 +1,12 @@
-/* $Id$ */
-# ifndef CPPAD_UNIFORM_01_INCLUDED
-# define CPPAD_UNIFORM_01_INCLUDED 
+# ifndef CPPAD_SPEED_UNIFORM_01_HPP
+# define CPPAD_SPEED_UNIFORM_01_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-12 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
-                    GNU General Public License Version 3.
+the terms of the
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
@@ -16,16 +15,14 @@ Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 $begin uniform_01$$
 $spell
 	CppAD
-	cppad.hpp
 	namespace
+	cppad
+	hpp
 $$
 
-$section Simulate a [0,1] Uniform Random Variate$$ 
+$section Simulate a [0,1] Uniform Random Variate$$
+$mindex uniform_01$$
 
-$index uniform_01$$
-$index random, uniform vector$$
-$index uniform, random vector$$
-$index vector, uniform random$$
 
 $head Syntax$$
 $codei%# include <cppad/speed/uniform_01.hpp>
@@ -39,12 +36,9 @@ This routine is used to create random values for speed testing purposes.
 
 $head Inclusion$$
 The template function $code uniform_01$$ is defined in the $code CppAD$$
-namespace by including 
-the file $code cppad/speed/uniform_01.hpp$$ 
+namespace by including
+the file $code cppad/speed/uniform_01.hpp$$
 (relative to the CppAD distribution directory).
-It is only intended for example and testing purposes, 
-so it is not automatically included by
-$cref/cppad.hpp/cppad/$$.
 
 $head seed$$
 The argument $icode seed$$ has prototype
@@ -85,7 +79,7 @@ $children%
 %$$
 
 $head Source Code$$
-The file 
+The file
 $cref uniform_01.hpp$$
 constraints the source code for this template function.
 

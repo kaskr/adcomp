@@ -1,88 +1,72 @@
-// $Id:$
-# ifndef CPPAD_CONFIGURE_INCLUDED
-# define CPPAD_CONFIGURE_INCLUDED
+# ifndef CPPAD_CONFIGURE_HPP
+# define CPPAD_CONFIGURE_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the
-                    GNU General Public License Version 3.
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
-
-/*
-$begin configure$$
-$spell
-	CppAD
-$$
-
-$section Preprocessor Definitions Used by CppAD$$
-$index configure, symbol$$
-$index symbol, configure$$
-
-$head Preprocessor Symbols$$
-$index preprocessor, symbol$$
-$index symbol, processor$$
-All of the preprocessor symbols used by CppAD begin with
-$code CPPAD_$$
-(there are some deprecated symbols that begin with $code CppAD$$).
-
-$end
-*/
 
 /*!
  \file configure.hpp
 Replacement for config.h so that all preprocessor symbols begin with CPPAD_
 */
 
-# if __cplusplus >= 201100
 /*!
-\def CPPAD_HAS_RVALUE
-C++11: Does compiler cupport rvalues; i.e., values with move semantics
+\def CPPAD_COMPILER_IS_GNUCXX
+is the compiler a variant of g++
 */
-# define CPPAD_HAS_RVALUE 0
-# endif
+# define CPPAD_COMPILER_IS_GNUCXX 1
 
-# if __cplusplus >= 201100
 /*!
-def CPPAD_HAS_NULLPTR
-C++11: Does compiler support the null-pointer constant nullptr
-*/
-# define CPPAD_HAS_NULLPTR 0
-# endif
+\def CPPAD_DISABLE_SOME_MICROSOFT_COMPILER_WARNINGS
+This macro is only used to document the pragmas that disables the
+follow warnings:
 
-# if __cplusplus >= 201100
-/*!
-\def CPPAD_HAS_CSTDINT_8_TO_64
-C++11: Does compiler support the types uint_8, uint_16, uint_32, and uint_64
+\li C4100
+unreferenced formal parameter.
+\li C4127
+conditional expression is constant.
 */
-# define CPPAD_HAS_CSTDINT_8_TO_64 0
+# define CPPAD_DISABLE_SOME_MICROSOFT_COMPILER_WARNINGS 1
+# if _MSC_VER
+# pragma warning( disable : 4100 )
+# pragma warning( disable : 4127 )
 # endif
+# undef CPPAD_DISABLE_SOME_MICROSOFT_COMPILER_WARNINGS
 
-# if __cplusplus >= 201100
 /*!
-\def CPPAD_COMPILER_HAS_ERF
-C++11: Does compiler support std::erf(double)
+\def CPPAD_USE_CPLUSPLUS_2011
+Should CppAD use C++11 features. This will be true if the current
+compiler flags request C++11 features and the install procedure
+determined that all the necessary features are avaiable.
 */
-# define CPPAD_COMPILER_HAS_ERF 0
-# endif
-
-# if __cplusplus >= 201100
-/*!
-\def CPPAD_HAS_HIGH_RESOLUTION_CLOCK
-C++11: Does compiler support std::chrono::high_resolution_clock
-*/
-# define CPPAD_HAS_HIGH_RESOLUTION_CLOCK 0
-# endif
+# if     _MSC_VER
+# define    CPPAD_USE_CPLUSPLUS_2011 0
+# else   //
+# if         __cplusplus >= 201100
+# define         CPPAD_USE_CPLUSPLUS_2011 0
+# else       //
+# define         CPPAD_USE_CPLUSPLUS_2011 0
+# endif      //
+# endif //
 
 /*!
 \def CPPAD_PACKAGE_STRING
 cppad-yyyymmdd as a C string where yyyy is year, mm is month, and dd is day.
 */
-# define CPPAD_PACKAGE_STRING "cppad-20141230"
+# define CPPAD_PACKAGE_STRING "cppad-20171208"
+
+/*!
+def CPPAD_HAS_ADOLC
+Was a adolc_prefix specified on the cmake command line.
+*/
+# define CPPAD_HAS_ADOLC 0
 
 /*!
 def CPPAD_HAS_COLPACK
@@ -91,19 +75,22 @@ Was a colpack_prefix specified on the cmake command line.
 # define CPPAD_HAS_COLPACK 0
 
 /*!
-def CPPAD_INTERNAL_SPARSE_SET
-is the internal representation used for sparse vectors of std::set<size_t>
-either sparse_set or sparse_list).
+def CPPAD_HAS_EIGEN
+Was a eigen_prefix specified on the cmake command line.
 */
-# define CPPAD_INTERNAL_SPARSE_SET sparse_list
+# define CPPAD_HAS_EIGEN 1
 
 /*!
-\def CPPAD_IMPLICIT_CTOR_FROM_ANY_TYPE
-If this symbol is one, an implicit constor of AD<Base> is defined
-where the argument has any type.
-Otherwise this constructor is explicit.
+def CPPAD_HAS_IPOPT
+Was a ipopt_prefix specified on the cmake command line.
 */
-# define CPPAD_IMPLICIT_CTOR_FROM_ANY_TYPE 0
+# define CPPAD_HAS_IPOPT 0
+
+/*!
+\def CPPAD_DEPRECATED
+This symbol is not currently being used.
+*/
+# define CPPAD_DEPRECATED 0
 
 /*!
 \def CPPAD_BOOSTVECTOR
@@ -150,13 +137,6 @@ Otherwise, this smybol should be zero.
 # define CPPAD_HAS_GETTIMEOFDAY 1
 
 /*!
-\def CPPAD_SIZE_T_NOT_UNSIGNED_INT
-If this symbol is zero, the type size_t is the same as the type unsigned int,
-otherwise this symbol is one.
-*/
-# define CPPAD_SIZE_T_NOT_UNSIGNED_INT 1
-
-/*!
 \def CPPAD_TAPE_ADDR_TYPE
 Is the type used to store address on the tape. If not size_t, then
 <code>sizeof(CPPAD_TAPE_ADDR_TYPE) <= sizeof( size_t )</code>
@@ -194,6 +174,36 @@ header files.  If it is not yet defined,
 */
 # ifndef CPPAD_MAX_NUM_THREADS
 # define CPPAD_MAX_NUM_THREADS 48
+# endif
+
+/*!
+\def CPPAD_HAS_MKSTEMP
+It true, mkstemp works in C++ on this system.
+*/
+# define CPPAD_HAS_MKSTEMP 1
+
+/*!
+\def CPPAD_HAS_TMPNAM_S
+It true, tmpnam_s works in C++ on this system.
+*/
+# define CPPAD_HAS_TMPNAM_S 0
+
+// ---------------------------------------------------------------------------
+// defines that only depend on values above
+// ---------------------------------------------------------------------------
+/*!
+\def CPPAD_NULL
+This preprocessor symbol is used for a null pointer.
+
+If it is not yet defined,
+it is defined when cppad/core/define.hpp is included.
+*/
+# ifndef CPPAD_NULL
+# if CPPAD_USE_CPLUSPLUS_2011
+# define CPPAD_NULL     nullptr
+# else
+# define CPPAD_NULL     0
+# endif
 # endif
 
 # endif
