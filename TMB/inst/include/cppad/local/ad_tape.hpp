@@ -1,20 +1,19 @@
-/* $Id$ */
-# ifndef CPPAD_AD_TAPE_INCLUDED
-# define CPPAD_AD_TAPE_INCLUDED
+# ifndef CPPAD_LOCAL_AD_TAPE_HPP
+# define CPPAD_LOCAL_AD_TAPE_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
-                    GNU General Public License Version 3.
+the terms of the
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
-# include <cppad/local/define.hpp>
+# include <cppad/core/define.hpp>
 
-namespace CppAD { // BEGIN_CPPAD_NAMESPACE
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL__NAMESPACE
 
 /*!
 Class used to hold tape that records AD<Base> operations.
@@ -37,52 +36,55 @@ class ADTape {
 
 	// functions -----------------------------------------------------------
 	// PrintFor
-	friend void PrintFor <Base> (
+	friend void CppAD::PrintFor <Base> (
 		const AD<Base>&    flag   ,
 		const char*        before ,
-		const AD<Base>&    var    , 
+		const AD<Base>&    var    ,
 		const char*        after
 	);
 	// CondExpOp
-	friend AD<Base> CondExpOp <Base> (
+	friend AD<Base> CppAD::CondExpOp <Base> (
 		enum CompareOp  cop          ,
-		const AD<Base> &left         , 
-		const AD<Base> &right        , 
-		const AD<Base> &trueCase     , 
-		const AD<Base> &falseCase 
+		const AD<Base> &left         ,
+		const AD<Base> &right        ,
+		const AD<Base> &trueCase     ,
+		const AD<Base> &falseCase
 	);
 	// pow
-	friend AD<Base> pow <Base>
+	friend AD<Base> CppAD::pow <Base>
+		(const AD<Base> &x, const AD<Base> &y);
+	// azmul
+	friend AD<Base> CppAD::azmul <Base>
 		(const AD<Base> &x, const AD<Base> &y);
 	// Parameter
-	friend bool Parameter     <Base> 
+	friend bool CppAD::Parameter     <Base>
 		(const AD<Base> &u);
 	// Variable
-	friend bool Variable      <Base> 
+	friend bool CppAD::Variable      <Base>
 		(const AD<Base> &u);
 	// operators -----------------------------------------------------------
 	// arithematic binary operators
-	friend AD<Base> operator + <Base>
+	friend AD<Base> CppAD::operator + <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend AD<Base> operator - <Base>
+	friend AD<Base> CppAD::operator - <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend AD<Base> operator * <Base>
+	friend AD<Base> CppAD::operator * <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend AD<Base> operator / <Base>
+	friend AD<Base> CppAD::operator / <Base>
 		(const AD<Base> &left, const AD<Base> &right);
 
 	// comparison operators
-	friend bool operator < <Base>
+	friend bool CppAD::operator < <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend bool operator <= <Base>
+	friend bool CppAD::operator <= <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend bool operator > <Base>
+	friend bool CppAD::operator > <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend bool operator >= <Base>
+	friend bool CppAD::operator >= <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend bool operator == <Base>
+	friend bool CppAD::operator == <Base>
 		(const AD<Base> &left, const AD<Base> &right);
-	friend bool operator != <Base>
+	friend bool CppAD::operator != <Base>
 		(const AD<Base> &left, const AD<Base> &right);
 	// ======================================================================
 
@@ -91,9 +93,9 @@ private:
 	// ----------------------------------------------------------------------
 	// private data
 	/*!
-	Unique identifier for this tape.  It is always greater than 
-	CPPAD_MAX_NUM_THREADS, and different for every tape (even ones that have 
-	been deleted). In addition, id_ % CPPAD_MAX_NUM_THREADS is the thread 
+	Unique identifier for this tape.  It is always greater than
+	CPPAD_MAX_NUM_THREADS, and different for every tape (even ones that have
+	been deleted). In addition, id_ % CPPAD_MAX_NUM_THREADS is the thread
 	number for this tape. Set by Independent and effectively const
 	*/
 	tape_id_t                    id_;
@@ -101,13 +103,13 @@ private:
 	/// Set by Independent and effectively const
 	size_t         size_independent_;
 	/// This is where the information is recorded.
-	recorder<Base>              Rec_;
+	local::recorder<Base>              Rec_;
 	// ----------------------------------------------------------------------
 	// private functions
 	//
 	// add a parameter to the tape
-	size_t RecordParOp(const Base &x);
-	
+	addr_t RecordParOp(const Base &x);
+
 	// see CondExp.h
 	void RecordCondExp(
 		enum CompareOp  cop           ,
@@ -147,7 +149,7 @@ when it is one of the dependent variabes.
 \param z
 value of the parameter that we are placing in the tape.
 
-\return 
+\return
 variable index (for this recording) correpsonding to the parameter.
 
 \par 2DO
@@ -155,9 +157,9 @@ All these operates are preformed in \c Rec_, so we should
 move this routine from <tt>ADTape<Base></tt> to <tt>recorder<Base></tt>.
 */
 template <class Base>
-size_t ADTape<Base>::RecordParOp(const Base &z)
-{	size_t z_taddr;
-	size_t ind;
+addr_t ADTape<Base>::RecordParOp(const Base &z)
+{	addr_t z_taddr;
+	addr_t ind;
 	CPPAD_ASSERT_UNKNOWN( NumRes(ParOp) == 1 );
 	CPPAD_ASSERT_UNKNOWN( NumArg(ParOp) == 1 );
 	z_taddr = Rec_.PutOp(ParOp);
@@ -186,7 +188,7 @@ The value for this vector index is the length of the vector.
 There are \c length indices following for this vector.
 The values for these vector indices are the corresponding
 parameter indices in the tape for the initial value of the corresponding
-vec_ad element.  
+vec_ad element.
 
 \par 2DO
 All these operates are preformed in \c Rec_, so we should
@@ -201,17 +203,17 @@ size_t ADTape<Base>::AddVec(size_t length, const pod_vector<Base>& data)
 	// store the length in VecInd
 	size_t start = Rec_.PutVecInd(length);
 
-	// store indices of the values in VecInd 
+	// store indices of the values in VecInd
 	for(i = 0; i < length; i++)
 	{
 		value_index = Rec_.PutPar( data[i] );
 		Rec_.PutVecInd( value_index );
 	}
- 
+
 	// return the taddr of the length (where the vector starts)
 	return start;
 }
 
-} // END_CPPAD_NAMESPACE
+} } // END_CPPAD_LOCAL_NAMESPACE
 
 # endif

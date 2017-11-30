@@ -1,19 +1,18 @@
-/* $Id$ */
-# ifndef CPPAD_DIV_OP_INCLUDED
-# define CPPAD_DIV_OP_INCLUDED
+# ifndef CPPAD_LOCAL_DIV_OP_HPP
+# define CPPAD_LOCAL_DIV_OP_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the
-                    GNU General Public License Version 3.
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-namespace CppAD { // BEGIN_CPPAD_NAMESPACE
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
 /*!
 \file div_op.hpp
 Forward and reverse mode calculations for z = x / y.
@@ -31,7 +30,7 @@ In the documentation below,
 this operations is for the case where both x and y are variables
 and the argument \a parameter is not used.
 
-\copydetails forward_binary_op
+\copydetails CppAD::local::forward_binary_op
 */
 
 template <class Base>
@@ -77,7 +76,7 @@ In the documentation below,
 this operations is for the case where both x and y are variables
 and the argument \a parameter is not used.
 
-\copydetails forward_binary_op_dir
+\copydetails CppAD::local::forward_binary_op_dir
 */
 
 template <class Base>
@@ -126,7 +125,7 @@ In the documentation below,
 this operations is for the case where both x and y are variables
 and the argument \a parameter is not used.
 
-\copydetails forward_binary_op_0
+\copydetails CppAD::local::forward_binary_op_0
 */
 
 template <class Base>
@@ -160,7 +159,7 @@ In the documentation below,
 this operations is for the case where both x and y are variables
 and the argument \a parameter is not used.
 
-\copydetails reverse_binary_op
+\copydetails CppAD::local::reverse_binary_op
 */
 
 template <class Base>
@@ -189,16 +188,9 @@ inline void reverse_divvv_op(
 	Base* py = partial + arg[1] * nc_partial;
 	Base* pz = partial + i_z    * nc_partial;
 
-	// If pz is zero, make sure this operation has no effect
-	// (zero times infinity or nan would be non-zero).
-	bool skip(true);
-	for(size_t i_d = 0; i_d <= d; i_d++)
-		skip &= IdenticalZero(pz[i_d]);
-	if( skip )
-		return;
-
 	// Using CondExp, it can make sense to divide by zero
 	// so do not make it an error.
+	Base inv_y0 = Base(1.0) / y[0];
 
 	size_t k;
 	// number of indices to access
@@ -206,14 +198,14 @@ inline void reverse_divvv_op(
 	while(j)
 	{	--j;
 		// scale partial w.r.t. z[j]
-		pz[j] /= y[0];
+		pz[j] = azmul(pz[j], inv_y0);
 
 		px[j] += pz[j];
 		for(k = 1; k <= j; k++)
-		{	pz[j-k] -= pz[j] * y[k];
-			py[k]   -= pz[j] * z[j-k];
+		{	pz[j-k] -= azmul(pz[j], y[k]  );
+			py[k]   -= azmul(pz[j], z[j-k]);
 		}
-		py[0] -= pz[j] * z[j];
+		py[0] -= azmul(pz[j], z[j]);
 	}
 }
 
@@ -228,7 +220,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a parameter and y is a variable.
 
-\copydetails forward_binary_op
+\copydetails CppAD::local::forward_binary_op
 */
 
 template <class Base>
@@ -262,7 +254,7 @@ inline void forward_divpv_op(
 		p++;
 	}
 	for(size_t d = p; d <= q; d++)
-	{	z[d] = Base(0);
+	{	z[d] = Base(0.0);
 		for(k = 1; k <= d; k++)
 			z[d] -= z[d-k] * y[k];
 		z[d] /= y[0];
@@ -278,7 +270,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a parameter and y is a variable.
 
-\copydetails forward_binary_op_dir
+\copydetails CppAD::local::forward_binary_op_dir
 */
 
 template <class Base>
@@ -323,7 +315,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a parameter and y is a variable.
 
-\copydetails forward_binary_op_0
+\copydetails CppAD::local::forward_binary_op_0
 */
 
 template <class Base>
@@ -358,7 +350,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a parameter and y is a variable.
 
-\copydetails reverse_binary_op
+\copydetails CppAD::local::reverse_binary_op
 */
 
 template <class Base>
@@ -386,16 +378,9 @@ inline void reverse_divpv_op(
 	Base* py = partial + arg[1] * nc_partial;
 	Base* pz = partial + i_z    * nc_partial;
 
-	// If pz is zero, make sure this operation has no effect
-	// (zero times infinity or nan would be non-zero).
-	bool skip(true);
-	for(size_t i_d = 0; i_d <= d; i_d++)
-		skip &= IdenticalZero(pz[i_d]);
-	if( skip )
-		return;
-
 	// Using CondExp, it can make sense to divide by zero so do not
 	// make it an error.
+	Base inv_y0 = Base(1.0) / y[0];
 
 	size_t k;
 	// number of indices to access
@@ -403,13 +388,13 @@ inline void reverse_divpv_op(
 	while(j)
 	{	--j;
 		// scale partial w.r.t z[j]
-		pz[j] /= y[0];
+		pz[j] = azmul(pz[j], inv_y0);
 
 		for(k = 1; k <= j; k++)
-		{	pz[j-k] -= pz[j] * y[k];
-			py[k]   -= pz[j] * z[j-k];
+		{	pz[j-k] -= azmul(pz[j], y[k]  );
+			py[k]   -= azmul(pz[j], z[j-k] );
 		}
-		py[0] -= pz[j] * z[j];
+		py[0] -= azmul(pz[j], z[j]);
 	}
 }
 
@@ -425,7 +410,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a variable and y is a parameter.
 
-\copydetails forward_binary_op
+\copydetails CppAD::local::forward_binary_op
 */
 
 template <class Base>
@@ -466,7 +451,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a variable and y is a parameter.
 
-\copydetails forward_binary_op_dir
+\copydetails CppAD::local::forward_binary_op_dir
 */
 
 template <class Base>
@@ -511,7 +496,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a variable and y is a parameter.
 
-\copydetails forward_binary_op_0
+\copydetails CppAD::local::forward_binary_op_0
 */
 
 template <class Base>
@@ -546,7 +531,7 @@ The C++ source code corresponding to this operation is
 In the documentation below,
 this operations is for the case where x is a variable and y is a parameter.
 
-\copydetails reverse_binary_op
+\copydetails CppAD::local::reverse_binary_op
 */
 
 template <class Base>
@@ -575,14 +560,15 @@ inline void reverse_divvp_op(
 
 	// Using CondExp, it can make sense to divide by zero
 	// so do not make it an error.
+	Base inv_y = Base(1.0) / y;
 
 	// number of indices to access
 	size_t j = d + 1;
 	while(j)
 	{	--j;
-		px[j] += pz[j] / y;
+		px[j] += azmul(pz[j], inv_y);
 	}
 }
 
-} // END_CPPAD_NAMESPACE
+} } // END_CPPAD_LOCAL_NAMESPACE
 # endif

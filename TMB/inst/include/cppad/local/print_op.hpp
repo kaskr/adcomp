@@ -1,20 +1,20 @@
-/* $Id$ */
-# ifndef CPPAD_PRINT_OP_INCLUDED
-# define CPPAD_PRINT_OP_INCLUDED
+// $Id$
+# ifndef CPPAD_LOCAL_PRINT_OP_HPP
+# define CPPAD_LOCAL_PRINT_OP_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-16 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
-                    GNU General Public License Version 3.
+the terms of the
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
 
-namespace CppAD { // BEGIN_CPPAD_NAMESPACE
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
 /*!
 Print operation for parameters; i.e., op = PriOp.
 
@@ -29,7 +29,7 @@ and the print occurs during the zero order forward mode computation.
 
 \tparam Base
 base type for the operator; i.e., this operation was recorded
-using AD< \a Base > and computations by this routine are done using type 
+using AD< \a Base > and computations by this routine are done using type
 \a Base .
 
 \param s_out
@@ -144,5 +144,5 @@ inline void forward_pri_0(
 		s_out << before << var << after;
 }
 
-} // END_CPPAD_NAMESPACE
+} } // END_CPPAD_LOCAL_NAMESPACE
 # endif

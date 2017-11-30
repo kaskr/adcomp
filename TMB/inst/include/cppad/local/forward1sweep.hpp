@@ -1,19 +1,18 @@
-/* $Id$ */
-# ifndef CPPAD_FORWARD1SWEEP_INCLUDED
-# define CPPAD_FORWARD1SWEEP_INCLUDED
+# ifndef CPPAD_LOCAL_FORWARD1SWEEP_HPP
+# define CPPAD_LOCAL_FORWARD1SWEEP_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
-                    GNU General Public License Version 3.
+the terms of the
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
-namespace CppAD { // BEGIN_CPPAD_NAMESPACE
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
 /*!
 \file forward1sweep.hpp
 Compute one Taylor coefficient for each order requested.
@@ -30,7 +29,7 @@ otherwise, it respolves to
 \code
 	user_ok = user_atom->forward
 \endcode
-This macro is undefined at the end of this file to facillitate its 
+This macro is undefined at the end of this file to facillitate its
 use with a different definition in other files.
 */
 # ifdef NDEBUG
@@ -41,7 +40,7 @@ use with a different definition in other files.
 
 /*!
 \def CPPAD_FORWARD1SWEEP_TRACE
-This value is either zero or one. 
+This value is either zero or one.
 Zero is the normal operational value.
 If it is one, a trace of every forward1sweep computation is printed.
 */
@@ -79,12 +78,6 @@ is a recording of the operations corresponding to the function
 \f]
 where \f$ n \f$ is the number of independent variables and
 \f$ m \f$ is the number of dependent variables.
-\n
-\n
-The object play is effectly constant.
-The exception to this is that while palying back the tape
-the object play holds information about the current location
-with in the tape and this changes during palyback. 
 
 \param J
 Is the number of columns in the coefficient matrix taylor.
@@ -101,13 +94,13 @@ Is a vector with size play->num_op_rec().
 In this case,
 the input value of the elements does not matter.
 Upon return, if cskip_op[i] is true, the operator with index i
-does not affect any of the dependent variable 
+does not affect any of the dependent variable
 (given the value of the independent variables).
 \n
 \n
 <tt>p > 0</tt>
 \n
-In this case cskip_op is not modified and has the same meaning 
+In this case cskip_op is not modified and has the same meaning
 as its return value above.
 
 \param var_by_load_op
@@ -118,7 +111,7 @@ is a vector with size play->num_load_op_rec().
 \n
 In this case,
 The input value of the elements does not matter.
-Upon return, 
+Upon return,
 it is the variable index corresponding the result for each load operator.
 In the case where the index is zero,
 the load operator results in a parameter (not a variable).
@@ -127,16 +120,16 @@ Note that the is no variable with index zero on the tape.
 \n
 <tt>p > 0</tt>
 \n
-In this case var_by_load_op is not modified and has the meaning 
+In this case var_by_load_op is not modified and has the meaning
 as its return value above.
 
 \param p
 is the lowest order of the Taylor coefficients
-that are computed during this call. 
+that are computed during this call.
 
 \param q
 is the highest order of the Taylor coefficients
-that are computed during this call. 
+that are computed during this call.
 
 \param taylor
 \n
@@ -144,7 +137,7 @@ that are computed during this call.
 For <code>i = 1 , ... , numvar-1</code>,
 <code>k = 0 , ... , p-1</code>,
 <code>taylor[ J*i + k]</code>
-is the k-th order Taylor coefficient corresponding to 
+is the k-th order Taylor coefficient corresponding to
 the i-th variable.
 \n
 \n
@@ -152,17 +145,17 @@ the i-th variable.
 For <code>i = 1 , ... , n</code>,
 <code>k = p , ... , q</code>,
 <code>taylor[ J*j + k]</code>
-is the k-th order Taylor coefficient corresponding to 
-the i-th variable 
+is the k-th order Taylor coefficient corresponding to
+the i-th variable
 (these are the independent varaibles).
 \n
 \n
-\b Output: 
-For <code>i = n+1 , ... , numvar-1</code>, and 
+\b Output:
+For <code>i = n+1 , ... , numvar-1</code>, and
 <code>k = 0 , ... , p-1</code>,
 <code>taylor[ J*i + k]</code>
 is the k-th order Taylor coefficient corresponding to
-the i-th variable. 
+the i-th variable.
 
 
 \param compare_change_count
@@ -173,33 +166,33 @@ zero order foward mode.
 If p is non-zero, this value is not changed, otherwise:
 If compare_change_count is zero, this value is set to zero, otherwise:
 this value is set to the number of comparision operations
-that have a different result from when the information in 
+that have a different result from when the information in
 play was recorded.
 
 \param compare_change_op_index
 if p is non-zero, this value is not changed, otherwise:
 If compare_change_count is zero, this value is set to zero.
 Otherwise it is the operator index (see forward_next) for the count-th
-comparision operation that has a different result from when the information in 
+comparision operation that has a different result from when the information in
 play was recorded.
 */
 
 template <class Base>
 void forward1sweep(
-	std::ostream&         s_out,
-	const bool            print,
-	const size_t          p,
-	const size_t          q,
-	const size_t          n,
-	const size_t          numvar,
-	player<Base>*         play,
-	const size_t          J,
-	Base*                 taylor,
-	bool*                 cskip_op,
-	pod_vector<addr_t>&   var_by_load_op,
-	size_t                compare_change_count,
-	size_t&               compare_change_number,
-	size_t&               compare_change_op_index
+	const local::player<Base>* play,
+	std::ostream&              s_out,
+	const bool                 print,
+	const size_t               p,
+	const size_t               q,
+	const size_t               n,
+	const size_t               numvar,
+	const size_t               J,
+	Base*                      taylor,
+	bool*                      cskip_op,
+	pod_vector<addr_t>&        var_by_load_op,
+	size_t                     compare_change_count,
+	size_t&                    compare_change_number,
+	size_t&                    compare_change_op_index
 )
 {
 	// number of directions
@@ -218,7 +211,7 @@ void forward1sweep(
 	// index for current instruction
 	size_t i_op;
 
-	// next variables 
+	// next variables
 	size_t i_var;
 
 	// operation argument indices
@@ -255,23 +248,17 @@ void forward1sweep(
 	// work space used by UserOp.
 	vector<bool> user_vx;        // empty vecotor
 	vector<bool> user_vy;        // empty vecotor
-	vector<Base> user_tx;        // argument vector Taylor coefficients 
-	vector<Base> user_ty;        // result vector Taylor coefficients 
-	size_t user_index = 0;       // indentifier for this atomic operation
-	size_t user_id    = 0;       // user identifier for this call to operator
-	size_t user_i     = 0;       // index in result vector
-	size_t user_j     = 0;       // index in argument vector
-	size_t user_m     = 0;       // size of result vector
-	size_t user_n     = 0;       // size of arugment vector
+	vector<Base> user_tx;        // argument vector Taylor coefficients
+	vector<Base> user_ty;        // result vector Taylor coefficients
 	//
 	atomic_base<Base>* user_atom = CPPAD_NULL; // user's atomic op calculator
 # ifndef NDEBUG
 	bool               user_ok   = false;      // atomic op return value
 # endif
 	//
-	// next expected operator in a UserOp sequence
-	enum { user_start, user_arg, user_ret, user_end, user_trace }
-	user_state = user_start;
+	// information defined by forward_user
+	size_t user_old=0, user_m=0, user_n=0, user_i=0, user_j=0;
+	enum_user_state user_state = start_user; // proper initialization
 
 	// length of the parameter vector (used by CppAD assert macros)
 	const size_t num_par = play->num_par_rec();
@@ -298,38 +285,48 @@ void forward1sweep(
 	// (not needed for order zero)
 	const size_t user_q1 = q+1;
 
-	// variable indices for results vector 
+	// variable indices for results vector
 	// (done differently for order zero).
-	vector<size_t> user_iy;      
+	vector<size_t> user_iy;
 
 	// skip the BeginOp at the beginning of the recording
-	play->forward_start(op, arg, i_op, i_var);
+	i_op = 0;
+	play->get_op_info(i_op, op, arg, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == BeginOp );
+	//
 # if CPPAD_FORWARD1SWEEP_TRACE
+	bool user_trace = false;
 	std::cout << std::endl;
 # endif
+	//
+	bool flag; // a temporary flag to use in switch cases
 	bool more_operators = true;
 	while(more_operators)
 	{
 		// this op
-		play->forward_next(op, arg, i_op, i_var);
-		CPPAD_ASSERT_UNKNOWN( (i_op > n)  | (op == InvOp) );  
-		CPPAD_ASSERT_UNKNOWN( (i_op <= n) | (op != InvOp) );  
+		play->get_op_info(++i_op, op, arg, i_var);
 		CPPAD_ASSERT_UNKNOWN( i_op < play->num_op_rec() );
-		CPPAD_ASSERT_ARG_BEFORE_RESULT(op, arg, i_var);
 
 		// check if we are skipping this operation
 		while( cskip_op[i_op] )
-		{	if( op == CSumOp )
-			{	// CSumOp has a variable number of arguments 
-				play->forward_csum(op, arg, i_op, i_var);
+		{	switch(op)
+			{
+				case UserOp:
+				{	// get information for this user atomic call
+					CPPAD_ASSERT_UNKNOWN( user_state == start_user );
+					play->get_user_info(op, arg, user_old, user_m, user_n);
+					//
+					// skip to the second UserOp
+					i_op += user_m + user_n;
+					play->get_op_info(++i_op, op, arg, i_var);
+					CPPAD_ASSERT_UNKNOWN( op == UserOp );
+				}
+				break;
+
+				default:
+				break;
 			}
-			CPPAD_ASSERT_UNKNOWN( op != CSkipOp );
-			// if( op == CSkipOp )
-			// {	// CSkip has a variable number of arguments
-			// 	play->forward_cskip(op, arg, i_op, i_var);
-			// }
-			play->forward_next(op, arg, i_op, i_var);
+			play->get_op_info(++i_op, op, arg, i_var);
 			CPPAD_ASSERT_UNKNOWN( i_op < play->num_op_rec() );
 		}
 
@@ -359,6 +356,15 @@ void forward1sweep(
 			break;
 			// -------------------------------------------------
 
+# if CPPAD_USE_CPLUSPLUS_2011
+			case AcoshOp:
+			// sqrt(x * x - 1), acosh(x)
+			CPPAD_ASSERT_UNKNOWN( i_var < numvar  );
+			forward_acosh_op(p, q, i_var, arg[0], J, taylor);
+			break;
+# endif
+			// -------------------------------------------------
+
 			case AsinOp:
 			// sqrt(1 - x * x), asin(x)
 			CPPAD_ASSERT_UNKNOWN( i_var < numvar  );
@@ -366,11 +372,29 @@ void forward1sweep(
 			break;
 			// -------------------------------------------------
 
+# if CPPAD_USE_CPLUSPLUS_2011
+			case AsinhOp:
+			// sqrt(1 + x * x), asinh(x)
+			CPPAD_ASSERT_UNKNOWN( i_var < numvar  );
+			forward_asinh_op(p, q, i_var, arg[0], J, taylor);
+			break;
+# endif
+			// -------------------------------------------------
+
 			case AtanOp:
 			// 1 + x * x, atan(x)
 			CPPAD_ASSERT_UNKNOWN( i_var < numvar  );
 			forward_atan_op(p, q, i_var, arg[0], J, taylor);
 			break;
+			// -------------------------------------------------
+
+# if CPPAD_USE_CPLUSPLUS_2011
+			case AtanhOp:
+			// 1 - x * x, atanh(x)
+			CPPAD_ASSERT_UNKNOWN( i_var < numvar  );
+			forward_atanh_op(p, q, i_var, arg[0], J, taylor);
+			break;
+# endif
 			// -------------------------------------------------
 
 			case CExpOp:
@@ -395,26 +419,18 @@ void forward1sweep(
 			// -------------------------------------------------
 
 			case CSkipOp:
-			// CSkipOp has a variable number of arguments and
-			// forward_next thinks it has no arguments.
-			// we must inform forward_next of this special case.
 			if( p == 0 )
 			{	forward_cskip_op_0(
 					i_var, arg, num_par, parameter, J, taylor, cskip_op
 				);
 			}
-			play->forward_cskip(op, arg, i_op, i_var);
 			break;
 			// -------------------------------------------------
 
 			case CSumOp:
-			// CSumOp has a variable number of arguments and
-			// forward_next thinks it has no arguments.
-			// we must inform forward_next of this special case.
 			forward_csum_op(
 				p, q, i_var, arg, num_par, parameter, J, taylor
 			);
-			play->forward_csum(op, arg, i_op, i_var);
 			break;
 			// -------------------------------------------------
 
@@ -468,10 +484,9 @@ void forward1sweep(
 			break;
 			// -------------------------------------------------
 
-# if CPPAD_COMPILER_HAS_ERF
+# if CPPAD_USE_CPLUSPLUS_2011
 			case ErfOp:
-			CPPAD_ASSERT_UNKNOWN( CPPAD_COMPILER_HAS_ERF );
-			// 2DO: implement zero order version of this function
+			CPPAD_ASSERT_UNKNOWN( CPPAD_USE_CPLUSPLUS_2011 );
 			forward_erf_op(p, q, i_var, arg, parameter, J, taylor);
 			break;
 # endif
@@ -480,6 +495,13 @@ void forward1sweep(
 			case ExpOp:
 			forward_exp_op(p, q, i_var, arg[0], J, taylor);
 			break;
+			// ---------------------------------------------------
+
+# if CPPAD_USE_CPLUSPLUS_2011
+			case Expm1Op:
+			forward_expm1_op(p, q, i_var, arg[0], J, taylor);
+			break;
+# endif
 			// ---------------------------------------------------
 
 			case InvOp:
@@ -491,16 +513,16 @@ void forward1sweep(
 			if( p == 0 )
 			{	forward_load_p_op_0(
 					play,
-					i_var, 
-					arg, 
-					parameter, 
-					J, 
+					i_var,
+					arg,
+					parameter,
+					J,
 					taylor,
 					isvar_by_ind.data(),
 					index_by_ind.data(),
 					var_by_load_op.data()
 				);
-				if( p < q ) forward_load_op( 
+				if( p < q ) forward_load_op(
 					play,
 					op,
 					p+1,
@@ -513,7 +535,7 @@ void forward1sweep(
 					taylor
 				);
 			}
-			else	forward_load_op( 
+			else	forward_load_op(
 				play,
 				op,
 				p,
@@ -532,16 +554,16 @@ void forward1sweep(
 			if( p == 0 )
 			{	forward_load_v_op_0(
 					play,
-					i_var, 
-					arg, 
-					parameter, 
-					J, 
+					i_var,
+					arg,
+					parameter,
+					J,
 					taylor,
 					isvar_by_ind.data(),
 					index_by_ind.data(),
 					var_by_load_op.data()
 				);
-				if( p < q ) forward_load_op( 
+				if( p < q ) forward_load_op(
 					play,
 					op,
 					p+1,
@@ -554,7 +576,7 @@ void forward1sweep(
 					taylor
 				);
 			}
-			else	forward_load_op( 
+			else	forward_load_op(
 				play,
 				op,
 				p,
@@ -606,6 +628,13 @@ void forward1sweep(
 			break;
 			// -------------------------------------------------
 
+# if CPPAD_USE_CPLUSPLUS_2011
+			case Log1pOp:
+			forward_log1p_op(p, q, i_var, arg[0], J, taylor);
+			break;
+# endif
+			// -------------------------------------------------
+
 			case LtpvOp:
 			if( ( p == 0 ) & ( compare_change_count > 0 ) )
 			{	forward_ltpv_op_0(
@@ -638,14 +667,14 @@ void forward1sweep(
 			break;
 			// -------------------------------------------------
 
-			case MulvvOp:
-			forward_mulvv_op(p, q, i_var, arg, parameter, J, taylor);
-			break;
-			// -------------------------------------------------
-
 			case MulpvOp:
 			CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_par );
 			forward_mulpv_op(p, q, i_var, arg, parameter, J, taylor);
+			break;
+			// -------------------------------------------------
+
+			case MulvvOp:
+			forward_mulvv_op(p, q, i_var, arg, parameter, J, taylor);
 			break;
 			// -------------------------------------------------
 
@@ -680,7 +709,7 @@ void forward1sweep(
 				i++;
 			}
 			while(i <= q)
-			{	taylor[ i_var * J + i] = Base(0); 
+			{	taylor[ i_var * J + i] = Base(0.0);
 				i++;
 			}
 			break;
@@ -739,10 +768,10 @@ void forward1sweep(
 			case StppOp:
 			if( p == 0 )
 			{	forward_store_pp_op_0(
-					i_var, 
-					arg, 
-					num_par, 
-					J, 
+					i_var,
+					arg,
+					num_par,
+					J,
 					taylor,
 					isvar_by_ind.data(),
 					index_by_ind.data()
@@ -754,10 +783,10 @@ void forward1sweep(
 			case StpvOp:
 			if( p == 0 )
 			{	forward_store_pv_op_0(
-					i_var, 
-					arg, 
-					num_par, 
-					J, 
+					i_var,
+					arg,
+					num_par,
+					J,
 					taylor,
 					isvar_by_ind.data(),
 					index_by_ind.data()
@@ -769,10 +798,10 @@ void forward1sweep(
 			case StvpOp:
 			if( p == 0 )
 			{	forward_store_vp_op_0(
-					i_var, 
-					arg, 
-					num_par, 
-					J, 
+					i_var,
+					arg,
+					num_par,
+					J,
 					taylor,
 					isvar_by_ind.data(),
 					index_by_ind.data()
@@ -784,10 +813,10 @@ void forward1sweep(
 			case StvvOp:
 			if( p == 0 )
 			{	forward_store_vv_op_0(
-					i_var, 
-					arg, 
-					num_par, 
-					J, 
+					i_var,
+					arg,
+					num_par,
+					J,
 					taylor,
 					isvar_by_ind.data(),
 					index_by_ind.data()
@@ -828,114 +857,126 @@ void forward1sweep(
 			// -------------------------------------------------
 
 			case UserOp:
-			// start or end an atomic operation sequence
-			CPPAD_ASSERT_UNKNOWN( NumRes( UserOp ) == 0 );
-			CPPAD_ASSERT_UNKNOWN( NumArg( UserOp ) == 4 );
-			if( user_state == user_start )
-			{	user_index = arg[0];
-				user_id    = arg[1];
-				user_n     = arg[2];
-				user_m     = arg[3];
-				user_atom  = atomic_base<Base>::class_object(user_index);
-# ifndef NDEBUG
-				if( user_atom == CPPAD_NULL )
-				{	std::string msg = 
-						atomic_base<Base>::class_name(user_index)
-						+ ": atomic_base function has been deleted";
-					CPPAD_ASSERT_KNOWN(false, msg.c_str() );
-				}
-# endif
-				if(user_tx.size() != user_n * user_q1)
-					user_tx.resize(user_n * user_q1);
-				if(user_ty.size() != user_m * user_q1)
-					user_ty.resize(user_m * user_q1);
-				if(user_iy.size() != user_m)
-					user_iy.resize(user_m);
-				user_j     = 0;
+			// start or end an atomic function call
+			flag = user_state == start_user;
+			user_atom = play->get_user_info(op, arg, user_old, user_m, user_n);
+			if( flag )
+			{	user_state = arg_user;
 				user_i     = 0;
-				user_state = user_arg;
+				user_j     = 0;
+				//
+				user_tx.resize(user_n * user_q1);
+				user_ty.resize(user_m * user_q1);
+				user_iy.resize(user_m);
 			}
 			else
-			{	CPPAD_ASSERT_UNKNOWN( user_state == user_end );
-				CPPAD_ASSERT_UNKNOWN( user_index == size_t(arg[0]) );
-				CPPAD_ASSERT_UNKNOWN( user_id    == size_t(arg[1]) );
-				CPPAD_ASSERT_UNKNOWN( user_n     == size_t(arg[2]) );
-				CPPAD_ASSERT_UNKNOWN( user_m     == size_t(arg[3]) );
-
+			{	user_state = start_user;
+				//
 				// call users function for this operation
-				user_atom->set_id(user_id);
+				user_atom->set_old(user_old);
 				CPPAD_ATOMIC_CALL(
 					p, q, user_vx, user_vy, user_tx, user_ty
 				);
 # ifndef NDEBUG
 				if( ! user_ok )
-				{	std::string msg = 
-						atomic_base<Base>::class_name(user_index)
+				{	std::string msg =
+						user_atom->afun_name()
 						+ ": atomic_base.forward: returned false";
 					CPPAD_ASSERT_KNOWN(false, msg.c_str() );
 				}
 # endif
-				for(i = 0; i < user_m; i++) 
+				for(i = 0; i < user_m; i++)
 					if( user_iy[i] > 0 )
 						for(k = p; k <= q; k++)
-							taylor[ user_iy[i] * J + k ] = 
+							taylor[ user_iy[i] * J + k ] =
 								user_ty[ i * user_q1 + k ];
 # if CPPAD_FORWARD1SWEEP_TRACE
-				user_state = user_trace;
-# else
-				user_state = user_start;
+				user_trace = true;
 # endif
 			}
 			break;
 
 			case UsrapOp:
-			// parameter argument in an atomic operation sequence
-			CPPAD_ASSERT_UNKNOWN( user_state == user_arg );
+			// parameter argument for a user atomic function
+			CPPAD_ASSERT_UNKNOWN( NumArg(op) == 1 );
+			CPPAD_ASSERT_UNKNOWN( user_state == arg_user );
+			CPPAD_ASSERT_UNKNOWN( user_i == 0 );
 			CPPAD_ASSERT_UNKNOWN( user_j < user_n );
-			CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_par );
+			CPPAD_ASSERT_UNKNOWN( size_t( arg[0] ) < num_par );
+			//
 			user_tx[user_j * user_q1 + 0] = parameter[ arg[0]];
 			for(k = 1; k < user_q1; k++)
-				user_tx[user_j * user_q1 + k] = Base(0);
+				user_tx[user_j * user_q1 + k] = Base(0.0);
+			//
 			++user_j;
 			if( user_j == user_n )
-				user_state = user_ret;
+				user_state = ret_user;
 			break;
 
 			case UsravOp:
-			// variable argument in an atomic operation sequence
-			CPPAD_ASSERT_UNKNOWN( user_state == user_arg );
+			// variable argument for a user atomic function
+			CPPAD_ASSERT_UNKNOWN( NumArg(op) == 1 );
+			CPPAD_ASSERT_UNKNOWN( user_state == arg_user );
+			CPPAD_ASSERT_UNKNOWN( user_i == 0 );
 			CPPAD_ASSERT_UNKNOWN( user_j < user_n );
-			CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) <= i_var );
+			//
 			for(k = 0; k < user_q1; k++)
 				user_tx[user_j * user_q1 + k] = taylor[ arg[0] * J + k];
+			//
 			++user_j;
 			if( user_j == user_n )
-				user_state = user_ret;
+				user_state = ret_user;
 			break;
 
 			case UsrrpOp:
-			// parameter result in an atomic operation sequence
-			CPPAD_ASSERT_UNKNOWN( user_state == user_ret );
+			// parameter result for a user atomic function
+			CPPAD_ASSERT_NARG_NRES(op, 1, 0);
+			CPPAD_ASSERT_UNKNOWN( user_state == ret_user );
 			CPPAD_ASSERT_UNKNOWN( user_i < user_m );
+			CPPAD_ASSERT_UNKNOWN( user_j == user_n );
+			CPPAD_ASSERT_UNKNOWN( size_t( arg[0] ) < num_par );
+			//
 			user_iy[user_i] = 0;
 			user_ty[user_i * user_q1 + 0] = parameter[ arg[0]];
 			for(k = 1; k < p; k++)
-				user_ty[user_i * user_q1 + k] = Base(0);
-			user_i++;
+				user_ty[user_i * user_q1 + k] = Base(0.0);
+			//
+			++user_i;
 			if( user_i == user_m )
-				user_state = user_end;
+				user_state = end_user;
 			break;
 
 			case UsrrvOp:
-			// variable result in an atomic operation sequence
-			CPPAD_ASSERT_UNKNOWN( user_state == user_ret );
+			// variable result for a user atomic function
+			CPPAD_ASSERT_NARG_NRES(op, 0, 1);
+			CPPAD_ASSERT_UNKNOWN( user_state == ret_user );
 			CPPAD_ASSERT_UNKNOWN( user_i < user_m );
+			CPPAD_ASSERT_UNKNOWN( user_j == user_n );
+			//
 			user_iy[user_i] = i_var;
 			for(k = 0; k < p; k++)
 				user_ty[user_i * user_q1 + k] = taylor[ i_var * J + k];
-			user_i++;
+			//
+			++user_i;
 			if( user_i == user_m )
-				user_state = user_end;
+				user_state = end_user;
+			break;
+			// -------------------------------------------------
+
+			case ZmulpvOp:
+			CPPAD_ASSERT_UNKNOWN( size_t(arg[0]) < num_par );
+			forward_zmulpv_op(p, q, i_var, arg, parameter, J, taylor);
+			break;
+			// -------------------------------------------------
+
+			case ZmulvpOp:
+			CPPAD_ASSERT_UNKNOWN( size_t(arg[1]) < num_par );
+			forward_zmulvp_op(p, q, i_var, arg, parameter, J, taylor);
+			break;
+			// -------------------------------------------------
+
+			case ZmulvvOp:
+			forward_zmulvv_op(p, q, i_var, arg, parameter, J, taylor);
 			break;
 			// -------------------------------------------------
 
@@ -943,53 +984,48 @@ void forward1sweep(
 			CPPAD_ASSERT_UNKNOWN(0);
 		}
 # if CPPAD_FORWARD1SWEEP_TRACE
-		if( user_state == user_trace )
-		{	user_state = user_start;
+		if( user_trace )
+		{	user_trace = false;
 
 			CPPAD_ASSERT_UNKNOWN( op == UserOp );
 			CPPAD_ASSERT_UNKNOWN( NumArg(UsrrvOp) == 0 );
 			for(i = 0; i < user_m; i++) if( user_iy[i] > 0 )
 			{	size_t i_tmp   = (i_op + i) - user_m;
 				printOp(
-					std::cout, 
+					std::cout,
 					play,
 					i_tmp,
 					user_iy[i],
-					UsrrvOp, 
+					UsrrvOp,
 					CPPAD_NULL
 				);
 				Base* Z_tmp = taylor + user_iy[i] * J;
 				printOpResult(
-					std::cout, 
-					q + 1, 
+					std::cout,
+					q + 1,
 					Z_tmp,
-					0, 
+					0,
 					(Base *) CPPAD_NULL
 				);
 				std::cout << std::endl;
 			}
 		}
 		Base*           Z_tmp   = taylor + J * i_var;
-		const addr_t*   arg_tmp = arg;
-		if( op == CSumOp )
-			arg_tmp = arg - arg[-1] - 4;
-		if( op == CSkipOp )
-			arg_tmp = arg - arg[-1] - 7;
 		if( op != UsrrvOp )
 		{
 			printOp(
-				std::cout, 
+				std::cout,
 				play,
 				i_op,
 				i_var,
-				op, 
-				arg_tmp
+				op,
+				arg
 			);
 			if( NumRes(op) > 0 ) printOpResult(
-				std::cout, 
-				q + 1, 
-				Z_tmp, 
-				0, 
+				std::cout,
+				q + 1,
+				Z_tmp,
+				0,
 				(Base *) CPPAD_NULL
 			);
 			std::cout << std::endl;
@@ -999,11 +1035,10 @@ void forward1sweep(
 # else
 	}
 # endif
-	CPPAD_ASSERT_UNKNOWN( user_state == user_start );
-	CPPAD_ASSERT_UNKNOWN( i_var + 1 == play->num_var_rec() );
+	CPPAD_ASSERT_UNKNOWN( user_state == start_user );
 
 	if( (p == 0) & (compare_change_count == 0) )
-		compare_change_number = 0; 
+		compare_change_number = 0;
 	return;
 }
 
@@ -1011,5 +1046,5 @@ void forward1sweep(
 # undef CPPAD_FORWARD1SWEEP_TRACE
 # undef CPPAD_ATOMIC_CALL
 
-} // END_CPPAD_NAMESPACE
+} } // END_CPPAD_LOCAL_NAMESPACE
 # endif
