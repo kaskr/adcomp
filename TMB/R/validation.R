@@ -532,6 +532,37 @@ oneStepPredict <- function(obj,
 ##' Goodness of fit residuals based on an approximate posterior
 ##' sample. (\emph{Beta version; may change without notice})
 ##'
+##' Denote by \eqn{(u, x)} the pair of the true un-observed random effect
+##' and the data. Let a model specification be given in terms of the
+##' estimated parameter vector \eqn{\theta} and let \eqn{u^*} be a
+##' sample from the conditional distribution of \eqn{u} given
+##' \eqn{x}. If the model specification is correct, it follows that the
+##' distribution of the pair \eqn{(u^*, x)} is the same as the distribution
+##' of \eqn{(u, x)}. Goodness-of-fit can thus be assessed by proceeding as
+##' if the random effect vector were observed, i.e check that \eqn{u^*}
+##' is consistent with prior model of the random effect and that \eqn{x}
+##' given \eqn{u^*} agrees with the observation model.
+##'
+##' This function can carry out the above procedure for many TMB models
+##' under the assumption that the true posterior is well approximated by a
+##' Gaussian distribution.
+##'
+##' First a draw from the Gaussian posterior distribution \eqn{u^*} is
+##' obtained based on the mode and Hessian of the random effects given the
+##' data.
+##' This sample uses sparsity of the Hessian and will thus work for large systems.
+##'
+##' An automatic standardization of the sample can be carried out \emph{if
+##' the observation model is Gaussian} (\code{fullGaussian=TRUE}). In this
+##' case the prior model is obtained by disabling the data term and
+##' calculating mode and Hessian. A \code{data.term.indicator} must be
+##' given in order for this to work. Standardization is performed using
+##' the Cholesiky of the precision which is order dependent. By default,
+##' the natural order of the parameter vector is used \code{perm=FALSE}
+##' which may be superior wrt. to interpretation. Otherwise
+##' \code{perm=TRUE} a fill-reducing permutation is used while
+##' standardizing.
+##' @references Waagepetersen, R. (2006). A Simulation‐based Goodness‐of‐fit Test for Random Effects in Generalized Linear Mixed Models. Scandinavian journal of statistics, 33(4), 721-731.
 ##' @param obj TMB model object from \code{MakeADFun}.
 ##' @param observation.name Character naming the observation in the template.
 ##' @param data.term.indicator Character naming an indicator data variable in the template. Only used if \code{standardize=TRUE}.
