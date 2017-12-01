@@ -529,8 +529,18 @@ oneStepPredict <- function(obj,
     pred
 }
 
+##' Goodness of fit residuals based on an approximate posterior
+##' sample. (\emph{Beta version; may change without notice})
+##'
+##' @param obj TMB model object from \code{MakeADFun}.
+##' @param observation.name Character naming the observation in the template.
+##' @param data.term.indicator Character naming an indicator data variable in the template. Only used if \code{standardize=TRUE}.
+##' @param standardize Logical; Standardize sample with the prior covariance ? Assumes all latent variables are Gaussian.
+##' @param as.list Output posterior sample, and the corresponding standardized residual, as a parameter list ?
+##' @param perm Logical; Use a fill-reducing ordering when standardizing ?
+##' @param fullGaussian Logical; Flag to signify that the joint distribution of random effects and data is Gaussian.
+##' @return List with components \code{sample} and \code{residual}.
 oneSamplePosterior <- function(obj,
-                               ## Names of data objects (not all are optional)
                                observation.name = NULL,
                                data.term.indicator = NULL,
                                standardize = TRUE,
@@ -574,6 +584,8 @@ oneSamplePosterior <- function(obj,
         ## Construct Hessian and Cholesky
         newobj$fn()
         ## Get Cholesky and prior mean
+        ## FIXME: We are using the mode as mean. Consider skewness
+        ## correction similar to 'bias.correct' in 'sdreport'.
         L <- newobj$env$L.created.by.newton
         mu <- newobj$env$last.par
         ## If perm == FALSE redo Cholesky with natural ordering
