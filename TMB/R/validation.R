@@ -547,6 +547,11 @@ oneStepPredict <- function(obj,
 ##' under the assumption that the true posterior is well approximated by a
 ##' Gaussian distribution.
 ##'
+##' \itemize {
+##' \item 1. Draw \eqn{u^*} from the Gaussian posterior approximation \eqn{N(\hat u, \hat H^{-1})}.
+##' \item 2. Pretend \eqn{u^*} is the true value of the random effect an standardize this vector using the one-step.
+##' }
+##'
 ##' First a draw from the Gaussian posterior distribution \eqn{u^*} is
 ##' obtained based on the mode and Hessian of the random effects given the
 ##' data.
@@ -557,7 +562,9 @@ oneStepPredict <- function(obj,
 ##' case the prior model is obtained by disabling the data term and
 ##' calculating mode and Hessian. A \code{data.term.indicator} must be
 ##' given in order for this to work. Standardization is performed using
-##' the Cholesiky of the precision which is order dependent. By default,
+##' the sparse Cholesky of the prior precision.
+##' By default, this step does not use a fill reduction permutation \code{perm=FALSE}.
+##' This is often superior wrt. to interpretation of the.
 ##' the natural order of the parameter vector is used \code{perm=FALSE}
 ##' which may be superior wrt. to interpretation. Otherwise
 ##' \code{perm=TRUE} a fill-reducing permutation is used while
