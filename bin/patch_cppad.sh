@@ -15,6 +15,6 @@ PATCH="echo_eval patch ${OPTIONS} -d${TMBDIR} -p1 < "
 echo_eval cd ${THISDIR}
 # -----------------------------------------------------------------------------
 # Apply patches
-${PATCH} patch/CTOR-workarounds.patch
-${PATCH} patch/CppAD-jacobian-prefer-reverse-mode-over-forward-mode.patch
-${PATCH} patch/Parallel-checkpoint-still-needed.patch
+# ${PATCH} patch/CTOR-workarounds.patch
+# ${PATCH} patch/CppAD-jacobian-prefer-reverse-mode-over-forward-mode.patch
+# ${PATCH} patch/Parallel-checkpoint-still-needed.patch
