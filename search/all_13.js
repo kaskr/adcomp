@@ -6,7 +6,7 @@ var searchData=
   ['separable',['SEPARABLE',['../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57',1,'SEPARABLE():&#160;density.hpp'],['../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5',1,'density::SEPARABLE()']]],
   ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],
   ['separable_5ft',['SEPARABLE_t',['../classSEPARABLE__t.html',1,'']]],
-  ['simulate',['simulate',['../classAR1__t.html#ab50537f15c92d25cc378863c41b63367',1,'AR1_t::simulate()'],['../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca',1,'density::AR1_t::simulate()'],['../atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782',1,'atomic::compois_utils::simulate()'],['../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2',1,'SIMULATE():&#160;tmb_core.hpp']]],
+  ['simulate',['simulate',['../classAR1__t.html#ab50537f15c92d25cc378863c41b63367',1,'AR1_t::simulate()'],['../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca',1,'density::AR1_t::simulate()'],['../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2',1,'SIMULATE():&#160;tmb_core.hpp'],['../atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782',1,'atomic::compois_utils::simulate()']]],
   ['simulate_5fnot_5fyet_5fimplemented',['SIMULATE_NOT_YET_IMPLEMENTED',['../density_8hpp.html#a55f3dd2dbccf00be303b1d76567d2f22',1,'tmbutils_extra.hpp']]],
   ['simulation',['Simulation',['../Simulation.html',1,'']]],
   ['sparsity',['Sparsity',['../Sparsity.html',1,'']]],
