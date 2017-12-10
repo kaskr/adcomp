@@ -564,7 +564,7 @@ oneStepPredict <- function(obj,
 ## which may be superior wrt. to interpretation. Otherwise
 ## \code{perm=TRUE} a fill-reducing permutation is used while
 ## standardizing.
-## @references Waagepetersen, R. (2006). A Simulation‐based Goodness‐of‐fit Test for Random Effects in Generalized Linear Mixed Models. Scandinavian journal of statistics, 33(4), 721-731.
+## @references Waagepetersen, R. (2006). A Simulation-based Goodness-of-fit Test for Random Effects in Generalized Linear Mixed Models. Scandinavian journal of statistics, 33(4), 721-731.
 ## @param obj TMB model object from \code{MakeADFun}.
 ## @param observation.name Character naming the observation in the template.
 ## @param data.term.indicator Character naming an indicator data variable in the template. Only used if \code{standardize=TRUE}.
