@@ -234,7 +234,7 @@ MakeADFun <- function(data, parameters, map=list(),
     ## For safety, check that parameter order match the parameter order in user template.
     ## If not, permute parameter list with a warning.
     ## Order in which parameters were requested:
-    parNameOrder <- .Call("getParameterOrder",data,parameters,new.env(),PACKAGE=DLL)
+    parNameOrder <- .Call("getParameterOrder",data,parameters,new.env(parent = emptyenv()),PACKAGE=DLL)
     if(!identical(names(parameters),parNameOrder)){
       if(!silent) cat("Order of parameters:\n")
       if(!silent) print(names(parameters))
@@ -298,7 +298,7 @@ MakeADFun <- function(data, parameters, map=list(),
   type <- match.arg(type, eval(type), several.ok = TRUE)
   #if("ADFun"%in%type)ptrADFun <- .Call("MakeADFunObject",data,parameters) else ptrADFun <- NULL
 
-  reportenv <- new.env()
+  reportenv <- new.env(parent = emptyenv())
   par <- NULL
   last.par.ok <- last.par <- last.par1 <- last.par2 <- last.par.best <- NULL
   value.best <- Inf

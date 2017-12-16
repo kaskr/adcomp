@@ -25,7 +25,7 @@
 config <- function(...,DLL=getUserDLL()){
   new <- list(...)
   ## Get
-  e <- new.env()
+  e <- new.env(parent = emptyenv())
   .Call("TMBconfig",e,as.integer(1),PACKAGE=DLL)
   conf <- eapply(e,as.integer)
   ## Set
@@ -34,7 +34,7 @@ config <- function(...,DLL=getUserDLL()){
   e <- local(environment(),conf)
   .Call("TMBconfig",e,as.integer(2),PACKAGE=DLL)
   ## Get
-  e <- new.env()
+  e <- new.env(parent = emptyenv())
   .Call("TMBconfig",e,as.integer(1),PACKAGE=DLL)
   conf <- eapply(e,as.integer)
   conf
