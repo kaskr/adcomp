@@ -916,21 +916,26 @@ public:
   For detailed explanation of GMRFs see the class definition @ref GMRF_t
   \param Q precision matrix
   \param order Convolution order, i.e. the precision matrix is Q^order (matrix product)
+  \param normalize Add normalizing constant ?
 
 */
 template <class scalartype>
-GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order=1){
-  return GMRF_t<scalartype>(Q, order);
+GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order, bool normalize=true) {
+  return GMRF_t<scalartype>(Q, order, normalize);
 }
 template <class scalartype, class arraytype >
-GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1){
-  return GMRF_t<scalartype>(x, delta, order);
+GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1, bool normalize=true) {
+  return GMRF_t<scalartype>(x, delta, order, normalize);
 }
 template <class scalartype, class arraytype >
-GMRF_t<scalartype> GMRF(arraytype x, scalartype delta, int order=1){
+GMRF_t<scalartype> GMRF(arraytype x, scalartype delta, int order=1, bool normalize=true) {
   vector<scalartype> d(x.cols());
-  for(int i=0;i<d.size();i++)d[i]=delta;
-  return GMRF_t<scalartype>(x, d, order);
+  for(int i=0; i<d.size(); i++) d[i] = delta;
+  return GMRF_t<scalartype>(x, d, order, normalize);
+}
+template <class scalartype>
+GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, bool normalize = true) {
+  return GMRF_t<scalartype>(Q, 1, normalize);
 }
 
 /** \brief Apply scale transformation on a density
