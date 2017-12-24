@@ -114,10 +114,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a212a5c9b3678fec10d2e5a3c0c113ae0"><td class="memTemplParams" colspan="2">template&lt;class scalartype &gt; </td></tr>
-<tr class="memitem:a212a5c9b3678fec10d2e5a3c0c113ae0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classdensity_1_1GMRF__t.html">GMRF_t</a>&lt; scalartype &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedensity.html#a212a5c9b3678fec10d2e5a3c0c113ae0">GMRF</a> (Eigen::SparseMatrix&lt; scalartype &gt; Q, int order=1)</td></tr>
-<tr class="memdesc:a212a5c9b3678fec10d2e5a3c0c113ae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q.  <a href="#a212a5c9b3678fec10d2e5a3c0c113ae0">More...</a><br /></td></tr>
-<tr class="separator:a212a5c9b3678fec10d2e5a3c0c113ae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3aee006c3c4f4ef0b0c3d4628ead67d0"><td class="memTemplParams" colspan="2">template&lt;class scalartype &gt; </td></tr>
+<tr class="memitem:a3aee006c3c4f4ef0b0c3d4628ead67d0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classdensity_1_1GMRF__t.html">GMRF_t</a>&lt; scalartype &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedensity.html#a3aee006c3c4f4ef0b0c3d4628ead67d0">GMRF</a> (Eigen::SparseMatrix&lt; scalartype &gt; Q, int order, bool normalize=true)</td></tr>
+<tr class="memdesc:a3aee006c3c4f4ef0b0c3d4628ead67d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q.  <a href="#a3aee006c3c4f4ef0b0c3d4628ead67d0">More...</a><br /></td></tr>
+<tr class="separator:a3aee006c3c4f4ef0b0c3d4628ead67d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0721aacc998f4cbd0290626073c19763"><td class="memTemplParams" colspan="2">template&lt;class scalartype &gt; </td></tr>
 <tr class="memitem:a0721aacc998f4cbd0290626073c19763"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classdensity_1_1MVNORM__t.html">MVNORM_t</a>&lt; scalartype &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a> (<a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; scalartype &gt; Sigma, bool use_atomic=true)</td></tr>
 <tr class="memdesc:a0721aacc998f4cbd0290626073c19763"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct object to evaluate multivariate zero-mean normal density with user supplied covariance matrix.  <a href="#a0721aacc998f4cbd0290626073c19763">More...</a><br /></td></tr>
@@ -141,8 +141,8 @@ template&lt;class vectortype , class distribution &gt; </td></tr>
 <div class="textblock"><p>Collection of multivariate Gaussian distributions (members listed in <a class="el" href="density_8hpp.html">density.hpp</a>) </p>
 <p>For use of the namespace see <a class="el" href="Introduction.html#Densities">Multivariate distributions </a> </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a212a5c9b3678fec10d2e5a3c0c113ae0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a212a5c9b3678fec10d2e5a3c0c113ae0">&sect;&nbsp;</a></span>GMRF()</h2>
+<a id="a3aee006c3c4f4ef0b0c3d4628ead67d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3aee006c3c4f4ef0b0c3d4628ead67d0">&sect;&nbsp;</a></span>GMRF()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -159,7 +159,13 @@ template&lt;class scalartype &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>order</em> = <code>1</code>&#160;</td>
+          <td class="paramname"><em>order</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>normalize</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -174,11 +180,12 @@ template&lt;class scalartype &gt; </div>
   <table class="params">
     <tr><td class="paramname">Q</td><td>precision matrix </td></tr>
     <tr><td class="paramname">order</td><td>Convolution order, i.e. the precision matrix is Q^order (matrix product) </td></tr>
+    <tr><td class="paramname">normalize</td><td>Add normalizing constant ? </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00919">919</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00924">924</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +270,7 @@ template&lt;class distribution1 , class distribution2 &gt; </div>
 </dl>
 <p>Shortform version to combine two densities using the class <a class="el" href="classSEPARABLE__t.html">SEPARABLE_t</a> . Typical use: </p><div class="fragment"><div class="line"><a class="code" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(x); <span class="comment">// 2D array</span></div><div class="line"><a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(phi), <a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma))(x);</div></div><!-- fragment --><p> where <code>MVNORM(Sigma)</code> acts in the first dimension of x and <code>AR1(phi)</code> acts in the second dimension of x. </p><dl class="section note"><dt>Note</dt><dd>The order of array dimensions is reversed in the sense that f_ acts in the <em>second</em> dimension and g_ acts in the <em>first</em> dimension (This order is consistent with how Kronecker products work in R). </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01228">1228</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01237">1237</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
 </div>
 </div>
