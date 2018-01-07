@@ -41,8 +41,8 @@ unlock:
 
 ## Alternative 'install-metis': Get source code and build...
 ## Select version that match R's Matrix package
-SUITESPARSE = SuiteSparse-4.2.1
-METIS = metis-4.0.3
+SUITESPARSE = SuiteSparse-5.1.2
+METIS = metis-5.1.0
 WGET = curl -O
 OS = $(shell uname)
 
@@ -50,22 +50,22 @@ $(SUITESPARSE).tar.gz :
 	$(WGET) http://faculty.cse.tamu.edu/davis/SuiteSparse/$(SUITESPARSE).tar.gz
 
 $(METIS).tar.gz :
-	$(WGET) http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/OLD/$(METIS).tar.gz
+	$(WGET) http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/$(METIS).tar.gz
 
 SuiteSparse: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 	tar zxfv $(SUITESPARSE).tar.gz
 	cd SuiteSparse; cp ../$(METIS).tar.gz .
 	cd SuiteSparse; tar zxfv $(METIS).tar.gz
-	cd SuiteSparse; ln -s $(METIS) metis-4.0
-## Edit "metis-4.0/Makefile.in" with COPTIONS = -fPIC
-	cd SuiteSparse; sed -i.backup s/COPTIONS\ =/COPTIONS\ =\ -fPIC/g metis-4.0/Makefile.in
-	cd SuiteSparse; cd metis-4.0 && make
+	cd SuiteSparse; ln -s $(METIS) metis-5.1
+## Edit "metis-5.1/Makefile" with COPTIONS = -fPIC
+	cd SuiteSparse; sed -i.backup s/COPTIONS\ =/COPTIONS\ =\ -fPIC/g metis-5.1/Makefile
+	cd SuiteSparse; cd metis-5.1 && make all 
 	cd SuiteSparse; make library
 ## Restore object files so we can make .so
 	cd SuiteSparse; cd SuiteSparse_config; ar vx *.a
 	cd SuiteSparse; cd CCOLAMD/Lib; ar vx *.a
 	cd SuiteSparse; cd COLAMD/Lib; ar vx *.a
-	cd SuiteSparse; gcc -shared -o libcholmod.so SuiteSparse_config/SuiteSparse_config.o CHOLMOD/Lib/*.o AMD/Lib/*.o CAMD/Lib/*.o CCOLAMD/Lib/*.o COLAMD/Lib/*.o metis-4.0/Lib/*.o `R CMD config BLAS_LIBS` `R CMD config LAPACK_LIBS`
+	cd SuiteSparse; gcc -shared -o libcholmod.so SuiteSparse_config/SuiteSparse_config.o CHOLMOD/Lib/*.o AMD/Lib/*.o CAMD/Lib/*.o CCOLAMD/Lib/*.o COLAMD/Lib/*.o metis-5.1/build/Linux-x86_64/libmetis/CMakeFiles/metis.dir/*.o `R CMD config BLAS_LIBS` `R CMD config LAPACK_LIBS`
 	if [ "$(OS)" = "Darwin" ]; then						\
 		cd SuiteSparse;							\
 		install_name_tool -id `pwd`/libcholmod.so libcholmod.so;	\
@@ -73,7 +73,7 @@ SuiteSparse: $(SUITESPARSE).tar.gz $(METIS).tar.gz
 
 install-metis-full: SuiteSparse
 	make build-package
-	LIBCHOLMOD=`pwd`/SuiteSparse/libcholmod.so R CMD INSTALL --preclean $(TARBALL)
+	LIBCHOLMOD=`pwd`/SuiteSparse/lib/libcholmod.so R CMD INSTALL --preclean $(TARBALL)
 
 ## Get a rough changelog since most recent github revision tag
 ## (Use as starting point when updating NEWS file)
