@@ -6,7 +6,7 @@
 \usage{
 compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
   openmp = isParallelTemplate(file[1]), libtmb = TRUE, libinit = TRUE,
-  ...)
+  tracesweep = FALSE, ...)
 }
 \arguments{
 \item{file}{C++ file.}
@@ -22,6 +22,8 @@ compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
 \item{libtmb}{Use precompiled TMB library if available (to speed up compilation)?}
 
 \item{libinit}{Turn on preprocessor flag to register native routines?}
+
+\item{tracesweep}{Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})}
 
 \item{...}{Passed as Makeconf variables.}
 }

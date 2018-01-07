@@ -1,4 +1,26 @@
 ------------------------------------------------------------------------
+TMB 1.7.12 (2017-12-10)
+------------------------------------------------------------------------
+
+o Fix CRAN rchk tool warnings (although false alarm)
+
+o New macro TMB_OBJECTIVE_PTR for more flexible use of DATA and
+  PARAMETER objects.
+
+o Fix 'oneStepPredict' when no random effects.
+
+o C callable routines 'tmb_forward' and 'tmb_reverse' added.
+
+o Fix bug in empty array assignment.
+
+o Fix slow 'oneStepPredict' caused by matrix inversion in
+  'tmbprofile'.
+
+o TMB:::setupRstudio()
+
+o compile: Add flag for tracing forward sweeps.
+
+------------------------------------------------------------------------
 TMB 1.7.11 (2017-08-09)
 ------------------------------------------------------------------------
 

@@ -7,7 +7,8 @@
 sdreport(obj, par.fixed = NULL, hessian.fixed = NULL,
   getJointPrecision = FALSE, bias.correct = FALSE,
   bias.correct.control = list(sd = FALSE, split = NULL, nsplit = NULL),
-  ignore.parm.uncertainty = FALSE, getReportCovariance = TRUE)
+  ignore.parm.uncertainty = FALSE, getReportCovariance = TRUE,
+  skip.delta.method = FALSE)
 }
 \arguments{
 \item{obj}{Object returned by \code{MakeADFun}}
@@ -25,6 +26,8 @@ sdreport(obj, par.fixed = NULL, hessian.fixed = NULL,
 \item{ignore.parm.uncertainty}{Optional. Ignore estimation variance of parameters?}
 
 \item{getReportCovariance}{Get full covariance matrix of ADREPORTed variables?}
+
+\item{skip.delta.method}{Skip the delta method? (\code{FALSE} by default)}
 }
 \value{
 Object of class \code{sdreport}
@@ -54,6 +57,8 @@ The covariance matrix of reported variables
 \eqn{V(\phi(\hat\theta))} is returned by default. This can cause
 high memory usage if many variables are ADREPORTed. Use
 \code{getReportCovariance=FALSE} to only return standard errors.
+In case standard deviations are not required one can completely skip
+the delta method using \code{skip.delta.method=TRUE}.
 
 For random effect models a generalized delta-method is used. First
 the joint covariance of random effects and parameters is estimated
@@ -105,7 +110,7 @@ estimator is calculated using
 \varepsilon \phi(u,\theta))\:du\right)_{|\varepsilon=0}}
 A further correction is added to this variance to account for the
 effect of replacing \eqn{\theta} by the MLE \eqn{\hat\theta}
-(unless \code{ignore.theta.uncertainty=TRUE}).
+(unless \code{ignore.parm.uncertainty=TRUE}).
 
 Bias correction can be be performed in chunks in order to reduce
 memory usage or in order to only bias correct a subset of
@@ -116,6 +121,8 @@ variables in two chunks. Second option is to pass the number of
 chunks as \code{bias.correct.control$nsplit} in which case all
 ADREPORTed variables are bias corrected in the specified number of
 chunks.
+Also note that \code{skip.delta.method} may be necessary when bias
+correcting a large number of variables.
 }
 \examples{
 \dontrun{

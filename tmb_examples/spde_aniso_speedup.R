@@ -4,8 +4,12 @@
 
 library(TMB)
 library(Matrix)
-compile("spde_aniso.cpp")
-dyn.load(dynlib("spde_aniso"))
+compile("spde_aniso_speedup.cpp")
+dyn.load(dynlib("spde_aniso_speedup"))
+
+## Expected output for this example:
+file.copy("spde_aniso.expected.RData",
+          "spde_aniso_speedup.expected.RData",TRUE)
 
 ## get cached objects - See 'spde_mesh.R'
 ##  'inla_mesh'
@@ -56,7 +60,10 @@ parameters <- list(beta       = c(-5.0,0,0,0,0),
                    x          = rep(0.0, data$spde$n_s))
 
 ## Fit model
-obj <- MakeADFun(data, parameters, random="x", DLL="spde_aniso")
+data$flag <- 1 ## Include data
+obj <- MakeADFun(data, parameters, random="x", DLL="spde_aniso_speedup")
+obj <- normalize(obj, flag="flag")
+
 L <- c(-7, -1, -1, -1, -1, -3.0, 2.0, c(-10,-10), log(0.1) )
 U <- c(-4,  1,  1,  1,  1, -1.0, 3.0, c( 10, 10), log(10.0))
 opt <- nlminb(obj$par, obj$fn, obj$gr, lower=L, upper=U)

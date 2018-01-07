@@ -818,77 +818,81 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
    \endverbatim
 */
 template <class scalartype_>
-class GMRF_t{
+class GMRF_t {
   TYPEDEFS(scalartype_);
 private:
   Eigen::SparseMatrix<scalartype> Q;
   scalartype logdetQ;
-  int sqdist(vectortype x, vectortype x_){
-    int ans=0;
+  int sqdist(vectortype x, vectortype x_) {
+    int ans = 0;
     int tmp;
-    for(int i=0;i<x.size();i++){
-      tmp=CppAD::Integer(x[i])-CppAD::Integer(x_[i]);
-      ans+=tmp*tmp;
+    for(int i=0; i<x.size(); i++){
+      tmp = CppAD::Integer(x[i]) - CppAD::Integer(x_[i]);
+      ans += tmp * tmp;
     }
     return ans;
   }
 public:
   GMRF_t(){}
-  GMRF_t(Eigen::SparseMatrix<scalartype> Q_, int order_=1){
-    setQ(Q_,order_);
+  GMRF_t(Eigen::SparseMatrix<scalartype> Q_, int order_=1, bool normalize=true){
+    setQ(Q_, order_, normalize);
   }
-  GMRF_t(arraytype x, vectortype delta, int order_=1){
-    int n=x.cols();
+  GMRF_t(arraytype x, vectortype delta, int order_=1, bool normalize=true){
+    int n = x.cols();
     typedef Eigen::Triplet<scalartype> T;
     std::vector<T> tripletList;
-    for(int i=0;i<n;i++){
-      for(int j=0;j<n;j++){
-	if(sqdist(x.col(i),x.col(j))==1){
-	  tripletList.push_back(T(i,j,scalartype(-1)));
-	  tripletList.push_back(T(i,i,scalartype(1)));
+    for(int i=0; i<n; i++){
+      for(int j=0; j<n; j++){
+	if (sqdist(x.col(i),x.col(j)) == 1){
+          tripletList.push_back(T(i, j, scalartype(-1)));
+          tripletList.push_back(T(i, i, scalartype( 1)));
 	}
       }
     }
-    for(int i=0;i<n;i++){
-      tripletList.push_back(T(i,i,delta[i]));
+    for(int i=0; i<n; i++) {
+      tripletList.push_back(T(i, i, delta[i]));
     }
-    Eigen::SparseMatrix<scalartype> Q_(n,n);
+    Eigen::SparseMatrix<scalartype> Q_(n, n);
     Q_.setFromTriplets(tripletList.begin(), tripletList.end());
-    setQ(Q_,order_);
+    setQ(Q_, order_, normalize);
   }
-  void setQ(Eigen::SparseMatrix<scalartype> Q_, int order=1){
-    Q=Q_;
-    Eigen::SimplicialLDLT< Eigen::SparseMatrix<scalartype> > ldl(Q);
-    vectortype D=ldl.vectorD();
-    logdetQ=(log(D)).sum();
-    /* Q^order */
-    for(int i=1;i<order;i++){
-      Q=Q*Q_;
+  void setQ(Eigen::SparseMatrix<scalartype> Q_, int order=1, bool normalize=true){
+    Q = Q_;
+    if (normalize) {
+      Eigen::SimplicialLDLT< Eigen::SparseMatrix<scalartype> > ldl(Q);
+      vectortype D = ldl.vectorD();
+      logdetQ = (log(D)).sum();
+    } else {
+      logdetQ = 0;
     }
-    logdetQ=scalartype(order)*logdetQ;
+    /* Q^order */
+    for(int i=1; i<order; i++){
+      Q = Q * Q_;
+    }
+    logdetQ = scalartype(order) * logdetQ;
   }
   /* Quadratic form: x'*Q^order*x */
   scalartype Quadform(vectortype x){
-    return (x*(Q*x.matrix()).array()).sum();
+    return (x * (Q * x.matrix()).array()).sum();
   }
   scalartype operator()(vectortype x){
-    return -scalartype(.5)*logdetQ + scalartype(.5)*Quadform(x) + x.size()*scalartype(log(sqrt(2.0*M_PI)));
+    return -scalartype(.5) * logdetQ + scalartype(.5) * Quadform(x) + x.size() * scalartype(log(sqrt(2.0 * M_PI)));
   }
   /* jacobian */
   arraytype jacobian(arraytype x){
     arraytype y(x.dim);
     matrixtype m(x.size()/x.cols(),x.cols());
-    for(int i=0;i<x.size();i++)m(i)=x[i];
-    matrixtype mQ=m*Q;
-    for(int i=0;i<x.size();i++)y[i]=mQ(i);
+    for(int i=0; i<x.size(); i++) m(i) = x[i];
+    matrixtype mQ = m * Q;
+    for(int i=0; i<x.size(); i++) y[i] = mQ(i);
     return y;
   }
-  int ndim(){return 1;}
-  vectortype variance(){
-    int n=Q.rows();
+  int ndim() { return 1; }
+  vectortype variance() {
+    int n = Q.rows();
     vectortype ans(n);
-    matrixtype C=invertSparseMatrix(Q);
-    for(int i=0;i<n;i++)ans[i]=C(i,i);
+    matrixtype C = invertSparseMatrix(Q);
+    for(int i=0; i<n; i++) ans[i] = C(i,i);
     return ans;
   }
   /* Simulation */
@@ -912,21 +916,26 @@ public:
   For detailed explanation of GMRFs see the class definition @ref GMRF_t
   \param Q precision matrix
   \param order Convolution order, i.e. the precision matrix is Q^order (matrix product)
+  \param normalize Add normalizing constant ?
 
 */
 template <class scalartype>
-GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order=1){
-  return GMRF_t<scalartype>(Q, order);
+GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, int order, bool normalize=true) {
+  return GMRF_t<scalartype>(Q, order, normalize);
 }
 template <class scalartype, class arraytype >
-GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1){
-  return GMRF_t<scalartype>(x, delta, order);
+GMRF_t<scalartype> GMRF(arraytype x, vector<scalartype> delta, int order=1, bool normalize=true) {
+  return GMRF_t<scalartype>(x, delta, order, normalize);
 }
 template <class scalartype, class arraytype >
-GMRF_t<scalartype> GMRF(arraytype x, scalartype delta, int order=1){
+GMRF_t<scalartype> GMRF(arraytype x, scalartype delta, int order=1, bool normalize=true) {
   vector<scalartype> d(x.cols());
-  for(int i=0;i<d.size();i++)d[i]=delta;
-  return GMRF_t<scalartype>(x, d, order);
+  for(int i=0; i<d.size(); i++) d[i] = delta;
+  return GMRF_t<scalartype>(x, d, order, normalize);
+}
+template <class scalartype>
+GMRF_t<scalartype> GMRF(Eigen::SparseMatrix<scalartype> Q, bool normalize = true) {
+  return GMRF_t<scalartype>(Q, 1, normalize);
 }
 
 /** \brief Apply scale transformation on a density

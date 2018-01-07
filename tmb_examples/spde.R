@@ -6,52 +6,50 @@ library(TMB)
 compile("spde.cpp")
 dyn.load(dynlib("spde"))
 
-# Sets INLA mesh. Please refer to R-INLA documentation
-require(splancs)
-require(rgl)
-require(INLA)
-require(lattice)
-data(Leuk)
-Leuk$id = 1:dim(Leuk)[1]
-loc = cbind(Leuk$xcoord,Leuk$ycoord)
-loc = cbind(Leuk$xcoord, Leuk$ycoord)
-bnd1 = inla.nonconvex.hull(loc, convex=0.05)
-bnd2 = inla.nonconvex.hull(loc, convex=0.25)
-mesh = inla.mesh.2d(
-                  loc=cbind(Leuk$xcoord, Leuk$ycoord),
-                  boundary=list(bnd1, bnd2),
-                  min.angle=24,
-                  max.edge=c(0.05, 0.2),
-                  cutoff=0.005,
-                  plot.delay=0.5
-                  )
-#------ End INLA setup
-     
-# Fixed effects part of model
-X = model.matrix(~1+sex+age+wbc+tpi,data=Leuk)
-data <- list(time=Leuk$time,notcens=Leuk$cens,meshidxloc=mesh$idx$loc-1,X=as.matrix(X))
+## get cached objects - See 'spde_mesh.R'
+##  'inla_mesh'
+##  'inla_spde'
+##  'Leuk'
+load("spde_mesh.RData")
 
-# SPDE part: builds 3 components of Q (precision matrix)
-data$spde <- (inla.spde2.matern(mesh, alpha=2)$param.inla)[c("M0","M1","M2")]	# Encapsulation of 3 matrices
-n_s = nrow(data$spde$M0)														# Number of points in mesh (including supporting points)
+## Fixed effects part of model
+X <- model.matrix( ~ 1 + sex + age + wbc + tpi, data = Leuk)
 
-parameters <- list(beta=c(-5.0,0,0,0,0),log_tau=-2.0,log_kappa=2.5,log_omega=-1,x=rep(0.0,n_s))
+data <- list(time       = Leuk$time,
+             notcens    = Leuk$cens,
+             meshidxloc = inla_mesh$idx$loc - 1,
+             X          = as.matrix(X))
 
-# Phase 1: Fit non-spatial part first to get good starting values for fixed effects
-not_phase1 = list(log_tau=as.factor(NA),log_kappa=as.factor(NA),x=factor(rep(NA,n_s)))
-obj <- MakeADFun(data,parameters,map=not_phase1,DLL="spde")
-#opt1 <- nlminb(obj$par,obj$fn,obj$gr,lower=L,upper=U)
-opt1 <- nlminb(obj$par,obj$fn,obj$gr)
+## SPDE part: builds 3 components of Q (precision matrix)
+data$spde <- inla_spde$param.inla[c("M0","M1","M2")]  # Encapsulation of 3 matrices
+n_s <- nrow(data$spde$M0)                             # Number of points in mesh (including supporting points)
 
-# Modify starting values after phase 1
-parameters <- list(beta=opt1$par[1:5],log_tau=-2.0,log_kappa=2.5,log_omega=opt1$par["log_omega"],x=rep(0.0,n_s))
+parameters <- list(beta      = c(-5.0,0,0,0,0),
+                   log_tau   = -2.0,
+                   log_kappa = 2.5,
+                   log_omega = -1,
+                   x         = rep(0.0, n_s) )
 
-# Phase 2: Include spatial part. Use starting values from phase 1
-obj <- MakeADFun(data,parameters,random="x",DLL="spde")
-L=c(-7,-1,-1,-1,-1,-3.0,2.0,log(0.1))
-U=c(-4,1,1,1,1,-1.0,3.0,log(10.0))
-opt <- nlminb(obj$par,obj$fn,obj$gr,lower=L,upper=U)
+## Phase 1: Fit non-spatial part first to get good starting values for fixed effects
+not_phase1 <- list(log_tau   = as.factor(NA),
+                   log_kappa = as.factor(NA),
+                   x         = factor(rep(NA, n_s)) )
+obj <- MakeADFun(data, parameters, map=not_phase1, DLL="spde")
+opt1 <- nlminb(obj$par, obj$fn, obj$gr)
+
+## Modify starting values after phase 1
+parameters <- list(beta      = opt1$par[1:5],
+                   log_tau   = -2.0,
+                   log_kappa =  2.5,
+                   log_omega = opt1$par["log_omega"],
+                   x         = rep(0.0, n_s))
+
+## Phase 2: Include spatial part. Use starting values from phase 1
+obj <- MakeADFun(data, parameters, random="x", DLL="spde")
+L   <- c(-7, -1, -1, -1, -1, -3.0, 2.0, log(0.1) )
+U   <- c(-4,  1,  1,  1,  1, -1.0, 3.0, log(10.0))
+opt <- nlminb(obj$par, obj$fn, obj$gr, lower=L, upper=U)
 
 # Calculate standard deviations, and extract rho
-Rep = sdreport(obj)
-rho_est = summary(Rep,"report")
+Rep <- sdreport(obj)
+rho_est <- summary(Rep,"report")

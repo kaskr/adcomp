@@ -315,8 +315,10 @@ getListElement(TMB_OBJECTIVE_PTR -> data,                               \
 if( isDouble<Type>::value &&                                            \
     TMB_OBJECTIVE_PTR -> current_parallel_region<0 )                    \
 {                                                                       \
+    SEXP _TMB_temporary_sexp_;                                          \
+    PROTECT( _TMB_temporary_sexp_ = asSEXP(name) );                     \
     Rf_defineVar(Rf_install(#name),                                     \
-                 asSEXP_protect(name), TMB_OBJECTIVE_PTR -> report);    \
+                 _TMB_temporary_sexp_, TMB_OBJECTIVE_PTR -> report);    \
     UNPROTECT(1);                                                       \
 }
 
