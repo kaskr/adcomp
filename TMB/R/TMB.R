@@ -708,8 +708,15 @@ MakeADFun <- function(data, parameters, map=list(),
                  antithetic=TRUE,    ## Reduce variance
                  keep=FALSE,         ## Keep samples and fct evals
                  phi=NULL,           ## Function to calculate mean of
+                 polar=FALSE,        ## Use quadrature along sampled directions.
                  ...){
     if(is.numeric(seed))set.seed(seed)
+    ## Check
+    if (is.null(polar)) polar <- FALSE
+    if (polar) {
+        stopifnot(is.null(phi))
+        stopifnot(order == 0)
+    }
     ## Clean up on exit
     last.par.old <- last.par
     last.par.best.old <- last.par.best
@@ -721,27 +728,64 @@ MakeADFun <- function(data, parameters, map=list(),
     updateCholesky(L,h)             ## P %*% h %*% Pt = L %*% Lt
     rmvnorm <- function(n){
         u <- matrix(rnorm(ncol(L)*n),ncol(L),n)
+        if (polar) {
+            norm.u <- sqrt(colSums(u * u))
+            u <- u / norm.u[col(u)]
+        }
         u <- solve(L,u,system="Lt") ## Solve Lt^-1 %*% u
         u <- solve(L,u,system="Pt") ## Multiply Pt %*% u
         as.matrix(u)
     }
-    M.5.log2pi <- -.5* log(2*pi) # = log(1/sqrt(2*pi))
-    logdmvnorm <- function(u){
-        logdetH.5 <- determinant(L,logarithm=TRUE)$modulus # = log(det(L)) =  .5 * log(det(H))
-        nrow(h)*M.5.log2pi + logdetH.5 - .5*colSums(u*as.matrix(h %*% u))
-    }
-    eval.target <- function(u,order=0){
-      par[random] <- u
-      f(par,order=order)
-    }
+    ## Draw samples
     samples <- rmvnorm(n)
-    if(antithetic)samples <- cbind(samples,-samples) ## Antithetic variates
-    log.density.propose <- logdmvnorm(samples)
-    samples <- samples+par0[random]
-    log.density.target <- -apply(samples,2,eval.target)
-    log.density.target[is.nan(log.density.target)] <- -Inf
-    I <- log.density.target - log.density.propose
-    M <- max(I)
+    if (antithetic)
+        samples <- cbind(samples, -samples) ## Antithetic variates
+    ## Case 1: Direct sampling (polar=FALSE)
+    if (!polar) {
+        M.5.log2pi <- -.5* log(2*pi) # = log(1/sqrt(2*pi))
+        logdmvnorm <- function(u){
+            logdetH.5 <- determinant(L,logarithm=TRUE)$modulus # = log(det(L)) =  .5 * log(det(H))
+            nrow(h)*M.5.log2pi + logdetH.5 - .5*colSums(u*as.matrix(h %*% u))
+        }
+        eval.target <- function(u,order=0){
+            par[random] <- u
+            f(par,order=order)
+        }
+        log.density.propose <- logdmvnorm(samples)
+        samples <- samples+par0[random]
+        log.density.target <- -apply(samples,2,eval.target)
+        log.density.target[is.nan(log.density.target)] <- -Inf
+        I <- log.density.target - log.density.propose
+        M <- max(I)
+    } else {
+        logRobustIntegrate <- function(logL) {
+            opt <- nlminb(1, function(x) -logL(x))
+            max <- -opt$objective
+            x0 <- opt$par
+            f <- Vectorize(function(t) {
+                ans <- exp(logL(t) - max)
+                ans[!is.finite(ans)] <- 0
+                ans
+            })
+            ans <- integrate(f, 0, x0)$val + integrate(f, x0, Inf)$val
+            ans <- log(ans)
+            ans <- ans + max
+            ans
+        }
+        eval.target <- function(direction) {
+            logRobustIntegrate(
+                function(r) {
+                    par0[random] <- par0[random] + r * direction
+                    -obj$env$f(par0) + (ncol(L)-1) * log(r)
+                })
+        }
+        log.density.target <- apply(samples, 2, eval.target)
+        ## FIXME: log.density.target[is.nan(log.density.target)] <- -Inf
+        logS <- (ncol(L)/2) * log(pi) + log(2) - lgamma(ncol(L)/2) ## Surface area of sphere
+        logL <- determinant(L)$mod
+        I <- log.density.target + logS - logL
+        M <- max(I)
+    }
     if(order>=1){
       vec <- exp(I-M)
       p <- vec/sum(vec)
@@ -828,7 +872,7 @@ MakeADFun <- function(data, parameters, map=list(),
            ans <- try({
              if(MCcontrol$doMC){
                ff(x,order=0)
-               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=0)
+               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,polar=MCcontrol$polar,order=0)
              } else
                ff(x,order=0)
            },silent=silent)
@@ -838,7 +882,7 @@ MakeADFun <- function(data, parameters, map=list(),
            ans <- try( {
              if(MCcontrol$doMC){
                ff(x,order=0)
-               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=1)
+               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,polar=MCcontrol$polar,order=1)
              } else
                ff(x,order=1)
            }, silent=silent)
