@@ -1,11 +1,11 @@
-R=R
-# -> you can do    R=R-devel  make ....
-
 PACKAGE=TMB
 VERSION := $(shell sed -n '/^Version: /s///p' TMB/DESCRIPTION)
 DATE := $(shell sed -n '/^Date: /s///p' TMB/DESCRIPTION)
 TARBALL=${PACKAGE}_${VERSION}.tar.gz
 ZIPFILE=${PACKAGE}_${VERSION}.zip
+
+# Allow e.g. "make R=R-devel install"
+R=R
 
 all:
 	make doc-update
@@ -14,27 +14,27 @@ all:
 	make pdf
 
 doc-update:
-	echo "library(roxygen2);roxygenize(\"$(PACKAGE)\",roclets = c(\"collate\", \"rd\"))" | R --slave
+	echo "library(roxygen2);roxygenize(\"$(PACKAGE)\",roclets = c(\"collate\", \"rd\"))" | $(R) --slave
 
 build-package:
-	R CMD build --resave-data=no $(PACKAGE)
+	$(R) CMD build --resave-data=no $(PACKAGE)
 
 install:
 	make build-package
-	R CMD INSTALL --preclean $(TARBALL)
+	$(R) CMD INSTALL --preclean $(TARBALL)
 
 install-metis:
 	make build-package
-	LIBCHOLMOD=/usr/lib/libcholmod.so.3.1.0 R CMD INSTALL --preclean $(TARBALL)
+	LIBCHOLMOD=/usr/lib/libcholmod.so.3.1.0 $(R) CMD INSTALL --preclean $(TARBALL)
 
 
 unexport TEXINPUTS
 pdf:
 	rm -f $(PACKAGE).pdf
-	R CMD Rd2pdf --no-preview $(PACKAGE)
+	$(R) CMD Rd2pdf --no-preview $(PACKAGE)
 
 check:
-	R CMD check $(PACKAGE)
+	$(R) CMD check $(PACKAGE)
 
 unlock:
 	rm -rf `Rscript --vanilla -e 'writeLines(.Library)'`/00LOCK-TMB
@@ -117,7 +117,7 @@ cran-version:
 ##########################################################
 ## For travis tests
 test:
-	R --version
+	$(R) --version
 	cd tmb_syntax; make test
 	cd tmb_examples; make test
 
@@ -125,4 +125,4 @@ doxygen:
 	cd dox; make all
 
 cran-check:
-	R CMD check --as-cran $(TARBALL)
+	$(R) CMD check --as-cran $(TARBALL)
