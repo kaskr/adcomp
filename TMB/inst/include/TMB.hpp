@@ -85,6 +85,7 @@ namespace CppAD{
 #include "atomic_convolve.hpp"
 #include "tiny_ad/atomic.hpp"
 #include "tiny_ad/integrate/integrate.hpp"
+#include "dynamic_data.hpp" // Requires atomic namespace
 #include "Vectorize.hpp"
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
