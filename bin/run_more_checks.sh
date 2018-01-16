@@ -8,4 +8,5 @@ if [ ! -f ~/.R/Makevars ]; then
     echo "CXX = g++ -Wall -pedantic -Werror" > ~/.R/Makevars
 fi
 
-make test-tmb_examples
+make test-tmb_syntax
+

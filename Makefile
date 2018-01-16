@@ -116,9 +116,12 @@ cran-version:
 
 ##########################################################
 ## For travis tests
-test:
+test-tmb_syntax:
 	$(R) --version
 	cd tmb_syntax; make test
+
+test-tmb_examples:
+	$(R) --version
 	cd tmb_examples; make test
 
 doxygen:
