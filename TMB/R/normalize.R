@@ -35,6 +35,7 @@ normalize <- function(obj, flag, value=0) {
     newobj$env <- obj1$env
     ## Workaround: Insert NAs in invalid hessian block H[fixed, fixed]
     ## if accessed by e.g. 'sdreport':
+    random <- NULL ## CRAN check: no visible binding
     local({
         f_old <- f
         f <- function(...) {
