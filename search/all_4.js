@@ -15,6 +15,7 @@ var searchData=
   ['data_5fsparse_5fmatrix',['DATA_SPARSE_MATRIX',['../group__macros.html#ga75dbde3f78d762602b7ffc0f19a99e1e',1,'tmb_core.hpp']]],
   ['data_5fstring',['DATA_STRING',['../group__macros.html#gaba52ba9bd5c88f42a0ce96432aa6e688',1,'tmb_core.hpp']]],
   ['data_5fstruct',['DATA_STRUCT',['../group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2',1,'tmb_core.hpp']]],
+  ['data_5fupdate',['DATA_UPDATE',['../group__macros.html#ga3a3716228d46fbe32e23856b2f53be8d',1,'dynamic_data.hpp']]],
   ['data_5fvector',['DATA_VECTOR',['../group__macros.html#gad334262a7679f343bdc919ae35810161',1,'tmb_core.hpp']]],
   ['data_5fvector_5findicator',['DATA_VECTOR_INDICATOR',['../group__macros.html#ga572dab4f17d676ac36bc8e92f3c9a4c0',1,'tmb_core.hpp']]],
   ['dbeta',['dbeta',['../group__R__style__distribution.html#ga5324c83759d5211c7c2fbbad37fa8e59',1,'distributions_R.hpp']]],

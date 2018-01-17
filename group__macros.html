@@ -123,6 +123,9 @@ Macros</h2></td></tr>
 <tr class="memitem:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>(name,  struct)&#160;&#160;&#160;struct&lt;Type&gt; name(getListElement(<a class="el" href="group__macros.html#ga50653183cdc71e3cb81b410768f23efb">TMB_OBJECTIVE_PTR</a> -&gt; data, #name));</td></tr>
 <tr class="memdesc:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data list object from R and make it available in C++.  <a href="#gaf9885566da0d248c1a4b4d7a0eeafcd2">More...</a><br /></td></tr>
 <tr class="separator:gaf9885566da0d248c1a4b4d7a0eeafcd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3a3716228d46fbe32e23856b2f53be8d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga3a3716228d46fbe32e23856b2f53be8d">DATA_UPDATE</a>(name)</td></tr>
+<tr class="memdesc:ga3a3716228d46fbe32e23856b2f53be8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update a data object without re-taping.  <a href="#ga3a3716228d46fbe32e23856b2f53be8d">More...</a><br /></td></tr>
+<tr class="separator:ga3a3716228d46fbe32e23856b2f53be8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad334262a7679f343bdc919ae35810161"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(name)</td></tr>
 <tr class="memdesc:gad334262a7679f343bdc919ae35810161"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get data vector from R and declare it as vector&lt;Type&gt;  <a href="#gad334262a7679f343bdc919ae35810161">More...</a><br /></td></tr>
 <tr class="separator:gad334262a7679f343bdc919ae35810161"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -337,6 +340,31 @@ Levels: d e f g h i j
 <p>In R: </p><div class="fragment"><div class="line">data &lt;- list()</div><div class="line">data$object &lt;- list(a=1:10, b=<a class="code" href="structmatrix.html">matrix</a>(1:6,2))</div><div class="line">obj &lt;- MakeADFun(data,........) </div></div><!-- fragment --><p>In C++: </p><div class="fragment"><div class="line"><span class="comment">// Corresponding list object on the C++ side</span></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div><div class="line"><span class="keyword">struct </span>my_list {</div><div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> a;</div><div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> b;</div><div class="line">  my_list(SEXP x){ <span class="comment">// Constructor</span></div><div class="line">    a = asVector&lt;Type&gt;(getListElement(x,<span class="stringliteral">&quot;a&quot;</span>));</div><div class="line">    b = asMatrix&lt;Type&gt;(getListElement(x,<span class="stringliteral">&quot;b&quot;</span>));</div><div class="line">  }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div><div class="line">Type objective_function&lt;Type&gt;::operator() ()</div><div class="line">{</div><div class="line">  <a class="code" href="group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>(<span class="keywordtype">object</span>, my_list);</div><div class="line">  <a class="code" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(<span class="keywordtype">object</span>.a); <span class="comment">// Now you can use &quot;a&quot; and &quot;b&quot; as you like</span></div><div class="line">  <a class="code" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(<span class="keywordtype">object</span>.b);</div><div class="line">  <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="spde_8cpp-example.html#a3">spde.cpp</a>, <a class="el" href="spde_aniso_8cpp-example.html#a3">spde_aniso.cpp</a>, and <a class="el" href="spde_aniso_speedup_8cpp-example.html#a4">spde_aniso_speedup.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00434">434</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ga3a3716228d46fbe32e23856b2f53be8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3a3716228d46fbe32e23856b2f53be8d">&sect;&nbsp;</a></span>DATA_UPDATE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DATA_UPDATE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">name = atomic::dynamic_data::sexp_to_vector(            \</div><div class="line">         atomic::dynamic_data::list_lookup_by_name(     \</div><div class="line">           atomic::dynamic_data::envir_lookup_by_name(  \</div><div class="line">             atomic::dynamic_data::set_dependent(       \</div><div class="line">               atomic::dynamic_data::sexp_to_double(    \</div><div class="line">                 ENCLOS(this-&gt;report)                   \</div><div class="line">               ),                                       \</div><div class="line">               this-&gt;theta[0]                           \</div><div class="line">             ),                                         \</div><div class="line">             <span class="stringliteral">&quot;data&quot;</span>                                     \</div><div class="line">           ),                                           \</div><div class="line">           #name                                        \</div><div class="line">         )                                              \</div><div class="line">       );</div></div><!-- fragment -->
+<p>Update a data object without re-taping. </p>
+<p>Placing <a class="el" href="group__macros.html#ga3a3716228d46fbe32e23856b2f53be8d" title="Update a data object without re-taping. ">DATA_UPDATE(x)</a> <b>after</b> e.g. <a class="el" href="group__macros.html#gad334262a7679f343bdc919ae35810161" title="Get data vector from R and declare it as vector&lt;Type&gt; ">DATA_VECTOR(x)</a> will allow to change x on the R-side (through obj$env$data$x) without re-taping.</p>
+<dl class="section note"><dt>Note</dt><dd>Only works for <a class="el" href="group__macros.html#gad334262a7679f343bdc919ae35810161" title="Get data vector from R and declare it as vector&lt;Type&gt; ">DATA_VECTOR()</a>, <a class="el" href="group__macros.html#gada5d1729c6988c1060cfa456b56c8d8c" title="Get data matrix from R and declare it as matrix&lt;Type&gt; ">DATA_MATRIX()</a> and <a class="el" href="group__macros.html#ga97c14a26ca75571090d332f15130ae4b" title="Get data array from R and declare it as array&lt;Type&gt; ">DATA_ARRAY()</a>. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>It is the user's responsibility not to reshape the data from R (i.e. change length or dimension). Storage mode must also remain constant. </dd></dl>
+
+<p>Definition at line <a class="el" href="dynamic__data_8hpp_source.html#l00202">202</a> of file <a class="el" href="dynamic__data_8hpp_source.html">dynamic_data.hpp</a>.</p>
 
 </div>
 </div>
