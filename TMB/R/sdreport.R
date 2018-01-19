@@ -497,6 +497,11 @@ as.list.sdreport <- function(x, what = "", ...){
         if(is.null(attr(x,"map")))
             return(x)
         y <- attr(x,"shape")
+        ## Handle special case where parameters are mapped to a fixed
+        ## value
+        if (what != "Estimate") {
+            y[] <- NA
+        }
         f <- attr(x,"map")
         i <- which(f >= 0)
         y[i] <- x[f[i] + 1L]
