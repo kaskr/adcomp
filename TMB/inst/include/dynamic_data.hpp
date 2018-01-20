@@ -105,6 +105,11 @@ namespace dynamic_data {
                              // forward double
                              SEXP data = double_to_sexp( tx[0] );
                              int n = LENGTH( data );
+                             if (n != (int) ty.size())
+                               Rf_error("Data update: "
+                                        "number of items to replace (%i) "
+                                        "does not match replacement length (%i)",
+                                        ty.size(), n);
                              for (int i = 0; i<n; i++) ty[i] = REAL(data)[i];
                              ,
                              // reverse
@@ -173,18 +178,19 @@ namespace dynamic_data {
     return list_lookup_by_index(tx)[0];
   }
 
-  /*
-    // Example 1
-    SEXP env = ENCLOS(this->report); // Get 'env'
-    Type tmp = set_dependent(sexp_to_double(env), this->theta[0]);
-    Type tmp2 = envir_lookup_by_name(tmp, "a");
-    vector<Type> sexp_to_vector(tmp2);
+  // Fill elements from y into x
+  template<class T1, class T2>
+  void cpy(T1 &x, T2 y) {
+    for (int i=0; i<y.size(); i++) {
+      x.coeffRef(i) = y.coeffRef(i);
+    }
+  }
 
-    // Example 2
-    DATA_ARRAY(a);
-    DATA_UPDATE(a);
-
-  */
+  // Scalar case
+  template<class Type>
+  void cpy(Type &x, vector<Type> y) {
+    x = y[0];
+  }
 
 }  
 }
@@ -193,24 +199,29 @@ namespace dynamic_data {
 
     Placing DATA_UPDATE(x) **after** e.g. DATA_VECTOR(x) will allow to
     change x on the R-side (through obj$env$data$x) without re-taping.
+    Updatable data items behave like *parameters*. In particular,
+    if-else branching on such data should be avoided.
 
-    \note Only works for DATA_VECTOR(), DATA_MATRIX() and DATA_ARRAY().
+    \note Only works for DATA_VECTOR(), DATA_MATRIX(), DATA_ARRAY()
+    and DATA_SCALAR().
     \warning It is the user's responsibility not to reshape the data
     from R (i.e. change length or dimension). Storage mode must also
     remain constant.
     \ingroup macros */
 #define DATA_UPDATE(name)                               \
-name = atomic::dynamic_data::sexp_to_vector(            \
-         atomic::dynamic_data::list_lookup_by_name(     \
-           atomic::dynamic_data::envir_lookup_by_name(  \
-             atomic::dynamic_data::set_dependent(       \
-               atomic::dynamic_data::sexp_to_double(    \
-                 ENCLOS(this->report)                   \
-               ),                                       \
-               this->theta[0]                           \
-             ),                                         \
-             "data"                                     \
-           ),                                           \
-           #name                                        \
-         )                                              \
-       );
+atomic::dynamic_data::cpy(name,                         \
+  atomic::dynamic_data::sexp_to_vector(                 \
+    atomic::dynamic_data::list_lookup_by_name(          \
+      atomic::dynamic_data::envir_lookup_by_name(       \
+        atomic::dynamic_data::set_dependent(            \
+          atomic::dynamic_data::sexp_to_double(         \
+            ENCLOS(this->report)                        \
+          ),                                            \
+          this->theta[0]                                \
+        ),                                              \
+        "data"                                          \
+      ),                                                \
+      #name                                             \
+    )                                                   \
+  )                                                     \
+);
