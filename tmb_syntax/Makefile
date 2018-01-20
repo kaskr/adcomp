@@ -20,6 +20,9 @@ test_reload:
 test_protect:
 	$(R) --slave < test_protect.R
 
+data_update:
+	$(R) --slave < data_update.R
+
 clean :
 	rm -rf *.o *.so *.dll *~ core *.output.RData *.pdf *.profile
 	rm -rf */*.o */*.so */*.dll */*~ core */*.output.RData */*.pdf */*.profile
@@ -37,6 +40,7 @@ spict:
 	echo 'TMB:::compile("spict.cpp",CXX="g++")' | $(R) --slave
 
 test:
+	make data_update
 	make test_protect
 	make check_simulations
 	make report
