@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      https://github.com/kaskr/adcomp/blob/master/emacs
 
-(defconst tmb-mode-version "3.4" "TMB Mode version number.")
+(defconst tmb-mode-version "3.5" "TMB Mode version number.")
 
 ;;; Commentary:
 ;;
@@ -412,7 +412,7 @@ fit <- nlminb(obj$par, obj$fn, obj$gr)
 
 ## Get parameter uncertainties and convergence diagnostics
 sdr <- sdreport(obj)
-sdr
+print(sdr)
 ")
       (goto-char (point-min))(write-file model-r t)))
   (message (concat "Ready to compile R script ("
