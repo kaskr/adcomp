@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      https://github.com/kaskr/adcomp/blob/master/emacs
 
-(defconst tmb-mode-version "3.4" "TMB Mode version number.")
+(defconst tmb-mode-version "3.5" "TMB Mode version number.")
 
 ;;; Commentary:
 ;;
@@ -341,10 +341,12 @@ Filename history is accessible in the minibuffer prompt \
  \\[next-history-element]).\n
 The script is sourced in an existing R session, or a new session is started."
   (interactive "fRun R script: ")(save-buffer)
-  (let* ((ess-dialect "R")
-         (inferior-R-args "--quiet --vanilla")
-         (ess-ask-for-ess-directory nil))
-    (tmb-split-window)(ess-load-file script)))
+  (let ((ess-dialect "R")
+        (inferior-R-args "--quiet --vanilla")
+        (ess-ask-for-ess-directory nil)
+        (cmd (concat "source(\"" script "\", echo=TRUE)")))
+    (if (get-buffer-window "*R*")(ess-eval-linewise cmd) ; check if visible
+      (tmb-open)(ess-eval-linewise cmd)(delete-other-windows)(tmb-show-r))))
 (defun tmb-scroll-down (n)
   "Scroll other window down N lines, or visit next error message.\n
 The behavior of this command depends on whether the compilation buffer is
