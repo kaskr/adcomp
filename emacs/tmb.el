@@ -337,8 +337,8 @@ The script is sourced in an existing R session, or a new R session is started."
 If the R script has the same filename prefix as the current buffer, then use
 `tmb-run' instead.\n
 Filename history is accessible in the minibuffer prompt \
-(\\<minibuffer-local-map>\\[previous-history-element],\
- \\[next-history-element]).\n
+\(\\<minibuffer-local-map>\\[previous-history-element], \
+\\[next-history-element]).\n
 The script is sourced in an existing R session, or a new session is started."
   (interactive "fRun R script: ")(save-buffer)
   (let ((ess-dialect "R")
