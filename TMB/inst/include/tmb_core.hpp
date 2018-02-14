@@ -464,6 +464,11 @@ if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
                                            #name) );                    \
+}                                                                       \
+else                                                                    \
+if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> data, #name))) {     \
+  name.fill( asVector<Type>(getListElement(                             \
+         TMB_OBJECTIVE_PTR -> data, #name, &Rf_isNumeric)));            \
 }
 
 /** \brief Declare an indicator vector 'name' of same shape as 'obs'.
