@@ -705,6 +705,12 @@ public:
                       replicates. */
   }
 
+  /** \brief Syncronize user's data object. It could be changed between calls to e.g. EvalDoubleFunObject */
+  void sync_data() {
+    SEXP env = ENCLOS(this->report);
+    this->data = findVar(install("data"), env);
+  }
+
   /** \brief Extract theta vector from objetive function object */
   SEXP defaultpar()
   {
@@ -1276,6 +1282,7 @@ extern "C"
       int do_simulate = INTEGER(getListElement(control, "do_simulate"))[0];
       objective_function<double>* pf;
       pf = (objective_function<double>*) R_ExternalPtrAddr(f);
+      pf -> sync_data();
       PROTECT( theta=Rf_coerceVector(theta,REALSXP) );
       int n = pf->theta.size();
       if (LENGTH(theta)!=n) Rf_error("Wrong parameter length.");
