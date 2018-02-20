@@ -207,7 +207,16 @@ namespace dynamic_data {
     \warning It is the user's responsibility not to reshape the data
     from R (i.e. change length or dimension). Storage mode must also
     remain constant.
-    \ingroup macros */
+    \ingroup macros
+    \internal
+    Explanation: The SEXP pointer of the model environment (`obj$env`)
+    is put on the tape with a fake dependency on an arbitrary model
+    parameter (`theta[0]`). This ensures that the corresponding node
+    in the computational graph is traversed on each forward sweep. In
+    contrast to other SEXPs, it is safe to put environments on the
+    tape because they do not change on copy or modification of the
+    variables they contain.
+*/
 #define DATA_UPDATE(name)                               \
 atomic::dynamic_data::cpy(name,                         \
   atomic::dynamic_data::sexp_to_vector(                 \
@@ -215,9 +224,9 @@ atomic::dynamic_data::cpy(name,                         \
       atomic::dynamic_data::envir_lookup_by_name(       \
         atomic::dynamic_data::set_dependent(            \
           atomic::dynamic_data::sexp_to_double(         \
-            ENCLOS(this->report)                        \
+            ENCLOS(TMB_OBJECTIVE_PTR -> report)         \
           ),                                            \
-          this->theta[0]                                \
+          TMB_OBJECTIVE_PTR -> theta[0]                 \
         ),                                              \
         "data"                                          \
       ),                                                \
