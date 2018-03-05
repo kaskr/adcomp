@@ -71,5 +71,15 @@ normalize <- function(obj, flag, value=0) {
             cat("outer mgc: ", max(abs(ans)), "\n")
         ans
     }
+    newobj$he <- function(x = newobj$par) {
+        ans <- obj1$he(x) - obj0$he(x)
+        ans
+    }
+    newobj$report <- obj1$env$report
+    newobj$simulate <- obj1$env$simulate
+    newobj$retape <- function(...) { obj1$retape(...); obj0$retape(...) }
+    ## Ensure all slots are present:
+    nm.diff <- setdiff(names(obj1), names(newobj))
+    newobj[nm.diff] <- obj1[nm.diff]
     newobj
 }
