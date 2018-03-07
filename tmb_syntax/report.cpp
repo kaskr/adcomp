@@ -29,5 +29,11 @@ Type objective_function<Type>::operator() ()
   voa[1] = c;
   REPORT(voa);
 
+  // AD Report objects back to R:
+  ADREPORT(a);
+  ADREPORT(b);
+  ADREPORT(c);
+  ADREPORT(p);
+
   return 0;
 }
