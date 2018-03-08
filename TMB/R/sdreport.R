@@ -536,7 +536,8 @@ as.list.sdreport <- function(x, what = "", report=FALSE, ...) {
         skeleton <- lapply(x$env$ADreportDims,
                            function(dim) array(NA, dim))
         skeleton <- as.relistable(skeleton)
-        ans <- relist(par, skeleton)
+        ans <- relist(par, skeleton) ## Not keeping array dims !
+        ans <- Map(array, ans, x$env$ADreportDims)
         class(ans) <- NULL
     }
     attr(ans, "check.passed") <- NULL
