@@ -381,6 +381,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ans$env <- new.env(parent = emptyenv())
   ans$env$parameters <- obj$env$parameters
   ans$env$random <- obj$env$random
+  ans$env$ADreportDims <- obj2$env$ADreportDims
   class(ans) <- "sdreport"
   ans
 }
@@ -461,7 +462,8 @@ print.sdreport <- function(x, ...)
 ##'
 ##' @title Convert estimates to original list format.
 ##' @param x Output from \code{\link{sdreport}}.
-##' @param what Select what to convert.
+##' @param what Select what to convert (Estimate / Std. Error).
+##' @param report Get AD reported variables rather than model parameters ?
 ##' @param ... Passed to \code{\link{summary.sdreport}}.
 ##' @return List of same shape as original parameter list.
 ##' @method as.list sdreport
@@ -469,49 +471,73 @@ print.sdreport <- function(x, ...)
 ##' @examples
 ##' \dontrun{
 ##' example(sdreport)
+##'
+##' ## Estimates as a parameter list:
 ##' as.list(rep, "Est")
+##'
+##' ## Std Errors in the same list format:
 ##' as.list(rep, "Std")
+##'
+##' ## p-values in the same list format:
 ##' as.list(rep, "Pr", p.value=TRUE)
+##'
+##' ## AD reported variables as a list:
+##' as.list(rep, "Estimate", report=TRUE)
+##'
+##' ## Bias corrected AD reported variables as a list:
+##' as.list(rep, "Est. (bias.correct)", report=TRUE)
 ##' }
-as.list.sdreport <- function(x, what = "", ...){
-    ans <- x$env$parameters
-    random <- x$env$random
-    par <- numeric(length(x$par.fixed) +
-                   length(x$par.random))
-    fixed <- rep(TRUE, length(par))
-    if(length(random)>0)
-        fixed[random] <- FALSE
-    ## Possible choices
-    opts <- colnames( summary(x, select = c("fixed", "random"), ...) )
-    what <- match.arg(what, opts)
-    if( any( fixed ) )
-        par[ fixed ] <- summary(x, select = "fixed",  ...)[ , what]
-    if( any(!fixed ) )
-        par[!fixed ] <- summary(x, select = "random", ...)[ , what]
-    ## Workaround utils::relist bug (?) for empty list items
-    nonemp <- sapply(ans, function(x)length(x) > 0)
-    nonempindex <- which(nonemp)
-    skeleton <- as.relistable(ans[nonemp])
-    li <- relist(par, skeleton)
-    reshape <- function(x){
-        if(is.null(attr(x,"map")))
-            return(x)
-        y <- attr(x,"shape")
-        ## Handle special case where parameters are mapped to a fixed
-        ## value
-        if (what != "Estimate") {
-            y[] <- NA
+as.list.sdreport <- function(x, what = "", report=FALSE, ...) {
+    if (!report) {
+        ans <- x$env$parameters
+        random <- x$env$random
+        par <- numeric(length(x$par.fixed) +
+                       length(x$par.random))
+        fixed <- rep(TRUE, length(par))
+        if(length(random)>0)
+            fixed[random] <- FALSE
+        ## Possible choices
+        opts <- colnames( summary(x, select = c("fixed", "random"), ...) )
+        what <- match.arg(what, opts)
+        if( any( fixed ) )
+            par[ fixed ] <- summary(x, select = "fixed",  ...)[ , what]
+        if( any(!fixed ) )
+            par[!fixed ] <- summary(x, select = "random", ...)[ , what]
+        ## Workaround utils::relist bug (?) for empty list items
+        nonemp <- sapply(ans, function(x)length(x) > 0)
+        nonempindex <- which(nonemp)
+        skeleton <- as.relistable(ans[nonemp])
+        li <- relist(par, skeleton)
+        reshape <- function(x){
+            if(is.null(attr(x,"map")))
+                return(x)
+            y <- attr(x,"shape")
+            ## Handle special case where parameters are mapped to a fixed
+            ## value
+            if (what != "Estimate") {
+                y[] <- NA
+            }
+            f <- attr(x,"map")
+            i <- which(f >= 0)
+            y[i] <- x[f[i] + 1L]
+            y
         }
-        f <- attr(x,"map")
-        i <- which(f >= 0)
-        y[i] <- x[f[i] + 1L]
-        y
-    }
-    for(i in seq(skeleton)){
-        ans[[nonempindex[i]]][] <- as.vector(li[[i]])
-    }
-    for(i in seq(ans)){
-        ans[[i]] <- reshape(ans[[i]])
+        for(i in seq(skeleton)){
+            ans[[nonempindex[i]]][] <- as.vector(li[[i]])
+        }
+        for(i in seq(ans)){
+            ans[[i]] <- reshape(ans[[i]])
+        }
+    } else { ## Reported variables
+        ## Possible choices
+        opts <- colnames( summary(x, select = "report", ...) )
+        what <- match.arg(what, opts)
+        par <- summary(x, select = "report",  ...)[ , what]
+        skeleton <- lapply(x$env$ADreportDims,
+                           function(dim) array(NA, dim))
+        skeleton <- as.relistable(skeleton)
+        ans <- relist(par, skeleton)
+        class(ans) <- NULL
     }
     attr(ans, "check.passed") <- NULL
     attr(ans, "what") <- what
