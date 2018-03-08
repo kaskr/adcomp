@@ -1,7 +1,7 @@
 var searchData=
 [
   ['validation',['Validation',['../Validation.html',1,'']]],
-  ['vec',['vec',['../structtmbutils_1_1matrix.html#a5479cff1a0b3231b1c4270c07759e83e',1,'tmbutils::matrix::vec()'],['../structmatrix.html#aff2bcb64bc91137b9635369a6cee82b6',1,'matrix::vec()']]],
+  ['vec',['vec',['../structarray.html#a73c905d02300879a7c8ed576f2c1d84f',1,'array::vec()'],['../structtmbutils_1_1matrix.html#a5479cff1a0b3231b1c4270c07759e83e',1,'tmbutils::matrix::vec()'],['../structtmbutils_1_1array.html#a53bb19235e5edf965c52bbd26a3fdea0',1,'tmbutils::array::vec()'],['../structmatrix.html#aff2bcb64bc91137b9635369a6cee82b6',1,'matrix::vec()']]],
   ['vecscale',['VECSCALE',['../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e',1,'VECSCALE():&#160;density.hpp'],['../namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680',1,'density::VECSCALE()']]],
   ['vecscale_5ft',['VECSCALE_t',['../classVECSCALE__t.html',1,'']]],
   ['vecscale_5ft',['VECSCALE_t',['../classdensity_1_1VECSCALE__t.html',1,'density']]],
@@ -15,6 +15,7 @@ var searchData=
   ['vector_3c_20matrix2x2_20_3e',['vector&lt; matrix2x2 &gt;',['../structvector.html',1,'vector&lt; matrix2x2 &gt;'],['../structtmbutils_1_1vector.html',1,'tmbutils::vector&lt; matrix2x2 &gt;']]],
   ['vector_3c_20mvnorm_5ft_3c_20scalartype_20_3e_20_3e',['vector&lt; MVNORM_t&lt; scalartype &gt; &gt;',['../structvector.html',1,'']]],
   ['vector_3c_20sphess_20_2a_20_3e',['vector&lt; sphess * &gt;',['../structvector.html',1,'']]],
+  ['vector_3c_20vector_3c_20int_20_3e_20_3e',['vector&lt; vector&lt; int &gt; &gt;',['../structvector.html',1,'']]],
   ['vector_3c_20vector_3c_20size_5ft_20_3e_20_3e',['vector&lt; vector&lt; size_t &gt; &gt;',['../structvector.html',1,'']]],
   ['vectorize_2ehpp',['Vectorize.hpp',['../Vectorize_8hpp.html',1,'']]],
   ['vectorize1_5fn',['VECTORIZE1_n',['../Vectorize_8hpp.html#ae22a0bbfbf5fe142d7a6060028aa88cb',1,'Vectorize.hpp']]],
