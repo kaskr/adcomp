@@ -25,8 +25,8 @@ Type objective_function<Type>::operator() ()
   UNSTRUCTURED_CORR_t<Type> neg_log_density(off_diag_x);
   for(int i=0;i<n;i++)
   {
-    vector<Type> sigma_y = exp(Type(0.5)*(mu_x + vector<Type>(h.col(i))));
-    g += VECSCALE(neg_log_density,sigma_y)(vector<Type>(y.col(i)));
+    vector<Type> sigma_y = exp( Type(0.5) * (mu_x + h.col(i).vec() ));
+    g += VECSCALE(neg_log_density,sigma_y)( y.col(i).vec() );
   }
 
   return g;

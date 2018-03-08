@@ -22,7 +22,7 @@ Type objective_function<Type>::operator() ()
   vector<Type> tmp(p);
   for(j=0;j<p;j++)
     tmp(j) = sigma(j)/sqrt(Type(1.0)-phi(j)*phi(j)); 
-  g -= sum(dnorm(vector<Type>(h.col(0)),Type(0),tmp,1));
+  g -= sum(dnorm(h.col(0).vec(), Type(0), tmp, true));
 
   // Likelihood contribution: State transitions
   for(i=1;i<n;i++)
@@ -30,7 +30,7 @@ Type objective_function<Type>::operator() ()
     vector<Type> tmp2(p);
     for(j=0;j<p;j++)
       tmp2(j) = phi(j)*h(j,i-1);
-    g -= sum(dnorm(vector<Type>(h.col(i)),tmp2,sigma,1));
+    g -= sum(dnorm(h.col(i).vec(), tmp2, sigma, true));
   }
 
   // Cholesky factor of Sigma
@@ -57,7 +57,7 @@ Type objective_function<Type>::operator() ()
   // Likelihood contribution: observations
   for(i=0;i<n;i++)
   {
-    vector<Type> sigma_y = exp(Type(0.5)*(mu_x + vector<Type>(h.col(i))));
+    vector<Type> sigma_y = exp( Type(0.5) * ( mu_x + h.col(i).vec() ));
 
     // Scale up correlation matrix
     matrix<Type> Sigma_y(p,p);
@@ -65,7 +65,7 @@ Type objective_function<Type>::operator() ()
       for(j=0;j<p;j++)
         Sigma_y(i2,j) = Sigma(i2,j)*sigma_y(i2)*sigma_y(j);
 
-    g += MVNORM(Sigma_y, false /* no atomic */)(vector<Type>(y.col(i)));
+    g += MVNORM(Sigma_y, false /* no atomic */)( y.col(i).vec() );
   }
 
   return g;

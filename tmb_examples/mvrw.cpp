@@ -27,10 +27,9 @@ Type objective_function<Type>::operator() ()
   MVNORM_t<Type> neg_log_density(cov);
   /* Define likelihood */
   Type ans=0;
-  //  ans-=dnorm(vector<Type>(u.col(0)),Type(0),Type(1),1).sum();
   for(int i=1;i<timeSteps;i++)    
-    ans+=neg_log_density(u.col(i)-u.col(i-1)); // Process likelihood 
-  for(int i=0;i<timeSteps;i++)
-    ans-=dnorm(vector<Type>(obs.col(i)),vector<Type>(u.col(i)),sdObs,1).sum(); // Data likelihood
+    ans += neg_log_density(u.col(i)-u.col(i-1)); // Process likelihood
+  for(int i=0; i<timeSteps; i++)
+    ans -= dnorm(obs.col(i).vec(), u.col(i).vec(), sdObs, true).sum(); // Data likelihood
   return ans;
 }
