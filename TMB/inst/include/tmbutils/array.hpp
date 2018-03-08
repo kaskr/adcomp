@@ -302,6 +302,9 @@ struct array:Map< Array<Type,Dynamic,1> >{
     return ans;
   }
 
+  /** \brief Convert TMB array to vector */
+  tmbutils::vector<Type> vec() { return *this; }
+
   /* Methods this class should *not* inherit (generate compile time error if used) */
   private:
   using MapBase::row;
