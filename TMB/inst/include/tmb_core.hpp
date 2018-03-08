@@ -1306,6 +1306,7 @@ extern "C"
   {
     TMB_TRY {
       int do_simulate = INTEGER(getListElement(control, "do_simulate"))[0];
+      int get_reportdims = INTEGER(getListElement(control, "get_reportdims"))[0];
       objective_function<double>* pf;
       pf = (objective_function<double>*) R_ExternalPtrAddr(f);
       pf -> sync_data();
@@ -1327,6 +1328,12 @@ extern "C"
       if(do_simulate) {
         pf->set_simulate( false );
         PutRNGstate(); /* Write seed back to R */
+      }
+      if(get_reportdims) {
+        SEXP reportdims;
+        PROTECT( reportdims = pf -> reportvector.reportdims() );
+        setAttrib( res, install("reportdims"), reportdims);
+        UNPROTECT(1);
       }
       UNPROTECT(2);
       return res;
