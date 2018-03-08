@@ -164,7 +164,7 @@ The secondary window shows compilation and model runs, among other things."
              "invlogit" "lgamma" "logit"
              ;; Arrays, basics
              "array" "matrix"
-             "head" "segment" "size" "tail"
+             "head" "segment" "size" "tail" "vec"
              "col" "cols" "colwise" "row" "rows" "rowwise"
              "block" "diagonal" "transpose"
              "max" "min" "prod" "sum"
