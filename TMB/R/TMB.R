@@ -326,6 +326,19 @@ MakeADFun <- function(data, parameters, map=list(),
   }
   if(silent)beSilent()
 
+  ## Getting shape of ad reported variables
+  ADreportDims <- NULL
+  ADreportIndex <- function() {
+      lngt <- sapply(ADreportDims, prod)
+      offset <- head( cumsum( c(1, lngt) ) , -1)
+      ans <- lapply(seq_along(lngt),
+                    function(i) array(seq(from = offset[i],
+                                          length.out = lngt[i]),
+                                      ADreportDims[[i]] ))
+      names(ans) <- names(ADreportDims)
+      ans
+  }
+
   ## All external pointers are created in function "retape" and can be re-created
   ## by running retape() if e.g. the number of openmp threads is changed.
   retape <- function(){
@@ -334,7 +347,11 @@ MakeADFun <- function(data, parameters, map=list(),
       ## Have to call "double-template" to trigger tape generation
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
-      .Call("EvalDoubleFunObject",Fun$ptr,unlist(parameters),control=list(do_simulate=as.integer(0)),PACKAGE=DLL)
+      out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
+                   control = list(do_simulate = as.integer(0),
+                                  get_reportdims = as.integer(1)),
+                   PACKAGE=DLL)
+      ADreportDims <<- attr(out, "reportdims")
     }
     if(is.character(profile)){
         random <<- c(random, profile)
@@ -434,7 +451,7 @@ MakeADFun <- function(data, parameters, map=list(),
 
         "double" = {
           res <- .Call("EvalDoubleFunObject", Fun$ptr, theta,
-                       control=list(do_simulate=as.integer(do_simulate)),PACKAGE=DLL)
+                       control=list(do_simulate=as.integer(do_simulate),get_reportdims=as.integer(0)),PACKAGE=DLL)
         },
 
         "ADGrad" = {
