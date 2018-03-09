@@ -545,11 +545,6 @@ struct report_stack{
     result.conservativeResize(result.size() + n);
   }
   // Get dimension of various object types
-  vector<int> getDim(const vector<Type> &x) {
-    vector<int> dim(1);
-    dim << x.size();
-    return dim;
-  }
   vector<int> getDim(const matrix<Type> &x) {
     vector<int> dim(2);
     dim << x.rows(), x.cols();
@@ -558,6 +553,12 @@ struct report_stack{
   vector<int> getDim(const tmbutils::array<Type> &x) {
     return x.dim;
   }
+  template<class Other> // i.e. vector or expression
+  vector<int> getDim(const Other &x) {
+    vector<int> dim(1);
+    dim << x.size();
+    return dim;
+  }
   // push vector, matrix or array
   template<class Vector_Matrix_Or_Array>
   void push(Vector_Matrix_Or_Array x, const char* name) {
@@ -565,7 +566,9 @@ struct report_stack{
     int oldsize = result.size();
     vector<int> dim = getDim(x);
     increase(dim, name);
-    result.segment(oldsize, n) = x.vec();
+    Eigen::Array<Type, Eigen::Dynamic, Eigen::Dynamic> xvec = x;
+    xvec.resize(xvec.size(), 1);
+    result.segment(oldsize, n) = xvec;
   }
   // push scalar (convert to vector case)
   void push(Type x, const char* name){
