@@ -4,12 +4,14 @@
 \alias{as.list.sdreport}
 \title{Convert estimates to original list format.}
 \usage{
-\method{as.list}{sdreport}(x, what = "", ...)
+\method{as.list}{sdreport}(x, what = "", report = FALSE, ...)
 }
 \arguments{
 \item{x}{Output from \code{\link{sdreport}}.}
 
-\item{what}{Select what to convert.}
+\item{what}{Select what to convert (Estimate / Std. Error).}
+
+\item{report}{Get AD reported variables rather than model parameters ?}
 
 \item{...}{Passed to \code{\link{summary.sdreport}}.}
 }
@@ -31,9 +33,21 @@ added as an attribute to the output.
 \examples{
 \dontrun{
 example(sdreport)
+
+## Estimates as a parameter list:
 as.list(rep, "Est")
+
+## Std Errors in the same list format:
 as.list(rep, "Std")
+
+## p-values in the same list format:
 as.list(rep, "Pr", p.value=TRUE)
+
+## AD reported variables as a list:
+as.list(rep, "Estimate", report=TRUE)
+
+## Bias corrected AD reported variables as a list:
+as.list(rep, "Est. (bias.correct)", report=TRUE)
 }
 }
 

@@ -117,7 +117,11 @@ memory usage or in order to only bias correct a subset of
 variables. First option is to pass a list of indices as
 \code{bias.correct.control$split}. E.g. a list
 \code{list(1:2,3:4)} calculates the first four ADREPORTed
-variables in two chunks. Second option is to pass the number of
+variables in two chunks.
+The internal function \code{obj$env$ADreportIndex()}
+gives an overview of the possible indices of ADREPORTed variables.
+
+Second option is to pass the number of
 chunks as \code{bias.correct.control$nsplit} in which case all
 ADREPORTed variables are bias corrected in the specified number of
 chunks.
