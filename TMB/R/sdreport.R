@@ -333,9 +333,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
-      ihessian.random <- .Call("tmb_invQ", L, PACKAGE = "TMB")
-      iperm <- invPerm(L@perm+1L)
-      diag.term1 <- diag(ihessian.random)[iperm]
+      diag.term1 <- solveSubset(L=L, diag=TRUE)
       if(ignore.parm.uncertainty){
           diag.term2 <- 0
       } else {
