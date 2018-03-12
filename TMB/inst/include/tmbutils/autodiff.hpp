@@ -185,4 +185,63 @@ namespace autodiff {
     jacobian_t<Functor, Type> J(f);
     return J(x);
   }
+
+
+  /* Sparse Jacobian */
+  template<class Functor, class Type>
+  struct sparse_jacobian_t
+  {
+    Functor f;
+    sparse_jacobian_t(Functor f_) : f(f_) {}
+    vector<AD<Type> > userfun(vector<AD<Type> > x){
+      return f(x);
+    }
+    Eigen::SparseMatrix<Type> operator()(vector<Type> x0) {
+      /* Tape user functor F(x, y) */
+      CppAD::vector<AD<Type> > x( x0 );
+      CppAD::Independent(x);
+      CppAD::vector<AD<Type> > y = userfun(x);
+      CppAD::ADFun<Type> F(x, y);
+      CppAD::vector<Type> x_eval(x0);
+      /* Evaluate Sparse Jacobian */
+      typedef vector<int> SizeVector;
+      int nx = x.size();
+      int ny = y.size();
+      vector<bool> keep_col(nx); // Jacobian cols to get
+      for(int i = 0; i < nx; i++) {
+        keep_col[i] = true;
+      }
+      vector<Type> u(nx);
+      // Prepare output
+      typedef Eigen::Triplet<Type> T;
+      std::vector<T> tripletList;
+      // Do sweeps
+      F.Forward(0, x_eval);
+      SizeVector row_pattern(0);
+      // Mark domain dependencies and initialize
+      F.subgraph_reverse(keep_col);
+      for(int r = 0; r < ny; r++) {
+        // Do reverse sub sweep
+        F.subgraph_reverse(1,           // order
+                           r,           // range component
+                           row_pattern, // valid rows
+                           u);          // domain vector
+        // Append value and integer pairs
+        for (int k=0; k < row_pattern.size(); k++) {
+          int c = row_pattern[k];
+          tripletList.push_back( T(r, c, u[c]) );
+        }
+      }
+      // Output
+      Eigen::SparseMatrix<Type> mat(ny, nx);
+      mat.setFromTriplets(tripletList.begin(), tripletList.end());
+      return mat;
+    }
+  };
+
+  template<class Functor, class Type>
+  Eigen::SparseMatrix<Type> sparse_jacobian(Functor f, vector<Type> x){
+    sparse_jacobian_t<Functor, Type> J(f);
+    return J(x);
+  }
 }
