@@ -140,8 +140,8 @@ namespace autodiff {
       CppAD::vector<AD<Type> > y = userfun(x);
       CppAD::ADFun<Type> F(x, y);
       CppAD::vector<Type> x_eval(x0);
-      vector<Type> ans = F.Jacobian(x_eval);
-      return asMatrix(ans, y.size(), x.size());
+      vector<Type> ans = F.Jacobian(x_eval); // By row !
+      return asMatrix(ans, x.size(), y.size()).transpose();
     }
   };
 
