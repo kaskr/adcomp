@@ -1,4 +1,19 @@
 ------------------------------------------------------------------------
+TMB 1.7.13 (2018-03-14)
+------------------------------------------------------------------------
+
+o ADREPORT now tracks object dimensions. More infomation in
+  '?TMB::as.list.sdreport'.
+
+o New feature to do process normalization from R. See
+  '?TMB::normalize'.
+
+o New feature to update data from R without re-taping the
+  computational graph. Enabled on C++ side using 'DATA_UPDATE'.
+
+o bugfix C++ namespace 'autodiff': Jacobian had wrong dimension.
+
+------------------------------------------------------------------------
 TMB 1.7.12 (2017-12-10)
 ------------------------------------------------------------------------
 
