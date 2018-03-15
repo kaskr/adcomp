@@ -21,3 +21,4 @@ stopifnot( identical( obj$report(obj$par)$h, obj$he(obj$par) ) )
 data$select <- 3
 obj <- MakeADFun(data, parameters, DLL="check_autodiff", ADreport=TRUE, silent=TRUE)
 stopifnot( all( obj$report(obj$par)$j == obj$gr(obj$par) ) )
+stopifnot( all( obj$report(obj$par)$sj == obj$gr(obj$par) ) )
