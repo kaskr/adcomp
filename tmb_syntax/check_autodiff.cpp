@@ -41,6 +41,9 @@ Type objective_function<Type>::operator() () {
     // Calculate jacobian
     matrix<Type> j = autodiff::jacobian(f, theta);
     REPORT(j);
+    // Calculate sparse jacobian
+    Eigen::SparseMatrix<Type> sj = autodiff::sparse_jacobian(f, theta);
+    REPORT(sj);
     ADREPORT(f(theta));
   }
 
