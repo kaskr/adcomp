@@ -239,6 +239,41 @@ namespace autodiff {
     }
   };
 
+  /** \brief Calculate sparse jacobian of vector function with vector values
+
+      \param f Functor with vector values
+      \param x Vector evaluation point
+      \return Sparse Jacobian matrix
+
+      \note The evaluation method of the functor must be templated
+
+      Example:
+
+      \code
+      #include <TMB.hpp>
+
+      struct func {
+        template <class T>
+        vector<T> operator()(vector<T> x){  // Evaluate function
+          vector<T> y(2);
+          y(0) = x.sum();
+          y(1) = x.prod();
+          return y;
+        }
+      };
+
+      template<class Type>
+      Type objective_function<Type>::operator() () {
+        PARAMETER_VECTOR(theta);
+        func f;
+        // Calculate jacobian
+        Eigen::SparseMatrix<Type> j = autodiff::sparse_jacobian(f, theta);
+        REPORT(j);
+        // Exit
+        return 0;
+      }
+      \endcode
+  */
   template<class Functor, class Type>
   Eigen::SparseMatrix<Type> sparse_jacobian(Functor f, vector<Type> x){
     sparse_jacobian_t<Functor, Type> J(f);
