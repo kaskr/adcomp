@@ -1,6 +1,8 @@
 ------------------------------------------------------------------------
-TMB 1.7.13 (2018-03-14)
+TMB 1.7.13 (2018-03-22)
 ------------------------------------------------------------------------
+
+o Redundant warnings from CHOLMOD have been silenced.
 
 o ADREPORT now tracks object dimensions. More infomation in
   '?TMB::as.list.sdreport'.
