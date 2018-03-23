@@ -260,6 +260,7 @@ Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
 <blockquote>
 <p>#1 0x00007ffff0e7eb09 in objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:14</p>
 </blockquote>
+<p>This enabling of floating point errors applies to R as well as the TMB program. For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script before the floating point exception in the TMB program (i.e. the problem of interest) happens. To circumvent this problem one can run without NaN debugging enabled and save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation), then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type=&quot;double&quot;)</code>.</p>
 </div>
 </div>
 </div>

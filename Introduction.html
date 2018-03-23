@@ -340,6 +340,7 @@ Compilation and run time errors </h1>
 <div class="fragment"><div class="line">library(TMB)</div><div class="line">gdbsource(&quot;nan_error_ex.R&quot;)</div></div><!-- fragment --><blockquote class="doxtable">
 <p>#1 0x00007ffff0e7eb09 in objective_function&lt;double&gt;::operator() (this=&lt;optimized out&gt;=""&gt;) at nan_error_ex.cpp:14 </p>
 </blockquote>
+<p>This enabling of floating point errors applies to R as well as the TMB program. For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script before the floating point exception in the TMB program (i.e. the problem of interest) happens. To circumvent this problem one can run without NaN debugging enabled and save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation), then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type="double")</code>.</p>
 <h1><a class="anchor" id="Toolbox"></a>
 Toolbox </h1>
 <p>First read the <em>Statistical Modelling</em> section of <a href="#Tutorial">Tutorial</a>.</p>
