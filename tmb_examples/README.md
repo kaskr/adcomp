@@ -180,3 +180,9 @@ This requires "amplxe-cl" on your path. View the profile with
 ```shell
 amplxe-gui spatial.profile
 ```
+
+Memory leaks can be found using
+```shell
+make spatial.memprofile
+inspxe-gui spatial.memprofile
+```

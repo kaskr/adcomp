@@ -30,7 +30,10 @@ clean :
 	rm -rf */*.o */*.so */*.dll */*~ core */*.output.RData */*.pdf */*.profile
 
 %.profile : %.R %.cpp
-	example=$(basename $<) $(R) --slave < tools/profiler.R
+	example=$(basename $<) type=hotspots $(R) --slave < tools/profiler.R
+
+%.memprofile : %.R %.cpp
+	example=$(basename $<) type=mi1 $(R) --slave < tools/profiler.R
 
 %.logpid : %.R %.cpp
 	example=$(basename $<) $(R) --slave < tools/logpid.R
