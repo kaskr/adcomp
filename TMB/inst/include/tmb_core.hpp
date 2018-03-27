@@ -1209,18 +1209,28 @@ extern "C"
   SEXP InfoADFunObject(SEXP f)
   {
     ADFun<double>* pf;
-    pf=(ADFun<double>*)R_ExternalPtrAddr(f);
-    SEXP ans,names;
-    PROTECT(ans=Rf_allocVector(VECSXP,4));
-    PROTECT(names=Rf_allocVector(STRSXP,4));
-    SET_VECTOR_ELT(ans,0,asSEXP(int(pf->Domain())));
-    SET_STRING_ELT(names,0,Rf_mkChar("Domain"));
-    SET_VECTOR_ELT(ans,1,asSEXP(int(pf->Range())));
-    SET_STRING_ELT(names,1,Rf_mkChar("Range"));
-    SET_VECTOR_ELT(ans,2,asSEXP(int(pf->use_VecAD())));
-    SET_STRING_ELT(names,2,Rf_mkChar("use_VecAD"));
-    SET_VECTOR_ELT(ans,3,asSEXP(int(pf->size_var())));
-    SET_STRING_ELT(names,3,Rf_mkChar("size_var"));
+    pf = (ADFun<double>*) R_ExternalPtrAddr(f);
+    SEXP ans, names;
+    PROTECT(ans = Rf_allocVector(VECSXP, 12));
+    PROTECT(names = Rf_allocVector(STRSXP, 12));
+    int i = 0;
+#define GET_MORE_INFO(MEMBER)                           \
+    SET_VECTOR_ELT(ans, i, asSEXP(int(pf->MEMBER())));  \
+    SET_STRING_ELT(names, i, Rf_mkChar(#MEMBER));       \
+    i++;
+    GET_MORE_INFO(Domain);
+    GET_MORE_INFO(Range);
+    GET_MORE_INFO(size_op);
+    GET_MORE_INFO(size_op_arg);
+    GET_MORE_INFO(size_op_seq);
+    GET_MORE_INFO(size_par);
+    GET_MORE_INFO(size_order);
+    GET_MORE_INFO(size_direction);
+    GET_MORE_INFO(size_text);
+    GET_MORE_INFO(size_var);
+    GET_MORE_INFO(size_VecAD);
+    GET_MORE_INFO(Memory);
+#undef GET_MORE_INFO
     Rf_setAttrib(ans,R_NamesSymbol,names);
     UNPROTECT(2);
     return ans;

@@ -16,3 +16,10 @@ solveSubset <- function(Q,
     }
     invQ
 }
+
+## Get information on ADFun object pointer
+info <- function(ptr, DLL = getUserDLL()) {
+    ok <- is(ptr, "externalptr") && !isNullPointer(ptr)
+    if (!ok) stop("'ptr' is not a valid external pointer")
+    .Call("InfoADFunObject", ptr, PACKAGE=DLL)
+}
