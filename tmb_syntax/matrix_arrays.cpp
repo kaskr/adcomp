@@ -168,5 +168,11 @@ Type objective_function<Type>::operator() ()
   array<Type> a_cpy;
   a_cpy = a0;
 
+  // Splitting a vector.
+  // Similar to 'split(c3, f3)' from R
+  DATA_FACTOR(f3); // Same length as 'v3'
+  vector<vector<Type> > spl3 = split(v3, f3);
+  REPORT(spl3);
+
   return 0;
 }

@@ -10,7 +10,8 @@ model_data = list(v1 = c(9,11),
                   m4 = matrix(c(10,20,30,40,50), nrow=4, ncol=5),
                   a1 = array(c(1,2,3,4),         dim = c(2,2)),
                   a2 = array(c(8,9,10,11,12),    dim = c(7,5)),
-                  a0 = array(0,                  dim = c(0,0)) )
+                  a0 = array(0,                  dim = c(0,0)),
+                  f3 = factor(c(2,1,3,1,2)) )
 
 require(TMB)
 compile("matrix_arrays.cpp")
