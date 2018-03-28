@@ -698,9 +698,9 @@ public:
 	size_t Memory(void) const
 	{	size_t pervar  = cap_order_taylor_ * sizeof(Base)
 		+ for_jac_sparse_pack_.memory()
-		+ for_jac_sparse_set_.memory()
+		+ for_jac_sparse_set_.memory();
+		size_t total   = num_var_tape_  * pervar + play_.Memory()
 		+ subgraph_info_.memory();
-		size_t total   = num_var_tape_  * pervar + play_.Memory();
 		return total;
 	}
 
