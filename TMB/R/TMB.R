@@ -343,7 +343,8 @@ MakeADFun <- function(data, parameters, map=list(),
 
   ## All external pointers are created in function "retape" and can be re-created
   ## by running retape() if e.g. the number of openmp threads is changed.
-  retape <- function(){
+  ## set.defaults: reset internal parameters to their default values.
+  retape <- function(set.defaults = TRUE){
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
@@ -394,16 +395,21 @@ MakeADFun <- function(data, parameters, map=list(),
           tmp[profile] <- 1L
           profile <<- tmp
       }
-      par <<- unlist(parameters)
+      if (set.defaults) {
+          par <<- unlist(parameters)
+      }
     }
     if("ADFun"%in%type){
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
-      par <<- attr(ADFun$ptr,"par")
-      last.par <<- par
-      last.par1 <<- par
-      last.par2 <<- par
-      last.par.best <<- par
+      if (set.defaults) {
+          par <<- attr(ADFun$ptr,"par")
+          last.par <<- par
+          last.par1 <<- par
+          last.par2 <<- par
+          last.par.best <<- par
+          value.best <<- Inf
+      }
     }
     if("Fun"%in%type)
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
@@ -417,7 +423,7 @@ MakeADFun <- function(data, parameters, map=list(),
                   assign.env = env)
   }## end{retape}
 
-  retape()
+  retape(set.defaults = TRUE)
 
   ## Has atomic functions been generated for the tapes ?
   usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
@@ -428,7 +434,9 @@ MakeADFun <- function(data, parameters, map=list(),
                 dumpstack=0, doforward=1, do_simulate=0) {
     if(isNullPointer(ADFun$ptr)) {
         if(silent)beSilent()
-        retape()
+        ## Loaded or deep copied object: Only restore external
+        ## pointers. Don't touch last.par/last.par.best etc:
+        retape(set.defaults = FALSE)
     }
     switch(type,
            "ADdouble" = {
