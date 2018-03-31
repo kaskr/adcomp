@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="ModelObject.html">
-<link rel="next" href="Simulation.html">
+<link rel="prev" href="Validation.html">
+<link rel="next" href="Appendix.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -196,91 +196,146 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Sparsity" class="section level1">
-<h1><span class="header-section-number">12</span> Sparsity</h1>
-<p>Large random effect models require sparsity in order to work in TMB. In this section we will discuss:</p>
+<div id="AtomicFunctions" class="section level1">
+<h1><span class="header-section-number">15</span> Atomic functions</h1>
+<p>Custom functions and derivatives can be added to the TMB library. This may be necessary due to the following reasons:</p>
 <ul>
-<li>What exactly we mean by <em>sparsity</em>.</li>
-<li>How to formulate <em>sparse</em> models (the same model can sometimes be formulated as both dense and sparse).</li>
-<li>How to calculate the sparsity pattern of a given TMB model.</li>
-<li>How to visualize sparsity either as a matrix or a graph.</li>
-<li>How to use sparsity for general optimization problems (not just random effects).</li>
+<li>Adaptive (e.g. iterative) algorithms cannot be represented by a fixed computational graph and thus cannot be directly differentiated using TMB. Algorithms that use parameter dependent if-else branching are examples of such functions.</li>
+<li>Some functions have so many floating point operations that it is infeasible to expand the computational graph. Memory usage may be greatly reduced in such cases by collapsing the computational graph to a singe node with multiple inputs and outputs.</li>
 </ul>
-<div id="conditional-independence-graphs-and-dags" class="section level2">
-<h2><span class="header-section-number">12.1</span> Conditional independence graphs and DAGs</h2>
-<div id="conditional-independence" class="section level3">
-<h3><span class="header-section-number">12.1.1</span> Conditional independence</h3>
-<p>There are various graph representations that are commonly used to visualize probabilistic structure. One such is the <em>conditional independence graph</em>. Say we have a model of four random variables <span class="math inline">\(X_1,...,X_4\)</span> for which the joint density is:</p>
-<p><span class="math display">\[p(x_1,x_2,x_3,x_4) \propto f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)\]</span></p>
-<p>The separability of factors on the right hand side implies some conditional independence properties. For instance if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span> are held constant then <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> varies independently. We say that <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> are conditionally independent given <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span>. The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor <span class="math inline">\(f_i\)</span>:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /></p>
-<p>Equivalently the graph may be visualized via its adjacency matrix:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-12-1.svg" width="336" style="display: block; margin: auto;" /></p>
-<p>This is the <strong>sparsity pattern</strong> of the model.</p>
-<blockquote>
-<p>The sparsity pattern visualizes the conditional independence structure of the random effects in the model.</p>
-</blockquote>
+<div id="reverse-mode-differentiation" class="section level2">
+<h2><span class="header-section-number">15.1</span> Reverse mode differentiation</h2>
+<p>TMB uses CppAD as engine for reverse mode derivatives. In order to add a new primitive function</p>
+<p><span class="math display">\[f: R^n \rightarrow R^m\]</span></p>
+<p>we must inform CppAD how to calclualate derivatives of this function in reverse mode. That is, for any range space vector <span class="math inline">\(w \in R^m\)</span> we must calculate the gradient of the function <span class="math inline">\(R^n \rightarrow R\)</span> given by</p>
+<p><span class="math display">\[ x \rightarrow \text{sum}( f(x) \odot w ) \]</span></p>
+<p>where ‘<span class="math inline">\(\odot\)</span>’ is pointwise multiplication.</p>
 </div>
-<div id="node-removal-properties" class="section level3">
-<h3><span class="header-section-number">12.1.2</span> Node removal properties</h3>
-<p>Important probabilistic properties can be deduced directly from the graph. This is due to the following <em>node removal</em> properties.</p>
+<div id="example-adding-new-primitive-function-with-known-derivatives" class="section level2">
+<h2><span class="header-section-number">15.2</span> Example: Adding new primitive function with known derivatives</h2>
+<p>As an example consider the <a href="https://en.wikipedia.org/wiki/Lambert_W_function">Lambert W function</a> defined implicitly by</p>
+<p><span class="math display">\[y = W(y e^y)\]</span></p>
+<p>Here, we only consider <span class="math inline">\(W\)</span> as defined on the positive reals. It follows, by differentiating the above identity, that</p>
+<p><span class="math display">\[ W&#39;(x) = \frac{1}{ \exp\left(W(x)\right) \left(1 + W(x)\right) } \]</span></p>
+<p>When coding up reverse mode derivatives we can assume that the function value <span class="math inline">\(W(x)\)</span> has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating <span class="math inline">\(W(x)\)</span> in the reverse pass.</p>
+<p>We’ll assume that a plain C++ function (taking double types as input/output) is available to calculate <span class="math inline">\(W(x)\)</span>. It doesn’t matter whether you have the source code of an implementation or just the header with linkage to an external library:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">double</span> LambertW(<span class="dt">double</span> x);</code></pre></div>
+<p>The macro <code>TMB_ATOMIC_VECTOR_FUNCTION()</code> is used to declare our new primitive Lambert W function:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">TMB_ATOMIC_VECTOR_FUNCTION(
+    <span class="co">// ATOMIC_NAME</span>
+    LambertW
+    ,
+    <span class="co">// OUTPUT_DIM</span>
+    <span class="dv">1</span>,
+    <span class="co">// ATOMIC_DOUBLE</span>
+    ty[<span class="dv">0</span>] = LambertW(tx[<span class="dv">0</span>]); <span class="co">// Call the &#39;double&#39; version</span>
+    ,
+    <span class="co">// ATOMIC_REVERSE</span>
+    Type W  = ty[<span class="dv">0</span>];                    <span class="co">// Function value from forward pass</span>
+    Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span>
+    px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span>
+)</code></pre></div>
+<p>Let’s explain in details what is going on. The macro takes four arguments:</p>
 <ol style="list-style-type: decimal">
-<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph: <img src="_main_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /></p></li>
-<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes: <img src="_main_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><code>ATOMIC_NAME</code>: Name of new primitive function taking <code><a class="code" href="../namespaceCppAD.html">CppAD</a>::vector</code> as input and output.</li>
+<li><code>OUTPUT_DIM</code>: Dimension of the <code><a class="code" href="../namespaceCppAD.html">CppAD</a>::vector</code> which is the function output.</li>
+<li><code>ATOMIC_DOUBLE</code>: Specifies how to evaluate the primitive function for the ordinary double type. <code>tx</code> denotes the input vector and <code>ty</code> the output vector of the function <span class="math inline">\(f: R^n \rightarrow R^m\)</span>. In this case both have dimension one.</li>
+<li><code>ATOMIC_REVERSE</code>: How to calculate the reverse mode derivatives for a general <code>Type</code>. Again <code>tx</code> and <code>ty</code> denote function input and output but now <code>ty</code> has been computed and is available as an intermediate value. The vectors <code>px</code> and <code>py</code> denote partial derivatives of the end result wrt. <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> respectively. <code>py</code> is given and we must calculate <code>px</code> using the chain rule. This first order derivative rule is automatically expanded up to higher orders required when using TMB’s random effects calculations.</li>
 </ol>
-<blockquote>
-<p>Conditioning preserves sparseness. Marginalizing tend to destroy sparseness by adding more edges to the graph.</p>
-</blockquote>
+<p>To make the function work like other TMB functions it is convenient to define scalar and a vectorized versions that call the atomic function:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Scalar version</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type LambertW(Type x){
+  <a class="code" href="../namespaceCppAD.html">CppAD</a>::<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; tx(<span class="dv">1</span>);
+  tx[<span class="dv">0</span>] = x;
+  <span class="kw">return</span> LambertW(tx)[<span class="dv">0</span>];
+}
+
+<span class="co">// Vectorized version</span>
+VECTORIZE_1t(LambertW)</code></pre></div>
+<div id="testing-the-primitive-function" class="section level3">
+<h3><span class="header-section-number">15.2.1</span> Testing the primitive function</h3>
+<p>The complete example using Newton’s method to calculate the Lambert W function is:</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">
+<span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
+
+<span class="co">// Double version of Lambert W function</span>
+<span class="dt">double</span> LambertW(<span class="dt">double</span> x) {
+  <span class="dt">double</span> logx = log(x);
+  <span class="dt">double</span> y = (logx &gt; <span class="dv">0</span> ? logx : <span class="dv">0</span>);
+  <span class="dt">int</span> niter = <span class="dv">100</span>, i=<span class="dv">0</span>;
+  <span class="kw">for</span> (; i &lt; niter; i++) {
+    <span class="kw">if</span> ( fabs( logx - log(y) - y) &lt; <span class="fl">1e-9</span>) <span class="kw">break</span>;
+    y -= (y - exp(logx - y)) / (<span class="dv">1</span> + y);
+  }
+  <span class="kw">if</span> (i == niter) Rf_warning(<span class="st">&quot;W: failed convergence&quot;</span>);
+  <span class="kw">return</span> y;
+}
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+    <span class="co">// ATOMIC_NAME</span>
+    LambertW
+    ,
+    <span class="co">// OUTPUT_DIM</span>
+    <span class="dv">1</span>,
+    <span class="co">// ATOMIC_DOUBLE</span>
+    ty[<span class="dv">0</span>] = LambertW(tx[<span class="dv">0</span>]); <span class="co">// Call the &#39;double&#39; version</span>
+    ,
+    <span class="co">// ATOMIC_REVERSE</span>
+    Type W  = ty[<span class="dv">0</span>];                    <span class="co">// Function value from forward pass</span>
+    Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span>
+    px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span>
+)
+
+<span class="co">// Scalar version</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type LambertW(Type x){
+  <a class="code" href="../namespaceCppAD.html">CppAD</a>::<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; tx(<span class="dv">1</span>);
+  tx[<span class="dv">0</span>] = x;
+  <span class="kw">return</span> LambertW(tx)[<span class="dv">0</span>];
+}
+
+<span class="co">// Vectorized version</span>
+<a class="code" href="../Vectorize_8hpp.html#a1055d4f2b2504316a2fb8c939c8c1ce4">VECTORIZE1_t</a>(LambertW)
+
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
+{
+  <a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(x);
+  Type f = LambertW(x).<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>();
+  <span class="kw">return</span> f;
+}</code></pre></div>
+<p>And from R</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compile</span>(<span class="st">&quot;lambert.cpp&quot;</span>)
+<span class="kw">dyn.load</span>(<span class="kw">dynlib</span>(<span class="st">&quot;lambert&quot;</span>))</code></pre></div>
+<div id="checking-function-value-and-derivatives" class="section level4">
+<h4><span class="header-section-number">15.2.1.1</span> Checking function value and derivatives</h4>
+<p>Check definition of the function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(<span class="dt">data=</span><span class="kw">list</span>(), <span class="dt">parameters=</span><span class="kw">list</span>(<span class="dt">x=</span><span class="dv">1</span>), <span class="dt">DLL=</span><span class="st">&quot;lambert&quot;</span>)
+obj$<span class="kw">fn</span>(<span class="dv">7</span> *<span class="st"> </span><span class="kw">exp</span>(<span class="dv">7</span>))</code></pre></div>
+<pre><code>## [1] 7</code></pre>
+<p>Check derivatives using the <code>numDeriv</code> package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">numDeriv::<span class="kw">grad</span>(obj$fn, <span class="dv">7</span>)</code></pre></div>
+<pre><code>## [1] 0.08626538</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obj$<span class="kw">gr</span>(<span class="dv">7</span>)</code></pre></div>
+<pre><code>##            [,1]
+## [1,] 0.08626538</code></pre>
+<p>Also try second order derivatives:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">numDeriv::<span class="kw">hessian</span>(obj$fn, <span class="dv">7</span>)</code></pre></div>
+<pre><code>##             [,1]
+## [1,] -0.01038959</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">obj$<span class="kw">he</span>(<span class="dv">7</span>)</code></pre></div>
+<pre><code>##             [,1]
+## [1,] -0.01038969</code></pre>
 </div>
-<div id="directed-acyclic-graph" class="section level3">
-<h3><span class="header-section-number">12.1.3</span> Directed acyclic graph</h3>
-<p>When building models in TMB it is often more natural to specify processes in incremental steps - i.e. through the successive conditional distributions. The previous example could be simulated by drawing the variables <span class="math inline">\(X_1,X_2,X_3,X_4\)</span> one by one in the given order as illustrated by the following <em>directed</em> graph:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /></p>
-<p>The graph shows dependencies of any specific node <em>given past nodes</em>. The edge from <span class="math inline">\(X_1\)</span> to <span class="math inline">\(X_3\)</span> was not in the original (undirected) graph. This is a so-called <strong>fill-in</strong>.</p>
-<blockquote>
-<p>Order matters. The DAG is different from the conditional independence graph.</p>
-</blockquote>
-</div>
-<div id="the-effect-of-adding-data" class="section level3">
-<h3><span class="header-section-number">12.1.4</span> The effect of adding data</h3>
-<p>It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that <span class="math inline">\(X_4\)</span> is a data point we would illustrate it by:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /></p>
-<p>Here there are only three variables left. The conditional independence structure of the variables is:</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-17-1.svg" style="display: block; margin: auto;" /></p>
-<p>which is the same graph as was previously found by integrating <span class="math inline">\(X_4\)</span> out of the joint distribution.</p>
-<blockquote>
-<p>Data nodes destroy sparsity the same way as marginalization. To avoid this, try to associate each data point with a single random effect.</p>
-</blockquote>
 </div>
 </div>
-<div id="the-theta-logistic-example" class="section level2">
-<h2><span class="header-section-number">12.2</span> The theta logistic example</h2>
-<p>Consider the ``theta logistic’’ population model <span class="citation">(Pedersen et al. <a href="#ref-pedersen2011estimation">2011</a>)</span>. This is a state-space model with state equation</p>
-<p><span class="math display">\[u_t = u_{t-1} + r_0\left(1-\left(\frac{\exp(u_{t-1})}{K}\right)^\psi\right) + e_t\]</span></p>
-<p>and observation equation</p>
-<p><span class="math display">\[y_t = u_t + v_t\]</span></p>
-<p>where <span class="math inline">\(e_t \sim N(0,Q)\)</span>, <span class="math inline">\(v_t \sim N(0,R)\)</span> and <span class="math inline">\(t\in \{0,...,n-1\}\)</span>. A uniform prior is implicitly assigned to <span class="math inline">\(u_0\)</span>.</p>
-<p>The joint negative log-likelihood of state vector <span class="math inline">\(u\)</span> and measurements <span class="math inline">\(y\)</span> is implemented in the C++ template <a href="../thetalog_8cpp-example.html">thetalog.cpp</a>. The example can be run by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="dt">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</code></pre></div>
-<p>We demonstrate it in the case <span class="math inline">\(n=5\)</span>. Here is the DAG</p>
-<p><img src="_main_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /></p>
-<p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
-<p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(Matrix)
-obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">random=</span><span class="kw">c</span>(<span class="st">&quot;X&quot;</span>), <span class="dt">DLL=</span><span class="st">&quot;thetalog&quot;</span>)
-<span class="kw">image</span>(obj$env$<span class="kw">spHess</span>(<span class="dt">random=</span><span class="ot">TRUE</span>))</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-20-1.svg" width="336" style="display: block; margin: auto;" /></p>
-<blockquote>
-<p>FIXME: NOT DONE YET !</p>
-</blockquote>
+<div id="other-approaches" class="section level2">
+<h2><span class="header-section-number">15.3</span> Other approaches</h2>
+<p>For the Lambert W function we knew how to calculate the derivatives. There are cases for which the derivatives are impossible (or difficult) to write down. If this is the situation you’re in you may want to try using forward mode AD to help defining an atomic function. A full worked out example is available here: <a href="../adaptive_integration_8cpp-example.html">adaptive_integration.cpp</a>. Derivatives are calculated automatically and if-else branching is allowed. The main downside with the approach is that it is limited to functions with very few inputs.</p>
+<p>A second technique worth mentioning is checkpointing. It is demonstrated in the example <a href="../register_atomic_8cpp-example.html">register_atomic.cpp</a>. It does not work for adaptive algorithms but is otherwise automatic. It is useful to reduce AD memory usage in cases where the same operation sequence is being applied many times.</p>
 
 
-</div>
-</div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-pedersen2011estimation">
-<p>Pedersen, Martin Wæver, Casper Willestofte Berg, Uffe Høgsbro Thygesen, Anders Nielsen, and Henrik Madsen. 2011. “Estimation Methods for Nonlinear State-Space Models in Ecology.” <em>Ecological Modelling</em> 222 (8). Elsevier: 1394–1400.</p>
 </div>
 </div>
             </section>
@@ -288,8 +343,8 @@ obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parame
           </div>
         </div>
       </div>
-<a href="ModelObject.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="Simulation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="Validation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="Appendix.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -15,5 +15,6 @@ var searchData=
   ['asvector',['asVector',['../convert_8hpp.html#adc8961faf80b653a6990357580dcd67c',1,'convert.hpp']]],
   ['atomic',['atomic',['../namespaceatomic.html',1,'atomic'],['../structconfig__struct.html#a8c79291139cc892ef39fc1cfdf1c590b',1,'config_struct::atomic()']]],
   ['atomic_2ehpp',['atomic.hpp',['../atomic_8hpp.html',1,'']]],
+  ['atomic_20functions',['Atomic functions',['../AtomicFunctions.html',1,'']]],
   ['autodiff',['autodiff',['../namespaceautodiff.html',1,'']]]
 ];

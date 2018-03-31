@@ -30,7 +30,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="Validation.html">
+<link rel="prev" href="AtomicFunctions.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -167,10 +167,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="14.2" data-path="Validation.html"><a href="Validation.html#checking-the-laplace-approximation"><i class="fa fa-check"></i><b>14.2</b> Checking the Laplace approximation</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>15</b> Appendix</a><ul>
-<li class="chapter" data-level="15.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>15.1</b> Notation</a></li>
-<li class="chapter" data-level="15.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>15.2</b> Profiling the inner problem</a></li>
-<li class="chapter" data-level="15.3" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>15.3</b> Example</a></li>
+<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a><ul>
+<li class="chapter" data-level="15.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#reverse-mode-differentiation"><i class="fa fa-check"></i><b>15.1</b> Reverse mode differentiation</a></li>
+<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a><ul>
+<li class="chapter" data-level="15.2.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#testing-the-primitive-function"><i class="fa fa-check"></i><b>15.2.1</b> Testing the primitive function</a></li>
+</ul></li>
+<li class="chapter" data-level="15.3" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#other-approaches"><i class="fa fa-check"></i><b>15.3</b> Other approaches</a></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a><ul>
+<li class="chapter" data-level="16.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>16.1</b> Notation</a></li>
+<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a></li>
+<li class="chapter" data-level="16.3" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>16.3</b> Example</a></li>
 </ul></li>
 </ul>
 
@@ -190,9 +197,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
             <section class="normal" id="section-">
 <div id="Appendix" class="section level1">
-<h1><span class="header-section-number">15</span> Appendix</h1>
+<h1><span class="header-section-number">16</span> Appendix</h1>
 <div id="notation" class="section level2">
-<h2><span class="header-section-number">15.1</span> Notation</h2>
+<h2><span class="header-section-number">16.1</span> Notation</h2>
 <p>We use the following notation</p>
 <table style="width:107%;">
 <colgroup>
@@ -238,7 +245,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </table>
 </div>
 <div id="profiling-the-inner-problem" class="section level2">
-<h2><span class="header-section-number">15.2</span> Profiling the inner problem</h2>
+<h2><span class="header-section-number">16.2</span> Profiling the inner problem</h2>
 <p><strong>Theorem 1 (Profiling inner problem)</strong> Assume that for any <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\theta\)</span></p>
 <ul>
 <li><strong>Assumption 1</strong> The partial derivative <span class="math inline">\(\partial_{\beta} f(u,\beta,\theta)\)</span> is a linear function of u.</li>
@@ -266,7 +273,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><span class="math inline">\(\square\)</span></p>
 </div>
 <div id="example" class="section level2">
-<h2><span class="header-section-number">15.3</span> Example</h2>
+<h2><span class="header-section-number">16.3</span> Example</h2>
 <p>The standard situation for which <strong>assumption 1</strong> holds is when the <span class="math inline">\(\beta\)</span>s are the linear fixed effects of a mixed model. In this case the joint negative log density takes the form <span class="math display">\[ f(u,\beta,\theta) = \frac{1}{2}(u-A\beta)&#39;\Sigma_{\theta}^{-1}(u-A\beta) + ... \]</span> for some design matrix <span class="math inline">\(A\)</span> where ‘<span class="math inline">\(...\)</span>’ does not depend on <span class="math inline">\(\beta\)</span>. The derivative <span class="math display">\[ \partial_{\beta} f(u,\beta,\theta) = A&#39;\Sigma_{\theta}^{-1}(u-A\beta) \]</span> is thus a linear function of the random effect <span class="math inline">\(u\)</span>.</p>
 <p>In general <strong>assumption 2</strong> holds exact for models with a symmetric (e.g. Gaussian) posterior distribution.</p>
 
@@ -285,7 +292,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           </div>
         </div>
       </div>
-<a href="Validation.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="AtomicFunctions.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
     </div>
   </div>
