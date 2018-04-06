@@ -24,6 +24,8 @@
 ##' \eqn{V(\phi(\hat\theta))} is returned by default. This can cause
 ##' high memory usage if many variables are ADREPORTed. Use
 ##' \code{getReportCovariance=FALSE} to only return standard errors.
+##' In case standard deviations are not required one can completely skip
+##' the delta method using \code{skip.delta.method=TRUE}.
 ##'
 ##' For random effect models a generalized delta-method is used. First
 ##' the joint covariance of random effects and parameters is estimated
@@ -75,17 +77,23 @@
 ##' \varepsilon \phi(u,\theta))\:du\right)_{|\varepsilon=0}}
 ##' A further correction is added to this variance to account for the
 ##' effect of replacing \eqn{\theta} by the MLE \eqn{\hat\theta}
-##' (unless \code{ignore.theta.uncertainty=TRUE}).
+##' (unless \code{ignore.parm.uncertainty=TRUE}).
 ##'
 ##' Bias correction can be be performed in chunks in order to reduce
 ##' memory usage or in order to only bias correct a subset of
 ##' variables. First option is to pass a list of indices as
 ##' \code{bias.correct.control$split}. E.g. a list
 ##' \code{list(1:2,3:4)} calculates the first four ADREPORTed
-##' variables in two chunks. Second option is to pass the number of
+##' variables in two chunks.
+##' The internal function \code{obj$env$ADreportIndex()}
+##' gives an overview of the possible indices of ADREPORTed variables.
+##'
+##' Second option is to pass the number of
 ##' chunks as \code{bias.correct.control$nsplit} in which case all
 ##' ADREPORTed variables are bias corrected in the specified number of
 ##' chunks.
+##' Also note that \code{skip.delta.method} may be necessary when bias
+##' correcting a large number of variables.
 ##'
 ##' @title General sdreport function.
 ##' @param obj Object returned by \code{MakeADFun}
@@ -96,6 +104,7 @@
 ##' @param bias.correct.control a \code{list} of bias correction options; currently \code{sd}, \code{split} and \code{nsplit} are used - see details.
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of parameters?
 ##' @param getReportCovariance Get full covariance matrix of ADREPORTed variables?
+##' @param skip.delta.method Skip the delta method? (\code{FALSE} by default)
 ##' @return Object of class \code{sdreport}
 ##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 ##' @examples
@@ -114,7 +123,7 @@
 ##' summary(rep, "report")                      ## Include bias correction
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=NULL), ignore.parm.uncertainty = FALSE,
-                     getReportCovariance=TRUE){
+                     getReportCovariance=TRUE, skip.delta.method=FALSE){
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -228,12 +237,17 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       ##list(phi=phi, cov=cov)
       cov
   }
-  if(getReportCovariance){ ## Get all
-      cov <- doDeltaMethod()
-      sd <- sqrt(diag(cov))
+  if (!skip.delta.method) {
+      if (getReportCovariance) { ## Get all
+          cov <- doDeltaMethod()
+          sd <- sqrt(diag(cov))
+      } else {
+          tmp <- lapply(seq_along(phi), doDeltaMethod)
+          sd <- sqrt(unlist(tmp))
+          cov <- NA
+      }
   } else {
-      tmp <- lapply(seq_along(phi), doDeltaMethod)
-      sd <- sqrt(unlist(tmp))
+      sd <- rep(NA, length(phi))
       cov <- NA
   }
   ## Output
@@ -319,9 +333,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
     if(is(L,"dCHMsuper")){ ## Required by inverse subset algorithm
-      ihessian.random <- .Call("tmb_invQ", L, PACKAGE = "TMB")
-      iperm <- invPerm(L@perm+1L)
-      diag.term1 <- diag(ihessian.random)[iperm]
+      diag.term1 <- solveSubset(L=L, diag=TRUE)
       if(ignore.parm.uncertainty){
           diag.term2 <- 0
       } else {
@@ -371,6 +383,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ans$env <- new.env(parent = emptyenv())
   ans$env$parameters <- obj$env$parameters
   ans$env$random <- obj$env$random
+  ans$env$ADreportDims <- obj2$env$ADreportDims
   class(ans) <- "sdreport"
   ans
 }
@@ -451,7 +464,8 @@ print.sdreport <- function(x, ...)
 ##'
 ##' @title Convert estimates to original list format.
 ##' @param x Output from \code{\link{sdreport}}.
-##' @param what Select what to convert.
+##' @param what Select what to convert (Estimate / Std. Error).
+##' @param report Get AD reported variables rather than model parameters ?
 ##' @param ... Passed to \code{\link{summary.sdreport}}.
 ##' @return List of same shape as original parameter list.
 ##' @method as.list sdreport
@@ -459,44 +473,74 @@ print.sdreport <- function(x, ...)
 ##' @examples
 ##' \dontrun{
 ##' example(sdreport)
+##'
+##' ## Estimates as a parameter list:
 ##' as.list(rep, "Est")
+##'
+##' ## Std Errors in the same list format:
 ##' as.list(rep, "Std")
+##'
+##' ## p-values in the same list format:
 ##' as.list(rep, "Pr", p.value=TRUE)
+##'
+##' ## AD reported variables as a list:
+##' as.list(rep, "Estimate", report=TRUE)
+##'
+##' ## Bias corrected AD reported variables as a list:
+##' as.list(rep, "Est. (bias.correct)", report=TRUE)
 ##' }
-as.list.sdreport <- function(x, what = "", ...){
-    ans <- x$env$parameters
-    random <- x$env$random
-    par <- numeric(length(x$par.fixed) +
-                   length(x$par.random))
-    fixed <- rep(TRUE, length(par))
-    if(length(random)>0)
-        fixed[random] <- FALSE
-    ## Possible choices
-    opts <- colnames( summary(x, select = c("fixed", "random"), ...) )
-    what <- match.arg(what, opts)
-    if( any( fixed ) )
-        par[ fixed ] <- summary(x, select = "fixed",  ...)[ , what]
-    if( any(!fixed ) )
-        par[!fixed ] <- summary(x, select = "random", ...)[ , what]
-    ## Workaround utils::relist bug (?) for empty list items
-    nonemp <- sapply(ans, function(x)length(x) > 0)
-    nonempindex <- which(nonemp)
-    skeleton <- as.relistable(ans[nonemp])
-    li <- relist(par, skeleton)
-    reshape <- function(x){
-        if(is.null(attr(x,"map")))
-            return(x)
-        y <- attr(x,"shape")
-        f <- attr(x,"map")
-        i <- which(f >= 0)
-        y[i] <- x[f[i] + 1L]
-        y
-    }
-    for(i in seq(skeleton)){
-        ans[[nonempindex[i]]][] <- as.vector(li[[i]])
-    }
-    for(i in seq(ans)){
-        ans[[i]] <- reshape(ans[[i]])
+as.list.sdreport <- function(x, what = "", report=FALSE, ...) {
+    if (!report) {
+        ans <- x$env$parameters
+        random <- x$env$random
+        par <- numeric(length(x$par.fixed) +
+                       length(x$par.random))
+        fixed <- rep(TRUE, length(par))
+        if(length(random)>0)
+            fixed[random] <- FALSE
+        ## Possible choices
+        opts <- colnames( summary(x, select = c("fixed", "random"), ...) )
+        what <- match.arg(what, opts)
+        if( any( fixed ) )
+            par[ fixed ] <- summary(x, select = "fixed",  ...)[ , what]
+        if( any(!fixed ) )
+            par[!fixed ] <- summary(x, select = "random", ...)[ , what]
+        ## Workaround utils::relist bug (?) for empty list items
+        nonemp <- sapply(ans, function(x)length(x) > 0)
+        nonempindex <- which(nonemp)
+        skeleton <- as.relistable(ans[nonemp])
+        li <- relist(par, skeleton)
+        reshape <- function(x){
+            if(is.null(attr(x,"map")))
+                return(x)
+            y <- attr(x,"shape")
+            ## Handle special case where parameters are mapped to a fixed
+            ## value
+            if (what != "Estimate") {
+                y[] <- NA
+            }
+            f <- attr(x,"map")
+            i <- which(f >= 0)
+            y[i] <- x[f[i] + 1L]
+            y
+        }
+        for(i in seq(skeleton)){
+            ans[[nonempindex[i]]][] <- as.vector(li[[i]])
+        }
+        for(i in seq(ans)){
+            ans[[i]] <- reshape(ans[[i]])
+        }
+    } else { ## Reported variables
+        ## Possible choices
+        opts <- colnames( summary(x, select = "report", ...) )
+        what <- match.arg(what, opts)
+        par <- summary(x, select = "report",  ...)[ , what]
+        skeleton <- lapply(x$env$ADreportDims,
+                           function(dim) array(NA, dim))
+        skeleton <- as.relistable(skeleton)
+        ans <- relist(par, skeleton) ## Not keeping array dims !
+        ans <- Map(array, ans, x$env$ADreportDims)
+        class(ans) <- NULL
     }
     attr(ans, "check.passed") <- NULL
     attr(ans, "what") <- what

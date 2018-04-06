@@ -3,43 +3,65 @@
 ## Script input
 ## example: Name of example.
 example <- Sys.getenv("example")
+type <- Sys.getenv("type")
 ## ===============================================================
 
 Rexe <- paste(Sys.getenv("R_HOME"),"bin/exec/R",sep="/")
 
-cmd <- paste("amplxe-cl -collect hotspots -result-dir ",example,".profile"," -- ",Rexe," --vanilla < ",example,".R",sep="")
-system(cmd)
+## amplxe-cl -help collect
+amplxe.options <- c(
+    "advanced-hotspots",
+    "concurrency",
+    "cpugpu-concurrency",
+    "disk-io",
+    "general-exploration",
+    "gpu-hotspots",
+    "hotspots",
+    "hpc-performance",
+    "locksandwaits",
+    "memory-access",
+    "sgx-hotspots",
+    "tsx-exploration",
+    "tsx-hotspots")
 
-## Read total duration of profile
-cmd <- paste("amplxe-cl -report summary -result-dir ",example,".profile"," | grep Elapsed",sep="")
-out <- system(cmd,TRUE,FALSE,TRUE)
-endTime <- as.numeric(gsub("[^0-9.]*","",out))
-## Bisect to find relevant profile time interval
-f <- function(a,b){
-  time.filter <- paste(a,b,sep=":")
-  cmd <- paste("amplxe-cl -report top-down -result-dir ",example,".profile"," -time-filter ",time.filter,sep="")
-  system(cmd,TRUE,FALSE,TRUE)
+## inspxe-cl -help collect
+##    mi1   Detect Leaks
+##    mi2   Detect Memory Problems
+##    mi3   Locate Memory Problems
+##    ti1   Detect Deadlocks
+##    ti2   Detect Deadlocks and Data Races
+##    ti3   Locate Deadlocks and Data Races
+inspxe.options <- c(
+    "mi1",
+    "mi2",
+    "mi3",
+    "ti1",
+    "ti2",
+    "ti3")
+
+if (!is.na(match(type, amplxe.options))) {
+    cmd <- paste("amplxe-cl -collect ",
+                 type,
+                 " -result-dir ",
+                 example,
+                 ".profile",
+                 " -- ",
+                 Rexe,
+                 " --vanilla < ",
+                 example,".R",sep="")
+} else if (!is.na(match(type, inspxe.options))) {
+    file.copy(paste0(example, ".R"), paste0(example, ".clean_exit.R") )
+    cat("rm(list=ls()); gc()", file=paste0(example, ".clean_exit.R"), append=TRUE)
+    cmd <- paste("inspxe-cl -collect=",
+                 type,
+                 " -result-dir ",
+                 example,
+                 ".memprofile",
+                 " -- ",
+                 Rexe,
+                 " --vanilla < ",
+                 example,".R",sep="")
+} else {
+    stop("Unknown option collect type: ", type)
 }
-g <- function(x,regexp,tol=0.05,direction=1){
-  empty <- length(grep(regexp,f(x[1],x[2])))==0
-  dx <- x[2]-x[1]
-  print(x)
-  if(dx<tol)return(x)
-  if(empty){
-    x <- x+dx*direction
-  } else {
-    if(direction>0)
-      x <- c(min(x),min(x)+dx/2)
-    else
-      x <- c(min(x)+dx/2,max(x))
-  }
-  return(g(x,regexp,tol,direction))
-}
-if(length(grep("CppAD",f(0,endTime)))!=0){
-  begin <- min(g(c(0,2),"CppAD"))
-  end <- max(g(c(endTime-1,endTime),"CppAD",direction=-1))
-  time.filter <- paste(begin,end,sep=":")
-  cat("Profiling time interval",time.filter,"\n")
-  cmd <- paste("amplxe-cl -report top-down -result-dir ",example,".profile"," -time-filter ",time.filter," > ",example,".profile.txt",sep="")
-  system(cmd)
-}
+system(cmd)

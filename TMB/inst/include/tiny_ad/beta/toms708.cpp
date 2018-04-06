@@ -15,14 +15,7 @@
 #define max(a,b) ((a > b)?a:b)
 
 // Kasper: More strict convergence test (includes derivatives)
-template<class Float>
-double max_fabs(Float x) {
-  double* px = (double*) (&x);
-  static const int n = sizeof(Float) / sizeof(double);
-  double ans = 0;
-  for(int i=0; i<n; i++) ans = max(ans, fabs(px[i]));
-  return ans;
-}
+using atomic::tiny_ad::max_fabs;
 
 #include "nmath.h"
 #include "dpq.h"

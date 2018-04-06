@@ -16,9 +16,21 @@ Type objective_function<Type>::operator() ()
   Type ans = 0;
   ans -= dnorm(u, Type(0), exp(logsdu), true).sum();
 
+  // Optionally: How to simulate the random effects
+  SIMULATE {
+    u = rnorm(u.size(), Type(0), exp(logsdu));
+    REPORT(u);
+  }
+
   // Distribution of obs given random effects (x|u):
   vector<Type> y = A * beta + B * u;
   ans -= dnorm(x, y, exp(logsd0), true).sum();
+
+  // Optionally: How to simulate the data
+  SIMULATE {
+    x = rnorm(y, exp(logsd0));
+    REPORT(x);
+  }
 
   // Apply delta method on sd0:
   ADREPORT( exp(logsd0) );

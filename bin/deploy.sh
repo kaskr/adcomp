@@ -9,12 +9,12 @@ function doCompile {
 }
 
 # Only first worker builds documentation
-echo "TRAVIS_JOB_NUMBER=$TRAVIS_JOB_NUMBER"
-echo "WORKER=${TRAVIS_JOB_NUMBER: -1}"
-if [ "${TRAVIS_JOB_NUMBER: -1}" != "1" ]; then
-    echo "Skipping deploy; Not my job."
-    exit 0
-fi
+# echo "TRAVIS_JOB_NUMBER=$TRAVIS_JOB_NUMBER"
+# echo "WORKER=${TRAVIS_JOB_NUMBER: -1}"
+# if [ "${TRAVIS_JOB_NUMBER: -1}" != "1" ]; then
+#     echo "Skipping deploy; Not my job."
+#     exit 0
+# fi
 
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify

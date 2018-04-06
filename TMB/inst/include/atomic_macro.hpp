@@ -46,7 +46,8 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
                          CppAD::vector<bool>& vy,                             \
                          const CppAD::vector<Type>& tx,                       \
                          CppAD::vector<Type>& ty) {                           \
-      if (q > 0) error("Atomic '" #ATOMIC_NAME "' order not implemented.\n"); \
+      if (q > 0)                                                              \
+        Rf_error("Atomic '" #ATOMIC_NAME "' order not implemented.\n");       \
       if (vx.size() > 0) {                                                    \
         bool anyvx = false;                                                   \
         for (size_t i = 0; i < vx.size(); i++) anyvx |= vx[i];                \
@@ -59,7 +60,8 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
                          const CppAD::vector<Type>& ty,                       \
                          CppAD::vector<Type>& px,                             \
                          const CppAD::vector<Type>& py) {                     \
-      if (q > 0) error("Atomic '" #ATOMIC_NAME "' order not implemented.\n"); \
+      if (q > 0)                                                              \
+        Rf_error("Atomic '" #ATOMIC_NAME "' order not implemented.\n");       \
       ATOMIC_REVERSE;                                                         \
       return true;                                                            \
     }                                                                         \
@@ -73,7 +75,7 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
     virtual bool rev_sparse_jac(size_t q,                                     \
                                 const CppAD::vector<std::set<size_t> >& rt,   \
                                 CppAD::vector<std::set<size_t> >& st) {       \
-      error("Should not be called");                                          \
+      Rf_error("Should not be called");                                       \
     }                                                                         \
   };                                                                          \
   template <class Type>                                                       \

@@ -47,13 +47,15 @@ getUserDLL <- function(){
 
 ## Un-exported functions that we need
 .shlib_internal <- get(".shlib_internal", envir = asNamespace("tools"), inherits = FALSE)
-destructive_Chol_update <- get("destructive_Chol_update", envir = asNamespace("Matrix"), inherits = FALSE)
 
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
-  destructive_Chol_update(L, H, t) ## Was: Matrix:::destructive_Chol_update(L, H, t)
-  ## TODO: Ask MM to export from Matrix!
+  .Call("tmb_destructive_CHM_update", L, H, t, PACKAGE="TMB")
+}
+
+solveCholesky <- function(L, x){
+  .Call("tmb_CHMfactor_solve", L, x, PACKAGE="TMB")
 }
 
 ## Test for invalid external pointer
@@ -174,7 +176,7 @@ MakeADFun <- function(data, parameters, map=list(),
   env <- environment() ## This environment
   if(!is.list(data))
     stop("'data' must be a list")
-  ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&is.numeric(x)
+  ok <- function(x)(is.matrix(x)|is.vector(x)|is.array(x))&(is.numeric(x)|is.logical(x))
   ok.data <- function(x)ok(x)|is.factor(x)|is(x,"sparseMatrix")|is.list(x)|(is.character(x)&length(x)==1)
   check.passed <- function(x){
     y <- attr(x,"check.passed")
@@ -326,6 +328,19 @@ MakeADFun <- function(data, parameters, map=list(),
   }
   if(silent)beSilent()
 
+  ## Getting shape of ad reported variables
+  ADreportDims <- NULL
+  ADreportIndex <- function() {
+      lngt <- sapply(ADreportDims, prod)
+      offset <- head( cumsum( c(1, lngt) ) , -1)
+      ans <- lapply(seq_along(lngt),
+                    function(i) array(seq(from = offset[i],
+                                          length.out = lngt[i]),
+                                      ADreportDims[[i]] ))
+      names(ans) <- names(ADreportDims)
+      ans
+  }
+
   ## All external pointers are created in function "retape" and can be re-created
   ## by running retape() if e.g. the number of openmp threads is changed.
   retape <- function(){
@@ -334,7 +349,11 @@ MakeADFun <- function(data, parameters, map=list(),
       ## Have to call "double-template" to trigger tape generation
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
-      .Call("EvalDoubleFunObject",Fun$ptr,unlist(parameters),control=list(do_simulate=as.integer(0)),PACKAGE=DLL)
+      out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
+                   control = list(do_simulate = as.integer(0),
+                                  get_reportdims = as.integer(1)),
+                   PACKAGE=DLL)
+      ADreportDims <<- attr(out, "reportdims")
     }
     if(is.character(profile)){
         random <<- c(random, profile)
@@ -434,7 +453,7 @@ MakeADFun <- function(data, parameters, map=list(),
 
         "double" = {
           res <- .Call("EvalDoubleFunObject", Fun$ptr, theta,
-                       control=list(do_simulate=as.integer(do_simulate)),PACKAGE=DLL)
+                       control=list(do_simulate=as.integer(do_simulate),get_reportdims=as.integer(0)),PACKAGE=DLL)
         },
 
         "ADGrad" = {
@@ -459,7 +478,7 @@ MakeADFun <- function(data, parameters, map=list(),
       ans <- f(theta,order=0) + .5*logdetH - length(random)/2*log(2*pi)
       if(LaplaceNonZeroGradient){
         grad <- f(theta,order=1)[random]
-        ans - .5* sum(grad * as.numeric( solve(L, grad) ))
+        ans - .5* sum(grad * as.numeric( solveCholesky(L, grad) ))
       } else
         ans
     }
@@ -643,11 +662,11 @@ MakeADFun <- function(data, parameters, map=list(),
       if(!skipFixedEffects){
         ## Relies on "hess[-random,random]" !!!!!
         res <- grad[-random] -
-          hess[-random,random] %*% as.vector(solve(L,grad[random]))
+          hess[-random,random] %*% as.vector(solveCholesky(L,grad[random]))
       } else {
         ## Smarter: Do a reverse sweep of ptrADGrad
         w <- rep(0,length(par))
-        w[random] <- as.vector(solve(L,grad[random]))
+        w[random] <- as.vector(solveCholesky(L,grad[random]))
         res <- grad[-random] -
           f(par, order=1, type="ADGrad", rangeweight=w)[-random]
       }
@@ -835,13 +854,14 @@ MakeADFun <- function(data, parameters, map=list(),
            if(is.character(ans))NaN else ans
          },
          gr=function(x=last.par[-random],...){
-           ans <- {
+           ans <- try( {
              if(MCcontrol$doMC){
                ff(x,order=0)
                MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=1)
              } else
                ff(x,order=1)
-           }
+           }, silent=silent)
+           if(is.character(ans)) ans <- rep(NaN, length(x))
            if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
            ans
          },
@@ -902,11 +922,12 @@ openmp <- function(n=NULL){
 ##' @param openmp Turn on openmp flag? Auto detected for parallel templates.
 ##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
 ##' @param libinit Turn on preprocessor flag to register native routines?
+##' @param tracesweep Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file[1]),libtmb=TRUE,
-                    libinit=TRUE,...){
+                    libinit=TRUE,tracesweep=FALSE,...){
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
@@ -914,6 +935,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
       chartr("\\", "/", shortPathName(ans))
     }
   }
+  ## Cannot use the pre-compiled library when enabling sweep tracing
+  if (tracesweep) libtmb <- FALSE
   ## libtmb existence
   debug <-
       length(grep("-O0", flags)) &&
@@ -980,7 +1003,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb],
-                   paste0("-DTMB_LIB_INIT=R_init_",libname)[libinit]
+                   paste0("-DTMB_LIB_INIT=R_init_",libname)[libinit],
+                   "-DCPPAD_FORWARD0SWEEP_TRACE"[tracesweep]
                    )
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
@@ -1251,26 +1275,20 @@ newton <- function (par,fn,gr,he,
   chol.solve <- function(h,g){
     ##.Call("destructive_CHM_update",L,h,as.double(0),PACKAGE="Matrix")
     updateCholesky(L,h)
-    as.vector(solve(L,g))
+    as.vector(solveCholesky(L,g))
   }
   ## optimize <- stats::optimize
   nam <- names(par)
   par <- as.vector(par)
   g <- h <- NULL
-  ## Disable CHOLMOD warings
-  if(silent) {
-    oldWarn <- getOption("warn")
-    options(warn = -1)
-    on.exit(options(warn = oldWarn))
-  }
   ## pd.check: Quick test for hessian being positive definite
   iterate <- function(par,pd.check=FALSE) {
     if(file.exists(".Rbreakpoint"))browser() ## secret backdoor to poke around...
     if(pd.check){
       if(is.null(h))return(TRUE)
       h <<- he(par) ## Make sure hessian is updated
-      tmp <- try( updateCholesky(L,h) , silent=silent)
-      return( !inherits(tmp,"try-error") )
+      PD <- updateCholesky(L, h)
+      return( PD )
     }
     g <<- as.vector(gr(par))
     if(any( !is.finite(g) ))stop("Newton dropout because inner gradient had non-finite components.")
@@ -1293,12 +1311,12 @@ newton <- function (par,fn,gr,he,
         ## Passed...
         ## Now do more expensive check...
         ##ok <- !is.character(try( .Call("destructive_CHM_update",L,h,as.double(t),PACKAGE="Matrix") , silent=silent))
-        ok <- !is.character(try( updateCholesky(L,h,t) , silent=silent))
+        ok <- updateCholesky(L, h, t)
         if(!ok)return(NaN)
-        dp <- as.vector(solve(L,g))
+        dp <- as.vector(solveCholesky(L,g))
         p <<- par-dp
         ans <- fn(p)
-        if(gradient)attr(ans,"gradient") <- sum(solve(L,dp)*gr(p))
+        if(gradient)attr(ans,"gradient") <- sum(solveCholesky(L,dp)*gr(p))
         ans
       }
 

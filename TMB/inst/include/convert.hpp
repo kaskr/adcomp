@@ -23,34 +23,30 @@ double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::
 template<class Type>
 SEXP asSEXP(const matrix<Type> &a) 
 {
-   int nr=a.rows();
-   int nc=a.cols();
-   int size = nr * nc;
+   R_xlen_t nr = a.rows();
+   R_xlen_t nc = a.cols();
    SEXP val;
-   PROTECT(val = allocVector(REALSXP,size));
+   PROTECT(val = Rf_allocMatrix(REALSXP, nr, nc));
    double *p = REAL(val);
-   for(int i=0;i<nr;i++)
-     for(int j=0;j<nc;j++)
-       p[i+j*nr]=asDouble(a(i,j));
-   SEXP dim;
-   PROTECT(dim = allocVector(INTSXP,2));
-   INTEGER(dim)[0] = nr; INTEGER(dim)[1] = nc;
-   setAttrib(val, R_DimSymbol, dim);
-   UNPROTECT(2);
+   for(R_xlen_t i=0; i<nr; i++)
+     for(R_xlen_t j=0; j<nc; j++)
+       p[i + j * nr] = asDouble(a(i,j));
+   UNPROTECT(1);
    return val;
 }
 
 // Report vector of numeric types: Make R-vector
-#define asSEXP_VECTOR_OF_NUMERIC(Type)			\
-SEXP asSEXP(const vector<Type> &a) CSKIP(		\
-{							\
-  int size = a.size();					\
-  SEXP val;						\
-  PROTECT(val = allocVector(REALSXP,size));		\
-  double *p = REAL(val);				\
-  for (int i = 0; i < size; i++) p[i] = asDouble(a[i]);	\
-  UNPROTECT(1);						\
-  return val;						\
+#define asSEXP_VECTOR_OF_NUMERIC(Type)          \
+SEXP asSEXP(const vector<Type> &a) CSKIP(       \
+{                                               \
+  R_xlen_t size = a.size();                     \
+  SEXP val;                                     \
+  PROTECT(val = Rf_allocVector(REALSXP,size));  \
+  double *p = REAL(val);                        \
+  for (R_xlen_t i = 0; i < size; i++)           \
+    p[i] = asDouble(a[i]);                      \
+  UNPROTECT(1);                                 \
+  return val;                                   \
 })
 asSEXP_VECTOR_OF_NUMERIC(int)
 asSEXP_VECTOR_OF_NUMERIC(double)
@@ -61,10 +57,11 @@ asSEXP_VECTOR_OF_NUMERIC(AD<Type>)
 template<class Type>
 SEXP asSEXP(const vector<Type> &a)
 {
-   int size = a.size();
+   R_xlen_t size = a.size();
    SEXP val;
-   PROTECT(val = allocVector(VECSXP, size));
-   for (int i = 0; i < size; i++) SET_VECTOR_ELT(val, i, asSEXP(a[i]));
+   PROTECT(val = Rf_allocVector(VECSXP, size));
+   for (R_xlen_t i = 0; i < size; i++)
+     SET_VECTOR_ELT(val, i, asSEXP(a[i]));
    UNPROTECT(1);
    return val;
 }
@@ -72,7 +69,7 @@ SEXP asSEXP(const vector<Type> &a)
 SEXP asSEXP(const double &a) CSKIP(
 {
    SEXP val;
-   PROTECT(val=allocVector(REALSXP,1));
+   PROTECT(val=Rf_allocVector(REALSXP,1));
    REAL(val)[0]=a;
    UNPROTECT(1);
    return val;
@@ -80,7 +77,7 @@ SEXP asSEXP(const double &a) CSKIP(
 SEXP asSEXP(const int &a) CSKIP(
 {
    SEXP val;
-   PROTECT(val=allocVector(INTSXP,1));
+   PROTECT(val=Rf_allocVector(INTSXP,1));
    INTEGER(val)[0]=a;
    UNPROTECT(1);
    return val;
@@ -95,8 +92,8 @@ SEXP asSEXP(const AD<Type> &a){
 template <class Type>
 vector<Type> asVector(SEXP x)
 {
-   if(!isReal(x)) error("NOT A VECTOR!");
-   int n = length(x);
+   if(!Rf_isReal(x)) Rf_error("NOT A VECTOR!");
+   R_xlen_t n = XLENGTH(x);
    typedef Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,1> > MapVector;
    MapVector tmp(REAL(x), n);
    vector<Type> y = tmp.cast<Type>();
@@ -107,26 +104,23 @@ vector<Type> asVector(SEXP x)
 template<class Type>
 matrix<Type> asMatrix(const vector<Type> &x, int nr, int nc)
 {
-  if(nr*nc!=x.size())error("nr*nc!=n in asMatrix");
-  matrix<Type> res(nr,nc);
-  for(int i=0;i<nr;i++)
-    for(int j=0;j<nc;j++)
-      res(i,j)=x[i*nc+j];
-  return res;
+  matrix<Type> xm = x.matrix();
+  xm.resize(nr, nc);
+  return xm;
 }
 
-// kasper: MOVE TO asMatrix.hpp ?
-/** \brief Construct c++-matrix from SEXP object */
+/** \brief Construct C++-matrix from SEXP object */
 template <class Type>
 matrix<Type> asMatrix(SEXP x)
 {
-   if(!isMatrix(x))error("NOT A MATRIX!");
-   int nr=nrows(x);
-   int nc=ncols(x);
-   matrix<Type> y(nr,nc);
-   for(int i=0;i<nr;i++)
-     for(int j=0;j<nc;j++)
-       y(i,j)=Type(REAL(x)[i+nr*j]);
+   if (!Rf_isMatrix(x))
+     Rf_error("x must be a matrix in 'asMatrix(x)'");
+   R_xlen_t nr = Rf_nrows(x); // nrows is int
+   R_xlen_t nc = Rf_ncols(x); // ncols is int
+   matrix<Type> y(nr, nc);
+   for(R_xlen_t i=0; i<nr; i++)
+     for(R_xlen_t j=0; j<nc; j++)
+       y(i, j) = Type(REAL(x)[i + nr * j]);
    return y;
 }
 
@@ -134,13 +128,15 @@ template<class Type>
 SEXP asSEXP(const tmbutils::array<Type> &a)
 {
    SEXP val;
-   PROTECT(val = allocVector(REALSXP,a.size()));
+   PROTECT(val = Rf_allocVector(REALSXP, a.size()));
    double *p = REAL(val);
-   for(int i=0;i<a.size();i++)p[i]=asDouble(a[i]);
+   for(R_xlen_t i=0; i<a.size(); i++)
+     p[i] = asDouble(a[i]);
    SEXP dim;
-   PROTECT(dim = allocVector(INTSXP,a.dim.size()));
-   for(int i=0;i<a.dim.size();i++)INTEGER(dim)[i]=a.dim[i];
-   setAttrib(val, R_DimSymbol, dim);
+   PROTECT(dim = Rf_allocVector(INTSXP, a.dim.size()));
+   for(int i=0; i<a.dim.size(); i++)
+     INTEGER(dim)[i] = a.dim[i];
+   Rf_setAttrib(val, R_DimSymbol, dim);
    UNPROTECT(2);
    return val;
 }
@@ -150,25 +146,25 @@ template<class Type>
 SEXP asSEXP(Eigen::SparseMatrix<Type> x){
   typedef typename Eigen::SparseMatrix<Type>::InnerIterator Iterator;
   // Allocate return object
-  int nnz = x.nonZeros();
+  R_xlen_t nnz = x.nonZeros();
   SEXP ans = PROTECT(R_do_new_object(R_do_MAKE_CLASS("dgTMatrix")));
-  SEXP dim = PROTECT(allocVector(INTSXP, 2));
-  SEXP dimnames = PROTECT(allocVector(VECSXP, 2));
-  SEXP values = PROTECT(allocVector(REALSXP, nnz));
-  SEXP i = PROTECT(allocVector(INTSXP, nnz));
-  SEXP j = PROTECT(allocVector(INTSXP, nnz));
-  SEXP factors = PROTECT(allocVector(VECSXP, 0));
-  R_do_slot_assign(ans, install("i"), i);
-  R_do_slot_assign(ans, install("j"), j);
-  R_do_slot_assign(ans, install("Dim"), dim);
-  R_do_slot_assign(ans, install("Dimnames"), dimnames);
-  R_do_slot_assign(ans, install("x"), values);
-  R_do_slot_assign(ans, install("factors"), factors);
+  SEXP dim = PROTECT(Rf_allocVector(INTSXP, 2));
+  SEXP dimnames = PROTECT(Rf_allocVector(VECSXP, 2));
+  SEXP values = PROTECT(Rf_allocVector(REALSXP, nnz));
+  SEXP i = PROTECT(Rf_allocVector(INTSXP, nnz));
+  SEXP j = PROTECT(Rf_allocVector(INTSXP, nnz));
+  SEXP factors = PROTECT(Rf_allocVector(VECSXP, 0));
+  R_do_slot_assign(ans, Rf_install("i"), i);
+  R_do_slot_assign(ans, Rf_install("j"), j);
+  R_do_slot_assign(ans, Rf_install("Dim"), dim);
+  R_do_slot_assign(ans, Rf_install("Dimnames"), dimnames);
+  R_do_slot_assign(ans, Rf_install("x"), values);
+  R_do_slot_assign(ans, Rf_install("factors"), factors);
   // Insert
   INTEGER(dim)[0] = x.rows();
   INTEGER(dim)[1] = x.cols();
-  int k=0;
-  for (int cx=0; cx<x.outerSize(); cx++)
+  R_xlen_t k = 0;
+  for (R_xlen_t cx=0; cx<x.outerSize(); cx++)
     {
       for (Iterator itx(x,cx); itx; ++itx)
 	{
@@ -179,16 +175,5 @@ SEXP asSEXP(Eigen::SparseMatrix<Type> x){
 	}
     }
   UNPROTECT(7);
-  return ans;
-}
-
-
-/** \brief Convert C++ object to R object and protect the result from garbage collection
-    \note Each call to this function must be followed by UNPROTECT(1)
-*/
-template<class T>
-SEXP asSEXP_protect(const T &x) {
-  SEXP ans;
-  PROTECT( ans = asSEXP(x) );
   return ans;
 }

@@ -23,8 +23,8 @@ checkMatrixPackageVersion <- function() {
             "Current Matrix version is ",
             cur.Matrix.version,
             "\n",
-            "Please re-install 'TMB' from source ",
-            "or restore original 'Matrix' package"
+            "Please re-install 'TMB' from source using install.packages('TMB', type = 'source') ",
+            "or ask CRAN for a binary version of 'TMB' matching CRAN's 'Matrix' package"
         )
     }
 }

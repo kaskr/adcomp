@@ -1,6 +1,22 @@
-```{.R echo=FALSE, eval=TRUE, results='hide'}
+```{r echo=FALSE, eval=TRUE, results='hide'}
 source("layout/utils.R")
 ```
+
+Introduction {#Introduction}
+============
+
+TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is strongly inspired by [ADMB](http://www.admb-project.org). Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.
+
+* TMB can calculate first and second order derivatives of the likelihood function by [AD](http://en.wikipedia.org/wiki/Automatic_differentiation), or any objective function written in C++.
+* The objective function (and its derivatives) can be called from R. Hence, parameter estimation via e.g. `nlminb()` is easy.
+* The user can specify that the [Laplace approximation](http://en.wikipedia.org/wiki/Laplace_approximation) should be applied to any subset of the function arguments. 
+  * Yields marginal likelihood in latent variable model.
+* Standard deviations of any parameter, or derived parameter, obtained by the ['delta method'](http://en.wikipedia.org/wiki/Delta_method).
+* Pre and post-processing of data done in R.
+* TMB is based on state-of-the art software: [CppAD](http://www.coin-or.org/CppAD/), [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page), ...
+
+A more general introduction including the underlying theory used in TMB can be found in this [paper](https://www.jstatsoft.org/index.php/jss/article/view/v070i05/v70i05.pdf). 
+
 
 Tutorial {#Tutorial}
 ========
@@ -49,7 +65,34 @@ nll = Type(1.2);    // Assign value 1.2; a cast is needed.
 ## Obtaining data and parameter values from R
 Obviously, we will need to pass both data and parameter values to the
 objective function.  This is done through a set of macros that TMB
-defines for us. To see which macros are available start typing
+defines for us.
+
+### List of data macros
+
+```{r, results='asis', echo=FALSE}
+tmp <- unlist(lapply(dir("../TMB/inst/include", full=TRUE), readLines))
+tmp <- grep('^#define DATA_', tmp, value=TRUE)
+tmp <- sub("^#define ","",tmp)
+tmp <- sub("\\(.*","",tmp)
+tmp <- tmp[-grep("INDICATOR",tmp)]
+tmp <- sort(tmp)
+tmp <- paste(paste0("`",tmp,"()`"), collapse=", ")
+cat("> ", tmp)
+```
+
+### List of parameter macros
+
+```{r, results='asis', echo=FALSE}
+tmp <- unlist(lapply(dir("../TMB/inst/include", full=TRUE), readLines))
+tmp <- grep('^#define PARAMETER', tmp, value=TRUE)
+tmp <- sub("^#define ","",tmp)
+tmp <- sub("\\(.*","",tmp)
+tmp <- sort(tmp)
+tmp <- paste(paste0("`",tmp,"()`"), collapse=", ")
+cat("> ", tmp)
+```
+
+To see which macros are available start typing
 `DATA_` or `PARAMETER_` in the Doxygen search field of
 your browser (you may need to refresh the browser window between each
 time you make a new search). A simple example if you want to read a
@@ -282,6 +325,9 @@ res = your_dmnorm(x);
 ```
 
 in which `your_dmnorm` is a variable that holds the "density". 
+
+Note, that the latter way (using the `MVNORM_t`) is _more efficient_
+when you need to evaluate the density more than once, i.e. for different values of `x`.
     
 _Sigma_ can be parameterized in different ways. Due to the symmetry of
 *Sigma* there are at most *n(n+1)/2* free parameters (*n* variances
@@ -348,7 +394,7 @@ Now, *var[x(t)] = sigma^2*. Because all elements of `x` are scaled by
 the same constant we use SCALE rather than VECSCALE.
 
 #### Multivariate AR1 processes
-This is the first real illustrations of how distributions can be used
+This is the first real illustration of how distributions can be used
 as building blocks to obtain more complex distributions. Consider the
 *p* dimensional AR1 process
 
@@ -436,7 +482,7 @@ Example collection {#Examples}
 - **Controlling R code**
     `r include_source("../tmb_examples/linreg.R", indent=4)`
 - To run this example use the R command
-    ```{.R, eval = FALSE}
+    ```{r, eval = FALSE}
     source("linreg.R")
     ```
 
@@ -492,7 +538,7 @@ This will cause TMB and R to crash with the following error message:
 
 So, you must restart R and give the commands
 
-```{.R eval=FALSE}
+```{r eval=FALSE}
 library(TMB)
 gdbsource("my_project.R")
 ```
@@ -525,7 +571,7 @@ need to be included ("//Extra line needed" in the above example).
 
 When we try to run this program in the usual way, the program crashes:
 
-```{.R eval=FALSE}
+```{r eval=FALSE}
 source("nan_error_ex.R")
 ```
 
@@ -535,12 +581,19 @@ source("nan_error_ex.R")
 At this stage you should run the debugger to find out that the
 floating point exception occurs at line number 14:
 
-```{.R eval=FALSE}
+```{r eval=FALSE}
 library(TMB)
 gdbsource("nan_error_ex.R")
 ```
 
 > \#1  0x00007ffff0e7eb09 in objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:14
+
+This enabling of floating point errors applies to R as well as the TMB program.
+For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script
+before the floating point exception in the TMB program (i.e. the problem of interest) happens.
+To circumvent this problem one can run without NaN debugging enabled and
+ save the parameter vector that gave the floating point exception (e.g. `badpar <- obj$env$last.par` after the NaN evaluation),
+then enable NaN debugging, re-compile, and evaluate `obj$env$f( badpar, type="double")`.
 
 
 
@@ -624,7 +677,7 @@ Constants     3.4                Type(3.4);                  // Explicit casting
 Scalar        x = 5.2            Type x = Type(5.2);         // Variables must have type
 Arrays        x = numeric(10)    vector<Type> x(10);         // C++ code here does NOT initialize to 0
 Indexing      x[1]+x[10]         x(0)+x(9);                  // C++ indexing is zero-based
-Loops         for(i in 1:10)     for(i=1;i<=10;i++)          // Integer i must be declared in C++
+Loops         for(i in 1:10)     for(int i=1;i<=10;i++)      // Integer i must be declared in C++
 Increments    x[1] = x[1] + 3    x(0) += 3.0;                // += -= *= /= incremental operators in C++
 ```
 

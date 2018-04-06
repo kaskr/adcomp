@@ -16,8 +16,9 @@ p <- rnorm(1)
 data <- list(a=a,b=b,c=c,d=d)
 parameters <- list(p=p)
 
+## REPORT()
 ## Check objects are unchanged when passed back to R
-obj <- MakeADFun(data=data,parameters=parameters,DLL="report")
+obj <- MakeADFun(data=data, parameters=parameters, DLL="report")
 (rep <- obj$report())
 stopifnot( identical(rep$a, a) )
 stopifnot( identical(rep$b, b) )
@@ -25,3 +26,12 @@ stopifnot( identical(rep$c, c) )
 stopifnot( identical(rep$d, d) )
 stopifnot( identical(rep$p, p) )
 stopifnot( identical(rep$voa, list(c, c)) )
+
+## ADREPORT()
+## Check objects are unchanged when passed back to R
+sdr <- sdreport(obj, hessian.fixed=diag(1))
+adrep <- as.list(sdr, "Estimate", report=TRUE)
+stopifnot( all( adrep$a == a ) )
+stopifnot( identical(adrep$b, b) ) ## Dimension preserved
+stopifnot( identical(adrep$c, c) ) ## Dimension preserved
+stopifnot( all( adrep$p == p ) )

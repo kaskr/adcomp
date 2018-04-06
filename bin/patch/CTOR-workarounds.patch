@@ -1,0 +1,82 @@
+From 401df6e3484fc225ba90c52493817aaf19f8e136 Mon Sep 17 00:00:00 2001
+From: Kasper Kristensen <kaskr@dtu.dk>
+Date: Tue, 21 Nov 2017 14:35:30 +0100
+Subject: [PATCH 3/6] CTOR workarounds
+
+---
+ TMB/inst/include/cppad/core/ad.hpp      |  7 ++++++-
+ TMB/inst/include/cppad/core/ad_ctor.hpp | 27 +++++++++++++++++++--------
+ 2 files changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/TMB/inst/include/cppad/core/ad.hpp b/TMB/inst/include/cppad/core/ad.hpp
+index 937b7db..1ab55ac 100644
+--- a/TMB/inst/include/cppad/core/ad.hpp
++++ b/TMB/inst/include/cppad/core/ad.hpp
+@@ -169,7 +169,7 @@ public:
+ 	// inline AD& operator=(const AD &x);
+ 
+ 	// implicit construction and assingment from base type
+-	inline AD(const Base &b);
++	// inline AD(const Base &b);
+ 	inline AD& operator=(const Base &b);
+ 
+ 	// implicit contructor and assignment from VecAD<Base>::reference
+@@ -179,6 +179,11 @@ public:
+ 	// explicit construction from some other type (depricated)
+ 	template <class T> inline explicit AD(const T &t);
+ 
++	// Kasper: explicit CTOR does not allow e.g. 'AD<AD<double> > x = 0;'
++#define CTOR_FROM(TYPE) inline AD(const TYPE &t);
++  CTOR_FROM(double)
++#undef CTOR_FROM
++
+ 	// assignment from some other type
+ 	template <class T> inline AD& operator=(const T &right);
+ 
+diff --git a/TMB/inst/include/cppad/core/ad_ctor.hpp b/TMB/inst/include/cppad/core/ad_ctor.hpp
+index ab10718..4e3d09e 100644
+--- a/TMB/inst/include/cppad/core/ad_ctor.hpp
++++ b/TMB/inst/include/cppad/core/ad_ctor.hpp
+@@ -122,14 +122,14 @@ is the Base type value corresponding to this AD object.
+ The tape identifier will be an invalid tape identifier,
+ so this object is initially a parameter.
+ */
+-template <class Base>
+-inline AD<Base>::AD(const Base &b)
+-: value_(b)
+-, tape_id_(0)
+-, taddr_(0)
+-{	// check that this is a parameter
+-	CPPAD_ASSERT_UNKNOWN( Parameter(*this) );
+-}
++// template <class Base>
++// inline AD<Base>::AD(const Base &b)
++// : value_(b)
++// , tape_id_(0)
++// , taddr_(0)
++// {	// check that this is a parameter
++// 	CPPAD_ASSERT_UNKNOWN( Parameter(*this) );
++// }
+ 
+ /*!
+ Constructor from an ADVec<Base> element drops the vector information.
+@@ -163,5 +163,16 @@ inline AD<Base>::AD(const T &t)
+ , taddr_(0)
+ { }
+ 
++// Added by Kasper
++#define CTOR_FROM(TYPE)                         \
++template <class Base>                           \
++inline AD<Base>::AD(const TYPE &t)              \
++: value_(Base(t))                               \
++, tape_id_(0)                                   \
++, taddr_(0)                                     \
++{ }
++  CTOR_FROM(double)
++#undef CTOR_FROM
++
+ } // END_CPPAD_NAMESPACE
+ # endif
+-- 
+2.7.4
+

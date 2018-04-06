@@ -49,7 +49,8 @@
 #include <R_ext/Lapack.h>
 #include "Matrix.h"
 
-/* Copy-pasted from "Writing R Extensions" */
+/* Copy-pasted from "Writing R Extensions". A similar spell is present
+   in Matrix.h so might not be needed anymore ? */
 #ifdef __GNUC__
 // this covers gcc, clang, icc
 # undef alloca
@@ -58,6 +59,94 @@
 // needed for native compilers on Solaris and AIX
 # include <alloca.h>
 #endif
+
+extern cholmod_common c; // See init.c
+
+/* Temporary fix until 'AS_CHM_FR__' is part of Matrix API.
+   In future replace code below by something like:
+
+#ifdef AS_CHM_FR__
+#undef AS_CHM_FR
+#define AS_CHM_FR AS_CHM_FR__
+#endif
+
+*/
+#undef AS_CHM_FR
+#define AS_CHM_FR(x) tmb_as_cholmod_factor3((CHM_FR)alloca(sizeof(cholmod_factor)), x, FALSE)
+CHM_FR tmb_as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
+{
+  int *type = INTEGER(GET_SLOT(x, install("type")));
+  SEXP tmp;
+  memset(ans, 0, sizeof(cholmod_factor)); /* zero the struct */
+  ans->itype = CHOLMOD_INT;	/* characteristics of the system */
+  ans->dtype = CHOLMOD_DOUBLE;
+  ans->z = (void *) NULL;
+  ans->xtype = CHOLMOD_REAL;
+  ans->ordering = type[0];	/* unravel the type */
+  ans->is_ll = (type[1] ? 1 : 0);
+  ans->is_super = (type[2] ? 1 : 0);
+  ans->is_monotonic = (type[3] ? 1 : 0);
+  SEXP Matrix_permSym = install("perm");
+  tmp = GET_SLOT(x, Matrix_permSym);
+  ans->minor = ans->n = LENGTH(tmp); ans->Perm = INTEGER(tmp);
+  ans->ColCount = INTEGER(GET_SLOT(x, install("colcount")));
+  ans->z = ans->x = (void *) NULL;
+  SEXP Matrix_xSym = install("x");
+  tmp = GET_SLOT(x, Matrix_xSym);
+  ans->x = REAL(tmp);
+  if (ans->is_super) {	/* supernodal factorization */
+    ans->xsize = LENGTH(tmp);
+    ans->maxcsize = type[4]; ans->maxesize = type[5];
+    ans->i = (int*)NULL;
+    tmp = GET_SLOT(x, install("super"));
+    ans->nsuper = LENGTH(tmp) - 1; ans->super = INTEGER(tmp);
+    tmp = GET_SLOT(x, install("pi"));
+    ans->pi = INTEGER(tmp);
+    tmp = GET_SLOT(x, install("px"));
+    ans->px = INTEGER(tmp);
+    tmp = GET_SLOT(x, install("s"));
+    ans->ssize = LENGTH(tmp); ans->s = INTEGER(tmp);
+  } else {
+    Rf_error("Unexpected");
+  }
+  return ans;
+}
+
+SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult)
+{
+    CHM_FR f = AS_CHM_FR(L);
+    CHM_SP A = AS_CHM_SP__(H);
+    double mm[2] = {0, 0};
+    mm[0] = asReal(mult);
+    // NB: Result depends if A is "dsC" or "dgC"; the latter case assumes we mean AA' !!!
+    /*
+      cholmod_factorize_p return value:
+
+      TRUE:  CHOLMOD_OK, CHOLMOD_NOT_POSDEF, CHOLMOD_DSMALL
+
+      FALSE: CHOLMOD_NOT_INSTALLED, CHOLMOD_OUT_OF_MEMORY,
+             CHOLMOD_TOO_LARGE, CHOLMOD_INVALID, CHOLMOD_GPU_PROBLEM
+    */
+    if (!M_cholmod_factorize_p(A, mm, (int*)NULL, 0 /*fsize*/, f, &c))
+      /* -> ./CHOLMOD/Cholesky/cholmod_factorize.c */
+      error("cholmod_factorize_p failed: status %d, minor %d of ncol %d",
+            c.status, f->minor, f->n);
+    int ok = (c.status == CHOLMOD_OK);
+    return ScalarLogical(ok);
+}
+
+SEXP tmb_CHMfactor_solve(SEXP L_, SEXP y_)
+{
+    CHM_FR L = AS_CHM_FR(L_);
+    int n = LENGTH(y_);
+    CHM_DN y = N_AS_CHM_DN(REAL(y_), n, 1);
+    SEXP x = PROTECT( NEW_NUMERIC( n ) );
+    CHM_DN sol = M_cholmod_solve(CHOLMOD_A, L, y, &c);
+    memcpy(REAL(x), sol->x, n * sizeof(double));
+    M_cholmod_free_dense(&sol, &c);
+    UNPROTECT(1);
+    return x;
+}
 
 // Notes about the CHOLMOD super-nodal storage. 
 // According to the documentation of CHOLMOD we have:
@@ -191,8 +280,6 @@ CHM_SP tmb_inv_super(CHM_FR Lfac, cholmod_common *c){
 
 SEXP tmb_invQ(SEXP Lfac){
   CHM_FR L=AS_CHM_FR(Lfac);
-  cholmod_common c;
-  M_R_cholmod_start(&c);
   CHM_SP iQ = tmb_inv_super(L, &c);
   return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "", R_NilValue);
 }
@@ -212,8 +299,6 @@ void half_diag(CHM_SP A){
 
 SEXP tmb_invQ_tril_halfdiag(SEXP Lfac){
   CHM_FR L=AS_CHM_FR(Lfac);
-  cholmod_common c;
-  M_R_cholmod_start(&c);
   CHM_SP iQ = tmb_inv_super(L, &c);
   half_diag(iQ);
   iQ->stype=0; /* Change to non-sym */

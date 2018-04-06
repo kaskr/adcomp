@@ -53,6 +53,9 @@ void eigen_REprintf(const char* x);
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+/* Workaround side effect when -DEIGEN_USE_LAPACKE is set */
+#undef I
+
 /* Include the CppAD library. (Always turn off debug for cppad) */
 #undef NDEBUG
 #define NDEBUG 1
@@ -82,6 +85,7 @@ namespace CppAD{
 #include "atomic_convolve.hpp"
 #include "tiny_ad/atomic.hpp"
 #include "tiny_ad/integrate/integrate.hpp"
+#include "dynamic_data.hpp" // Requires atomic namespace
 #include "Vectorize.hpp"
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless

@@ -1,7 +1,4 @@
-// MVRandomWalkValidation
-//
-// Estimate and validate a multivariate random walk model with correlated
-// increments and correlated observations.
+// Estimate and validate a multivariate random walk model with correlated increments and correlated observations.
 //
 // Compare Thygesen et al (submitted, 2016): Validation of state space
 // models fitted as mixed effects models

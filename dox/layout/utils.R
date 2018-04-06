@@ -1,3 +1,6 @@
+library(TMB)
+formals(MakeADFun)$silent <- TRUE
+
 ## knitr global options
 knitr::opts_chunk$set(fig.width=3.5, fig.height=3.5) ## half of default (both for html and pdf output)
 knitr::opts_chunk$set(fig.align="center")
@@ -62,11 +65,24 @@ doxy_markdown_tweaks <- function(file) {
     ## 2: Doxygen does not like the 4-space rule
     x <- gsub("    ```", "  ```", x)
     ## 3: TODO: Remove empty lines before code in lists
-    ## 4: Formula workaround (inline):
-    x <- gsub("^\\$([^$]+?)\\$", "\\\\f$\\1\\\\f$", x)
-    x <- gsub(" \\$([^$]+?)\\$", " \\\\f$\\1\\\\f$", x)
+    ## 4: Formula workaround:
+    x <- paste(x, collapse="\n ")
+    x <- gsub("\\$\\$([^$]+?)\\$\\$", "\\\\f[\\1\\\\f]", x) ## centered
+    x <- gsub(" \\$([^$#]+?)\\$", " \\\\f$\\1\\\\f$", x)    ## inline
+    x <- strsplit(x, "\n ")[[1]]
     ## Save
     writeLines(x, file)
+}
+
+## Output graph as svg
+graph2svg <- function(graph) {
+    dotfile <- tempfile(fileext=".dot")
+    svgfile <- tempfile(fileext=".svg")
+    cat(graph, file=dotfile)
+    cmd <- paste("dot", "-Tsvg", dotfile, "-o", svgfile)
+    system(cmd)
+    class(svgfile) <- "svgfile"
+    svgfile
 }
 
 ## plot graph of hessian as either
@@ -136,13 +152,7 @@ plotGraph <- function(h, DAG=TRUE, fill_in=DAG, group = function(x)(x-1)%%nrow,
     }
     graph <- paste(graph, collapse="\n")
     if(debug)return(graph)
-    dotfile <- tempfile(fileext=".dot")
-    svgfile <- tempfile(fileext=".svg")
-    cat(graph, file=dotfile)
-    cmd <- paste("dot", "-Tsvg", dotfile, "-o", svgfile)
-    system(cmd)
-    class(svgfile) <- "svgfile"
-    svgfile
+    graph2svg(graph)
 }
 
 print.svgfile <- function(x) {

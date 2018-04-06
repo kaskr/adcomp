@@ -1,0 +1,30 @@
+From b68e77207678520560fca88c3c7da8899b66343a Mon Sep 17 00:00:00 2001
+From: Kasper Kristensen <kaskr@dtu.dk>
+Date: Fri, 24 Nov 2017 10:20:33 +0100
+Subject: [PATCH 5/6] CppAD jacobian: prefer reverse mode over forward mode if
+ work is equal - TMB only requires 1st order reverse (not forward) mode to be 
+  implemented for atomic functions. This can result in the error   'order not
+ implemented' if CppAD automatically selects forward over   reverse mode. - In
+ cases where the work of forward and reverse mode are equal it is   therefore
+ more natural (from TMB perspective) to select reverse   mode.
+
+---
+ TMB/inst/include/cppad/core/jacobian.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/TMB/inst/include/cppad/core/jacobian.hpp b/TMB/inst/include/cppad/core/jacobian.hpp
+index 75e91d5..3651f61 100644
+--- a/TMB/inst/include/cppad/core/jacobian.hpp
++++ b/TMB/inst/include/cppad/core/jacobian.hpp
+@@ -221,7 +221,7 @@ Vector ADFun<Base>::Jacobian(const Vector &x)
+ 
+ 	// choose the method with the least work
+ 	Vector jac( n * m );
+-	if( workForward <= workReverse )
++	if( workForward < workReverse )
+ 		JacobianFor(*this, x, jac);
+ 	else	JacobianRev(*this, x, jac);
+ 
+-- 
+2.7.4
+

@@ -29,5 +29,18 @@ Type objective_function<Type>::operator() ()
   voa[1] = c;
   REPORT(voa);
 
+  // AD Report objects back to R:
+  ADREPORT(a);
+  ADREPORT(b);
+  ADREPORT(c);
+  ADREPORT(p);
+
+  // AD Reporting transformed objects back to R must also work
+  // although will lose dimension.
+  ADREPORT(exp(a));
+  ADREPORT(exp(b));
+  ADREPORT(c.array().exp());
+  ADREPORT(exp(p));
+
   return 0;
 }

@@ -47,7 +47,7 @@
 ##' \preformatted{
 ##'     DATA_VECTOR(x);
 ##'     ...
-##'     nll -= dnorm(x(i), u(i), 0.0, true);
+##'     nll -= dnorm(x(i), u(i), sd(i), true);
 ##'     ...
 ##' }
 ##'
@@ -57,7 +57,7 @@
 ##'     DATA_VECTOR(x);
 ##'     DATA_VECTOR_INDICATOR(keep, x);
 ##'     ...
-##'     nll -= keep(i) * dnorm(x(i), u(i), 0.0, true);
+##'     nll -= keep(i) * dnorm(x(i), u(i), sd(i), true);
 ##'     ...
 ##' }
 ##'
@@ -149,8 +149,6 @@ oneStepPredict <- function(obj,
         stop("'observation.name' must define a data component")
     if (!(observation.name %in% names(obj$env$data)))
         stop("'observation.name' must be in data component")
-    if (is.null(obj$env$random))
-        stop("oneStepPredict is only for random effect models")
     method <- match.arg(method)
     if (is.null(data.term.indicator)){
         if(method != "fullGaussian"){
@@ -192,7 +190,10 @@ oneStepPredict <- function(obj,
     ## Args to construct copy of 'obj'
     args <- as.list(obj$env)[intersect(names(formals(MakeADFun)), ls(obj$env))]
     ## Use the best encountered parameter for new object
-    args$parameters <- obj$env$parList(par = obj$env$last.par.best)
+    if(length(obj$env$random))
+        args$parameters <- obj$env$parList(par = obj$env$last.par.best)
+    else
+        args$parameters <- obj$env$parList(obj$env$last.par.best)
     ## Fix all non-random components of parameter list
     names.random <- unique(names(obj$env$par[obj$env$random]))
     names.all <- names(args$parameters)
@@ -526,4 +527,151 @@ oneStepPredict <- function(obj,
     }
 
     pred
+}
+
+## Goodness of fit residuals based on an approximate posterior
+## sample. (\emph{Beta version; may change without notice})
+##
+## Denote by \eqn{(u, x)} the pair of the true un-observed random effect
+## and the data. Let a model specification be given in terms of the
+## estimated parameter vector \eqn{\theta} and let \eqn{u^*} be a
+## sample from the conditional distribution of \eqn{u} given
+## \eqn{x}. If the model specification is correct, it follows that the
+## distribution of the pair \eqn{(u^*, x)} is the same as the distribution
+## of \eqn{(u, x)}. Goodness-of-fit can thus be assessed by proceeding as
+## if the random effect vector were observed, i.e check that \eqn{u^*}
+## is consistent with prior model of the random effect and that \eqn{x}
+## given \eqn{u^*} agrees with the observation model.
+##
+## This function can carry out the above procedure for many TMB models
+## under the assumption that the true posterior is well approximated by a
+## Gaussian distribution.
+##
+## First a draw from the Gaussian posterior distribution \eqn{u^*} is
+## obtained based on the mode and Hessian of the random effects given the
+## data.
+## This sample uses sparsity of the Hessian and will thus work for large systems.
+##
+## An automatic standardization of the sample can be carried out \emph{if
+## the observation model is Gaussian} (\code{fullGaussian=TRUE}). In this
+## case the prior model is obtained by disabling the data term and
+## calculating mode and Hessian. A \code{data.term.indicator} must be
+## given in order for this to work. Standardization is performed using
+## the sparse Cholesky of the prior precision.
+## By default, this step does not use a fill reduction permutation \code{perm=FALSE}.
+## This is often superior wrt. to interpretation of the.
+## the natural order of the parameter vector is used \code{perm=FALSE}
+## which may be superior wrt. to interpretation. Otherwise
+## \code{perm=TRUE} a fill-reducing permutation is used while
+## standardizing.
+## @references Waagepetersen, R. (2006). A Simulation-based Goodness-of-fit Test for Random Effects in Generalized Linear Mixed Models. Scandinavian journal of statistics, 33(4), 721-731.
+## @param obj TMB model object from \code{MakeADFun}.
+## @param observation.name Character naming the observation in the template.
+## @param data.term.indicator Character naming an indicator data variable in the template. Only used if \code{standardize=TRUE}.
+## @param standardize Logical; Standardize sample with the prior covariance ? Assumes all latent variables are Gaussian.
+## @param as.list Output posterior sample, and the corresponding standardized residual, as a parameter list ?
+## @param perm Logical; Use a fill-reducing ordering when standardizing ?
+## @param fullGaussian Logical; Flag to signify that the joint distribution of random effects and data is Gaussian.
+## @return List with components \code{sample} and \code{residual}.
+oneSamplePosterior <- function(obj,
+                               observation.name = NULL,
+                               data.term.indicator = NULL,
+                               standardize = TRUE,
+                               as.list = TRUE,
+                               perm = FALSE,
+                               fullGaussian = FALSE){
+    ## Draw Gaussian posterior sample
+    tmp <- obj$env$MC(n=1, keep=TRUE, antithetic=FALSE)
+    samp <- as.vector( attr(tmp, "samples") )
+    ## If standardize
+    resid <- NULL
+    if (standardize) {
+        ## Args to construct copy of 'obj'
+        args <- as.list(obj$env)[intersect(names(formals(MakeADFun)), ls(obj$env))]
+        ## Use the best encountered parameter for new object
+        args$parameters <- obj$env$parList(par = obj$env$last.par.best)
+        ## Make data.term.indicator in parameter list
+        obs <- obj$env$data[[observation.name]]
+        nobs <- length(obs)
+        zero <- rep(0, nobs)
+        if ( ! fullGaussian )
+            args$parameters[[data.term.indicator]] <- zero
+        ## Fix all non-random components of parameter list
+        names.random <- unique(names(obj$env$par[obj$env$random]))
+        names.all <- names(args$parameters)
+        fix <- setdiff(names.all, names.random)
+        map <- lapply(args$parameters[fix], function(x)factor(x*NA))
+        args$map <- map ## Overwrite map
+        ## If 'fullGaussian == TRUE' turn 'obs' into a random effect
+        if (fullGaussian) {
+            names.random <- c(names.random, observation.name)
+            args$parameters[[observation.name]] <- obs
+        }
+        ## Find randomeffects character
+        args$random <- names.random
+        args$regexp <- FALSE
+        ## New object be silent
+        args$silent <- TRUE
+        ## Create new object
+        newobj <- do.call("MakeADFun", args)
+        ## Construct Hessian and Cholesky
+        newobj$fn()
+        ## Get Cholesky and prior mean
+        ## FIXME: We are using the mode as mean. Consider skewness
+        ## correction similar to 'bias.correct' in 'sdreport'.
+        L <- newobj$env$L.created.by.newton
+        mu <- newobj$env$last.par
+        ## If perm == FALSE redo Cholesky with natural ordering
+        if ( ! perm ) {
+            Q <- newobj$env$spHess(mu, random=TRUE)
+            L <- Matrix::Cholesky(Q, super=TRUE, perm=FALSE)
+        }
+        ## If 'fullGaussian == TRUE' add 'obs' to the sample
+        if (fullGaussian) {
+            tmp <- newobj$env$par * NA
+            tmp[names(tmp) == observation.name] <- obs
+            tmp[names(tmp) != observation.name] <- samp
+            samp <- tmp
+        }
+        ## Standardize ( P * Q * P^T = L * L^T )
+        r <- samp - mu
+        rp <- r[L@perm + 1]
+        Lt <- Matrix::t(
+            as(L, "sparseMatrix")
+        )
+        resid <- as.vector( Lt %*% rp )
+    }
+    if (as.list) {
+        if (standardize) obj <- newobj
+        par <- obj$env$last.par.best
+        asList <- function(samp) {
+            par[obj$env$random] <- samp
+            samp <- obj$env$parList(par=par)
+            nm <- unique(names(obj$env$par[obj$env$random]))
+            samp[nm]
+        }
+        samp <- asList(samp)
+        if (!is.null(resid))
+            resid <- asList(resid)
+    }
+    ans <- list()
+    ans$sample <- samp
+    ans$residual <- resid
+    ans
+}
+
+if(FALSE) {
+    library(TMB)
+    runExample("MVRandomWalkValidation", exfolder="../../tmb_examples/validation")
+    set.seed(1)
+    system.time( qw <- TMB:::oneSamplePosterior(obj, "obs", "keep") )
+    qqnorm(as.vector(qw$residual$u)); abline(0,1)
+    runExample("rickervalidation", exfolder="../../tmb_examples/validation")
+    set.seed(1)
+    system.time( qw <- TMB:::oneSamplePosterior(obj, "Y", "keep") )
+    qqnorm(as.vector(qw$residual$X)); abline(0,1)
+    runExample("ar1xar1")
+    set.seed(1)
+    system.time( qw <- TMB:::oneSamplePosterior(obj, "N", "keep") )
+    qqnorm(as.vector(qw$residual$eta)); abline(0,1)
 }

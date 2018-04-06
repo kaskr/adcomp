@@ -1,5 +1,3 @@
-// randomwalkvalidation
-//
 // Estimate and validate a random walk model with and without drift
 //
 // Compare Thygesen et al (submitted, 2016): Validation of state space models

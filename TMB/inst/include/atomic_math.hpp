@@ -53,11 +53,21 @@ namespace Rmath {
     double	Rf_lgammafn(double);
     double	Rf_psigamma(double, double);
     double	Rf_fmin2(double, double);
+    /* Selected headers from <R_ext/Applic.h> */
+    typedef void integr_fn(double *x, int n, void *ex);
+    void Rdqags(integr_fn f, void *ex, double *a, double *b,
+                double *epsabs, double *epsrel,
+                double *result, double *abserr, int *neval, int *ier,
+                int *limit, int *lenw, int *last, int *iwork, double *work);
+    void Rdqagi(integr_fn f, void *ex, double *bound, int *inf,
+                double *epsabs, double *epsrel,
+                double *result, double *abserr, int *neval, int *ier,
+                int *limit, int *lenw, int *last,
+                int *iwork, double *work);
   }
 
   /* Non-standard TMB special functions based on numerical
      integration: */
-  #include <R_ext/Applic.h>
 #ifdef WITH_LIBTMB
   void integrand_D_incpl_gamma_shape(double *x, int nx, void *ex);
   double D_incpl_gamma_shape(double x, double shape, double n, double logc);
@@ -104,7 +114,7 @@ namespace Rmath {
 	   &limit, &lenw, &last, iwork, work);
     if(ier!=0){
 #ifndef _OPENMP
-      warning("incpl_gamma (indef) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
+      Rf_warning("incpl_gamma (indef) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
 #endif
     }
     /* integrate min(log(x),log(shape))...log(x) */
@@ -118,7 +128,7 @@ namespace Rmath {
 	     &limit, &lenw, &last, iwork, work);
       if(ier!=0){
 #ifndef _OPENMP
-	warning("incpl_gamma (def) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
+	Rf_warning("incpl_gamma (def) integrate unreliable: x=%f shape=%f n=%f ier=%i", x, shape, n, ier);
 #endif
       }
     }

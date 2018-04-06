@@ -456,7 +456,11 @@ bool is_tape_point_constant(size_t index){
   }
   if(numarg==0)return false; // E.g. begin or end operators
   bool ans=true;
-  for(int i=0;i<numarg;i++){
+  int from = 0;
+  if (tp1.op == CSumOp) {
+    from = 3;                // Skip arg[0], arg[1], arg[2]
+  }
+  for(int i=from; i<numarg; i++){
     ans = ans && ( constant_tape_point_[var2op_[op_arg[i]]] || (!isDepArg(&op_arg[i])) )   ;
   }
   return ans;

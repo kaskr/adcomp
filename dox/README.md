@@ -13,16 +13,16 @@
 
 ## Requirements
 
-#### R packages
-
-```R
-install.packages(c("knitr", "bookdown", "rsvg"))
-```
-
 #### Command line tools
 
 ```shell
 sudo apt-get install doxygen pandoc pandoc-citeproc graphviz librsvg2-dev
+```
+
+#### R packages
+
+```R
+install.packages(c("knitr", "bookdown", "rsvg"))
 ```
 
 ## Export options

@@ -4,7 +4,7 @@ dyn.load(dynlib("socatt"))
 
 ## Read data
 source("tools/readdat.R")
-d <- readadmb("../admb_examples/socatt/socatt.dat")
+d <- readadmb("socatt.dat")
 
 d$ngroup <- d$ngroup[-length(d$ngroup)]
 d$y <- as.factor(d$y)

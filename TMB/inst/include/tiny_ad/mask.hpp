@@ -109,7 +109,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(						\
     tyref = CALL.getDeriv();                                            \
   }									\
   else									\
-    error("Order not implemented");					\
+    Rf_error("Order not implemented");					\
   ,									\
   typedef								\
   atomic::mask_t<OCTAL(MASK)>::set_length<NCHAR(MASK)> mask_type;	\

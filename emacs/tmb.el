@@ -1,27 +1,12 @@
 ;;; tmb.el --- Major mode for creating statistical models with TMB
 
-;; Copyright (C) 2015-2016 Arni Magnusson
+;; Copyright (C) 2015-2018 Arni Magnusson
 
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
-;; URL:      http://www.hafro.is/~arnima/tmb.html
+;; URL:      https://github.com/kaskr/adcomp/blob/master/emacs
 
-(defconst tmb-mode-version "3.2" "TMB Mode version number.")
-
-;; This file is not part of GNU Emacs.
-
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+(defconst tmb-mode-version "3.5" "TMB Mode version number.")
 
 ;;; Commentary:
 ;;
@@ -78,9 +63,11 @@
 ;;   (set-face-attribute 'tmb-report-face    nil :foreground "dodgerblue")
 ;;   (set-face-attribute 'font-lock-variable-name-face nil
 ;;                       :foreground 'unspecified)
-;;   (local-set-key [f9]           'tmb-run )
-;;   (local-set-key [f10]          'tmb-open)
-;;   (local-set-key [down-mouse-3] 'imenu  ))
+;;   (local-set-key [f7]  'tmb-clean  )
+;;   (local-set-key [f8]  'tmb-compile)
+;;   (local-set-key [f9]  'tmb-run    )
+;;   (local-set-key [f10] 'tmb-debug  )
+;;   (local-set-key [down-mouse-3] 'imenu))
 ;; (add-hook 'tmb-mode-hook 'my-tmb-hook)
 ;;
 ;; Usage:
@@ -94,41 +81,7 @@
 
 ;;; History:
 ;;
-;; 16 Nov 2016  3.2  Added user variable `tmb-block-face'. Added keywords
-;;                   "DATA_STRING", "SIMULATE", "PARALLEL_REGION", "rnorm",
-;;                   "rpois", "rnbinom", "rnbinom2", "rgamma", and "simulate".
-;;                   Improved `tmb-template-mini' so it asks for model name.
-;; 10 Nov 2015  3.1  Added user function `tmb-toggle-window', internal function
-;;                   `tmb-split-window', and user variable `tmb-window-right'.
-;; 01 Oct 2015  3.0  Added user functions `tmb-compile' and `tmb-multi-window'.
-;;                   Added user variables `tmb-compile-args' and
-;;                   `tmb-debug-args'. Renamed `tmb-run-debug' to `tmb-debug',
-;;                   `tmb-run-make' to `tmb-make', and `tmb-r-command' to
-;;                   `tmb-compile-command'. Removed `tmb-tool-bar-map'.
-;; 28 Sep 2015  2.3  Improved `tmb-toggle-nan-debug'.
-;; 22 Sep 2015  2.2  Added user function `tmb-toggle-nan-debug' and internal
-;;                   functions `tmb-nan-off' and `tmb-nan-on'. Added internal
-;;                   variables `tmb-menu', `tmb-mode-map', and
-;;                   `tmb-tool-bar-map'. Added GUI menu and toolbar. Renamed
-;;                   `tmb-toggle-function' to `tmb-toggle-show-function'.
-;;                   Improved `tmb-template-mini'.
-;; 10 Sep 2015  2.1  Added internal function `tmb-windows-os-p'. Improved
-;;                   `tmb-run-debug' and `tmb-template-mini'.
-;; 07 Sep 2015  2.0  Added user functions `tmb-run-debug', `tmb-scroll-down',
-;;                   `tmb-scroll-up', `tmb-show-compilation', and `tmb-show-r'.
-;;                   Renamed `tmb-open' to `tmb-open-any' and `tmb-run-r' to
-;;                   `tmb-run'. Improved `tmb-open', `tmb-open-any', `tmb-run',
-;;                   `tmb-run-any', and `tmb-template-mini'.
-;; 05 Sep 2015  1.3  Added user function `tmb-template-mini'. Renamed
-;;                   `tmb-toggle-section' to `tmb-toggle-function'.
-;; 04 Sep 2015  1.2  Added user functions `tmb-clean', `tmb-for',
-;;                   `tmb-kill-process', `tmb-open', `tmb-open-r',
-;;                   `tmb-run-any', `tmb-run-make', `tmb-run-r', and
-;;                   `tmb-toggle-section'. Added user variables
-;;                   `tmb-make-command' and `tmb-r-command'. Disabled
-;;                   `abbrev-mode'.
-;; 03 Sep 2015  1.1  Shortened list of recognized FUNCTIONS for maintainability.
-;; 01 Sep 2015  1.0  Created main function `tmb-mode', derived from `c++-mode'.
+;; See the NEWS file.
 
 ;;; Code:
 
@@ -149,7 +102,7 @@
 
 (defcustom tmb-compile-args
   ;; Platform-specific: -O1 in Windows, -O0 otherwise
-  (concat ",'-O" (if (tmb-windows-os-p) "1" "0") " -Wall'")
+  (concat ",'-g -O" (if (tmb-windows-os-p) "1" "0") " -Wall'")
   "Arguments for compile() function in `tmb-compile'  and `tmb-template-mini'."
   :tag "Compile args" :type 'string)
 (defcustom tmb-compile-command "R --quiet --vanilla"
@@ -211,7 +164,7 @@ The secondary window shows compilation and model runs, among other things."
              "invlogit" "lgamma" "logit"
              ;; Arrays, basics
              "array" "matrix"
-             "head" "segment" "size" "tail"
+             "head" "segment" "size" "tail" "vec"
              "col" "cols" "colwise" "row" "rows" "rowwise"
              "block" "diagonal" "transpose"
              "max" "min" "prod" "sum"
@@ -250,19 +203,19 @@ The secondary window shows compilation and model runs, among other things."
 (nconc tmb-font-lock-keywords c++-font-lock-keywords)
 (defvar tmb-menu
   '("TMB"
-    ["View Script"         tmb-open            ]
-    ["View Compilation"    tmb-show-compilation]
-    ["View R Session"      tmb-show-r          ]
+    ["Stop"                tmb-kill-process    ]
+    ["Clean"               tmb-clean           ]
     "--"
     ["Compile"             tmb-compile         ]
     ["Run"                 tmb-run             ]
     ["Make"                tmb-make            ]
     "--"
-    ["Stop"                tmb-kill-process    ]
-    ["Clean"               tmb-clean           ]
-    "--"
     ["Debug"               tmb-debug           ]
     ["Toggle NaN Debug"    tmb-toggle-nan-debug]
+    "--"
+    ["View Script"         tmb-open            ]
+    ["View Compilation"    tmb-show-compilation]
+    ["View R Session"      tmb-show-r          ]
     "--"
     ["Mini Template"       tmb-template-mini   ]
     ["Multi-Window Layout" tmb-multi-window    ]
@@ -277,6 +230,7 @@ The secondary window shows compilation and model runs, among other things."
   ;; Available C-c C-     e   ij          u   yz
   (let ((map (make-sparse-keymap)))
     (easy-menu-define nil map nil tmb-menu)
+    (define-key map [f11]               'tmb-open                )
     (define-key map [f12]               'tmb-template-mini       )
     (define-key map [?\C-c C-backspace] 'tmb-clean               )
     (define-key map [M-up]              'tmb-scroll-up           )
@@ -300,7 +254,14 @@ The secondary window shows compilation and model runs, among other things."
     (define-key map [?\C-c ?\C-t]       'tmb-toggle-window       )
     (define-key map [?\C-c ?\C-v]       'tmb-run                 )
     (define-key map [?\C-c ?\C-w]       'tmb-multi-window        )
-    (define-key map [?\C-\M-v]          'ignore                  )
+    map))
+(defvar tmb-tool-bar-map
+  (let ((map (tool-bar-make-keymap)))
+    (tool-bar-local-item "separator" 'ignore nil map :help "" :enable nil)
+    (tool-bar-local-item "disconnect" 'tmb-clean 'Clean map)
+    (tool-bar-local-item "connect" 'tmb-compile 'Compile map)
+    (tool-bar-local-item "jump-to" 'tmb-run 'Run map)
+    (tool-bar-local-item "describe" 'tmb-debug 'Debug map)
     map))
 
 ;; 4  User functions
@@ -358,7 +319,7 @@ The R session stays alive if it was running when this function was called."
   "Show TMB Mode version number." (interactive)
   (message "TMB Mode version %s" tmb-mode-version))
 (defun tmb-open ()
-  "Open R script with same filename prefix as current buffer." (interactive)
+  "Open R script with same filename prefix in other window." (interactive)
   (tmb-open-any "R"))
 (defun tmb-open-any (ext)
   "Open file with extension EXT in other window." (interactive "sExtension: ")
@@ -376,14 +337,16 @@ The script is sourced in an existing R session, or a new R session is started."
 If the R script has the same filename prefix as the current buffer, then use
 `tmb-run' instead.\n
 Filename history is accessible in the minibuffer prompt \
-(\\<minibuffer-local-map>\\[previous-history-element],\
- \\[next-history-element]).\n
+\(\\<minibuffer-local-map>\\[previous-history-element], \
+\\[next-history-element]).\n
 The script is sourced in an existing R session, or a new session is started."
   (interactive "fRun R script: ")(save-buffer)
-  (let* ((ess-dialect "R")
-         (inferior-R-args "--quiet --vanilla")
-         (ess-ask-for-ess-directory nil))
-    (tmb-split-window)(ess-load-file script)))
+  (let ((ess-dialect "R")
+        (inferior-R-args "--quiet --vanilla")
+        (ess-ask-for-ess-directory nil)
+        (cmd (concat "source(\"" script "\", echo=TRUE)")))
+    (if (get-buffer-window "*R*")(ess-eval-linewise cmd) ; check if visible
+      (tmb-open)(ess-eval-linewise cmd)(delete-other-windows)(tmb-show-r))))
 (defun tmb-scroll-down (n)
   "Scroll other window down N lines, or visit next error message.\n
 The behavior of this command depends on whether the compilation buffer is
@@ -423,8 +386,8 @@ Type objective_function<Type>::operator() ()
   PARAMETER(mu);
   PARAMETER(logSigma);
 
-  Type f;
-  f = -sum(dnorm(x, mu, exp(logSigma), true));
+  Type f = 0;
+  f -= dnorm(x, mu, exp(logSigma), true).sum();
 
   return f;
 }
@@ -433,20 +396,25 @@ Type objective_function<Type>::operator() ()
     (save-selected-window
       (tmb-split-window)(find-file-other-window model-r)
       (delete-region (point-min)(point-max))(insert "\
+library(TMB)
+
+## Compile and load the model
+compile(\"" model-cpp "\")
+dyn.load(dynlib(\"" model "\"))
+
+## Data and parameters
 data <- list(x=rivers)
 parameters <- list(mu=0, logSigma=0)
 
-require(TMB)
-compile('" model-cpp "'" tmb-compile-args ")
-dyn.load(dynlib('" model "'))
+## Make a function object
+obj <- MakeADFun(data, parameters, DLL=\"" model "\")
 
-################################################################################
+## Call function minimizer
+fit <- nlminb(obj$par, obj$fn, obj$gr)
 
-model <- MakeADFun(data, parameters)
-fit <- nlminb(model$par, model$fn, model$gr)
-rep <- sdreport(model)
-
-print(rep)
+## Get parameter uncertainties and convergence diagnostics
+sdr <- sdreport(obj)
+sdr
 ")
       (goto-char (point-min))(write-file model-r t)))
   (message (concat "Ready to compile R script ("
@@ -515,9 +483,9 @@ can be helpful.\n
 While staying in the TMB window, navigate the secondary window with
 \\<tmb-mode-map>\
 \\[beginning-of-buffer-other-window], \\[scroll-other-window-down], \
-\\[tmb-scroll-up] (scroll home, page up, line up), and
+\\[tmb-scroll-up] (home, page up, line up), and
 \\[end-of-buffer-other-window], \\[scroll-other-window], \
-\\[tmb-scroll-down] (scroll end, page down, line down).
+\\[tmb-scroll-down] (end, page down, line down).
 This is particularly efficient for navigating error messages listed
 in the compilation buffer.\n
 \\{tmb-mode-map}"
@@ -525,6 +493,9 @@ in the compilation buffer.\n
   (modify-syntax-entry ?_ "w" tmb-mode-syntax-table)
   (set (make-local-variable 'font-lock-defaults)
        '(tmb-font-lock-keywords nil nil))
+  (set (make-local-variable 'tool-bar-map) tmb-tool-bar-map)
   (setq compilation-scroll-output 'first-error))
 
 (provide 'tmb)
+
+;;; tmb.el ends here

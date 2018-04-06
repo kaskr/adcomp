@@ -62,5 +62,6 @@ all:
 	make pdf_book
 	make inject_links
 	cd _book; sed -i 's|\.\./html/|\.\./|g' *.html
+	rm -rf html/_book
 	mv _book html
 	touch html/.nojekyll

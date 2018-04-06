@@ -46,10 +46,18 @@ Zero is the normal operational value.
 If it is one, a trace of every forward0sweep computation is printed.
 (Note that forward0sweep is not used if CPPAD_USE_FORWARD0SWEEP is zero).
 */
-# define CPPAD_FORWARD0SWEEP_TRACE 0
-void traceforward0sweep(int trace)CSKIP({
-  // CPPAD_FORWARD0SWEEP_TRACE=trace;
-})
+
+# if CPPAD_FORWARD0SWEEP_TRACE
+  int do_trace;
+  void traceforward0sweep(int trace) {
+    do_trace = trace;
+  }
+# define IF_TRACE if (do_trace)
+# else
+  void traceforward0sweep(int trace) CSKIP( {
+    // Default: Ignore
+  })
+# endif
 
 /*!
 Compute zero order forward mode Taylor coefficients.
@@ -259,7 +267,7 @@ void forward0sweep(
 	play->forward_start(op, arg, i_op, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == BeginOp );
 # if CPPAD_FORWARD0SWEEP_TRACE
-	std::cout << std::endl;
+	IF_TRACE std::cout << std::endl;
 # endif
 	bool more_operators = true;
 	while(more_operators)
@@ -845,7 +853,7 @@ void forward0sweep(
 			CPPAD_ASSERT_UNKNOWN( NumArg(UsrrvOp) == 0 );
 			for(size_t i = 0; i < user_m; i++) if( user_iy[i] > 0 )
 			{	size_t i_tmp   = (i_op + i) - user_m;
-				printOp(
+				IF_TRACE printOp(
 					std::cout, 
 					play,
 					i_tmp,
@@ -854,14 +862,14 @@ void forward0sweep(
 					CPPAD_NULL
 				);
 				Base* Z_tmp = taylor + user_iy[i] * J;
-				printOpResult(
+				IF_TRACE printOpResult(
 					std::cout, 
 					d + 1, 
 					Z_tmp,
 					0, 
 					(Base *) CPPAD_NULL
 				);
-				std::cout << std::endl;
+				IF_TRACE std::cout << std::endl;
 			}
 		}
 		Base*           Z_tmp   = taylor + i_var * J;
@@ -872,7 +880,7 @@ void forward0sweep(
 			arg_tmp = arg - arg[-1] - 7;
 		if( op != UsrrvOp )
 		{
-			printOp(
+			IF_TRACE printOp(
 				std::cout, 
 				play,
 				i_op,
@@ -880,17 +888,17 @@ void forward0sweep(
 				op, 
 				arg_tmp
 			);
-			if( NumRes(op) > 0 ) printOpResult(
+			if( NumRes(op) > 0 ) IF_TRACE printOpResult(
 				std::cout, 
 				d + 1, 
 				Z_tmp, 
 				0, 
 				(Base *) CPPAD_NULL
 			);
-			std::cout << std::endl;
+			IF_TRACE std::cout << std::endl;
 		}
 	}
-	std::cout << std::endl;
+	IF_TRACE std::cout << std::endl;
 # else
 	}
 # endif
