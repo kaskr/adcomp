@@ -198,16 +198,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="AtomicFunctions" class="section level1">
 <h1><span class="header-section-number">15</span> Atomic functions</h1>
-<p>Custom functions and derivatives can be added to the TMB library. This may be necessary due to the following reasons:</p>
+<p>Custom functions and derivatives can be added to the TMB library. This may be necessary for the following reasons:</p>
 <ul>
 <li>Adaptive (e.g. iterative) algorithms cannot be represented by a fixed computational graph and thus cannot be directly differentiated using TMB. Algorithms that use parameter dependent if-else branching are examples of such functions.</li>
 <li>Some functions have so many floating point operations that it is infeasible to expand the computational graph. Memory usage may be greatly reduced in such cases by collapsing the computational graph to a singe node with multiple inputs and outputs.</li>
 </ul>
 <div id="reverse-mode-differentiation" class="section level2">
 <h2><span class="header-section-number">15.1</span> Reverse mode differentiation</h2>
-<p>TMB uses CppAD as engine for reverse mode derivatives. In order to add a new primitive function</p>
+<p>TMB uses CppAD as its engine for reverse mode derivatives. In order to add a new primitive function</p>
 <p><span class="math display">\[f: R^n \rightarrow R^m\]</span></p>
-<p>we must inform CppAD how to calclualate derivatives of this function in reverse mode. That is, for any range space vector <span class="math inline">\(w \in R^m\)</span> we must calculate the gradient of the function <span class="math inline">\(R^n \rightarrow R\)</span> given by</p>
+<p>we must inform CppAD how to calculate derivatives of this function in reverse mode. That is, for any range space vector <span class="math inline">\(w \in R^m\)</span> we must calculate the gradient of the function <span class="math inline">\(R^n \rightarrow R\)</span> given by</p>
 <p><span class="math display">\[ x \rightarrow \text{sum}( f(x) \odot w ) \]</span></p>
 <p>where ‘<span class="math inline">\(\odot\)</span>’ is pointwise multiplication.</p>
 </div>
@@ -217,10 +217,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><span class="math display">\[y = W(y e^y)\]</span></p>
 <p>Here, we only consider <span class="math inline">\(W\)</span> as defined on the positive reals. It follows, by differentiating the above identity, that</p>
 <p><span class="math display">\[ W&#39;(x) = \frac{1}{ \exp\left(W(x)\right) \left(1 + W(x)\right) } \]</span></p>
-<p>When coding up reverse mode derivatives we can assume that the function value <span class="math inline">\(W(x)\)</span> has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating <span class="math inline">\(W(x)\)</span> in the reverse pass.</p>
+<p>When coding reverse-mode derivatives we can assume that the function value <span class="math inline">\(W(x)\)</span> has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating <span class="math inline">\(W(x)\)</span> in the reverse pass.</p>
 <p>We’ll assume that a plain C++ function (taking double types as input/output) is available to calculate <span class="math inline">\(W(x)\)</span>. It doesn’t matter whether you have the source code of an implementation or just the header with linkage to an external library:</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">double</span> LambertW(<span class="dt">double</span> x);</code></pre></div>
-<p>The macro <code>TMB_ATOMIC_VECTOR_FUNCTION()</code> is used to declare our new primitive Lambert W function:</p>
+<p>The macro <code>TMB_ATOMIC_VECTOR_FUNCTION()</code> is used to declare our new primitive Lambert <span class="math inline">\(W\)</span> function:</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">TMB_ATOMIC_VECTOR_FUNCTION(
     <span class="co">// ATOMIC_NAME</span>
     LambertW
@@ -235,12 +235,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span>
     px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span>
 )</code></pre></div>
-<p>Let’s explain in details what is going on. The macro takes four arguments:</p>
+<p>Let’s explain in detail what is going on. The macro takes four arguments:</p>
 <ol style="list-style-type: decimal">
 <li><code>ATOMIC_NAME</code>: Name of new primitive function taking <code><a class="code" href="../namespaceCppAD.html">CppAD</a>::vector</code> as input and output.</li>
 <li><code>OUTPUT_DIM</code>: Dimension of the <code><a class="code" href="../namespaceCppAD.html">CppAD</a>::vector</code> which is the function output.</li>
 <li><code>ATOMIC_DOUBLE</code>: Specifies how to evaluate the primitive function for the ordinary double type. <code>tx</code> denotes the input vector and <code>ty</code> the output vector of the function <span class="math inline">\(f: R^n \rightarrow R^m\)</span>. In this case both have dimension one.</li>
-<li><code>ATOMIC_REVERSE</code>: How to calculate the reverse mode derivatives for a general <code>Type</code>. Again <code>tx</code> and <code>ty</code> denote function input and output but now <code>ty</code> has been computed and is available as an intermediate value. The vectors <code>px</code> and <code>py</code> denote partial derivatives of the end result wrt. <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> respectively. <code>py</code> is given and we must calculate <code>px</code> using the chain rule. This first order derivative rule is automatically expanded up to higher orders required when using TMB’s random effects calculations.</li>
+<li><code>ATOMIC_REVERSE</code>: How to calculate the reverse mode derivatives for a general <code>Type</code>. Again <code>tx</code> and <code>ty</code> denote function input and output but now <code>ty</code> has been computed and is available as an intermediate value. The vectors <code>px</code> and <code>py</code> denote partial derivatives of the end result with respect to <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> respectively. <code>py</code> is given and we must calculate <code>px</code> using the chain rule. This first order derivative rule is automatically expanded up to higher orders required when using TMB’s random effects calculations.</li>
 </ol>
 <p>To make the function work like other TMB functions it is convenient to define scalar and a vectorized versions that call the atomic function:</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Scalar version</span>
@@ -255,7 +255,7 @@ Type LambertW(Type x){
 VECTORIZE_1t(LambertW)</code></pre></div>
 <div id="testing-the-primitive-function" class="section level3">
 <h3><span class="header-section-number">15.2.1</span> Testing the primitive function</h3>
-<p>The complete example using Newton’s method to calculate the Lambert W function is:</p>
+<p>Here is a complete example using Newton’s method to calculate the Lambert <span class="math inline">\(W\)</span> function (there are more sophisticated algorithms such as the one by <a href="https://doi.org/10.1016/j.cam.2012.11.021">Fukushima (2013)</a>, but that doesn’t matter for this example):</p>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">
 <span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
 
@@ -332,8 +332,8 @@ obj$<span class="kw">fn</span>(<span class="dv">7</span> *<span class="st"> </sp
 </div>
 <div id="other-approaches" class="section level2">
 <h2><span class="header-section-number">15.3</span> Other approaches</h2>
-<p>For the Lambert W function we knew how to calculate the derivatives. There are cases for which the derivatives are impossible (or difficult) to write down. If this is the situation you’re in you may want to try using forward mode AD to help defining an atomic function. A full worked out example is available here: <a href="../adaptive_integration_8cpp-example.html">adaptive_integration.cpp</a>. Derivatives are calculated automatically and if-else branching is allowed. The main downside with the approach is that it is limited to functions with very few inputs.</p>
-<p>A second technique worth mentioning is checkpointing. It is demonstrated in the example <a href="../register_atomic_8cpp-example.html">register_atomic.cpp</a>. It does not work for adaptive algorithms but is otherwise automatic. It is useful to reduce AD memory usage in cases where the same operation sequence is being applied many times.</p>
+<p>For the Lambert <span class="math inline">\(W\)</span> function we know how to calculate the derivatives. There are cases for which the derivatives are impossible (or difficult) to write down. If you’re in this situation you may want to try using forward mode AD to help in defining an atomic function. A full worked out example is available here: <a href="../adaptive_integration_8cpp-example.html">adaptive_integration.cpp</a>. Derivatives are calculated automatically and if-else branching is allowed. The main downside with this approach is that it is limited to functions with very few inputs.</p>
+<p>Checkpointing is another useful technique. It is demonstrated in the example <a href="../register_atomic_8cpp-example.html">register_atomic.cpp</a>. It does not work for adaptive algorithms but is otherwise automatic. It is useful to reduce AD memory usage in cases where the same sequence of operations is being applied many times.</p>
 
 
 </div>
