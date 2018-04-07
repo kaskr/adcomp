@@ -7,7 +7,7 @@ importFrom("methods", as, is, new,
 	   cbind2, rbind2)
 importFrom("stats", approx, confint, integrate, median, nlminb,
 	   optim, optimHess, pchisq, qchisq, qnorm, rnorm,
-	   runif, sd, splinefun, var)
+	   runif, sd, splinefun, uniroot, var)
 importFrom("utils", as.relistable, relist,
 	   head, tail)
 ## Windows specific imports
@@ -55,7 +55,8 @@ export(benchmark,
        summary.checkConsistency,
        summary.sdreport,
        template,
-       tmbprofile)
+       tmbprofile,
+       tmbroot)
 
 ## Methods :
 S3method(confint, tmbprofile)
