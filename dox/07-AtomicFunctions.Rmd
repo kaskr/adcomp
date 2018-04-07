@@ -7,18 +7,18 @@ library(Matrix)
 Atomic functions {#AtomicFunctions}
 ================
 
-Custom functions and derivatives can be added to the TMB library. This may be necessary due to the following reasons:
+Custom functions and derivatives can be added to the TMB library. This may be necessary for the following reasons:
 
 * Adaptive (e.g. iterative) algorithms cannot be represented by a fixed computational graph and thus cannot be directly differentiated using TMB. Algorithms that use parameter dependent if-else branching are examples of such functions.
 * Some functions have so many floating point operations that it is infeasible to expand the computational graph. Memory usage may be greatly reduced in such cases by collapsing the computational graph to a singe node with multiple inputs and outputs.
 
 ## Reverse mode differentiation
 
-TMB uses CppAD as engine for reverse mode derivatives. In order to add a new primitive function
+TMB uses CppAD as its engine for reverse mode derivatives. In order to add a new primitive function
 
 $$f: R^n \rightarrow R^m$$
 
-we must inform CppAD how to calclualate derivatives of this function in reverse mode. That is, for any range space vector $w \in R^m$ we must calculate the gradient of the function $R^n \rightarrow R$ given by
+we must inform CppAD how to calculate derivatives of this function in reverse mode. That is, for any range space vector $w \in R^m$ we must calculate the gradient of the function $R^n \rightarrow R$ given by
 
 $$ x \rightarrow \text{sum}( f(x) \odot w ) $$
 
@@ -34,7 +34,7 @@ Here, we only consider $W$ as defined on the positive reals. It follows, by diff
 
 $$ W'(x) = \frac{1}{ \exp\left(W(x)\right) \left(1 + W(x)\right) } $$
 
-When coding up reverse mode derivatives we can assume that the function value $W(x)$ has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating $W(x)$ in the reverse pass.
+When coding reverse-mode derivatives we can assume that the function value $W(x)$ has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating $W(x)$ in the reverse pass.
 
 We'll assume that a plain C++ function (taking double types as input/output) is available to calculate $W(x)$. It doesn't matter whether you have the source code of an implementation or just the header with linkage to an external library:
 
@@ -42,7 +42,7 @@ We'll assume that a plain C++ function (taking double types as input/output) is 
 double LambertW(double x);
 ```
 
-The macro `TMB_ATOMIC_VECTOR_FUNCTION()` is used to declare our new primitive Lambert W function:
+The macro `TMB_ATOMIC_VECTOR_FUNCTION()` is used to declare our new primitive Lambert $W$ function:
 
 ```{cpp}
 TMB_ATOMIC_VECTOR_FUNCTION(
@@ -61,12 +61,12 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 )
 ```
 
-Let's explain in details what is going on. The macro takes four arguments:
+Let's explain in detail what is going on. The macro takes four arguments:
 
 1. `ATOMIC_NAME`: Name of new primitive function taking `CppAD::vector` as input and output.
 2. `OUTPUT_DIM`: Dimension of the `CppAD::vector` which is the function output.
 3. `ATOMIC_DOUBLE`: Specifies how to evaluate the primitive function for the ordinary double type. `tx` denotes the input vector and `ty` the output vector of the function $f: R^n \rightarrow R^m$. In this case both have dimension one.
-4. `ATOMIC_REVERSE`: How to calculate the reverse mode derivatives for a general `Type`. Again `tx` and `ty` denote function input and output but now `ty` has been computed and is available as an intermediate value. The vectors `px` and `py` denote partial derivatives of the end result wrt. $x$ and $y$ respectively. `py` is given and we must calculate `px` using the chain rule. This first order derivative rule is automatically expanded up to higher orders required when using TMB's random effects calculations.
+4. `ATOMIC_REVERSE`: How to calculate the reverse mode derivatives for a general `Type`. Again `tx` and `ty` denote function input and output but now `ty` has been computed and is available as an intermediate value. The vectors `px` and `py` denote partial derivatives of the end result with respect to $x$ and $y$ respectively. `py` is given and we must calculate `px` using the chain rule. This first order derivative rule is automatically expanded up to higher orders required when using TMB's random effects calculations.
 
 To make the function work like other TMB functions it is convenient to define scalar and a vectorized versions that call the atomic function:
 
@@ -85,7 +85,9 @@ VECTORIZE_1t(LambertW)
 
 ### Testing the primitive function
 
-The complete example using Newton's method to calculate the Lambert W function is:
+Here is a complete example using Newton's method to calculate the Lambert $W$ function
+(there are more sophisticated algorithms such as the one by [Fukushima (2013)](https://doi.org/10.1016/j.cam.2012.11.021),
+but that doesn't matter for this example):
 
 ```{r, echo=FALSE}
 create_source("
@@ -174,6 +176,6 @@ obj$he(7)
 
 ## Other approaches
 
-For the Lambert W function we knew how to calculate the derivatives. There are cases for which the derivatives are impossible (or difficult) to write down. If this is the situation you're in you may want to try using forward mode AD to help defining an atomic function. A full worked out example is available here: `r doxylink("adaptive_integration.cpp")`. Derivatives are calculated automatically and if-else branching is allowed. The main downside with the approach is that it is limited to functions with very few inputs.
+For the Lambert $W$ function we know how to calculate the derivatives. There are cases for which the derivatives are impossible (or difficult) to write down. If you're in this situation you may want to try using forward mode AD to help in defining an atomic function. A full worked out example is available here: `r doxylink("adaptive_integration.cpp")`. Derivatives are calculated automatically and if-else branching is allowed. The main downside with this approach is that it is limited to functions with very few inputs.
 
-A second technique worth mentioning is checkpointing. It is demonstrated in the example `r doxylink("register_atomic.cpp")`. It does not work for adaptive algorithms but is otherwise automatic. It is useful to reduce AD memory usage in cases where the same operation sequence is being applied many times.
+Checkpointing is another useful technique. It is demonstrated in the example `r doxylink("register_atomic.cpp")`. It does not work for adaptive algorithms but is otherwise automatic. It is useful to reduce AD memory usage in cases where the same sequence of operations is being applied many times.
