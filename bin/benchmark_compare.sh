@@ -1,4 +1,10 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
+# bash function that rename files by regexp. Ignoring 1st arg.
+rename() {
+    for f in ${@:3}; do mv "$f" $(echo "$f" | sed $2); done
+}
+# ----------------------------------------------------------------------------
 
 BRANCH1=$1
 BRANCH2=$2

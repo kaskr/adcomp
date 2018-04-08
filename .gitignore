@@ -1,6 +1,12 @@
+# The directory benchmark at top level
+/benchmark/
+# Any file or directory that ends with ~
 *~
+# Any file or directory that ends with following extensions:
 *.o
 *.so
+*.gz
+# Any file or directory with the following names:
 .Rhistory
 Rgrid.pe*
 Rgrid.po*
