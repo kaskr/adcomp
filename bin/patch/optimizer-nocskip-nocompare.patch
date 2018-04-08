@@ -1,0 +1,19 @@
+commit 20bb0f330bb5ceb3ea8beb26a4f2644ac5dffe80
+Author: Kasper Kristensen <kaskr@dtu.dk>
+Date:   Thu Nov 30 22:34:35 2017 +0100
+
+    optimizer: 'no cond skip' and 'no compare ops'
+
+diff --git a/TMB/inst/include/cppad/core/ad_fun.hpp b/TMB/inst/include/cppad/core/ad_fun.hpp
+index 525687c..99909a1 100644
+--- a/TMB/inst/include/cppad/core/ad_fun.hpp
++++ b/TMB/inst/include/cppad/core/ad_fun.hpp
+@@ -670,7 +670,7 @@ public:
+ 
+ 	// Optimize the tape
+ 	// (see doxygen documentation in optimize.hpp)
+-	void optimize( const std::string& options = "" );
++	void optimize( const std::string& options = "no_conditional_skip no_compare_op" );
+ 
+ 	// create abs-normal representation of the function f(x)
+ 	void abs_normal_fun( ADFun& g, ADFun& a );
