@@ -18,3 +18,4 @@ echo_eval cd ${THISDIR}
 # ${PATCH} patch/CTOR-workarounds.patch
 # ${PATCH} patch/CppAD-jacobian-prefer-reverse-mode-over-forward-mode.patch
 # ${PATCH} patch/Parallel-checkpoint-still-needed.patch
+${PATCH} patch/optimizer-nocskip-nocompare.patch
