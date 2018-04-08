@@ -686,7 +686,7 @@ public:
 
 	// Optimize the tape
 	// (see doxygen documentation in optimize.hpp)
-	void optimize( const std::string& options = "" );
+	void optimize( const std::string& options = "no_conditional_skip no_compare_op" );
 
 	// create abs-normal representation of the function f(x)
 	void abs_normal_fun( ADFun& g, ADFun& a ) const;
