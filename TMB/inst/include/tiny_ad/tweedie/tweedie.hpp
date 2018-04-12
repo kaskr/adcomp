@@ -35,15 +35,6 @@ int imin2(S x, int y) {return (x < y) ? x : y;}
 #undef TWEEDIE_NTERM
 #undef imax
 
-template<class Float>
-Float dtweedie(Float y, Float mu, Float phi, Float p, int give_log = 0) {
-  Float ans;
-  bool ok = (0 <= y) & (0 < mu) & (0 < phi) & (1 < p) & (p < 2);
-  if (!ok) return NAN;
-  dtweedie<Float>(1, &y, &mu, phi, p, NULL, &ans);
-  return ( give_log ? ans : exp(ans) );
-}
-
 } // End namespace tweedie_utils
 
 #endif

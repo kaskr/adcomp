@@ -545,13 +545,17 @@ VECTORIZE2_tt(besselY)
 */
 template<class Type>
 Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
-  CppAD::vector<Type> tx(5);
-  tx[0] = y;
-  tx[1] = mu;
-  tx[2] = phi;
-  tx[3] = p;
-  tx[4] = 0;
-  Type ans = atomic::log_dtweedie(tx)[0];
+  Type p1 = p - 1.0, p2 = 2.0 - p;
+  Type ans = -pow(mu, p2) / (phi * p2); // log(prob(y=0))
+  if (y > 0) {
+    CppAD::vector<Type> tx(4);
+    tx[0] = y;
+    tx[1] = phi;
+    tx[2] = p;
+    tx[3] = 0;
+    ans += atomic::tweedie_logW(tx)[0];
+    ans += -y / (phi * p1 * pow(mu, p1)) - log(y);
+  }
   return ( give_log ? ans : exp(ans) );
 }
 
