@@ -24,12 +24,20 @@ normalize <- function(obj, flag, value=0) {
     obj0$env$L.created.by.newton <- NULL ## Can't use same Cholesky object
     if (missing(flag)        ||
         ! is.character(flag) ||
-        length(flag) != 1    ||
-        length(obj0$env$data[[flag]]) == 0 ) {
-        stop("'flag' must be a character of length one naming a data item.")
+        ! all( flag %in% names(obj0$env$data) ) ) {
+        stop("'flag' must be a character vector naming one or more data items.")
     }
-    obj0$env$data[[flag]][] <- value
-    obj0$retape()    
+    if ( (length(flag)==1) && length(value) > 0) {
+        ## Examples: flag="flag" and value=0 ("flag" ~ INTEGER)
+        ##           flag="keep" and value=0 ("keep" ~ DATA_VECTOR_INDICATOR)
+        obj0$env$data[[flag]][] <- value
+    } else {
+        ## Examples: flag="obs" and value=numeric(0) ("obs" ~ DATA_VECTOR)
+        ##           flag=c("obs1","obs2") and value=list(numeric(0),numeric(0))
+        if (!is.list(value)) value <- list(value)
+        obj0$env$data[flag] <- value
+    }
+    obj0$retape()
     newobj <- list()
     newobj$par <- obj1$par
     newobj$env <- obj1$env
