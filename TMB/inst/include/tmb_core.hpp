@@ -1512,6 +1512,7 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
   vector< AD<AD<AD<double> > > > y(1);
   y[0] = F.evalUserTemplate();
   ADFun<AD<AD<double> > > tape1(F.theta, y);
+  tape1.clear_subgraph();
 
   /* Tape 2: Gradient R^n -> R^n   (and optimize) */
   vector<AD<AD<double> > > xx(n);
@@ -1560,8 +1561,10 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
       colindex[ colindex.size() - 1 ] = c;
     }
   }
+  tape2.clear_subgraph();
   ADFun< double >* ptape3 = new ADFun< double >;
   ptape3->Dependent(xxx, yyy);
+  ptape3->clear_subgraph();
   sphess ans(ptape3, rowindex, colindex);
   return ans;
 } // MakeADHessObject2
