@@ -58,6 +58,10 @@ make report
 echo '
 files1 <- dir(pattern="*.logpid1$", recursive=TRUE)
 files2 <- dir(pattern="*.logpid2$", recursive=TRUE)
+files  <- intersect(sub(".logpid1$","",files1),
+                    sub(".logpid2$","",files2))
+files1 <- paste0(files, ".logpid1")
+files2 <- paste0(files, ".logpid2")
 f <- function(f1, f2) {
     x <- read.table(f1, TRUE)
     y <- read.table(f2, TRUE)
