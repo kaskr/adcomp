@@ -1,20 +1,19 @@
-/* $Id$ */
-# ifndef CPPAD_SIN_OP_INCLUDED
-# define CPPAD_SIN_OP_INCLUDED
+# ifndef CPPAD_LOCAL_SIN_OP_HPP
+# define CPPAD_LOCAL_SIN_OP_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the
-                    GNU General Public License Version 3.
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
 
-namespace CppAD { // BEGIN_CPPAD_NAMESPACE
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
 /*!
 \file sin_op.hpp
 Forward and reverse mode calculations for z = sin(x).
@@ -35,7 +34,7 @@ The auxillary result is
 The value of y, and its derivatives, are computed along with the value
 and derivatives of z.
 
-\copydetails forward_unary2_op
+\copydetails CppAD::local::forward_unary2_op
 */
 template <class Base>
 inline void forward_sin_op(
@@ -68,14 +67,14 @@ inline void forward_sin_op(
 	}
 	for(size_t j = p; j <= q; j++)
 	{
-		s[j] = Base(0);
-		c[j] = Base(0);
+		s[j] = Base(0.0);
+		c[j] = Base(0.0);
 		for(k = 1; k <= j; k++)
-		{	s[j] += Base(k) * x[k] * c[j-k];
-			c[j] -= Base(k) * x[k] * s[j-k];
+		{	s[j] += Base(double(k)) * x[k] * c[j-k];
+			c[j] -= Base(double(k)) * x[k] * s[j-k];
 		}
-		s[j] /= Base(j);
-		c[j] /= Base(j);
+		s[j] /= Base(double(j));
+		c[j] /= Base(double(j));
 	}
 }
 /*!
@@ -92,7 +91,7 @@ The auxillary result is
 The value of y, and its derivatives, are computed along with the value
 and derivatives of z.
 
-\copydetails forward_unary2_op_dir
+\copydetails CppAD::local::forward_unary2_op_dir
 */
 template <class Base>
 inline void forward_sin_op_dir(
@@ -121,14 +120,14 @@ inline void forward_sin_op_dir(
 	// (except that there is a sign difference for the hyperbolic case).
 	size_t m = (q-1) * r + 1;
 	for(size_t ell = 0; ell < r; ell++)
-	{	s[m+ell] =   Base(q) * x[m + ell] * c[0];
-		c[m+ell] = - Base(q) * x[m + ell] * s[0];
+	{	s[m+ell] =   Base(double(q)) * x[m + ell] * c[0];
+		c[m+ell] = - Base(double(q)) * x[m + ell] * s[0];
 		for(size_t k = 1; k < q; k++)
-		{	s[m+ell] += Base(k) * x[(k-1)*r+1+ell] * c[(q-k-1)*r+1+ell];
-			c[m+ell] -= Base(k) * x[(k-1)*r+1+ell] * s[(q-k-1)*r+1+ell];
+		{	s[m+ell] += Base(double(k)) * x[(k-1)*r+1+ell] * c[(q-k-1)*r+1+ell];
+			c[m+ell] -= Base(double(k)) * x[(k-1)*r+1+ell] * s[(q-k-1)*r+1+ell];
 		}
-		s[m+ell] /= Base(q);
-		c[m+ell] /= Base(q);
+		s[m+ell] /= Base(double(q));
+		c[m+ell] /= Base(double(q));
 	}
 }
 
@@ -146,7 +145,7 @@ The auxillary result is
 \endverbatim
 The value of y is computed along with the value of z.
 
-\copydetails forward_unary2_op_0
+\copydetails CppAD::local::forward_unary2_op_0
 */
 template <class Base>
 inline void forward_sin_op_0(
@@ -182,7 +181,7 @@ The auxillary result is
 \endverbatim
 The value of y is computed along with the value of z.
 
-\copydetails reverse_unary2_op
+\copydetails CppAD::local::reverse_unary2_op
 */
 
 template <class Base>
@@ -213,13 +212,6 @@ inline void reverse_sin_op(
 	const Base* c  = s  - cap_order; // called y in documentation
 	Base* pc       = ps - nc_partial;
 
-	// If ps is zero, make sure this operation has no effect
-	// (zero times infinity or nan would be non-zero).
-	bool skip(true);
-	for(size_t i_d = 0; i_d <= d; i_d++)
-		skip &= IdenticalZero(ps[i_d]);
-	if( skip )
-		return;
 
 	// rest of this routine is identical for the following cases:
 	// reverse_sin_op, reverse_cos_op, reverse_sinh_op, reverse_cosh_op.
@@ -227,22 +219,22 @@ inline void reverse_sin_op(
 	size_t k;
 	while(j)
 	{
-		ps[j]   /= Base(j);
-		pc[j]   /= Base(j);
+		ps[j]   /= Base(double(j));
+		pc[j]   /= Base(double(j));
 		for(k = 1; k <= j; k++)
 		{
-			px[k]   += ps[j] * Base(k) * c[j-k];
-			px[k]   -= pc[j] * Base(k) * s[j-k];
+			px[k]   += Base(double(k)) * azmul(ps[j], c[j-k]);
+			px[k]   -= Base(double(k)) * azmul(pc[j], s[j-k]);
 
-			ps[j-k] -= pc[j] * Base(k) * x[k];
-			pc[j-k] += ps[j] * Base(k) * x[k];
+			ps[j-k] -= Base(double(k)) * azmul(pc[j], x[k]);
+			pc[j-k] += Base(double(k)) * azmul(ps[j], x[k]);
 
 		}
 		--j;
 	}
-	px[0] += ps[0] * c[0];
-	px[0] -= pc[0] * s[0];
+	px[0] += azmul(ps[0], c[0]);
+	px[0] -= azmul(pc[0], s[0]);
 }
 
-} // END_CPPAD_NAMESPACE
+} } // END_CPPAD_LOCAL_NAMESPACE
 # endif

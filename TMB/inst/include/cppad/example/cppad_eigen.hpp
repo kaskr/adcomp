@@ -1,12 +1,11 @@
-/* $Id$ */
-# ifndef CPPAD_CPPAD_EIGEN_INCLUDED
-# define CPPAD_CPPAD_EIGEN_INCLUDED
+# ifndef CPPAD_EXAMPLE_CPPAD_EIGEN_HPP
+# define CPPAD_EXAMPLE_CPPAD_EIGEN_HPP
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
-                    GNU General Public License Version 3.
+the terms of the
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
@@ -20,7 +19,6 @@ $spell
 	inline
 	neg
 	eps
-	plugin
 	atan
 	Num
 	acos
@@ -46,46 +44,49 @@ $head Syntax$$
 $codei%# include <cppad/example/cppad_eigen.hpp>%$$
 $children%
 	cppad/example/eigen_plugin.hpp%
-	example/eigen_array.cpp%
-	example/eigen_det.cpp
+	example/general/eigen_array.cpp%
+	example/general/eigen_det.cpp
 %$$
 
 $head Purpose$$
-Enables the use of the 
-$href%http://eigen.tuxfamily.org%eigen%$$
-linear algebra package with the type $icode%AD<%Base%>%$$.
+Enables the use of the $cref/eigen/eigen_prefix/$$
+linear algebra package with the type $icode%AD<%Base%>%$$; see
+$href%
+	https://eigen.tuxfamily.org/dox/TopicCustomizing_CustomScalar.html%
+	custom scalar types
+%$$.
 
 $head Example$$
-The files $cref eigen_array.cpp$$ and $cref eigen_det.cpp$$ 
+The files $cref eigen_array.cpp$$ and $cref eigen_det.cpp$$
 contain an example and test of this include file.
-It returns true if it succeeds and false otherwise.
+They return true if they succeed and false otherwise.
 
 $head Include Files$$
 The file $code cppad_eigen.hpp$$ includes both
-$code <cppad/cppad.hpp>$$ and $code <Eigen/Core>$$. 
-In addition,
-The file $cref eigen_plugin.hpp$$ 
-is used to define $code value_type$$
-in the Eigen matrix class definition so its vectors are 
-$cref/simple vectors/SimpleVector/$$.
-$codep */
+$code <cppad/cppad.hpp>$$ and $code <Eigen/Core>$$.
+The file $cref eigen_plugin.hpp$$ defines $code value_type$$
+in the Eigen matrix class so its vectors are
+$cref/simple vectors/SimpleVector/$$
+(not necessary for eigen-3.3.3 and later).
+$srccode%cpp% */
 # define EIGEN_MATRIXBASE_PLUGIN <cppad/example/eigen_plugin.hpp>
 # include <Eigen/Core>
 # include <cppad/cppad.hpp>
-/* $$
+/* %$$
 $head Eigen NumTraits$$
 Eigen needs the following definitions to work properly
 with $codei%AD<%Base%>%$$ scalars:
-$codep */
+$srccode%cpp% */
 namespace Eigen {
-	template <class Base> struct NumTraits< CppAD::AD<Base> > : NumTraits<Base>
+	template <class Base> struct NumTraits< CppAD::AD<Base> >
 	{	// type that corresponds to the real part of an AD<Base> value
 		typedef CppAD::AD<Base>   Real;
 		// type for AD<Base> operations that result in non-integer values
 		typedef CppAD::AD<Base>   NonInteger;
+		//  type to use for numeric literals such as "2" or "0.5".
+		typedef CppAD::AD<Base>   Literal;
 		// type for nested value inside an AD<Base> expression tree
 		typedef CppAD::AD<Base>   Nested;
-		typedef CppAD::AD<Base>   Literal;
 
 		enum {
 			// does not support complex Base types
@@ -110,8 +111,8 @@ namespace Eigen {
 		// relaxed version of machine epsilon for comparison of different
 		// operations that should result in the same value
 		static CppAD::AD<Base> dummy_precision(void)
-		{	return 100. * 
-				CppAD::numeric_limits< CppAD::AD<Base> >::epsilon(); 
+		{	return 100. *
+				CppAD::numeric_limits< CppAD::AD<Base> >::epsilon();
 		}
 
 		// minimum normalized positive value
@@ -122,13 +123,16 @@ namespace Eigen {
 		static CppAD::AD<Base> highest(void)
 		{	return CppAD::numeric_limits< CppAD::AD<Base> >::max(); }
 
+		// number of decimal digits that can be represented without change.
+		static int digits10(void)
+		{	return CppAD::numeric_limits< CppAD::AD<Base> >::digits10; }
 	};
 }
-/* $$
+/* %$$
 $head CppAD Namespace$$
 Eigen also needs the following definitions to work properly
 with $codei%AD<%Base%>%$$ scalars:
-$codep */
+$srccode%cpp% */
 namespace CppAD {
 		// functions that return references
 		template <class Base> const AD<Base>& conj(const AD<Base>& x)
@@ -143,28 +147,7 @@ namespace CppAD {
 		{	return x * x; }
 }
 
-namespace Eigen {
-  namespace internal {
-    // Test if version before 3.3
-#if ( ( EIGEN_WORLD_VERSION <= 2 ) || ( EIGEN_WORLD_VERSION == 3 ) && ( EIGEN_MAJOR_VERSION <= 2 ) )
-    template<class Base>
-    struct significant_decimals_default_impl< CppAD::AD<Base>, false>
-    { typedef CppAD::AD<Base> Scalar;
-      typedef typename NumTraits<Scalar>::Real RealScalar;
-      static inline int run()
-      {	Scalar neg_log_eps = - log(
-                                   NumTraits<RealScalar>::epsilon()
-                                   );
-        int ceil_neg_log_eps = Integer( neg_log_eps );
-        if( Scalar(ceil_neg_log_eps) < neg_log_eps )
-          ceil_neg_log_eps++;
-        return ceil_neg_log_eps;
-      }
-    };
-#endif
-  }
-}
-/* $$
+/* %$$
 $end
 */
 # endif
