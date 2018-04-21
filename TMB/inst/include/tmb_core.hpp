@@ -136,6 +136,7 @@ void optimizeTape(ADFunPointer pf){
     { /* Avoid multiple tape optimizations at the same time (to reduce memory) */
       if(config.trace.optimize)std::cout << "Optimizing tape... ";
       pf->optimize();
+      pf->clear_subgraph();
       if(config.trace.optimize)std::cout << "Done\n";
     }
   }
@@ -143,6 +144,7 @@ void optimizeTape(ADFunPointer pf){
     { /* Allow multiple tape optimizations at the same time */
       if(config.trace.optimize)std::cout << "Optimizing tape... ";
       pf->optimize();
+      pf->clear_subgraph();
       if(config.trace.optimize)std::cout << "Done\n";
     }
 }
@@ -1171,6 +1173,7 @@ extern "C"
 	  pfvec[i] = NULL;
 	  pfvec[i] = MakeADFunObject_(data, parameters, report, control, i, info);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
+          pfvec[i]->clear_subgraph();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
       }
@@ -1189,6 +1192,7 @@ extern "C"
 	pf = NULL;
 	pf = MakeADFunObject_(data, parameters, report, control, -1, info);
 	if (config.optimize.instantly) pf->optimize();
+        pf->clear_subgraph();
       }
       TMB_CATCH {
 	if (pf != NULL) delete pf;
@@ -1247,11 +1251,13 @@ extern "C"
       ADFun<double>* pf;
       pf=(ADFun<double>*)R_ExternalPtrAddr(f);
       pf->optimize();
+      pf->clear_subgraph();
     }
     if(!strcmp(CHAR(tag), "parallelADFun")){
       parallelADFun<double>* pf;
       pf=(parallelADFun<double>*)R_ExternalPtrAddr(f);
-      pf->optimize();      
+      pf->optimize();
+      pf->clear_subgraph();
     }
     return R_NilValue;
   }
@@ -1436,6 +1442,7 @@ extern "C"
 	  pfvec[i] = NULL;
 	  pfvec[i] = MakeADGradObject_(data, parameters, report, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
+          pf->clear_subgraph();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
       }
@@ -1454,6 +1461,7 @@ extern "C"
         pf = NULL;
         pf = MakeADGradObject_(data, parameters, report, -1);
         if(config.optimize.instantly)pf->optimize();
+        pf->clear_subgraph();
       }
       TMB_CATCH {
 	if (pf != NULL) delete pf;
