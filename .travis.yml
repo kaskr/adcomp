@@ -52,11 +52,11 @@ jobs:
       script:
         - ./bin/run_full_example_suite.sh
 
-    - stage: Run full example suite
-      r: release
-      install: true
-      script:
-        - ./bin/run_full_example_suite.sh
+##    - stage: Run full example suite
+##      r: release
+##      install: true
+##      script:
+##        - ./bin/run_full_example_suite.sh
 
     - stage: Build and deploy documentation
       r: release
