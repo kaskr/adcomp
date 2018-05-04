@@ -82,7 +82,7 @@ function (obj, name, target=0.5*qchisq(0.95,df=1),
         }
         newgr <- function(par0) {
             par <- par + as.vector(C %*% par0)
-            as.vector(obj$gr(par) %*% C)
+            as.vector(obj$gr(par, drop=FALSE) %*% C)
         }
         obj$env$value.best <- Inf
         obj$env$inner.control$trace <- FALSE

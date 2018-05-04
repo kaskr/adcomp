@@ -829,11 +829,11 @@ MakeADFun <- function(data, parameters, map=list(),
            }
            res
          },
-         gr=function(x=last.par,...){
+         gr=function(x=last.par, drop=TRUE,...){
            ans <- f(x,order=1)
            ok <- is.numeric(ans) && length(ans)==length(x)
            if(!ok) ans <- rep(NaN, length(x))
-           dim(ans) <- NULL
+           if(drop && nrow(ans)==1) dim(ans) <- NULL
            if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
            ans
          },
@@ -864,7 +864,7 @@ MakeADFun <- function(data, parameters, map=list(),
            },silent=silent)
            if(is.character(ans))NaN else ans
          },
-         gr=function(x=last.par[-random],...){
+         gr=function(x=last.par[-random], drop=TRUE,...){
            ans <- try( {
              if(MCcontrol$doMC){
                ff(x,order=0)
@@ -874,7 +874,7 @@ MakeADFun <- function(data, parameters, map=list(),
            }, silent=silent)
            ok <- is.numeric(ans) && length(ans)==length(x)
            if(!ok) ans <- rep(NaN, length(x))
-           dim(ans) <- NULL
+           if(drop && nrow(ans)==1) dim(ans) <- NULL
            if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
            ans
          },

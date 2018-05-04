@@ -187,7 +187,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
           simpleCase <- TRUE
       } else { ## Something to report - get derivatives
           if(is.null(chunk)){ ## Do all at once
-              Dphi <- obj2$gr(par)
+              Dphi <- obj2$gr(par, drop=FALSE)
           } else {
               ## Do *chunk* only
               ## Reduce to Dphi[chunk,] and phi[chunk]
@@ -292,7 +292,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
           if(!is.null(chunk)) epsilon <- epsilon[chunk]
           par.full <- c(par.fixed, epsilon)
           i <- (1:length(par.full)) > length(par.fixed) ## epsilon indices
-          grad <- obj3$gr(par.full)
+          grad <- obj3$gr(par.full, drop=FALSE)
           Vestimate <-
               if(bias.correct.control$sd) {
                   ## requireNamespace("numDeriv")

@@ -116,7 +116,7 @@ tmbprofile <- function(obj,
         }
         newgr <- function(par0){
           par <- par + as.vector( C %*% par0 )
-          as.vector( obj$gr(par) %*% C )
+          as.vector( obj$gr(par, drop=FALSE) %*% C )
         }
         ## For inner problem: Use initial guess from previous evaluation
         obj$env$value.best <- Inf
