@@ -31,6 +31,6 @@ map <- NULL
 ################################################################################
 
 obj <- MakeADFun(data, parameters, map=map, DLL="matern")
-system.time( fit <- nlminb(obj$par, obj$fn, obj$gr, obj$he) )
+system.time( fit <- nlminb(obj$par, obj$fn, obj$gr, he=obj$he) )
 system.time( rep <- sdreport(obj, fit$par, obj$he(fit$par)) )
 print(rep)
