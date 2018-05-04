@@ -833,7 +833,7 @@ MakeADFun <- function(data, parameters, map=list(),
            ans <- f(x,order=1)
            ok <- is.numeric(ans) && length(ans)==length(x)
            if(!ok) ans <- rep(NaN, length(x))
-           if(drop && nrow(ans)==1) dim(ans) <- NULL
+           if(drop) ans <- base::drop(ans)
            if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
            ans
          },
@@ -874,7 +874,7 @@ MakeADFun <- function(data, parameters, map=list(),
            }, silent=silent)
            ok <- is.numeric(ans) && length(ans)==length(x)
            if(!ok) ans <- rep(NaN, length(x))
-           if(drop && nrow(ans)==1) dim(ans) <- NULL
+           if(drop) ans <- base::drop(ans)
            if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
            ans
          },
