@@ -605,7 +605,7 @@ VECTORIZE2_tt(compois_calc_loglambda)
     \f[ (0 \leq x) \land (0 < \lambda) \land (0 < \nu) \f] .
 
     \param x Observation
-    \param mode Approximate mode \f$ \lambda^\nu \f$
+    \param mode Approximate mode \f$ \lambda^\frac{1}{\nu} \f$
     \param nu   \f$ \nu \f$
 
     \ingroup R_style_distribution
