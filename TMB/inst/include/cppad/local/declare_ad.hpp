@@ -1,26 +1,37 @@
-/* $Id$ */
-# ifndef CPPAD_DECLARE_AD_INCLUDED
-# define CPPAD_DECLARE_AD_INCLUDED
+# ifndef CPPAD_LOCAL_DECLARE_AD_HPP
+# define CPPAD_LOCAL_DECLARE_AD_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-13 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
-the terms of the 
-                    GNU General Public License Version 3.
+the terms of the
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
 # include <cppad/configure.hpp>
-# if CPPAD_HAS_CSTDINT_8_TO_64
+# if CPPAD_USE_CPLUSPLUS_2011
 # include <cstdint>
 # endif
 
+/*!
+\file declare_ad.hpp CppAD forward declarations; i.e., before definition
+*/
+
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
+
+template <class Base> class ADTape;
+template <class Base> class player;
+template <class Base> class recorder;
+
+} } // END_CPPAD_LOCAL_NAMESPACE
+
 namespace CppAD {
 	// The conditional expression operator enum type
-	enum CompareOp 
+	enum CompareOp
 	{	CompareLt, // less than
 		CompareLe, // less than or equal
 		CompareEq, // equal
@@ -34,22 +45,21 @@ namespace CppAD {
 	typedef CPPAD_TAPE_ID_TYPE   tape_id_t;
 
 	// classes
+	class sparse_hes_work;
+	class sparse_jac_work;
 	class sparse_jacobian_work;
 	class sparse_hessian_work;
 	template <class Base> class AD;
 	template <class Base> class ADFun;
-	template <class Base> class ADTape;
 	template <class Base> class atomic_base;
 	template <class Base> class discrete;
-	template <class Base> class player;
-	template <class Base> class recorder;
 	template <class Base> class VecAD;
 	template <class Base> class VecAD_reference;
 
 	// functions with one VecAD<Base> argument
 	template <class Base> bool Parameter         (const VecAD<Base> &u);
 	template <class Base> bool Variable          (const VecAD<Base> &u);
-	
+
 	// functions with one AD<Base> argument
 	template <class Base> int  Integer           (const AD<Base> &u);
 	template <class Base> bool Parameter         (const AD<Base> &u);
@@ -104,6 +114,10 @@ namespace CppAD {
 	template <class Base> AD<Base> pow (
 		const AD<Base> &x, const AD<Base> &y);
 
+	// azmul
+	template <class Base> AD<Base> azmul (
+		const AD<Base> &x, const AD<Base> &y);
+
 	// NearEqual
 	template <class Base> bool NearEqual(
 	const AD<Base> &x, const AD<Base> &y, const Base &r, const Base &a);
@@ -113,30 +127,30 @@ namespace CppAD {
 
 	template <class Base> bool NearEqual(
 	const AD<Base> &x, const Base &y, const Base &r, const Base &a);
-	
+
 	// CondExpOp
 	template <class Base> AD<Base> CondExpOp (
 		enum CompareOp         cop ,
-		const AD<Base>       &left , 
-		const AD<Base>      &right , 
-		const AD<Base>   &trueCase , 
-		const AD<Base>  &falseCase 
+		const AD<Base>       &left ,
+		const AD<Base>      &right ,
+		const AD<Base>   &trueCase ,
+		const AD<Base>  &falseCase
 	);
-	
+
 	// IdenticalEqualPar
-	template <class Base> 
+	template <class Base>
 	bool IdenticalEqualPar (const AD<Base> &u, const AD<Base> &v);
-	
+
 	// EqualOpSeq
-	template <class Base> 
+	template <class Base>
 	bool EqualOpSeq (const AD<Base> &u, const AD<Base> &v);
-	
+
 	// PrintFor
-	template <class Base> 
+	template <class Base>
 	void PrintFor(
 		const AD<Base>&    flag   ,
 		const char*        before ,
-		const AD<Base>&    var    , 
+		const AD<Base>&    var    ,
 		const char*        after
 	);
 

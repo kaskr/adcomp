@@ -1,20 +1,19 @@
-/* $Id$ */
-# ifndef CPPAD_SQRT_OP_INCLUDED
-# define CPPAD_SQRT_OP_INCLUDED
+# ifndef CPPAD_LOCAL_SQRT_OP_HPP
+# define CPPAD_LOCAL_SQRT_OP_HPP
 
 /* --------------------------------------------------------------------------
-CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-15 Bradley M. Bell
+CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-17 Bradley M. Bell
 
 CppAD is distributed under multiple licenses. This distribution is under
 the terms of the
-                    GNU General Public License Version 3.
+                    Eclipse Public License Version 1.0.
 
 A copy of this license is included in the COPYING file of this distribution.
 Please visit http://www.coin-or.org/CppAD/ for information on other licenses.
 -------------------------------------------------------------------------- */
 
 
-namespace CppAD { // BEGIN_CPPAD_NAMESPACE
+namespace CppAD { namespace local { // BEGIN_CPPAD_LOCAL_NAMESPACE
 /*!
 \file sqrt_op.hpp
 Forward and reverse mode calculations for z = sqrt(x).
@@ -29,7 +28,7 @@ The C++ source code corresponding to this operation is
 	z = sqrt(x)
 \endverbatim
 
-\copydetails forward_unary1_op
+\copydetails CppAD::local::forward_unary1_op
 */
 template <class Base>
 inline void forward_sqrt_op(
@@ -57,15 +56,11 @@ inline void forward_sqrt_op(
 	}
 	for(size_t j = p; j <= q; j++)
 	{
-		CPPAD_ASSERT_KNOWN(
-			x[0] != Base(0),
-			"Forward: attempt to take derivatve of square root of zero"
-		)
-		z[j] = Base(0);
+		z[j] = Base(0.0);
 		for(k = 1; k < j; k++)
-			z[j] -= Base(k) * z[k] * z[j-k];
-		z[j] /= Base(j);
-		z[j] += x[j] / Base(2);
+			z[j] -= Base(double(k)) * z[k] * z[j-k];
+		z[j] /= Base(double(j));
+		z[j] += x[j] / Base(2.0);
 		z[j] /= z[0];
 	}
 }
@@ -78,7 +73,7 @@ The C++ source code corresponding to this operation is
 	z = sqrt(x)
 \endverbatim
 
-\copydetails forward_unary1_op_dir
+\copydetails CppAD::local::forward_unary1_op_dir
 */
 template <class Base>
 inline void forward_sqrt_op_dir(
@@ -99,18 +94,14 @@ inline void forward_sqrt_op_dir(
 	size_t num_taylor_per_var = (cap_order-1) * r + 1;
 	Base* z = taylor + i_z * num_taylor_per_var;
 	Base* x = taylor + i_x * num_taylor_per_var;
-	CPPAD_ASSERT_KNOWN(
-		x[0] != Base(0),
-		"Forward: attempt to take derivatve of square root of zero"
-	)
 
 	size_t m = (q-1) * r + 1;
 	for(size_t ell = 0; ell < r; ell++)
-	{	z[m+ell] = Base(0);
+	{	z[m+ell] = Base(0.0);
 		for(size_t k = 1; k < q; k++)
-			z[m+ell] -= Base(k) * z[(k-1)*r+1+ell] * z[(q-k-1)*r+1+ell];
-		z[m+ell] /= Base(q);
-		z[m+ell] += x[m+ell] / Base(2);
+			z[m+ell] -= Base(double(k)) * z[(k-1)*r+1+ell] * z[(q-k-1)*r+1+ell];
+		z[m+ell] /= Base(double(q));
+		z[m+ell] += x[m+ell] / Base(2.0);
 		z[m+ell] /= z[0];
 	}
 }
@@ -123,7 +114,7 @@ The C++ source code corresponding to this operation is
 	z = sqrt(x)
 \endverbatim
 
-\copydetails forward_unary1_op_0
+\copydetails CppAD::local::forward_unary1_op_0
 */
 template <class Base>
 inline void forward_sqrt_op_0(
@@ -151,7 +142,7 @@ The C++ source code corresponding to this operation is
 	z = sqrt(x)
 \endverbatim
 
-\copydetails reverse_unary1_op
+\copydetails CppAD::local::reverse_unary1_op
 */
 
 template <class Base>
@@ -177,18 +168,8 @@ inline void reverse_sqrt_op(
 	const Base* z  = taylor  + i_z * cap_order;
 	Base* pz       = partial + i_z * nc_partial;
 
-	// If pz is zero, make sure this operation has no effect
-	// (zero times infinity or nan would be non-zero).
-	bool skip(true);
-	for(size_t i_d = 0; i_d <= d; i_d++)
-		skip &= IdenticalZero(pz[i_d]);
-	if( skip )
-		return;
 
-	CPPAD_ASSERT_KNOWN(
-		z[0] != Base(0),
-		"Reverse: attempt to take derivatve of square root of zero"
-	)
+	Base inv_z0 = Base(1.0) / z[0];
 
 	// number of indices to access
 	size_t j = d;
@@ -197,16 +178,16 @@ inline void reverse_sqrt_op(
 	{
 
 		// scale partial w.r.t. z[j]
-		pz[j]   /= z[0];
+		pz[j]    = azmul(pz[j], inv_z0);
 
-		pz[0]   -= pz[j] * z[j];
-		px[j]   += pz[j] / Base(2);
+		pz[0]   -= azmul(pz[j], z[j]);
+		px[j]   += pz[j] / Base(2.0);
 		for(k = 1; k < j; k++)
-			pz[k]   -= pz[j] * z[j-k];
+			pz[k]   -= azmul(pz[j], z[j-k]);
 		--j;
 	}
-	px[0] += pz[0] / (Base(2) * z[0]);
+	px[0] += azmul(pz[0], inv_z0) / Base(2.0);
 }
 
-} // END_CPPAD_NAMESPACE
+} } // END_CPPAD_LOCAL_NAMESPACE
 # endif
