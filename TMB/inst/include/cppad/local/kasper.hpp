@@ -461,7 +461,7 @@ bool is_tape_point_constant(size_t index){
     from = 3;                // Skip arg[0], arg[1], arg[2]
   }
   for(int i=from; i<numarg; i++){
-    ans = ans && ( constant_tape_point_[var2op_[op_arg[i]]] || (!isDepArg(&op_arg[i])) )   ;
+    ans = ans && ( (!isDepArg(&op_arg[i])) || constant_tape_point_[var2op_[op_arg[i]]] )   ;
   }
   return ans;
 }
