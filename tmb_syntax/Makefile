@@ -23,6 +23,9 @@ test_reload:
 test_protect:
 	$(R) --slave < test_protect.R
 
+test_UsrapOp:
+	$(R) --slave < test_UsrapOp.R
+
 data_update:
 	$(R) --slave < data_update.R
 
@@ -47,6 +50,7 @@ VAST:
 	echo 'TMB:::compile("VAST_v4_0_0.cpp",CXX="g++")' | $(R) --slave
 
 test:
+	make test_UsrapOp
 	make check_autodiff
 	make data_update
 	make test_protect
