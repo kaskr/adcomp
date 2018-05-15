@@ -48,41 +48,69 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 </head>
@@ -198,7 +226,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="Sparsity" class="section level1">
 <h1><span class="header-section-number">12</span> Sparsity</h1>
-<p>Large random effect models require sparsity in order to work in TMB. In this section we will discuss:</p>
+<p>Large random effect models require sparsity in order to work in TMB.
+In this section we will discuss:</p>
 <ul>
 <li>What exactly we mean by <em>sparsity</em>.</li>
 <li>How to formulate <em>sparse</em> models (the same model can sometimes be formulated as both dense and sparse).</li>
@@ -210,9 +239,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">12.1</span> Conditional independence graphs and DAGs</h2>
 <div id="conditional-independence" class="section level3">
 <h3><span class="header-section-number">12.1.1</span> Conditional independence</h3>
-<p>There are various graph representations that are commonly used to visualize probabilistic structure. One such is the <em>conditional independence graph</em>. Say we have a model of four random variables <span class="math inline">\(X_1,...,X_4\)</span> for which the joint density is:</p>
+<p>There are various graph representations that are commonly used to
+visualize probabilistic structure. One such is the <em>conditional
+independence graph</em>. Say we have a model of four random variables <span class="math inline">\(X_1,...,X_4\)</span> for which the joint density is:</p>
 <p><span class="math display">\[p(x_1,x_2,x_3,x_4) \propto f_1(x_1,x_2)f_2(x_2,x_3)f_3(x_3,x_4)f_4(x_4,x_1)\]</span></p>
-<p>The separability of factors on the right hand side implies some conditional independence properties. For instance if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span> are held constant then <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> varies independently. We say that <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> are conditionally independent given <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span>. The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor <span class="math inline">\(f_i\)</span>:</p>
+<p>The separability of factors on the right hand side implies some conditional independence properties. For instance if <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span> are held constant then <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> varies independently. We say that <span class="math inline">\(x_2\)</span> and <span class="math inline">\(x_4\)</span> are conditionally independent given <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_3\)</span>.
+The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor <span class="math inline">\(f_i\)</span>:</p>
 <p><img src="_main_files/figure-html/unnamed-chunk-11-1.svg" style="display: block; margin: auto;" /></p>
 <p>Equivalently the graph may be visualized via its adjacency matrix:</p>
 <p><img src="_main_files/figure-html/unnamed-chunk-12-1.svg" width="336" style="display: block; margin: auto;" /></p>
@@ -225,8 +257,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3><span class="header-section-number">12.1.2</span> Node removal properties</h3>
 <p>Important probabilistic properties can be deduced directly from the graph. This is due to the following <em>node removal</em> properties.</p>
 <ol style="list-style-type: decimal">
-<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph: <img src="_main_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /></p></li>
-<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes: <img src="_main_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph:
+<img src="_main_files/figure-html/unnamed-chunk-13-1.svg" style="display: block; margin: auto;" /></p></li>
+<li><p>The marginal distribution wrt. a node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> from the graph and connecting <em>all</em> <span class="math inline">\(X_i\)</span>’s neighbors. For instance when integrating <span class="math inline">\(X_4\)</span> out of the joint density we get the following graph for the remaining nodes:
+<img src="_main_files/figure-html/unnamed-chunk-14-1.svg" style="display: block; margin: auto;" /></p></li>
 </ol>
 <blockquote>
 <p>Conditioning preserves sparseness. Marginalizing tend to destroy sparseness by adding more edges to the graph.</p>
@@ -255,20 +289,24 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="the-theta-logistic-example" class="section level2">
 <h2><span class="header-section-number">12.2</span> The theta logistic example</h2>
-<p>Consider the ``theta logistic’’ population model <span class="citation">(Pedersen et al. <a href="#ref-pedersen2011estimation">2011</a>)</span>. This is a state-space model with state equation</p>
+<p>Consider the ``theta logistic’’ population model <span class="citation">(Pedersen et al. <a href="#ref-pedersen2011estimation">2011</a>)</span>. This is a
+state-space model with state equation</p>
 <p><span class="math display">\[u_t = u_{t-1} + r_0\left(1-\left(\frac{\exp(u_{t-1})}{K}\right)^\psi\right) + e_t\]</span></p>
 <p>and observation equation</p>
 <p><span class="math display">\[y_t = u_t + v_t\]</span></p>
-<p>where <span class="math inline">\(e_t \sim N(0,Q)\)</span>, <span class="math inline">\(v_t \sim N(0,R)\)</span> and <span class="math inline">\(t\in \{0,...,n-1\}\)</span>. A uniform prior is implicitly assigned to <span class="math inline">\(u_0\)</span>.</p>
-<p>The joint negative log-likelihood of state vector <span class="math inline">\(u\)</span> and measurements <span class="math inline">\(y\)</span> is implemented in the C++ template <a href="../thetalog_8cpp-example.html">thetalog.cpp</a>. The example can be run by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="dt">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</code></pre></div>
+<p>where <span class="math inline">\(e_t \sim N(0,Q)\)</span>, <span class="math inline">\(v_t \sim N(0,R)\)</span> and <span class="math inline">\(t\in \{0,...,n-1\}\)</span>. A
+uniform prior is implicitly assigned to <span class="math inline">\(u_0\)</span>.</p>
+<p>The joint negative log-likelihood of state vector <span class="math inline">\(u\)</span> and measurements
+<span class="math inline">\(y\)</span> is implemented in the C++ template <a href="../thetalog_8cpp-example.html">thetalog.cpp</a>.
+The example can be run by:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="dt">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</a></code></pre></div>
 <p>We demonstrate it in the case <span class="math inline">\(n=5\)</span>. Here is the DAG</p>
 <p><img src="_main_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /></p>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
 <p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(Matrix)
-obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">random=</span><span class="kw">c</span>(<span class="st">&quot;X&quot;</span>), <span class="dt">DLL=</span><span class="st">&quot;thetalog&quot;</span>)
-<span class="kw">image</span>(obj$env$<span class="kw">spHess</span>(<span class="dt">random=</span><span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">library</span>(Matrix)</a>
+<a class="sourceLine" id="cb32-2" data-line-number="2">obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">random=</span><span class="kw">c</span>(<span class="st">&quot;X&quot;</span>), <span class="dt">DLL=</span><span class="st">&quot;thetalog&quot;</span>)</a>
+<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="kw">image</span>(obj<span class="op">$</span>env<span class="op">$</span><span class="kw">spHess</span>(<span class="dt">random=</span><span class="ot">TRUE</span>))</a></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-20-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>FIXME: NOT DONE YET !</p>
@@ -335,7 +373,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    var src = "";
+    var src = "true";
     if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(src))
       src = src.replace(/^https?:/, '');

@@ -48,41 +48,69 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 </head>
@@ -198,12 +226,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="Errors" class="section level1">
 <h1><span class="header-section-number">8</span> Compilation and run time errors</h1>
-<p>The R interface to the debugger (gdb) is documented as part of the R help system, i.e. you can type <code>?gdbsource</code> in R to get info. The current document only adresses isses that the relate to C++.</p>
+<p>The R interface to the debugger (gdb) is documented as part of the R
+help system, i.e. you can type <code>?gdbsource</code> in R to get info. The
+current document only adresses isses that the relate to C++.</p>
 <div id="compilation-errors" class="section level2">
 <h2><span class="header-section-number">8.1</span> Compilation errors</h2>
-<p>It may be hard to understand the compilation errors for the following reasons</p>
+<p>It may be hard to understand the compilation errors for the following
+reasons</p>
 <ul>
-<li>The Eigen libraries use templated C++ which generate non-intuitive error messages.</li>
+<li>The Eigen libraries use templated C++ which generate non-intuitive
+error messages.</li>
 </ul>
 </div>
 <div id="run-time-errors" class="section level2">
@@ -213,61 +245,81 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Out-of-bounds (you are “walking out of an array”)</li>
 <li>Floating point exceptions</li>
 </ul>
-<p>You can use the debugger to locate both types of errors, but the procedure is a little bit different in the two cases. The following assumes that you have the GNU debugger <code>gdb</code> installed.</p>
+<p>You can use the debugger to locate both types of errors, but the
+procedure is a little bit different in the two cases. The following
+assumes that you have the GNU debugger <code>gdb</code> installed.</p>
 <div id="out-of-bounds-error" class="section level3">
 <h3><span class="header-section-number">8.2.1</span> Out-of-bounds error</h3>
 <p>An example is:</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; y(<span class="dv">4</span>);
-y(<span class="dv">5</span>);                <span class="co">// 5 is not a valid index value here</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb21-1" data-line-number="1"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; y(<span class="dv">4</span>);</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">y(<span class="dv">5</span>);                <span class="co">// 5 is not a valid index value here</span></a></code></pre></div>
 <p>This will cause TMB and R to crash with the following error message:</p>
 <blockquote>
-<p>TMB has received an error from Eigen. The following condition was not met: index &gt;= 0 &amp;&amp; index &lt; size() Please check your matrix-vector bounds etc., or run your program through a debugger. Aborted (core dumped)</p>
+<p>TMB has received an error from Eigen. The following condition was not met:
+index &gt;= 0 &amp;&amp; index &lt; size()
+Please check your matrix-vector bounds etc., or run your program through a debugger.
+Aborted (core dumped)</p>
 </blockquote>
 <p>So, you must restart R and give the commands</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(TMB)
-<span class="kw">gdbsource</span>(<span class="st">&quot;my_project.R&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw">library</span>(TMB)</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">gdbsource</span>(<span class="st">&quot;my_project.R&quot;</span>)</a></code></pre></div>
 <blockquote>
 <p>#5 objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:11</p>
 </blockquote>
-<p>and you can see that the debugger points to line number 11 in the .cpp file. <code>gdbsource()</code> is an R function that is part of TMB.</p>
+<p>and you can see that the debugger points to line number 11 in the .cpp
+file. <code>gdbsource()</code> is an R function that is part of TMB.</p>
 </div>
 <div id="floating-point-exception" class="section level3">
 <h3><span class="header-section-number">8.2.2</span> Floating point exception</h3>
-<p>If you on the other hand perform an illegal mathematical operation, such as</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">Type f = sqrt(<span class="fl">-1.</span>);</code></pre></div>
-<p>R will not crash, but the objective function will return a NaN value. However, you will not know in which part of your C++ code the error occured. By including the <code>fenv.h</code> library (part of many C++ compilers, but can otherwise be downloaded from <a href="http://www.scs.stanford.edu/histar/src/uinc/fenv.h" class="uri">http://www.scs.stanford.edu/histar/src/uinc/fenv.h</a>)</p>
+<p>If you on the other hand perform an illegal mathematical operation,
+such as</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb23-1" data-line-number="1">Type f = sqrt(<span class="dv">-1</span>.);</a></code></pre></div>
+<p>R will not crash, but the objective function will return a NaN value.
+However, you will not know in which part of your C++ code the error
+occured. By including the <code>fenv.h</code> library (part of many C++
+compilers, but can otherwise be downloaded from
+<a href="http://www.scs.stanford.edu/histar/src/uinc/fenv.h" class="uri">http://www.scs.stanford.edu/histar/src/uinc/fenv.h</a>)</p>
 <p><code>nan_error_ex.cpp</code>:</p>
-<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Illustrates how to make the debugger catch a floating point error.</span>
-<span class="ot">#include &lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
-<span class="ot">#include &lt;fenv.h&gt; </span><span class="co">// Extra line needed</span>
-
-<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
-Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
-{
-  feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW); <span class="co">// Extra line needed</span>
-    
-  <a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);
-  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(x);
-  Type f;
-  f = sqrt(<span class="fl">-1.</span>);        <span class="co">// FE_INVALID   ( sqrt(-1.) returns NaN )</span>
-  <span class="co">//f = 1./0.;          // FE_DIVBYZERO ( division by zero )</span>
-  <span class="co">//f = exp(100000.);   // FE_OVERFLOW  ( exp(100000.) returns Inf )   [Does not work on all platforms]</span>
-  <span class="co">//f = exp(-100000.);  // FE_UNDERFLOW ( exp(-100000.) returns 0 )</span>
-  <span class="kw">return</span> f;
-}</code></pre></div>
-<p>a floating point exception will be turned into an actual error that can be picked up by the debugger. There are only two extra lines that need to be included (“//Extra line needed” in the above example).</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co">// Illustrates how to make the debugger catch a floating point error.</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="pp">#include </span><span class="im">&lt;fenv.h&gt;</span><span class="pp"> </span><span class="co">// Extra line needed</span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb24-5" data-line-number="5"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
+<a class="sourceLine" id="cb24-6" data-line-number="6">Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</a>
+<a class="sourceLine" id="cb24-7" data-line-number="7">{</a>
+<a class="sourceLine" id="cb24-8" data-line-number="8">  feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW); <span class="co">// Extra line needed</span></a>
+<a class="sourceLine" id="cb24-9" data-line-number="9">    </a>
+<a class="sourceLine" id="cb24-10" data-line-number="10">  <a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);</a>
+<a class="sourceLine" id="cb24-11" data-line-number="11">  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(x);</a>
+<a class="sourceLine" id="cb24-12" data-line-number="12">  Type f;</a>
+<a class="sourceLine" id="cb24-13" data-line-number="13">  f = sqrt(<span class="dv">-1</span>.);        <span class="co">// FE_INVALID   ( sqrt(-1.) returns NaN )</span></a>
+<a class="sourceLine" id="cb24-14" data-line-number="14">  <span class="co">//f = 1./0.;          // FE_DIVBYZERO ( division by zero )</span></a>
+<a class="sourceLine" id="cb24-15" data-line-number="15">  <span class="co">//f = exp(100000.);   // FE_OVERFLOW  ( exp(100000.) returns Inf )   [Does not work on all platforms]</span></a>
+<a class="sourceLine" id="cb24-16" data-line-number="16">  <span class="co">//f = exp(-100000.);  // FE_UNDERFLOW ( exp(-100000.) returns 0 )</span></a>
+<a class="sourceLine" id="cb24-17" data-line-number="17">  <span class="cf">return</span> f;</a>
+<a class="sourceLine" id="cb24-18" data-line-number="18">}</a></code></pre></div>
+<p>a floating point exception will be turned into an actual error that
+can be picked up by the debugger. There are only two extra lines that
+need to be included (“//Extra line needed” in the above example).</p>
 <p>When we try to run this program in the usual way, the program crashes:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;nan_error_ex.R&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;nan_error_ex.R&quot;</span>)</a></code></pre></div>
 <blockquote>
-<p>Floating point exception (core dumped) tmp3&gt;</p>
+<p>Floating point exception (core dumped)
+tmp3&gt;</p>
 </blockquote>
-<p>At this stage you should run the debugger to find out that the floating point exception occurs at line number 14:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(TMB)
-<span class="kw">gdbsource</span>(<span class="st">&quot;nan_error_ex.R&quot;</span>)</code></pre></div>
+<p>At this stage you should run the debugger to find out that the
+floating point exception occurs at line number 14:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">library</span>(TMB)</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2"><span class="kw">gdbsource</span>(<span class="st">&quot;nan_error_ex.R&quot;</span>)</a></code></pre></div>
 <blockquote>
 <p>#1 0x00007ffff0e7eb09 in objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:14</p>
 </blockquote>
-<p>This enabling of floating point errors applies to R as well as the TMB program. For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script before the floating point exception in the TMB program (i.e. the problem of interest) happens. To circumvent this problem one can run without NaN debugging enabled and save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation), then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type=&quot;double&quot;)</code>.</p>
+<p>This enabling of floating point errors applies to R as well as the TMB program.
+For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script
+before the floating point exception in the TMB program (i.e. the problem of interest) happens.
+To circumvent this problem one can run without NaN debugging enabled and
+save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation),
+then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type=&quot;double&quot;)</code>.</p>
 </div>
 </div>
 </div>
@@ -323,7 +375,7 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    var src = "";
+    var src = "true";
     if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(src))
       src = src.replace(/^https?:/, '');
