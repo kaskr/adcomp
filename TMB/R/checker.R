@@ -117,11 +117,12 @@ checkConsistency <- function(obj,
 ##'
 ##' @title Summarize output from \code{\link{checkConsistency}}
 ##' @param object Output from \code{\link{checkConsistency}}
+##' @param na.rm Logical; Remove failed simulations ?
 ##' @param ... Not used
 ##' @return List of diagnostics
 ##' @method summary checkConsistency
 ##' @S3method summary checkConsistency
-summary.checkConsistency <- function(object, ...) {
+summary.checkConsistency <- function(object, na.rm=FALSE, ...) {
     ans <- list()
     ans$par <- attr(object, "par")
     getMat <- function(name) {
@@ -135,6 +136,10 @@ summary.checkConsistency <- function(object, ...) {
     ## Check simulation
     check <- function(mat) {
         if(!is.matrix(mat)) return( list(p.value=NA, bias=NA) )
+        if (na.rm) {
+            fail <- as.logical( colSums( !is.finite(mat) ) )
+            mat <- mat[, !fail, drop=FALSE]
+        }
         mu <- rowMeans(mat)
         npar <- length(mu)
         nsim <- ncol(mat)
