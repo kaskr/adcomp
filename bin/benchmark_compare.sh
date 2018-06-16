@@ -71,13 +71,16 @@ f <- function(f1, f2) {
     t <- seq_len(nrow(m)) - 1
     t <- t / 10
     matplot(t, m, type="b", ylab="Memory (percent)", xlab="Time (sec)")
-    legend("bottomright", legend=1:2 ,1:2, col=1:2, lty=1)
+    legend("bottomright", legend=c("BRANCH1", "BRANCH2"), col=1:2, lty=1, lwd=2)
     title(sub(".logpid1$", "", f1))
 }
 pdf("memory.pdf")
 invisible(Map(f, files1, files2))
 dev.off()
-' | R --slave
+' |
+sed s/BRANCH1/${BRANCH1}/g |
+sed s/BRANCH2/${BRANCH2}/g |
+R --slave
 
 echo
 echo "Output generated:"
