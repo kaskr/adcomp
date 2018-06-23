@@ -1,4 +1,19 @@
 ------------------------------------------------------------------------
+TMB 1.7.14 (2018-06-23)
+------------------------------------------------------------------------
+
+o Fix performance bug triggered by R-devel.
+
+o Fixed bug in sparsity detection algorithm.
+
+o Tweedie atomic function speedup.
+
+o Fix save/reload model object. Loaded object no longer overwrites
+  fitted parameters when running e.g. obj$report() or obj$simulate().
+
+o New function 'tmbroot' computes likelihood profile confidence intervals.
+
+------------------------------------------------------------------------
 TMB 1.7.13 (2018-03-22)
 ------------------------------------------------------------------------
 
