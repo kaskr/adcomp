@@ -1291,7 +1291,6 @@ newton <- function (par,fn,gr,he,
   g <- h <- NULL
   ## pd.check: Quick test for hessian being positive definite
   iterate <- function(par,pd.check=FALSE) {
-    if(file.exists(".Rbreakpoint"))browser() ## secret backdoor to poke around...
     if(pd.check){
       if(is.null(h))return(TRUE)
       h <<- he(par) ## Make sure hessian is updated
