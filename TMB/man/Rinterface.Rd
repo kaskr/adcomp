@@ -16,4 +16,3 @@ Create a skeleton of required R-code once the cpp template is ready.
 file <- system.file("examples/simple.cpp", package = "TMB")
 Rinterface(file)
 }
-

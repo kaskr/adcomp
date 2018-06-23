@@ -18,4 +18,3 @@ List of updated parameters.
 Inner-problem options can be set for a model object using this
 function.
 }
-

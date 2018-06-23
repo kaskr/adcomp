@@ -28,4 +28,3 @@ normalizing constant is difficult to implement, or if its calulation
 involves so many operations that it becomes infeasible to include in
 the AD machinery.
 }
-

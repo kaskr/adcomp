@@ -18,4 +18,3 @@
 \description{
 Plot (negative log) likelihood profile with confidence interval added.
 }
-

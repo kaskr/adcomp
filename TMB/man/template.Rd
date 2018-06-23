@@ -66,4 +66,3 @@ Some distributions are available as C++ templates with syntax close to R's distr
 \examples{
 template()
 }
-

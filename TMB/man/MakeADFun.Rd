@@ -130,4 +130,3 @@ A high level of tracing information will be output by default when evaluating th
 This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 \code{silent=TRUE} to the \code{MakeADFun} call.
 }
-

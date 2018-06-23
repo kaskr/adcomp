@@ -14,4 +14,3 @@
 \description{
 Print diagnostics output from \code{\link{checkConsistency}}
 }
-

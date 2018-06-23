@@ -15,4 +15,3 @@ running a full suite of ordering algorithms. NOTE: requires a
 specialized installation of the package. More information is
 available at the package URL.
 }
-

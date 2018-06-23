@@ -152,4 +152,3 @@ osa.ar1xar1 <- oneStepPredict(obj, "N", "keep", method="cdf", discrete=TRUE, sub
 qqnorm(osa.ar1xar1$residual); abline(0,1)
 }
 }
-

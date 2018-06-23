@@ -17,4 +17,3 @@ Add the platform dependent dynlib extension. In order for examples
 to work across platforms DLLs should be loaded by
 \code{dyn.load(dynlib("name"))}.
 }
-

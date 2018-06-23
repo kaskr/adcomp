@@ -146,4 +146,3 @@ summary(rep, "report")                      ## Include bias correction
 \seealso{
 \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 }
-

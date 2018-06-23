@@ -66,4 +66,3 @@ s$marginal$p.value  ## Laplace exact for Gaussian models }
 \seealso{
 \code{\link{summary.checkConsistency}}, \code{\link{print.checkConsistency}}
 }
-

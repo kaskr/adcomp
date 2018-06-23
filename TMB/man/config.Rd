@@ -34,4 +34,3 @@ config(tape.parallel=0, DLL="mymodel")
 obj <- MakeADFun(..., DLL="mymodel")
 }
 }
-
