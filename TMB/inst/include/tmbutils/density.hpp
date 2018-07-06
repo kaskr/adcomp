@@ -1187,7 +1187,7 @@ public:
     // Collapse f dimension to a single dimension:
     vector<int> new_dim(g.ndim() + 1);
     new_dim << g_dim, f_size;
-    u.dim = new_dim;
+    u.setdim(new_dim);
     for(int i=0; i<f_size; i++) {
       u.col(i) = g.sqrt_cov_scale( u.col(i) );
     }
@@ -1195,12 +1195,12 @@ public:
     // Collapse g dimension to a single dimension:
     new_dim.resize(f.ndim() + 1);
     new_dim << f_dim, g_size;
-    u.dim = new_dim;
+    u.setdim(new_dim);
     for(int i=0; i<g_size; i++) {
       u.col(i) = f.sqrt_cov_scale( u.col(i) );
     }
     u = u.rotate(1);
-    u.dim = u_dim;
+    u.setdim(u_dim);
     return u;
   }
 
