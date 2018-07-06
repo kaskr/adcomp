@@ -15,8 +15,9 @@ checkSimulation <- function(obj) {
     ans <- data.frame(distribution=obj$env$data$distr,
                       p.value=p.value, PASSED = p.value>.05 )
     .GlobalEnv$.results <- rbind(.GlobalEnv$.results, ans)
+    print(ans)
     stopifnot(ans$PASSED)
-    ans
+    invisible(ans)
 }
 
 n <- 100000
@@ -135,6 +136,18 @@ checkSimulation(obj)
 ######################################################################
 data <- list(distr="SEPARABLE", n=n)
 parameters <- list(phi1 = .2, phi2 = c(.9, .05))
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+data <- list(distr="GMRF", n=1000)
+parameters <- list(delta = .1)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+data <- list(distr="SEPARABLE_NESTED", n=1000)
+parameters <- list(phi1 = .2, phi2 = .9, delta = .1)
 obj <- MakeADFun(data, parameters)
 checkSimulation(obj)
 
