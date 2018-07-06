@@ -136,6 +136,10 @@ Type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 <tr class="memitem:acb5b2b5cc97e59ab32636cff1f017fe3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1array.html#acb5b2b5cc97e59ab32636cff1f017fe3">rows</a> ()</td></tr>
 <tr class="memdesc:acb5b2b5cc97e59ab32636cff1f017fe3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of inner-most dimensions.  <a href="#acb5b2b5cc97e59ab32636cff1f017fe3">More...</a><br /></td></tr>
 <tr class="separator:acb5b2b5cc97e59ab32636cff1f017fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1800f7ced31e5deb6f8864bc9369f5d1"><td class="memItemLeft" align="right" valign="top"><a id="a1800f7ced31e5deb6f8864bc9369f5d1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1array.html#a1800f7ced31e5deb6f8864bc9369f5d1">setdim</a> (<a class="el" href="structtmbutils_1_1vector.html">vector</a>&lt; int &gt; dim_)</td></tr>
+<tr class="memdesc:a1800f7ced31e5deb6f8864bc9369f5d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets dimension attribute and updates internal stride. <b>Must</b> be used when e.g. collapsing array dimensions. <br /></td></tr>
+<tr class="separator:a1800f7ced31e5deb6f8864bc9369f5d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25f546d435692cbc7da96d568e51d050"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structtmbutils_1_1array.html">array</a>&lt; Type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050">transpose</a> ()</td></tr>
 <tr class="memdesc:a25f546d435692cbc7da96d568e51d050"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array transpose (Special case of array permutation)  <a href="#a25f546d435692cbc7da96d568e51d050">More...</a><br /></td></tr>
 <tr class="separator:a25f546d435692cbc7da96d568e51d050"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,7 +186,7 @@ template&lt;class Type&gt; </div>
 <p>Number of outer-most dimensions. </p>
 <dl class="section return"><dt>Returns</dt><dd>Last array dimension (Similar to R's ncol in 2D case only) </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00177">177</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00178">178</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
 
 </div>
 </div>
@@ -215,7 +219,7 @@ template&lt;class Type&gt; </div>
 <p>Convert TMB array to matrix by keeping the first dimension and collapsing remaining dimensions. </p>
 <p>E.g. if array dimension is (n1,n2,n3) the resulting matrix dimension is (n1, n2*n3). </p>
 
-<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00300">300</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00301">301</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
 
 </div>
 </div>
@@ -248,7 +252,7 @@ template&lt;class Type&gt; </div>
 <p>Array rotate (Special case of array permutation) </p>
 <p>Rotates array dimension with n steps where n can be any (positive or negative) integer. If e.g. x has dimension [3,4,5,6] then x.rotate(1) has dimension [6,3,4,5]. </p>
 
-<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00280">280</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00281">281</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
 
 </div>
 </div>
@@ -280,7 +284,7 @@ template&lt;class Type&gt; </div>
 <p>Number of inner-most dimensions. </p>
 <dl class="section return"><dt>Returns</dt><dd>First array dimension (Similar to R's nrow) </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00184">184</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00185">185</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +316,7 @@ template&lt;class Type&gt; </div>
 <p>Array transpose (Special case of array permutation) </p>
 <p>If e.g. x has dimension [3,4,5,6] then x.transpose() has dimension [6,5,4,3]. </p>
 
-<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00266">266</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmbutils_8hpp_source.html#l00267">267</a> of file <a class="el" href="tmbutils_8hpp_source.html">tmbutils.hpp</a>.</p>
 
 </div>
 </div>

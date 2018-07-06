@@ -132,6 +132,10 @@ Type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 <tr class="memitem:addd5d17ec312d77a1aa7e701089224b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarray.html#addd5d17ec312d77a1aa7e701089224b9">rows</a> ()</td></tr>
 <tr class="memdesc:addd5d17ec312d77a1aa7e701089224b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of inner-most dimensions.  <a href="#addd5d17ec312d77a1aa7e701089224b9">More...</a><br /></td></tr>
 <tr class="separator:addd5d17ec312d77a1aa7e701089224b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a41ec12f07808c62e5b9848cebe9a63"><td class="memItemLeft" align="right" valign="top"><a id="a8a41ec12f07808c62e5b9848cebe9a63"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarray.html#a8a41ec12f07808c62e5b9848cebe9a63">setdim</a> (<a class="el" href="structvector.html">vector</a>&lt; int &gt; dim_)</td></tr>
+<tr class="memdesc:a8a41ec12f07808c62e5b9848cebe9a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets dimension attribute and updates internal stride. <b>Must</b> be used when e.g. collapsing array dimensions. <br /></td></tr>
+<tr class="separator:a8a41ec12f07808c62e5b9848cebe9a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f0df57cc5403f71194f2159ec80bd66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structarray.html">array</a>&lt; Type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structarray.html#a9f0df57cc5403f71194f2159ec80bd66">transpose</a> ()</td></tr>
 <tr class="memdesc:a9f0df57cc5403f71194f2159ec80bd66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array transpose (Special case of array permutation)  <a href="#a9f0df57cc5403f71194f2159ec80bd66">More...</a><br /></td></tr>
 <tr class="separator:a9f0df57cc5403f71194f2159ec80bd66"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,7 +183,7 @@ template&lt;class Type&gt; </div>
 <p>Number of outer-most dimensions. </p>
 <dl class="section return"><dt>Returns</dt><dd>Last array dimension (Similar to R's ncol in 2D case only) </dd></dl>
 
-<p>Definition at line <a class="el" href="array_8hpp_source.html#l00176">176</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
+<p>Definition at line <a class="el" href="array_8hpp_source.html#l00177">177</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structarray.html#a4fd607c3b000df567725bbf4a846139e">array&lt; Type &gt;::col()</a>.</p>
 
@@ -213,7 +217,7 @@ template&lt;class Type&gt; </div>
 <p>Convert TMB array to matrix by keeping the first dimension and collapsing remaining dimensions. </p>
 <p>E.g. if array dimension is (n1,n2,n3) the resulting matrix dimension is (n1, n2*n3). </p>
 
-<p>Definition at line <a class="el" href="array_8hpp_source.html#l00299">299</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
+<p>Definition at line <a class="el" href="array_8hpp_source.html#l00300">300</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 
 </div>
 </div>
@@ -246,7 +250,7 @@ template&lt;class Type&gt; </div>
 <p>Array rotate (Special case of array permutation) </p>
 <p>Rotates array dimension with n steps where n can be any (positive or negative) integer. If e.g. x has dimension [3,4,5,6] then x.rotate(1) has dimension [6,3,4,5]. </p>
 
-<p>Definition at line <a class="el" href="array_8hpp_source.html#l00279">279</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
+<p>Definition at line <a class="el" href="array_8hpp_source.html#l00280">280</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 
 </div>
 </div>
@@ -278,7 +282,7 @@ template&lt;class Type&gt; </div>
 <p>Number of inner-most dimensions. </p>
 <dl class="section return"><dt>Returns</dt><dd>First array dimension (Similar to R's nrow) </dd></dl>
 
-<p>Definition at line <a class="el" href="array_8hpp_source.html#l00183">183</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
+<p>Definition at line <a class="el" href="array_8hpp_source.html#l00184">184</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structarray.html#accfc8dbb05153041d1d72dbbec388130">array&lt; Type &gt;::matrix()</a>.</p>
 
@@ -313,7 +317,7 @@ template&lt;class Type&gt; </div>
 <p>If e.g. x has dimension [3,4,5,6] then x.transpose() has dimension [6,5,4,3]. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="matrix_arrays_8cpp-example.html#a10">matrix_arrays.cpp</a>, and <a class="el" href="sdv_multi_compact_8cpp-example.html#a5">sdv_multi_compact.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="array_8hpp_source.html#l00265">265</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
+<p>Definition at line <a class="el" href="array_8hpp_source.html#l00266">266</a> of file <a class="el" href="array_8hpp_source.html">array.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="classcontAR2__t.html#a830ac5259d38d4c76b18dbb1ae387392">contAR2_t&lt; scalartype_ &gt;::operator()()</a>.</p>
 
