@@ -616,8 +616,8 @@ follows:
 PARAMETER_VECTOR(u);                             // Underlying latent random variables 
 Type nll=Type(0.0);
 nll -= sum(dnorm(u,Type(0),Type(1),true));       // Assign N(0,1) distribution u 
-vector<Type> v = pnorm(u,Type(0),Type(1),true);  // Uniformly distributed variables (on [0,1])
-vector<Type> w = qgamma(v,shape,scale,true);
+vector<Type> v = pnorm(u,Type(0),Type(1));  // Uniformly distributed variables (on [0,1])
+vector<Type> w = qgamma(v,shape,scale);
 ```
 
 `w` now has a gamma distribution.
