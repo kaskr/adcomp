@@ -133,7 +133,9 @@ isNullPointer <- function(pointer) {
 ##' A high level of tracing information will be output by default when evaluating the objective function and gradient.
 ##' This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 ##' \code{silent=TRUE} to the \code{MakeADFun} call.
-##' 
+##'
+##' @note Do not rely upon the default arguments of any of the functions in the model object \code{obj$fn}, \code{obj$gr}, \code{obj$he}, \code{obj$report}. I.e. always use the explicit form \code{obj$fn(obj$par)} rather than \code{obj$fn()}.
+##'
 ##' @title Construct objective functions with derivatives based on a compiled C++ template.
 ##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
