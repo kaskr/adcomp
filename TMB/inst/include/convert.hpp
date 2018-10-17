@@ -128,10 +128,7 @@ template<class Type>
 SEXP asSEXP(const tmbutils::array<Type> &a)
 {
    SEXP val;
-   PROTECT(val = Rf_allocVector(REALSXP, a.size()));
-   double *p = REAL(val);
-   for(R_xlen_t i=0; i<a.size(); i++)
-     p[i] = asDouble(a[i]);
+   PROTECT( val = asSEXP( vector<Type> ( a ) ) );
    SEXP dim;
    PROTECT(dim = Rf_allocVector(INTSXP, a.dim.size()));
    for(int i=0; i<a.dim.size(); i++)
