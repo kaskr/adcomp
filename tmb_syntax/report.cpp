@@ -29,6 +29,12 @@ Type objective_function<Type>::operator() ()
   voa[1] = c;
   REPORT(voa);
 
+  //// Array of anything:
+  vector<int> dim(4);
+  dim << 1, 1, 2, 1;
+  array<matrix<Type> > aoa(voa, dim);
+  REPORT(aoa);
+
   // AD Report objects back to R:
   ADREPORT(a);
   ADREPORT(b);
