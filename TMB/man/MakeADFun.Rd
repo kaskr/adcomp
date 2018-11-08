@@ -130,3 +130,6 @@ A high level of tracing information will be output by default when evaluating th
 This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 \code{silent=TRUE} to the \code{MakeADFun} call.
 }
+\note{
+Do not rely upon the default arguments of any of the functions in the model object \code{obj$fn}, \code{obj$gr}, \code{obj$he}, \code{obj$report}. I.e. always use the explicit form \code{obj$fn(obj$par)} rather than \code{obj$fn()}.
+}
