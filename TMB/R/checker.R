@@ -92,6 +92,14 @@ checkConsistency <- function(obj,
         haveRandomSim <- all( names.random %in% names(newobj$env$data) )
         if (haveRandomSim) {
             newobj$env$parameters[names.random] <- newobj$env$data[names.random]
+            ## Snippet taken from MakeADFun to account for mapped parameters:
+            map <- args$map[names(args$map) %in% names.random]
+            if (length(map) > 0) {
+                param.map <- lapply(names(map), function(nam) {
+                    updateMap(newobj$env$parameters[[nam]], map[[nam]])
+                })
+                keepAttrib(newobj$env$parameters[names(map)]) <- param.map
+            }
         }
         reDoCholesky <- TRUE ## FIXME: Perhaps make it an option
         if(reDoCholesky)
