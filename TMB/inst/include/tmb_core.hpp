@@ -502,6 +502,7 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
 /** \internal \brief Get list element named "str", or return NULL */
 #ifdef WITH_LIBTMB
 SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL);
+int  getListInteger(SEXP list, const char *str, int default_value = 0);
 #else
 SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
 {
@@ -518,6 +519,14 @@ SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
   if(config.debug.getListElement)std::cout << "\n";
   RObjectTestExpectedType(elmt, expectedtype, str);
   return elmt; 
+}
+int getListInteger(SEXP list, const char *str, int default_value = 0) {
+  SEXP tmp = getListElement(list, str);
+  if ( tmp == R_NilValue ) {
+    Rf_warning("Missing integer variable '%s'. Using default: %d. (Perhaps you are using a model object created with an old TMB version?)", str, default_value);
+    return default_value;
+  }
+  return INTEGER(tmp)[0];
 }
 #endif
 
@@ -1318,8 +1327,8 @@ extern "C"
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
-      int do_simulate = INTEGER(getListElement(control, "do_simulate"))[0];
-      int get_reportdims = INTEGER(getListElement(control, "get_reportdims"))[0];
+      int do_simulate = getListInteger(control, "do_simulate");
+      int get_reportdims = getListInteger(control, "get_reportdims");
       objective_function<double>* pf;
       pf = (objective_function<double>*) R_ExternalPtrAddr(f);
       pf -> sync_data();
