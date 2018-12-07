@@ -997,16 +997,16 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   int m=pf->Range();
   if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
   // Do forwardsweep ?
-  int doforward=INTEGER(getListElement(control,"doforward"))[0];
+  int doforward = getListInteger(control, "doforward", 1);
   //R-index -> C-index
-  int rangecomponent=INTEGER(getListElement(control,"rangecomponent"))[0]-1;
+  int rangecomponent = getListInteger(control, "rangecomponent", 1) - 1;
   if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
     Rf_error("Wrong range component.");
-  int order = INTEGER(getListElement(control,"order"))[0];
+  int order = getListInteger(control, "order");
   if((order!=0) & (order!=1) & (order!=2) & (order!=3))
     Rf_error("order can be 0, 1, 2 or 3");
-  int sparsitypattern=INTEGER(getListElement(control,"sparsitypattern"))[0];
-  int dumpstack=INTEGER(getListElement(control,"dumpstack"))[0];
+  int sparsitypattern = getListInteger(control, "sparsitypattern");
+  int dumpstack = getListInteger(control, "dumpstack");
   SEXP hessiancols; // Hessian columns
   PROTECT(hessiancols=getListElement(control,"hessiancols"));
   int ncols=Rf_length(hessiancols);
@@ -1097,7 +1097,7 @@ ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
 {
-  int returnReport = INTEGER(getListElement(control,"report"))[0];
+  int returnReport = getListInteger(control, "report");
   /* Create objective_function "dummy"-object */
   objective_function< AD<double> > F(data,parameters,report);
   F.set_parallel_region(parallel_region);
@@ -1147,7 +1147,7 @@ extern "C"
     if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
     if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
     if(!Rf_isNewList(control))Rf_error("'control' must be a list");
-    int returnReport = INTEGER(getListElement(control,"report"))[0];
+    int returnReport = getListInteger(control, "report");
 
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL,info;
