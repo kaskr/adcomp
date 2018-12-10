@@ -5,11 +5,11 @@
 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>The comprehensive TMB documentation</title>
+  <title>15 Atomic functions | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
 
-  <meta property="og:title" content="The comprehensive TMB documentation" />
+  <meta property="og:title" content="15 Atomic functions | The comprehensive TMB documentation />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
@@ -17,7 +17,7 @@
   <meta name="github-repo" content="kaskr/adcomp" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="The comprehensive TMB documentation" />
+  <meta name="twitter:title" content="15 Atomic functions | The comprehensive TMB documentation />
   
   <meta name="twitter:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="twitter:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
@@ -34,6 +34,7 @@
 <link rel="next" href="Appendix.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
@@ -247,22 +248,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><span class="math display">\[ W&#39;(x) = \frac{1}{ \exp\left(W(x)\right) \left(1 + W(x)\right) } \]</span></p>
 <p>When coding reverse-mode derivatives we can assume that the function value <span class="math inline">\(W(x)\)</span> has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating <span class="math inline">\(W(x)\)</span> in the reverse pass.</p>
 <p>We’ll assume that a plain C++ function (taking double types as input/output) is available to calculate <span class="math inline">\(W(x)\)</span>. It doesn’t matter whether you have the source code of an implementation or just the header with linkage to an external library:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="dt">double</span> LambertW(<span class="dt">double</span> x);</a></code></pre></div>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">double</span> LambertW(<span class="dt">double</span> x);</code></pre>
 <p>The macro <code>TMB_ATOMIC_VECTOR_FUNCTION()</code> is used to declare our new primitive Lambert <span class="math inline">\(W\)</span> function:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb49-1" data-line-number="1">TMB_ATOMIC_VECTOR_FUNCTION(</a>
-<a class="sourceLine" id="cb49-2" data-line-number="2">    <span class="co">// ATOMIC_NAME</span></a>
-<a class="sourceLine" id="cb49-3" data-line-number="3">    LambertW</a>
-<a class="sourceLine" id="cb49-4" data-line-number="4">    ,</a>
-<a class="sourceLine" id="cb49-5" data-line-number="5">    <span class="co">// OUTPUT_DIM</span></a>
-<a class="sourceLine" id="cb49-6" data-line-number="6">    <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb49-7" data-line-number="7">    <span class="co">// ATOMIC_DOUBLE</span></a>
-<a class="sourceLine" id="cb49-8" data-line-number="8">    ty[<span class="dv">0</span>] = LambertW(tx[<span class="dv">0</span>]); <span class="co">// Call the &#39;double&#39; version</span></a>
-<a class="sourceLine" id="cb49-9" data-line-number="9">    ,</a>
-<a class="sourceLine" id="cb49-10" data-line-number="10">    <span class="co">// ATOMIC_REVERSE</span></a>
-<a class="sourceLine" id="cb49-11" data-line-number="11">    Type W  = ty[<span class="dv">0</span>];                    <span class="co">// Function value from forward pass</span></a>
-<a class="sourceLine" id="cb49-12" data-line-number="12">    Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span></a>
-<a class="sourceLine" id="cb49-13" data-line-number="13">    px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span></a>
-<a class="sourceLine" id="cb49-14" data-line-number="14">)</a></code></pre></div>
+<pre class="sourceCode cpp"><code class="sourceCode cpp">TMB_ATOMIC_VECTOR_FUNCTION(
+    <span class="co">// ATOMIC_NAME</span>
+    LambertW
+    ,
+    <span class="co">// OUTPUT_DIM</span>
+    <span class="dv">1</span>,
+    <span class="co">// ATOMIC_DOUBLE</span>
+    ty[<span class="dv">0</span>] = LambertW(tx[<span class="dv">0</span>]); <span class="co">// Call the &#39;double&#39; version</span>
+    ,
+    <span class="co">// ATOMIC_REVERSE</span>
+    Type W  = ty[<span class="dv">0</span>];                    <span class="co">// Function value from forward pass</span>
+    Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span>
+    px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span>
+)</code></pre>
 <p>Let’s explain in detail what is going on. The macro takes four arguments:</p>
 <ol style="list-style-type: decimal">
 <li><code>ATOMIC_NAME</code>: Name of new primitive function taking <code><a class="code" href="../namespaceCppAD.html">CppAD</a>::vector</code> as input and output.</li>
@@ -271,90 +272,90 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>ATOMIC_REVERSE</code>: How to calculate the reverse mode derivatives for a general <code>Type</code>. Again <code>tx</code> and <code>ty</code> denote function input and output but now <code>ty</code> has been computed and is available as an intermediate value. The vectors <code>px</code> and <code>py</code> denote partial derivatives of the end result with respect to <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> respectively. <code>py</code> is given and we must calculate <code>px</code> using the chain rule. This first order derivative rule is automatically expanded up to higher orders required when using TMB’s random effects calculations.</li>
 </ol>
 <p>To make the function work like other TMB functions it is convenient to define scalar and a vectorized versions that call the atomic function:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="co">// Scalar version</span></a>
-<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
-<a class="sourceLine" id="cb50-3" data-line-number="3">Type LambertW(Type x){</a>
-<a class="sourceLine" id="cb50-4" data-line-number="4">  <a class="code" href="../namespaceCppAD.html">CppAD</a>::<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; tx(<span class="dv">1</span>);</a>
-<a class="sourceLine" id="cb50-5" data-line-number="5">  tx[<span class="dv">0</span>] = x;</a>
-<a class="sourceLine" id="cb50-6" data-line-number="6">  <span class="cf">return</span> LambertW(tx)[<span class="dv">0</span>];</a>
-<a class="sourceLine" id="cb50-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb50-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb50-9" data-line-number="9"><span class="co">// Vectorized version</span></a>
-<a class="sourceLine" id="cb50-10" data-line-number="10">VECTORIZE_1t(LambertW)</a></code></pre></div>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Scalar version</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type LambertW(Type x){
+  <a class="code" href="../namespaceCppAD.html">CppAD</a>::<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; tx(<span class="dv">1</span>);
+  tx[<span class="dv">0</span>] = x;
+  <span class="cf">return</span> LambertW(tx)[<span class="dv">0</span>];
+}
+
+<span class="co">// Vectorized version</span>
+VECTORIZE_1t(LambertW)</code></pre>
 <div id="testing-the-primitive-function" class="section level3">
 <h3><span class="header-section-number">15.2.1</span> Testing the primitive function</h3>
 <p>Here is a complete example using Newton’s method to calculate the Lambert <span class="math inline">\(W\)</span> function
 (there are more sophisticated algorithms such as the one by <a href="https://doi.org/10.1016/j.cam.2012.11.021">Fukushima (2013)</a>,
 but that doesn’t matter for this example):</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb51-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb51-2" data-line-number="2"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></a>
-<a class="sourceLine" id="cb51-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb51-4" data-line-number="4"><span class="co">// Double version of Lambert W function</span></a>
-<a class="sourceLine" id="cb51-5" data-line-number="5"><span class="dt">double</span> LambertW(<span class="dt">double</span> x) {</a>
-<a class="sourceLine" id="cb51-6" data-line-number="6">  <span class="dt">double</span> logx = log(x);</a>
-<a class="sourceLine" id="cb51-7" data-line-number="7">  <span class="dt">double</span> y = (logx &gt; <span class="dv">0</span> ? logx : <span class="dv">0</span>);</a>
-<a class="sourceLine" id="cb51-8" data-line-number="8">  <span class="dt">int</span> niter = <span class="dv">100</span>, i=<span class="dv">0</span>;</a>
-<a class="sourceLine" id="cb51-9" data-line-number="9">  <span class="cf">for</span> (; i &lt; niter; i++) {</a>
-<a class="sourceLine" id="cb51-10" data-line-number="10">    <span class="cf">if</span> ( fabs( logx - log(y) - y) &lt; <span class="fl">1e-9</span>) <span class="cf">break</span>;</a>
-<a class="sourceLine" id="cb51-11" data-line-number="11">    y -= (y - exp(logx - y)) / (<span class="dv">1</span> + y);</a>
-<a class="sourceLine" id="cb51-12" data-line-number="12">  }</a>
-<a class="sourceLine" id="cb51-13" data-line-number="13">  <span class="cf">if</span> (i == niter) Rf_warning(<span class="st">&quot;W: failed convergence&quot;</span>);</a>
-<a class="sourceLine" id="cb51-14" data-line-number="14">  <span class="cf">return</span> y;</a>
-<a class="sourceLine" id="cb51-15" data-line-number="15">}</a>
-<a class="sourceLine" id="cb51-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb51-17" data-line-number="17">TMB_ATOMIC_VECTOR_FUNCTION(</a>
-<a class="sourceLine" id="cb51-18" data-line-number="18">    <span class="co">// ATOMIC_NAME</span></a>
-<a class="sourceLine" id="cb51-19" data-line-number="19">    LambertW</a>
-<a class="sourceLine" id="cb51-20" data-line-number="20">    ,</a>
-<a class="sourceLine" id="cb51-21" data-line-number="21">    <span class="co">// OUTPUT_DIM</span></a>
-<a class="sourceLine" id="cb51-22" data-line-number="22">    <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb51-23" data-line-number="23">    <span class="co">// ATOMIC_DOUBLE</span></a>
-<a class="sourceLine" id="cb51-24" data-line-number="24">    ty[<span class="dv">0</span>] = LambertW(tx[<span class="dv">0</span>]); <span class="co">// Call the &#39;double&#39; version</span></a>
-<a class="sourceLine" id="cb51-25" data-line-number="25">    ,</a>
-<a class="sourceLine" id="cb51-26" data-line-number="26">    <span class="co">// ATOMIC_REVERSE</span></a>
-<a class="sourceLine" id="cb51-27" data-line-number="27">    Type W  = ty[<span class="dv">0</span>];                    <span class="co">// Function value from forward pass</span></a>
-<a class="sourceLine" id="cb51-28" data-line-number="28">    Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span></a>
-<a class="sourceLine" id="cb51-29" data-line-number="29">    px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span></a>
-<a class="sourceLine" id="cb51-30" data-line-number="30">)</a>
-<a class="sourceLine" id="cb51-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb51-32" data-line-number="32"><span class="co">// Scalar version</span></a>
-<a class="sourceLine" id="cb51-33" data-line-number="33"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
-<a class="sourceLine" id="cb51-34" data-line-number="34">Type LambertW(Type x){</a>
-<a class="sourceLine" id="cb51-35" data-line-number="35">  <a class="code" href="../namespaceCppAD.html">CppAD</a>::<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; tx(<span class="dv">1</span>);</a>
-<a class="sourceLine" id="cb51-36" data-line-number="36">  tx[<span class="dv">0</span>] = x;</a>
-<a class="sourceLine" id="cb51-37" data-line-number="37">  <span class="cf">return</span> LambertW(tx)[<span class="dv">0</span>];</a>
-<a class="sourceLine" id="cb51-38" data-line-number="38">}</a>
-<a class="sourceLine" id="cb51-39" data-line-number="39"></a>
-<a class="sourceLine" id="cb51-40" data-line-number="40"><span class="co">// Vectorized version</span></a>
-<a class="sourceLine" id="cb51-41" data-line-number="41"><span class="dt">VECTORIZE1_t</span>(LambertW)</a>
-<a class="sourceLine" id="cb51-42" data-line-number="42"></a>
-<a class="sourceLine" id="cb51-43" data-line-number="43"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
-<a class="sourceLine" id="cb51-44" data-line-number="44">Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</a>
-<a class="sourceLine" id="cb51-45" data-line-number="45">{</a>
-<a class="sourceLine" id="cb51-46" data-line-number="46">  <a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(x);</a>
-<a class="sourceLine" id="cb51-47" data-line-number="47">  Type f = LambertW(x).<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>();</a>
-<a class="sourceLine" id="cb51-48" data-line-number="48">  <span class="cf">return</span> f;</a>
-<a class="sourceLine" id="cb51-49" data-line-number="49">}</a></code></pre></div>
+<pre class="sourceCode cpp"><code class="sourceCode cpp">
+<span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
+
+<span class="co">// Double version of Lambert W function</span>
+<span class="dt">double</span> LambertW(<span class="dt">double</span> x) {
+  <span class="dt">double</span> logx = log(x);
+  <span class="dt">double</span> y = (logx &gt; <span class="dv">0</span> ? logx : <span class="dv">0</span>);
+  <span class="dt">int</span> niter = <span class="dv">100</span>, i=<span class="dv">0</span>;
+  <span class="cf">for</span> (; i &lt; niter; i++) {
+    <span class="cf">if</span> ( fabs( logx - log(y) - y) &lt; <span class="fl">1e-9</span>) <span class="cf">break</span>;
+    y -= (y - exp(logx - y)) / (<span class="dv">1</span> + y);
+  }
+  <span class="cf">if</span> (i == niter) Rf_warning(<span class="st">&quot;W: failed convergence&quot;</span>);
+  <span class="cf">return</span> y;
+}
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+    <span class="co">// ATOMIC_NAME</span>
+    LambertW
+    ,
+    <span class="co">// OUTPUT_DIM</span>
+    <span class="dv">1</span>,
+    <span class="co">// ATOMIC_DOUBLE</span>
+    ty[<span class="dv">0</span>] = LambertW(tx[<span class="dv">0</span>]); <span class="co">// Call the &#39;double&#39; version</span>
+    ,
+    <span class="co">// ATOMIC_REVERSE</span>
+    Type W  = ty[<span class="dv">0</span>];                    <span class="co">// Function value from forward pass</span>
+    Type DW = <span class="fl">1.</span> / (exp(W) * (<span class="fl">1.</span> + W)); <span class="co">// Derivative</span>
+    px[<span class="dv">0</span>] = DW * py[<span class="dv">0</span>];                 <span class="co">// Reverse mode chain rule</span>
+)
+
+<span class="co">// Scalar version</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type LambertW(Type x){
+  <a class="code" href="../namespaceCppAD.html">CppAD</a>::<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; tx(<span class="dv">1</span>);
+  tx[<span class="dv">0</span>] = x;
+  <span class="cf">return</span> LambertW(tx)[<span class="dv">0</span>];
+}
+
+<span class="co">// Vectorized version</span>
+<span class="dt">VECTORIZE1_t</span>(LambertW)
+
+<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
+Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
+{
+  <a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(x);
+  Type f = LambertW(x).<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>();
+  <span class="cf">return</span> f;
+}</code></pre>
 <p>And from R</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="kw">compile</span>(<span class="st">&quot;lambert.cpp&quot;</span>)</a>
-<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="kw">dyn.load</span>(<span class="kw">dynlib</span>(<span class="st">&quot;lambert&quot;</span>))</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">compile</span>(<span class="st">&quot;lambert.cpp&quot;</span>)
+<span class="kw">dyn.load</span>(<span class="kw">dynlib</span>(<span class="st">&quot;lambert&quot;</span>))</code></pre>
 <div id="checking-function-value-and-derivatives" class="section level4">
 <h4><span class="header-section-number">15.2.1.1</span> Checking function value and derivatives</h4>
 <p>Check definition of the function:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1">obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(<span class="dt">data=</span><span class="kw">list</span>(), <span class="dt">parameters=</span><span class="kw">list</span>(<span class="dt">x=</span><span class="dv">1</span>), <span class="dt">DLL=</span><span class="st">&quot;lambert&quot;</span>)</a>
-<a class="sourceLine" id="cb53-2" data-line-number="2">obj<span class="op">$</span><span class="kw">fn</span>(<span class="dv">7</span> <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(<span class="dv">7</span>))</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(<span class="dt">data=</span><span class="kw">list</span>(), <span class="dt">parameters=</span><span class="kw">list</span>(<span class="dt">x=</span><span class="dv">1</span>), <span class="dt">DLL=</span><span class="st">&quot;lambert&quot;</span>)
+obj<span class="op">$</span><span class="kw">fn</span>(<span class="dv">7</span> <span class="op">*</span><span class="st"> </span><span class="kw">exp</span>(<span class="dv">7</span>))</code></pre>
 <pre><code>## [1] 7</code></pre>
 <p>Check derivatives using the <code>numDeriv</code> package:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1">numDeriv<span class="op">::</span><span class="kw">grad</span>(obj<span class="op">$</span>fn, <span class="dv">7</span>)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">numDeriv<span class="op">::</span><span class="kw">grad</span>(obj<span class="op">$</span>fn, <span class="dv">7</span>)</code></pre>
 <pre><code>## [1] 0.08626538</code></pre>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">obj<span class="op">$</span><span class="kw">gr</span>(<span class="dv">7</span>)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">obj<span class="op">$</span><span class="kw">gr</span>(<span class="dv">7</span>)</code></pre>
 <pre><code>##            [,1]
 ## [1,] 0.08626538</code></pre>
 <p>Also try second order derivatives:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1">numDeriv<span class="op">::</span><span class="kw">hessian</span>(obj<span class="op">$</span>fn, <span class="dv">7</span>)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">numDeriv<span class="op">::</span><span class="kw">hessian</span>(obj<span class="op">$</span>fn, <span class="dv">7</span>)</code></pre>
 <pre><code>##             [,1]
 ## [1,] -0.01038959</code></pre>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">obj<span class="op">$</span><span class="kw">he</span>(<span class="dv">7</span>)</a></code></pre></div>
+<pre class="sourceCode r"><code class="sourceCode r">obj<span class="op">$</span><span class="kw">he</span>(<span class="dv">7</span>)</code></pre>
 <pre><code>##             [,1]
 ## [1,] -0.01038969</code></pre>
 </div>
@@ -394,7 +395,7 @@ gitbook.start({
 "google": false,
 "linkedin": false,
 "weibo": false,
-"instapper": false,
+"instapaper": false,
 "vk": false,
 "all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
 },
@@ -404,6 +405,10 @@ gitbook.start({
 "size": 2
 },
 "edit": {
+"link": null,
+"text": null
+},
+"history": {
 "link": null,
 "text": null
 },
@@ -421,7 +426,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(src))
       src = src.replace(/^https?:/, '');
     script.src = src;
