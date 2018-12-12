@@ -438,6 +438,8 @@ struct<Type> name(getListElement(TMB_OBJECTIVE_PTR -> data, #name));
 template<class VT, class Type>
 struct data_indicator : VT{
   VT cdf_lower, cdf_upper;
+  /* Default CTOR */
+  data_indicator() { }
   /* Construct from observation */
   data_indicator(VT obs){
     VT::operator=(obs); VT::fill(Type(1.0));
