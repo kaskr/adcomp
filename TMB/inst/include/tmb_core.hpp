@@ -434,47 +434,65 @@ Type objective_function<Type>::operator() ()
 #define DATA_STRUCT(name, struct)                                       \
 struct<Type> name(getListElement(TMB_OBJECTIVE_PTR -> data, #name));
 
-/** \brief Utilities for OSA residuals */
+/** \brief Utilities for OSA residuals
+    \tparam VT Can be **vector<Type>** or **array<Type>**
+    \warning When extracting subsets of a `data_indicator` note that in general the subset is not applied to `cdf_lower` and `cdf_upper`.
+*/
 template<class VT, class Type>
 struct data_indicator : VT{
-  VT cdf_lower, cdf_upper;
-  /* Default CTOR */
+  /** \brief **Logarithm** of lower CDF */
+  VT cdf_lower;
+  /** \brief **Logarithm** of upper CDF */
+  VT cdf_upper;
+  /** \brief Default CTOR */
   data_indicator() { }
-  /* Construct from observation */
-  data_indicator(VT obs){
-    VT::operator=(obs); VT::fill(Type(1.0));
+  /** \brief Construct from observation vector
+      \param obs Observation vector or array
+      \param init_one If true the data_indicator will be filled with ones signifying that all observations should be enabled.
+  */
+  data_indicator(VT obs, bool init_one = false){
+    VT::operator=(obs);
+    if (init_one) VT::fill(Type(1.0));
     cdf_lower = obs; cdf_lower.setZero();
     cdf_upper = obs; cdf_upper.setZero();
   }
-  /* Fill with parameter vector */
+  /** \brief Fill with parameter vector */
   void fill(vector<Type> p){
     int n = (*this).size();
     if(p.size() >= n  ) VT::operator=(p.segment(0, n));
     if(p.size() >= 2*n) cdf_lower = p.segment(n, n);
     if(p.size() >= 3*n) cdf_upper = p.segment(2 * n, n);
   }
+  /** \brief Extract segment of indicator vector or array
+      \note For this method the segment **is** applied to `cdf_lower` and `cdf_upper`. */
+  data_indicator segment(int pos, int n) {
+    data_indicator ans ( VT::segment(pos, n) );
+    ans.cdf_lower = cdf_lower.segment(pos, n);
+    ans.cdf_upper = cdf_upper.segment(pos, n);
+    return ans;
+  }
 };
 
-/** \brief Declare an indicator array 'name' of same shape as 'obs'.
-
+/** \brief Declare an indicator array 'name' of same shape as 'obs'. By default, the indicator array is filled with ones indicating that all observations are enabled.
+    \details
     This is used in conjunction with one-step-ahead residuals - see
     ?oneStepPredict
     \ingroup macros */
 #define DATA_ARRAY_INDICATOR(name, obs)                                 \
-data_indicator<tmbutils::array<Type>, Type > name(obs);                 \
+data_indicator<tmbutils::array<Type>, Type > name(obs, true);           \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
                                            #name) );                    \
 }
 
-/** \brief Declare an indicator vector 'name' of same shape as 'obs'.
-
+/** \brief Declare an indicator vector 'name' of same shape as 'obs'. By default, the indicator vector is filled with ones indicating that all observations are enabled.
+    \details
     This is used in conjunction with one-step-ahead residuals - see
     ?oneStepPredict
     \ingroup macros */
 #define DATA_VECTOR_INDICATOR(name, obs)                                \
-data_indicator<tmbutils::vector<Type>, Type > name(obs);                \
+data_indicator<tmbutils::vector<Type>, Type > name(obs, true);          \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
