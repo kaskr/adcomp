@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parallel',['parallel',['../structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48',1,'config_struct']]]
+  ['optimize',['optimize',['../structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c',1,'config_struct']]]
 ];

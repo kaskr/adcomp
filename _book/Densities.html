@@ -257,7 +257,7 @@ with covariance matrix <em>Sigma</em> (symmetric positive definite),
 that we want to evaluate at <em>x</em>:</p>
 <pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = <span class="dv">10</span>;
 <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point           </span>
-x.fill(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></code></pre>
+x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></code></pre>
 <p>The negative log-normal density is evaluated as follows:</p>
 <pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
 <a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span>
@@ -305,7 +305,7 @@ Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd88
 <span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
  
 <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point</span>
-x.fill(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span>
+x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span>
 Type rho = <span class="fl">0.2</span>;              <span class="co">// Correlation parameter</span>
 res = AR1(rho)(x);           <span class="co">// Evaluate negative log-<a class="code" href="../namespacedensity.html">density</a> of AR1 process at point x </span></code></pre>
 <p>Due to the assumed stationarity the correlation parameter must

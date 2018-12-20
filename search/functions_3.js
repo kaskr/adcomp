@@ -2,6 +2,7 @@ var searchData=
 [
   ['d_5fincpl_5fgamma_5fshape',['D_incpl_gamma_shape',['../namespaceatomic.html#ab86d10e39e1b3aebc1fbd26aa26346d4',1,'atomic']]],
   ['d_5flgamma',['D_lgamma',['../namespaceatomic.html#a3b1fbc500a01972017dabccfbcd6ebc1',1,'atomic']]],
+  ['data_5findicator',['data_indicator',['../structdata__indicator.html#aca9cc66e90faebe0972beb8d880fb80e',1,'data_indicator::data_indicator()'],['../structdata__indicator.html#a1ae65647bfa39c414e677ad57bca6f0d',1,'data_indicator::data_indicator(VT obs, bool init_one=false)']]],
   ['dbeta',['dbeta',['../group__R__style__distribution.html#ga5324c83759d5211c7c2fbbad37fa8e59',1,'distributions_R.hpp']]],
   ['dbinom',['dbinom',['../group__R__style__distribution.html#gaee11f805f02bc1febc6d7bf0487671be',1,'distributions_R.hpp']]],
   ['dbinom_5frobust',['dbinom_robust',['../group__R__style__distribution.html#gaecb5a18095a320b42e2d20c4b120f5f5',1,'dbinom_robust():&#160;distributions_R.hpp'],['../atomic_8hpp.html#aacf2ed2ae2a9935331b45947fd174c90',1,'atomic::robust_utils::dbinom_robust()']]],

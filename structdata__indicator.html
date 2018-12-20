@@ -66,6 +66,8 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structdata__indicator-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">data_indicator&lt; VT, Type &gt; Struct Template Reference</div>  </div>
@@ -76,14 +78,144 @@ $(function() {
  <a href="structdata__indicator.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:aca9cc66e90faebe0972beb8d880fb80e"><td class="memItemLeft" align="right" valign="top"><a id="aca9cc66e90faebe0972beb8d880fb80e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#aca9cc66e90faebe0972beb8d880fb80e">data_indicator</a> ()</td></tr>
+<tr class="memdesc:aca9cc66e90faebe0972beb8d880fb80e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default CTOR. <br /></td></tr>
+<tr class="separator:aca9cc66e90faebe0972beb8d880fb80e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ae65647bfa39c414e677ad57bca6f0d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a1ae65647bfa39c414e677ad57bca6f0d">data_indicator</a> (VT obs, bool init_one=false)</td></tr>
+<tr class="memdesc:a1ae65647bfa39c414e677ad57bca6f0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from observation vector.  <a href="#a1ae65647bfa39c414e677ad57bca6f0d">More...</a><br /></td></tr>
+<tr class="separator:a1ae65647bfa39c414e677ad57bca6f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabea3718c778b6469ba72eac7811e565"><td class="memItemLeft" align="right" valign="top"><a id="aabea3718c778b6469ba72eac7811e565"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a> (<a class="el" href="structvector.html">vector</a>&lt; Type &gt; p)</td></tr>
+<tr class="memdesc:aabea3718c778b6469ba72eac7811e565"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill with parameter vector. <br /></td></tr>
+<tr class="separator:aabea3718c778b6469ba72eac7811e565"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf31037a7d7e5b5c3427edb5472fa8ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdata__indicator.html">data_indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#adf31037a7d7e5b5c3427edb5472fa8ad">segment</a> (int pos, int n)</td></tr>
+<tr class="memdesc:adf31037a7d7e5b5c3427edb5472fa8ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract segment of indicator vector or array.  <a href="#adf31037a7d7e5b5c3427edb5472fa8ad">More...</a><br /></td></tr>
+<tr class="separator:adf31037a7d7e5b5c3427edb5472fa8ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:af47c87a6a8ac5c010da838d508c7c3f6"><td class="memItemLeft" align="right" valign="top"><a id="af47c87a6a8ac5c010da838d508c7c3f6"></a>
+VT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#af47c87a6a8ac5c010da838d508c7c3f6">cdf_lower</a></td></tr>
+<tr class="memdesc:af47c87a6a8ac5c010da838d508c7c3f6"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>Logarithm</b> of lower CDF <br /></td></tr>
+<tr class="separator:af47c87a6a8ac5c010da838d508c7c3f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4197613b975dbb510a79dd0aae34361b"><td class="memItemLeft" align="right" valign="top"><a id="a4197613b975dbb510a79dd0aae34361b"></a>
+VT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a4197613b975dbb510a79dd0aae34361b">cdf_upper</a></td></tr>
+<tr class="memdesc:a4197613b975dbb510a79dd0aae34361b"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>Logarithm</b> of upper CDF <br /></td></tr>
+<tr class="separator:a4197613b975dbb510a79dd0aae34361b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class VT, class Type&gt;<br />
 struct data_indicator&lt; VT, Type &gt;</h3>
 
 <p>Utilities for OSA residuals. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">VT</td><td>Can be <b>vector&lt;Type&gt;</b> or <b>array&lt;Type&gt;</b> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section warning"><dt>Warning</dt><dd>When extracting subsets of a <code><a class="el" href="structdata__indicator.html" title="Utilities for OSA residuals. ">data_indicator</a></code> note that in general the subset is not applied to <code>cdf_lower</code> and <code>cdf_upper</code>. </dd></dl>
 
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00439">439</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00442">442</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a1ae65647bfa39c414e677ad57bca6f0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ae65647bfa39c414e677ad57bca6f0d">&sect;&nbsp;</a></span>data_indicator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class VT, class Type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdata__indicator.html">data_indicator</a>&lt; VT, Type &gt;::<a class="el" href="structdata__indicator.html">data_indicator</a> </td>
+          <td>(</td>
+          <td class="paramtype">VT&#160;</td>
+          <td class="paramname"><em>obs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>init_one</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct from observation vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">obs</td><td>Observation vector or array </td></tr>
+    <tr><td class="paramname">init_one</td><td>If true the <a class="el" href="structdata__indicator.html" title="Utilities for OSA residuals. ">data_indicator</a> will be filled with ones signifying that all observations should be enabled. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00453">453</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="adf31037a7d7e5b5c3427edb5472fa8ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf31037a7d7e5b5c3427edb5472fa8ad">&sect;&nbsp;</a></span>segment()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class VT, class Type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdata__indicator.html">data_indicator</a> <a class="el" href="structdata__indicator.html">data_indicator</a>&lt; VT, Type &gt;::segment </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Extract segment of indicator vector or array. </p>
+<dl class="section note"><dt>Note</dt><dd>For this method the segment <b>is</b> applied to <code>cdf_lower</code> and <code>cdf_upper</code>. </dd></dl>
+
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00468">468</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a></li>
 </ul>
 </div><!-- contents -->
