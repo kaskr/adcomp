@@ -6,7 +6,7 @@
 ;; Keywords: languages
 ;; URL:      https://github.com/kaskr/adcomp/blob/master/emacs
 
-(defconst tmb-mode-version "3.5" "TMB Mode version number.")
+(defconst tmb-mode-version "3.51" "TMB Mode version number.")
 
 ;;; Commentary:
 ;;
@@ -145,7 +145,7 @@ The secondary window shows compilation and model runs, among other things."
            '("DATA_INTEGER" "DATA_IVECTOR" "DATA_IARRAY"
              "DATA_SCALAR"  "DATA_VECTOR"  "DATA_ARRAY"
              "DATA_FACTOR"  "DATA_STRING"  "DATA_STRUCT"
-             "DATA_MATRIX"  "DATA_SPARSE_MATRIX"
+             "DATA_MATRIX"  "DATA_IMATRIX" "DATA_SPARSE_MATRIX"
              "DATA_VECTOR_INDICATOR" "DATA_ARRAY_INDICATOR"))
           (PARAMETERS
            '("PARAMETER" "PARAMETER_VECTOR"

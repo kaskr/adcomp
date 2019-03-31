@@ -20,11 +20,12 @@
 ##' @title Source R-script through gdb to get backtrace.
 ##' @param file Your R script
 ##' @param interactive Run interactive gdb session?
+##' @param object.name Optional name of compiled object if not the same as file name
 ##' @return Object of class \code{backtrace}
-gdbsource <- function(file,interactive=FALSE){
+gdbsource <- function(file,interactive=FALSE,object.name=NULL){
   if(!file.exists(file))stop("File '",file,"' not found")
   if(.Platform$OS.type=="windows"){
-    return(.gdbsource.win(file,interactive))
+    return(.gdbsource.win(file,interactive,object.name=object.name))
   }
   gdbscript <- tempfile()
   if(interactive){
@@ -40,13 +41,16 @@ gdbsource <- function(file,interactive=FALSE){
     cmd <- paste("R --vanilla < ",file," -d gdb --debugger-args=\"-x",
                  gdbscript,"\"")
     txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
-    attr(txt,"file") <- file
+    if(is.null(object.name))
+        attr(txt,"file") <- file
+    else
+        attr(txt,"file") <- object.name
     class(txt) <- "backtrace"
     return(txt)
   }
 }
 ## Windows case
-.gdbsource.win <- function(file,interactive=FALSE){
+.gdbsource.win <- function(file,interactive=FALSE,object.name=NULL){
   gdbscript <- tempfile()
   txt <- paste("set breakpoint pending on\nb abort\nrun --vanilla -f",
                file, "\nbt\n")
@@ -59,7 +63,10 @@ gdbsource <- function(file,interactive=FALSE){
   }
   else {
     txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
-    attr(txt,"file") <- file
+    if(is.null(object.name))
+        attr(txt,"file") <- file
+    else
+        attr(txt,"file") <- object.name
     class(txt) <- "backtrace"
     return(txt)
   }
@@ -67,7 +74,8 @@ gdbsource <- function(file,interactive=FALSE){
 
 ##' If \code{gdbsource} is run non-interactively (the default) only
 ##' the relevant information will be printed. Note that this will only
-##' work if the cpp file and the R file share the same base name.
+##' work if the cpp file and the R file share the same base name unless
+##' an optional different object name is supplied to gdbsource.
 ##'
 ##' @title Print problematic cpp line number.
 ##' @param x Backtrace from \code{gdbsource}
