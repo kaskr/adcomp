@@ -20,9 +20,8 @@
 ##' @title Source R-script through gdb to get backtrace.
 ##' @param file Your R script
 ##' @param interactive Run interactive gdb session?
-##' @param object.name Optional name of compiled object if not the same as file name
 ##' @return Object of class \code{backtrace}
-gdbsource <- function(file,interactive=FALSE,object.name=NULL){
+gdbsource <- function(file,interactive=FALSE){
   if(!file.exists(file))stop("File '",file,"' not found")
   if(.Platform$OS.type=="windows"){
     return(.gdbsource.win(file,interactive,object.name=object.name))
@@ -41,16 +40,13 @@ gdbsource <- function(file,interactive=FALSE,object.name=NULL){
     cmd <- paste("R --vanilla < ",file," -d gdb --debugger-args=\"-x",
                  gdbscript,"\"")
     txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
-    if(is.null(object.name))
-        attr(txt,"file") <- file
-    else
-        attr(txt,"file") <- object.name
+    attr(txt,"file") <- file
     class(txt) <- "backtrace"
     return(txt)
   }
 }
 ## Windows case
-.gdbsource.win <- function(file,interactive=FALSE,object.name=NULL){
+.gdbsource.win <- function(file,interactive=FALSE){
   gdbscript <- tempfile()
   txt <- paste("set breakpoint pending on\nb abort\nrun --vanilla -f",
                file, "\nbt\n")
@@ -63,19 +59,14 @@ gdbsource <- function(file,interactive=FALSE,object.name=NULL){
   }
   else {
     txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
-    if(is.null(object.name))
-        attr(txt,"file") <- file
-    else
-        attr(txt,"file") <- object.name
+    attr(txt,"file") <- file
     class(txt) <- "backtrace"
     return(txt)
   }
 }
 
 ##' If \code{gdbsource} is run non-interactively (the default) only
-##' the relevant information will be printed. Note that this will only
-##' work if the cpp file and the R file share the same base name unless
-##' an optional different object name is supplied to gdbsource.
+##' the relevant information will be printed. 
 ##'
 ##' @title Print problematic cpp line number.
 ##' @param x Backtrace from \code{gdbsource}
@@ -85,11 +76,14 @@ gdbsource <- function(file,interactive=FALSE,object.name=NULL){
 ##' @S3method print backtrace
 ##' @return NULL
 print.backtrace <- function(x,...){
-  ## Backtrace begins here
-  line <- grep("#0",x)
-  ## Assume cpp file same name as r file
-  pattern <- gsub("[R|r]$","",attr(x,"file"))
-  x <- x[line:length(x)]
-  x <- grep(pattern,x,value=TRUE)
-  cat(paste(x,"\n"))  
+    ## Both gdb and lldb use the output format
+    ##   ' at file.cpp:123'
+    ## to specify the problematic source lines:
+    pattern <- "\\ at\\ .*\\.cpp\\:[0-9]+"
+    x <- grep(pattern, x, value=TRUE)
+    if (length(x) == 0)
+        x <- "Program returned without errors"
+    else
+        x <- c("Errors:", x)
+    cat(paste(x,"\n"))
 }
