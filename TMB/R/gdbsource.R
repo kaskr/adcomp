@@ -24,7 +24,7 @@
 gdbsource <- function(file,interactive=FALSE){
   if(!file.exists(file))stop("File '",file,"' not found")
   if(.Platform$OS.type=="windows"){
-    return(.gdbsource.win(file,interactive,object.name=object.name))
+    return(.gdbsource.win(file,interactive))
   }
   gdbscript <- tempfile()
   if(interactive){
