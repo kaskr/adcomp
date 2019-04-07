@@ -156,6 +156,7 @@ isNullPointer <- function(pointer) {
 ##' @param checkParameterOrder Optional check for correct parameter order.
 ##' @param regexp Match random effects by regular expressions?
 ##' @param silent Disable all tracing information?
+##' @param SPA Calculate the saddlepoint approximation instead of the Laplace approximation.
 ##' @param ... Currently unused.
 ##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data, parameters, map=list(),
@@ -174,6 +175,7 @@ MakeADFun <- function(data, parameters, map=list(),
                       checkParameterOrder=TRUE, ## Optional check
                       regexp=FALSE,
                       silent=FALSE,
+                      SPA=FALSE,
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
@@ -485,7 +487,11 @@ MakeADFun <- function(data, parameters, map=list(),
     if(order == 0) {
       ##logdetH <- determinant(hessian)$mod
       logdetH <- 2*determinant(L)$mod
-      ans <- f(theta,order=0) + .5*logdetH - length(random)/2*log(2*pi)
+      if(!SPA){
+          ans <- f(theta,order=0) + .5*logdetH - length(random)/2*log(2*pi)    
+      }else{
+          ans <- -f(theta,order=0) + .5*logdetH + length(random)/2*log(2*pi) # when f = spa inner problem
+      }
       if(LaplaceNonZeroGradient){
         grad <- f(theta,order=1)[random]
         ans - .5* sum(grad * as.numeric( solveCholesky(L, grad) ))
@@ -558,19 +564,24 @@ MakeADFun <- function(data, parameters, map=list(),
       ## Reverse mode evaluate ptr in rangedirection w
       ## now gives .5*tr(Hdot*Hinv) !!
       ## return
-      as.vector( f(theta,order=1) ) +
-        .Call("EvalADFunObject", e$ADHess$ptr, theta,
-              control=list(
-                        order=as.integer(1),
-                        hessiancols=as.integer(0),
-                        hessianrows=as.integer(0),
-                        sparsitypattern=as.integer(0),
-                        rangecomponent=as.integer(1),
-                        rangeweight=as.double(w),
-                        dumpstack=as.integer(0),
-                        doforward=as.integer(1)
-                      ),
-              PACKAGE=DLL)
+      df <- as.vector( f(theta,order=1) )
+      dlogdetH.5 <- .Call("EvalADFunObject", e$ADHess$ptr, theta,
+                          control=list(
+                              order=as.integer(1),
+                              hessiancols=as.integer(0),
+                              hessianrows=as.integer(0),
+                              sparsitypattern=as.integer(0),
+                              rangecomponent=as.integer(1),
+                              rangeweight=as.double(w),
+                              dumpstack=as.integer(0),
+                              doforward=as.integer(1)
+                          ),
+                          PACKAGE=DLL)
+      if(!SPA){
+          df + dlogdetH.5
+      }else{
+          -df + dlogdetH.5
+      }
     }## order == 1
     else stop(sprintf("'order'=%d not yet implemented", order))
   } ## end{ h }
