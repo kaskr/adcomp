@@ -1,7 +1,4 @@
 #Noncentral chi square MLE
-setwd("D:/Dropbox/UIB/Master Thesis/R programmering/Exact Likelihood/Noncentral Chi Square")
-
-
 # Compile c++ code and load into R
 library(TMB)
 compile("dbessel_I_nchisq.cpp")
