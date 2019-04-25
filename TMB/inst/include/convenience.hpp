@@ -201,17 +201,3 @@ Type logspace_sub(Type logx, Type logy) {
   tx[2] = 0; // order
   return atomic::logspace_sub(tx)[0];
 }
-
-
-/**
- * Modified bessel function of the first kind.
- * Differentiation is allowed with respect to both parameters, x and nu.
- */
-
-template<class Type>
-Type besselI2(Type x, Type nu){
-    CppAD::vector<Type> tx(2);
-    tx[0] = x;
-    tx[1] = nu;
-    return atomic::besselI2(tx)[0];
-}

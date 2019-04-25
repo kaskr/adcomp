@@ -405,36 +405,6 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = Type(0.5) * ( B_left + B_right ) * py[0];
 			   px[1] = Type(0); /* Not implemented (!) */
 )
-    
-/** \brief Atomic version of \f$besselI(x,\nu)\f$.
-     Valid parameter range: \f$x =(x,\nu) \in \mathbb{R}_+\times\mathbb{R}\f$.
-     \note Derivative wrt. \f$\nu\f$ is now implemented approximately.
-     \param x Input vector of length 2.
-     \return Vector of length 1.
-*/
-TMB_ATOMIC_VECTOR_FUNCTION(
-        // ATOMIC_NAME
-        besselI2
-        ,
-        // OUTPUT_DIM
-        1
-        ,
-        // ATOMIC_DOUBLE
-        ty[0] = Rmath::Rf_bessel_i(tx[0], tx[1], 1.0 /* Not scaled */ );
-        ,
-        // ATOMIC REVERSE
-        Type value = ty[0];
-        Type x = tx[0];
-        Type nu = tx[1];
-        CppAD::vector<Type> arg(2);
-        arg[0] = x;
-        arg[1] = nu + Type(1);
-        px[0] = ( besselI2(arg)[0] + value * (nu / x) )* py[0]; // With respect to x
-        arg[1] = nu + Type(0.00001);
-        px[1] = ( ( besselI2(arg)[0] - besselI2(tx)[0] ) / Type(0.00001) )* py[0]; // With respect to nu, approximated
-)
-    
-
 
 /** \cond */
 template<class Type> /* Header of matmul interface */
