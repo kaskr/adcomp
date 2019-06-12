@@ -77,6 +77,16 @@ using CppAD::ADFun;
 namespace CppAD{
   /* Add to CppAD so that 'Variable' works for any 'Type' */
   bool Variable(double x)CSKIP({ return false; })
+  /* Add 'isfinite', 'isinf' and 'isnan' to CppAD */
+  using std::isfinite;
+  template <class T>
+  bool isfinite(const AD<T> &x)CSKIP({ return isfinite(Value(x)); })
+  using std::isinf;
+  template <class T>
+  bool isinf(const AD<T> &x)CSKIP({ return isinf(Value(x)); })
+  using std::isnan;
+  template <class T>
+  bool isnan(const AD<T> &x)CSKIP({ return isnan(Value(x)); })
 }
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"
