@@ -60,6 +60,7 @@ void eigen_REprintf(const char* x);
 #undef NDEBUG
 #define NDEBUG 1
 #include "cppad/cppad.hpp"
+#include "TMBad/TMBad.hpp"
 
 /* Include the R library _after_ Eigen and CppAD. Otherwise, the R
    macros can cause conflicts (as they do not respect the Eigen and
