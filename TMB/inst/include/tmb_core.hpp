@@ -1387,8 +1387,8 @@ extern "C"
   } // TMBAD_MakeADFunObject
 
   /** \internal \brief Construct ADFun object */
-  SEXP MakeADFunObject(SEXP data, SEXP parameters,
-		       SEXP report, SEXP control)
+  SEXP CPPAD_MakeADFunObject(SEXP data, SEXP parameters,
+                             SEXP report, SEXP control)
   {
     ADFun<double>* pf = NULL;
     /* Some type checking */
@@ -1534,7 +1534,7 @@ extern "C"
     }
   }
 
-  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
+  SEXP CPPAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
       if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
@@ -1548,6 +1548,16 @@ extern "C"
     TMB_CATCH {
       TMB_ERROR_BAD_ALLOC;
     }
+  }
+
+  // Select AD framework
+  SEXP MakeADFunObject(SEXP data, SEXP parameters,
+                             SEXP report, SEXP control) {
+    return TMBAD_MakeADFunObject(data, parameters,
+                                 report, control);
+  }
+  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control) {
+    return TMBAD_EvalADFunObject(f, theta, control);
   }
   
 }
