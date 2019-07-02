@@ -1550,6 +1550,15 @@ extern "C"
     }
   }
 
+  SEXP tmbad_print(SEXP f) {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    adfun* pf;
+    pf = (adfun*) R_ExternalPtrAddr(f);
+    pf->glob.print();
+    return R_NilValue;
+  }
+
   // Select AD framework
   SEXP MakeADFunObject(SEXP data, SEXP parameters,
                              SEXP report, SEXP control) {
@@ -2017,6 +2026,7 @@ extern "C"{
 #define TMB_CALLDEFS                                            \
   {"MakeADFunObject",     (DL_FUNC) &MakeADFunObject,     4},   \
   {"InfoADFunObject",     (DL_FUNC) &InfoADFunObject,     1},   \
+  {"tmbad_print",         (DL_FUNC) &tmbad_print,         1},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
   {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \
   {"EvalDoubleFunObject", (DL_FUNC) &EvalDoubleFunObject, 3},   \
