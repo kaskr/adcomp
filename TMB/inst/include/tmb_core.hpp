@@ -991,8 +991,8 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   int order = getListInteger(control, "order");
   if((order!=0) & (order!=1) & (order!=2) & (order!=3))
     Rf_error("order can be 0, 1, 2 or 3");
-  int sparsitypattern = getListInteger(control, "sparsitypattern");
-  int dumpstack = getListInteger(control, "dumpstack");
+  //int sparsitypattern = getListInteger(control, "sparsitypattern");
+  //int dumpstack = getListInteger(control, "dumpstack");
   SEXP hessiancols; // Hessian columns
   PROTECT(hessiancols=getListElement(control,"hessiancols"));
   int ncols=Rf_length(hessiancols);
@@ -1020,13 +1020,13 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
       pf->DomainVecSet(x);
       pf->glob.forward();
     }
-    for (size_t i=0; i<LENGTH(rangeweight); i++) {
+    for (int i=0; i<LENGTH(rangeweight); i++) {
       pf->glob.deriv_dep(i) = REAL(rangeweight)[i];
     }
     pf->glob.reverse();
     vector<double> ans(pf->Domain());
     for (int i=0; i<ans.size(); i++)
-      ans(i) = pf->glob.deriv_inv[i];
+      ans(i) = pf->glob.deriv_inv(i);
     res = asSEXP(ans);
     UNPROTECT(3);
     return res;
@@ -1514,6 +1514,24 @@ extern "C"
   /** \internal \brief Get tag of external pointer */
   SEXP getTag(SEXP f){
     return R_ExternalPtrTag(f);
+  }
+
+  SEXP TMBAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
+  {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    TMB_TRY {
+      if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
+      SEXP tag=R_ExternalPtrTag(f);
+      if(tag == Rf_install("ADFun"))
+	return TMBAD_EvalADFunObjectTemplate< adfun >(f,theta,control);
+      // if(tag == Rf_install("parallelADFun"))
+      //   return EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
+      Rf_error("NOT A KNOWN FUNCTION POINTER");
+    }
+    TMB_CATCH {
+      TMB_ERROR_BAD_ALLOC;
+    }
   }
 
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
