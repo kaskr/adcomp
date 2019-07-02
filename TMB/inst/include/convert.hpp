@@ -36,8 +36,8 @@ SEXP asSEXP(const matrix<Type> &a)
 }
 
 // Report vector of numeric types: Make R-vector
-#define asSEXP_VECTOR_OF_NUMERIC(Type)          \
-SEXP asSEXP(const vector<Type> &a) CSKIP(       \
+#define asSEXP_VECTOR_OF_NUMERIC(Type, ns)      \
+SEXP asSEXP(const ns::vector<Type> &a) CSKIP(   \
 {                                               \
   R_xlen_t size = a.size();                     \
   SEXP val;                                     \
@@ -48,10 +48,11 @@ SEXP asSEXP(const vector<Type> &a) CSKIP(       \
   UNPROTECT(1);                                 \
   return val;                                   \
 })
-asSEXP_VECTOR_OF_NUMERIC(int)
-asSEXP_VECTOR_OF_NUMERIC(double)
+asSEXP_VECTOR_OF_NUMERIC(int, tmbutils)
+asSEXP_VECTOR_OF_NUMERIC(double, tmbutils)
+asSEXP_VECTOR_OF_NUMERIC(double, std)
 template<class Type>
-asSEXP_VECTOR_OF_NUMERIC(AD<Type>)
+asSEXP_VECTOR_OF_NUMERIC(AD<Type>, tmbutils)
 #undef asSEXP_VECTOR_OF_NUMERIC
 // Report vector of anything else: Make R-list
 template<class Type>
