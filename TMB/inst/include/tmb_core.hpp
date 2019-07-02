@@ -1050,17 +1050,17 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     }
   }
   if(order==1){
+    std::vector<double> jvec = pf->Jacobian(x);
     // if(doforward)pf->Forward(0,x);
-    // matrix<double> jac(m, n);
-    // vector<double> u(n);
-    // vector<double> v(m);
-    // v.setZero();
-    // for(int i=0; i<m; i++) {
-    //   v[i] = 1.0; u = pf->Reverse(1,v);
-    //   v[i] = 0.0;
-    //   jac.row(i) = u;
-    // }
-    // PROTECT( res = asSEXP(jac) );
+    matrix<double> jac(m, n);
+    int k=0;
+    for (int i=0; i<m; i++) {
+      for (int j=0; j<n; j++) {
+        jac(i, j) = jvec[k];
+        k++;
+      }
+    }
+    PROTECT( res = asSEXP(jac) );
   }
   //if(order==2)res=asSEXP(pf->Hessian(x,0),1);
   if(order==2){
