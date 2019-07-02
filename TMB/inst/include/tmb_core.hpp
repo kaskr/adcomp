@@ -972,6 +972,116 @@ struct parallel_accumulator{
 
 #ifndef WITH_LIBTMB
 
+template<class ADFunType>
+SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
+{
+  if(!Rf_isNewList(control))Rf_error("'control' must be a list");
+  ADFunType* pf;
+  pf=(ADFunType*)R_ExternalPtrAddr(f);
+  PROTECT(theta=Rf_coerceVector(theta,REALSXP));
+  int n=pf->Domain();
+  int m=pf->Range();
+  if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
+  // Do forwardsweep ?
+  int doforward = getListInteger(control, "doforward", 1);
+  //R-index -> C-index
+  int rangecomponent = getListInteger(control, "rangecomponent", 1) - 1;
+  if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
+    Rf_error("Wrong range component.");
+  int order = getListInteger(control, "order");
+  if((order!=0) & (order!=1) & (order!=2) & (order!=3))
+    Rf_error("order can be 0, 1, 2 or 3");
+  int sparsitypattern = getListInteger(control, "sparsitypattern");
+  int dumpstack = getListInteger(control, "dumpstack");
+  SEXP hessiancols; // Hessian columns
+  PROTECT(hessiancols=getListElement(control,"hessiancols"));
+  int ncols=Rf_length(hessiancols);
+  SEXP hessianrows; // Hessian rows
+  PROTECT(hessianrows=getListElement(control,"hessianrows"));
+  int nrows=Rf_length(hessianrows);
+  if((nrows>0)&(nrows!=ncols))Rf_error("hessianrows and hessianrows must have same length");
+  vector<size_t> cols(ncols);
+  vector<size_t> cols0(ncols);
+  vector<size_t> rows(nrows);
+  if(ncols>0){
+    for(int i=0;i<ncols;i++){
+      cols[i]=INTEGER(hessiancols)[i]-1; //R-index -> C-index
+      cols0[i]=0;
+      if(nrows>0)rows[i]=INTEGER(hessianrows)[i]-1; //R-index -> C-index
+    }
+  }
+  std::vector<double> x(REAL(theta), REAL(theta) + LENGTH(theta));
+
+  SEXP res=R_NilValue;
+  SEXP rangeweight=getListElement(control,"rangeweight");
+  if(rangeweight!=R_NilValue){
+    if(LENGTH(rangeweight)!=m)Rf_error("rangeweight must have length equal to range dimension");
+    if (doforward) {
+      pf->DomainVecSet(x);
+      pf->glob.forward();
+    }
+    for (size_t i=0; i<LENGTH(rangeweight); i++) {
+      pf->glob.deriv_dep(i) = REAL(rangeweight)[i];
+    }
+    pf->glob.reverse();
+    vector<double> ans(pf->Domain());
+    for (int i=0; i<ans.size(); i++)
+      ans(i) = pf->glob.deriv_inv[i];
+    res = asSEXP(ans);
+    UNPROTECT(3);
+    return res;
+  }
+  if(order==3){
+    Rf_error("Not implemented for TMBad");
+    // vector<double> w(1);
+    // w[0]=1;
+    // if((nrows!=1) | (ncols!=1))Rf_error("For 3rd order derivatives a single hessian coordinate must be specified.");
+    // pf->ForTwo(x,rows,cols); /* Compute forward directions */
+    // PROTECT(res=asSEXP(asMatrix(pf->Reverse(3,w),n,3)));
+  }
+  if(order==0){
+    //if(dumpstack)CppAD::traceforward0sweep(1);
+    std::vector<double> ans = pf->operator()(x);
+    PROTECT(res=asSEXP(ans));
+    //if(dumpstack)CppAD::traceforward0sweep(0);
+    SEXP rangenames=Rf_getAttrib(f,Rf_install("range.names"));
+    if(LENGTH(res)==LENGTH(rangenames)){
+      Rf_setAttrib(res,R_NamesSymbol,rangenames);
+    }
+  }
+  if(order==1){
+    // if(doforward)pf->Forward(0,x);
+    // matrix<double> jac(m, n);
+    // vector<double> u(n);
+    // vector<double> v(m);
+    // v.setZero();
+    // for(int i=0; i<m; i++) {
+    //   v[i] = 1.0; u = pf->Reverse(1,v);
+    //   v[i] = 0.0;
+    //   jac.row(i) = u;
+    // }
+    // PROTECT( res = asSEXP(jac) );
+  }
+  //if(order==2)res=asSEXP(pf->Hessian(x,0),1);
+  if(order==2){
+    // if(ncols==0){
+    //   if(sparsitypattern){
+    //     PROTECT(res=asSEXP(HessianSparsityPattern(pf)));  
+    //   } else {
+    //     PROTECT(res=asSEXP(asMatrix(pf->Hessian(x,rangecomponent),n,n)));
+    //   }
+    // }
+    // else if (nrows==0){
+    //   /* Fixme: the cols0 argument should be user changeable */
+    //   PROTECT(res=asSEXP(asMatrix(pf->RevTwo(x,cols0,cols),n,ncols)));
+    // }
+    // else PROTECT(res=asSEXP(asMatrix(pf->ForTwo(x,rows,cols),m,ncols)));
+  }
+  UNPROTECT(4);
+  return res;
+} // EvalADFunObjectTemplate
+
+
 /** \internal \brief Evaluates an ADFun object from R
 
    Template argument can be "ADFun" or an object extending
