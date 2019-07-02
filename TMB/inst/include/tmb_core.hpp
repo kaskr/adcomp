@@ -1193,6 +1193,90 @@ extern "C"
   }
 
   /** \internal \brief Construct ADFun object */
+  SEXP TMBAD_MakeADFunObject(SEXP data, SEXP parameters,
+		       SEXP report, SEXP control)
+  {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+
+    adfun* pf = NULL;
+    /* Some type checking */
+    if(!Rf_isNewList(data))Rf_error("'data' must be a list");
+    if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
+    if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
+    if(!Rf_isNewList(control))Rf_error("'control' must be a list");
+    int returnReport = getListInteger(control, "report");
+
+    /* Get the default parameter vector (tiny overhead) */
+    SEXP par,res=NULL,info;
+    objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
+    int n=F.count_parallel_regions(); // Evaluates user template
+#else
+    F.count_parallel_regions(); // Evaluates user template
+#endif
+    if(returnReport && F.reportvector.size()==0){
+      /* Told to report, but no ADREPORT in template: Get out quickly */
+      return R_NilValue;
+    }
+    PROTECT(par=F.defaultpar());
+    PROTECT(info=R_NilValue); // Important
+
+    if(_openmp && !returnReport){ // Parallel mode
+#ifdef _OPENMP
+      if(config.trace.parallel)
+	std::cout << n << " regions found.\n";
+      //start_parallel(); /* Start threads */
+      vector< adfun* > pfvec(n);
+      bool bad_thread_alloc = false;
+#pragma omp parallel for if (config.tape.parallel)
+      for(int i=0;i<n;i++){
+	TMB_TRY {
+	  pfvec[i] = NULL;
+	  pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
+	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
+	}
+	TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if(bad_thread_alloc){
+	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+	TMB_ERROR_BAD_ALLOC;
+      }
+
+      // FIXME: NOT DONE YET
+
+      //parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+      /* Convert parallel ADFun pointer to R_ExternalPtr */
+      //PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+      //R_RegisterCFinalizer(res,finalizeparallelADFun);
+#endif
+    } else { // Serial mode
+      TMB_TRY{
+	/* Actual work: tape creation */
+	pf = NULL;
+	pf = TMBAD_MakeADFunObject_(data, parameters, report, control, -1, info);
+	if (config.optimize.instantly) pf->glob.optimize();
+      }
+      TMB_CATCH {
+	if (pf != NULL) delete pf;
+	TMB_ERROR_BAD_ALLOC;
+      }
+      /* Convert ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
+      Rf_setAttrib(res,Rf_install("range.names"),info);
+      R_RegisterCFinalizer(res,finalizeADFun);
+    }
+
+    /* Return list of external pointer and default-parameter */
+    SEXP ans;
+    Rf_setAttrib(res,Rf_install("par"),par);
+    PROTECT(ans=ptrList(res));
+    UNPROTECT(4);
+
+    return ans;
+  } // TMBAD_MakeADFunObject
+
+  /** \internal \brief Construct ADFun object */
   SEXP MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
   {
