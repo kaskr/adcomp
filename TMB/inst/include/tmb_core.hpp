@@ -1113,6 +1113,41 @@ void finalize(SEXP x)
 
 
 /** \internal \brief Construct ADFun object */
+TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters,
+			       SEXP report, SEXP control, int parallel_region=-1,
+			       SEXP &info=R_NilValue)
+{
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  int returnReport = getListInteger(control, "report");
+  /* Create objective_function "dummy"-object */
+  objective_function< ad > F(data,parameters,report);
+  F.set_parallel_region(parallel_region);
+  /* Create ADFun pointer.
+     We have the option to tape either the value returned by the
+     objective_function template or the vector reported using the
+     macro "ADREPORT" */
+  adfun* pf = new adfun();
+  pf->glob.ad_start();
+  //TMBad::Independent(F.theta);  // In both cases theta is the independent variable
+  for (int i=0; i<F.theta.size(); i++) F.theta(i).Independent();
+  if(!returnReport){ // Default case: no ad report - parallel run allowed
+    vector< ad > y(1);
+    y[0] = F.evalUserTemplate();
+    //TMBad::Dependent(y);
+    for (int i=0; i<y.size(); i++) y[i].Dependent();
+  } else { // ad report case
+    F(); // Run through user template (modifies reportvector)
+    //TMBad::Dependent(F.reportvector.result);
+    for (int i=0; i<F.reportvector.result.size(); i++) F.reportvector.result[i].Dependent();
+    info=F.reportvector.reportnames(); // parallel run *not* allowed
+  }
+  pf->glob.ad_stop();
+  return pf;
+}
+
+
+/** \internal \brief Construct ADFun object */
 ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
