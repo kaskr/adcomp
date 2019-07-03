@@ -1558,16 +1558,6 @@ extern "C"
     pf->glob.print();
     return R_NilValue;
   }
-
-  // Select AD framework
-  SEXP MakeADFunObject(SEXP data, SEXP parameters,
-                             SEXP report, SEXP control) {
-    return TMBAD_MakeADFunObject(data, parameters,
-                                 report, control);
-  }
-  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control) {
-    return TMBAD_EvalADFunObject(f, theta, control);
-  }
   
 }
 
@@ -2067,6 +2057,19 @@ extern "C"
         y = pf->Reverse(1, v);
       } else
         Rf_error("Unknown function pointer");
+  }
+}
+
+extern "C"
+{
+  // Select AD framework
+  SEXP MakeADFunObject(SEXP data, SEXP parameters,
+                       SEXP report, SEXP control) {
+    return TMBAD_MakeADFunObject(data, parameters,
+                                 report, control);
+  }
+  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control) {
+    return TMBAD_EvalADFunObject(f, theta, control);
   }
 }
 
