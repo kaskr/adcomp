@@ -62,6 +62,11 @@ void eigen_REprintf(const char* x);
 #include "cppad/cppad.hpp"
 #include "TMBad/TMBad.hpp"
 
+// Workaround to make CppAD::Integer working with TMBad
+namespace CppAD {
+int Integer(const TMBad::ad_aug &x) CSKIP ({ return (int) x.Value(); })
+}
+
 /* Include the R library _after_ Eigen and CppAD. Otherwise, the R
    macros can cause conflicts (as they do not respect the Eigen and
    CppAD namespace limits). E.g., the 'length' macro conflicts with
