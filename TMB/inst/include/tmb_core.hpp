@@ -1707,6 +1707,78 @@ extern "C"
 {
 
   /** \internal \brief Tape the gradient using nested AD types */
+  SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
+  {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+
+    adfun* pf = NULL;
+    /* Some type checking */
+    if(!Rf_isNewList(data))Rf_error("'data' must be a list");
+    if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
+    if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
+
+    /* Get the default parameter vector (tiny overhead) */
+    SEXP par,res=NULL;
+    objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
+    int n=F.count_parallel_regions(); // Evaluates user template
+#else
+    F.count_parallel_regions(); // Evaluates user template
+#endif
+    PROTECT(par=F.defaultpar());
+
+    if(_openmp){ // Parallel mode
+#ifdef _OPENMP
+      if(config.trace.parallel)
+	std::cout << n << " regions found.\n";
+      start_parallel(); /* Start threads */
+      vector< adfun* > pfvec(n);
+      bool bad_thread_alloc = false;
+#pragma omp parallel for if (config.tape.parallel)
+      for(int i=0;i<n;i++){
+	TMB_TRY {
+	  pfvec[i] = NULL;
+	  pfvec[i] = TMBAD_MakeADGradObject_(data, parameters, report, i);
+	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
+	}
+	TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if(bad_thread_alloc){
+	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+	TMB_ERROR_BAD_ALLOC;
+      }
+      // FIXME: NOT DONE YET!
+      // parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+      // /* Convert parallel ADFun pointer to R_ExternalPtr */
+      // PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+      // R_RegisterCFinalizer(res,finalizeparallelADFun);
+#endif
+    } else { // Serial mode
+      /* Actual work: tape creation */
+      TMB_TRY {
+        pf = NULL;
+        pf = TMBAD_MakeADGradObject_(data, parameters, report, -1);
+        if(config.optimize.instantly)pf->glob.optimize();
+      }
+      TMB_CATCH {
+	if (pf != NULL) delete pf;
+	TMB_ERROR_BAD_ALLOC;
+      }
+      /* Convert ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
+      R_RegisterCFinalizer(res,finalizeADFun);
+    }
+
+    /* Return ptrList */
+    SEXP ans;
+    Rf_setAttrib(res,Rf_install("par"),par);
+    PROTECT(ans=ptrList(res));
+    UNPROTECT(3);
+    return ans;
+  } // TMBAD_MakeADGradObject
+
+  /** \internal \brief Tape the gradient using nested AD types */
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
     ADFun<double>* pf = NULL;
