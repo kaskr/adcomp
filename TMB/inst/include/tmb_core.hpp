@@ -2024,7 +2024,15 @@ extern "C"
 
 extern "C"
 {
-  SEXP usingAtomics(){
+  SEXP TMBAD_usingAtomics(){
+    SEXP ans;
+    PROTECT(ans = Rf_allocVector(INTSXP,1));
+    INTEGER(ans)[0] = 1; // TMBAD doesn't benefit from knowing if 'false'
+    UNPROTECT(1);
+    return ans;
+  }
+
+  SEXP CPPAD_usingAtomics(){
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
     INTEGER(ans)[0] = atomic::atomicFunctionGenerated;
@@ -2078,6 +2086,9 @@ extern "C"
   }
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report) {
     return TMBAD_MakeADGradObject(data, parameters, report);
+  }
+  SEXP usingAtomics() {
+    return TMBAD_usingAtomics();
   }
 }
 
