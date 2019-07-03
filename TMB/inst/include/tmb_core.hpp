@@ -1775,7 +1775,7 @@ extern "C"
   } // TMBAD_MakeADGradObject
 
   /** \internal \brief Tape the gradient using nested AD types */
-  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
+  SEXP CPPAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
     ADFun<double>* pf = NULL;
     /* Some type checking */
@@ -2073,6 +2073,9 @@ extern "C"
   }
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control) {
     return TMBAD_EvalADFunObject(f, theta, control);
+  }
+  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report) {
+    return TMBAD_MakeADGradObject(data, parameters, report);
   }
 }
 
