@@ -11,12 +11,14 @@ double asDouble(double x);
 double asDouble(AD<double> x);
 double asDouble(AD<AD<double> > x);
 double asDouble(AD<AD<AD<double> > > x);
+double asDouble(TMBad::ad_aug x);
 #else
 double asDouble(int x){return double(x);}
 double asDouble(double x){return x;}
 double asDouble(AD<double> x){return CppAD::Value(x);}
 double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
 double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+double asDouble(TMBad::ad_aug x){return x.Value();}
 #endif
 
 /** \brief Convert TMB matrix, vector, scalar or int to R style */
