@@ -1229,7 +1229,7 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
-  int returnReport = getListInteger(control, "report");
+  int returnReport = (control!=R_NilValue) && getListInteger(control, "report");
   /* Create objective_function "dummy"-object */
   objective_function< ad > F(data,parameters,report);
   F.set_parallel_region(parallel_region);
@@ -1672,6 +1672,16 @@ extern "C"
 
 } /* Double interface */
 
+TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
+{
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  SEXP control = R_NilValue;
+  adfun* pf = TMBAD_MakeADFunObject_(data, parameters, report, control, parallel_region);
+  adfun* pgf = new adfun (pf->JacFun());
+  delete pf;
+  return pgf;
+}
 
 ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
 {
