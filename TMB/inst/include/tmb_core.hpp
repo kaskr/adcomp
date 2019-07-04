@@ -1299,6 +1299,11 @@ extern "C"
 {
 
   /** \internal \brief Garbage collect an ADFun object pointer */
+  void TMBAD_finalizeADFun(SEXP x)
+  {
+    finalize<TMBad::ADFun<TMBad::ad_aug> > (x);
+  }
+  /** \internal \brief Garbage collect an ADFun object pointer */
   void finalizeADFun(SEXP x)
   {
     finalize<ADFun<double> > (x);
@@ -1364,7 +1369,7 @@ extern "C"
       //parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
       //PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-      //R_RegisterCFinalizer(res,finalizeparallelADFun);
+      //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
 #endif
     } else { // Serial mode
       TMB_TRY{
@@ -1380,7 +1385,7 @@ extern "C"
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
       Rf_setAttrib(res,Rf_install("range.names"),info);
-      R_RegisterCFinalizer(res,finalizeADFun);
+      R_RegisterCFinalizer(res,TMBAD_finalizeADFun);
     }
 
     /* Return list of external pointer and default-parameter */
@@ -1745,7 +1750,7 @@ extern "C"
       // parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       // /* Convert parallel ADFun pointer to R_ExternalPtr */
       // PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-      // R_RegisterCFinalizer(res,finalizeparallelADFun);
+      // R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
@@ -1760,7 +1765,7 @@ extern "C"
       }
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
-      R_RegisterCFinalizer(res,finalizeADFun);
+      R_RegisterCFinalizer(res,TMBAD_finalizeADFun);
     }
 
     /* Return ptrList */
