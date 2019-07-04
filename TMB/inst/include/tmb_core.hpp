@@ -1291,15 +1291,11 @@ extern "C"
   /** \internal \brief Garbage collect an ADFun object pointer */
   void finalizeADFun(SEXP x)
   {
-    ADFun<double>* ptr=(ADFun<double>*)R_ExternalPtrAddr(x);
-    if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer(x);
+    finalize<ADFun<double> > (x);
   }
   void finalizeparallelADFun(SEXP x)
   {
-    parallelADFun<double>* ptr=(parallelADFun<double>*)R_ExternalPtrAddr(x);
-    if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer(x);
+    finalize<parallelADFun<double> > (x);
   }
 
   /** \internal \brief Construct ADFun object */
