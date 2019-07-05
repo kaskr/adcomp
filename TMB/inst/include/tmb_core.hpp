@@ -1990,6 +1990,66 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
 
 extern "C"
 {
+
+#ifdef _OPENMP
+  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    typedef sphess_t<adfun> sphess;
+    if(config.trace.parallel)
+      std::cout << "Count num parallel regions\n";
+    objective_function< double > F(data,parameters,report);
+    int n=F.count_parallel_regions();
+    if(config.trace.parallel)
+      std::cout << n << " regions found.\n";
+
+    //start_parallel(); /* Start threads */
+
+    /* parallel test */
+    bool bad_thread_alloc = false;
+    vector<sphess*> Hvec(n);
+#pragma omp parallel for if (config.tape.parallel)
+    for (int i=0; i<n; i++) {
+      TMB_TRY {
+	Hvec[i] = NULL;
+	Hvec[i] = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, skip, i) );
+	//optimizeTape( Hvec[i]->pf );
+      }
+      TMB_CATCH { bad_thread_alloc = true; }
+    }
+    if (bad_thread_alloc) {
+      for(int i=0; i<n; i++) {
+	if (Hvec[i] != NULL) {
+	  delete Hvec[i]->pf;
+	  delete Hvec[i];
+	}
+      }
+      TMB_ERROR_BAD_ALLOC;
+    }
+    //parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
+    //return asSEXP(tmp->convert(),"parallelADFun");
+  } // MakeADHessObject2
+#else
+  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    typedef sphess_t<adfun> sphess;
+    sphess* pH = NULL;
+    TMB_TRY {
+      pH = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, skip, -1) );
+      //optimizeTape( pH->pf );
+      return asSEXP(*pH, "ADFun");
+    }
+    TMB_CATCH {
+      if (pH != NULL) {
+	delete pH->pf;
+	delete pH;
+      }
+      TMB_ERROR_BAD_ALLOC;
+    }
+  } // MakeADHessObject2
+#endif
+
 #ifdef _OPENMP
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     if(config.trace.parallel)
