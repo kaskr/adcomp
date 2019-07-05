@@ -1879,7 +1879,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
           change dimension - only treat h[:,skip] and h[skip,:] as
           zero). Negative subscripts are not allowed.
 */
-sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
+sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
 {
   /* Some type checking */
   if(!Rf_isNewList(data))Rf_error("'data' must be a list");
@@ -2051,7 +2051,7 @@ extern "C"
 #endif
 
 #ifdef _OPENMP
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     if(config.trace.parallel)
       std::cout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
@@ -2068,7 +2068,7 @@ extern "C"
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
-	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, skip, i) );
+	Hvec[i] = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, skip, i) );
 	optimizeTape( Hvec[i]->pf );
       }
       TMB_CATCH { bad_thread_alloc = true; }
@@ -2091,11 +2091,11 @@ extern "C"
     return ans;
   } // MakeADHessObject2
 #else
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     sphess* pH = NULL;
     SEXP ans;
     TMB_TRY {
-      pH = new sphess( MakeADHessObject2_(data, parameters, report, skip, -1) );
+      pH = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, skip, -1) );
       optimizeTape( pH->pf );
       ans = asSEXP(*pH, "ADFun");
     }
@@ -2176,6 +2176,9 @@ extern "C"
   }
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report) {
     return TMBAD_MakeADGradObject(data, parameters, report);
+  }
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip) {
+    return TMBAD_MakeADHessObject2(data, parameters, report, skip);
   }
   SEXP usingAtomics() {
     return TMBAD_usingAtomics();
