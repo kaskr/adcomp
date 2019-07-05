@@ -1860,14 +1860,16 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   }
   TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol);
   delete pgf;
-  h.subset_inplace( h.row() >= h.col() ); // Lower triangle
+  // NB: Lower triangle, column major =
+  //     Transpose of upper triangle, row major
+  h.subset_inplace( h.row() <= h.col() ); // Upper triangle, row major
   if (config.optimize.instantly) h.glob.optimize(); // Optimize later ?
   adfun* phf = new adfun( h );
   vector<int> rowindex(h.i.size());
   vector<int> colindex(h.j.size());
   for (size_t k=0; k<h.i.size(); k++) {
-    rowindex[k] = h.i[k];
-    colindex[k] = h.j[k];
+    rowindex[k] = h.j[k]; // Transpose !
+    colindex[k] = h.i[k]; // Transpose !
   }
   sphess ans(phf, rowindex, colindex);
   return ans;
