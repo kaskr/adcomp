@@ -1845,6 +1845,40 @@ extern "C"
           change dimension - only treat h[:,skip] and h[skip,:] as
           zero). Negative subscripts are not allowed.
 */
+sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
+{
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  typedef sphess_t<adfun> sphess;
+  adfun* pgf = TMBAD_MakeADGradObject_(data, parameters, report, parallel_region);
+  if (config.optimize.instantly) pgf->glob.optimize();
+  int n = pgf->Domain();
+  std::vector<bool> keepcol(n, true);
+  for(int i=0; i<LENGTH(skip); i++) {
+    keepcol[ INTEGER(skip)[i] - 1 ] = false; // skip is R-index !
+  }
+  TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol);
+  delete pgf;
+  h.subset_inplace( h.row() >= h.col() ); // Lower triangle
+  if (config.optimize.instantly) h.glob.optimize(); // Optimize later ?
+  adfun* phf = new adfun( h );
+  vector<int> rowindex(h.i.size());
+  vector<int> colindex(h.j.size());
+  for (size_t k=0; k<h.i.size(); k++) {
+    rowindex[k] = h.i[k];
+    colindex[k] = h.j[k];
+  }
+  sphess ans(phf, rowindex, colindex);
+  return ans;
+} // TMBAD_MakeADHessObject2
+
+
+/** \internal \brief Tape the hessian[cbind(i,j)] using nested AD types.
+
+    skip: integer vector of columns to skip from the hessian (will not
+          change dimension - only treat h[:,skip] and h[skip,:] as
+          zero). Negative subscripts are not allowed.
+*/
 sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
 {
   /* Some type checking */
