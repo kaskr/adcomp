@@ -62,6 +62,7 @@ void eigen_REprintf(const char* x);
 #include "cppad/cppad.hpp"
 #define TMBAD_ALLOW_COMPARISON 1
 #include "TMBad/TMBad.hpp"
+#include "TMBad/eigen_numtraits.hpp"
 
 // Workaround to make CppAD::Integer working with TMBad
 namespace CppAD {
