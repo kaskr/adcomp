@@ -1020,6 +1020,7 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
       pf->DomainVecSet(x);
       pf->glob.forward();
     }
+    pf->glob.clear_deriv();
     for (int i=0; i<LENGTH(rangeweight); i++) {
       pf->glob.deriv_dep(i) = REAL(rangeweight)[i];
     }
