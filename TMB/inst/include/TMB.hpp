@@ -57,8 +57,8 @@ void eigen_REprintf(const char* x);
 #undef I
 
 /* Select AD framework: TMBAD or CPPAD  */
-#ifndef TMBAD_FRAMEWORK
-#define CPPAD_FRAMEWORK
+#ifndef CPPAD_FRAMEWORK
+#define TMBAD_FRAMEWORK
 #endif
 
 /* Include the CppAD library. (Always turn off debug for cppad) */
