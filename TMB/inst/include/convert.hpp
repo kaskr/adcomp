@@ -53,6 +53,7 @@ SEXP asSEXP(const ns::vector<Type> &a) CSKIP(   \
 asSEXP_VECTOR_OF_NUMERIC(int, tmbutils)
 asSEXP_VECTOR_OF_NUMERIC(double, tmbutils)
 asSEXP_VECTOR_OF_NUMERIC(double, std)
+asSEXP_VECTOR_OF_NUMERIC(TMBad::ad_aug, tmbutils)
 template<class Type>
 asSEXP_VECTOR_OF_NUMERIC(AD<Type>, tmbutils)
 #undef asSEXP_VECTOR_OF_NUMERIC
@@ -89,6 +90,9 @@ SEXP asSEXP(const int &a) CSKIP(
 template<class Type>
 SEXP asSEXP(const AD<Type> &a){
   return asSEXP(CppAD::Value(a));
+}
+SEXP asSEXP(const TMBad::ad_aug &a){
+  return asSEXP(a.Value());
 }
 
 /** \brief Construct c++-vector from SEXP object */
