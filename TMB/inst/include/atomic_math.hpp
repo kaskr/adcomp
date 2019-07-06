@@ -150,7 +150,13 @@ namespace Rmath {
 
 }
 
+#if TMB_AD_FRAMEWORK == CPPAD
 #include "atomic_macro.hpp"
+#endif
+
+#if TMB_AD_FRAMEWORK == TMBAD
+#include "tmbad_atomic_macro.hpp"
+#endif
 
 template<class Type>
 struct TypeDefs{
