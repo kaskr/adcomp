@@ -56,6 +56,11 @@ void eigen_REprintf(const char* x);
 /* Workaround side effect when -DEIGEN_USE_LAPACKE is set */
 #undef I
 
+/* Select AD framework: TMBAD or CPPAD  */
+#ifndef TMB_AD_FRAMEWORK
+#define TMB_AD_FRAMEWORK TMBAD
+#endif
+
 /* Include the CppAD library. (Always turn off debug for cppad) */
 #undef NDEBUG
 #define NDEBUG 1
