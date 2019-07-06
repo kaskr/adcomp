@@ -1487,6 +1487,12 @@ extern "C"
   } // MakeADFunObject
 #endif
 
+#ifdef TMBAD_FRAMEWORK
+  SEXP InfoADFunObject(SEXP f) {
+    return R_NilValue;
+  }
+#endif
+
 #ifdef CPPAD_FRAMEWORK
   SEXP InfoADFunObject(SEXP f)
   {
