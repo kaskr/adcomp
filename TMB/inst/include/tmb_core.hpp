@@ -2156,6 +2156,8 @@ extern "C"
 
 extern "C"
 {
+
+#ifdef TMBAD_FRAMEWORK
   SEXP TMBAD_usingAtomics(){
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
@@ -2163,7 +2165,9 @@ extern "C"
     UNPROTECT(1);
     return ans;
   }
+#endif
 
+#ifdef CPPAD_FRAMEWORK
   SEXP CPPAD_usingAtomics(){
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
@@ -2171,6 +2175,8 @@ extern "C"
     UNPROTECT(1);
     return ans;
   }
+#endif
+
 }
 
 extern "C"
