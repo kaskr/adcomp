@@ -150,11 +150,11 @@ namespace Rmath {
 
 }
 
-#if TMB_AD_FRAMEWORK == CPPAD
+#ifdef CPPAD_FRAMEWORK
 #include "atomic_macro.hpp"
 #endif
 
-#if TMB_AD_FRAMEWORK == TMBAD
+#ifdef TMBAD_FRAMEWORK
 #include "tmbad_atomic_macro.hpp"
 #endif
 
