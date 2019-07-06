@@ -41,7 +41,7 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
     for (size_t i=0; i<ty.size(); i++) ty[i] = _args_.y(i);             \
     for (size_t i=0; i<py.size(); i++) py[i] = _args_.dy(i);            \
     ATOMIC_REVERSE;                                                     \
-    for (size_t i=0; i<py.size(); i++) _args_.dx(i) += py[i];           \
+    for (size_t i=0; i<px.size(); i++) _args_.dx(i) += px[i];           \
   }                                                                     \
   void forward(TMBad::ForwardArgs<TMBad::Writer> &args) { ASSERT(false); } \
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); } \
