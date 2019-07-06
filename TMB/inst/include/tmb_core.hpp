@@ -1222,7 +1222,7 @@ void finalize(SEXP x)
   memory_manager.CallCFinalizer(x);
 }
 
-
+#if TMB_AD_FRAMEWORK == TMBAD
 /** \internal \brief Construct ADFun object */
 TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
@@ -1256,8 +1256,9 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters
   pf->glob.ad_stop();
   return pf;
 }
+#endif
 
-
+#if TMB_AD_FRAMEWORK == CPPAD
 /** \internal \brief Construct ADFun object */
 ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
@@ -1284,26 +1285,35 @@ ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
   }
   return pf;
 }
-
+#endif
 
 extern "C"
 {
 
+#if TMB_AD_FRAMEWORK == TMBAD
   /** \internal \brief Garbage collect an ADFun object pointer */
   void TMBAD_finalizeADFun(SEXP x)
   {
     finalize<TMBad::ADFun<TMBad::ad_aug> > (x);
   }
+#endif
+
+#if TMB_AD_FRAMEWORK == CPPAD
   /** \internal \brief Garbage collect an ADFun object pointer */
   void finalizeADFun(SEXP x)
   {
     finalize<ADFun<double> > (x);
   }
+#endif
+
+#if TMB_AD_FRAMEWORK == CPPAD
   void finalizeparallelADFun(SEXP x)
   {
     finalize<parallelADFun<double> > (x);
   }
+#endif
 
+#if TMB_AD_FRAMEWORK == TMBAD
   /** \internal \brief Construct ADFun object */
   SEXP TMBAD_MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
@@ -1387,7 +1397,9 @@ extern "C"
 
     return ans;
   } // TMBAD_MakeADFunObject
+#endif
 
+#if TMB_AD_FRAMEWORK == CPPAD
   /** \internal \brief Construct ADFun object */
   SEXP CPPAD_MakeADFunObject(SEXP data, SEXP parameters,
                              SEXP report, SEXP control)
@@ -1465,7 +1477,9 @@ extern "C"
 
     return ans;
   } // MakeADFunObject
-  
+#endif
+
+#if TMB_AD_FRAMEWORK == CPPAD
   SEXP InfoADFunObject(SEXP f)
   {
     ADFun<double>* pf;
@@ -1495,7 +1509,9 @@ extern "C"
     UNPROTECT(2);
     return ans;
   }
+#endif
 
+#if TMB_AD_FRAMEWORK == CPPAD
   /** \internal \brief Call tape optimization function in CppAD */
   SEXP optimizeADFunObject(SEXP f)
   {
@@ -1512,12 +1528,14 @@ extern "C"
     }
     return R_NilValue;
   }
+#endif
 
   /** \internal \brief Get tag of external pointer */
   SEXP getTag(SEXP f){
     return R_ExternalPtrTag(f);
   }
 
+#if TMB_AD_FRAMEWORK == TMBAD
   SEXP TMBAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
     typedef TMBad::ad_aug ad;
@@ -1535,7 +1553,9 @@ extern "C"
       TMB_ERROR_BAD_ALLOC;
     }
   }
+#endif
 
+#if TMB_AD_FRAMEWORK == CPPAD
   SEXP CPPAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
@@ -1551,13 +1571,17 @@ extern "C"
       TMB_ERROR_BAD_ALLOC;
     }
   }
+#endif
+
 
   SEXP tmbad_print(SEXP f) {
+#if TMB_AD_FRAMEWORK == TMBAD
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     adfun* pf;
     pf = (adfun*) R_ExternalPtrAddr(f);
     pf->glob.print();
+#endif
     return R_NilValue;
   }
   
@@ -1664,6 +1688,8 @@ extern "C"
 
 } /* Double interface */
 
+
+#if TMB_AD_FRAMEWORK == TMBAD
 TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
 {
   typedef TMBad::ad_aug ad;
@@ -1674,7 +1700,9 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameter
   delete pf;
   return pgf;
 }
+#endif
 
+#if TMB_AD_FRAMEWORK == CPPAD
 ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
 {
   /* Create ADFun pointer */
@@ -1694,10 +1722,11 @@ ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int 
   ADFun< double >* pf = new ADFun< double >(x,yy);
   return pf;
 }
+#endif
 
 extern "C"
 {
-
+#if TMB_AD_FRAMEWORK == TMBAD
   /** \internal \brief Tape the gradient using nested AD types */
   SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
@@ -1769,7 +1798,9 @@ extern "C"
     UNPROTECT(3);
     return ans;
   } // TMBAD_MakeADGradObject
+#endif
 
+#if TMB_AD_FRAMEWORK == CPPAD
   /** \internal \brief Tape the gradient using nested AD types */
   SEXP CPPAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
   {
@@ -1837,6 +1868,7 @@ extern "C"
     UNPROTECT(3);
     return ans;
   } // MakeADGradObject
+#endif
 }
 
 
@@ -1846,6 +1878,7 @@ extern "C"
           change dimension - only treat h[:,skip] and h[skip,:] as
           zero). Negative subscripts are not allowed.
 */
+#if TMB_AD_FRAMEWORK == TMBAD
 sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
 {
   typedef TMBad::ad_aug ad;
@@ -1874,7 +1907,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   sphess ans(phf, rowindex, colindex);
   return ans;
 } // TMBAD_MakeADHessObject2
-
+#endif
 
 /** \internal \brief Tape the hessian[cbind(i,j)] using nested AD types.
 
@@ -1882,6 +1915,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
           change dimension - only treat h[:,skip] and h[skip,:] as
           zero). Negative subscripts are not allowed.
 */
+#if TMB_AD_FRAMEWORK == CPPAD
 sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
 {
   /* Some type checking */
@@ -1964,6 +1998,7 @@ sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP sk
   sphess ans(ptape3, rowindex, colindex);
   return ans;
 } // MakeADHessObject2
+#endif
 
 // kasper: Move to new file e.g. "convert.hpp"
 template <class ADFunType>
@@ -1994,6 +2029,7 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
 extern "C"
 {
 
+#if TMB_AD_FRAMEWORK == TMBAD
 #ifdef _OPENMP
   SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     typedef TMBad::ad_aug ad;
@@ -2052,7 +2088,9 @@ extern "C"
     }
   } // MakeADHessObject2
 #endif
+#endif
 
+#if TMB_AD_FRAMEWORK == CPPAD
 #ifdef _OPENMP
   SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     if(config.trace.parallel)
@@ -2113,6 +2151,7 @@ extern "C"
     return ans;
   } // MakeADHessObject2
 #endif
+#endif
 }
 
 extern "C"
@@ -2137,6 +2176,7 @@ extern "C"
 extern "C"
 {
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y) {
+#if TMB_AD_FRAMEWORK == CPPAD
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
@@ -2149,8 +2189,10 @@ extern "C"
         y = pf->Forward(0, x);
       } else
         Rf_error("Unknown function pointer");
+#endif
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
+#if TMB_AD_FRAMEWORK == CPPAD
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
@@ -2164,28 +2206,25 @@ extern "C"
       } else
         Rf_error("Unknown function pointer");
   }
+#endif
 }
 
 extern "C"
 {
   // Select AD framework
-  SEXP MakeADFunObject(SEXP data, SEXP parameters,
-                       SEXP report, SEXP control) {
-    return TMBAD_MakeADFunObject(data, parameters,
-                                 report, control);
-  }
-  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control) {
-    return TMBAD_EvalADFunObject(f, theta, control);
-  }
-  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report) {
-    return TMBAD_MakeADGradObject(data, parameters, report);
-  }
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip) {
-    return TMBAD_MakeADHessObject2(data, parameters, report, skip);
-  }
-  SEXP usingAtomics() {
-    return TMBAD_usingAtomics();
-  }
+#if TMB_AD_FRAMEWORK == TMBAD
+#define MakeADFunObject   TMBAD_MakeADFunObject
+#define EvalADFunObject   TMBAD_EvalADFunObject
+#define MakeADGradObject  TMBAD_MakeADGradObject
+#define MakeADHessObject2 TMBAD_MakeADHessObject2
+#define usingAtomics      TMBAD_usingAtomics
+#elif TMB_AD_FRAMEWORK == CPPAD
+#define MakeADFunObject   CPPAD_MakeADFunObject
+#define EvalADFunObject   CPPAD_EvalADFunObject
+#define MakeADGradObject  CPPAD_MakeADGradObject
+#define MakeADHessObject2 CPPAD_MakeADHessObject2
+#define usingAtomics      CPPAD_usingAtomics
+#endif
 }
 
 #endif /* #ifndef WITH_LIBTMB */
