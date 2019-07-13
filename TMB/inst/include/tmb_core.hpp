@@ -1313,6 +1313,8 @@ extern "C"
   }
 #endif
 
+  /* --- MakeADFunObject ----------------------------------------------- */
+
 #ifdef TMBAD_FRAMEWORK
   /** \internal \brief Construct ADFun object */
   SEXP TMBAD_MakeADFunObject(SEXP data, SEXP parameters,
@@ -1478,6 +1480,44 @@ extern "C"
     return ans;
   } // MakeADFunObject
 #endif
+
+  /* --- TransformADFunObject ----------------------------------------------- */
+
+#ifdef TMBAD_FRAMEWORK
+/** \internal \brief Transform an existing ADFun object */
+SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
+{
+  //TMBad::ADFun< TMBad::ad_aug >*
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  // FIXME: Must require non parallel object !!!
+  if (Rf_isNull(f)) Rf_error("Expected external pointer - got NULL");
+  SEXP tag = R_ExternalPtrTag(f);
+  if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
+  adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+  SEXP random_order = getListElement(control, "random_order");
+  int nr = LENGTH(random_order);
+  std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
+  TMB_TRY {
+    *pf = pf -> marginal_greedy(random);
+  }
+  TMB_CATCH {
+    TMB_ERROR_BAD_ALLOC;
+  }
+  return R_NilValue;
+}
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+/** \internal \brief Transform an existing ADFun object */
+SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
+{
+  Rf_error("Not supported for CPPAD_FRAMEWORK");
+  return R_NilValue;
+}
+#endif
+
+  /* --- InfoADFunObject ---------------------------------------------------- */
 
 #ifdef TMBAD_FRAMEWORK
   SEXP InfoADFunObject(SEXP f) {
@@ -2225,18 +2265,20 @@ extern "C"
 {
   // Select AD framework
 #ifdef TMBAD_FRAMEWORK
-#define MakeADFunObject   TMBAD_MakeADFunObject
-#define EvalADFunObject   TMBAD_EvalADFunObject
-#define MakeADGradObject  TMBAD_MakeADGradObject
-#define MakeADHessObject2 TMBAD_MakeADHessObject2
-#define usingAtomics      TMBAD_usingAtomics
+#define MakeADFunObject      TMBAD_MakeADFunObject
+#define EvalADFunObject      TMBAD_EvalADFunObject
+#define MakeADGradObject     TMBAD_MakeADGradObject
+#define MakeADHessObject2    TMBAD_MakeADHessObject2
+#define usingAtomics         TMBAD_usingAtomics
+#define TransformADFunObject TMBAD_TransformADFunObject
 #endif
 #ifdef CPPAD_FRAMEWORK
-#define MakeADFunObject   CPPAD_MakeADFunObject
-#define EvalADFunObject   CPPAD_EvalADFunObject
-#define MakeADGradObject  CPPAD_MakeADGradObject
-#define MakeADHessObject2 CPPAD_MakeADHessObject2
-#define usingAtomics      CPPAD_usingAtomics
+#define MakeADFunObject      CPPAD_MakeADFunObject
+#define EvalADFunObject      CPPAD_EvalADFunObject
+#define MakeADGradObject     CPPAD_MakeADGradObject
+#define MakeADHessObject2    CPPAD_MakeADHessObject2
+#define usingAtomics         CPPAD_usingAtomics
+#define TransformADFunObject CPPAD_TransformADFunObject
 #endif
 }
 
@@ -2261,6 +2303,7 @@ extern "C"
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip);
   SEXP usingAtomics();
+  SEXP TransformADFunObject(SEXP f, SEXP control);
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y);
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y);
 }
