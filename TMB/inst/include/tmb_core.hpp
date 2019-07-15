@@ -1498,12 +1498,15 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   SEXP random_order = getListElement(control, "random_order");
   int nr = LENGTH(random_order);
   std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
+  for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
   TMB_TRY {
     *pf = pf -> marginal_greedy(random);
   }
   TMB_CATCH {
     TMB_ERROR_BAD_ALLOC;
   }
+  // for (size_t i=0; i<random.size(); i++) random[i] += 1 ; // C index -> R index
+  // Rf_setAttrib(f, Rf_install("random_order"), asSEXP(random));
   return R_NilValue;
 }
 #endif
