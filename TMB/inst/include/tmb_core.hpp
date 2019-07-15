@@ -2326,6 +2326,7 @@ extern "C"{
   {"InfoADFunObject",     (DL_FUNC) &InfoADFunObject,     1},   \
   {"tmbad_print",         (DL_FUNC) &tmbad_print,         1},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
+  {"TransformADFunObject",(DL_FUNC) &TransformADFunObject,2},   \
   {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \
   {"EvalDoubleFunObject", (DL_FUNC) &EvalDoubleFunObject, 3},   \
   {"getParameterOrder",   (DL_FUNC) &getParameterOrder,   3},   \
