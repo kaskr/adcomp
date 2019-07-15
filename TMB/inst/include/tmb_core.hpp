@@ -1495,12 +1495,16 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   SEXP tag = R_ExternalPtrTag(f);
   if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
   adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+  int method = getListInteger(control, "method", 0);
   SEXP random_order = getListElement(control, "random_order");
   int nr = LENGTH(random_order);
   std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
   for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
   TMB_TRY {
-    *pf = pf -> marginal_greedy(random);
+    if (method == 0)
+      *pf = pf -> marginal_greedy(random);
+    else if (method == 1)
+      *pf = pf -> marginal_sr(random);
   }
   TMB_CATCH {
     TMB_ERROR_BAD_ALLOC;
