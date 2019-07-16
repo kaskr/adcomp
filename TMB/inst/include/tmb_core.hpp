@@ -1505,6 +1505,9 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       *pf = pf -> marginal_greedy(random);
     else if (method == 1)
       *pf = pf -> marginal_sr(random);
+    else if (method == 2)
+      *pf = pf -> parallelize(2);
+    if (config.optimize.instantly) pf->glob.optimize();
   }
   TMB_CATCH {
     TMB_ERROR_BAD_ALLOC;
