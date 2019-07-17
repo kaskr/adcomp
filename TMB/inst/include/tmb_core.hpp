@@ -1635,8 +1635,10 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     adfun* pf;
+    TMBad::global::print_config cfg;
+    if (config.tmbad.deep_print) cfg.deep = true;
     pf = (adfun*) R_ExternalPtrAddr(f);
-    pf->glob.print();
+    pf->glob.print(cfg);
 #endif
     return R_NilValue;
   }
