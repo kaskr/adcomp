@@ -40,6 +40,9 @@ struct config_struct{
   struct {
     bool getListElement;
   } debug;
+  struct {
+    bool deep_print;
+  } tmbad;
 
   int cmd;
   SEXP envir; /* PROTECTed because function argument - see
@@ -64,6 +67,7 @@ struct config_struct{
     SET(optimize.instantly,true);
     SET(optimize.parallel,false);
     SET(tape.parallel,true);
+    SET(tmbad.deep_print,false);
   })
 #undef SET
   config_struct() CSKIP(
