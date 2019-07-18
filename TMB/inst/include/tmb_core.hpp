@@ -1334,11 +1334,11 @@ extern "C"
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL,info;
     objective_function< double > F(data,parameters,report);
-#ifdef _OPENMP
-    int n=F.count_parallel_regions(); // Evaluates user template
-#else
+// #ifdef _OPENMP
+//     int n=F.count_parallel_regions(); // Evaluates user template
+// #else
     F.count_parallel_regions(); // Evaluates user template
-#endif
+// #endif
     if(returnReport && F.reportvector.size()==0){
       /* Told to report, but no ADREPORT in template: Get out quickly */
       return R_NilValue;
@@ -1346,35 +1346,35 @@ extern "C"
     PROTECT(par=F.defaultpar());
     PROTECT(info=R_NilValue); // Important
 
-    if(_openmp && !returnReport){ // Parallel mode
-#ifdef _OPENMP
-      if(config.trace.parallel)
-	std::cout << n << " regions found.\n";
-      //start_parallel(); /* Start threads */
-      vector< adfun* > pfvec(n);
-      bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
-      for(int i=0;i<n;i++){
-	TMB_TRY {
-	  pfvec[i] = NULL;
-	  pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
-	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
-	}
-	TMB_CATCH { bad_thread_alloc = true; }
-      }
-      if(bad_thread_alloc){
-	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-	TMB_ERROR_BAD_ALLOC;
-      }
+//     if(_openmp && !returnReport){ // Parallel mode
+// #ifdef _OPENMP
+//       if(config.trace.parallel)
+// 	std::cout << n << " regions found.\n";
+//       //start_parallel(); /* Start threads */
+//       vector< adfun* > pfvec(n);
+//       bool bad_thread_alloc = false;
+// #pragma omp parallel for if (config.tape.parallel)
+//       for(int i=0;i<n;i++){
+// 	TMB_TRY {
+// 	  pfvec[i] = NULL;
+// 	  pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
+// 	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
+// 	}
+// 	TMB_CATCH { bad_thread_alloc = true; }
+//       }
+//       if(bad_thread_alloc){
+// 	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+// 	TMB_ERROR_BAD_ALLOC;
+//       }
 
-      // FIXME: NOT DONE YET
+//       // FIXME: NOT DONE YET
 
-      //parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
-      /* Convert parallel ADFun pointer to R_ExternalPtr */
-      //PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-      //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
-#endif
-    } else { // Serial mode
+//       //parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+//       /* Convert parallel ADFun pointer to R_ExternalPtr */
+//       //PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+//       //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+// #endif
+//     } else { // Serial mode
       TMB_TRY{
 	/* Actual work: tape creation */
 	pf = NULL;
@@ -1389,7 +1389,7 @@ extern "C"
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
       Rf_setAttrib(res,Rf_install("range.names"),info);
       R_RegisterCFinalizer(res,TMBAD_finalizeADFun);
-    }
+// }
 
     /* Return list of external pointer and default-parameter */
     SEXP ans;
@@ -1800,40 +1800,40 @@ extern "C"
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL;
     objective_function< double > F(data,parameters,report);
-#ifdef _OPENMP
-    int n=F.count_parallel_regions(); // Evaluates user template
-#else
+// #ifdef _OPENMP
+//     int n=F.count_parallel_regions(); // Evaluates user template
+// #else
     F.count_parallel_regions(); // Evaluates user template
-#endif
+// #endif
     PROTECT(par=F.defaultpar());
 
-    if(_openmp){ // Parallel mode
-#ifdef _OPENMP
-      if(config.trace.parallel)
-	std::cout << n << " regions found.\n";
-      start_parallel(); /* Start threads */
-      vector< adfun* > pfvec(n);
-      bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
-      for(int i=0;i<n;i++){
-	TMB_TRY {
-	  pfvec[i] = NULL;
-	  pfvec[i] = TMBAD_MakeADGradObject_(data, parameters, report, i);
-	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
-	}
-	TMB_CATCH { bad_thread_alloc = true; }
-      }
-      if(bad_thread_alloc){
-	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-	TMB_ERROR_BAD_ALLOC;
-      }
-      // FIXME: NOT DONE YET!
-      // parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
-      // /* Convert parallel ADFun pointer to R_ExternalPtr */
-      // PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-      // R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
-#endif
-    } else { // Serial mode
+//     if(_openmp){ // Parallel mode
+// #ifdef _OPENMP
+//       if(config.trace.parallel)
+// 	std::cout << n << " regions found.\n";
+//       start_parallel(); /* Start threads */
+//       vector< adfun* > pfvec(n);
+//       bool bad_thread_alloc = false;
+// #pragma omp parallel for if (config.tape.parallel)
+//       for(int i=0;i<n;i++){
+// 	TMB_TRY {
+// 	  pfvec[i] = NULL;
+// 	  pfvec[i] = TMBAD_MakeADGradObject_(data, parameters, report, i);
+// 	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
+// 	}
+// 	TMB_CATCH { bad_thread_alloc = true; }
+//       }
+//       if(bad_thread_alloc){
+// 	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+// 	TMB_ERROR_BAD_ALLOC;
+//       }
+//       // FIXME: NOT DONE YET!
+//       // parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+//       // /* Convert parallel ADFun pointer to R_ExternalPtr */
+//       // PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+//       // R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+// #endif
+//     } else { // Serial mode
       /* Actual work: tape creation */
       TMB_TRY {
         pf = NULL;
@@ -1847,7 +1847,7 @@ extern "C"
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
       R_RegisterCFinalizer(res,TMBAD_finalizeADFun);
-    }
+    // }
 
     /* Return ptrList */
     SEXP ans;
@@ -2088,45 +2088,45 @@ extern "C"
 {
 
 #ifdef TMBAD_FRAMEWORK
-#ifdef _OPENMP
-  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
-    typedef TMBad::ad_aug ad;
-    typedef TMBad::ADFun<ad> adfun;
-    typedef sphess_t<adfun> sphess;
-    if(config.trace.parallel)
-      std::cout << "Count num parallel regions\n";
-    objective_function< double > F(data,parameters,report);
-    int n=F.count_parallel_regions();
-    if(config.trace.parallel)
-      std::cout << n << " regions found.\n";
+// #ifdef _OPENMP
+//   SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+//     typedef TMBad::ad_aug ad;
+//     typedef TMBad::ADFun<ad> adfun;
+//     typedef sphess_t<adfun> sphess;
+//     if(config.trace.parallel)
+//       std::cout << "Count num parallel regions\n";
+//     objective_function< double > F(data,parameters,report);
+//     int n=F.count_parallel_regions();
+//     if(config.trace.parallel)
+//       std::cout << n << " regions found.\n";
 
-    //start_parallel(); /* Start threads */
+//     //start_parallel(); /* Start threads */
 
-    /* parallel test */
-    bool bad_thread_alloc = false;
-    vector<sphess*> Hvec(n);
-#pragma omp parallel for if (config.tape.parallel)
-    for (int i=0; i<n; i++) {
-      TMB_TRY {
-	Hvec[i] = NULL;
-	Hvec[i] = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, skip, i) );
-	//optimizeTape( Hvec[i]->pf );
-      }
-      TMB_CATCH { bad_thread_alloc = true; }
-    }
-    if (bad_thread_alloc) {
-      for(int i=0; i<n; i++) {
-	if (Hvec[i] != NULL) {
-	  delete Hvec[i]->pf;
-	  delete Hvec[i];
-	}
-      }
-      TMB_ERROR_BAD_ALLOC;
-    }
-    //parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
-    //return asSEXP(tmp->convert(),"parallelADFun");
-  } // MakeADHessObject2
-#else
+//     /* parallel test */
+//     bool bad_thread_alloc = false;
+//     vector<sphess*> Hvec(n);
+// #pragma omp parallel for if (config.tape.parallel)
+//     for (int i=0; i<n; i++) {
+//       TMB_TRY {
+// 	Hvec[i] = NULL;
+// 	Hvec[i] = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, skip, i) );
+// 	//optimizeTape( Hvec[i]->pf );
+//       }
+//       TMB_CATCH { bad_thread_alloc = true; }
+//     }
+//     if (bad_thread_alloc) {
+//       for(int i=0; i<n; i++) {
+// 	if (Hvec[i] != NULL) {
+// 	  delete Hvec[i]->pf;
+// 	  delete Hvec[i];
+// 	}
+//       }
+//       TMB_ERROR_BAD_ALLOC;
+//     }
+//     //parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
+//     //return asSEXP(tmp->convert(),"parallelADFun");
+//   } // MakeADHessObject2
+// #else
   SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
@@ -2145,7 +2145,7 @@ extern "C"
       TMB_ERROR_BAD_ALLOC;
     }
   } // MakeADHessObject2
-#endif
+// #endif
 #endif
 
 #ifdef CPPAD_FRAMEWORK
