@@ -1006,11 +1006,14 @@ openmp <- function(n=NULL){
 ##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
 ##' @param libinit Turn on preprocessor flag to register native routines?
 ##' @param tracesweep Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})
+##' @param framework Which AD framework to use
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file[1]),libtmb=TRUE,
-                    libinit=TRUE,tracesweep=FALSE,...){
+                    libinit=TRUE,tracesweep=FALSE,framework=c("TMBad", "CppAD"),
+                    ...){
+  framework <- match.arg(framework)
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
@@ -1090,7 +1093,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb],
                    paste0("-DTMB_LIB_INIT=R_init_",libname)[libinit],
-                   "-DCPPAD_FORWARD0SWEEP_TRACE"[tracesweep]
+                   "-DCPPAD_FORWARD0SWEEP_TRACE"[tracesweep],
+                   paste0("-D",toupper(framework),"_FRAMEWORK")
                    )
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
