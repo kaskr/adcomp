@@ -954,6 +954,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   useTMBad <- (framework == "TMBad")
   incTMBad <- system.file("include", package="TMBad")
   libTMBad <- system.file(dynlib("libs/TMBad"), package="TMBad")
+  incRcpp <- system.file("include", package="Rcpp")
+  useRcpp <- useTMBad
   ## libtmb existence
   debug <-
       length(grep("-O0", flags)) &&
@@ -1017,7 +1019,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
                    paste0("-I",system.file("include",package="RcppEigen"))[useRcppEigen],
                    paste0("-I",system.file("include/contrib",package="TMB"))[useContrib],
-                   incTMBad[useTMBad],
+                   paste0("-I",incTMBad)[useTMBad],
+                   paste0("-I",incRcpp)[useRcpp],
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb],
