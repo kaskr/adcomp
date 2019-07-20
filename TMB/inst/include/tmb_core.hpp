@@ -1531,7 +1531,29 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
 
 #ifdef TMBAD_FRAMEWORK
   SEXP InfoADFunObject(SEXP f) {
-    return R_NilValue;
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    if (Rf_isNull(f)) Rf_error("Expected external pointer - got NULL");
+    SEXP tag = R_ExternalPtrTag(f);
+    if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
+    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+    SEXP ans, names;
+    PROTECT(ans = Rf_allocVector(VECSXP, 1));
+    PROTECT(names = Rf_allocVector(STRSXP, 1));
+    int i = 0;
+#define GET_INFO(EXPR)                          \
+    SET_VECTOR_ELT(ans, i, asSEXP(EXPR));       \
+    SET_STRING_ELT(names, i, Rf_mkChar(#EXPR)); \
+    i++;
+    // begin
+    int accumulation_tree_size =
+      TMBad::get_accumulation_tree(pf->glob).size();
+    GET_INFO(accumulation_tree_size);
+    // end
+#undef GET_INFO
+    Rf_setAttrib(ans,R_NamesSymbol,names);
+    UNPROTECT(2);
+    return ans;
   }
 #endif
 
