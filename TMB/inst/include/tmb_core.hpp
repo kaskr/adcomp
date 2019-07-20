@@ -1538,17 +1538,23 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
     adfun* pf = (adfun*) R_ExternalPtrAddr(f);
     SEXP ans, names;
-    PROTECT(ans = Rf_allocVector(VECSXP, 1));
-    PROTECT(names = Rf_allocVector(STRSXP, 1));
+    PROTECT(ans = Rf_allocVector(VECSXP, 4));
+    PROTECT(names = Rf_allocVector(STRSXP, 4));
     int i = 0;
 #define GET_INFO(EXPR)                          \
     SET_VECTOR_ELT(ans, i, asSEXP(EXPR));       \
     SET_STRING_ELT(names, i, Rf_mkChar(#EXPR)); \
     i++;
     // begin
-    int accumulation_tree_size =
+    int opstack_accumulation_tree_size =
       TMBad::get_accumulation_tree(pf->glob).size();
-    GET_INFO(accumulation_tree_size);
+    GET_INFO(opstack_accumulation_tree_size);
+    int opstack_size = pf->glob.opstack.size();
+    GET_INFO(opstack_size);
+    int values_size = pf->glob.values.size();
+    GET_INFO(values_size);
+    int inputs_size = pf->glob.inputs.size();
+    GET_INFO(inputs_size);
     // end
 #undef GET_INFO
     Rf_setAttrib(ans,R_NamesSymbol,names);
