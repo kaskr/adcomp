@@ -1671,7 +1671,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     typedef TMBad::ADFun<ad> adfun;
     adfun* pf;
     int depth = getListInteger(control, "depth", 1);
-    int dot   = getListInteger(control, "dot", 0);
+    // int dot   = getListInteger(control, "dot", 0);
     TMBad::global::print_config cfg;
     cfg.depth = depth;
     pf = (adfun*) R_ExternalPtrAddr(f);
