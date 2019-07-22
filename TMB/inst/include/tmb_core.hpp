@@ -1658,13 +1658,15 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
 #endif
 
 
-  SEXP tmbad_print(SEXP f) {
+  SEXP tmbad_print(SEXP f, SEXP control) {
 #ifdef TMBAD_FRAMEWORK
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     adfun* pf;
+    int depth = getListInteger(control, "depth", 1);
+    int dot   = getListInteger(control, "dot", 0);
     TMBad::global::print_config cfg;
-    if (config.tmbad.deep_print) cfg.deep = true;
+    cfg.depth = depth;
     pf = (adfun*) R_ExternalPtrAddr(f);
     pf->glob.print(cfg);
 #endif
@@ -2361,7 +2363,7 @@ extern "C"{
 #define TMB_CALLDEFS                                            \
   {"MakeADFunObject",     (DL_FUNC) &MakeADFunObject,     4},   \
   {"InfoADFunObject",     (DL_FUNC) &InfoADFunObject,     1},   \
-  {"tmbad_print",         (DL_FUNC) &tmbad_print,         1},   \
+  {"tmbad_print",         (DL_FUNC) &tmbad_print,         2},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
   {"TransformADFunObject",(DL_FUNC) &TransformADFunObject,2},   \
   {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \
