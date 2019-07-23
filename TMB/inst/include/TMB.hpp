@@ -68,6 +68,10 @@ void eigen_REprintf(const char* x);
 #include "TMBad/TMBad.hpp"
 #include "TMBad/tmbad_allow_comparison.hpp"
 #include "TMBad/eigen_numtraits.hpp"
+#undef error
+#include "TMBad/compile.hpp"
+#include "TMBad/graph2dot.hpp"
+#define error Rf_error
 
 // Workaround to make CppAD::Integer working with TMBad
 namespace CppAD {
