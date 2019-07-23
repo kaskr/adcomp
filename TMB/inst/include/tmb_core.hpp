@@ -1507,7 +1507,16 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       *pf = pf -> marginal_sr(random);
     else if (method == 2)
       *pf = pf -> parallelize(2);
-    if (config.optimize.instantly) pf->glob.optimize();
+    else if (method == 10)
+      TMBad::compile(pf->glob);
+    else if (method == 11)
+      pf->glob = accumulation_tree_split(pf->glob, true);
+    else if (method == 12) {
+      pf->glob.set_fuse(true);
+      pf->replay();
+      pf->glob.set_fuse(false);
+    }
+    if (config.optimize.instantly && method < 10) pf->glob.optimize();
   }
   TMB_CATCH {
     TMB_ERROR_BAD_ALLOC;
