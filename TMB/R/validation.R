@@ -199,6 +199,8 @@ oneStepPredict <- function(obj,
     names.all <- names(args$parameters)
     fix <- setdiff(names.all, names.random)
     map <- lapply(args$parameters[fix], function(x)factor(x*NA))
+    ran.in.map <- names.random[names.random %in% names(args$map)]
+    if(length(ran.in.map)) map <- c(map, args$map[ran.in.map]) # don't overwrite random effects mapping
     args$map <- map ## Overwrite map
     ## Find randomeffects character
     args$random <- names.random
