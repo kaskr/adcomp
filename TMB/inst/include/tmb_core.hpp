@@ -1515,8 +1515,14 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       *pf = pf -> marginal_sr(random);
     else if (method == 2)
       *pf = pf -> parallelize(2);
-    else if (method == 10)
+    else if (method == 9) {
+      TMBad::compress(pf->glob);
+    }
+    else if (method == 10) {
+      TMBad::compress(pf->glob);
+      pf->glob.optimize();
       TMBad::compile(pf->glob);
+    }
     else if (method == 11)
       pf->glob = accumulation_tree_split(pf->glob, true);
     else if (method == 12) {
@@ -1555,8 +1561,8 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
     adfun* pf = (adfun*) R_ExternalPtrAddr(f);
     SEXP ans, names;
-    PROTECT(ans = Rf_allocVector(VECSXP, 4));
-    PROTECT(names = Rf_allocVector(STRSXP, 4));
+    PROTECT(ans = Rf_allocVector(VECSXP, 6));
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
     int i = 0;
 #define GET_INFO(EXPR)                          \
     SET_VECTOR_ELT(ans, i, asSEXP(EXPR));       \
@@ -1572,6 +1578,10 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     GET_INFO(values_size);
     int inputs_size = pf->glob.inputs.size();
     GET_INFO(inputs_size);
+    int Domain = pf->Domain();
+    GET_INFO(Domain);
+    int Range = pf->Range();
+    GET_INFO(Range);
     // end
 #undef GET_INFO
     Rf_setAttrib(ans,R_NamesSymbol,names);
