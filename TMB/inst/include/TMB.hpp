@@ -71,6 +71,7 @@ void eigen_REprintf(const char* x);
 #undef error
 #include "TMBad/compile.hpp"
 #include "TMBad/graph2dot.hpp"
+#include "TMBad/periodic.hpp"
 #define error Rf_error
 
 // Workaround to make CppAD::Integer working with TMBad
