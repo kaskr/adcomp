@@ -2305,7 +2305,7 @@ extern "C"
 #endif
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
-#if TMB_AD_FRAMEWORK == CPPAD
+#if CPPAD_FRAMEWORK
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
