@@ -2303,9 +2303,16 @@ extern "C"
       } else
         Rf_error("Unknown function pointer");
 #endif
+#ifdef TMBAD_FRAMEWORK
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    //SEXP tag=R_ExternalPtrTag(f);
+    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+    y = pf->forward(x);
+#endif
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
-#if CPPAD_FRAMEWORK
+#ifdef CPPAD_FRAMEWORK
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
@@ -2318,8 +2325,15 @@ extern "C"
         y = pf->Reverse(1, v);
       } else
         Rf_error("Unknown function pointer");
-  }
 #endif
+#ifdef TMBAD_FRAMEWORK
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    //SEXP tag=R_ExternalPtrTag(f);
+    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+    y = pf->reverse(v);
+#endif
+  }
 }
 
 extern "C"
