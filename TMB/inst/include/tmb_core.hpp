@@ -1520,7 +1520,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     }
     else if (method == 10) {
       TMBad::compress(pf->glob);
-      pf->glob.optimize();
+      if (config.optimize.instantly) pf->glob.optimize();
       TMBad::compile(pf->glob);
     }
     else if (method == 11)
