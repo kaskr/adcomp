@@ -1379,7 +1379,7 @@ extern "C"
 	/* Actual work: tape creation */
 	pf = NULL;
 	pf = TMBAD_MakeADFunObject_(data, parameters, report, control, -1, info);
-	if (config.optimize.instantly) pf->glob.optimize();
+	if (config.optimize.instantly) pf->optimize();
       }
       TMB_CATCH {
 	if (pf != NULL) delete pf;
@@ -1512,7 +1512,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     }
     else if (method == 10) {
       TMBad::compress(pf->glob);
-      if (config.optimize.instantly) pf->glob.optimize();
+      if (config.optimize.instantly) pf->glob.eliminate();
       TMBad::compile(pf->glob);
     }
     else if (method == 11)
@@ -1522,7 +1522,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       pf->replay();
       pf->glob.set_fuse(false);
     }
-    if (config.optimize.instantly && method < 10) pf->glob.optimize();
+    if (config.optimize.instantly && method < 10) pf->optimize();
   }
   TMB_CATCH {
     TMB_ERROR_BAD_ALLOC;
@@ -1868,7 +1868,7 @@ extern "C"
 // 	TMB_TRY {
 // 	  pfvec[i] = NULL;
 // 	  pfvec[i] = TMBAD_MakeADGradObject_(data, parameters, report, i);
-// 	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
+// 	  if (config.optimize.instantly) pfvec[i]->optimize();
 // 	}
 // 	TMB_CATCH { bad_thread_alloc = true; }
 //       }
@@ -1887,7 +1887,7 @@ extern "C"
       TMB_TRY {
         pf = NULL;
         pf = TMBAD_MakeADGradObject_(data, parameters, report, -1);
-        if(config.optimize.instantly)pf->glob.optimize();
+        if(config.optimize.instantly)pf->optimize();
       }
       TMB_CATCH {
 	if (pf != NULL) delete pf;
@@ -1992,7 +1992,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   typedef TMBad::ADFun<ad> adfun;
   typedef sphess_t<adfun> sphess;
   adfun* pgf = TMBAD_MakeADGradObject_(data, parameters, report, parallel_region);
-  if (config.optimize.instantly) pgf->glob.optimize();
+  if (config.optimize.instantly) pgf->optimize();
   int n = pgf->Domain();
   std::vector<bool> keepcol(n, true);
   for(int i=0; i<LENGTH(skip); i++) {
@@ -2003,7 +2003,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   // NB: Lower triangle, column major =
   //     Transpose of upper triangle, row major
   h.subset_inplace( h.row() <= h.col() ); // Upper triangle, row major
-  if (config.optimize.instantly) h.glob.optimize(); // Optimize later ?
+  if (config.optimize.instantly) h.optimize(); // Optimize later ?
   adfun* phf = new adfun( h );
   vector<int> rowindex(h.i.size());
   vector<int> colindex(h.j.size());
