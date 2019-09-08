@@ -65,6 +65,7 @@ void eigen_REprintf(const char* x);
 #undef NDEBUG
 #define NDEBUG 1
 #include "cppad/cppad.hpp"
+#ifdef TMBAD_FRAMEWORK
 #include "TMBad/TMBad.hpp"
 #include "TMBad/tmbad_allow_comparison.hpp"
 #include "TMBad/eigen_numtraits.hpp"
@@ -73,11 +74,11 @@ void eigen_REprintf(const char* x);
 #include "TMBad/graph2dot.hpp"
 #include "TMBad/compression.hpp"
 #define error Rf_error
-
 // Workaround to make CppAD::Integer working with TMBad
 namespace CppAD {
 int Integer(const TMBad::ad_aug &x) CSKIP ({ return (int) x.Value(); })
 }
+#endif
 
 /* Include the R library _after_ Eigen and CppAD. Otherwise, the R
    macros can cause conflicts (as they do not respect the Eigen and
