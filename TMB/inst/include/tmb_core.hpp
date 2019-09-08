@@ -2336,9 +2336,10 @@ extern "C"
   }
 }
 
-extern "C"
-{
-  // Select AD framework
+#endif /* #ifndef WITH_LIBTMB */
+
+
+// Select AD framework
 #ifdef TMBAD_FRAMEWORK
 #define MakeADFunObject      TMBAD_MakeADFunObject
 #define EvalADFunObject      TMBAD_EvalADFunObject
@@ -2356,8 +2357,6 @@ extern "C"
 #define TransformADFunObject CPPAD_TransformADFunObject
 #endif
 }
-
-#endif /* #ifndef WITH_LIBTMB */
 
 
 #ifdef WITH_LIBTMB
