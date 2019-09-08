@@ -11,14 +11,18 @@ double asDouble(double x);
 double asDouble(AD<double> x);
 double asDouble(AD<AD<double> > x);
 double asDouble(AD<AD<AD<double> > > x);
+#ifdef TMBAD_FRAMEWORK
 double asDouble(TMBad::ad_aug x);
+#endif
 #else
 double asDouble(int x){return double(x);}
 double asDouble(double x){return x;}
 double asDouble(AD<double> x){return CppAD::Value(x);}
 double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
 double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+#ifdef TMBAD_FRAMEWORK
 double asDouble(TMBad::ad_aug x){return x.Value();}
+#endif
 #endif
 
 /** \brief Convert TMB matrix, vector, scalar or int to R style */
@@ -53,7 +57,9 @@ SEXP asSEXP(const ns::vector<Type> &a) CSKIP(   \
 asSEXP_VECTOR_OF_NUMERIC(int, tmbutils)
 asSEXP_VECTOR_OF_NUMERIC(double, tmbutils)
 asSEXP_VECTOR_OF_NUMERIC(double, std)
+#ifdef TMBAD_FRAMEWORK
 asSEXP_VECTOR_OF_NUMERIC(TMBad::ad_aug, tmbutils)
+#endif
 template<class Type>
 asSEXP_VECTOR_OF_NUMERIC(AD<Type>, tmbutils)
 #undef asSEXP_VECTOR_OF_NUMERIC
@@ -91,9 +97,11 @@ template<class Type>
 SEXP asSEXP(const AD<Type> &a){
   return asSEXP(CppAD::Value(a));
 }
+#ifdef TMBAD_FRAMEWORK
 SEXP asSEXP(const TMBad::ad_aug &a){
   return asSEXP(a.Value());
 }
+#endif
 
 /** \brief Construct c++-vector from SEXP object */
 template <class Type>
