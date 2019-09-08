@@ -74,9 +74,10 @@ precompSource <- function(
     classes   = "MVNORM_t",
     types     = c(
         "double ",
-        "CppAD::AD<double> ",
-        "CppAD::AD<CppAD::AD<double> > ",
-        "CppAD::AD<CppAD::AD<CppAD::AD<double> > > "),
+        ## "CppAD::AD<double> ",
+        ## "CppAD::AD<CppAD::AD<double> > ",
+        ## "CppAD::AD<CppAD::AD<CppAD::AD<double> > > ",
+        "TMBad::ad_aug"),
     macros    = TRUE,
     append    = FALSE ## Modify input file in place
     ) {
