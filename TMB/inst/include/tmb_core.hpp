@@ -2370,6 +2370,7 @@ extern "C"
 {
   SEXP MakeADFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP InfoADFunObject(SEXP f);
+  SEXP tmbad_print(SEXP f, SEXP control);
   SEXP optimizeADFunObject(SEXP f);
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control);
   SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report);
