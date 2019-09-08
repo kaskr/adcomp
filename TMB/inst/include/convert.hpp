@@ -98,9 +98,9 @@ SEXP asSEXP(const AD<Type> &a){
   return asSEXP(CppAD::Value(a));
 }
 #ifdef TMBAD_FRAMEWORK
-SEXP asSEXP(const TMBad::ad_aug &a){
+SEXP asSEXP(const TMBad::ad_aug &a) CSKIP( {
   return asSEXP(a.Value());
-}
+} )
 #endif
 
 /** \brief Construct c++-vector from SEXP object */
