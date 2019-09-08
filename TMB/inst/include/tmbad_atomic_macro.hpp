@@ -54,11 +54,20 @@ CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx
   TMBad::Index n = tx.size();                                           \
   TMBad::Index m = OUTPUT_DIM;                                          \
   typedef ATOMIC_NAME ## Op <> OP;                                      \
-  TMBad::OperatorPure* pOp = TMBad::get_glob()->getOperator<OP>(n, m);  \
-  std::vector<TMBad::ad_plain> x(&tx[0], &tx[0] + tx.size());           \
-  std::vector<TMBad::ad_plain> y = TMBad::get_glob()->add_to_stack<OP>(pOp, x); \
-  CppAD::vector<TMBad::ad_aug> ty(y.size());                            \
-  for (size_t i=0; i<y.size(); i++) ty[i] = y[i];                       \
+  bool all_constant = true;                                             \
+  for (size_t i = 0; i<tx.size(); i++) all_constant &= tx[i].constant(); \
+  CppAD::vector<TMBad::ad_aug> ty(m);                                   \
+  if (all_constant) {                                                   \
+    CppAD::vector<double> xd(tx.size());                                \
+    for (size_t i=0; i<xd.size(); i++) xd[i] = tx[i].Value();           \
+    CppAD::vector<double> yd = ATOMIC_NAME(xd);                         \
+    for (size_t i=0; i<yd.size(); i++) ty[i] = yd[i];                   \
+  } else {                                                              \
+    TMBad::OperatorPure* pOp = TMBad::get_glob()->getOperator<OP>(n, m); \
+    std::vector<TMBad::ad_plain> x(&tx[0], &tx[0] + tx.size());         \
+    std::vector<TMBad::ad_plain> y = TMBad::get_glob()->add_to_stack<OP>(pOp, x); \
+    for (size_t i=0; i<y.size(); i++) ty[i] = y[i];                     \
+  }                                                                     \
   return ty;                                                            \
 }                                                                       \
 template<class dummy=void>                                              \
