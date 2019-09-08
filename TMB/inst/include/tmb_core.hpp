@@ -815,6 +815,7 @@ public:
   double value(AD<double> x){return CppAD::Value(x);}
   double value(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
   double value(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+  double value(TMBad::ad_aug x){return x.Value();}
   /** @} */
 
   /** \brief Find the length of theta, i.e. in application obj=parameters */
@@ -2356,15 +2357,21 @@ extern "C"
 #define usingAtomics         CPPAD_usingAtomics
 #define TransformADFunObject CPPAD_TransformADFunObject
 #endif
-}
+
 
 
 #ifdef WITH_LIBTMB
 
 template class objective_function<double>;
+#ifdef CPPAD_FRAMEWORK
 template class objective_function<AD<double> >;
 template class objective_function<AD<AD<double> > >;
 template class objective_function<AD<AD<AD<double> > > >;
+#endif
+#ifdef TMBAD_FRAMEWORK
+template class objective_function<TMBad::ad_aug>;
+#endif
+
 extern "C"
 {
   SEXP MakeADFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
