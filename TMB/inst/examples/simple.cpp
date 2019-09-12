@@ -33,10 +33,13 @@ Type objective_function<Type>::operator() ()
   }
 
   // Apply delta method on sd0:
-  ADREPORT( exp(logsd0) );
+  Type sd0=exp(logsd0);	
+  ADREPORT( sd0 );
+  REPORT(sd0);
 
   // Report posterior mode and mean of sum(exp(u))
   ADREPORT( sum(exp(u)) );
+ 
 
   return ans;
 }
