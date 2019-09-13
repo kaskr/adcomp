@@ -78,9 +78,21 @@ void eigen_REprintf(const char* x);
 namespace CppAD {
 int Integer(const TMBad::ad_aug &x) CSKIP ({ return (int) x.Value(); })
 TMBad::ad_aug abs(const TMBad::ad_aug &x) CSKIP ({ return TMBad::fabs(x); })
-TMBad::ad_aug CondExpEq(const TMBad::ad_aug &lhs, const TMBad::ad_aug &rhs, TMBad::ad_aug yes, TMBad::ad_aug no) CSKIP ( {
-  if (lhs == rhs) return yes; else return no;
-} )
+#define TMBAD_CONDEXP(NAME)                             \
+TMBad::ad_aug CondExp ## NAME(                          \
+  const TMBad::ad_aug &x0,                              \
+  const TMBad::ad_aug &x1,                              \
+  const TMBad::ad_aug &x2,                              \
+  const TMBad::ad_aug &x3) CSKIP ( {                    \
+      return TMBad::CondExp ## NAME(x0, x1, x2, x3);    \
+})
+TMBAD_CONDEXP(Eq)
+TMBAD_CONDEXP(Ne)
+TMBAD_CONDEXP(Lt)
+TMBAD_CONDEXP(Gt)
+TMBAD_CONDEXP(Le)
+TMBAD_CONDEXP(Ge)
+#undef TMBAD_CONDEXP
 bool Variable(const TMBad::ad_aug &x) CSKIP ({ return !x.constant(); })
 }
 #endif
