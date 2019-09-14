@@ -815,7 +815,9 @@ public:
   double value(AD<double> x){return CppAD::Value(x);}
   double value(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
   double value(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+#ifdef TMBAD_FRAMEWORK
   double value(TMBad::ad_aug x){return x.Value();}
+#endif
   /** @} */
 
   /** \brief Find the length of theta, i.e. in application obj=parameters */
