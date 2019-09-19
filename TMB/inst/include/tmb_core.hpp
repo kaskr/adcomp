@@ -1525,6 +1525,9 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       pf->replay();
       pf->glob.set_fuse(false);
     }
+    else if (method == 13) {
+      pf->reorder(random);
+    }
     if (config.optimize.instantly && method < 10) pf->optimize();
   }
   TMB_CATCH {
