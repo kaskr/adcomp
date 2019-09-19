@@ -981,6 +981,13 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   if(!Rf_isNewList(control))Rf_error("'control' must be a list");
   ADFunType* pf;
   pf=(ADFunType*)R_ExternalPtrAddr(f);
+  int set_tail = getListInteger(control, "set_tail", 0) - 1;
+  if (set_tail == -1) {
+    pf -> unset_tail();
+  } else {
+    std::vector<TMBad::Index> r(1, set_tail);
+    pf -> set_tail(r);
+  }
   PROTECT(theta=Rf_coerceVector(theta,REALSXP));
   int n=pf->Domain();
   int m=pf->Range();
