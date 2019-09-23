@@ -238,7 +238,7 @@ MakeADFun <- function(data, parameters, map=list(),
     ## For safety, check that parameter order match the parameter order in user template.
     ## If not, permute parameter list with a warning.
     ## Order in which parameters were requested:
-    parNameOrder <- .Call("getParameterOrder",data,parameters,new.env(),PACKAGE=DLL)
+    parNameOrder <- .Call("getParameterOrder",data,parameters,new.env(),NULL,PACKAGE=DLL)
     if(!identical(names(parameters),parNameOrder)){
       if(!silent) cat("Order of parameters:\n")
       if(!silent) print(names(parameters))
@@ -350,7 +350,7 @@ MakeADFun <- function(data, parameters, map=list(),
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
-      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
       out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
                    control = list(do_simulate = as.integer(0),
@@ -418,9 +418,9 @@ MakeADFun <- function(data, parameters, map=list(),
         .Call("TransformADFunObject", ADFun$ptr, list(random_order = random, method=13L), PACKAGE=DLL)
     }
     if("Fun"%in%type)
-      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
     if("ADGrad"%in%type)
-      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
     ## Skip fixed effects from the full hessian ?
     ## * Probably more efficient - especially in terms of memory.
     ## * Only possible if a taped gradient is available - see function "ff" below.
@@ -848,7 +848,7 @@ MakeADFun <- function(data, parameters, map=list(),
            if(!atomic) return( f(x,order=2) )
            ## Otherwise, get Hessian as 1st order derivative of gradient:
            if(is.null(ADGrad))
-             ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+             ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
            f(x,type="ADGrad",order=1)
          },
          hessian=hessian, method=method,
