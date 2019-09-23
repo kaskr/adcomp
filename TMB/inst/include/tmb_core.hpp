@@ -986,6 +986,7 @@ struct parallel_accumulator{
 
 #ifndef WITH_LIBTMB
 
+#ifdef TMBAD_FRAMEWORK
 template<class ADFunType>
 SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
 {
@@ -1102,8 +1103,9 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   UNPROTECT(4);
   return res;
 } // EvalADFunObjectTemplate
+#endif
 
-
+#ifdef CPPAD_FRAMEWORK
 /** \internal \brief Evaluates an ADFun object from R
 
    Template argument can be "ADFun" or an object extending
@@ -1233,6 +1235,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   UNPROTECT(4);
   return res;
 } // EvalADFunObjectTemplate
+#endif
 
 /** \internal \brief Garbage collect an ADFun or parallelADFun object pointer */
 template <class ADFunType>
