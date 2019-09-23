@@ -1719,7 +1719,7 @@ extern "C"
     memory_manager.CallCFinalizer(x);
   }
   
-  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report)
+  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     /* Some type checking */
     if(!Rf_isNewList(data))Rf_error("'data' must be a list");
@@ -1790,7 +1790,7 @@ extern "C"
   /** \internal \brief Gets parameter order by running the user template
 
    We spend a function evaluation on getting the parameter order (!) */
-  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report)
+  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     TMB_TRY {
       /* Some type checking */
@@ -1810,7 +1810,7 @@ extern "C"
 
 
 #ifdef TMBAD_FRAMEWORK
-TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
+TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
@@ -1823,7 +1823,7 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameter
 #endif
 
 #ifdef CPPAD_FRAMEWORK
-ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
+ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   /* Create ADFun pointer */
   objective_function< AD<AD<double> > > F(data,parameters,report);
@@ -1848,7 +1848,7 @@ extern "C"
 {
 #ifdef TMBAD_FRAMEWORK
   /** \internal \brief Tape the gradient using nested AD types */
-  SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
+  SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
@@ -1922,7 +1922,7 @@ extern "C"
 
 #ifdef CPPAD_FRAMEWORK
   /** \internal \brief Tape the gradient using nested AD types */
-  SEXP CPPAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
+  SEXP CPPAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     ADFun<double>* pf = NULL;
     /* Some type checking */
@@ -2391,10 +2391,10 @@ extern "C"
   SEXP tmbad_print(SEXP f, SEXP control);
   SEXP optimizeADFunObject(SEXP f);
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control);
-  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report);
+  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control);
-  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report);
-  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
+  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report, SEXP control);
+  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP usingAtomics();
   SEXP TransformADFunObject(SEXP f, SEXP control);
@@ -2418,10 +2418,10 @@ extern "C"{
   {"tmbad_print",         (DL_FUNC) &tmbad_print,         2},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
   {"TransformADFunObject",(DL_FUNC) &TransformADFunObject,2},   \
-  {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \
+  {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 4},   \
   {"EvalDoubleFunObject", (DL_FUNC) &EvalDoubleFunObject, 3},   \
-  {"getParameterOrder",   (DL_FUNC) &getParameterOrder,   3},   \
-  {"MakeADGradObject",    (DL_FUNC) &MakeADGradObject,    3},   \
+  {"getParameterOrder",   (DL_FUNC) &getParameterOrder,   4},   \
+  {"MakeADGradObject",    (DL_FUNC) &MakeADGradObject,    4},   \
   {"MakeADHessObject2",   (DL_FUNC) &MakeADHessObject2,   4},   \
   {"usingAtomics",        (DL_FUNC) &usingAtomics,        0},   \
   {"TMBconfig",           (DL_FUNC) &TMBconfig,           2}
