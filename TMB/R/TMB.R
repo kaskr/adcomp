@@ -413,6 +413,10 @@ MakeADFun <- function(data, parameters, map=list(),
           value.best <<- Inf
       }
     }
+    if (length(random) > 0) {
+        ## Experiment !
+        .Call("TransformADFunObject", ADFun$ptr, list(random_order = random, method=13L), PACKAGE=DLL)
+    }
     if("Fun"%in%type)
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
     if("ADGrad"%in%type)
@@ -591,7 +595,7 @@ MakeADFun <- function(data, parameters, map=list(),
       par[random] <- par.random
       par[-random] <- par.fixed
       #spHess(par)[random,random,drop=FALSE]
-      spHess(par,random=TRUE)
+      spHess(par,random=TRUE,set_tail=random[1])
     }
     if(inner.method=="newton"){
       #opt <- newton(eval(random.start),fn=f0,gr=function(x)f0(x,order=1),
@@ -1459,7 +1463,9 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                   obj$env$reportenv,
                   skip, ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL)
-  ev <- function(par)
+  ## Experiment !
+  .Call("TransformADFunObject", ADHess$ptr, list(random_order = r, method=13L), PACKAGE=obj$env$DLL)
+  ev <- function(par, set_tail=0)
           .Call("EvalADFunObject", ADHess$ptr, par,
                 control = list(
                             order = as.integer(0),
@@ -1469,7 +1475,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                             rangecomponent = as.integer(1),
                             dumpstack=as.integer(0),
                             doforward=as.integer(1),
-                            set_tail = as.integer(0)
+                            set_tail = as.integer(set_tail)
                 ), PACKAGE=obj$env$DLL)
   n <- as.integer(length(obj$env$par))
   M <- new("dsTMatrix",
@@ -1480,14 +1486,14 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
   Hrandom <- Hfull[r,r,drop=FALSE]
   ## before returning the function, remove unneeded variables from the environment:
   rm(skip, n, M)
-  function(par = obj$env$par, random=FALSE) {
+  function(par = obj$env$par, random=FALSE, set_tail=0) {
     if(!random) {
       Hfull@x[] <- ev(par)
       Hfull
     } else if(skipFixedEffects) {
         .Call("setxslot", Hrandom, ev(par), PACKAGE="TMB")
     } else {
-        Hfull@x[] <- ev(par)
+        Hfull@x[] <- ev(par, set_tail=set_tail)
         Hfull[r,r]
     }
   }
