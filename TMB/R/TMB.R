@@ -1461,7 +1461,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
   ## ptr.list
   ADHess <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters,
                   obj$env$reportenv,
-                  skip, ## <-- Skip this index vector of parameters
+                  list(skip=skip), ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL)
   ## Experiment !
   .Call("TransformADFunObject", ADHess$ptr, list(random_order = r, method=13L), PACKAGE=obj$env$DLL)
