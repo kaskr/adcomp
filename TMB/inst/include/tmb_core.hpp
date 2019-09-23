@@ -2022,7 +2022,15 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
   typedef sphess_t<adfun> sphess;
-  adfun* pgf = TMBAD_MakeADGradObject_(data, parameters, report, control, parallel_region);
+  SEXP gf = getListElement(control, "gf");
+  adfun* pgf;
+  bool allocate_new_pgf = ( gf == R_NilValue );
+  if ( ! allocate_new_pgf ) {
+    pgf = (adfun*) R_ExternalPtrAddr(gf);
+  } else {
+    SEXP control_adgrad = R_NilValue;
+    pgf = TMBAD_MakeADGradObject_(data, parameters, report, control_adgrad, parallel_region);
+  }
   if (config.optimize.instantly) pgf->optimize();
   int n = pgf->Domain();
   std::vector<bool> keepcol(n, true);
@@ -2031,7 +2039,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
     keepcol[ INTEGER(skip)[i] - 1 ] = false; // skip is R-index !
   }
   TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol);
-  delete pgf;
+  if (allocate_new_pgf) delete pgf;
   // NB: Lower triangle, column major =
   //     Transpose of upper triangle, row major
   h.subset_inplace( h.row() <= h.col() ); // Upper triangle, row major
