@@ -1999,7 +1999,7 @@ extern "C"
           zero). Negative subscripts are not allowed.
 */
 #ifdef TMBAD_FRAMEWORK
-sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
+sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
@@ -2036,7 +2036,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
           zero). Negative subscripts are not allowed.
 */
 #ifdef CPPAD_FRAMEWORK
-sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
+sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   /* Some type checking */
   if(!Rf_isNewList(data))Rf_error("'data' must be a list");
@@ -2151,7 +2151,7 @@ extern "C"
 
 #ifdef TMBAD_FRAMEWORK
 // #ifdef _OPENMP
-//   SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+//   SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
 //     typedef TMBad::ad_aug ad;
 //     typedef TMBad::ADFun<ad> adfun;
 //     typedef sphess_t<adfun> sphess;
@@ -2189,7 +2189,7 @@ extern "C"
 //     //return asSEXP(tmp->convert(),"parallelADFun");
 //   } // MakeADHessObject2
 // #else
-  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     typedef sphess_t<adfun> sphess;
@@ -2212,7 +2212,7 @@ extern "C"
 
 #ifdef CPPAD_FRAMEWORK
 #ifdef _OPENMP
-  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     if(config.trace.parallel)
       std::cout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
@@ -2252,7 +2252,7 @@ extern "C"
     return ans;
   } // MakeADHessObject2
 #else
-  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     sphess* pH = NULL;
     SEXP ans;
     TMB_TRY {
@@ -2395,7 +2395,7 @@ extern "C"
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control);
   SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report);
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip);
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP usingAtomics();
   SEXP TransformADFunObject(SEXP f, SEXP control);
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y);
