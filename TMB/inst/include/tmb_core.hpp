@@ -1814,7 +1814,6 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameter
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
-  SEXP control = R_NilValue;
   adfun* pf = TMBAD_MakeADFunObject_(data, parameters, report, control, parallel_region);
   adfun* pgf = new adfun (pf->JacFun());
   delete pf;
@@ -1899,7 +1898,7 @@ extern "C"
       /* Actual work: tape creation */
       TMB_TRY {
         pf = NULL;
-        pf = TMBAD_MakeADGradObject_(data, parameters, report, -1);
+        pf = TMBAD_MakeADGradObject_(data, parameters, report, control, -1);
         if(config.optimize.instantly)pf->optimize();
       }
       TMB_CATCH {
@@ -1951,7 +1950,7 @@ extern "C"
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
-	  pfvec[i] = MakeADGradObject_(data, parameters, report, i);
+	  pfvec[i] = MakeADGradObject_(data, parameters, report, control, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
@@ -1969,7 +1968,7 @@ extern "C"
       /* Actual work: tape creation */
       TMB_TRY {
         pf = NULL;
-        pf = MakeADGradObject_(data, parameters, report, -1);
+        pf = MakeADGradObject_(data, parameters, report, control, -1);
         if(config.optimize.instantly)pf->optimize();
       }
       TMB_CATCH {
@@ -2004,7 +2003,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
   typedef sphess_t<adfun> sphess;
-  adfun* pgf = TMBAD_MakeADGradObject_(data, parameters, report, parallel_region);
+  adfun* pgf = TMBAD_MakeADGradObject_(data, parameters, report, control, parallel_region);
   if (config.optimize.instantly) pgf->optimize();
   int n = pgf->Domain();
   std::vector<bool> keepcol(n, true);
