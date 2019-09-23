@@ -1817,10 +1817,25 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameter
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
-  SEXP control_adfun = R_NilValue;
-  adfun* pf = TMBAD_MakeADFunObject_(data, parameters, report, control_adfun, parallel_region);
+  SEXP f = getListElement(control, "f");
+  adfun* pf;
+  bool allocate_new_pf = ( f == R_NilValue );
+  if ( ! allocate_new_pf ) {
+    pf = (adfun*) R_ExternalPtrAddr(f);
+  } else {
+    SEXP control_adfun = R_NilValue;
+    pf = TMBAD_MakeADFunObject_(data, parameters, report, control_adfun, parallel_region);
+  }
+  // Optionally skip gradient components (only need 'random' part of gradient)
+  SEXP random = getListElement(control, "random");
+  if (random != R_NilValue) {
+    int set_tail = INTEGER(random)[0] - 1;
+    std::vector<TMBad::Index> r(1, set_tail);
+    pf -> set_tail(r);
+  }
   adfun* pgf = new adfun (pf->JacFun());
-  delete pf;
+  pf -> unset_tail(); // Not really needed
+  if (allocate_new_pf) delete pf;
   return pgf;
 }
 #endif

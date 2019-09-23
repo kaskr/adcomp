@@ -419,8 +419,14 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     if("Fun"%in%type)
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-    if("ADGrad"%in%type)
-      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
+    if("ADGrad"%in%type) {
+        ## Use already taped function value
+        control <- list( f = ADFun$ptr )
+        ## In random effects case we only need the 'random' part of the gradient
+        if (!is.null(random))
+            control$random <- as.integer(random)
+        ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,control,PACKAGE=DLL)
+    }
     ## Skip fixed effects from the full hessian ?
     ## * Probably more efficient - especially in terms of memory.
     ## * Only possible if a taped gradient is available - see function "ff" below.
