@@ -1814,7 +1814,8 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameter
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
-  adfun* pf = TMBAD_MakeADFunObject_(data, parameters, report, control, parallel_region);
+  SEXP control_adfun = R_NilValue;
+  adfun* pf = TMBAD_MakeADFunObject_(data, parameters, report, control_adfun, parallel_region);
   adfun* pgf = new adfun (pf->JacFun());
   delete pf;
   return pgf;
