@@ -2008,6 +2008,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   if (config.optimize.instantly) pgf->optimize();
   int n = pgf->Domain();
   std::vector<bool> keepcol(n, true);
+  SEXP skip = getListElement(control, "skip");
   for(int i=0; i<LENGTH(skip); i++) {
     keepcol[ INTEGER(skip)[i] - 1 ] = false; // skip is R-index !
   }
@@ -2047,6 +2048,7 @@ sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP co
   objective_function< AD<AD<AD<double> > > > F(data,parameters,report);
   F.set_parallel_region(parallel_region);
   int n = F.theta.size();
+  SEXP skip = getListElement(control, "skip");
   vector<bool> keepcol(n); // Scatter for fast lookup 
   for(int i=0; i<n; i++){
     keepcol[i]=true;
@@ -2195,7 +2197,7 @@ extern "C"
     typedef sphess_t<adfun> sphess;
     sphess* pH = NULL;
     TMB_TRY {
-      pH = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, skip, -1) );
+      pH = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, control, -1) );
       //optimizeTape( pH->pf );
       return asSEXP(*pH, "ADFun");
     }
@@ -2229,7 +2231,7 @@ extern "C"
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
-	Hvec[i] = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, skip, i) );
+	Hvec[i] = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, control, i) );
 	optimizeTape( Hvec[i]->pf );
       }
       TMB_CATCH { bad_thread_alloc = true; }
@@ -2256,7 +2258,7 @@ extern "C"
     sphess* pH = NULL;
     SEXP ans;
     TMB_TRY {
-      pH = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, skip, -1) );
+      pH = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, control, -1) );
       optimizeTape( pH->pf );
       ans = asSEXP(*pH, "ADFun");
     }
