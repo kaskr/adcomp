@@ -420,12 +420,7 @@ MakeADFun <- function(data, parameters, map=list(),
     if("Fun"%in%type)
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
     if("ADGrad"%in%type) {
-        ## Use already taped function value
-        control <- list( f = ADFun$ptr )
-        ## In random effects case we only need the 'random' part of the gradient
-        if (!is.null(random))
-            control$random <- as.integer(random)
-        ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,control,PACKAGE=DLL)
+        retape_adgrad(lazy = TRUE)
     }
     ## Skip fixed effects from the full hessian ?
     ## * Probably more efficient - especially in terms of memory.
@@ -434,9 +429,16 @@ MakeADFun <- function(data, parameters, map=list(),
     delayedAssign("spHess", sparseHessianFun(env, skipFixedEffects=skipFixedEffects ),
                   assign.env = env)
   }## end{retape}
-
+  ## Lazy / Full adgrad ?
+  retape_adgrad <- function(lazy = TRUE) {
+      ## Use already taped function value
+      control <- list( f = ADFun$ptr )
+      ## In random effects case we only need the 'random' part of the gradient
+      if (lazy && !is.null(random))
+          control$random <- as.integer(random)
+      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,control,PACKAGE=DLL)
+  }
   retape(set.defaults = TRUE)
-
   ## Has atomic functions been generated for the tapes ?
   usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
 
