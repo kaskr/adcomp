@@ -176,6 +176,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   }
   ADGradForward0Initialized <- FALSE
   ADGradForward0Initialize <- function() { ## NOTE_2: ADGrad forward sweep now initialized !
+      obj$env$retape_adgrad(lazy = FALSE) ## FIXME: Memory spike (?) + TMBad only
       obj$env$f(par, order = 0, type = "ADGrad")
       ADGradForward0Initialized <<- TRUE
   }
