@@ -176,7 +176,6 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   }
   ADGradForward0Initialized <- FALSE
   ADGradForward0Initialize <- function() { ## NOTE_2: ADGrad forward sweep now initialized !
-      obj$env$retape_adgrad(lazy = FALSE) ## FIXME: Memory spike (?) + TMBad only
       obj$env$f(par, order = 0, type = "ADGrad")
       ADGradForward0Initialized <<- TRUE
   }
@@ -346,7 +345,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               f(par, order = 1, type = "ADGrad", rangeweight = w, doforward=0)[r]
           }
           nonr <- setdiff(seq_along(par), r)
-          tmp <- sapply(nonr,reverse.sweep)
+          ## tmp <- sapply(nonr,reverse.sweep)
+          tmp <- f(par, order = 1, type = "ADGrad", keepx=nonr, keepy=r) ## FIXME: TMBad only !!!
           if(!is.matrix(tmp)) ## Happens if length(r)==1
               tmp <- matrix(tmp, ncol=length(nonr) )
           A <- solve(hessian.random, tmp)
