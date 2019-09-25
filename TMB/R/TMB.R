@@ -445,7 +445,8 @@ MakeADFun <- function(data, parameters, map=list(),
   f <- function(theta=par, order=0, type="ADdouble",
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
-                dumpstack=0, doforward=1, do_simulate=0, set_tail=0) {
+                dumpstack=0, doforward=1, do_simulate=0, set_tail=0,
+                keepx=NULL, keepy=NULL) {
     if(isNullPointer(ADFun$ptr)) {
         if(silent)beSilent()
         ## Loaded or deep copied object: Only restore external
@@ -489,7 +490,9 @@ MakeADFun <- function(data, parameters, map=list(),
                                     rangeweight=rangeweight,
                                     dumpstack=as.integer(dumpstack),
                                     doforward=as.integer(doforward),
-                                    set_tail = as.integer(set_tail)),PACKAGE=DLL)
+                                    set_tail = as.integer(set_tail),
+                                    keepx=as.integer(keepx),
+                                    keepy=as.integer(keepy)),PACKAGE=DLL)
         },
         stop("invalid 'type'")) # end{ switch() }
     res

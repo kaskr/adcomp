@@ -1062,7 +1062,24 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     }
   }
   if(order==1){
-    std::vector<double> jvec = pf->Jacobian(x);
+    std::vector<double> jvec;
+    SEXP keepx = getListElement(control, "keepx");
+    if (keepx != R_NilValue && LENGTH(keepx) > 0) {
+      SEXP keepy = getListElement(control, "keepy");
+      std::vector<bool> keep_x(pf->Domain(), false);
+      std::vector<bool> keep_y(pf->Range(), false);
+      for (int i=0; i<LENGTH(keepx); i++) {
+        keep_x[INTEGER(keepx)[i] - 1] = true;
+      }
+      for (int i=0; i<LENGTH(keepy); i++) {
+        keep_y[INTEGER(keepy)[i] - 1] = true;
+      }
+      n = LENGTH(keepx);
+      m = LENGTH(keepy);
+      jvec = pf->Jacobian(x, keep_x, keep_y);
+    } else {
+      jvec = pf->Jacobian(x);
+    }
     // if(doforward)pf->Forward(0,x);
     matrix<double> jac(m, n);
     int k=0;
