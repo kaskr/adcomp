@@ -1527,6 +1527,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   adfun* pf = (adfun*) R_ExternalPtrAddr(f);
   int method = getListInteger(control, "method", 0);
   SEXP random_order = getListElement(control, "random_order");
+  int max_period_size = getListInteger(control, "max_period_size", 1024);
   int nr = LENGTH(random_order);
   std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
   for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
@@ -1538,10 +1539,10 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     else if (method == 2)
       *pf = pf -> parallelize(2);
     else if (method == 9) {
-      TMBad::compress(pf->glob);
+      TMBad::compress(pf->glob, max_period_size);
     }
     else if (method == 10) {
-      TMBad::compress(pf->glob);
+      TMBad::compress(pf->glob, max_period_size);
       if (config.optimize.instantly) pf->glob.eliminate();
       TMBad::compile(pf->glob);
     }
