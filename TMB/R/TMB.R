@@ -876,10 +876,8 @@ MakeADFun <- function(data, parameters, map=list(),
            ## If no atomics on tape we have all orders implemented:
            if(!atomic) return( f(x,order=2) )
            ## Otherwise, get Hessian as 1st order derivative of gradient:
-           if(is.null(ADGrad)) {
-             ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-             registerFinalizer(ADGrad, DLL)
-           }
+           if(is.null(ADGrad))
+             retape_adgrad()
            f(x,type="ADGrad",order=1)
          },
          hessian=hessian, method=method,
