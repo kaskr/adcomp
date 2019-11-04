@@ -2497,6 +2497,9 @@ void TMB_LIB_INIT(DllInfo *dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, (Rboolean)FALSE);
   // Example: TMB_LIB_INIT = R_init_mypkg
+  //                                ^
+  //                                +-------+
+  //                                        ^
   TMB_CCALLABLES(&(xstringify(TMB_LIB_INIT)[7]));
 }
 #endif /* #ifdef TMB_LIB_INIT */
