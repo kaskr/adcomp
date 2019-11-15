@@ -1526,6 +1526,20 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
   adfun* pf = (adfun*) R_ExternalPtrAddr(f);
   int method = getListInteger(control, "method", 0);
+  // Test adfun copy
+  if (method == -1) {
+    adfun* pf_new = new adfun(*pf);
+    /* Convert ADFun pointer to R_ExternalPtr */
+    SEXP res;
+    PROTECT(res = R_MakeExternalPtr((void*) pf_new,
+                                    Rf_install("ADFun"),R_NilValue));
+    R_RegisterCFinalizer(res, TMBAD_finalizeADFun);
+    /* Return list of external pointer and default-parameter */
+    SEXP ans;
+    PROTECT(ans=ptrList(res));
+    UNPROTECT(2);
+    return ans;
+  }
   SEXP random_order = getListElement(control, "random_order");
   int max_period_size = getListInteger(control, "max_period_size", 1024);
   int nr = LENGTH(random_order);
