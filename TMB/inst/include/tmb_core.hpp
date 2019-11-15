@@ -1543,7 +1543,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     }
     else if (method == 10) {
       TMBad::compress(pf->glob, max_period_size);
-      if (config.optimize.instantly) pf->glob.eliminate();
+      // if (config.optimize.instantly) pf->glob.eliminate();
       TMBad::compile(pf->glob);
     }
     else if (method == 11)
