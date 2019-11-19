@@ -75,6 +75,19 @@ struct vector : Array<Type,Dynamic,1>
     for(int i=0; i<n; i++) this->operator[](i) = Type(x[i]);
   }
 
+  // std::vector
+  operator std::vector<Type>(){
+    int n = this->size();
+    std::vector<Type> x(n);
+    for(int i=0; i<n; i++) x[i] = (*this)(i);
+    return x;
+  }
+  vector(const std::vector<Type> &x) : Base(){
+    int n = x.size();
+    this->resize(n);
+    for(int i=0; i<n; i++) (*this)[i] = x[i];
+  }
+
   vector<Type> vec() { return *this; }
 };
 
