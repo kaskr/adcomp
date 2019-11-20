@@ -61,8 +61,15 @@ namespace autodiff {
   */
   template<class Functor, class Type>
   vector<Type> gradient(Functor F, vector<Type> x){
+#ifdef CPPAD_FRAMEWORK
     gradient_t<Functor, Type> f(F);
     return f(x);
+#endif
+#ifdef TMBAD_FRAMEWORK
+    TMBad::ADFun<> G(TMBad::StdWrap<Functor,vector<TMBad::ad_aug> >(F), x);
+    G = G.JacFun();
+    return G(x);
+#endif
   }
 
   /* Hessian */
@@ -121,8 +128,16 @@ namespace autodiff {
   */
   template<class Functor, class Type>
   matrix<Type> hessian(Functor f, vector<Type> x){
+#ifdef CPPAD_FRAMEWORK
     hessian_t<Functor, Type> H(f);
     return H(x);
+#endif
+#ifdef TMBAD_FRAMEWORK
+    TMBad::ADFun<> F(TMBad::StdWrap<Functor,vector<TMBad::ad_aug> >(f), x);
+    F = F.JacFun().JacFun();
+    vector<Type> Fx = F(x);
+    return asMatrix(Fx, x.size(), x.size());
+#endif
   }
 
   /* Jacobian */
@@ -182,7 +197,16 @@ namespace autodiff {
   */
   template<class Functor, class Type>
   matrix<Type> jacobian(Functor f, vector<Type> x){
+#ifdef CPPAD_FRAMEWORK
     jacobian_t<Functor, Type> J(f);
     return J(x);
+#endif
+#ifdef TMBAD_FRAMEWORK
+    TMBad::ADFun<> J(TMBad::StdWrap<Functor,vector<TMBad::ad_aug> >(f), x);
+    int m = J.Range();
+    J = J.JacFun();
+    vector<Type> Jx = J(x);
+    return asMatrix(Jx, x.size(), m).transpose();
+#endif
   }
 }
