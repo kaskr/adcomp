@@ -21,6 +21,20 @@ struct func3 {
   }
 };
 
+// Function with local variables
+// grad_x(func2) = [ exp(a), exp(b) ]
+// jac_ab = diag( [ exp(a), exp(b) ] )
+template<class Type>
+struct func2 {
+  Type a;
+  Type b;
+  template <class T>
+  T operator()(vector<T> x) {  // Evaluate function
+    T c = exp(a) * x[0] + exp(b) * x[1];
+    return c;
+  }
+};
+
 template<class Type>
 Type objective_function<Type>::operator() () {
   PARAMETER_VECTOR(theta);
@@ -34,6 +48,13 @@ Type objective_function<Type>::operator() () {
     REPORT(g);
     REPORT(h);
     ADREPORT(f(theta));
+  }
+
+  if (select == 2) {
+    func2<Type> f = { theta[0], theta[1] };
+    // Calculate gradient and hessian
+    vector<Type> g = autodiff::gradient(f, theta);
+    ADREPORT(g);
   }
 
   if (select == 3) {  
