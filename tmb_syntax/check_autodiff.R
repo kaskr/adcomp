@@ -17,6 +17,11 @@ obj <- MakeADFun(data, parameters, DLL="check_autodiff", ADreport=TRUE, silent=T
 stopifnot( all( obj$report(obj$par)$g == obj$gr(obj$par) ) )
 stopifnot( identical( obj$report(obj$par)$h, obj$he(obj$par) ) )
 
+## Make a function object
+data$select <- 2
+obj <- MakeADFun(data, parameters, DLL="check_autodiff", ADreport=TRUE, silent=TRUE)
+stopifnot( all( obj$gr(obj$par) == diag(exp(obj$par)) ) )
+
 ## Make new function object
 data$select <- 3
 obj <- MakeADFun(data, parameters, DLL="check_autodiff", ADreport=TRUE, silent=TRUE)
