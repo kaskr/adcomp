@@ -2359,6 +2359,15 @@ extern "C"
   }
 #endif
 
+  SEXP getFramework() {
+#ifdef TMBAD_FRAMEWORK
+    return mkString("TMBad");
+#endif
+#ifdef CPPAD_FRAMEWORK
+    return mkString("CppAD");
+#endif
+    return mkString("Unknown");
+  }
 }
 
 extern "C"
@@ -2459,6 +2468,7 @@ extern "C"
   SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP usingAtomics();
+  SEXP getFramework();
   SEXP TransformADFunObject(SEXP f, SEXP control);
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y);
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y);
@@ -2486,6 +2496,7 @@ extern "C"{
   {"MakeADGradObject",    (DL_FUNC) &MakeADGradObject,    4},   \
   {"MakeADHessObject2",   (DL_FUNC) &MakeADHessObject2,   4},   \
   {"usingAtomics",        (DL_FUNC) &usingAtomics,        0},   \
+  {"getFramework",        (DL_FUNC) &getFramework,        0},   \
   {"TMBconfig",           (DL_FUNC) &TMBconfig,           2}
   /* May be used as part of custom R_init function
      C-callable routines (PACKAGE is 'const char*') */
