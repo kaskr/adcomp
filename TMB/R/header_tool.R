@@ -122,24 +122,50 @@ precompSource <- function(
 }
 
 precompileSource <- function() {
+    CppAD_types <- c(
+        "double ",
+        "CppAD::AD<double> ",
+        "CppAD::AD<CppAD::AD<double> > ",
+        "CppAD::AD<CppAD::AD<CppAD::AD<double> > > ")
+    TMBad_types <- c(
+        "double ",
+        "TMBad::ad_aug "
+    )
+    ## TODO :
+    ## ==============================================
+    ## precompSource(
+    ##     filename  = "include/tmbutils/vector.hpp",
+    ##     namespace = NULL,
+    ##     classes   = c("vector", "matrix"),
+    ##     append    = TRUE )
+    ## ,
+    ## precompSource(
+    ##     filename  = "include/tmbutils/array.hpp",
+    ##     namespace = "tmbutils",
+    ##     classes   = c("array"),
+    ##     macros    = FALSE )
+    ## ,
+    ## ==============================================
     x <- c(
-        ## precompSource(
-        ##     filename  = "include/tmbutils/vector.hpp",
-        ##     namespace = NULL,
-        ##     classes   = c("vector", "matrix"),
-        ##     append    = TRUE )
-        ## ,
-        ## precompSource(
-        ##     filename  = "include/tmbutils/array.hpp",
-        ##     namespace = "tmbutils",
-        ##     classes   = c("array"),
-        ##     macros    = FALSE )
-        ## ,
+        ## Precompile using CppAD
+        "#ifdef CPPAD_FRAMEWORK",
         precompSource(
             filename  = "include/tmbutils/density.hpp",
             namespace = "density",
-            classes   = c("MVNORM_t", "GMRF_t") )
-        )
+            classes   = c("MVNORM_t", "GMRF_t"),
+            types = CppAD_types
+        ),
+        "#endif",
+        ## Precompile using TMBad
+        "#ifdef TMBAD_FRAMEWORK",
+        precompSource(
+            filename  = "include/tmbutils/density.hpp",
+            namespace = "density",
+            classes   = c("MVNORM_t", "GMRF_t"),
+            types = TMBad_types
+        ),
+        "#endif"
+    )
     outfile <-
         paste0(system.file("include", package="TMB"), "/precompile.hpp")
     writeLines(x, outfile)
