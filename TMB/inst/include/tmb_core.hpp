@@ -1585,7 +1585,9 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
 /** \internal \brief Transform an existing ADFun object */
 SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
 {
-  Rf_error("Not supported for CPPAD_FRAMEWORK");
+  int mustWork = getListInteger(control, "mustWork", 1);
+  if (mustWork)
+    Rf_error("Not supported for CPPAD_FRAMEWORK");
   return R_NilValue;
 }
 #endif
