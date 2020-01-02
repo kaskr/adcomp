@@ -345,8 +345,11 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               f(par, order = 1, type = "ADGrad", rangeweight = w, doforward=0)[r]
           }
           nonr <- setdiff(seq_along(par), r)
-          ## tmp <- sapply(nonr,reverse.sweep)
-          tmp <- f(par, order = 1, type = "ADGrad", keepx=nonr, keepy=r) ## FIXME: TMBad only !!!
+          framework <- .Call("getFramework", PACKAGE=obj$env$DLL)
+          if (framework != "TMBad")
+              tmp <- sapply(nonr,reverse.sweep)
+          else
+              tmp <- f(par, order = 1, type = "ADGrad", keepx=nonr, keepy=r) ## TMBad only !!!
           if(!is.matrix(tmp)) ## Happens if length(r)==1
               tmp <- matrix(tmp, ncol=length(nonr) )
           A <- solve(hessian.random, tmp)
