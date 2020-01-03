@@ -2256,10 +2256,11 @@ extern "C"
     typedef TMBad::ADFun<ad> adfun;
     typedef sphess_t<adfun> sphess;
     sphess* pH = NULL;
+    SEXP ans;
     TMB_TRY {
       pH = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, control, -1) );
       //optimizeTape( pH->pf );
-      return asSEXP(*pH, "ADFun");
+      ans = asSEXP(*pH, "ADFun");
     }
     TMB_CATCH {
       if (pH != NULL) {
@@ -2268,6 +2269,8 @@ extern "C"
       }
       TMB_ERROR_BAD_ALLOC;
     }
+    delete pH;
+    return ans;
   } // MakeADHessObject2
 // #endif
 #endif
