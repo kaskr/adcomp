@@ -1650,7 +1650,12 @@ extern "C"
       TMB_ERROR_BAD_ALLOC;
     }
     parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
-    return asSEXP(tmp->convert(),"parallelADFun");
+    for(int i=0; i<n; i++) {
+      delete Hvec[i];
+    }
+    // Adds finalizer for 'tmp' !!! (so, don't delete tmp...)
+    SEXP ans = asSEXP(tmp->convert(),"parallelADFun");
+    return ans;
   } // MakeADHessObject2
 #else
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
