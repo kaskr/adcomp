@@ -26,8 +26,8 @@ report-full:
 	report_level=1 $(R) --slave < tools/unittest.R
 
 clean :
-	rm -rf *.o *.so *.dll *~ core *.output.RData *.pdf *.profile
-	rm -rf */*.o */*.so */*.dll */*~ core */*.output.RData */*.pdf */*.profile
+	rm -rf *.o *.so *.dll *~ core *.output.RData *.pdf *.profile *.memprofile
+	rm -rf */*.o */*.so */*.dll */*~ core */*.output.RData */*.pdf */*.profile */*.memprofile
 
 %.profile : %.R %.cpp
 	example=$(basename $<) type=hotspots $(R) --slave < tools/profiler.R
