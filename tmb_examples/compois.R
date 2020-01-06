@@ -17,13 +17,13 @@ parameters <- list( logmu = 0, lognu = 0 )
 ## Parameterization through the mode
 data$parameterization <- "mode"
 obj <- MakeADFun(data, parameters, DLL="compois")
-system.time(fit.mode <- nlminb(obj$par, obj$fn, obj$gr))
+system.time(fit.mode <- nlminb(obj$par, obj$fn, obj$gr, obj$he))
 rep.mode <- sdreport(obj)
 
 ## Parameterization through the mean
 data$parameterization <- "mean"
 obj <- MakeADFun(data, parameters, DLL="compois")
-system.time(fit.mean <- nlminb(obj$par, obj$fn, obj$gr))
+system.time(fit.mean <- nlminb(obj$par, obj$fn, obj$gr, obj$he))
 rep.mean <- sdreport(obj)
 
 summary(rep.mode, "report")
