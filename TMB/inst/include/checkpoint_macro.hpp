@@ -25,6 +25,7 @@
 */
 
 /* general helper functions */
+#ifdef CPPAD_FRAMEWORK
 namespace atomic{
 /**
     \name User defined atomic functions
@@ -242,3 +243,93 @@ vector<AD<AD<AD<double> > > > USERFUNCTION(vector<AD<AD<AD<double> > > > x){ \
    @}
 */
 } /* end namespace atomic */
+#endif // CPPAD_FRAMEWORK
+
+#ifdef TMBAD_FRAMEWORK
+namespace atomic {
+
+/**
+   \brief User interface to checkpointing using TMBad
+   \details This is the recommended way of constucting atomic
+   functions without knowing the reverse mode derivatives.
+
+   Usage: Within `objective_function` (or any other function) one can do
+
+   ```
+   AtomicLocal<Functor> F(Functor());
+   ```
+
+   - Each call to `F(x)` only generates one new operatation on the ad stack.
+   - Thread safe because local.
+   - `F` is owned by the operation stack and is automatically freed when no longer needed.
+*/
+template<class Functor>
+struct AtomicLocal {
+  typedef TMBad::StdWrap<Functor, vector<TMBad::ad_aug> > StdWrapFunctor;
+  Functor F;
+  TMBad::ADFun<> Tape;
+  AtomicLocal(const Functor &F) : F(F) {}
+  template<class Type>
+  vector<Type> operator()(const vector<Type> &x) {
+    if ( (size_t) x.size() != Tape.Domain() ) {
+      Tape = TMBad::ADFun<>( StdWrapFunctor(F), x).atomic();
+    }
+    std::vector<Type> x_(x.data(), x.data() + x.size());
+    std::vector<Type> y_ = Tape(x_);
+    vector<Type> y(y_);
+    return y;
+  }
+};
+
+/**
+   \brief For backwards compatibility with CppAD
+   \details Allocate an atomic function for each thread.
+   Main purpuse is to support the `REGISTER_ATOMIC` macro.
+   \tparam Functor assumed to have a default CTOR
+   \warning Static atomic functions are never freed.
+*/
+template<class Functor>
+struct AtomicGlobal {
+#ifdef _OPENMP
+#define NTHREADS omp_get_max_threads()
+#define THREAD omp_get_thread_num()
+#else
+#define NTHREADS 1
+#define THREAD 0
+#endif
+  std::vector< AtomicLocal<Functor> >* p_;
+  AtomicGlobal() {
+    static std::vector< AtomicLocal<Functor> >* p =
+      new std::vector< AtomicLocal<Functor> > (NTHREADS, Functor() );
+    p_ = p;
+  }
+  template<class Type>
+  vector<Type> operator()(const vector<Type> &x) {
+    return ((*p_)[THREAD])(x);
+  }
+#undef NTHREADS
+#undef THREAD
+};
+
+#define REGISTER_ATOMIC(USERFUNCTION)                                   \
+  namespace USERFUNCTION##NAMESPACE {                                   \
+  template<class Type>                                                  \
+  struct UserFunctor {                                                  \
+    typedef Type ScalarType;                                            \
+    vector<Type> operator()(const vector<Type> &x) {                    \
+      return USERFUNCTION(x);                                           \
+    }                                                                   \
+  };                                                                    \
+  }                                                                     \
+  vector<double> USERFUNCTION(const vector<double> &x) {                \
+    typedef USERFUNCTION##NAMESPACE::UserFunctor<TMBad::ad_aug> Functor; \
+    return atomic::AtomicGlobal<Functor>()(x);                          \
+  }                                                                     \
+  vector<TMBad::ad_aug> USERFUNCTION(const vector<TMBad::ad_aug> &x) {  \
+    typedef USERFUNCTION##NAMESPACE::UserFunctor<TMBad::ad_aug> Functor; \
+    return atomic::AtomicGlobal<Functor>()(x);                          \
+  }
+
+} // End namespace atomic
+
+#endif // TMBAD_FRAMEWORK
