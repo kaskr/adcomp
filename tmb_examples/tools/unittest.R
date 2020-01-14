@@ -150,7 +150,7 @@ if(example!=""){
   abs.tol["optim.value"] <- 1e-07
   abs.tol["sdreport.cov.fixed"] <- 1e-04
   abs.tol["sdreport.diag.cov.random"] <- 1e-07
-  abs.tol["sdreport.gradient.fixed"] <- 2e-04
+  abs.tol["sdreport.gradient.fixed"] <- 6e-04
   abs.tol["sdreport.par.fixed"] <- 1e-05
   abs.tol["sdreport.par.random"] <- 1e-06
   abs.tol["sdreport.value"] <- 1e-06
