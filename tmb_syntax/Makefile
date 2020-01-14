@@ -43,11 +43,11 @@ glmmTMB:
 	echo 'TMB:::compile("glmmTMB.cpp",libinit=FALSE)' | $(R) --slave
 spict:
 	wget http://rawgit.com/mawp/spict/master/spict/src/spict.cpp
-	echo 'TMB:::compile("spict.cpp",CXX="g++")' | $(R) --slave
+	echo 'TMB:::compile("spict.cpp",CXX="g++ -std=c++11")' | $(R) --slave
 
 VAST:
 	wget http://rawgit.com/James-Thorson/VAST/master/inst/executables/VAST_v8_0_0.cpp
-	echo 'TMB:::compile("VAST_v8_0_0.cpp",CXX="g++")' | $(R) --slave
+	echo 'TMB:::compile("VAST_v8_0_0.cpp",CXX="g++ -std=c++11")' | $(R) --slave
 
 test:
 	make test_UsrapOp
