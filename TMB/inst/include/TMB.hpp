@@ -75,6 +75,9 @@ void eigen_REprintf(const char* x);
 #include "TMBad/compile.hpp"
 #include "TMBad/graph2dot.hpp"
 #include "TMBad/compression.hpp"
+#ifndef WITH_LIBTMB
+#include "TMBad/TMBad.cpp"
+#endif
 #define error Rf_error
 // Workaround to make CppAD::Integer working with TMBad
 namespace CppAD {
@@ -96,6 +99,16 @@ TMBAD_CONDEXP(Le)
 TMBAD_CONDEXP(Ge)
 #undef TMBAD_CONDEXP
 bool Variable(const TMBad::ad_aug &x) CSKIP ({ return !x.constant(); })
+}
+// FIXME: Move to TMBad source?
+namespace TMBad {
+  /* Add 'isfinite', 'isinf' and 'isnan' to TMBad */
+  using std::isfinite;
+  bool isfinite(const TMBad::ad_aug &x)CSKIP({ return isfinite(x.Value()); })
+  using std::isinf;
+  bool isinf(const TMBad::ad_aug &x)CSKIP({ return isinf(x.Value()); })
+  using std::isnan;
+  bool isnan(const TMBad::ad_aug &x)CSKIP({ return isnan(x.Value()); })
 }
 #endif
 
