@@ -76,6 +76,10 @@ notifications:
     on_success: never
     on_failure: never
 
+after_failure:
+  - cat /home/travis/build/kaskr/adcomp/TMB.Rcheck/00install.out
+  - cat /home/travis/build/kaskr/adcomp/TMB.Rcheck/00check.log
+
 addons:
   apt:
     packages:
