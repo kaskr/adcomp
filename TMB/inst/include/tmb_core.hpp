@@ -1556,9 +1556,13 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       TMBad::compress(pf->glob, max_period_size);
     }
     else if (method == 10) {
+#ifdef HAVE_COMPILE_HPP
       TMBad::compress(pf->glob, max_period_size);
       // if (config.optimize.instantly) pf->glob.eliminate();
       TMBad::compile(pf->glob);
+#else
+      Rf_error("TMBad::compile() is unavailable");
+#endif
     }
     else if (method == 11)
       pf->glob = accumulation_tree_split(pf->glob, true);
