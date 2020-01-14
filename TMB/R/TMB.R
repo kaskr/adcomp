@@ -970,8 +970,8 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   if (tracesweep) libtmb <- FALSE
   ## Find TMBad framework
   useTMBad <- (framework == "TMBad")
-  incTMBad <- system.file("include", package="TMBad")
-  libTMBad <- system.file(dynlib("libs/TMBad"), package="TMBad")
+  incTMBad <- system.file("include/TMBad", package="TMB")
+  libTMBad <- ""
   incRcpp <- system.file("include", package="Rcpp")
   useRcpp <- useTMBad
   ## libtmb existence
