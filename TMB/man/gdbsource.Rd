@@ -25,8 +25,7 @@ Object of class \code{backtrace}
 Source R-script through gdb to get backtrace.
 
 If \code{gdbsource} is run non-interactively (the default) only
-the relevant information will be printed. Note that this will only
-work if the cpp file and the R file share the same base name.
+the relevant information will be printed.
 }
 \details{
 This function is useful for debugging templates.

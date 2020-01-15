@@ -1,4 +1,31 @@
 ------------------------------------------------------------------------
+TMB 1.7.16 (2020-01-15)
+------------------------------------------------------------------------
+
+o Fixed memory leaks in sparse hessian.
+
+o logspace_add: Added some edge case reductions.
+
+o 'oneStepPredict' no longer overwrites mapping of random effects.
+
+o Fix isfinite, isinf, isnan etc (github #297).
+
+o Add support for other object names to 'gdbsource'.
+
+o dbinom: Handle edge cases 0*log(0).
+
+o Add segment method to vector_indicator.
+
+o data_indicator: Add default CTOR.
+
+o splinefun: fix memleak + add vector evaluation.
+
+o Saved models from old TMB versions should now be usable in new TMB
+  versions without giving the INTEGER(...) error.
+
+o checkConsistency bugfix: did not work for mapped random effects.
+
+------------------------------------------------------------------------
 TMB 1.7.15 (2018-11-08)
 ------------------------------------------------------------------------
 
