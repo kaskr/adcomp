@@ -50,7 +50,7 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
   void forward(TMBad::ForwardArgs<TMBad::Writer> &args) { ASSERT(false); } \
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); } \
 };                                                                      \
-template<class dummy=void>                                              \
+template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) { \
   TMBad::Index n = tx.size();                                           \
   TMBad::Index m = OUTPUT_DIM;                                          \
