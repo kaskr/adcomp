@@ -415,7 +415,7 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     if (length(random) > 0) {
         ## Experiment !
-        .Call("TransformADFunObject", ADFun$ptr, list(random_order = random, method=13L, mustWork=0L), PACKAGE=DLL)
+        .Call("TransformADFunObject", ADFun$ptr, list(random_order = random, method=13L, mustWork=0L, max_period_size=1024L), PACKAGE=DLL)
     }
     if("Fun"%in%type)
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
@@ -1475,7 +1475,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                   list(gf=obj$env$ADGrad$ptr, skip=skip), ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL)
   ## Experiment !
-  .Call("TransformADFunObject", ADHess$ptr, list(random_order = r, method=13L, mustWork=0L), PACKAGE=obj$env$DLL)
+  .Call("TransformADFunObject", ADHess$ptr, list(random_order = r, method=13L, mustWork=0L, max_period_size=1024L), PACKAGE=obj$env$DLL)
   ev <- function(par, set_tail=0)
           .Call("EvalADFunObject", ADHess$ptr, par,
                 control = list(
