@@ -22,6 +22,18 @@ typedef double Scalar;
 typedef std::pair<Index, Index> IndexPair;
 typedef std::vector<unsigned int> IndexVector;
 
+template <class T>
+std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
+  out << "{";
+  size_t last = v.size() - 1;
+  for (size_t i = 0; i < v.size(); ++i) {
+    out << v[i];
+    if (i != last) out << ", ";
+  }
+  out << "}";
+  return out;
+}
+
 /** \brief Union of closed intervals */
 template <class T>
 struct intervals {
@@ -2578,18 +2590,6 @@ template <class S, class T>
 std::ostream &operator<<(std::ostream &os, const std::pair<S, T> &x) {
   os << "(" << x.first << ", " << x.second << ")";
   return os;
-}
-
-template <class T>
-std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
-  out << "{";
-  size_t last = v.size() - 1;
-  for (size_t i = 0; i < v.size(); ++i) {
-    out << v[i];
-    if (i != last) out << ", ";
-  }
-  out << "}";
-  return out;
 }
 
 std::ostream &operator<<(std::ostream &os, const global::ad_plain &x);
