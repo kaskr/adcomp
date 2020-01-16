@@ -3321,16 +3321,21 @@ ad_plain CondExpLe(const ad_plain &x0, const ad_plain &x1, const ad_plain &x2,
 ad_aug CondExpLe(const ad_aug &x0, const ad_aug &x1, const ad_aug &x2,
                  const ad_aug &x3);
 
-ad_plain sum(const std::vector<ad_plain> &x);
 struct SumOp : global::DynamicOperator<-1, 1> {
   static const bool is_linear = true;
-  size_t n;
   static const bool have_input_size_output_size = true;
+  static const bool add_forward_replay_copy = true;
+  size_t n;
   Index input_size() const;
   Index output_size() const;
   SumOp(size_t n);
-  void forward(ForwardArgs<Scalar> &args);
-  void forward(ForwardArgs<Replay> &args);
+  template <class Type>
+  void forward(ForwardArgs<Type> &args) {
+    args.y(0) = 0;
+    for (size_t i = 0; i < n; i++) {
+      args.y(0) += args.x(i);
+    }
+  }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     for (size_t i = 0; i < n; i++) {
@@ -3339,11 +3344,9 @@ struct SumOp : global::DynamicOperator<-1, 1> {
   }
   const char *op_name();
 };
-ad_plain sum(const std::vector<ad_plain> &x);
 template <class T>
-T sum(const std::vector<T> &x_) {
-  std::vector<ad_plain> x(x_.begin(), x_.end());
-  return sum(x);
+T sum(const std::vector<T> &x) {
+  return global::Complete<SumOp>(x.size())(x)[0];
 }
 
 ad_plain logspace_sum(const std::vector<ad_plain> &x);

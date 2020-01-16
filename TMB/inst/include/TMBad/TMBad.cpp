@@ -2868,31 +2868,13 @@ ad_aug CondExpLe(const ad_aug &x0, const ad_aug &x1, const ad_aug &x2,
   }
 }
 
-Index SumOp::input_size() const { return this->n; }
+Index SumOp::input_size() const { return n; }
 
 Index SumOp::output_size() const { return 1; }
 
 SumOp::SumOp(size_t n) : n(n) {}
 
-void SumOp::forward(ForwardArgs<Scalar> &args) {
-  args.y(0) = 0;
-  for (size_t i = 0; i < n; i++) {
-    args.y(0) += args.x(i);
-  }
-}
-
-void SumOp::forward(ForwardArgs<Replay> &args) {
-  std::vector<ad_plain> x(input_size());
-  for (Index i = 0; i < input_size(); i++) x[i] = args.x(i);
-  args.y(0) = sum(x);
-}
-
 const char *SumOp::op_name() { return "SumOp"; }
-
-ad_plain sum(const std::vector<ad_plain> &x) {
-  OperatorPure *pOp = get_glob()->getOperator<SumOp>(x.size());
-  return get_glob()->add_to_stack<SumOp>(pOp, x)[0];
-}
 
 Index LogSpaceSumOp::input_size() const { return this->n; }
 
