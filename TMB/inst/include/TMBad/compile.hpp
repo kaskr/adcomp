@@ -13,10 +13,10 @@
 #define GLOBAL_MAX_NUM_THREADS 48
 #define INDEX_OVERFLOW(x) \
   ((size_t)(x) >= (size_t)std::numeric_limits<GLOBAL_INDEX_TYPE>::max())
-#define ASSERT(x)                                    \
-  if (!(x)) {                                        \
-    std::cout << "ASSERTION FAILED: " << #x << "\n"; \
-    abort();                                         \
+#define ASSERT(x)                                \
+  if (!(x)) {                                    \
+    Rcout << "ASSERTION FAILED: " << #x << "\n"; \
+    abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
 #define INHERIT_CTOR(A, B)                          \
