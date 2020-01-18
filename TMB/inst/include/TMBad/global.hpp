@@ -67,14 +67,14 @@ struct intervals {
   }
   void print() {
     for (iterator it = x.begin(); it != x.end(); ++it) {
-      if (it->left()) std::cout << "[ ";
-      std::cout << (*it).first;
+      if (it->left()) Rcout << "[ ";
+      Rcout << (*it).first;
       if (it->left())
-        std::cout << " , ";
+        Rcout << " , ";
       else
-        std::cout << " ] ";
+        Rcout << " ] ";
     }
-    std::cout << "\n";
+    Rcout << "\n";
   }
 };
 
@@ -1245,9 +1245,12 @@ struct global {
     /** \brief If applicable, how to access the reference count */
     size_t &reference_count() {
       if (!(false)) {
-        std::cout << "ASSERTION FAILED: "
-                  << "false"
-                  << "\n";
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "reference_count() member not implemented"
+              << "\n";
         abort();
       };
       return *new (size_t);
@@ -2084,9 +2087,13 @@ struct global {
     template <class Type>
     void reverse(ReverseArgs<Type> &args) {
       if (!(false)) {
-        std::cout << "ASSERTION FAILED: "
-                  << "false"
-                  << "\n";
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Reverse mode updates are forbidden until all references "
+                 "are resolved"
+              << "\n";
         abort();
       };
     }
@@ -2139,9 +2146,9 @@ struct global {
 
     if (!(!((size_t)(values.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(values.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(values.size())"
+            << "\n";
       abort();
     };
     return ans;
@@ -2161,16 +2168,16 @@ struct global {
 
     if (!(!((size_t)(values.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(values.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(values.size())"
+            << "\n";
       abort();
     };
     if (!(!((size_t)(inputs.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(inputs.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(inputs.size())"
+            << "\n";
       abort();
     };
     return ans;
@@ -2191,16 +2198,16 @@ struct global {
 
     if (!(!((size_t)(values.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(values.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(values.size())"
+            << "\n";
       abort();
     };
     if (!(!((size_t)(inputs.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(inputs.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(inputs.size())"
+            << "\n";
       abort();
     };
     return ans;
@@ -2222,16 +2229,16 @@ struct global {
 
     if (!(!((size_t)(values.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(values.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(values.size())"
+            << "\n";
       abort();
     };
     if (!(!((size_t)(inputs.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(inputs.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(inputs.size())"
+            << "\n";
       abort();
     };
     return ans;
@@ -2254,16 +2261,16 @@ struct global {
 
     if (!(!((size_t)(values.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(values.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(values.size())"
+            << "\n";
       abort();
     };
     if (!(!((size_t)(inputs.size()) >=
             (size_t)std::numeric_limits<unsigned int>::max()))) {
-      std::cout << "ASSERTION FAILED: "
-                << "!INDEX_OVERFLOW(inputs.size())"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "!INDEX_OVERFLOW(inputs.size())"
+            << "\n";
       abort();
     };
     std::vector<ad_plain> out(n);
@@ -2520,6 +2527,8 @@ struct global {
         the variable cannot be assumed to be the most recently
         added. */
     void addToTape() const;
+    /** \brief Check if 'glob' exists in the active context stack */
+    bool in_context_stack(global *glob) const;
     /** \brief Deep copy existing ad_aug. Result will be last value of
         the current tape. */
     ad_aug copy() const;
@@ -3122,18 +3131,18 @@ struct CondExpEqOp : global::Operator<4, 1> {
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
@@ -3157,18 +3166,18 @@ struct CondExpNeOp : global::Operator<4, 1> {
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
@@ -3192,18 +3201,18 @@ struct CondExpGtOp : global::Operator<4, 1> {
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
@@ -3227,18 +3236,18 @@ struct CondExpLtOp : global::Operator<4, 1> {
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
@@ -3262,18 +3271,18 @@ struct CondExpGeOp : global::Operator<4, 1> {
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
@@ -3297,18 +3306,18 @@ struct CondExpLeOp : global::Operator<4, 1> {
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     if (!(false)) {
-      std::cout << "ASSERTION FAILED: "
-                << "false"
-                << "\n";
+      Rcerr << "ASSERTION FAILED: "
+            << "false"
+            << "\n";
       abort();
     };
   }
