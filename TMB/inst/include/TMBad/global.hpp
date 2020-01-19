@@ -2072,7 +2072,26 @@ struct global {
     template <class T>
     void reverse(ReverseArgs<T> &args) {}
   };
-  /** \brief Reference a variable on another tape */
+  /** \brief Reference a variable on another tape
+
+      \details References to other tapes are a handy alternative to
+      independent variables, but there are caveats. One must note that
+      these references are absolute pointers into an other tape's
+      value space. If the other tape is optimized the value indices
+      might get remapped and the absolute references would no longer
+      be valid!
+      It follows that we must have some strict limitations on their use:
+
+      - References to other tapes are only allowed to exist
+        temporarily, during tape construction.
+      - If a child tape has references to a parent tape the parent
+        tape is not complete until all references are 'resolved',
+        i.e. the child tape has been replayed on top of the parent.
+      - Atomic functions can never be allowed to contain references
+        because atomic function replay does not change whats inside
+        the atomic function. In other words, references would persist
+        during replay and never get resolved.
+  */
   struct RefOp : DynamicOperator<0, 1> {
     static const bool dynamic = true;
     global *glob;
@@ -2508,7 +2527,11 @@ struct global {
     } data;
     bool ontape() const;
     bool constant() const;
-    /** \brief Get the tape of this ad_aug */
+    /** \brief Get the tape of this ad_aug
+        \return Returns the tape address of this variable **if**
+        variable belongs to *some* tape.  Otherwise `NULL` is
+        returned.
+    */
     global *glob() const;
     /** \brief Return the underlying scalar value of this `ad_aug`. */
     Scalar Value() const;
