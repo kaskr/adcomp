@@ -1950,7 +1950,8 @@ bool global::ad_aug::bothConstant(const ad_aug &other) const {
 
 bool global::ad_aug::identical(const ad_aug &other) const {
   if (constant() && other.constant()) return (data.value == other.data.value);
-  if (ontape() && other.ontape())
+
+  if (glob() == other.glob())
     return (taped_value.index == other.taped_value.index);
   return false;
 }
