@@ -1540,6 +1540,15 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     UNPROTECT(2);
     return ans;
   }
+  if (method == 100) {
+    typedef void(*fct_ptr1)(double*);
+    typedef void(*fct_ptr2)(double*,double*);
+    pf->glob.forward_compiled =
+      (fct_ptr1) R_ExternalPtrAddr(getListElement(control, "forward_compiled"));
+    pf->glob.reverse_compiled =
+      (fct_ptr2) R_ExternalPtrAddr(getListElement(control, "reverse_compiled"));
+    return R_NilValue;
+  }
   SEXP random_order = getListElement(control, "random_order");
   int max_period_size = getListInteger(control, "max_period_size", 1024);
   int nr = LENGTH(random_order);
