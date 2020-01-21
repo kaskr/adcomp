@@ -1745,12 +1745,34 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     adfun* pf;
-    int depth = getListInteger(control, "depth", 1);
-    // int dot   = getListInteger(control, "dot", 0);
-    TMBad::global::print_config cfg;
-    cfg.depth = depth;
     pf = (adfun*) R_ExternalPtrAddr(f);
-    pf->glob.print(cfg);
+    int method = getListInteger(control, "method", 0);
+    if (method == 0) { // Print tape
+      int depth = getListInteger(control, "depth", 1);
+      TMBad::global::print_config cfg;
+      cfg.depth = depth;
+      pf->glob.print(cfg);
+    }
+    else if (method == 1) { // Print dot format
+      graph2dot(pf->glob, true, Rcout);
+    }
+    else if (method == 2) { // Print C src code
+      TMBad::code_config cfg;
+      cfg.gpu = false;
+      cfg.asm_comments = false;
+      cfg.cout = &Rcout;
+      *cfg.cout << "#include <cmath>" << std::endl;
+      *cfg.cout
+        << "template<class T>T sign(const T &x) { return (x > 0) - (x < 0); }"
+        << std::endl;
+      TMBad::global glob = pf->glob; // Invoke deep copy
+      TMBad::compress(glob);
+      write_forward(glob, cfg);
+      write_reverse(glob, cfg);
+    }
+    else {
+      Rf_error("Unknown method");
+    }
 #endif
     return R_NilValue;
   }
