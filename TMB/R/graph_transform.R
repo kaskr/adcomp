@@ -5,7 +5,8 @@ tape_print <- function(x, depth=0, dot=FALSE, DLL=getUserDLL()) {
     .Call("tmbad_print", x, control, PACKAGE=DLL)
 }
 
-src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess")) {
+src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
+                          flags = "-O3") {
     what <- match.arg(what)
     DLL <- obj$env$DLL
     control <- list(method=2L)
@@ -16,7 +17,7 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess")) {
     qw <- .Call("tmbad_print", ptr, control, PACKAGE = DLL)
     sink(NULL)
     ## Overload
-    TMB:::compile(dll.cpp)
+    TMB:::compile(dll.cpp, flags=flags)
     dyn.load(dynlib(dll))
     dllinfo <- getLoadedDLLs()[[basename(dll)]]
     forward_compiled <- getNativeSymbolInfo("forward",PACKAGE=dllinfo)$address
