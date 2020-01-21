@@ -95,7 +95,8 @@ changelog:
 ## Eigen headers, nothing else)
 eliminate-cout:
 	cd TMB/inst/include; sed -i /.*using\ std::cout.*/d cppad/*.hpp cppad/*/*.hpp
-	cd TMB/inst/include; sed -i s/[std:]*cout/Rcout/g cppad/*.hpp cppad/*/*.hpp ./*.hpp tmbutils/*.hpp
+	cd TMB/inst/include; sed -i s/[std:]*cout/Rcout/g cppad/*.hpp cppad/*/*.hpp
+	cd TMB/inst/include; sed -i s/std..cout/Rcout/g ./*.hpp tmbutils/*.hpp
 	git checkout TMB/inst/include/Rstream.hpp
 cran-version:
 	cd TMB; git clean -xdf
