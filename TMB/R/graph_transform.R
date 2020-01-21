@@ -7,6 +7,13 @@ tape_print <- function(x, depth=0, dot=FALSE, DLL=getUserDLL()) {
 
 src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
                           flags = "-O3") {
+    if(.Platform$OS.type=="windows"){
+        ## Overload tempfile
+        tempfile <- function(...){
+            ans <- base::tempfile(...)
+            chartr("\\", "/", shortPathName(ans))
+        }
+    }
     what <- match.arg(what)
     DLL <- obj$env$DLL
     control <- list(method=2L)
