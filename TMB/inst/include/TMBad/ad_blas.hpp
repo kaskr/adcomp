@@ -9,12 +9,18 @@
 #define THREAD_NUM 0
 #define GLOBAL_INDEX_VECTOR std::vector<GLOBAL_INDEX_TYPE>
 #define GLOBAL_INDEX_TYPE unsigned int
+#define ASSERT2(x, msg)                          \
+  if (!(x)) {                                    \
+    Rcerr << "ASSERTION FAILED: " << #x << "\n"; \
+    Rcerr << "POSSIBLE REASON: " << msg << "\n"; \
+    abort();                                     \
+  }
 #define GLOBAL_MAX_NUM_THREADS 48
 #define INDEX_OVERFLOW(x) \
   ((size_t)(x) >= (size_t)std::numeric_limits<GLOBAL_INDEX_TYPE>::max())
 #define ASSERT(x)                                \
   if (!(x)) {                                    \
-    Rcout << "ASSERTION FAILED: " << #x << "\n"; \
+    Rcerr << "ASSERTION FAILED: " << #x << "\n"; \
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
@@ -91,7 +97,11 @@ void matmul(const vmatrix x, const vmatrix y, Map<vmatrix> z) {
   fill(z, out);
 }
 
+/** \brief Multiply two matrices of ad variables */
 vmatrix matmul(const vmatrix &x, const vmatrix &y);
+
+/** \brief Multiply two matrices of scalar types */
+dmatrix matmul(const dmatrix &x, const dmatrix &y);
 
 /** Expand all 8 combinations */
 template <bool XT, bool YT, bool ZT>
