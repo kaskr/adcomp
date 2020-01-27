@@ -8,7 +8,8 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
   method = c("oneStepGaussianOffMode", "fullGaussian", "oneStepGeneric",
   "oneStepGaussian", "cdf"), subset = NULL, conditional = NULL,
   discrete = NULL, discreteSupport = NULL, range = c(-Inf, Inf),
-  seed = 123, parallel = FALSE, trace = TRUE, ...)
+  seed = 123, parallel = FALSE, trace = TRUE, reverse = (method ==
+  "oneStepGaussianOffMode"), ...)
 }
 \arguments{
 \item{obj}{Output from \code{MakeADFun}.}
@@ -34,6 +35,8 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 \item{parallel}{Run in parallel using the \code{parallel} package?}
 
 \item{trace}{Trace progress?}
+
+\item{reverse}{Do calculations in opposite order to improve stability ? (currently enabled by default for \code{oneStepGaussianOffMode} method only)}
 
 \item{...}{Control parameters for OSA method}
 }
