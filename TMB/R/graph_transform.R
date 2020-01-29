@@ -24,7 +24,7 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
     qw <- .Call("tmbad_print", ptr, control, PACKAGE = DLL)
     sink(NULL)
     ## Overload
-    TMB:::compile(dll.cpp, flags=flags)
+    compile(dll.cpp, flags=flags)
     dyn.load(dynlib(dll))
     dllinfo <- getLoadedDLLs()[[basename(dll)]]
     forward_compiled <- getNativeSymbolInfo("forward",PACKAGE=dllinfo)$address
