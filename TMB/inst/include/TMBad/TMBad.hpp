@@ -9,12 +9,18 @@
 #define THREAD_NUM 0
 #define GLOBAL_INDEX_VECTOR std::vector<GLOBAL_INDEX_TYPE>
 #define GLOBAL_INDEX_TYPE unsigned int
+#define ASSERT2(x, msg)                          \
+  if (!(x)) {                                    \
+    Rcerr << "ASSERTION FAILED: " << #x << "\n"; \
+    Rcerr << "POSSIBLE REASON: " << msg << "\n"; \
+    abort();                                     \
+  }
 #define GLOBAL_MAX_NUM_THREADS 48
 #define INDEX_OVERFLOW(x) \
   ((size_t)(x) >= (size_t)std::numeric_limits<GLOBAL_INDEX_TYPE>::max())
 #define ASSERT(x)                                \
   if (!(x)) {                                    \
-    Rcout << "ASSERTION FAILED: " << #x << "\n"; \
+    Rcerr << "ASSERTION FAILED: " << #x << "\n"; \
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
@@ -400,10 +406,12 @@ struct ADFun {
      specified the returned function object R^(n+m)->R^n represents the Jacobian
      multiplied by a range vector (x,w)->f'*w.
   */
-  ADFun JacFun(bool range_weight = false) {
+  ADFun JacFun(bool range_weight = false,
+               std::vector<bool> keep_x = std::vector<bool>(0),
+               std::vector<bool> keep_y = std::vector<bool>(0)) {
     ADFun ans;
-    std::vector<bool> keep_x(Domain(), true);
-    std::vector<bool> keep_y(Range(), true);
+    if (keep_x.size() == 0) keep_x.resize(Domain(), true);
+    if (keep_y.size() == 0) keep_y.resize(Range(), true);
     std::vector<bool> keep = get_keep_var(keep_x, keep_y);
     keep = glob.var2op(keep);
     global::replay replay(this->glob, ans.glob);
@@ -475,9 +483,34 @@ struct ADFun {
      may be removed.
   */
   void replay() { glob.forward_replay(true, true); }
+  /** \brief Sparse Jacobian function generator
+      \details Denote by `f:R^n->R^m` this function object.
 
+      By default the return value is a new function object
+      f':R^n->R^l representing the *sparse* Jacobian. Here `l`
+      denotes the number of non zeros.  The function object is itself
+      an `ADFun` object, but in addition the sparsity pattern
+      is contained in the output.
+
+      If the Jacobian is only needed on a subset of the sparsity
+      pattern, one can use the boolean vectors `keep_x` and `keep_y`
+      to select a subset of interest. Jacobian elements outside this
+      subset are considered being identical zero, in order to reduce
+      the caclulations. Note that indices are not remapped. Also note
+      that `keep_x` / `keep_y` cooresponds to input / output
+      respectively.
+
+      \param keep_x Jacobian **columns** to consider
+      \param keep_y Jacobian **rows** to consider
+      \param compress Apply row-wise compression if it reduces memory ?
+      \return `Sparse<ADFun>` containing function and sparsity pattern.
+  */
   Sparse<ADFun> SpJacFun(std::vector<bool> keep_x = std::vector<bool>(0),
-                         std::vector<bool> keep_y = std::vector<bool>(0)) {
+                         std::vector<bool> keep_y = std::vector<bool>(0),
+                         bool compress = false) {
+    ADFun atomic_jac_row;
+    std::vector<Index> rowcounts;
+
     Sparse<ADFun> ans;
 
     std::vector<bool> keep_var = get_keep_var(keep_x, keep_y);
@@ -501,6 +534,20 @@ struct ADFun {
       glob.subgraph_seq.push_back(G.dep2op[k]);
       G.search(glob.subgraph_seq);
 
+      bool do_compress = false;
+      if (compress) {
+        if (rowcounts.size() == 0) rowcounts = G.rowcounts();
+
+        size_t cost1 = 0;
+        for (size_t i = 0; i < glob.subgraph_seq.size(); i++) {
+          cost1 += rowcounts[glob.subgraph_seq[i]];
+        }
+
+        size_t cost2 = Domain() + Range() + Domain();
+
+        if (cost2 < cost1) do_compress = true;
+      }
+
       if (true) {
         glob.clear_array_subgraph(keep_var);
         keep_var[i] = true;
@@ -521,13 +568,35 @@ struct ADFun {
 
       ans.i.resize(ans.i.size() + col_idx.size(), k);
       ans.j.insert(ans.j.end(), col_idx.begin(), col_idx.end());
+      if (!do_compress) {
+        replay.clear_deriv_sub();
 
-      replay.clear_deriv_sub();
+        replay.deriv_dep(k) = 1.;
 
-      replay.deriv_dep(k) = 1.;
+        replay.reverse_sub();
 
-      replay.reverse_sub();
+      } else {
+        if (atomic_jac_row.Domain() == 0) {
+          Rcout << "jac_row create\n";
+          atomic_jac_row = this->JacFun(true, keep_x, keep_y);
+          Rcout << atomic_jac_row.glob.opstack.size() << "\n";
+          atomic_jac_row.optimize();
+          Rcout << atomic_jac_row.glob.opstack.size() << "\n";
+          atomic_jac_row = atomic_jac_row.atomic();
 
+          replay.clear_deriv_sub();
+          Rcout << "done\n";
+        }
+        std::vector<Replay> vec(atomic_jac_row.Domain(), Replay(0));
+        for (size_t i = 0; i < this->Domain(); i++) {
+          vec[i] = replay.value_inv(i);
+        }
+        vec[this->Domain() + k] = 1.;
+        std::vector<Replay> r = atomic_jac_row(vec);
+        for (size_t i = 0; i < this->Domain(); i++) {
+          replay.deriv_inv(i) = r[i];
+        }
+      }
       for (size_t l = 0; l < col_idx.size(); l++) {
         replay.deriv_inv(col_idx[l]).Dependent();
       }

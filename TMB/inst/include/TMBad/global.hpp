@@ -433,6 +433,10 @@ struct graph {
   std::vector<Index> inv2op;
   /** \brief Used to lookup operator (node) of a dependent variable */
   std::vector<Index> dep2op;
+  /** \brief Number of column indices by row, i.e. number of *outgoing* edges */
+  std::vector<Index> rowcounts();
+  /** \brief Number of row indices by column, i.e. number of *ingoing* edges */
+  std::vector<Index> colcounts();
   /** \brief Perform a breadth-first search
       \param start Nodes that initiate the search
       \param visited On input contains boolean mask of already visited
@@ -2306,6 +2310,10 @@ struct global {
     void addToTape() const;
     /** \brief Get the tape of this ad_plain */
     global *glob() const;
+    /** \brief Override this ad_plain
+        \details Ignored
+    */
+    void override_by(const ad_plain &x) const;
 
     /** \brief Default CTOR \details Default constuction, along with
         copy construction and copy assignment, are **the only
@@ -2550,6 +2558,10 @@ struct global {
         the variable cannot be assumed to be the most recently
         added. */
     void addToTape() const;
+    /** \brief Override this ad_plain and set glob to `get_glob()`
+        \warning Internal use only
+    */
+    void override_by(const ad_plain &x) const;
     /** \brief Check if 'glob' exists in the active context stack */
     bool in_context_stack(global *glob) const;
     /** \brief Deep copy existing ad_aug. Result will be last value of

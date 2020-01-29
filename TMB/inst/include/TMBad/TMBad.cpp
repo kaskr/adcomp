@@ -737,6 +737,18 @@ void graph::print() {
   }
 }
 
+std::vector<Index> graph::rowcounts() {
+  std::vector<Index> ans(num_nodes());
+  for (size_t i = 0; i < ans.size(); i++) ans[i] = num_neighbors(i);
+  return ans;
+}
+
+std::vector<Index> graph::colcounts() {
+  std::vector<Index> ans(num_nodes());
+  for (size_t i = 0; i < j.size(); i++) ans[j[i]]++;
+  return ans;
+}
+
 void graph::bfs(const std::vector<Index> &start, std::vector<bool> &visited,
                 std::vector<Index> &result) {
   for (size_t i = 0; i < start.size(); i++) {
@@ -1342,8 +1354,8 @@ void global::append_edges::operator()(Index dep_j) {
     if (i != k && !op_marks[k]) {
       IndexPair edge;
 
-      edge.first = i;
-      edge.second = k;
+      edge.first = k;
+      edge.second = i;
       edges.push_back(edge);
       op_marks[k] = true;
     }
@@ -1354,7 +1366,7 @@ void global::append_edges::start_iteration() { pos = edges.size(); }
 
 void global::append_edges::end_iteration() {
   size_t n = edges.size() - pos;
-  for (size_t j = 0; j < n; j++) op_marks[edges[pos + j].second] = false;
+  for (size_t j = 0; j < n; j++) op_marks[edges[pos + j].first] = false;
 }
 
 graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
@@ -1381,7 +1393,7 @@ graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
     opstack[i]->increment(args.ptr);
   }
 
-  if (!transpose) {
+  if (transpose) {
     for (size_t j = 0; j < edges.size(); j++)
       std::swap(edges[j].first, edges[j].second);
   }
@@ -1714,6 +1726,8 @@ global *global::ad_plain::glob() const {
   return (ontape() ? get_glob() : NULL);
 }
 
+void global::ad_plain::override_by(const ad_plain &x) const {}
+
 global::ad_plain::ad_plain() : index(NA) {}
 
 global::ad_plain::ad_plain(Scalar x) {
@@ -1910,6 +1924,11 @@ void global::ad_aug::addToTape() const {
     return;
   }
   this->taped_value = ad_plain(data.value);
+  this->data.glob = get_glob();
+}
+
+void global::ad_aug::override_by(const ad_plain &x) const {
+  this->taped_value = x;
   this->data.glob = get_glob();
 }
 
