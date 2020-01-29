@@ -56,7 +56,7 @@ namespace TMBad {
 template <class Matrix>
 global::ad_range contiguousBlock(const Matrix &x) {
   bool yes = true;
-  Index j_previous;
+  Index j_previous = -1;
   for (size_t i = 0; i < (size_t)x.size(); i++) {
     if (!x(i).ontape()) {
       yes = false;
