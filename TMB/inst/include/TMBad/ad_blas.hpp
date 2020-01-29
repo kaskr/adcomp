@@ -40,7 +40,19 @@
 
 namespace TMBad {
 
-/** \brief Request a contiguous block on the tape. */
+/** \brief Request a contiguous block on the tape.
+
+    1. Check if `x` already is on the tape and satisfies the storage
+   requirement.
+    2. If **no** invoke a deep copy of `x` to the tape **and** *update* `x` with
+   the new tape addresses.
+
+    \return A reference to `x` as a contiguous block on the tape.
+
+    \note The update step is critical as it ensures that a given
+    matrix can be used several times without invoking a deep copy more
+    than once.
+*/
 template <class Matrix>
 global::ad_range contiguousBlock(const Matrix &x) {
   bool yes = true;
@@ -66,6 +78,8 @@ global::ad_range contiguousBlock(const Matrix &x) {
   ad_plain ans;
   for (size_t i = 0; i < (size_t)x.size(); i++) {
     ad_plain xi_cpy = x(i).copy();
+
+    x(i).override_by(xi_cpy);
     if (i == 0) ans = xi_cpy;
   }
   return global::ad_range(ans, x.rows(), x.cols());
@@ -90,7 +104,7 @@ void fill(Target &y, const global::ad_range x) {
 template <bool XT, bool YT, bool ZT>
 struct MatMul;
 template <bool XT, bool YT, bool ZT>
-void matmul(const vmatrix x, const vmatrix y, Map<vmatrix> z) {
+void matmul(const vmatrix &x, const vmatrix &y, Map<vmatrix> z) {
   global::ad_range xc = contiguousBlock(x);
   global::ad_range yc = contiguousBlock(y);
   global::ad_range out = get_glob()->add_to_stack<MatMul<XT, YT, ZT> >(xc, yc);
