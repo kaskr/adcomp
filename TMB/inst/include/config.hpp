@@ -41,7 +41,8 @@ struct config_struct{
     bool getListElement;
   } debug;
   struct {
-    bool deep_print;
+    /** \brief Reduce memory of sparse hessian even if reducing speed ? */
+    bool sparse_hessian_compress;
   } tmbad;
 
   int cmd;
@@ -67,7 +68,7 @@ struct config_struct{
     SET(optimize.instantly,true);
     SET(optimize.parallel,false);
     SET(tape.parallel,true);
-    SET(tmbad.deep_print,false);
+    SET(tmbad.sparse_hessian_compress,true);
   })
 #undef SET
   config_struct() CSKIP(
