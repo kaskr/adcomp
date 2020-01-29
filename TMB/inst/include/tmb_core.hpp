@@ -2107,7 +2107,8 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   for(int i=0; i<LENGTH(skip); i++) {
     keepcol[ INTEGER(skip)[i] - 1 ] = false; // skip is R-index !
   }
-  TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol);
+  bool compress = config.tmbad.sparse_hessian_compress;
+  TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol, compress);
   if (allocate_new_pgf) delete pgf;
   // NB: Lower triangle, column major =
   //     Transpose of upper triangle, row major
