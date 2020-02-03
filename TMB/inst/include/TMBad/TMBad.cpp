@@ -3906,21 +3906,7 @@ void remap_identical_sub_expressions(global &glob, bool all_allow_remap) {
   Dependencies dep2;
   size_t reject = 0;
   size_t total = 0;
-
   Args<> args(glob.inputs);
-  if (!all_allow_remap) {
-    forbid_remap<std::vector<Index> > fb(remap);
-    intervals<Index> visited;
-    for (size_t i = 0; i < glob.opstack.size(); i++) {
-      OperatorPure::op_info info = glob.opstack[i]->info();
-      if (!info.allow_remap) {
-        Dependencies dep;
-        glob.opstack[i]->dependencies(args, dep);
-        dep.apply_if_not_visited(fb, visited);
-      }
-      glob.opstack[i]->increment(args.ptr);
-    }
-  }
 
   for (size_t j = 0, i = 0, nout = 0; j < glob.opstack.size(); j++, i += nout) {
     nout = glob.opstack[j]->output_size();
@@ -3981,6 +3967,25 @@ void remap_identical_sub_expressions(global &glob, bool all_allow_remap) {
   for (size_t i = 0; i < remap.size(); i++) {
     ASSERT(remap[i] <= i);
     ASSERT(remap[remap[i]] == remap[i]);
+  }
+
+  if (!all_allow_remap) {
+    Args<> args(glob.inputs);
+    intervals<Index> visited;
+    for (size_t i = 0; i < glob.opstack.size(); i++) {
+      OperatorPure::op_info info = glob.opstack[i]->info();
+      if (!info.allow_remap) {
+        Dependencies dep;
+        glob.opstack[i]->dependencies(args, dep);
+        for (size_t j = 0; j < dep.I.size(); j++) {
+          visited.insert(dep.I[j].first, dep.I[j].second);
+        }
+      }
+      glob.opstack[i]->increment(args.ptr);
+    }
+
+    forbid_remap<std::vector<Index> > fb(remap);
+    visited.apply(fb);
   }
   if (reject > 0) {
     Rcout << "Rejected remappings: " << reject << " of " << total << "\n";

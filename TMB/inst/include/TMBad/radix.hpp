@@ -39,6 +39,7 @@
 #include <vector>
 #include "global.hpp"  // ASSERT
 
+/** \brief Radix based sorting and first_occurance */
 namespace radix {
 
 /** \brief Simple radix sort implementation
@@ -135,6 +136,8 @@ std::vector<I> order(const std::vector<T>& x) {
   return radix<T, I>(x).order();
 }
 
+/** \brief For each element of a vector find the index of its first
+    occurance from the left */
 template <class I, class T>
 std::vector<I> first_occurance(const std::vector<T>& x) {
   return radix<T, I>(x).first_occurance();
