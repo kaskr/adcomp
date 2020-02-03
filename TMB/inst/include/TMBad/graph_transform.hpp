@@ -658,19 +658,78 @@ std::vector<Index> get_likely_expression_duplicates(const global &glob);
 */
 bool all_allow_remap(const global &glob);
 
+/** \brief Forbid remappings if not consecutive */
 template <class T>
 struct forbid_remap {
   T &remap;
   forbid_remap(T &remap) : remap(remap) {}
-  void operator()(Index i) { remap[i] = i; }
+  void operator()(Index a, Index b) {
+    bool ok = true;
+    for (Index i = a + 1; i <= b; i++) {
+      ok &= (remap[i] - remap[i - 1] == 1);
+    }
+    if (ok) {
+      return;
+    } else {
+      for (Index i = a; i <= b; i++) {
+        remap[i] = i;
+      }
+    }
+  }
 };
 
 /** \brief Remap identical sub-expressions
 
-    Special attention must be payed to operators with pointer inputs
-    because they assume a contiguous memory layout. Extra calculations
-    are required to deal with this case (can be skipped by passing
-   `all_allow_remap=true`).
+    \details
+
+    ### Description
+    Recall that all variables are stored sequentially on the
+    tape and that each variable can be thought of as an 'expression'.
+    The purpuse of the present function is to find out for any given
+    variable whether it has already been calculated and, if so, find
+    its first occurance. Finally, having constructed such a variable
+    remapping table, we apply the remapping to all operator *inputs*,
+    and return.
+
+    This routine is thus only useful when followed by a call to the
+    method `global::eliminate`, which will remove all redundant
+    variables.
+
+    ### Algorithm
+    The algorithm essentially consists of two forward passes:
+
+    1. **Hash step** Calculate a table of *likely* valid remappings
+       using `global::hash_sweep` and `radix::first_occurance`. We
+       call the resulting vector 'remap'. It satisfies `remap[i] <= i`
+       with equality signifying that the variable `i` must be kept as
+       is (which is always valid).
+
+    2. **Proof step** Assume by induction that `remap[j]` is valid for
+       all j strictly less than i. We must decide if `remap[i]` is
+       valid, that is if the expressions `remap[i]` and `i` are
+       identical. The two expressions are identical if they are result
+       of the same operator *and* if their inputs are identical
+       expressions. Because these inputs have index smaller than `i`
+       we know that `remap` is valid for them. In other words we
+       simply check that `remap[inputs(remap[i])]` is the same as
+       `remap[inputs(i)]`. If this is the case we have proved that the
+       expressions are equal and can accept the remapping. Otherwise
+       we reject the remapping by setting `remap[i]=i`. In any case
+       `remap[i]` now contains a valid remapping which completes the
+       induction step.
+
+    ### Applying the remap
+    To summarize the above algorithm, it gives as output a vector
+    `remap` such that expressions `i` and `remap[i]` are identical. We
+    can thus apply the remap to all operator inputs and get an
+    equivalent computational graph.
+
+    However, special attention must be payed to operators with
+    pointer inputs because they assume a contiguous memory layout.
+    If an operator assumes a contiguous memory layout of the variables
+    `a:b` we must require that the remapped variables `remap[a:b]` are
+    also contiguous. This is done as a post rejection step by setting
+    `remap[a:b] := a:b` for invalid remappings.
 
     \param glob Function object to be modified
     \param all_allow_remap Skip extra check

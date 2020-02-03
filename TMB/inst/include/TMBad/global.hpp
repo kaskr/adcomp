@@ -14,6 +14,7 @@
 #include <valarray>
 #include <vector>
 /** \brief Test whether the maximum of GLOBAL_INDEX_TYPE has been exceeded */
+/** \brief Namespace of all TMBad classes and functions */
 namespace TMBad {
 
 typedef unsigned int hash_t;
@@ -40,6 +41,7 @@ struct intervals {
   struct ep : std::pair<T, bool> {
     bool left() const { return !this->second; }
     ep(T x, bool type) : std::pair<T, bool>(x, type) {}
+    operator T() { return this->first; }
   };
   std::set<ep> x;
   typedef typename std::set<ep>::iterator iterator;
@@ -65,15 +67,24 @@ struct intervals {
     if (insert_x2) x.insert(x2);
     return change;
   }
-  void print() {
-    for (iterator it = x.begin(); it != x.end(); ++it) {
-      if (it->left()) Rcout << "[ ";
-      Rcout << (*it).first;
-      if (it->left())
-        Rcout << " , ";
-      else
-        Rcout << " ] ";
+  /** \brief Apply a functor to each interval */
+  template <class F>
+  F &apply(F &f) const {
+    for (iterator it = x.begin(); it != x.end();) {
+      ep a = *it;
+      ++it;
+      ep b = *it;
+      ++it;
+      f(a, b);
     }
+    return f;
+  }
+  struct print_interval {
+    void operator()(T a, T b) { Rcout << "[ " << a << " , " << b << " ] "; }
+  };
+  void print() {
+    print_interval f;
+    this->apply(f);
     Rcout << "\n";
   }
 };

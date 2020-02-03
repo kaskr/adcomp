@@ -577,11 +577,14 @@ struct ADFun {
 
       } else {
         if (atomic_jac_row.Domain() == 0) {
-          Rcout << "jac_row create\n";
+          Rcout << "Warning: This is an experimental compression method\n";
+          Rcout << "Disable: 'config(tmbad.sparse_hessian_compress=0)'\n";
           atomic_jac_row = this->JacFun(true, keep_x, keep_y);
-          Rcout << atomic_jac_row.glob.opstack.size() << "\n";
           atomic_jac_row.optimize();
-          Rcout << atomic_jac_row.glob.opstack.size() << "\n";
+          atomic_jac_row.glob.set_fuse(true);
+          atomic_jac_row.replay();
+          atomic_jac_row.glob.set_fuse(false);
+
           atomic_jac_row = atomic_jac_row.atomic();
 
           replay.clear_deriv_sub();
