@@ -31,7 +31,7 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
     reverse_compiled <- getNativeSymbolInfo("reverse",PACKAGE=dllinfo)$address
     .Call("TransformADFunObject",
           ptr,
-          list(method=100L,
+          list(method="set_compiled",
                forward_compiled=forward_compiled,
                reverse_compiled=reverse_compiled
                ), PACKAGE=DLL)
