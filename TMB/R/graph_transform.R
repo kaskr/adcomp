@@ -1,7 +1,7 @@
 ## Utility
-tape_print <- function(x, depth=0, dot=FALSE, DLL=getUserDLL()) {
+tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL()) {
     if (is.list(x)) x <- x$ptr
-    control <- list(depth=as.integer(depth), dot=as.integer(dot))
+    control <- list(depth=as.integer(depth), method=as.character(method))
     .Call("tmbad_print", x, control, PACKAGE=DLL)
 }
 
@@ -16,7 +16,7 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
     }
     what <- match.arg(what)
     DLL <- obj$env$DLL
-    control <- list(method=2L)
+    control <- list(method="src")
     dll <- tempfile()
     dll.cpp <- paste0(dll, ".cpp")
     sink(dll.cpp)
