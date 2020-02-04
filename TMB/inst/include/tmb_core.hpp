@@ -1525,9 +1525,10 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   SEXP tag = R_ExternalPtrTag(f);
   if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
   adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-  int method = getListInteger(control, "method", 0);
+  std::string method =
+    CHAR(STRING_ELT(getListElement(control, "method"), 0));
   // Test adfun copy
-  if (method == -1) {
+  if (method == "copy") {
     adfun* pf_new = new adfun(*pf);
     /* Convert ADFun pointer to R_ExternalPtr */
     SEXP res;
@@ -1540,7 +1541,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     UNPROTECT(2);
     return ans;
   }
-  if (method == 100) {
+  if (method == "set_compiled") {
     typedef void(*fct_ptr1)(double*);
     typedef void(*fct_ptr2)(double*,double*);
     pf->glob.forward_compiled =
@@ -1555,16 +1556,16 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
   for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
   TMB_TRY {
-    if (method == 0)
+    if (method == "marginal_greedy")
       *pf = pf -> marginal_greedy(random);
-    else if (method == 1)
+    else if (method == "marginal_sr")
       *pf = pf -> marginal_sr(random);
-    else if (method == 2)
+    else if (method == "parallelize")
       *pf = pf -> parallelize(2);
-    else if (method == 9) {
+    else if (method == "compress") {
       TMBad::compress(pf->glob, max_period_size);
     }
-    else if (method == 10) {
+    else if (method == "compress_and_compile") {
 #ifdef HAVE_COMPILE_HPP
       TMBad::compress(pf->glob, max_period_size);
       // if (config.optimize.instantly) pf->glob.eliminate();
@@ -1573,17 +1574,21 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       Rf_error("TMBad::compile() is unavailable");
 #endif
     }
-    else if (method == 11)
+    else if (method == "accumulation_tree_split")
       pf->glob = accumulation_tree_split(pf->glob, true);
-    else if (method == 12) {
+    else if (method == "fuse_and_replay") {
       pf->glob.set_fuse(true);
       pf->replay();
       pf->glob.set_fuse(false);
     }
-    else if (method == 13) {
+    else if (method == "reorder_random") {
       pf->reorder(random);
     }
-    if (config.optimize.instantly && method < 10) pf->optimize();
+    else if (method == "optimize") {
+      pf->optimize();
+    } else {
+      Rf_error("Method unknown: ", method.c_str());
+    }
   }
   TMB_CATCH {
     TMB_ERROR_BAD_ALLOC;
