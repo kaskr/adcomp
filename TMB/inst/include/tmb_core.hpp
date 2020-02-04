@@ -1751,17 +1751,18 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     typedef TMBad::ADFun<ad> adfun;
     adfun* pf;
     pf = (adfun*) R_ExternalPtrAddr(f);
-    int method = getListInteger(control, "method", 0);
-    if (method == 0) { // Print tape
+    std::string method =
+      CHAR(STRING_ELT(getListElement(control, "method"), 0));
+    if (method == "tape") { // Print tape
       int depth = getListInteger(control, "depth", 1);
       TMBad::global::print_config cfg;
       cfg.depth = depth;
       pf->glob.print(cfg);
     }
-    else if (method == 1) { // Print dot format
+    else if (method == "dot") { // Print dot format
       graph2dot(pf->glob, true, Rcout);
     }
-    else if (method == 2) { // Print C src code
+    else if (method == "src") { // Print C src code
       TMBad::code_config cfg;
       cfg.gpu = false;
       cfg.asm_comments = false;
@@ -1776,7 +1777,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       write_reverse(glob, cfg);
     }
     else {
-      Rf_error("Unknown method");
+      Rf_error("Unknown method: ", method.c_str());
     }
 #endif
     return R_NilValue;
