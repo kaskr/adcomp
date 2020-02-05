@@ -137,7 +137,7 @@ isNullPointer <- function(pointer) {
 ##' @note Do not rely upon the default arguments of any of the functions in the model object \code{obj$fn}, \code{obj$gr}, \code{obj$he}, \code{obj$report}. I.e. always use the explicit form \code{obj$fn(obj$par)} rather than \code{obj$fn()}.
 ##'
 ##' @title Construct objective functions with derivatives based on a compiled C++ template.
-##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).
+##' @param data List of data objects (vectors, matrices, arrays, factors, sparse matrices) required by the user template (order does not matter and un-used components are allowed).
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
 ##' @param map List defining how to optionally collect and fix parameters - see details.
 ##' @param type Character vector defining which operation stacks are generated from the users template - see details.
