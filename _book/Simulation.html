@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>13 Simulation | The comprehensive TMB documentation</title>
-  <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="13 Simulation | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -25,13 +24,13 @@
 
 
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="Sparsity.html">
-<link rel="next" href="Validation.html">
+<link rel="prev" href="Sparsity.html"/>
+<link rel="next" href="Validation.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -39,6 +38,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -54,7 +56,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -285,37 +286,37 @@ executed when requested from R.</p>
 <h3><span class="header-section-number">13.2.1</span> A linear regression example</h3>
 <p>A complete example extending the example <a href="../linreg_8cpp-example.html">linreg.cpp</a>
 with simulation code is:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp">
-<span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
-<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
-Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
-{
-  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);
-  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);
-  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);
-  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);
-  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(sd);
-  <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; mu = a + b * x;
-  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(y, mu, sd, <span class="kw">true</span>));
-  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {
-    y = <a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(mu, sd);  <span class="co">// Simulate response</span>
-    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(y);          <span class="co">// Report the simulation</span>
-  }
-  <span class="cf">return</span> nll;
-}</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb33-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></a>
+<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
+<a class="sourceLine" id="cb33-4" data-line-number="4">Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</a>
+<a class="sourceLine" id="cb33-5" data-line-number="5">{</a>
+<a class="sourceLine" id="cb33-6" data-line-number="6">  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);</a>
+<a class="sourceLine" id="cb33-7" data-line-number="7">  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</a>
+<a class="sourceLine" id="cb33-8" data-line-number="8">  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);</a>
+<a class="sourceLine" id="cb33-9" data-line-number="9">  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);</a>
+<a class="sourceLine" id="cb33-10" data-line-number="10">  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(sd);</a>
+<a class="sourceLine" id="cb33-11" data-line-number="11">  <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; mu = a + b * x;</a>
+<a class="sourceLine" id="cb33-12" data-line-number="12">  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(y, mu, sd, <span class="kw">true</span>));</a>
+<a class="sourceLine" id="cb33-13" data-line-number="13">  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {</a>
+<a class="sourceLine" id="cb33-14" data-line-number="14">    y = <a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(mu, sd);  <span class="co">// Simulate response</span></a>
+<a class="sourceLine" id="cb33-15" data-line-number="15">    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(y);          <span class="co">// Report the simulation</span></a>
+<a class="sourceLine" id="cb33-16" data-line-number="16">  }</a>
+<a class="sourceLine" id="cb33-17" data-line-number="17">  <span class="cf">return</span> nll;</a>
+<a class="sourceLine" id="cb33-18" data-line-number="18">}</a></code></pre></div>
 <blockquote>
 <p>The <code>SIMULATE</code> block marks the simulation and is not executed by default.</p>
 </blockquote>
 <p>We compile the C++-file and the model object is constructed as usual:</p>
-<pre class="sourceCode r"><code class="sourceCode r">obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">DLL=</span><span class="st">&quot;linreg&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">obj &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(data, parameters, <span class="dt">DLL=</span><span class="st">&quot;linreg&quot;</span>)</a></code></pre></div>
 <p>Now a simulation can be generated with</p>
-<pre class="sourceCode r"><code class="sourceCode r">obj<span class="op">$</span><span class="kw">simulate</span>()</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">obj<span class="op">$</span><span class="kw">simulate</span>()</a></code></pre></div>
 <pre><code>## $y
 ##  [1]  1.2240818  0.3598138  0.4007715  0.1106827 -0.5558411  1.7869131
 ##  [7]  0.4978505 -1.9666172  0.7013559 -0.4727914</code></pre>
 <p>This only includes the simulated response - not the rest of the
 data. A complete dataset can be generated by:</p>
-<pre class="sourceCode r"><code class="sourceCode r">obj<span class="op">$</span><span class="kw">simulate</span>(<span class="dt">complete=</span><span class="ot">TRUE</span>)</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">obj<span class="op">$</span><span class="kw">simulate</span>(<span class="dt">complete=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>## $y
 ##  [1] -1.0678237 -0.2179749 -1.0260044 -0.7288912 -0.6250393 -1.6866933
 ##  [7]  0.8377870  0.1533731 -1.1381369  1.2538149
@@ -337,18 +338,18 @@ that can be used for this.</p>
 <h3><span class="header-section-number">13.2.2</span> A simulation study</h3>
 <p>Simulating datasets from known parameters and re-estimationg those
 parameters can be done generically by:</p>
-<pre class="sourceCode r"><code class="sourceCode r">sim &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">50</span>, {
-  simdata &lt;-<span class="st"> </span>obj<span class="op">$</span><span class="kw">simulate</span>(<span class="dt">par=</span>obj<span class="op">$</span>par, <span class="dt">complete=</span><span class="ot">TRUE</span>)
-  obj2 &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(simdata, parameters, <span class="dt">DLL=</span><span class="st">&quot;linreg&quot;</span>, <span class="dt">silent=</span><span class="ot">TRUE</span>)
-  <span class="kw">nlminb</span>(obj2<span class="op">$</span>par, obj2<span class="op">$</span>fn, obj2<span class="op">$</span>gr)<span class="op">$</span>par
-})</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">sim &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">50</span>, {</a>
+<a class="sourceLine" id="cb39-2" data-line-number="2">  simdata &lt;-<span class="st"> </span>obj<span class="op">$</span><span class="kw">simulate</span>(<span class="dt">par=</span>obj<span class="op">$</span>par, <span class="dt">complete=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb39-3" data-line-number="3">  obj2 &lt;-<span class="st"> </span><span class="kw">MakeADFun</span>(simdata, parameters, <span class="dt">DLL=</span><span class="st">&quot;linreg&quot;</span>, <span class="dt">silent=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb39-4" data-line-number="4">  <span class="kw">nlminb</span>(obj2<span class="op">$</span>par, obj2<span class="op">$</span>fn, obj2<span class="op">$</span>gr)<span class="op">$</span>par</a>
+<a class="sourceLine" id="cb39-5" data-line-number="5">})</a></code></pre></div>
 <p>We reshape and plot the result:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
-<a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">estimate=</span><span class="kw">as.vector</span>(sim), <span class="dt">parameter=</span><span class="kw">names</span>(obj<span class="op">$</span>par)[<span class="kw">row</span>(sim)])
-<span class="kw">densityplot</span>( <span class="op">~</span><span class="st"> </span>estimate <span class="op">|</span><span class="st"> </span>parameter, <span class="dt">data=</span><a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a>, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw">library</span>(lattice)</a>
+<a class="sourceLine" id="cb40-2" data-line-number="2"><a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">estimate=</span><span class="kw">as.vector</span>(sim), <span class="dt">parameter=</span><span class="kw">names</span>(obj<span class="op">$</span>par)[<span class="kw">row</span>(sim)])</a>
+<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="kw">densityplot</span>( <span class="op">~</span><span class="st"> </span>estimate <span class="op">|</span><span class="st"> </span>parameter, <span class="dt">data=</span><a class="code" href="../group__R__style__distribution.html#ga6297091307163f5bb21e1a526fc8044a">df</a>, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</a></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-29-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <p>Compare with the true parameter values of the simulation:</p>
-<pre class="sourceCode r"><code class="sourceCode r">obj<span class="op">$</span>par</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">obj<span class="op">$</span>par</a></code></pre></div>
 <pre><code>##  a  b sd 
 ##  0  0  1</code></pre>
 </div>
@@ -357,41 +358,41 @@ parameters can be done generically by:</p>
 <p>The examples <a href="../sam_8cpp-example.html">sam.cpp</a> and <a href="../ar1_4D_8cpp-example.html">ar1_4D.cpp</a>
 includes more advanced simulation code. The latter demonstrates how to
 simulate from the density objects:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// Separable covariance on 4D lattice with AR1 structure in each direction.</span>
-<span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
-
-<span class="co">/* Parameter transform */</span>
-<span class="kw">template</span> &lt;<span class="kw">class</span> Type&gt;
-Type f(Type x){<span class="cf">return</span> Type(<span class="dv">2</span>)/(Type(<span class="dv">1</span>) + exp(-Type(<span class="dv">2</span>) * x)) - Type(<span class="dv">1</span>);}
-
-<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
-Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
-{
-  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(N)
-  <a class="code" href="../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(eta);
-  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(transf_phi); <span class="co">/* fastest running dim */</span>
-  Type phi=f(transf_phi);
-  <a class="code" href="../group__macros.html#ga43a13c435127491364e4a167478f4992">ADREPORT</a>(phi);
-
-  <span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
-  Type res=<span class="dv">0</span>;
-
-  res+=AR1(phi,AR1(phi,AR1(phi,AR1(phi))))(eta);
-
-  <span class="co">// logdpois = N log lam - lam</span>
-  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>;i&lt;N.size();i++)res-=N[i]*eta[i]-exp(eta[i]);
-
-  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {
-    AR1(phi,AR1(phi,AR1(phi,AR1(phi)))).<a class="code" href="../atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">simulate</a>(eta);
-    <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; lam = exp(eta);
-    N = <a class="code" href="../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e">rpois</a>(lam);
-    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(eta);
-    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(N);
-  }
-
-  <span class="cf">return</span> res;
-
-}</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="co">// Separable covariance on 4D lattice with AR1 structure in each direction.</span></a>
+<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></a>
+<a class="sourceLine" id="cb43-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb43-4" data-line-number="4"><span class="co">/* Parameter transform */</span></a>
+<a class="sourceLine" id="cb43-5" data-line-number="5"><span class="kw">template</span> &lt;<span class="kw">class</span> Type&gt;</a>
+<a class="sourceLine" id="cb43-6" data-line-number="6">Type f(Type x){<span class="cf">return</span> Type(<span class="dv">2</span>)/(Type(<span class="dv">1</span>) + exp(-Type(<span class="dv">2</span>) * x)) - Type(<span class="dv">1</span>);}</a>
+<a class="sourceLine" id="cb43-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb43-8" data-line-number="8"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
+<a class="sourceLine" id="cb43-9" data-line-number="9">Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</a>
+<a class="sourceLine" id="cb43-10" data-line-number="10">{</a>
+<a class="sourceLine" id="cb43-11" data-line-number="11">  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(N)</a>
+<a class="sourceLine" id="cb43-12" data-line-number="12">  <a class="code" href="../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(eta);</a>
+<a class="sourceLine" id="cb43-13" data-line-number="13">  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(transf_phi); <span class="co">/* fastest running dim */</span></a>
+<a class="sourceLine" id="cb43-14" data-line-number="14">  Type phi=f(transf_phi);</a>
+<a class="sourceLine" id="cb43-15" data-line-number="15">  <a class="code" href="../group__macros.html#ga43a13c435127491364e4a167478f4992">ADREPORT</a>(phi);</a>
+<a class="sourceLine" id="cb43-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb43-17" data-line-number="17">  <span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
+<a class="sourceLine" id="cb43-18" data-line-number="18">  Type res=<span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb43-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb43-20" data-line-number="20">  res+=AR1(phi,AR1(phi,AR1(phi,AR1(phi))))(eta);</a>
+<a class="sourceLine" id="cb43-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb43-22" data-line-number="22">  <span class="co">// logdpois = N log lam - lam</span></a>
+<a class="sourceLine" id="cb43-23" data-line-number="23">  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>;i&lt;N.size();i++)res-=N[i]*eta[i]-exp(eta[i]);</a>
+<a class="sourceLine" id="cb43-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb43-25" data-line-number="25">  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {</a>
+<a class="sourceLine" id="cb43-26" data-line-number="26">    AR1(phi,AR1(phi,AR1(phi,AR1(phi)))).<a class="code" href="../atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">simulate</a>(eta);</a>
+<a class="sourceLine" id="cb43-27" data-line-number="27">    <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; lam = exp(eta);</a>
+<a class="sourceLine" id="cb43-28" data-line-number="28">    N = <a class="code" href="../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e">rpois</a>(lam);</a>
+<a class="sourceLine" id="cb43-29" data-line-number="29">    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(eta);</a>
+<a class="sourceLine" id="cb43-30" data-line-number="30">    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(N);</a>
+<a class="sourceLine" id="cb43-31" data-line-number="31">  }</a>
+<a class="sourceLine" id="cb43-32" data-line-number="32"></a>
+<a class="sourceLine" id="cb43-33" data-line-number="33">  <span class="cf">return</span> res;</a>
+<a class="sourceLine" id="cb43-34" data-line-number="34"></a>
+<a class="sourceLine" id="cb43-35" data-line-number="35">}</a></code></pre></div>
 <p>In this example the 4D-array <code>eta</code> is passed to the simulator by
 reference. Thereby the simulator knows the dimension of <code>eta</code> and can
 fill <code>eta</code> with a simulation.</p>
@@ -410,11 +411,13 @@ fill <code>eta</code> with a simulation.</p>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -422,12 +425,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -439,6 +441,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -457,8 +463,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>10 C++ tutorial | The comprehensive TMB documentation</title>
-  <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="10 C++ tutorial | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -25,13 +24,13 @@
 
 
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="Toolbox.html">
-<link rel="next" href="ModelObject.html">
+<link rel="prev" href="Toolbox.html"/>
+<link rel="next" href="ModelObject.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -39,6 +38,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -54,7 +56,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -230,22 +231,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="i-know-r-but-not-c" class="section level3">
 <h3><span class="header-section-number">10.0.1</span> I know R but not C++</h3>
 <p>Summary of how syntax differs between R and C++:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp">              R code             C++/TMB code
-
-Comments      <span class="er">#</span>                  <span class="co">//                          // Comment symbol</span>
-Constants     <span class="fl">3.4</span>                Type(<span class="fl">3.4</span>);                  <span class="co">// Explicit casting recommended in TMB</span>
-Scalar        x = <span class="fl">5.2</span>            Type x = Type(<span class="fl">5.2</span>);         <span class="co">// Variables must have type</span>
-Arrays        x = numeric(<span class="dv">10</span>)    <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(<span class="dv">10</span>);         <span class="co">// C++ code here does NOT initialize to 0</span>
-Indexing      x[<span class="dv">1</span>]+x[<span class="dv">10</span>]         x(<span class="dv">0</span>)+x(<span class="dv">9</span>);                  <span class="co">// C++ indexing is zero-based</span>
-Loops         <span class="cf">for</span>(i in <span class="dv">1</span>:<span class="dv">10</span>)     <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">1</span>;i&lt;=<span class="dv">10</span>;i++)      <span class="co">// Integer i must be declared in C++</span>
-Increments    x[<span class="dv">1</span>] = x[<span class="dv">1</span>] + <span class="dv">3</span>    x(<span class="dv">0</span>) += <span class="fl">3.0</span>;                <span class="co">// += -= *= /= incremental operators in C++</span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb29-1" data-line-number="1">              R code             C++/TMB code</a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb29-3" data-line-number="3">Comments      <span class="er">#</span>                  <span class="co">//                          // Comment symbol</span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4">Constants     <span class="fl">3.4</span>                Type(<span class="fl">3.4</span>);                  <span class="co">// Explicit casting recommended in TMB</span></a>
+<a class="sourceLine" id="cb29-5" data-line-number="5">Scalar        x = <span class="fl">5.2</span>            Type x = Type(<span class="fl">5.2</span>);         <span class="co">// Variables must have type</span></a>
+<a class="sourceLine" id="cb29-6" data-line-number="6">Arrays        x = numeric(<span class="dv">10</span>)    <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(<span class="dv">10</span>);         <span class="co">// C++ code here does NOT initialize to 0</span></a>
+<a class="sourceLine" id="cb29-7" data-line-number="7">Indexing      x[<span class="dv">1</span>]+x[<span class="dv">10</span>]         x(<span class="dv">0</span>)+x(<span class="dv">9</span>);                  <span class="co">// C++ indexing is zero-based</span></a>
+<a class="sourceLine" id="cb29-8" data-line-number="8">Loops         <span class="cf">for</span>(i in <span class="dv">1</span>:<span class="dv">10</span>)     <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">1</span>;i&lt;=<span class="dv">10</span>;i++)      <span class="co">// Integer i must be declared in C++</span></a>
+<a class="sourceLine" id="cb29-9" data-line-number="9">Increments    x[<span class="dv">1</span>] = x[<span class="dv">1</span>] + <span class="dv">3</span>    x(<span class="dv">0</span>) += <span class="fl">3.0</span>;                <span class="co">// += -= *= /= incremental operators in C++</span></a></code></pre></div>
 <p>It is important to note the following difference compared to R:</p>
 <blockquote>
 <p>Vectors, matrices and arrays are <strong>not</strong> zero-initialized in C++.</p>
 </blockquote>
 <p>A zero initialized object is created using Eigens <code>setZero()</code>:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; m(<span class="dv">4</span>,<span class="dv">5</span>);
-m.setZero();</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb30-1" data-line-number="1"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; m(<span class="dv">4</span>,<span class="dv">5</span>);</a>
+<a class="sourceLine" id="cb30-2" data-line-number="2">m.setZero();</a></code></pre></div>
 </div>
 <div id="i-know-c" class="section level3">
 <h3><span class="header-section-number">10.0.2</span> I know C++</h3>
@@ -268,11 +269,13 @@ statement, so the code will produce unexpected results.</p>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -280,12 +283,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -297,6 +299,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -315,8 +321,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

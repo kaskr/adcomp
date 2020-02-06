@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2 Tutorial | The comprehensive TMB documentation</title>
-  <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2 Tutorial | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -25,13 +24,13 @@
 
 
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="Introduction.html">
-<link rel="next" href="Structure-TMB.html">
+<link rel="prev" href="Introduction.html"/>
+<link rel="next" href="Structure-TMB.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -39,6 +38,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -54,7 +56,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -238,13 +239,13 @@ i.e. the negative log-likelihood of the model. The program is compiled
 and called from R, where it can be fed to a function minimizer like
 <code>nlminb()</code>.</p>
 <p>The objective function should be of the following C++ type:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span>
-
-<span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;
-Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()
-{
-.... Here goes your C++ code ..... 
-}</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">{</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">.... Here goes your C++ code ..... </a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">}</a></code></pre></div>
 <p>The first line includes the source code for the whole TMB package (and
 all its dependencies). The objective function is a templated class
 where <code>&lt;Type&gt;</code> is the data type of both the input values and
@@ -256,8 +257,8 @@ technical aspects of this are hidden from the user. There is however
 one aspect that surprises the new TMB user. When a constant like “1.2”
 is used in a calculation that affects the return value it must be
 “cast” to Type:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp">Type nll;           <span class="co">// Define variable that holds the return value (neg. log. lik)</span>
-nll = Type(<span class="fl">1.2</span>);    <span class="co">// Assign value 1.2; a cast is needed.</span></code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb2-1" data-line-number="1">Type nll;           <span class="co">// Define variable that holds the return value (neg. log. lik)</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">nll = Type(<span class="fl">1.2</span>);    <span class="co">// Assign value 1.2; a cast is needed.</span></a></code></pre></div>
 <div id="obtaining-data-and-parameter-values-from-r" class="section level2">
 <h2><span class="header-section-number">2.1</span> Obtaining data and parameter values from R</h2>
 <p>Obviously, we will need to pass both data and parameter values to the
@@ -279,11 +280,11 @@ defines for us.</p>
 your browser (you may need to refresh the browser window between each
 time you make a new search). A simple example if you want to read a
 vector of numbers (doubles) is the following</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);     <span class="co">// Vector x(0),x(1),...,x(n-1), where n is the length of x</span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb3-1" data-line-number="1"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);     <span class="co">// Vector x(0),x(1),...,x(n-1), where n is the length of x</span></a></code></pre></div>
 <p>Note that all vectors and matrices in TMB uses a <strong>zero-based</strong>
 indexing scheme. It is not necessary to explicitly pass the dimension
 of <code>x</code>, as it can be retrieved inside the C++ program:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = x.size();</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="dt">int</span> n = x.size();</a></code></pre></div>
 </div>
 </div>
 <div id="an-extended-c-language" class="section level2">
@@ -299,9 +300,9 @@ likelihood functions. You have different toolboxes available:</p>
 <code>PARAMETER_</code> macros there can be “local” variables, for which
 ordinary C++ scoping rules apply. There must also be a variable that
 holds the return value (neg. log. likelihood).</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);               <span class="co">// Vector x(0), x(1), ..., x(n-1)</span>
-Type tmp = x(<span class="dv">1</span>);
-Type nll = tmp * tmp; </code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb5-1" data-line-number="1"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);               <span class="co">// Vector x(0), x(1), ..., x(n-1)</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">Type tmp = x(<span class="dv">1</span>);</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">Type nll = tmp * tmp; </a></code></pre></div>
 <p>As in ordinary C++ local variable tmp must be assigned a value before
 it can enter into a calculation.</p>
 </div>
@@ -329,9 +330,9 @@ density of data and latent random variables. Each datum and individual
 latent random effect gives a contribution to log likelihood, which may
 be though of as a “distribution assignment” by users familiar with
 software in the BUGS family.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);          <span class="co">// Latent random variable </span>
-Type nll = Type(<span class="dv">0</span>);           <span class="co">// Return value</span>
-nll -= dnorm(u(<span class="dv">0</span>),<span class="dv">0</span>,<span class="dv">1</span>,<span class="kw">true</span>)   <span class="co">// Distributional assignment: u(0) ~ N(0,1) </span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb6-1" data-line-number="1"><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);          <span class="co">// Latent random variable </span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">Type nll = Type(<span class="dv">0</span>);           <span class="co">// Return value</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">nll -= dnorm(u(<span class="dv">0</span>),<span class="dv">0</span>,<span class="dv">1</span>,<span class="kw">true</span>)   <span class="co">// Distributional assignment: u(0) ~ N(0,1) </span></a></code></pre></div>
 <p>The following rules apply:</p>
 <ul>
 <li>Distribution assignments do not need to take place before the latent
@@ -364,11 +365,13 @@ these libraries, the user can use raw C++ code:
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -376,12 +379,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -393,6 +395,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -411,8 +417,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

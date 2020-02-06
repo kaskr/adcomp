@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html >
-
+<html lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6 Multivariate distributions | The comprehensive TMB documentation</title>
-  <meta name="description" content="Comprehensive documentation of TMB - theory and examples.">
-  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+  <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6 Multivariate distributions | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -25,13 +24,13 @@
 
 
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="R-style-distribution.html">
-<link rel="next" href="Examples.html">
+<link rel="prev" href="R-style-distribution.html"/>
+<link rel="next" href="Examples.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -39,6 +38,9 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -54,7 +56,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -228,7 +229,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="Densities" class="section level1">
 <h1><span class="header-section-number">6</span> Multivariate distributions</h1>
 <p>The namespace</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a></code></pre></div>
 <p>gives access to a variety of multivariate normal distributions:</p>
 <ul>
 <li>Multivariate normal distributions specified via a covariance matrix
@@ -255,19 +256,19 @@ density, opposed to the univariate densities in <a href="R-style-distribution.ht
 <p>Consider a zero-mean multivariate normal distribution
 with covariance matrix <em>Sigma</em> (symmetric positive definite),
 that we want to evaluate at <em>x</em>:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = <span class="dv">10</span>;
-<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point           </span>
-x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="dt">int</span> n = <span class="dv">10</span>;</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point           </span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></a></code></pre></div>
 <p>The negative log-normal density is evaluated as follows:</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
-<a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span>
-<span class="co">// ..... User must assign value to Sigma here</span>
-res = <a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(x);      <span class="co">// Evaluate negative log likelihod</span></code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">// ..... User must assign value to Sigma here</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">res = <a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(x);      <span class="co">// Evaluate negative log likelihod</span></a></code></pre></div>
 <p>In the last line <code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)</code> should be interpreted as a
 multivariate density, which via the last parenthesis <code>(x)</code> is
 evaluated at <code>x</code>. A less compact way of expressing this is</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);
-res = your_dmnorm(x);</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">res = your_dmnorm(x);</a></code></pre></div>
 <p>in which <code>your_dmnorm</code> is a variable that holds the “density”.</p>
 <p>Note, that the latter way (using the <code>MVNORM_t</code>) is <em>more efficient</em>
 when you need to evaluate the density more than once, i.e. for different values of <code>x</code>.</p>
@@ -279,19 +280,19 @@ these freely (modulo the positive definite constraint) you can use
 <code><a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>()</code> to specify variances. <code><a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>()</code> takes as
 input a vector a dummy parameters that internally is used to build the
 correlation matrix via its cholesky factor.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
-<span class="dt">int</span> n = <span class="dv">10</span>;
-<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; unconstrained_params(n*(n<span class="dv">-1</span>)/<span class="dv">2</span>);  <span class="co">// Dummy parameterization of correlation matrix</span>
-<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; sds(n);                           <span class="co">// Standard deviations</span>
-res = <a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>(<a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="dt">int</span> n = <span class="dv">10</span>;</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; unconstrained_params(n*(n<span class="dv">-1</span>)/<span class="dv">2</span>);  <span class="co">// Dummy parameterization of correlation matrix</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; sds(n);                           <span class="co">// Standard deviations</span></a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">res = <a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>(<a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</a></code></pre></div>
 <p>If all elements of <code>dummy_params</code> are estimated we are in effect
 estimating a full correlation matrix without any constraints on its
 elements (except for the mandatory positive definiteness). The actual
 value of the correlation matrix, but not the full covariance matrix,
 can easily be assessed using the <code>.<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>()</code> operator</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);
-Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();
-<a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to R session</span></code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb12-1" data-line-number="1"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to R session</span></a></code></pre></div>
 </div>
 <div id="autoregressive-processes" class="section level2">
 <h2><span class="header-section-number">6.2</span> Autoregressive processes</h2>
@@ -301,13 +302,13 @@ Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd88
 <li><em>x(t)</em> has mean 0 and variance 1 (for all <em>t</em>).</li>
 </ul>
 <p>The multivariate density of the vector <em>x</em> can be evaluated as follows</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = <span class="dv">10</span>;
-<span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
- 
-<a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point</span>
-x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span>
-Type rho = <span class="fl">0.2</span>;              <span class="co">// Correlation parameter</span>
-res = AR1(rho)(x);           <span class="co">// Evaluate negative log-<a class="code" href="../namespacedensity.html">density</a> of AR1 process at point x </span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="dt">int</span> n = <span class="dv">10</span>;</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"> </a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5">x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">Type rho = <span class="fl">0.2</span>;              <span class="co">// Correlation parameter</span></a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">res = AR1(rho)(x);           <span class="co">// Evaluate negative log-<a class="code" href="../namespacedensity.html">density</a> of AR1 process at point x </span></a></code></pre></div>
 <p>Due to the assumed stationarity the correlation parameter must
 satisfy:</p>
 <ul>
@@ -315,8 +316,8 @@ satisfy:</p>
 </ul>
 <p>Note that <em>cor[x(t),x(t-1)] = rho</em>.</p>
 <p>The <code>SCALE()</code> function can be used to set the standard deviation.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp">Type sigma = <span class="fl">2.1</span>;            <span class="co">// standard deviation of x</span>
-res = SCALE(AR1(rho),sigma)(x);</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb14-1" data-line-number="1">Type sigma = <span class="fl">2.1</span>;            <span class="co">// standard deviation of x</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">res = SCALE(AR1(rho),sigma)(x);</a></code></pre></div>
 <p>Now, <em>var[x(t)] = sigma^2</em>. Because all elements of <code>x</code> are scaled by
 the same constant we use SCALE rather than VECSCALE.</p>
 <div id="multivariate-ar1-processes" class="section level4">
@@ -324,14 +325,14 @@ the same constant we use SCALE rather than VECSCALE.</p>
 <p>This is the first real illustration of how distributions can be used
 as building blocks to obtain more complex distributions. Consider the
 <em>p</em> dimensional AR1 process</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> n = <span class="dv">10</span>;                   <span class="co">// Number of time steps</span>
-<span class="dt">int</span> p=<span class="dv">3</span>;                      <span class="co">// dim(x)</span>
-<a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(p,n);           <span class="co">// Evaluation point</span></code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="dt">int</span> n = <span class="dv">10</span>;                   <span class="co">// Number of time steps</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="dt">int</span> p=<span class="dv">3</span>;                      <span class="co">// dim(x)</span></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(p,n);           <span class="co">// Evaluation point</span></a></code></pre></div>
 <p>The columns in <code>x</code> refer to the different time points. We then
 evaluate the (negative log) joint density of the time series.</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);  <span class="co">// Density of x(t) </span>
-Type phi;                           <span class="co">// Correlation parameter</span>
-res = AR1(phi,your_dmnorm)(x);</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);  <span class="co">// Density of x(t) </span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">Type phi;                           <span class="co">// Correlation parameter</span></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">res = AR1(phi,your_dmnorm)(x);</a></code></pre></div>
 <p>Note the following:</p>
 <ul>
 <li>We have introduced an intermediate variable <code>your_dmnorm</code>, which
@@ -373,16 +374,16 @@ space by a distance <code>ds</code> and in time by a distance <code>dt</code>, h
 correlation given by</p>
 <p><code>rho_s^ds*rho_t^dt</code></p>
 <p>This is implemented as</p>
-<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;
-<span class="dt">int</span> n_s = <span class="dv">10</span>;                   <span class="co">// Number of grid points in space</span>
-<span class="dt">int</span> <span class="dt">n_t</span> = <span class="dv">10</span>;                   <span class="co">// Number of grid points in time</span>
-Type rho_s = <span class="fl">0.2</span>;               <span class="co">// Correlation in space</span>
-Type <span class="dt">rho_t</span> = <span class="fl">0.4</span>;               <span class="co">// Correlation in time</span>
-
-<a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(n_s,<span class="dt">n_t</span>);
-x.setZero();                    <span class="co">// x = 0</span>
-
-res = <a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(<span class="dt">rho_t</span>),AR1(rho_s))(x);</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="dt">int</span> n_s = <span class="dv">10</span>;                   <span class="co">// Number of grid points in space</span></a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="dt">int</span> <span class="dt">n_t</span> = <span class="dv">10</span>;                   <span class="co">// Number of grid points in time</span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4">Type rho_s = <span class="fl">0.2</span>;               <span class="co">// Correlation in space</span></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5">Type <span class="dt">rho_t</span> = <span class="fl">0.4</span>;               <span class="co">// Correlation in time</span></a>
+<a class="sourceLine" id="cb17-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb17-7" data-line-number="7"><a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(n_s,<span class="dt">n_t</span>);</a>
+<a class="sourceLine" id="cb17-8" data-line-number="8">x.setZero();                    <span class="co">// x = 0</span></a>
+<a class="sourceLine" id="cb17-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb17-10" data-line-number="10">res = <a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(<span class="dt">rho_t</span>),AR1(rho_s))(x);</a></code></pre></div>
 <p>Note that the arguments to <code><a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>()</code> are given in the opposite order
 to the dimensions of <code>x</code>.</p>
 </div>
@@ -398,11 +399,13 @@ to the dimensions of <code>x</code>.</p>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -410,12 +413,11 @@ gitbook.start({
 "github": false,
 "facebook": true,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -427,6 +429,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
@@ -445,8 +451,9 @@ gitbook.start({
     script.type = "text/javascript";
     var src = "true";
     if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
