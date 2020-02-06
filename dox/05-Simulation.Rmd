@@ -33,7 +33,7 @@ different:
 Currently the following simulators are implemented:
 
 ```{r, results='asis', echo=FALSE}
-tmp <- unlist(lapply(dir("../TMB/inst/include", full=TRUE), readLines))
+tmp <- unlist(lapply(dir("../TMB/inst/include", ".hpp$", full=TRUE), readLines))
 tmp <- grep('^VECTORIZE._n', tmp, value=TRUE)
 tmp <- sub(".*\\((.*)\\)","\\1",tmp)
 tmp <- paste(paste0("`",tmp,"()`"), collapse=", ")
