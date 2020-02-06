@@ -60,16 +60,16 @@ jobs:
       script:
         - ./bin/run_full_example_suite.sh
 
-    ## - stage: Build and deploy documentation
-    ##   r: release
-    ##   install:
-    ##     - wget http://www.student.dtu.dk/~kaskr/doxygen-1.8.12.linux.bin.tar.gz
-    ##     - tar zxf doxygen-1.8.12.linux.bin.tar.gz
-    ##     - export PATH=`pwd`/doxygen-1.8.12/bin:$PATH
-    ##     - doxygen -v
-    ##   script:
-    ##     - make doxygen
-    ##     - ./bin/deploy.sh
+    - stage: Build and deploy documentation
+      r: release
+      install:
+        - wget http://www.student.dtu.dk/~kaskr/doxygen-1.8.12.linux.bin.tar.gz
+        - tar zxf doxygen-1.8.12.linux.bin.tar.gz
+        - export PATH=`pwd`/doxygen-1.8.12/bin:$PATH
+        - doxygen -v
+      script:
+        - make doxygen
+        - ./bin/deploy.sh
 
 notifications:
   email:
