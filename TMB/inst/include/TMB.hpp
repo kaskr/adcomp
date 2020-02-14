@@ -88,6 +88,58 @@ namespace CppAD{
   template <class T>
   bool isnan(const AD<T> &x)CSKIP({ return isnan(Value(x)); })
 }
+#ifdef __APPLE__
+/* Apple clang++ is very strictive casting int to double or float*/
+  double sqrt(const int& i)CSKIP({return double(i);})
+  namespace std{
+    template<>
+    complex<AD<double>> operator/(const complex<AD<double>>& x, const complex<AD<double>>& y){
+      AD<double> d    = (y.real()*y.real() + y.imag()*y.imag());
+      AD<double> real = (x.real()*y.real() + x.imag()*y.imag())/d;
+      AD<double> imag = (x.imag()*y.real() - x.real()*y.imag())/d;
+      return complex<AD<double>>(real, imag);
+    }
+
+    template<>
+    complex<AD<AD<double>>> operator/(const complex<AD<AD<double>>>& x, const complex<AD<AD<double>>>& y){
+      AD<AD<double>> d    = (y.real()*y.real() + y.imag()*y.imag());
+      AD<AD<double>> real = (x.real()*y.real() + x.imag()*y.imag())/d;
+      AD<AD<double>> imag = (x.imag()*y.real() - x.real()*y.imag())/d;
+      return complex<AD<AD<double>>>(real, imag);
+
+    }
+
+    template<>
+    complex<AD<AD<AD<double>>>> operator/(const complex<AD<AD<AD<double>>>>& x, const complex<AD<AD<AD<double>>>>& y){
+      AD<AD<AD<double>>> d    = (y.real()*y.real() + y.imag()*y.imag());
+      AD<AD<AD<double>>> real = (x.real()*y.real() + x.imag()*y.imag())/d;
+      AD<AD<AD<double>>> imag = (x.imag()*y.real() - x.real()*y.imag())/d;
+      return complex<AD<AD<AD<double>>>>(real, imag);
+    }
+  
+    template<>
+    complex<AD<double>> operator*(const complex<AD<double>>& x, const complex<AD<double>>& y){
+      AD<double> real = (x.real()*y.real() - x.imag()*y.imag());
+      AD<double> imag = (x.imag()*y.real() + x.real()*y.imag());
+      return complex<AD<double>>(real, imag);
+    }
+
+    template<>
+    complex<AD<AD<double>>> operator*(const complex<AD<AD<double>>>& x, const complex<AD<AD<double>>>& y){
+      AD<AD<double>> real = (x.real()*y.real() - x.imag()*y.imag());
+      AD<AD<double>> imag = (x.imag()*y.real() + x.real()*y.imag());
+      return complex<AD<AD<double>>>(real, imag);
+    }
+
+    template<>
+    complex<AD<AD<AD<double>>>> operator*(const complex<AD<AD<AD<double>>>>& x, const complex<AD<AD<AD<double>>>>& y){
+      AD<AD<AD<double>>> real = (x.real()*y.real() - x.imag()*y.imag());
+      AD<AD<AD<double>>> imag = (x.imag()*y.real() + x.real()*y.imag());
+      return complex<AD<AD<AD<double>>>>(real, imag);
+    }
+  }
+#endif
+
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"
 #include "atomic_math.hpp"
