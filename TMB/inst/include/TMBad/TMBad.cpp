@@ -1652,10 +1652,6 @@ Index global::DynamicInputOutputOperator::output_size() const {
   return this->noutput_;
 }
 
-size_t &global::SharedDynamicOperator::reference_count() { return counter; }
-
-global::SharedDynamicOperator::SharedDynamicOperator() : counter(0) {}
-
 const char *global::InvOp::op_name() { return "InvOp"; }
 
 const char *global::DepOp::op_name() { return "DepOp"; }
