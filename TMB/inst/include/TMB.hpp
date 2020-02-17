@@ -88,6 +88,25 @@ namespace CppAD{
   template <class T>
   bool isnan(const AD<T> &x)CSKIP({ return isnan(Value(x)); })
 }
+// Experimental:
+// Workaround limitations in llvm libc++ implementation
+#ifdef _LIBCPP_VERSION
+namespace std {
+  template<class T>
+  complex<AD<T> > operator/(const complex<AD<T> >& x, const complex<AD<T> >& y) {
+    AD<T> d    = (y.real() * y.real() + y.imag() * y.imag());
+    AD<T> real = (x.real() * y.real() + x.imag() * y.imag()) / d;
+    AD<T> imag = (x.imag() * y.real() - x.real() * y.imag()) / d;
+    return complex<AD<T> >(real, imag);
+  }
+  template<class T>
+  complex<AD<T> > operator*(const complex<AD<T> >& x, const complex<AD<T> >& y) {
+    AD<T> real = (x.real() * y.real() - x.imag() * y.imag());
+    AD<T> imag = (x.imag() * y.real() + x.real() * y.imag());
+    return complex<AD<T> >(real, imag);
+  }
+}
+#endif // _LIBCPP_VERSION
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"
 #include "atomic_math.hpp"
