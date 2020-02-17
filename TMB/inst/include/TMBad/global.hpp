@@ -354,9 +354,9 @@ struct Writer : std::string {
 };
 
 template <>
-struct ForwardArgs<Writer> : ForwardArgs<double> {
-  typedef std::vector<double> ScalarVector;
-  typedef ForwardArgs<double> Base;
+struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
+  typedef std::vector<Scalar> ScalarVector;
+  typedef ForwardArgs<Scalar> Base;
   bool indirect;
   void set_indirect() {
     indirect = true;
@@ -371,14 +371,14 @@ struct ForwardArgs<Writer> : ForwardArgs<double> {
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
   Writer y_const(Index j) { return tostr(Base::y(j)); }
   ForwardArgs(IndexVector &inputs, ScalarVector &values)
-      : ForwardArgs<double>(inputs, values) {
+      : ForwardArgs<Scalar>(inputs, values) {
     indirect = false;
   }
 };
 
 template <>
 struct ReverseArgs<Writer> : Args<> {
-  typedef std::vector<double> ScalarVector;
+  typedef std::vector<Scalar> ScalarVector;
   bool indirect;
   void set_indirect() {
     indirect = true;
@@ -506,38 +506,39 @@ template <class CompleteOperator, bool dynamic>
 struct constructOperator {};
 template <class CompleteOperator>
 struct constructOperator<CompleteOperator, false> {
-  CompleteOperator *operator()(const global *glob) {
+  CompleteOperator *operator()() {
     static CompleteOperator *pOp = new CompleteOperator();
     return pOp;
   }
 };
 template <class CompleteOperator>
 struct constructOperator<CompleteOperator, true> {
-  CompleteOperator *operator()(const global *glob) {
+  CompleteOperator *operator()() {
     CompleteOperator *pOp = new CompleteOperator();
     return pOp;
   }
 
   template <class T1>
-  CompleteOperator *operator()(const global *glob, T1 x1) {
+  CompleteOperator *operator()(const T1 &x1) {
     CompleteOperator *pOp = new CompleteOperator(x1);
     return pOp;
   }
 
   template <class T1, class T2>
-  CompleteOperator *operator()(const global *glob, T1 x1, T2 x2) {
+  CompleteOperator *operator()(const T1 &x1, const T2 &x2) {
     CompleteOperator *pOp = new CompleteOperator(x1, x2);
     return pOp;
   }
 
   template <class T1, class T2, class T3>
-  CompleteOperator *operator()(const global *glob, T1 x1, T2 x2, T3 x3) {
+  CompleteOperator *operator()(const T1 &x1, const T2 &x2, const T3 &x3) {
     CompleteOperator *pOp = new CompleteOperator(x1, x2, x3);
     return pOp;
   }
 
   template <class T1, class T2, class T3, class T4>
-  CompleteOperator *operator()(const global *glob, T1 x1, T2 x2, T3 x3, T4 x4) {
+  CompleteOperator *operator()(const T1 &x1, const T2 &x2, const T3 &x3,
+                               const T4 &x4) {
     CompleteOperator *pOp = new CompleteOperator(x1, x2, x3, x4);
     return pOp;
   }
@@ -1257,19 +1258,6 @@ struct global {
     static const bool is_linear = false;
     /** \brief Is this operator a 'smart pointer' (with reference counting) ? */
     static const bool smart_pointer = false;
-    /** \brief If applicable, how to access the reference count */
-    size_t &reference_count() {
-      if (!(false)) {
-        Rcerr << "ASSERTION FAILED: "
-              << "false"
-              << "\n";
-        Rcerr << "POSSIBLE REASON: "
-              << "reference_count() member not implemented"
-              << "\n";
-        abort();
-      };
-      return *new (size_t);
-    }
     /** \brief How to fuse this operator (self) with another (other) */
     OperatorPure *other_fuse(OperatorPure *self, OperatorPure *other) {
       return NULL;
@@ -1331,10 +1319,6 @@ struct global {
   struct SharedDynamicOperator : UniqueDynamicOperator {
     /** \brief This is an `Operator::smart_pointer` */
     static const bool smart_pointer = true;
-
-    size_t counter;
-    size_t &reference_count();
-    SharedDynamicOperator();
   };
 
   /** \brief Add default implementation of mandatory members:
@@ -1343,13 +1327,15 @@ struct global {
   struct AddInputSizeOutputSize : OperatorBase {
     AddInputSizeOutputSize() {}
     template <class T1>
-    AddInputSizeOutputSize(T1 x1) : OperatorBase(x1) {}
+    AddInputSizeOutputSize(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddInputSizeOutputSize(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddInputSizeOutputSize(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddInputSizeOutputSize(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddInputSizeOutputSize(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddInputSizeOutputSize(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddInputSizeOutputSize(const T1 &x1, const T2 &x2, const T3 &x3,
+                           const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
     Index input_size() const { return this->ninput; }
     Index output_size() const { return this->noutput; }
@@ -1362,13 +1348,15 @@ struct global {
   struct AddIncrementDecrement : OperatorBase {
     AddIncrementDecrement() {}
     template <class T1>
-    AddIncrementDecrement(T1 x1) : OperatorBase(x1) {}
+    AddIncrementDecrement(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddIncrementDecrement(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddIncrementDecrement(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddIncrementDecrement(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddIncrementDecrement(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddIncrementDecrement(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddIncrementDecrement(const T1 &x1, const T2 &x2, const T3 &x3,
+                          const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
     void increment(IndexPair &ptr) {
       ptr.first += this->input_size();
@@ -1388,13 +1376,14 @@ struct global {
   struct AddForwardReverse : OperatorBase {
     AddForwardReverse() {}
     template <class T1>
-    AddForwardReverse(T1 x1) : OperatorBase(x1) {}
+    AddForwardReverse(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddForwardReverse(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddForwardReverse(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddForwardReverse(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddForwardReverse(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddForwardReverse(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddForwardReverse(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
 
     template <class Type>
@@ -1418,13 +1407,16 @@ struct global {
   struct AddForwardIncrReverseDecr : OperatorBase {
     AddForwardIncrReverseDecr() {}
     template <class T1>
-    AddForwardIncrReverseDecr(T1 x1) : OperatorBase(x1) {}
+    AddForwardIncrReverseDecr(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddForwardIncrReverseDecr(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddForwardIncrReverseDecr(const T1 &x1, const T2 &x2)
+        : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddForwardIncrReverseDecr(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddForwardIncrReverseDecr(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddForwardIncrReverseDecr(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddForwardIncrReverseDecr(const T1 &x1, const T2 &x2, const T3 &x3,
+                              const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
 
     template <class Type>
@@ -1447,13 +1439,16 @@ struct global {
   struct AddForwardMarkReverseMark : OperatorBase {
     AddForwardMarkReverseMark() {}
     template <class T1>
-    AddForwardMarkReverseMark(T1 x1) : OperatorBase(x1) {}
+    AddForwardMarkReverseMark(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddForwardMarkReverseMark(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddForwardMarkReverseMark(const T1 &x1, const T2 &x2)
+        : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddForwardMarkReverseMark(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddForwardMarkReverseMark(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddForwardMarkReverseMark(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddForwardMarkReverseMark(const T1 &x1, const T2 &x2, const T3 &x3,
+                              const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
 
     template <class Type>
@@ -1476,13 +1471,14 @@ struct global {
   struct AddDependencies : OperatorBase {
     AddDependencies() {}
     template <class T1>
-    AddDependencies(T1 x1) : OperatorBase(x1) {}
+    AddDependencies(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddDependencies(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddDependencies(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddDependencies(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddDependencies(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddDependencies(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddDependencies(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
     void dependencies(Args<> &args, Dependencies &dep) const {
       Index ninput_ = this->input_size();
@@ -1500,13 +1496,14 @@ struct global {
   struct AddForwardFromEval<OperatorBase, 1> : OperatorBase {
     AddForwardFromEval() {}
     template <class T1>
-    AddForwardFromEval(T1 x1) : OperatorBase(x1) {}
+    AddForwardFromEval(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddForwardFromEval(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddForwardFromEval(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddForwardFromEval(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddForwardFromEval(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddForwardFromEval(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddForwardFromEval(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
     template <class Type>
     void forward(ForwardArgs<Type> &args) {
@@ -1518,18 +1515,35 @@ struct global {
   struct AddForwardFromEval<OperatorBase, 2> : OperatorBase {
     AddForwardFromEval() {}
     template <class T1>
-    AddForwardFromEval(T1 x1) : OperatorBase(x1) {}
+    AddForwardFromEval(const T1 &x1) : OperatorBase(x1) {}
     template <class T1, class T2>
-    AddForwardFromEval(T1 x1, T2 x2) : OperatorBase(x1, x2) {}
+    AddForwardFromEval(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
     template <class T1, class T2, class T3>
-    AddForwardFromEval(T1 x1, T2 x2, T3 x3) : OperatorBase(x1, x2, x3) {}
+    AddForwardFromEval(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    AddForwardFromEval(T1 x1, T2 x2, T3 x3, T4 x4)
+    AddForwardFromEval(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
         : OperatorBase(x1, x2, x3, x4) {}
     template <class Type>
     void forward(ForwardArgs<Type> &args) {
       args.y(0) = this->eval(args.x(0), args.x(1));
     }
+  };
+
+  /** \brief Reference counting */
+  template <bool flag, class dummy>
+  struct ReferenceCounter {
+    void increment() {}
+    void decrement() {}
+    size_t operator()() const { return 0; }
+  };
+  template <class dummy>
+  struct ReferenceCounter<true, dummy> {
+    size_t counter;
+    ReferenceCounter() : counter(0) {}
+    void increment() { counter++; }
+    void decrement() { counter--; }
+    size_t operator()() const { return counter; }
   };
 
   /** \brief Utility for member completion */
@@ -1607,6 +1621,8 @@ struct global {
         (Operator1::max_fuse_depth < Operator2::max_fuse_depth
              ? Operator1::max_fuse_depth - 1
              : Operator2::max_fuse_depth - 1);
+    /** \copydoc Operator::is_linear */
+    static const bool is_linear = Operator1::is_linear && Operator2::is_linear;
     template <class Type>
     void forward_incr(ForwardArgs<Type> &args) {
       Op1.forward_incr(args);
@@ -1638,6 +1654,8 @@ struct global {
     static const int independent_variable = Operator1::independent_variable;
     /** \copydoc Operator::dependent_variable */
     static const int dependent_variable = Operator1::dependent_variable;
+    /** \copydoc Operator::is_linear */
+    static const bool is_linear = Operator1::is_linear;
     Index n;
     Rep(Index n) : n(n) {}
     Index input_size() const { return Operator1::ninput * n; }
@@ -1662,6 +1680,12 @@ struct global {
         `NULL`.
     */
     OperatorPure *compress() {
+      if (!(false)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        abort();
+      };
       std::vector<Index> &inputs = get_glob()->inputs;
       size_t k = Op.input_size();
       size_t start = inputs.size() - k * n;
@@ -1685,15 +1709,8 @@ struct global {
     }
     OperatorPure *other_fuse(OperatorPure *self, OperatorPure *other) {
       OperatorPure *op1 = get_glob()->getOperator<Operator1>();
-      if ((op1 == other) && (this->n < 16)) {
+      if (op1 == other) {
         this->n++;
-        if (this->n == 16) {
-          OperatorPure *cOp = this->compress();
-          if (cOp != NULL) {
-            self->deallocate();
-            return cOp;
-          }
-        }
         return self;
       }
       return NULL;
@@ -1708,6 +1725,7 @@ struct global {
       \note When replacing a batch of binary operators by
       `RepCompress` the memory *reduction* is assymptotically `2/3`
       (ratio will in general depend on the configuration typedefs).
+      \warning TO BE DEPRECATED. HAS IMPLICIT DEPENDENCIES.
   */
   template <class Operator1>
   struct RepCompress : DynamicOperator<-1, -1> {
@@ -1715,6 +1733,8 @@ struct global {
     static const int independent_variable = Operator1::independent_variable;
     /** \copydoc Operator::dependent_variable */
     static const int dependent_variable = Operator1::dependent_variable;
+    /** \copydoc Operator::is_linear */
+    static const bool is_linear = Operator1::is_linear;
     typename CPL<Operator1>::type Op;
     Index n;
 
@@ -1884,13 +1904,14 @@ struct global {
     typename CPL<OperatorBase>::type Op;
     Complete() {}
     template <class T1>
-    Complete(T1 x1) : Op(x1) {}
+    Complete(const T1 &x1) : Op(x1) {}
     template <class T1, class T2>
-    Complete(T1 x1, T2 x2) : Op(x1, x2) {}
+    Complete(const T1 &x1, const T2 &x2) : Op(x1, x2) {}
     template <class T1, class T2, class T3>
-    Complete(T1 x1, T2 x2, T3 x3) : Op(x1, x2, x3) {}
+    Complete(const T1 &x1, const T2 &x2, const T3 &x3) : Op(x1, x2, x3) {}
     template <class T1, class T2, class T3, class T4>
-    Complete(T1 x1, T2 x2, T3 x3, T4 x4) : Op(x1, x2, x3, x4) {}
+    Complete(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
+        : Op(x1, x2, x3, x4) {}
     ~Complete() {}
     void forward(ForwardArgs<Scalar> &args) { Op.forward(args); }
     void reverse(ReverseArgs<Scalar> &args) { Op.reverse(args); }
@@ -1970,9 +1991,10 @@ struct global {
     OperatorPure *other_fuse(OperatorPure *other) {
       return Op.other_fuse(this, other);
     }
+    ReferenceCounter<OperatorBase::smart_pointer, void> ref_count;
     OperatorPure *copy() {
       if (Op.smart_pointer) {
-        Op.reference_count()++;
+        ref_count.increment();
         return this;
       } else if (Op.dynamic)
         return new Complete(*this);
@@ -1982,8 +2004,8 @@ struct global {
     void deallocate() {
       if (!Op.dynamic) return;
       if (Op.smart_pointer) {
-        if (Op.reference_count() > 1) {
-          Op.reference_count()--;
+        if (ref_count() > 1) {
+          ref_count.decrement();
           return;
         }
       }
@@ -2013,28 +2035,29 @@ struct global {
 
   template <class OperatorBase>
   Complete<OperatorBase> *getOperator() const {
-    return constructOperator<Complete<OperatorBase>, OperatorBase::dynamic>()(
-        this);
+    return constructOperator<Complete<OperatorBase>, OperatorBase::dynamic>()();
   }
   template <class OperatorBase, class T1>
-  Complete<OperatorBase> *getOperator(T1 x1) const {
+  Complete<OperatorBase> *getOperator(const T1 &x1) const {
     return constructOperator<Complete<OperatorBase>, OperatorBase::dynamic>()(
-        this, x1);
+        x1);
   }
   template <class OperatorBase, class T1, class T2>
-  Complete<OperatorBase> *getOperator(T1 x1, T2 x2) const {
+  Complete<OperatorBase> *getOperator(const T1 &x1, const T2 &x2) const {
     return constructOperator<Complete<OperatorBase>, OperatorBase::dynamic>()(
-        this, x1, x2);
+        x1, x2);
   }
   template <class OperatorBase, class T1, class T2, class T3>
-  Complete<OperatorBase> *getOperator(T1 x1, T2 x2, T3 x3) const {
+  Complete<OperatorBase> *getOperator(const T1 &x1, const T2 &x2,
+                                      const T3 &x3) const {
     return constructOperator<Complete<OperatorBase>, OperatorBase::dynamic>()(
-        this, x1, x2, x3);
+        x1, x2, x3);
   }
   template <class OperatorBase, class T1, class T2, class T3, class T4>
-  Complete<OperatorBase> *getOperator(T1 x1, T2 x2, T3 x3, T4 x4) const {
+  Complete<OperatorBase> *getOperator(const T1 &x1, const T2 &x2, const T3 &x3,
+                                      const T4 &x4) const {
     return constructOperator<Complete<OperatorBase>, OperatorBase::dynamic>()(
-        this, x1, x2, x3, x4);
+        x1, x2, x3, x4);
   }
   struct InvOp : Operator<0> {
     static const int independent_variable = true;
@@ -2664,13 +2687,14 @@ template <class T>
 struct adaptive : T {
   adaptive() {}
   template <class T1>
-  adaptive(T1 x1) : T(x1) {}
+  adaptive(const T1 &x1) : T(x1) {}
   template <class T1, class T2>
-  adaptive(T1 x1, T2 x2) : T(x1, x2) {}
+  adaptive(const T1 &x1, const T2 &x2) : T(x1, x2) {}
   template <class T1, class T2, class T3>
-  adaptive(T1 x1, T2 x2, T3 x3) : T(x1, x2, x3) {}
+  adaptive(const T1 &x1, const T2 &x2, const T3 &x3) : T(x1, x2, x3) {}
   template <class T1, class T2, class T3, class T4>
-  adaptive(T1 x1, T2 x2, T3 x3, T4 x4) : T(x1, x2, x3, x4) {}
+  adaptive(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
+      : T(x1, x2, x3, x4) {}
   bool operator==(const T &other) const {
     return this->Value() == other.Value();
   }
@@ -3443,7 +3467,7 @@ struct LogSpaceSumStrideOp : global::DynamicOperator<-1, 1> {
   template <class Type>
   Type rowsum(Type **px, size_t i) const {
     size_t m = stride.size();
-    Type s = (double)(0);
+    Type s = (Scalar)(0);
     for (size_t j = 0; j < m; j++) {
       s += entry(px, i, j);
     }

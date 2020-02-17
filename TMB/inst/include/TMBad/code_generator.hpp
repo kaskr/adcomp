@@ -24,16 +24,17 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
-#define INHERIT_CTOR(A, B)                          \
-  A() {}                                            \
-  template <class T1>                               \
-  A(T1 x1) : B(x1) {}                               \
-  template <class T1, class T2>                     \
-  A(T1 x1, T2 x2) : B(x1, x2) {}                    \
-  template <class T1, class T2, class T3>           \
-  A(T1 x1, T2 x2, T3 x3) : B(x1, x2, x3) {}         \
-  template <class T1, class T2, class T3, class T4> \
-  A(T1 x1, T2 x2, T3 x3, T4 x4) : B(x1, x2, x3, x4) {}
+#define INHERIT_CTOR(A, B)                                       \
+  A() {}                                                         \
+  template <class T1>                                            \
+  A(const T1 &x1) : B(x1) {}                                     \
+  template <class T1, class T2>                                  \
+  A(const T1 &x1, const T2 &x2) : B(x1, x2) {}                   \
+  template <class T1, class T2, class T3>                        \
+  A(const T1 &x1, const T2 &x2, const T3 &x3) : B(x1, x2, x3) {} \
+  template <class T1, class T2, class T3, class T4>              \
+  A(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)      \
+      : B(x1, x2, x3, x4) {}
 #define GLOBAL_SCALAR_TYPE double
 #include <fstream>
 #include <iostream>
@@ -41,8 +42,8 @@
 #include "global.hpp"
 namespace TMBad {
 
-void searchReplace(std::string& str, const std::string& oldStr,
-                   const std::string& newStr);
+void searchReplace(std::string &str, const std::string &oldStr,
+                   const std::string &newStr);
 
 struct code_config {
   bool asm_comments;
@@ -50,7 +51,7 @@ struct code_config {
   std::string indent;
   std::string header_comment;
   std::string float_str;
-  std::ostream* cout;
+  std::ostream *cout;
   std::string float_ptr();
   std::string void_str();
   void init_code();
@@ -58,11 +59,11 @@ struct code_config {
   code_config();
 };
 
-void write_common(std::ostringstream& buffer, code_config cfg, size_t node);
+void write_common(std::ostringstream &buffer, code_config cfg, size_t node);
 
-void write_forward(global& glob, code_config cfg = code_config());
+void write_forward(global &glob, code_config cfg = code_config());
 
-void write_reverse(global& glob, code_config cfg = code_config());
+void write_reverse(global &glob, code_config cfg = code_config());
 
 void write_all(global glob, code_config cfg = code_config());
 

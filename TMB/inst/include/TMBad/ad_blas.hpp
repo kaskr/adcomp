@@ -24,16 +24,17 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
-#define INHERIT_CTOR(A, B)                          \
-  A() {}                                            \
-  template <class T1>                               \
-  A(T1 x1) : B(x1) {}                               \
-  template <class T1, class T2>                     \
-  A(T1 x1, T2 x2) : B(x1, x2) {}                    \
-  template <class T1, class T2, class T3>           \
-  A(T1 x1, T2 x2, T3 x3) : B(x1, x2, x3) {}         \
-  template <class T1, class T2, class T3, class T4> \
-  A(T1 x1, T2 x2, T3 x3, T4 x4) : B(x1, x2, x3, x4) {}
+#define INHERIT_CTOR(A, B)                                       \
+  A() {}                                                         \
+  template <class T1>                                            \
+  A(const T1 &x1) : B(x1) {}                                     \
+  template <class T1, class T2>                                  \
+  A(const T1 &x1, const T2 &x2) : B(x1, x2) {}                   \
+  template <class T1, class T2, class T3>                        \
+  A(const T1 &x1, const T2 &x2, const T3 &x3) : B(x1, x2, x3) {} \
+  template <class T1, class T2, class T3, class T4>              \
+  A(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)      \
+      : B(x1, x2, x3, x4) {}
 #define GLOBAL_SCALAR_TYPE double
 #include <Eigen/Dense>
 #include "global.hpp"

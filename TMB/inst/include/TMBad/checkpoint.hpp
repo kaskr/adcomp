@@ -24,16 +24,17 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
-#define INHERIT_CTOR(A, B)                          \
-  A() {}                                            \
-  template <class T1>                               \
-  A(T1 x1) : B(x1) {}                               \
-  template <class T1, class T2>                     \
-  A(T1 x1, T2 x2) : B(x1, x2) {}                    \
-  template <class T1, class T2, class T3>           \
-  A(T1 x1, T2 x2, T3 x3) : B(x1, x2, x3) {}         \
-  template <class T1, class T2, class T3, class T4> \
-  A(T1 x1, T2 x2, T3 x3, T4 x4) : B(x1, x2, x3, x4) {}
+#define INHERIT_CTOR(A, B)                                       \
+  A() {}                                                         \
+  template <class T1>                                            \
+  A(const T1 &x1) : B(x1) {}                                     \
+  template <class T1, class T2>                                  \
+  A(const T1 &x1, const T2 &x2) : B(x1, x2) {}                   \
+  template <class T1, class T2, class T3>                        \
+  A(const T1 &x1, const T2 &x2, const T3 &x3) : B(x1, x2, x3) {} \
+  template <class T1, class T2, class T3, class T4>              \
+  A(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)      \
+      : B(x1, x2, x3, x4) {}
 #define GLOBAL_SCALAR_TYPE double
 #include "global.hpp"
 
@@ -91,16 +92,16 @@ namespace TMBad {
 template <bool retape = false>
 struct CallOp_ : global::SharedDynamicOperator {
   /** \brief Function value tape */
-  global* glob;
+  global *glob;
   /** \brief Derivative tape. If allocated, it is managed by
    * `global::operation_stack` */
-  global::Complete<CallOp_>* Dglob;
+  global::Complete<CallOp_> *Dglob;
   /** \brief Encapsulating Completion of 'this'. If allocated, it is managed by
    * `global::operation_stack` */
-  global::OperatorPure* self;
+  global::OperatorPure *self;
   /** \brief Deep copy of `self` used to handle replay of adaptive operator
    * (which can't be shared - see table above) */
-  global::OperatorPure* self_replay;
+  global::OperatorPure *self_replay;
   typedef CallOp_<retape> Operator;
   /** \brief Force an allocated derivative to **not** go out of scope
       before its parent.
@@ -120,32 +121,32 @@ struct CallOp_ : global::SharedDynamicOperator {
     if (Dglob != NULL) Dglob->deallocate();
   }
   /** \brief Get next element of linked list */
-  CallOp_* next_CallOp() { return &(Dglob->Op); }
+  CallOp_ *next_CallOp() { return &(Dglob->Op); }
   /** \brief Get next linked list element's tape */
-  global* next_glob() { return Dglob->Op.glob; }
+  global *next_glob() { return Dglob->Op.glob; }
   /** \brief Get `global::Complete` version of derivative (so can be put on a
    * stack) */
-  global::Complete<CallOp_>* next_Dglob() { return Dglob->Op.Dglob; }
+  global::Complete<CallOp_> *next_Dglob() { return Dglob->Op.Dglob; }
   Index input_size() const { return glob->inv_index.size(); }
   Index output_size() const { return glob->dep_index.size(); }
-  const char* op_name() { return "CallOp"; }
+  const char *op_name() { return "CallOp"; }
   void print(global::print_config cfg) { this->glob->print(cfg); }
   CallOp_(global glob) : Dglob(NULL), self_replay(NULL), root_var(-1) {
     this->glob = new global(glob);
   }
-  CallOp_(global* glob)
+  CallOp_(global *glob)
       : glob(glob), Dglob(NULL), self_replay(NULL), root_var(-1) {}
 
   CallOp_() : glob(NULL), Dglob(NULL), self_replay(NULL), root_var(-1) {}
 
-  CallOp_(const CallOp_& other) {
+  CallOp_(const CallOp_ &other) {
     this->glob = NULL;
     this->Dglob = NULL;
     if (other.glob != NULL) {
       this->glob = new global(*other.glob);
     }
   }
-  CallOp_& operator=(const CallOp_& other) { ASSERT(false); }
+  CallOp_ &operator=(const CallOp_ &other) { ASSERT(false); }
   ~CallOp_() {
     if (glob != NULL) {
       delete glob;
@@ -154,9 +155,9 @@ struct CallOp_ : global::SharedDynamicOperator {
     unprotect_child();
   }
   /** \brief The retape case **must** override the retape hook */
-  virtual void retape_hook(ForwardArgs<Scalar>& args) {}
+  virtual void retape_hook(ForwardArgs<Scalar> &args) {}
   /** \brief The retape case **must** override the replay hook */
-  virtual void replay_hook(ForwardArgs<global::Replay>& args) {}
+  virtual void replay_hook(ForwardArgs<global::Replay> &args) {}
   /** \brief The retape case overrides the dependency markers */
   static const bool have_forward_mark_reverse_mark = retape;
   /** \brief Retape case needs access to the variable id of some
@@ -164,13 +165,13 @@ struct CallOp_ : global::SharedDynamicOperator {
   Index root_var;
   /** \brief Used only in the retape case (see
    * `global::Operator::have_forward_mark_reverse_mark`) */
-  void forward(ForwardArgs<bool>& args) {
+  void forward(ForwardArgs<bool> &args) {
     typedef typename global::CPL<CallOp_>::type CPL_CallOp;
     args.mark_dense<CPL_CallOp>(*this);
   };
   /** \brief Used only in the retape case (see
    * `global::Operator::have_forward_mark_reverse_mark`) */
-  void reverse(ReverseArgs<bool>& args) {
+  void reverse(ReverseArgs<bool> &args) {
     typedef typename global::CPL<CallOp_>::type CPL_CallOp;
     bool any_marked_y = args.mark_dense<CPL_CallOp>(*this);
     if (any_marked_y) {
@@ -181,7 +182,7 @@ struct CallOp_ : global::SharedDynamicOperator {
   /** \brief Helper to construct and update derivative glob */
   void update_deriv() {
     if (Dglob == NULL) {
-      global* glob = new global();
+      global *glob = new global();
       Dglob = new global::Complete<CallOp_>(glob);
       Dglob->Op.self = Dglob;
       protect_child();
@@ -190,7 +191,7 @@ struct CallOp_ : global::SharedDynamicOperator {
       if (next_glob() != NULL) next_glob()->clear();
     }
 
-    global* newglob = next_glob();
+    global *newglob = next_glob();
     global::replay replay(*glob, *newglob);
     replay.start();
     replay.forward(true, false);
@@ -200,14 +201,14 @@ struct CallOp_ : global::SharedDynamicOperator {
     replay.target.eliminate();
   }
 
-  void forward(ForwardArgs<Scalar>& args) {
+  void forward(ForwardArgs<Scalar> &args) {
     retape_hook(args);
     for (size_t i = 0; i < input_size(); i++) glob->value_inv(i) = args.x(i);
 
     glob->forward();
     for (size_t i = 0; i < output_size(); i++) args.y(i) = glob->value_dep(i);
   }
-  void reverse(ReverseArgs<Scalar>& args) {
+  void reverse(ReverseArgs<Scalar> &args) {
     if (!retape) {
       for (size_t i = 0; i < input_size(); i++) glob->value_inv(i) = args.x(i);
       glob->forward();
@@ -218,7 +219,7 @@ struct CallOp_ : global::SharedDynamicOperator {
     for (size_t i = 0; i < input_size(); i++) args.dx(i) += glob->deriv_inv(i);
   }
 
-  void forward(ForwardArgs<global::Replay>& args) {
+  void forward(ForwardArgs<global::Replay> &args) {
     replay_hook(args);
     if (!retape) self_replay = self;
     std::vector<ad_plain> x(input_size());
@@ -227,8 +228,8 @@ struct CallOp_ : global::SharedDynamicOperator {
         get_glob()->add_to_stack<Operator>(self_replay->copy(), x);
     for (size_t i = 0; i < output_size(); i++) args.y(i) = y[i];
   }
-  void reverse(ReverseArgs<global::Replay>& args) {
-    CallOp_* tmp = (CallOp_*)self_replay->incomplete();
+  void reverse(ReverseArgs<global::Replay> &args) {
+    CallOp_ *tmp = (CallOp_ *)self_replay->incomplete();
     if (tmp->Dglob == NULL) tmp->update_deriv();
     std::vector<ad_plain> x;
     for (size_t i = 0; i < input_size(); i++) x.push_back(args.x(i));
@@ -238,17 +239,17 @@ struct CallOp_ : global::SharedDynamicOperator {
     for (size_t i = 0; i < input_size(); i++) args.dx(i) += dx[i];
   }
 
-  void forward(ForwardArgs<Writer>& args) { ASSERT(false); }
-  void reverse(ReverseArgs<Writer>& args) { ASSERT(false); }
+  void forward(ForwardArgs<Writer> &args) { ASSERT(false); }
+  void reverse(ReverseArgs<Writer> &args) { ASSERT(false); }
 };
 
 struct CallOp {
   typedef CallOp_<false> Operator;
-  global::Complete<Operator>* pOp;
+  global::Complete<Operator> *pOp;
   bool in_use;
   CallOp(global glob);
   ~CallOp();
-  std::vector<ad_plain> operator()(const std::vector<ad_plain>& x);
+  std::vector<ad_plain> operator()(const std::vector<ad_plain> &x);
   ad_plain operator()(ad_plain x0);
   ad_plain operator()(ad_plain x0, ad_plain x1);
   ad_plain operator()(ad_plain x0, ad_plain x1, ad_plain x2);
@@ -273,7 +274,7 @@ struct AdapOp_ : CallOp_<true> {
   Functor F;
   AdapOp_(Functor F) : F(F) {}
   /** \brief Retape helper */
-  void retape(std::vector<Scalar>& x_) {
+  void retape(std::vector<Scalar> &x_) {
     if (this->glob == NULL) this->glob = new global();
     this->glob->clear();
     this->glob->ad_start();
@@ -290,12 +291,12 @@ struct AdapOp_ : CallOp_<true> {
       the root variable is added to protect this adaptive operator
       from the tape optimizer.
   */
-  void retape_hook(ForwardArgs<Scalar>& args) {
+  void retape_hook(ForwardArgs<Scalar> &args) {
     std::vector<Scalar> x(this->input_size());
     for (size_t i = 0; i < x.size(); i++) x[i] = args.x(i);
     retape(x);
 
-    CallOp_<true>* current = this;
+    CallOp_<true> *current = this;
 
     if (this->output_size() > 0) current->root_var = args.output(0);
     while (current->Dglob != NULL) {
@@ -308,12 +309,12 @@ struct AdapOp_ : CallOp_<true> {
       including its entire linked list of derivatives. These copies
       are used to replay rather than the originals.
   */
-  void replay_hook(ForwardArgs<global::Replay>& args) {
-    global::Complete<AdapOp_>* pOp = new global::Complete<AdapOp_>(*this);
+  void replay_hook(ForwardArgs<global::Replay> &args) {
+    global::Complete<AdapOp_> *pOp = new global::Complete<AdapOp_>(*this);
     pOp->Op.self = pOp;
 
-    CallOp_<true>* current = this;
-    CallOp_<true>* current_ = &(pOp->Op);
+    CallOp_<true> *current = this;
+    CallOp_<true> *current_ = &(pOp->Op);
     current->self_replay = current_->self;
 
     if (this->output_size() > 0) current_->root_var = args.output(0);
@@ -324,7 +325,7 @@ struct AdapOp_ : CallOp_<true> {
       current->self_replay = current_->self;
     }
   }
-  const char* op_name() { return "AdapOp"; }
+  const char *op_name() { return "AdapOp"; }
 };
 
 template <class Functor, class ad = ad_plain>
@@ -334,8 +335,8 @@ struct AdapOp {
   Functor F;
   AdapOp(Functor F) : F(F) {}
 
-  std::vector<ad_plain> operator()(std::vector<ad_plain>& x) {
-    CPL_Operator* pOp = new CPL_Operator(F);
+  std::vector<ad_plain> operator()(std::vector<ad_plain> &x) {
+    CPL_Operator *pOp = new CPL_Operator(F);
     pOp->Op.self = pOp;
     std::vector<Scalar> xd(x.size());
     for (size_t i = 0; i < x.size(); i++) xd[i] = x[i].Value();
