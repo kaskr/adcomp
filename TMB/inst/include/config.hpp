@@ -68,7 +68,7 @@ struct config_struct{
     SET(optimize.instantly,true);
     SET(optimize.parallel,false);
     SET(tape.parallel,true);
-    SET(tmbad.sparse_hessian_compress,true);
+    SET(tmbad.sparse_hessian_compress,false);
   })
 #undef SET
   config_struct() CSKIP(
