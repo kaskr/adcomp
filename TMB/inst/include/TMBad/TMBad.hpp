@@ -159,8 +159,14 @@ struct ADFun {
       \note Operators with `allow_remap=false` can have lots of
       implicit dependencies which would slow down the optimizer. We
       skip optimization if any such operators are present.
+      \note If cached independent variable positions have been set, it
+      is illegal to run the tape optimizer because these variables
+      could be remapped.
   */
   void optimize() {
+    ASSERT2(inv_pos.size() == 0,
+            "Tape has 'cached independent variable positions' which would be "
+            "invalidated by the optimizer");
     remap_identical_sub_expressions(glob);
     glob.eliminate();
   }
@@ -244,6 +250,7 @@ struct ADFun {
   Position DomainVecSet(const std::vector<Scalar> &x) {
     ASSERT(x.size() == Domain());
     if (inv_pos.size() > 0) {
+      ASSERT(inv_pos.size() == Domain());
       size_t min_var_changed = -1;
       size_t i_min = -1;
       for (size_t i = 0; i < x.size(); i++) {
@@ -398,6 +405,62 @@ struct ADFun {
       }
     }
     return ans;
+  }
+  /** \brief Evaluate the Jacobian matrix multiplied by a vector
+      \details Denote by f:R^n->R^m this function object.
+      The Jacobian matrix is the m-by-n derivative matrix stored **row-major**.
+      This function calculates the derivative d/dx(sum(f(x)*w))
+  */
+  std::vector<Scalar> Jacobian(const std::vector<Scalar> &x,
+                               const std::vector<Scalar> &w) {
+    ASSERT(x.size() == Domain());
+    ASSERT(w.size() == Range());
+    DomainVecSet(x);
+    glob.forward();
+    glob.clear_deriv();
+    for (size_t j = 0; j < Range(); j++) glob.deriv_dep(j) = w[j];
+    glob.reverse();
+    std::vector<Scalar> ans(Domain());
+    for (size_t k = 0; k < Domain(); k++) ans[k] = glob.deriv_inv(k);
+    return ans;
+  }
+  std::vector<ad> Jacobian(const std::vector<ad> &x, const std::vector<ad> &w) {
+    global *cur_glob = get_glob();
+
+    ASSERT(x.size() == Domain());
+    for (size_t i = 0; i < x.size(); i++) {
+      x[i].addToTape();
+    }
+    for (size_t i = 0; i < x.size(); i++) {
+      ASSERT(x[i].ontape());
+      ASSERT(x[i].glob() == cur_glob);
+    }
+
+    ASSERT(w.size() == Range());
+    for (size_t i = 0; i < w.size(); i++) {
+      w[i].addToTape();
+    }
+    for (size_t i = 0; i < w.size(); i++) {
+      ASSERT(w[i].ontape());
+      ASSERT(w[i].glob() == cur_glob);
+    }
+
+    global::replay replay(this->glob, *get_glob());
+    replay.start();
+    for (size_t i = 0; i < this->Domain(); i++) {
+      replay.value_inv(i) = x[i];
+    }
+    replay.forward(false, false);
+    replay.clear_deriv();
+    for (size_t i = 0; i < this->Range(); i++) {
+      replay.deriv_dep(i) = w[i];
+    }
+    std::vector<ad> dx(this->Domain());
+    for (size_t i = 0; i < dx.size(); i++) {
+      dx[i] = replay.deriv_inv(i);
+    }
+    replay.stop();
+    return dx;
   }
   /** \brief Get Jacobian function object
       \param range_weight If `true` the input vector of the returned function
@@ -667,6 +730,50 @@ struct ADFun {
     std::vector<Index> nodes = find_op_by_name(this->glob, name);
     return decompose(nodes);
   }
+  /** \brief Resolve references of this ADFun object
+      \details
+      Assume that an active context (glob) exists.
+      1. Locate all 'RefOp' and play them on top of the active glob while
+     storing the corresponding generated variables in a vector.
+      2. Substitute all 'RefOp' by 'InvOp' and store the 'inv_index' of the
+     newly generated independent variables. \return Vector with variables
+     relative to the current active context (glob).
+  */
+  std::vector<ad_aug> resolve_refs() {
+    ASSERT2(inner_inv_index.size() == 0 && outer_inv_index.size() == 0,
+            "'resolve_refs' can only be run once for a given function object");
+    std::vector<Index> seq = find_op_by_name(glob, "RefOp");
+    std::vector<Replay> values(seq.size());
+    std::vector<Index> dummy_inputs;
+    ForwardArgs<Replay> args(dummy_inputs, values);
+    for (size_t i = 0; i < seq.size(); i++) {
+      ASSERT(glob.opstack[seq[i]]->input_size() == 0);
+      ASSERT(glob.opstack[seq[i]]->output_size() == 1);
+      glob.opstack[seq[i]]->forward_incr(args);
+      glob.opstack[seq[i]]->deallocate();
+      glob.opstack[seq[i]] = get_glob()->getOperator<global::InvOp>();
+    }
+    inner_inv_index = glob.inv_index;
+    outer_inv_index = glob.op2var(seq);
+
+    glob.inv_index.insert(glob.inv_index.end(), outer_inv_index.begin(),
+                          outer_inv_index.end());
+    return values;
+  }
+  std::vector<Index> inner_inv_index;
+  std::vector<Index> outer_inv_index;
+  /** \brief Number of inner parameters */
+  size_t DomainInner() const { return inner_inv_index.size(); }
+  /** \brief Number of outer parameters */
+  size_t DomainOuter() const { return outer_inv_index.size(); }
+  /** \brief Temporarily regard this object as function of inner parameters
+      \warning Don't forget to swap back when done!
+  */
+  void SwapInner() { std::swap(glob.inv_index, inner_inv_index); }
+  /** \brief Temporarily regard this object as function of outer parameters
+      \warning Don't forget to swap back when done!
+  */
+  void SwapOuter() { std::swap(glob.inv_index, outer_inv_index); }
 };
 
 template <class ad>
