@@ -85,9 +85,9 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
     size_t n1 = function.DomainOuter();
     size_t n2 = gradient.DomainOuter();
     size_t n3 = hessian.DomainOuter();
-    std::vector<Scalar> x = get_segment(args,  0, n1);
-    std::vector<Scalar> y = get_segment(args, n1, n2);
-    std::vector<Scalar> z = get_segment(args, n2, n3);
+    std::vector<Scalar> x = get_segment(args,     0, n1);
+    std::vector<Scalar> y = get_segment(args,    n1, n2);
+    std::vector<Scalar> z = get_segment(args, n1+n2, n3);
     // Set *outer* parameters
     SwapOuter(); // swap
     function.DomainVecSet(x);
@@ -113,9 +113,9 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
     size_t n1 = function.DomainOuter();
     size_t n2 = gradient.DomainOuter();
     size_t n3 = hessian.DomainOuter();
-    std::vector<T> x = get_segment(args,  0, n1);
-    std::vector<T> y = get_segment(args, n1, n2);
-    std::vector<T> z = get_segment(args, n2, n3);
+    std::vector<T> x = get_segment(args,     0, n1);
+    std::vector<T> y = get_segment(args,    n1, n2);
+    std::vector<T> z = get_segment(args, n1+n2, n3);
     std::vector<T> sol_z = sol; sol_z.insert(sol_z.end(), z.begin(), z.end());
     vector<T> h = hessian(sol_z);
     matrix<T> hm = asMatrix(h, sol.size(), sol.size());
