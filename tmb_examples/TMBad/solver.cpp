@@ -1,6 +1,21 @@
 // Demonstrate adaptive solver of TMBad
 #include <TMB.hpp>
 
+struct newton_config {
+  int maxit, trace;
+  double grad_tol, step_tol, tol10, mgcmax, ustep, power, u0;
+  newton_config() :
+    maxit(1000), trace(0),
+    grad_tol(1e-8),
+    step_tol(1e-8),
+    tol10(0.001),
+    mgcmax(1e+60),
+    ustep(1),
+    power(0.5),
+    u0(1e-04)
+  {}
+};
+
 /* Generalized newton solver similar to R function TMB:::newton */
 template<class Functor, class Type>
 struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
@@ -11,10 +26,9 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
   // FIXME: For now consider the dense hessian case
   TMBad::ADFun<> function, gradient, hessian;
   // Control convergence
-  int maxit;
-  Scalar grad_tol;
-  NewtonSolver(Functor &F, vector<Type> start) :
-    maxit(100), grad_tol(1e-8)
+  newton_config cfg;
+  NewtonSolver(Functor &F, vector<Type> start, newton_config cfg)
+    : cfg(cfg)
   {
     function = TMBad::ADFun<> ( FunctorExtend(F), start);
     function.optimize();
@@ -48,17 +62,74 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
     std::vector<TMBad::ad_aug> ans2(ans.begin(), ans.end());
     return ans2;
   }
-  void newton_iterate(std::vector<Scalar> &x) {
-    for (int i=0; i<maxit; i++) {
+  /* From TMB::newton */
+  double phi(double u) {
+    return 1. / u - 1.;
+  }
+  double invphi(double x) {
+    return 1. / (x + 1.);
+  }
+  double increase(double u) {
+    return cfg.u0 + (1. - cfg.u0) * std::pow(u, cfg.power);
+  }
+  double decrease(double u) {
+    return (u > 1e-10 ?
+            1. - increase(1. - u) :
+            (1. - cfg.u0) * cfg.power * u);
+  }
+  vector<Scalar> x_start; // Cached initial guess
+  void newton_iterate(vector<Scalar> &x) {
+    if (x_start.size() == x.size()) {
+      if (function(x_start)[0] < function(x)[0])
+        x = x_start;
+    }
+    Eigen::LLT<Eigen::Matrix<double, -1, -1> > llt;
+    Scalar f_previous = INFINITY;
+    for (int i=0; i < cfg.maxit; i++) {
       vector<Scalar> g = gradient(x);
       Scalar mgc = g.abs().maxCoeff();
-      if (mgc < grad_tol) return;
+      /* FIXME:
+        if (any(!is.finite(g)))
+            stop("Newton dropout because inner gradient had non-finite components.")
+        if (is.finite(mgcmax) && max(abs(g)) > mgcmax)
+            stop("Newton dropout because inner gradient too steep.")
+        if (max(abs(g)) < grad.tol)
+            return(par)
+      */
+      if (cfg.trace) std::cout << "mgc=" << mgc << " ";
+      if (mgc < cfg.grad_tol) {
+        x_start = x;
+        if (cfg.trace) std::cout << "\n";
+        return;
+      }
       vector<Scalar> h = hessian(x);
-      matrix<Scalar> hm = asMatrix(h, x.size(), x.size());
-      vector<Scalar> step = hm.inverse() * g.matrix();
-      x = vector<Scalar>(vector<Scalar>(x) - step);
+      if (cfg.trace) std::cout << "ustep=" << cfg.ustep << " ";
+      while (true) {
+        matrix<Scalar> hm = asMatrix(h, x.size(), x.size());
+        hm.diagonal().array() += phi( cfg.ustep );
+        llt.compute(hm);
+        if (cfg.trace) std::cout << "info=" << llt.info() << " ";
+        if (llt.info() == 0) break;
+        cfg.ustep = decrease(cfg.ustep);
+      }
+      // We now have a PD hessian
+      // Let's take a newton step and see if it improves...
+      matrix<Scalar> step = llt.solve( g.matrix() );
+      x = x - step.array();
+      Scalar f = function(x)[0];
+      if (f < f_previous + 1e-8) {
+        // Improvement
+        cfg.ustep = increase(cfg.ustep);
+        f_previous = f;
+      } else {
+        // Reject
+        cfg.ustep = decrease(cfg.ustep);
+        x = x + step.array();
+      }
+      if (cfg.trace) std::cout << "f=" << f << " ";
+      if (cfg.trace) std::cout << "\n";
     }
-    Rf_warning("Convergence failure");
+    Rf_warning("Newton convergence failure");
   }
   TMBad::Index input_size() const {
     size_t n1 = function.DomainOuter();
@@ -96,10 +167,10 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
     SwapOuter(); // swap back
     // Run *inner* iterations
     SwapInner(); // swap
-    std::vector<Scalar> sol = function.DomainVec();
+    vector<Scalar> sol = function.DomainVec();
     newton_iterate(sol);
     SwapInner(); // swap back
-    for (size_t i=0; i<sol.size(); i++) args.y(i) = sol[i];
+    for (size_t i=0; i < (size_t) sol.size(); i++) args.y(i) = sol[i];
   }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
@@ -119,7 +190,7 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
     std::vector<T> sol_z = sol; sol_z.insert(sol_z.end(), z.begin(), z.end());
     vector<T> h = hessian(sol_z);
     matrix<T> hm = asMatrix(h, sol.size(), sol.size());
-    vector<T> w2 = - hm.inverse() * w.matrix();
+    vector<T> w2 = - atomic::matinv(hm) * w.matrix();
     std::vector<T> sol_y = sol; sol_y.insert(sol_y.end(), y.begin(), y.end());
     vector<T> g = gradient.Jacobian(sol_y, w2);
     vector<T> g_outer = g.tail(n2);
@@ -130,14 +201,16 @@ struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
 };
 
 template<class Functor>
-vector<TMBad::ad_aug> Newton(Functor &F, vector<TMBad::ad_aug> start) {
-  NewtonSolver<Functor, TMBad::ad_aug > NS(F, start);
+vector<TMBad::ad_aug> Newton(Functor &F, vector<TMBad::ad_aug> start,
+                             newton_config cfg = newton_config() ) {
+  NewtonSolver<Functor, TMBad::ad_aug > NS(F, start, cfg);
   return NS.add_to_tape();
 }
 template<class Functor>
-vector<double> Newton(Functor &F, vector<double> start) {
-  NewtonSolver<Functor, TMBad::ad_aug > NS(F, start);
-  std::vector<double> x = start;
+vector<double> Newton(Functor &F, vector<double> start,
+                      newton_config cfg = newton_config() ) {
+  NewtonSolver<Functor, TMBad::ad_aug > NS(F, start, cfg);
+  vector<double> x = start;
   NS.newton_iterate(x);
   return x;
 }
@@ -159,7 +232,7 @@ struct Functor {
     v = v * v;
     vector<Type> y = x - v;
     vector<Type> my = m * y;
-    return (y * my).sum();
+    return (y * my).sum() + exp(x).sum();
   }
 };
 
@@ -167,9 +240,11 @@ struct Functor {
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
+  DATA_INTEGER(trace);
   DATA_MATRIX(m);
   PARAMETER_VECTOR(x);
   Functor<TMBad::ad_aug> F(m, x);
-  vector<Type> sol = Newton(F, x);
+  newton_config cfg; cfg.trace = trace;
+  vector<Type> sol = Newton(F, x, cfg);
   return sol.sum();
 }
