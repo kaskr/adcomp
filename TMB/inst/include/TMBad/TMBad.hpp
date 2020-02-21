@@ -455,6 +455,7 @@ struct ADFun {
     for (size_t i = 0; i < this->Range(); i++) {
       replay.deriv_dep(i) = w[i];
     }
+    replay.reverse(false, false);
     std::vector<ad> dx(this->Domain());
     for (size_t i = 0; i < dx.size(); i++) {
       dx[i] = replay.deriv_inv(i);
