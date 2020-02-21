@@ -8,8 +8,8 @@ dyn.load(dynlib("solver"))
 n <- 5
 m <- diag(n) + 5
 
-x <- 1:n
-data <- list(m=m)
+x <- rep(1, n)
+data <- list(m=m, trace=1)
 parameters <- list(x=x)
 
 ## Make a function object
