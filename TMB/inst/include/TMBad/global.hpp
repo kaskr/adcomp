@@ -1947,9 +1947,32 @@ struct global {
     void reverse(ReverseArgs<Writer> &args) { Op.reverse(args); }
     void forward_incr(ForwardArgs<Writer> &args) { Op.forward_incr(args); }
     void reverse_decr(ReverseArgs<Writer> &args) { Op.reverse_decr(args); }
-
+    /** \brief Move a stack allocated instance to the heap and let the
+       `operation_stack` manage the memory \details This is only useful for
+       dynamic operators and therfore disallowed for static operators.
+    */
     std::vector<ad_plain> operator()(const std::vector<ad_plain> &x) {
-      return get_glob()->add_to_stack<OperatorBase>(this->copy(), x);
+      if (!(OperatorBase::dynamic)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "OperatorBase::dynamic"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Stack to heap copy only allowed for dynamic operators"
+              << "\n";
+        abort();
+      };
+      Complete *pOp = new Complete(*this);
+      if (!(pOp->ref_count() == 0)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "pOp->ref_count() == 0"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Operator already on the heap"
+              << "\n";
+        abort();
+      };
+      pOp->ref_count.increment();
+      return get_glob()->add_to_stack<OperatorBase>(pOp, x);
     }
     template <class T>
     std::vector<T> operator()(const std::vector<T> &x) {
@@ -1961,7 +1984,8 @@ struct global {
     void forward_replay_copy(ForwardArgs<Replay> &args) {
       std::vector<ad_plain> x(Op.input_size());
       for (size_t i = 0; i < x.size(); i++) x[i] = args.x(i);
-      std::vector<ad_plain> y = (*this)(x);
+      std::vector<ad_plain> y =
+          get_glob()->add_to_stack<OperatorBase>(this->copy(), x);
       for (size_t i = 0; i < y.size(); i++) args.y(i) = y[i];
     }
     void dependencies(Args<> &args, Dependencies &dep) {
