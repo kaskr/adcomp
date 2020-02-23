@@ -23,9 +23,12 @@ obj$fn()
 obj$gr()
 obj$he()
 
-## Compare with known solution
+## Check derivatives
 library(numDeriv)
-f <- function(x){sum(x*x)}
-f(x)
-grad(f,x)
-round(hessian(f,x),10)
+p <- obj$par
+g <- grad(obj$fn, p)
+h <- jacobian(obj$gr, p)
+range(obj$gr(p)-g)
+range(obj$he(p)-h)
+
+nlminb(p, obj$fn, obj$gr)
