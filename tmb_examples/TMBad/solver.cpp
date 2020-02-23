@@ -18,7 +18,7 @@ struct newton_config {
 
 /* Generalized newton solver similar to R function TMB:::newton */
 template<class Functor, class Type>
-struct NewtonSolver : TMBad::global::DynamicOperator< -1, -1 > {
+struct NewtonSolver : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   typedef TMBad::Scalar Scalar;
