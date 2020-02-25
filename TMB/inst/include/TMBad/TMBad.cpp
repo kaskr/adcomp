@@ -1200,6 +1200,7 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
   size_t s = 0, s_input = 0;
   inv_index.resize(0);
   dep_index.resize(0);
+  std::vector<bool> opstack_deallocate(opstack.size(), false);
   for (size_t i = 0; i < opstack.size(); i++) {
     size_t nout = opstack[i]->output_size();
     bool any_marked_output = false;
@@ -1230,15 +1231,16 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
     }
     opstack[i]->increment(args.ptr);
     if (!any_marked_output) {
-      opstack[i]->deallocate();
-      opstack[i] = NULL;
+      opstack_deallocate[i] = true;
     }
   }
   inputs.resize(s_input);
   values.resize(s);
   size_t k = 0;
   for (size_t i = 0; i < opstack.size(); i++) {
-    if (opstack[i] != NULL) {
+    if (opstack_deallocate[i]) {
+      opstack[i]->deallocate();
+    } else {
       opstack[k] = opstack[i];
       k++;
     }
