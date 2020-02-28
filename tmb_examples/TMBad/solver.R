@@ -8,12 +8,15 @@ dyn.load(dynlib("solver"))
 n <- 5
 m <- diag(n) + 5
 
+## Configure Newton solver
+cfg <- list(sparse=FALSE, trace=TRUE)
+
 x <- rep(1, n)
-data <- list(m=m, trace=1)
+data <- list(m=m, cfg=cfg)
 parameters <- list(x=x)
 
 ## Make a function object
-obj <- MakeADFun(data, parameters, DLL="solver")
+system.time( obj <- MakeADFun(data, parameters, DLL="solver") )
 
 ## This is what tape looks like:
 TMB:::tape_print(obj$env$ADFun)
