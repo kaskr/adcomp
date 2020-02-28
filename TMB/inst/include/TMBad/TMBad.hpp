@@ -478,15 +478,33 @@ struct ADFun {
     if (keep_x.size() == 0) keep_x.resize(Domain(), true);
     if (keep_y.size() == 0) keep_y.resize(Range(), true);
     std::vector<bool> keep = get_keep_var(keep_x, keep_y);
+    graph G;
+    if (!range_weight && Range() > 1) {
+      G = this->glob.reverse_graph(keep);
+    }
     keep = glob.var2op(keep);
     global::replay replay(this->glob, ans.glob);
     replay.start();
     replay.forward(true, false);
     if (!range_weight) {
-      for (size_t i = 0; i < this->Range(); i++) {
+      if (G.empty()) {
+        for (size_t i = 0; i < this->Range(); i++) {
+          replay.clear_deriv();
+          replay.deriv_dep(i) = 1.;
+          replay.reverse(true, false, tail_start, keep);
+        }
+      } else {
         replay.clear_deriv();
-        replay.deriv_dep(i) = 1.;
-        replay.reverse(true, false, tail_start, keep);
+        for (size_t i = 0; i < this->Range(); i++) {
+          glob.subgraph_seq.resize(0);
+          glob.subgraph_seq.push_back(G.dep2op[i]);
+          G.search(glob.subgraph_seq);
+          replay.deriv_dep(i) = 1.;
+          replay.reverse_sub();
+          for (size_t j = 0; j < this->Domain(); j++)
+            replay.deriv_inv(j).Dependent();
+          replay.clear_deriv_sub();
+        }
       }
     } else {
       replay.clear_deriv();
