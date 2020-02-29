@@ -437,6 +437,20 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   const char* op_name() { return "Newton"; }
 };
 
+template<class Type>
+Type log_determinant(const matrix<Type> &H) {
+  return atomic::logdet(H);
+}
+template<class Type>
+Type log_determinant(const Eigen::SparseMatrix<Type> &H) {
+  // FIXME: Tape once for 'reasonable' numeric values - then replay
+  // (to avoid unpredictable brancing issues)
+  Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
+  //return ldl.vectorD().log().sum();
+  vector<Type> D = ldl.vectorD();
+  return D.log().sum();
+}
+
 // Interface
 template<class Newton>
 void Newton_CTOR_Hook(Newton &F, const vector<double> &start) {
@@ -482,6 +496,12 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
     h_par_sol << sol.tail(n), sol.segment(n1+n2,n3);
     return Base::hessian(std::vector<Type>(h_par_sol));
   }
+  Type Laplace() {
+    return
+      value() +
+      .5 * log_determinant( hessian() ) -
+      .5 * log(2. * M_PI) * n;
+  }
 };
 
 template<class Functor, class Type>
@@ -515,6 +535,22 @@ vector<Type> Newton(Functor &F, vector<Type> start,
     return NewtonDense(F, start, cfg);
 }
 
+/* Laplace */
+template<class Functor, class Type>
+Type Laplace(Functor &F, vector<Type> &start,
+             newton_config cfg = newton_config() ) {
+  if (cfg.sparse) {
+    auto opt = NewtonSparse(F, start, cfg);
+    start = opt.solution();
+    return opt.Laplace();
+  } else {
+    auto opt = NewtonDense(F, start, cfg);
+    start = opt.solution();
+    return opt.Laplace();
+  }
+}
+
+
 /*
   This class holds the function we wish to minimize
 
@@ -544,8 +580,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(x);
   Functor<TMBad::ad_aug> F(m, x);
   DATA_STRUCT(cfg, newton_config_t);
-  vector<Type> sol = Newton(F, x, cfg);
-  Type nll = 0;
-  nll += sol.sum();
+  Type nll = Laplace(F, x, cfg);
+  ADREPORT(x);
   return nll;
 }
