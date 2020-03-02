@@ -549,4 +549,40 @@ Type Laplace(Functor &F, vector<Type> &start,
   }
 }
 
+// Usage: slice<>(F, random).Laplace(cfg);
+template <class ADFun = TMBad::ADFun<> >
+struct slice {
+  ADFun &F;
+  std::vector<TMBad::Index> random;
+  slice(ADFun &F,
+        //std::vector<TMBad::ad_aug> x,
+        std::vector<TMBad::Index> random) :
+    F(F), random(random) {}
+  typedef TMBad::ad_aug T;
+  std::vector<TMBad::ad_aug> x;
+  std::vector<T> operator()(const std::vector<T> &x_random) {
+    for (size_t i=0; i<random.size(); i++)
+      x[random[i]] = x_random[i];
+    return F(x);
+  }
+  ADFun Laplace_(newton_config cfg = newton_config()) {
+    ADFun ans;
+    std::vector<double> xd = F.DomainVec();
+    x = std::vector<T> (xd.begin(), xd.end());
+    ans.glob.ad_start();
+    TMBad::Independent(x);
+    vector<T> start = TMBad::subset(x, random);
+    T y = Laplace(*this, start, cfg);
+    y.Dependent();
+    ans.glob.ad_stop();
+    return ans;
+  }
+};
+TMBad::ADFun<> Laplace_(TMBad::ADFun<> &F,
+                        const std::vector<TMBad::Index> &random,
+                        newton_config cfg = newton_config() ) CSKIP( {
+  slice<> S(F, random);
+  return S.Laplace_(cfg);
+} )
+
 } // End namespace newton
