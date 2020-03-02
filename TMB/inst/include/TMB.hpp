@@ -141,6 +141,7 @@ namespace CppAD{
 }
 #include "convert.hpp" // asSEXP, asMatrix, asVector
 #include "config.hpp"
+#include "tmbutils/getListElement.hpp"
 #include "atomic_math.hpp"
 #include "expm.hpp"
 #include "atomic_convolve.hpp"
