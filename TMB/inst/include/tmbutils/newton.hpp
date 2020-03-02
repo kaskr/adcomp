@@ -1,3 +1,5 @@
+#ifdef TMBAD_FRAMEWORK
+/** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
 namespace newton {
 
 /* =================== TODO ===================
@@ -586,3 +588,4 @@ TMBad::ADFun<> Laplace_(TMBad::ADFun<> &F,
 } )
 
 } // End namespace newton
+#endif // TMBAD_FRAMEWORK
