@@ -1491,7 +1491,13 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
   for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
   TMB_TRY {
-    if (method == "laplace") {
+    if (method == "remove_random_parameters") {
+      std::vector<bool> mask(pf->Domain(), true);
+      for (size_t i = 0; i<random.size(); i++)
+        mask[random[i]] = false;
+      pf->glob.inv_index = TMBad::subset(pf->glob.inv_index, mask);
+    }
+    else if (method == "laplace") {
       SEXP newton_cfg = getListElement(control, "newton_cfg");
       newton::newton_config cfg(newton_cfg);
       *pf = newton::Laplace_(*pf, random, cfg);

@@ -415,6 +415,17 @@ MakeADFun <- function(data, parameters, map=list(),
                                                         mustWork=1L,
                                                         max_period_size=1024L),
                 PACKAGE=DLL)
+          .Call("TransformADFunObject", ADFun$ptr,
+                list(
+                    method="remove_random_parameters",
+                    random_order = random,
+                    mustWork=1L,
+                    max_period_size=1024L),
+                PACKAGE=DLL)
+          ## FIXME: Should be done by above .Call
+          attr(ADFun$ptr,"par") <- attr(ADFun$ptr,"par")[-random]
+          ##
+          par <<- par[-random]
           random <<- NULL
       }
       if (set.defaults) {
