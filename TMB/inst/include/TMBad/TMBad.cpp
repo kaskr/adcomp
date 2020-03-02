@@ -1918,6 +1918,8 @@ void global::ad_aug::addToTape() const {
           get_glob()->getOperator<RefOp>(data.glob, taped_value.index);
       this->taped_value =
           get_glob()->add_to_stack<RefOp>(pOp, std::vector<ad_plain>(0))[0];
+
+      this->data.glob = get_glob();
     }
     return;
   }
