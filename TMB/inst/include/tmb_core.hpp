@@ -1491,7 +1491,12 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
   for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
   TMB_TRY {
-    if (method == "marginal_greedy")
+    if (method == "laplace") {
+      SEXP newton_cfg = getListElement(control, "newton_cfg");
+      newton::newton_config cfg(newton_cfg);
+      *pf = newton::Laplace_(*pf, random, cfg);
+    }
+    else if (method == "marginal_greedy")
       *pf = pf -> marginal_greedy(random);
     else if (method == "marginal_sr")
       *pf = pf -> marginal_sr(random);
