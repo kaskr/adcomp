@@ -168,6 +168,7 @@ registerFinalizer <- function(ADFun, DLL) {
 ##' @param checkParameterOrder Optional check for correct parameter order.
 ##' @param regexp Match random effects by regular expressions?
 ##' @param silent Disable all tracing information?
+##' @param intern Do Laplace approximation on C++ side ? (Experimental - may change without notice)
 ##' @param ... Currently unused.
 ##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data, parameters, map=list(),
@@ -186,6 +187,7 @@ MakeADFun <- function(data, parameters, map=list(),
                       checkParameterOrder=TRUE, ## Optional check
                       regexp=FALSE,
                       silent=FALSE,
+                      intern=FALSE,
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
@@ -419,6 +421,17 @@ MakeADFun <- function(data, parameters, map=list(),
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
       if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
           registerFinalizer(ADFun, DLL)
+      if (intern) {
+          cfg <- list(sparse=TRUE, trace = inner.control$trace )
+          cfg <- lapply(cfg, as.double)
+          .Call("TransformADFunObject", ADFun$ptr, list(newton_cfg=cfg,
+                                                        random_order = random,
+                                                        method="laplace",
+                                                        mustWork=1L,
+                                                        max_period_size=1024L),
+                PACKAGE=DLL)
+          random <<- NULL
+      }
       if (set.defaults) {
           par <<- attr(ADFun$ptr,"par")
           last.par <<- par
