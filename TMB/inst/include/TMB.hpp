@@ -151,6 +151,7 @@ namespace CppAD{
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
 #include "start_parallel.hpp"
+#include "tmbutils/newton.hpp" // Newton solver + Laplace used by TransformADFunObject
 #include "tmb_core.hpp"
 #include "distributions_R.hpp"
 #include "convenience.hpp"    // Requires besselK
