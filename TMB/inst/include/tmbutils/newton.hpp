@@ -215,6 +215,8 @@ struct newton_config {
   int maxit, trace;
   double grad_tol, step_tol, tol10, mgcmax, ustep, power, u0;
   bool sparse;
+  bool on_failure_return_nan;
+  bool on_failure_give_warning;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
@@ -227,6 +229,8 @@ struct newton_config {
     SET_DEFAULT(power, 0.5);
     SET_DEFAULT(u0, 1e-04);
     SET_DEFAULT(sparse, false);
+    SET_DEFAULT(on_failure_return_nan, true);
+    SET_DEFAULT(on_failure_give_warning, true);
 #undef SET_DEFAULT
   }
   newton_config() {
@@ -314,14 +318,22 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
   vector<Scalar> x_start; // Cached initial guess
   void newton_iterate(vector<Scalar> &x) {
+    Scalar f_previous = INFINITY;
     if (x_start.size() == x.size()) {
+      Scalar f_x_start = function(x_start)[0];
+      Scalar f_x = function(x)[0];
+      if ( ! std::isfinite(f_x_start) &&
+           ! std::isfinite(f_x) )
+        goto CONVERGENCE_FAILURE;
       if (function(x_start)[0] < function(x)[0])
         x = x_start;
     }
-    Scalar f_previous = INFINITY;
     for (int i=0; i < cfg.maxit; i++) {
       vector<Scalar> g = gradient(x);
       Scalar mgc = g.abs().maxCoeff();
+      if ( ! std::isfinite(mgc) ||
+           mgc > cfg.mgcmax)
+        goto CONVERGENCE_FAILURE;
       /* FIXME:
         if (any(!is.finite(g)))
             stop("Newton dropout because inner gradient had non-finite components.")
@@ -355,7 +367,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       vector<Scalar> x_new =
         x - hessian.llt.solve( g.matrix() ).array();
       Scalar f = function(x_new)[0];
-      if (f < f_previous + 1e-8) { // Improvement
+      if (std::isfinite(f) &&
+          f < f_previous + 1e-8) { // Improvement
         // Accept
         cfg.ustep = increase(cfg.ustep);
         f_previous = f;
@@ -367,7 +380,13 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "\n";
     }
-    Rf_warning("Newton convergence failure");
+  CONVERGENCE_FAILURE:
+    if (cfg.on_failure_give_warning) {
+      Rf_warning("Newton convergence failure");
+    }
+    if (cfg.on_failure_return_nan) {
+      x = NAN;
+    }
   }
   TMBad::Index input_size() const {
     size_t n1 = function.DomainOuter();
