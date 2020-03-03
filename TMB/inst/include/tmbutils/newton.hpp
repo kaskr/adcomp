@@ -48,7 +48,9 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   matrix<T> operator()(const std::vector<T> &x) {
     return as_matrix(Base::operator()(x));
   }
-  /* Sparsity restricted cross product */
+  /** \brief Sparsity restricted cross product
+      In dense case this is the usual cross product
+  */
   template<class T>
   vector<T> crossprod(const vector<T> &y2, const vector<T> &y) {
     matrix<T> ans = ( y2.matrix() * y.matrix().transpose() ).array();
@@ -59,7 +61,7 @@ struct jacobian_dense_t : TMBad::ADFun<> {
     llt.compute(h);
   }
 };
-/** Methods specific for a sparse hessian */
+/** \brief Methods specific for a sparse hessian */
 template<class Factorization=Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > >
 struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   typedef TMBad::Sparse<TMBad::ADFun<> > Base;
