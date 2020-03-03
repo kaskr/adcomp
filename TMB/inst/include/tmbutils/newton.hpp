@@ -213,11 +213,39 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   const char* op_name() { return "JSolve"; }
 };
 
+/** \brief Newton configuration parameters */
 struct newton_config {
-  int maxit, trace;
-  double grad_tol, step_tol, tol10, mgcmax, ustep, power, u0;
+  /** \brief Max number of iterations */
+  int maxit;
+  /** \brief Print trace info? */
+  int trace;
+  /** \brief Convergence tolerance of max gradient component */
+  double grad_tol;
+  /** \brief Convergence tolerance of consequtive function evaluations (not yet used) */
+  double step_tol;
+  /** \brief Convergence tolerance of consequtive function evaluations (not yet used) */
+  double tol10;
+  /** \brief Consider initial guess as invalid if the max gradient component is larger than this number */
+  double mgcmax;
+  /** \brief Initial step size between 0 and 1 */
+  double ustep;
+  /** \brief Internal parameter controlling ustep updates */
+  double power;
+  /** \brief Internal parameter controlling ustep updates */
+  double u0;
+  /** \brief Use *sparse* as opposed to dense hessian ?
+      \details
+      Using `sparse=true` for problem that is actually dense have been
+      observed to results in a slowdown factor of approximately 3. In
+      addition, the dense factorization can be accelerated using the
+      `EIGEN_USE_MKL_ALL` preprocessor flag.  On the other hand, using
+      `sparse=false` (dense) for a problem that is actually sparse can
+      result in much bigger slowdowns.
+  */
   bool sparse;
+  /** \brief Behaviour on convergence failure: Report nan-solution ? */
   bool on_failure_return_nan;
+  /** \brief Behaviour on convergence failure: Throw warning ?*/
   bool on_failure_give_warning;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
