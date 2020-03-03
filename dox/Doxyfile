@@ -2056,7 +2056,8 @@ PREDEFINED             =        VECTORIZE1_t(f)=       \
                                 VECTORIZE2_n(f)=       \
                                 CSKIP(body)=;          \
                                 "TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
-                                "TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);"
+                                "TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
+                                TMBAD_FRAMEWORK=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
