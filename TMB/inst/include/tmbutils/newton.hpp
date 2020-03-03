@@ -317,14 +317,17 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
             (1. - cfg.u0) * cfg.power * u);
   }
   vector<Scalar> x_start; // Cached initial guess
-  void newton_iterate(vector<Scalar> &x) {
+  const char* newton_iterate(vector<Scalar> &x) {
     Scalar f_previous = INFINITY;
+    const char* msg = NULL;
     if (x_start.size() == x.size()) {
       Scalar f_x_start = function(x_start)[0];
       Scalar f_x = function(x)[0];
       if ( ! std::isfinite(f_x_start) &&
-           ! std::isfinite(f_x) )
+           ! std::isfinite(f_x) ) {
+        msg = "Invalid initial guess";
         goto CONVERGENCE_FAILURE;
+      }
       if (function(x_start)[0] < function(x)[0])
         x = x_start;
     }
@@ -332,8 +335,10 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       vector<Scalar> g = gradient(x);
       Scalar mgc = g.abs().maxCoeff();
       if ( ! std::isfinite(mgc) ||
-           mgc > cfg.mgcmax)
+           mgc > cfg.mgcmax) {
+        msg = "Inner gradient had non-finite components";
         goto CONVERGENCE_FAILURE;
+      }
       /* FIXME:
         if (any(!is.finite(g)))
             stop("Newton dropout because inner gradient had non-finite components.")
@@ -346,7 +351,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       if (mgc < cfg.grad_tol) {
         x_start = x;
         if (cfg.trace) std::cout << "\n";
-        return;
+        return msg;
       }
       typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
         H = hessian(std::vector<Scalar>(x));
@@ -380,13 +385,16 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "\n";
     }
+    msg = "Iteration limit exceeded";
   CONVERGENCE_FAILURE:
     if (cfg.on_failure_give_warning) {
-      Rf_warning("Newton convergence failure");
+      Rf_warning("Newton convergence failure: %s",
+                 msg);
     }
     if (cfg.on_failure_return_nan) {
       x = NAN;
     }
+    return msg;
   }
   TMBad::Index input_size() const {
     size_t n1 = function.DomainOuter();
