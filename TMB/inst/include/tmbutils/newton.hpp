@@ -243,6 +243,7 @@ struct newton_config {
       result in much bigger slowdowns.
   */
   bool sparse;
+  bool decompose;
   /** \brief Behaviour on convergence failure: Report nan-solution ? */
   bool on_failure_return_nan;
   /** \brief Behaviour on convergence failure: Throw warning ?*/
@@ -259,6 +260,7 @@ struct newton_config {
     SET_DEFAULT(power, 0.5);
     SET_DEFAULT(u0, 1e-04);
     SET_DEFAULT(sparse, false);
+    SET_DEFAULT(decompose, false);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
 #undef SET_DEFAULT
@@ -316,9 +318,18 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   // Put it self on tape
   vector<TMBad::ad_aug> add_to_tape() {
     // Find outer parameters
-    std::vector<TMBad::ad_aug> f_par = function.resolve_refs();
-    std::vector<TMBad::ad_aug> g_par = gradient.resolve_refs();
-    std::vector<TMBad::ad_aug> h_par = hessian.resolve_refs();
+    std::vector<TMBad::ad_aug> f_par;
+    std::vector<TMBad::ad_aug> g_par;
+    std::vector<TMBad::ad_aug> h_par;
+    if (cfg.decompose) {
+      f_par = function.decompose_refs();
+      g_par = gradient.decompose_refs();
+      h_par = hessian.decompose_refs();
+    } else {
+      f_par = function.resolve_refs();
+      g_par = gradient.resolve_refs();
+      h_par = hessian.resolve_refs();
+    }
     // Append to 'full_par'
     std::vector<TMBad::ad_aug> full_par;
     full_par.insert(full_par.end(), f_par.begin(), f_par.end());
