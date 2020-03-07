@@ -407,7 +407,8 @@ MakeADFun <- function(data, parameters, map=list(),
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                       control=list(report=as.integer(ADreport)),PACKAGE=DLL)
       if (intern) {
-          cfg <- list(sparse=TRUE, trace = inner.control$trace )
+          cfg <- inner.control
+          if (is.null(cfg$sparse)) cfg$sparse <- TRUE
           cfg <- lapply(cfg, as.double)
           .Call("TransformADFunObject", ADFun$ptr, list(newton_cfg=cfg,
                                                         random_order = random,
