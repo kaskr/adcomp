@@ -422,7 +422,8 @@ MakeADFun <- function(data, parameters, map=list(),
       if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
           registerFinalizer(ADFun, DLL)
       if (intern) {
-          cfg <- list(sparse=TRUE, trace = inner.control$trace )
+          cfg <- inner.control
+          if (is.null(cfg$sparse)) cfg$sparse <- TRUE
           cfg <- lapply(cfg, as.double)
           .Call("TransformADFunObject", ADFun$ptr, list(newton_cfg=cfg,
                                                         random_order = random,
