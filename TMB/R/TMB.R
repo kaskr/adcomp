@@ -172,7 +172,7 @@ registerFinalizer <- function(ADFun, DLL) {
 ##' @param ... Currently unused.
 ##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data, parameters, map=list(),
-                      type=c("ADFun","Fun","ADGrad"[!is.null(random) || !is.null(profile)]),
+                      type=c("ADFun","Fun","ADGrad"[!intern && (!is.null(random) || !is.null(profile)) ] ),
                       random=NULL,
                       profile=NULL,
                       random.start=expression(last.par.best[random]),
