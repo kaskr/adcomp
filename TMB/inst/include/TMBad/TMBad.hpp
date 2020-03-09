@@ -749,6 +749,54 @@ struct ADFun {
     std::vector<Index> nodes = find_op_by_name(this->glob, name);
     return decompose(nodes);
   }
+  /** \brief Optional optimization step before resolving references
+      \details Replay all RefOp-only dependent sub-expression to active glob.
+      Expand this ADFun with boundary variables.
+  */
+  void decompose_refs() {
+    if (find_op_by_name(glob, "RefOp").size() == 0) return;
+
+    std::vector<bool> keep_x(Domain(), true);
+    std::vector<bool> keep_y(Range(), true);
+    std::vector<bool> vars = get_keep_var(keep_x, keep_y);
+
+    vars = reverse_boundary(glob, vars);
+
+    std::vector<Index> nodes = which<Index>(glob.var2op(vars));
+
+    Decomp2<ADFun> decomp = decompose(nodes);
+
+    size_t n_inner = decomp.first.Domain();
+    size_t n_outer = decomp.first.Range();
+
+    decomp.first.glob.inv_index.resize(0);
+
+    std::vector<ad_aug> empty;
+    std::vector<ad_aug> gx = decomp.first(empty);
+
+    ADFun &f = decomp.second;
+
+    f.replay();
+
+    ASSERT(n_inner + n_outer == f.Domain());
+    ASSERT(find_op_by_name(f.glob, "RefOp").size() == 0);
+    ASSERT(find_op_by_name(f.glob, "InvOp").size() == f.Domain());
+    ASSERT(gx.size() == n_outer);
+
+    for (size_t i = 0; i < n_outer; i++) {
+      Index j = f.glob.inv_index[n_inner + i];
+
+      if (gx[i].constant()) {
+        f.glob.opstack[j] = glob.getOperator<global::ConstOp>();
+      } else {
+        f.glob.opstack[j] = glob.getOperator<global::RefOp>(
+            gx[i].data.glob, gx[i].taped_value.index);
+      }
+    }
+    f.glob.inv_index.resize(n_inner);
+
+    *this = f;
+  }
   /** \brief Resolve references of this ADFun object
       \details
       Assume that an active context (glob) exists.
