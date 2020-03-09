@@ -428,6 +428,16 @@ MakeADFun <- function(data, parameters, map=list(),
           ##
           par <<- par[-random]
           random <<- NULL
+          ## Run tape optimizer
+          if (config(DLL=DLL)$optimize.instantly) {
+              .Call("TransformADFunObject", ADFun$ptr,
+                    list(
+                        method="optimize",
+                        random_order=integer(0),
+                        mustWork=1L,
+                        max_period_size=1024L),
+                    PACKAGE=DLL)
+          }
       }
       if (set.defaults) {
           par <<- attr(ADFun$ptr,"par")
