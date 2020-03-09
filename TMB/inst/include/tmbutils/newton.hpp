@@ -34,7 +34,19 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   // -->   JacFun, var2op, get_keep_var  -->  const
   jacobian_dense_t(TMBad::ADFun<> &G, size_t n) :
     n(n) {
-    Base::operator= ( G.JacFun() );
+    std::vector<bool> keep_x(n, true); // inner
+    keep_x.resize(G.Domain(), false);  // outer
+    std::vector<bool> keep_y(n, true); // inner
+    Base::operator= ( G.JacFun(false, keep_x, keep_y) );
+    // FIXME: JacFun proj argument ???
+    // rep(keep, n)
+    std::vector<bool> keep_dep;
+    for (size_t i=0; i<n; i++)
+      keep_dep.insert(keep_dep.begin(),
+                      keep_x.begin(),
+                      keep_x.end());
+    this->glob.dep_index = TMBad::subset(this->glob.dep_index,
+                                         keep_dep);
   }
   template<class T>
   matrix<T> as_matrix(const std::vector<T> &Hx) {
@@ -91,7 +103,10 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   // FIXME: G const !!!
   jacobian_sparse_t(TMBad::ADFun<> &G, size_t n) :
     n(n) {
-    Base::operator= (G.SpJacFun());
+    std::vector<bool> keep_x(n, true); // inner
+    keep_x.resize(G.Domain(), false);  // outer
+    std::vector<bool> keep_y(n, true); // inner
+    Base::operator= (G.SpJacFun(keep_x, keep_y));
     init_llt();
   }
   template<class T>
@@ -260,7 +275,7 @@ struct newton_config {
     SET_DEFAULT(power, 0.5);
     SET_DEFAULT(u0, 1e-04);
     SET_DEFAULT(sparse, false);
-    SET_DEFAULT(decompose, false);
+    SET_DEFAULT(decompose, true);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
 #undef SET_DEFAULT
@@ -294,15 +309,38 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   Hessian_Type hessian;
   // Control convergence
   newton_config cfg;
+  // Outer parameters
+  std::vector<TMBad::ad_aug> par_outer;
   NewtonOperator(Functor &F, vector<Type> start, newton_config cfg)
     : cfg(cfg)
   {
     function = TMBad::ADFun<> ( FunctorExtend(F), start);
     function.optimize();
-    gradient = function.JacFun();
+    if (cfg.decompose) {
+      function.decompose_refs();
+    }
+    size_t n_inner = function.Domain();
+    ASSERT(n_inner == (size_t) start.size());
+    par_outer = function.resolve_refs(); // Increases function.Domain()
+    // Mark inner parameter subset
+    std::vector<bool> keep_inner(n_inner, true);
+    keep_inner.resize(function.Domain(), false);
+    // =========================
+    // FIXME: inv_inner and inv_outer are no longer set for grad and hess !!!
+    // =========================
+    // Grad
+    gradient = function.JacFun(false, keep_inner);
+    gradient.glob.dep_index.resize(n_inner); // FIXME: JacFun should project ???
     gradient.optimize();
-    hessian = Hessian_Type(gradient, start.size());
+    // Hessian
+    hessian = Hessian_Type(gradient, n_inner);
     hessian.optimize();
+    // FIXME: Hack
+    std::vector<bool> keep_outer(keep_inner); keep_outer.flip();
+    gradient.inner_inv_index = TMBad::subset(gradient.glob.inv_index, keep_inner);
+    gradient.outer_inv_index = TMBad::subset(gradient.glob.inv_index, keep_outer);
+    hessian.inner_inv_index = TMBad::subset(hessian.glob.inv_index, keep_inner);
+    hessian.outer_inv_index = TMBad::subset(hessian.glob.inv_index, keep_outer);
   }
   // Helper to swap inner/outer
   void SwapInner() {
@@ -317,30 +355,11 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
   // Put it self on tape
   vector<TMBad::ad_aug> add_to_tape() {
-    // Find outer parameters
-    std::vector<TMBad::ad_aug> f_par;
-    std::vector<TMBad::ad_aug> g_par;
-    std::vector<TMBad::ad_aug> h_par;
-    if (cfg.decompose) {
-      f_par = function.decompose_refs();
-      g_par = gradient.decompose_refs();
-      h_par = hessian.decompose_refs();
-    } else {
-      f_par = function.resolve_refs();
-      g_par = gradient.resolve_refs();
-      h_par = hessian.resolve_refs();
-    }
-    // Append to 'full_par'
-    std::vector<TMBad::ad_aug> full_par;
-    full_par.insert(full_par.end(), f_par.begin(), f_par.end());
-    full_par.insert(full_par.end(), g_par.begin(), g_par.end());
-    full_par.insert(full_par.end(), h_par.begin(), h_par.end());
-    // Solver: input outer par -> output inner par
     TMBad::global::Complete<NewtonOperator> solver(*this);
-    std::vector<TMBad::ad_aug> sol = solver(full_par);
-    // Append solution to full_par
-    full_par.insert(full_par.end(), sol.begin(), sol.end());
-    return full_par;
+    std::vector<TMBad::ad_aug> sol = solver(par_outer);
+    // Append outer paramaters to solution
+    sol.insert(sol.end(), par_outer.begin(), par_outer.end());
+    return sol;
   }
   /* From TMB::newton */
   double phi(double u) {
@@ -438,10 +457,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     return msg;
   }
   TMBad::Index input_size() const {
-    size_t n1 = function.DomainOuter();
-    size_t n2 = gradient.DomainOuter();
-    size_t n3 = hessian.DomainOuter();
-    return n1 + n2 + n3;
+    return function.DomainOuter();
   }
   TMBad::Index output_size() const {
     return function.DomainInner(); // Inner dimension
@@ -459,17 +475,13 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     return ans;
   }
   void forward(TMBad::ForwardArgs<Scalar> &args) {
-    size_t n1 = function.DomainOuter();
-    size_t n2 = gradient.DomainOuter();
-    size_t n3 = hessian.DomainOuter();
-    std::vector<Scalar> x = get_segment(args,     0, n1);
-    std::vector<Scalar> y = get_segment(args,    n1, n2);
-    std::vector<Scalar> z = get_segment(args, n1+n2, n3);
+    size_t n = function.DomainOuter();
+    std::vector<Scalar> x = get_segment(args, 0, n);
     // Set *outer* parameters
     SwapOuter(); // swap
     function.DomainVecSet(x);
-    gradient.DomainVecSet(y);
-    hessian.DomainVecSet(z);
+    gradient.DomainVecSet(x);
+    hessian.DomainVecSet(x);
     SwapOuter(); // swap back
     // Run *inner* iterations
     SwapInner(); // swap
@@ -484,26 +496,29 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     for (size_t i=0; i < (size_t) w.size(); i++) w[i] = args.dy(i);
     std::vector<T> sol(output_size());
     for (size_t i=0; i<sol.size(); i++) sol[i] = args.y(i);
-    // FIXME: 'hessian' must have full (inner, outer) vector as input
-    size_t n1 = function.DomainOuter();
-    size_t n2 = gradient.DomainOuter();
-    size_t n3 = hessian.DomainOuter();
-    std::vector<T> x = get_segment(args,     0, n1);
-    std::vector<T> y = get_segment(args,    n1, n2);
-    std::vector<T> z = get_segment(args, n1+n2, n3);
-    std::vector<T> sol_z = sol; sol_z.insert(sol_z.end(), z.begin(), z.end());
+    // NOTE: 'hessian' must have full (inner, outer) vector as input
+    size_t n = function.DomainOuter();
+    std::vector<T> x = get_segment(args, 0, n);
+    std::vector<T> sol_x = sol; sol_x.insert(sol_x.end(), x.begin(), x.end());
     HessianSolveVector<Hessian_Type> solve(&hessian);
-    std::vector<T> hv = hessian.eval(sol_z);
+    std::vector<T> hv = hessian.eval(sol_x);
     vector<T> w2 = - solve.eval(hv, w);
-    std::vector<T> sol_y = sol; sol_y.insert(sol_y.end(), y.begin(), y.end());
-    vector<T> g = gradient.Jacobian(sol_y, w2);
-    vector<T> g_outer = g.tail(n2);
+    vector<T> g = gradient.Jacobian(sol_x, w2);
+    vector<T> g_outer = g.tail(n);
     for (size_t i=0; i < (size_t) g_outer.size(); i++) args.dx(i) += g_outer[i];
   }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
   const char* op_name() { return "Newton"; }
+  void print(TMBad::global::print_config cfg) {
+    Rcout << cfg.prefix << "======== function:\n";
+    function.glob.print(cfg);
+    Rcout << cfg.prefix << "======== gradient:\n";
+    gradient.glob.print(cfg);
+    Rcout << cfg.prefix << "======== hessian:\n";
+    hessian.glob.print(cfg);
+  }
 };
 
 template<class Type>
@@ -534,36 +549,24 @@ template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
   typedef NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > Base;
   typedef typename Hessian_Type::template MatrixResult<Type>::type hessian_t;
-  vector<Type> sol; // c(f_par, g_par, h_par, sol)
+  vector<Type> sol; // c(sol, par_outer)
   size_t n; // Number of inner parameters
   NewtonSolver(Functor &F, vector<Type> start, newton_config cfg) :
     Base(F, start, cfg), n(start.size()) {
-    // sol = start;
-    // Base::newton_iterate(sol);
     Newton_CTOR_Hook(*this, start);
   }
   // Get solution
   operator vector<Type>() const {
-    return sol.tail(n);
+    return sol.head(n);
   }
   vector<Type> solution() {
-    return sol.tail(n);
+    return sol.head(n);
   }
   Type value() {
-    // Construct c(sol, f_par)
-    size_t n1 = Base::function.DomainOuter();
-    vector<Type> f_par_sol(n1 + n);
-    f_par_sol << sol.tail(n), sol.head(n1);
-    return Base::function(std::vector<Type>(f_par_sol))[0];
+    return Base::function(std::vector<Type>(sol))[0];
   }
   hessian_t hessian() {
-    // Construct c(sol, h_par)
-    size_t n1 = Base::function.DomainOuter();
-    size_t n2 = Base::gradient.DomainOuter();
-    size_t n3 = Base::hessian.DomainOuter();
-    vector<Type> h_par_sol(n3 + n);
-    h_par_sol << sol.tail(n), sol.segment(n1+n2,n3);
-    return Base::hessian(std::vector<Type>(h_par_sol));
+    return Base::hessian(std::vector<Type>(sol));
   }
   Type Laplace() {
     return
