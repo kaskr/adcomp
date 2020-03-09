@@ -377,6 +377,17 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
             (1. - cfg.u0) * cfg.power * u);
   }
   vector<Scalar> x_start; // Cached initial guess
+  const char* convergence_fail(const char* msg,
+                               vector<Scalar> &x) {
+    if (cfg.on_failure_give_warning) {
+      Rf_warning("Newton convergence failure: %s",
+                 msg);
+    }
+    if (cfg.on_failure_return_nan) {
+      x = NAN;
+    }
+    return msg;
+  }
   const char* newton_iterate(vector<Scalar> &x) {
     Scalar f_previous = INFINITY;
     const char* msg = NULL;
@@ -385,8 +396,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       Scalar f_x = function(x)[0];
       if ( ! std::isfinite(f_x_start) &&
            ! std::isfinite(f_x) ) {
-        msg = "Invalid initial guess";
-        goto CONVERGENCE_FAILURE;
+        return
+          convergence_fail("Invalid initial guess", x);
       }
       if (function(x_start)[0] < function(x)[0])
         x = x_start;
@@ -396,8 +407,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       Scalar mgc = g.abs().maxCoeff();
       if ( ! std::isfinite(mgc) ||
            mgc > cfg.mgcmax) {
-        msg = "Inner gradient had non-finite components";
-        goto CONVERGENCE_FAILURE;
+        return
+          convergence_fail("Inner gradient had non-finite components", x);
       }
       /* FIXME:
         if (any(!is.finite(g)))
@@ -445,16 +456,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "\n";
     }
-    msg = "Iteration limit exceeded";
-  CONVERGENCE_FAILURE:
-    if (cfg.on_failure_give_warning) {
-      Rf_warning("Newton convergence failure: %s",
-                 msg);
-    }
-    if (cfg.on_failure_return_nan) {
-      x = NAN;
-    }
-    return msg;
+    return
+      convergence_fail("Iteration limit exceeded", x);
   }
   TMBad::Index input_size() const {
     return function.DomainOuter();
