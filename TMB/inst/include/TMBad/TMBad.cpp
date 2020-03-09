@@ -1693,7 +1693,9 @@ void global::RefOp::forward(ForwardArgs<Replay> &args) {
 }
 
 void global::RefOp::reverse(ReverseArgs<Replay> &args) {
-  args.dx(0) += args.dy(0);
+  if (get_glob() == this->glob) {
+    args.dx(0) += args.dy(0);
+  }
 }
 
 const char *global::RefOp::op_name() { return "RefOp"; }
