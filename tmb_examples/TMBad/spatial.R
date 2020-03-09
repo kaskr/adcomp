@@ -15,7 +15,8 @@ obj <- MakeADFun(data = list(n=100, y=y, X=X, dd=dd),
                      log_sigma = -0.6931472,
                      u = rep(0,n)),
                  DLL = "spatial",
-                 random = "u" , intern=TRUE, sparse=FALSE
+                 random = "u" , intern=TRUE,
+                 inner.control=list(sparse=FALSE)
 		 )
 
 system.time(
@@ -24,6 +25,5 @@ system.time(
                   upper=c( 100.0,  100.0, 3.00,  3.0) )
 )
 
-rep <- sdreport(obj, hessian=obj$he(opt$par))
 rep <- sdreport(obj)
 rep
