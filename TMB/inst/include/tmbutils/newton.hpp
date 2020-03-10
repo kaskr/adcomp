@@ -224,6 +224,8 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
 struct newton_config {
   /** \brief Max number of iterations */
   int maxit;
+  /** \brief Max number of allowed rejections */
+  int max_reject;
   /** \brief Print trace info? */
   int trace;
   /** \brief Convergence tolerance of max gradient component */
@@ -258,6 +260,7 @@ struct newton_config {
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
+    SET_DEFAULT(max_reject, 10);
     SET_DEFAULT(trace, 0);
     SET_DEFAULT(grad_tol, 1e-8);
     SET_DEFAULT(step_tol, 1e-8);
@@ -380,6 +383,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     return msg;
   }
   const char* newton_iterate(vector<Scalar> &x) {
+    int reject_counter = 0;
     Scalar f_previous = INFINITY;
     const char* msg = NULL;
     if (x_start.size() == x.size()) {
@@ -440,9 +444,14 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         cfg.ustep = increase(cfg.ustep);
         f_previous = f;
         x = x_new;
+        reject_counter = 0;
       } else { // No improvement
         // Reject
         cfg.ustep = decrease(cfg.ustep);
+        reject_counter ++;
+        if (reject_counter > cfg.max_reject)
+          return
+            convergence_fail("Max number of rejections exceeded", x);
       }
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "\n";
