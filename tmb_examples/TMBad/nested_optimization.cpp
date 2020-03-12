@@ -37,9 +37,6 @@
 struct NestedOptimizer {  
   objective_function<TMBad::ad_aug>& obj;
   TMBad::ADFun<> current_tape;
-  std::vector<int> input;
-  std::vector<int> output;
-  const char* name_output;
   newton::newton_config cfg;
   NestedOptimizer (objective_function<TMBad::ad_aug> &obj,
                    newton::newton_config cfg = newton::newton_config()) :
@@ -73,21 +70,23 @@ struct NestedOptimizer {
     }
     return output;
   }
-  vector<TMBad::ad_aug> get_x() {
-    vector<TMBad::ad_aug> x(input.size());
-    for (size_t i=0; i<input.size(); i++)
-      x[i] = obj.theta[input[i]];
-    return x;
-  }
+  // vector<TMBad::ad_aug> get_x(const std::vector<int> &input) {
+  //   vector<TMBad::ad_aug> x(input.size());
+  //   for (size_t i=0; i<input.size(); i++)
+  //     x[i] = obj.theta[input[i]];
+  //   return x;
+  // }
   vector<TMBad::ad_aug> get_y(const std::vector<int> &output) {
     vector<TMBad::ad_aug> y(output.size());
     for (size_t i=0; i<output.size(); i++)
       y[i] = obj.reportvector.result[output[i]];
     return y;
   }
-  void set_x(const vector<TMBad::ad_aug> &x) {
-    for (size_t i=0; i<input.size(); i++) obj.theta[input[i]] = x[i];
-  }
+  // void set_x(const std::vector<int> &input,
+  //            const vector<TMBad::ad_aug> &x) {
+  //   for (size_t i=0; i<input.size(); i++)
+  //     obj.theta[input[i]] = x[i];
+  // }
   vector<TMBad::ad_aug> eval_obj(const vector<TMBad::ad_aug> &x,
                                  const char *name_output) {
     // Clear because we allow using same obj multiple times
@@ -96,8 +95,13 @@ struct NestedOptimizer {
     obj.reportvector.clear();
     // Eval
     for (size_t i=0; i < (size_t) x.size(); i++) obj.theta[i] = x[i];
-    obj();
-    output.resize(0);
+    TMBad::ad_aug value = obj();
+    if (name_output == NULL) {
+      vector<TMBad::ad_aug> ans(1);
+      ans[0] = value;
+      return ans;
+    }
+    //output.resize(0);
     return get_y( get_output_index(name_output) );
   }
   // vector<TMBad::ad_aug> argmin(newton::newton_config cfg = newton::newton_config() ) {
