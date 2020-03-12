@@ -53,14 +53,8 @@ struct NestedOptimizer {
     TMBad::Dependent(x);
     current_tape.glob.ad_stop();
   }
-  void set_input(const char* name) {
-    for (int i=0; i<obj.thetanames.size(); i++) {
-      if (!strcmp(name, obj.thetanames[i])) input.push_back(i);
-    }
-    // std::cout << input << "\n";
-  }
 
-  std::vector<TMBad::Index> get_input(const char* name) {
+  std::vector<TMBad::Index> get_input_index(const char* name) {
     std::vector<TMBad::Index> input;
     for (int i=0; i<obj.thetanames.size(); i++) {
       if (!strcmp(name, obj.thetanames[i])) input.push_back(i);
@@ -150,7 +144,7 @@ struct NestedOptimizer {
     TMBad::Independent(x);
     //set_input(name); // FIXME: input = get_input("F")
     //std::vector<TMBad::Index> input(this->input.begin(), this->input.end());
-    std::vector<TMBad::Index> input = get_input(name);
+    std::vector<TMBad::Index> input = get_input_index(name);
     newton::slice<> S(current_tape, input);
     // FIXME: WTF:
     S.x = x;
