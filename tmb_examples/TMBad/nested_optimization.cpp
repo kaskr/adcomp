@@ -64,13 +64,14 @@ struct NestedOptimizer {
     return input;
   }
 
-  void set_output_index(const char* name) {
+  std::vector<int> get_output_index(const char* name) {
+    std::vector<int> output;
     SEXP names = obj.reportvector.reportnames();
     for (int i=0; i<LENGTH(names); i++) {
       std::cout << name << " " << CHAR(STRING_ELT(names, i)) << "\n";
       if ( ! strcmp(name, CHAR(STRING_ELT(names, i))) ) output.push_back(i);
     }
-    //std::cout << output << "\n";
+    return output;
   }
   vector<TMBad::ad_aug> get_x() {
     vector<TMBad::ad_aug> x(input.size());
@@ -78,7 +79,7 @@ struct NestedOptimizer {
       x[i] = obj.theta[input[i]];
     return x;
   }
-  vector<TMBad::ad_aug> get_y() {
+  vector<TMBad::ad_aug> get_y(const std::vector<int> &output) {
     vector<TMBad::ad_aug> y(output.size());
     for (size_t i=0; i<output.size(); i++)
       y[i] = obj.reportvector.result[output[i]];
@@ -97,8 +98,7 @@ struct NestedOptimizer {
     for (size_t i=0; i < (size_t) x.size(); i++) obj.theta[i] = x[i];
     obj();
     output.resize(0);
-    set_output_index(name_output);
-    return get_y();
+    return get_y( get_output_index(name_output) );
   }
   // vector<TMBad::ad_aug> argmin(newton::newton_config cfg = newton::newton_config() ) {
   //   // if (output.size() != 1)
