@@ -374,6 +374,9 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   const char* convergence_fail(const char* msg,
                                vector<Scalar> &x) {
     if (cfg.on_failure_give_warning) {
+      if (cfg.trace) {
+        Rcout << "Newton convergence failure: " << msg << "\n";
+      }
       Rf_warning("Newton convergence failure: %s",
                  msg);
     }
