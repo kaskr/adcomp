@@ -707,6 +707,26 @@ public:
                       obj$simulate() from R) we *do* write the seed
                       back after simulation in order to get varying
                       replicates. */
+    is_copy = false;
+  }
+  bool is_copy;
+  /** \brief Copy 'other' objective function of possibly different scalar type */
+  template <class T>
+  objective_function(const objective_function<T> &other) :
+    data(other.data),
+    parameters(other.parameters),
+    report(other.report),
+    thetanames(other.thetanames),
+    is_copy(true)
+  {
+    theta.resize(other.theta.size());
+    for (int i=0; i<theta.size(); i++) theta[i] = other.theta[i];
+    // FIXME: Consider if we want to copy any of this:
+    current_parallel_region=-1;
+    selected_parallel_region=-1;
+    max_parallel_regions=-1;
+    reversefill=false;
+    do_simulate = false;
   }
 
   /** \brief Syncronize user's data object. It could be changed between calls to e.g. EvalDoubleFunObject */
