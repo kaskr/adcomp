@@ -40,8 +40,10 @@ struct NestedOptimizer {
   std::vector<int> input;
   std::vector<int> output;
   const char* name_output;
-  NestedOptimizer (objective_function<TMBad::ad_aug> &obj) :
-    obj(obj) {
+  newton::newton_config cfg;
+  NestedOptimizer (objective_function<TMBad::ad_aug> &obj,
+                   newton::newton_config cfg = newton::newton_config()) :
+    obj(obj), cfg(cfg) {
 
     std::vector<TMBad::ad_aug> x(obj.theta.size()); // FIXME: DRY !!!
     for (size_t i=0; i<x.size(); i++) x[i] = obj.theta[i].Value(); // FIXME: DRY !!!
@@ -128,8 +130,7 @@ struct NestedOptimizer {
     current_tape = ans;
   }
   // argmin("F")
-  void set_argmin(const char *name,
-              newton::newton_config cfg = newton::newton_config()) {
+  void set_argmin(const char *name) {
     if (current_tape.Range() != 1)
       Rf_error("Minimization requires one dimensional output");
     TMBad::ADFun<> ans;
@@ -378,11 +379,11 @@ Type objective_function<Type>::operator() ()
     cfg.sparse = true;
     // Copy this objective function
     objective_function<TMBad::ad_aug> obj(*this);
-    NestedOptimizer Nopt(obj);
+    NestedOptimizer Nopt(obj, cfg);
     Nopt.set_output("ans");
-    Nopt.set_argmin("U", cfg);
+    Nopt.set_argmin("U");
     Nopt.set_output("SSB");
-    Nopt.set_argmin("rho", cfg);
+    Nopt.set_argmin("rho");
     // Replace U by Uhat in 'obj'
     // objective_slice(obj, "U", "ans").argmin_inplace();
     // vector<TMBad::ad_aug> Fhat = objective_slice(obj, "F", "SSB").argmin();
