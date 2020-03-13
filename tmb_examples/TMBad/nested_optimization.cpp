@@ -64,10 +64,12 @@ struct NestedOptimizer {
   std::vector<int> get_output_index(const char* name) {
     std::vector<int> output;
     SEXP names = obj.reportvector.reportnames();
+    PROTECT(names);
     for (int i=0; i<LENGTH(names); i++) {
       std::cout << name << " " << CHAR(STRING_ELT(names, i)) << "\n";
       if ( ! strcmp(name, CHAR(STRING_ELT(names, i))) ) output.push_back(i);
     }
+    UNPROTECT(1);
     return output;
   }
   // vector<TMBad::ad_aug> get_x(const std::vector<int> &input) {
@@ -160,6 +162,13 @@ struct NestedOptimizer {
     TMBad::Dependent(x);
     ans.glob.ad_stop();
     current_tape = ans;
+  }
+  void select_arg(const char *name) {
+    if (current_tape.Range() != (size_t) obj.theta.size())
+      Rf_error("'select_arg' requires output dimension equal to objective input dimension");
+    std::vector<TMBad::Index> input = get_input_index(name);
+    current_tape.glob.dep_index =
+      TMBad::subset(current_tape.glob.dep_index, input);
   }
 };
 
@@ -383,15 +392,20 @@ Type objective_function<Type>::operator() ()
     cfg.sparse = true;
     // Copy this objective function
     objective_function<TMBad::ad_aug> obj(*this);
+    obj.is_copy = true; // FIXME !!!!
     NestedOptimizer Nopt(obj, cfg);
     Nopt.set_output("ans");
     Nopt.set_argmin("U");
     Nopt.set_output("SSB");
     Nopt.set_argmin("rho");
+    Nopt.select_arg("rho");
     // Replace U by Uhat in 'obj'
     // objective_slice(obj, "U", "ans").argmin_inplace();
     // vector<TMBad::ad_aug> Fhat = objective_slice(obj, "F", "SSB").argmin();
     // REPORT(Fhat);
+    vector<Type> rho_hat = Nopt.current_tape(this->theta);
+    REPORT(rho_hat);
+    ADREPORT(rho_hat);
   }
   // ADREPORT(logN);
   // ADREPORT(logF);
