@@ -23,7 +23,7 @@ data$nlogF = max(data$keyLogFsta)+1
 data$nlogN = data$maxAge-data$minAge+1
 data$flag <- 0
 
-obj <- MakeADFun(data, parameters, random=c("U"), DLL="nested_optimization",type="ADFun")
+obj <- MakeADFun(data, parameters, random=c("U"), DLL="nested_optimization")
 lower <- obj$par*0-Inf
 upper <- obj$par*0+Inf
 lower["rho"] <- 0.01
@@ -33,6 +33,8 @@ system.time(opt <- nlminb(obj$par, obj$fn, obj$gr, lower=lower, upper=upper))
 
 obj$env$data$flag <- 1
 obj$report()
+h <- optimHess(opt$par,obj$fn,obj$gr)
 
-## rep <- sdreport(obj, hessian = obj$he(opt$par))
-## rep
+rep <- sdreport(obj,hessian=h)
+rep
+summary(rep,"report")
