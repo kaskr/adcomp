@@ -120,7 +120,7 @@ struct NestedOptimizer {
   //   set_x( x_hat );
   // }
   // Select output
-  void set_output(const char *name) {
+  void set_output(const char *name = NULL) {
     if (orig->is_copy) return;
     if (current_tape.Range() != (size_t) obj.theta.size())
       Rf_error("Incompatible output dimension of current tape");
@@ -401,7 +401,7 @@ Type objective_function<Type>::operator() ()
     cfg.trace = true;
     cfg.sparse = true;
     NestedOptimizer<Type> Nopt(this, cfg);
-    Nopt.set_output("ans");
+    Nopt.set_output();
     Nopt.set_argmin("U");
     Nopt.set_output("SSB");
     Nopt.set_argmin("rho");
