@@ -120,7 +120,7 @@ struct NestedOptimizer {
   //   set_x( x_hat );
   // }
   // Select output
-  void set_output(const char *name = NULL) {
+  void apply_objective(const char *name = NULL) {
     if (orig->is_copy) return;
     if (current_tape.Range() != (size_t) obj.theta.size())
       Rf_error("Incompatible output dimension of current tape");
@@ -141,7 +141,7 @@ struct NestedOptimizer {
     current_tape = ans;
   }
   // argmin("F")
-  void set_argmin(const char *name) {
+  void apply_argmin(const char *name) {
     if (orig->is_copy) return;
     if (current_tape.Range() != 1)
       Rf_error("Minimization requires one dimensional output");
@@ -185,7 +185,7 @@ struct NestedOptimizer {
 // NestedOptimizer objective_slice(objective_function<TMBad::ad_aug> &obj, const char *name_input, const char *name_output) {
 //   NestedOptimizer s(obj);
 //   s.set_input(name_input);
-//   //s.set_output(name_output);
+//   //s.apply_objective(name_output);
 //   s.name_output = name_output;
 //   return s;
 // }
@@ -401,10 +401,10 @@ Type objective_function<Type>::operator() ()
     cfg.trace = true;
     cfg.sparse = true;
     NestedOptimizer<Type> Nopt(this, cfg);
-    Nopt.set_output();
-    Nopt.set_argmin("U");
-    Nopt.set_output("SSB");
-    Nopt.set_argmin("rho");
+    Nopt.apply_objective();
+    Nopt.apply_argmin("U");
+    Nopt.apply_objective("SSB");
+    Nopt.apply_argmin("rho");
     Nopt.select_arg("rho");
     // Replace U by Uhat in 'obj'
     // objective_slice(obj, "U", "ans").argmin_inplace();
