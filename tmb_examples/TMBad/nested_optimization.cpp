@@ -173,6 +173,10 @@ struct NestedOptimizer {
     current_tape.glob.dep_index =
       TMBad::subset(current_tape.glob.dep_index, input);
   }
+  vector<Type> operator()() {
+    vector<Type> x = orig->theta;
+    return current_tape(x);
+  }
 };
 
 // NestedOptimizer objective_slice(objective_function<TMBad::ad_aug> &obj, const char *name_input, const char *name_output) {
@@ -403,7 +407,7 @@ Type objective_function<Type>::operator() ()
     // objective_slice(obj, "U", "ans").argmin_inplace();
     // vector<TMBad::ad_aug> Fhat = objective_slice(obj, "F", "SSB").argmin();
     // REPORT(Fhat);
-    vector<Type> rho_hat = Nopt.current_tape(this->theta);
+    vector<Type> rho_hat = Nopt();
     REPORT(rho_hat);
     ADREPORT(rho_hat);
   }
