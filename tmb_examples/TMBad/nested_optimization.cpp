@@ -34,14 +34,17 @@
 /* Calc ref point */
 //using namespace TMBad;
 // Utility 1: Construct slice function from objective function
-struct NestedOptimizer {  
-  objective_function<TMBad::ad_aug>& obj;
+template<class Type>
+struct NestedOptimizer {
+  const objective_function<Type>* orig;
+  objective_function<TMBad::ad_aug> obj;
   TMBad::ADFun<> current_tape;
   newton::newton_config cfg;
-  NestedOptimizer (objective_function<TMBad::ad_aug> &obj,
+  NestedOptimizer (const objective_function<Type>* orig,
                    newton::newton_config cfg = newton::newton_config()) :
-    obj(obj), cfg(cfg) {
-
+    orig(orig), obj(*orig), cfg(cfg) {
+    // Mark obj as a copy
+    obj.is_copy = true;
     std::vector<TMBad::ad_aug> x(obj.theta.size()); // FIXME: DRY !!!
     for (size_t i=0; i<x.size(); i++) x[i] = obj.theta[i].Value(); // FIXME: DRY !!!
 
@@ -390,10 +393,7 @@ Type objective_function<Type>::operator() ()
     newton::newton_config cfg = newton::newton_config();
     cfg.trace = true;
     cfg.sparse = true;
-    // Copy this objective function
-    objective_function<TMBad::ad_aug> obj(*this);
-    obj.is_copy = true; // FIXME !!!!
-    NestedOptimizer Nopt(obj, cfg);
+    NestedOptimizer<Type> Nopt(this, cfg);
     Nopt.set_output("ans");
     Nopt.set_argmin("U");
     Nopt.set_output("SSB");
