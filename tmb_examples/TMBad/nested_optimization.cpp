@@ -94,6 +94,7 @@ struct NestedOptimizer {
   // }
   vector<TMBad::ad_aug> eval_obj(const vector<TMBad::ad_aug> &x,
                                  const char *name_output) {
+    if (orig->is_copy) Rf_error("Infinite recursion?");
     // Clear because we allow using same obj multiple times
     obj.index = 0;
     obj.parnames.resize(0);
@@ -120,6 +121,7 @@ struct NestedOptimizer {
   // }
   // Select output
   void set_output(const char *name) {
+    if (orig->is_copy) return;
     if (current_tape.Range() != (size_t) obj.theta.size())
       Rf_error("Incompatible output dimension of current tape");
     TMBad::ADFun<> ans;
@@ -140,6 +142,7 @@ struct NestedOptimizer {
   }
   // argmin("F")
   void set_argmin(const char *name) {
+    if (orig->is_copy) return;
     if (current_tape.Range() != 1)
       Rf_error("Minimization requires one dimensional output");
     TMBad::ADFun<> ans;
@@ -393,7 +396,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT(SSB);
   // Avoid infinite recursion
   DATA_INTEGER(flag);
-  if ( flag && ! this -> is_copy ) {
+  if ( flag ) {
     newton::newton_config cfg = newton::newton_config();
     cfg.trace = true;
     cfg.sparse = true;
