@@ -390,13 +390,13 @@ Type objective_function<Type>::operator() ()
     REPORT(obs);
   }
 
-  // Some objective
-  Type SSB = rho*rho + U[0]*U[0];
-  ADREPORT(ans);
-  ADREPORT(SSB);
   // Avoid infinite recursion
   DATA_INTEGER(flag);
   if ( flag ) {
+    // Some objective
+    Type SSB = rho*rho + U[0]*U[0];
+    ADREPORT(ans);
+    ADREPORT(SSB);
     newton::newton_config cfg = newton::newton_config();
     cfg.trace = true;
     cfg.sparse = true;
