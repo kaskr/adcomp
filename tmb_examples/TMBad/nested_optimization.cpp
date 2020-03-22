@@ -376,10 +376,6 @@ Type objective_function<Type>::operator() ()
     Nopt.apply_objective("SSB");
     Nopt.apply_argmin("rho");
     Nopt.select_arg("rho");
-    // Replace U by Uhat in 'obj'
-    // objective_slice(obj, "U", "ans").argmin_inplace();
-    // vector<TMBad::ad_aug> Fhat = objective_slice(obj, "F", "SSB").argmin();
-    // REPORT(Fhat);
     vector<Type> rho_hat = Nopt();
     REPORT(rho_hat);
     ADREPORT(rho_hat);
