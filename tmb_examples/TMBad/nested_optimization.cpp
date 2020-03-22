@@ -31,31 +31,29 @@
 #include <TMB.hpp>
 #include <iostream>
 
-/* Calc ref point */
-//using namespace TMBad;
-// Utility 1: Construct slice function from objective function
 template<class Type>
 struct NestedOptimizer {
   const objective_function<Type>* orig;
   objective_function<TMBad::ad_aug> obj;
   TMBad::ADFun<> current_tape;
   newton::newton_config cfg;
+  /** \brief Create a NestedOptimizer representing the identitiy mapping f(theta)=theta */
   NestedOptimizer (const objective_function<Type>* orig,
                    newton::newton_config cfg = newton::newton_config()) :
     orig(orig), obj(*orig), cfg(cfg) {
     // Mark obj as a copy
     obj.is_copy = true;
-    std::vector<TMBad::ad_aug> x(obj.theta.size()); // FIXME: DRY !!!
-    for (size_t i=0; i<x.size(); i++) x[i] = obj.theta[i].Value(); // FIXME: DRY !!!
-
-    // Create identity tape
+    std::vector<TMBad::ad_aug> x(obj.theta.size());
+    for (size_t i=0; i<x.size(); i++) x[i] = obj.theta[i].Value();
+    // Create identity mapping f: theta -> theta
     current_tape.glob.ad_start();
-
     TMBad::Independent(x);
     TMBad::Dependent(x);
     current_tape.glob.ad_stop();
   }
-
+  /** \brief Internal helper
+      \details Equivalent of `which(names(theta) == name)`
+  */
   std::vector<TMBad::Index> get_input_index(const char* name) {
     std::vector<TMBad::Index> input;
     for (int i=0; i<obj.thetanames.size(); i++) {
@@ -63,7 +61,9 @@ struct NestedOptimizer {
     }
     return input;
   }
-
+  /** \brief Internal helper
+      \details Equivalent of `which(names(reportvector) == name)`
+  */
   std::vector<int> get_output_index(const char* name) {
     std::vector<int> output;
     SEXP names = obj.reportvector.reportnames();
@@ -75,23 +75,20 @@ struct NestedOptimizer {
     UNPROTECT(1);
     return output;
   }
-  // vector<TMBad::ad_aug> get_x(const std::vector<int> &input) {
-  //   vector<TMBad::ad_aug> x(input.size());
-  //   for (size_t i=0; i<input.size(); i++)
-  //     x[i] = obj.theta[input[i]];
-  //   return x;
-  // }
+  /** \brief Internal helper to get output vector
+      \details Equivalent of `reportvector[output]`
+  */
   vector<TMBad::ad_aug> get_y(const std::vector<int> &output) {
     vector<TMBad::ad_aug> y(output.size());
     for (size_t i=0; i<output.size(); i++)
       y[i] = obj.reportvector.result[output[i]];
     return y;
   }
-  // void set_x(const std::vector<int> &input,
-  //            const vector<TMBad::ad_aug> &x) {
-  //   for (size_t i=0; i<input.size(); i++)
-  //     obj.theta[input[i]] = x[i];
-  // }
+  /** \brief Internal helper to evaluate `objective_function`
+      \details If `name_output` is NULL the objective function value
+      is returned. Otherwise, the adreported values matching
+      `name_output` are returned.
+  */
   vector<TMBad::ad_aug> eval_obj(const vector<TMBad::ad_aug> &x,
                                  const char *name_output) {
     if (orig->is_copy) Rf_error("Infinite recursion?");
@@ -107,32 +104,22 @@ struct NestedOptimizer {
       ans[0] = value;
       return ans;
     }
-    //output.resize(0);
     return get_y( get_output_index(name_output) );
   }
-  // vector<TMBad::ad_aug> argmin(newton::newton_config cfg = newton::newton_config() ) {
-  //   // if (output.size() != 1)
-  //   //   Rf_error("Minimization requires one dimensional output");
-  //   return newton::Newton(*this, get_x(), cfg);
-  // }
-  // void argmin_inplace(newton::newton_config cfg = newton::newton_config() ) {
-  //   vector<TMBad::ad_aug> x_hat = argmin(cfg);
-  //   set_x( x_hat );
-  // }
-  // Select output
+  /** \brief Compose objective with this function object
+      \details Assume that the current function object represents a mapping `f:R^n->R^n`.
+      Assume `name` is a parameter function `g:R^n->R^k`.
+      Update current function object to the composition
+      `g o f: R^n -> R^k( x -> g(f(x)))`.
+  */
   void apply_objective(const char *name = NULL) {
     if (orig->is_copy) return;
     if (current_tape.Range() != (size_t) obj.theta.size())
       Rf_error("Incompatible output dimension of current tape");
     TMBad::ADFun<> ans;
-    //std::vector<TMBad::ad_aug> x = obj.theta;
     ans.glob.ad_start();
-    
     std::vector<double> tmp = current_tape.DomainVec();
     std::vector<TMBad::ad_aug> x(tmp.begin(), tmp.end());
-    // std::vector<TMBad::ad_aug> x(obj.theta.size()); // FIXME: DRY !!!
-    // for (size_t i=0; i<x.size(); i++) x[i] = obj.theta[i].Value(); // FIXME: DRY !!!
-
     TMBad::Independent(x);
     x = current_tape(x); // Replay current tape
     std::vector<TMBad::ad_aug> y = eval_obj(x, name);
@@ -140,23 +127,16 @@ struct NestedOptimizer {
     ans.glob.ad_stop();
     current_tape = ans;
   }
-  // argmin("F")
+  /** \brief Compose argmin functional with this function object */
   void apply_argmin(const char *name) {
     if (orig->is_copy) return;
     if (current_tape.Range() != 1)
       Rf_error("Minimization requires one dimensional output");
     TMBad::ADFun<> ans;
-    //std::vector<TMBad::ad_aug> x = obj.theta;
     ans.glob.ad_start();
-
     std::vector<double> tmp = current_tape.DomainVec();
     std::vector<TMBad::ad_aug> x(tmp.begin(), tmp.end());
-    //std::vector<TMBad::ad_aug> x(obj.theta.size()); // FIXME: DRY !!!
-    //for (size_t i=0; i<x.size(); i++) x[i] = obj.theta[i].Value(); // FIXME: DRY !!!
-
     TMBad::Independent(x);
-    //set_input(name); // FIXME: input = get_input("F")
-    //std::vector<TMBad::Index> input(this->input.begin(), this->input.end());
     std::vector<TMBad::Index> input = get_input_index(name);
     newton::slice<> S(current_tape, input);
     // FIXME: WTF:
@@ -181,16 +161,6 @@ struct NestedOptimizer {
     return current_tape(x);
   }
 };
-
-// NestedOptimizer objective_slice(objective_function<TMBad::ad_aug> &obj, const char *name_input, const char *name_output) {
-//   NestedOptimizer s(obj);
-//   s.set_input(name_input);
-//   //s.apply_objective(name_output);
-//   s.name_output = name_output;
-//   return s;
-// }
-// Utility 2: Construct ADreport function from objective function
-
 
 /* Parameter transform */
 template <class Type>
