@@ -6,7 +6,7 @@ tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL()) {
 }
 
 src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
-                          flags = "-O3") {
+                          flags = "-O3", perm=TRUE) {
     if(.Platform$OS.type=="windows"){
         ## Overload tempfile
         tempfile <- function(...){
@@ -19,8 +19,17 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
     control <- list(method="src")
     dll <- tempfile()
     dll.cpp <- paste0(dll, ".cpp")
-    sink(dll.cpp)
     ptr <- get(what, obj$env)$ptr
+    ## Reorder graph
+    if (perm) {
+        .Call("TransformADFunObject",
+              ptr,
+              list(random_order=integer(0),
+                   max_period_size=1024L,
+                   method="reorder_sub_expressions"), PACKAGE=DLL)
+    }
+    ## Write source code
+    sink(dll.cpp)
     qw <- .Call("tmbad_print", ptr, control, PACKAGE = DLL)
     sink(NULL)
     ## Overload
