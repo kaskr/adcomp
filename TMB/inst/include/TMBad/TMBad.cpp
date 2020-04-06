@@ -561,12 +561,49 @@ void StackOp::dependencies(Args<> args, Dependencies &dep) const {
 
 const char *StackOp::op_name() { return "StackOp"; }
 
+void reorder_sub_expressions(global &glob) {
+  global::hash_config cfg;
+  cfg.strong_inv = false;
+  cfg.strong_const = false;
+  cfg.strong_output = false;
+  cfg.reduce = false;
+  std::vector<hash_t> h = glob.hash_sweep(cfg);
+  std::vector<Index> remap = radix::first_occurance<Index>(h);
+
+  ASSERT(all_allow_remap(glob));
+
+  Args<> args(glob.inputs);
+  for (size_t i = 0; i < glob.opstack.size(); i++) {
+    Dependencies dep;
+    glob.opstack[i]->dependencies(args, dep);
+
+    Index var = args.ptr.second;
+    toposort_remap<Index> fb(remap, var);
+    dep.apply(fb);
+    glob.opstack[i]->increment(args.ptr);
+  }
+
+  std::vector<Index> ord = radix::order<Index>(remap);
+  std::vector<Index> v2o = glob.var2op();
+  glob.subgraph_seq = subset(v2o, ord);
+
+  glob = glob.extract_sub();
+}
+
 void compress(global &glob, size_t max_period_size) {
-  periodic<global::OperatorPure *> p(glob.opstack, max_period_size);
+  size_t min_period_rep = 10;
+  periodic<global::OperatorPure *> p(glob.opstack, max_period_size,
+                                     min_period_rep);
   std::vector<period> periods = p.find_all();
+
   std::vector<period> periods_expand;
   for (size_t i = 0; i < periods.size(); i++) {
     std::vector<period> tmp = split_period(&glob, periods[i], max_period_size);
+
+    if (tmp.size() > 10) {
+      tmp.resize(0);
+      tmp.push_back(periods[i]);
+    }
 
     for (size_t j = 0; j < tmp.size(); j++) {
       if (tmp[j].rep > 1) periods_expand.push_back(tmp[j]);
@@ -1502,7 +1539,7 @@ hash_t global::hash() const {
   return h;
 }
 
-std::vector<hash_t> global::hash_sweep(bool weak) const {
+std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
   std::vector<hash_t> hash_vec(values.size());
   Dependencies dep;
   OperatorPure *constant = getOperator<ConstOp>();
@@ -1515,8 +1552,8 @@ std::vector<hash_t> global::hash_sweep(bool weak) const {
     opstack[i]->dependencies(args, dep);
 
     hash_t h = 37;
-    if (!weak) {
-      if (opstack[i] == invop) h += i + 1;
+    if (opstack[i] == invop && cfg.strong_inv) {
+      h += i + 1;
     }
     for (size_t j = 0; j < dep.size(); j++) {
       if (j == 0)
@@ -1530,24 +1567,33 @@ std::vector<hash_t> global::hash_sweep(bool weak) const {
     hash(h, opstack[i]->identifier());
     ;
 
-    if (opstack[i] == constant) {
+    if (opstack[i] == constant && cfg.strong_const) {
       hash(h, values[ptr.second]);
       ;
     }
 
     size_t noutput = opstack[i]->output_size();
     for (size_t j = 0; j < noutput; j++) {
-      hash_vec[ptr.second + j] = h + j;
+      hash_vec[ptr.second + j] = h + j * cfg.strong_output;
     }
 
     opstack[i]->increment(ptr);
   }
-  if (!weak) return hash_vec;
+  if (!cfg.reduce) return hash_vec;
   std::vector<hash_t> ans(dep_index.size());
   for (size_t j = 0; j < dep_index.size(); j++) {
     ans[j] = hash_vec[dep_index[j]];
   }
   return ans;
+}
+
+std::vector<hash_t> global::hash_sweep(bool weak) const {
+  hash_config cfg;
+  cfg.strong_inv = !weak;
+  cfg.strong_const = true;
+  cfg.strong_output = true;
+  cfg.reduce = weak;
+  return hash_sweep(cfg);
 }
 
 void global::eliminate() {
@@ -2048,6 +2094,7 @@ void global::ad_aug::Independent() {
 
 Scalar &global::ad_aug::Value() {
   if (ontape())
+
     return taped_value.Value();
   else
     return data.value;
