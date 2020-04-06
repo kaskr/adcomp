@@ -237,23 +237,54 @@ template <class Float = ad_adapt>
 struct logIntegrate_t {
   typedef Float Scalar;
   global glob;
+  double mu, sigma, f_mu;
+  double f(double x) {
+    Index k = glob.inv_index.size();
+    glob.value_inv(k - 1) = x;
+    glob.forward();
+    return glob.value_dep(0);
+  }
+  double g(double x) { return f(x + .5) - f(x - .5); }
+  double h(double x) { return g(x + .5) - g(x - .5); }
+  /** \brief Rescale integrand
+      \f[
+      \log\left(\int_{-\infty}^{\infty} \exp(f(x))\:dx\right)=
+      \log\left(\int_{-\infty}^{\infty} \exp(f(\sigma u +
+     \mu)-f(\mu))\:du\right) + \log(\sigma) + f(\mu) \f]
+  */
+  void rescale_integrand(const std::vector<ad_plain> &x) {
+    for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i].Value();
+    f_mu = f(mu);
+    for (int i = 0; i < 100; i++) {
+      double mu_new = mu - g(mu) / h(mu);
+      double f_mu_new = f(mu_new);
+      if (f_mu_new - f_mu > 1) {
+        mu = mu_new;
+        f_mu = f_mu_new;
+      } else {
+        break;
+      }
+    }
+    sigma = 1. / sqrt(std::max(-h(mu), 1e-8));
+  }
 
-  logIntegrate_t(global &glob) : glob(glob) {
+  logIntegrate_t(global &glob) : glob(glob), mu(0), sigma(1), f_mu(0) {
     ASSERT(glob.dep_index.size() == 1);
   }
   logIntegrate_t() {}
   global::replay *p_replay;
 
-  Float operator()(Float x) {
+  Float operator()(Float u) {
     Index k = glob.inv_index.size();
-    p_replay->value_inv(k - 1) = x;
+    p_replay->value_inv(k - 1) = sigma * u + mu;
     p_replay->forward(false, false);
-    Float ans = exp(p_replay->value_dep(0));
+    Float ans = exp(p_replay->value_dep(0) - f_mu);
     if (ans == INFINITY) ans = INFINITY;
     return ans;
   }
 
   std::vector<ad_plain> operator()(const std::vector<ad_plain> &x) {
+    rescale_integrand(x);
     global::replay replay(this->glob, *get_glob());
     p_replay = &replay;
     replay.start();
@@ -261,7 +292,7 @@ struct logIntegrate_t {
     for (Index i = 0; i < k - 1; i++) replay.value_inv(i) = x[i];
     Float I = integrate(*this);
     if (I == INFINITY) I = 0;
-    Float ans = log(I);
+    Float ans = log(I) + log(sigma) + f_mu;
     replay.stop();
     return std::vector<ad_plain>(1, ans);
   }

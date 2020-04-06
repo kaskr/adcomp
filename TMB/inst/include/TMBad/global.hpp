@@ -1120,6 +1120,20 @@ struct global {
   */
   hash_t hash() const;
 
+  /** \brief Configuration of hash_sweep */
+  struct hash_config {
+    /** \brief Use unique code for each independent variable? (see `hash_sweep`)
+     */
+    bool strong_inv;
+    /** \brief Include numerical value as part of hash code for constants? (see
+     * `hash_sweep`) */
+    bool strong_const;
+    /** \brief Use unique hash code for each output of an operator? */
+    bool strong_output;
+    /** \brief Reduce returned hash values to one per dependent variable? */
+    bool reduce;
+  };
+
   /** \brief Calculate hash codes of each dependent variable using a
       single forward sweep
       \details The hash function has the following properties:
@@ -1174,6 +1188,8 @@ struct global {
         of dependent variables. In the strong case return the entire
         vector of variable hash codes (same length as `values`).
   */
+  std::vector<hash_t> hash_sweep(hash_config cfg) const;
+  /** \brief Handle two common cases */
   std::vector<hash_t> hash_sweep(bool weak = true) const;
 
   /** \brief Very simple tape optimizer

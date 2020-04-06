@@ -73,9 +73,15 @@ std::ostream &operator<<(std::ostream &os, const period &x);
 template <class T>
 struct periodic {
   const std::vector<T> &x;
+  /** \brief Test periods up to this size */
   size_t max_period_size;
-  periodic(const std::vector<T> &x, size_t max_period_size)
-      : x(x), max_period_size(max_period_size) {}
+  /** \brief Ignore periods with too small replicator */
+  size_t min_period_rep;
+  periodic(const std::vector<T> &x, size_t max_period_size,
+           size_t min_period_rep = 2)
+      : x(x),
+        max_period_size(max_period_size),
+        min_period_rep(min_period_rep) {}
   /** \brief Test period one step ahead
 
       Tests if `all(x[i]==x[i+p])` where `i = start + 0:(p-1)`.
@@ -128,7 +134,7 @@ struct periodic {
     std::vector<period> ans;
     for (size_t i = 0; i < x.size();) {
       period result = find_best_period(i);
-      if (result.rep > 1) {
+      if (result.rep >= min_period_rep) {
         ans.push_back(result);
         i += result.size * result.rep;
       } else {
@@ -295,6 +301,44 @@ template <class T>
 void trim(std::vector<T> &v, const T &elt) {
   v.erase(std::remove(v.begin(), v.end(), elt), v.end());
 }
+
+template <class T>
+struct toposort_remap {
+  std::vector<T> &remap;
+  T i;
+  toposort_remap(std::vector<T> &remap, T i) : remap(remap), i(i) {}
+  void operator()(Index k) {
+    if (remap[k] >= remap[i]) {
+      remap[i] = i;
+    }
+  }
+};
+
+/** \brief Re-order computational graph to make it more compressible
+
+    \details The degree of compression offered by the periodic
+    sequence analysis can be greatly improved by re-ordering the
+    computational graph before the analysis.
+    The re-ordering algorithm works as follows (see also
+   `remap_identical_sub_expressions`).
+
+    1. **Hash step** Two sub-expressions are considered 'weakly
+    similar' if they are result of the same operator sequence without
+    necessarily sharing any constants or independent variables. Assume
+    we have a vector of hash codes 'h' - one for each
+    sub-expression. Expressions with the same hash code are likely
+    'weakly similar'. Now `remap:=first_occurance(h)` gives a likely
+    valid reordering of variables satisfying `remap[i] <= i`.
+
+    2. **Proof step** Assume by induction that `remap[j]` is valid for
+    all j strictly less than i. Test if remap[i] is also valid
+    (i.e. max(remap[dependencies(v2o(i))]) < remap[i]). If yes keep
+    it. If no reject it be setting remap[i]=i (which is always valid).
+
+    3. Now `remap` provides a valid ordering of the graph using the
+    permutation `radix::order(remap)`
+*/
+void reorder_sub_expressions(global &glob);
 
 void compress(global &glob, size_t max_period_size = 1024);
 
