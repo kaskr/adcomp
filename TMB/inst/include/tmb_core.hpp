@@ -1530,6 +1530,9 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     else if (method == "reorder_random") {
       pf->reorder(random);
     }
+    else if (method == "reorder_sub_expressions") {
+      TMBad::reorder_sub_expressions(pf->glob);
+    }
     else if (method == "optimize") {
       pf->optimize();
     } else {
