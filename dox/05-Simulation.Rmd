@@ -179,3 +179,15 @@ simulate from the density objects:
 In this example the 4D-array `eta` is passed to the simulator by
 reference. Thereby the simulator knows the dimension of `eta` and can
 fill `eta` with a simulation.
+
+### Further notes
+
+The above example only used one simulation block. In general there is
+no limitation on the number of simulation blocks that can be used in a
+model and simulation blocks can use temporaries calculated outside the
+blocks (as demonstrated in the linear regression example). For clarity
+reasons, it is often a good idea to add a simulation block after each
+likelihood contribution. However, note that simulation blocks are in
+general **not** commutative (unlike likelihood accumulation).  It is
+therefore further recommended to add likelihood contributions of
+random effects in the natural hierarchical order.
