@@ -189,6 +189,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="13.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>13.2.1</b> A linear regression example</a></li>
 <li class="chapter" data-level="13.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>13.2.2</b> A simulation study</a></li>
 <li class="chapter" data-level="13.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>13.2.3</b> Advanced examples</a></li>
+<li class="chapter" data-level="13.2.4" data-path="Simulation.html"><a href="Simulation.html#further-notes"><i class="fa fa-check"></i><b>13.2.4</b> Further notes</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a><ul>
@@ -406,6 +407,18 @@ simulate from the density objects:</p>
 <p>In this example the 4D-array <code>eta</code> is passed to the simulator by
 reference. Thereby the simulator knows the dimension of <code>eta</code> and can
 fill <code>eta</code> with a simulation.</p>
+</div>
+<div id="further-notes" class="section level3">
+<h3><span class="header-section-number">13.2.4</span> Further notes</h3>
+<p>The above example only used one simulation block. In general there is
+no limitation on the number of simulation blocks that can be used in a
+model and simulation blocks can use temporaries calculated outside the
+blocks (as demonstrated in the linear regression example). For clarity
+reasons, it is often a good idea to add a simulation block after each
+likelihood contribution. However, note that simulation blocks are in
+general <strong>not</strong> commutative (unlike likelihood accumulation). It is
+therefore further recommended to add likelihood contributions of
+random effects in the natural hierarchical order.</p>
 
 </div>
 </div>
