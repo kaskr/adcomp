@@ -23,6 +23,7 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
   ATOMIC_NAME ## Op (TMBad::Index n, TMBad::Index m) : Base(n, m) {}    \
   const char* op_name() { return #ATOMIC_NAME; }                        \
   static const bool add_static_identifier = true;                       \
+  static const bool is_complex_analytic = false;                        \
   void forward(TMBad::ForwardArgs<TMBad::Scalar> _args_) {              \
     CppAD::vector<TMBad::Scalar> tx(this->input_size());                \
     CppAD::vector<TMBad::Scalar> ty(this->output_size());               \
