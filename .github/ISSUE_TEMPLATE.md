@@ -1,7 +1,10 @@
-#### IMPORTANT (read and delete)
-Questions on how to use TMB should be posted to https://groups.google.com/forum/#!forum/tmb-users.
+#### IMPORTANT TO READ CAREFULLY BEFORE POSTING AN ISSUE
 
-Only post an issue if you are fairly sure you've found a bug.
+**Only post an issue if you are fairly sure you've found a bug in TMB.**
+
+**Questions on how to use TMB or get help on errors relative to your own models should be posted to https://groups.google.com/forum/#!forum/tmb-users.**
+
+**Use the following as template for your issue post:**
 
 #### Description:
 Describe the issue as clearly as possible.
@@ -27,3 +30,4 @@ The version of R you are running (e.g., from `R.version.string`)
 
 #### Operating System:
 Your operating system (e.g., OS X 10.11.3)
+
