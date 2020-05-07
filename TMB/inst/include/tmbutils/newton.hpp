@@ -152,6 +152,7 @@ template <class Hessian_Type>
 struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
+  static const bool is_complex_analytic = false;
   /** \warning Pointer */
   Hessian_Type* hessian;
   HessianSolveVector(Hessian_Type* hessian) : hessian(hessian) {}
@@ -176,13 +177,21 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     return ans;
   }
   // S = TMBad::Scalar or TMBad::ComplexScalar
-  template<class S>
-  vector<S> eval(const std::vector<S> &h,
-                 const vector<S> &x) {
-    typename Hessian_Type::template MatrixResult<S>::type
+  // template<class S>
+  // vector<S> eval(const std::vector<S> &h,
+  //                const vector<S> &x) {
+  //   typename Hessian_Type::template MatrixResult<S>::type
+  //     H = hessian -> as_matrix(h);
+  //   hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
+  //   vector<S> y = hessian -> llt.solve(x.matrix()).array();
+  //   return y;
+  // }
+  vector<TMBad::Scalar> eval(const std::vector<TMBad::Scalar> &h,
+                 const vector<TMBad::Scalar> &x) {
+    typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
       H = hessian -> as_matrix(h);
     hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
-    vector<S> y = hessian -> llt.solve(x.matrix()).array();
+    vector<TMBad::Scalar> y = hessian -> llt.solve(x.matrix()).array();
     return y;
   }
   vector<TMBad::Replay> eval(const std::vector<TMBad::Replay> &h,
@@ -305,6 +314,7 @@ template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
+  static const bool is_complex_analytic = false;
   typedef TMBad::Scalar Scalar;
   typedef TMBad::StdWrap<Functor, vector<TMBad::ad_aug> > FunctorExtend;
   TMBad::ADFun<> function, gradient;
