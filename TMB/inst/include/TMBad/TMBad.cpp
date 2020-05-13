@@ -591,7 +591,7 @@ void reorder_sub_expressions(global &glob) {
 }
 
 void compress(global &glob, size_t max_period_size) {
-  size_t min_period_rep = 10;
+  size_t min_period_rep = GLOBAL_MIN_PERIOD_REP;
   periodic<global::OperatorPure *> p(glob.opstack, max_period_size,
                                      min_period_rep);
   std::vector<period> periods = p.find_all();
@@ -697,7 +697,7 @@ std::string tostr(const Scalar &x) {
 
 Writer::Writer(std::string str) : std::string(str) {}
 
-Writer::Writer(double x) : std::string(tostr(x)) {}
+Writer::Writer(Scalar x) : std::string(tostr(x)) {}
 
 Writer::Writer() {}
 
@@ -717,11 +717,11 @@ Writer Writer::operator*(const Writer &other) { return *this + " * " + other; }
 
 Writer Writer::operator/(const Writer &other) { return *this + " / " + other; }
 
-Writer Writer::operator*(const double &other) {
+Writer Writer::operator*(const Scalar &other) {
   return *this + "*" + tostr(other);
 }
 
-Writer Writer::operator+(const double &other) {
+Writer Writer::operator+(const Scalar &other) {
   return p(*this + "+" + tostr(other));
 }
 
@@ -946,24 +946,9 @@ Position global::end() {
 
 bool global::no_filter::operator[](size_t i) const { return true; }
 
-void global::forward(Position start) {
-  if (forward_compiled != NULL) {
-    forward_compiled(&values[0]);
-    return;
-  }
-  ForwardArgs<Scalar> args(inputs, values);
-  args.ptr = start.ptr;
-  forward_loop(args, start.node);
-}
+void global::forward(Position start) { forward<Scalar>(start); }
 
-void global::reverse(Position start) {
-  if (reverse_compiled != NULL) {
-    reverse_compiled(&values[0], &derivs[0]);
-    return;
-  }
-  ReverseArgs<Scalar> args(inputs, values, derivs);
-  reverse_loop(args, start.node);
-}
+void global::reverse(Position start) { reverse<Scalar>(start); }
 
 void global::forward_sub() {
   ForwardArgs<Scalar> args(inputs, values);
@@ -1725,6 +1710,10 @@ void global::RefOp::forward(ForwardArgs<Scalar> &args) {
   args.y(0) = glob->values[i];
 }
 
+void global::RefOp::forward(ForwardArgs<ComplexScalar> &args) {
+  args.y(0) = glob->values[i];
+}
+
 void global::RefOp::forward(ForwardArgs<Replay> &args) {
   if (get_glob() == this->glob) {
     ad_plain tmp;
@@ -2222,6 +2211,19 @@ ad_aug round(const ad_aug &x) {
 
 double sign(const double &x) { return (x > 0) - (x < 0); }
 
+ComplexScalar sign(const ComplexScalar &x) {
+  if (!(false)) {
+    Rcerr << "ASSERTION FAILED: "
+          << "false"
+          << "\n";
+    Rcerr << "POSSIBLE REASON: "
+          << "sign is not complex analytic"
+          << "\n";
+    abort();
+  };
+  return 0;
+}
+
 Writer sign(const Writer &x) {
   return "sign"
          "(" +
@@ -2234,6 +2236,19 @@ ad_aug sign(const ad_aug &x) {
     return Scalar(sign(x.Value()));
   else
     return sign(ad_plain(x));
+}
+
+ComplexScalar expm1(const ComplexScalar &z) {
+  Scalar x = z.real(), y = z.imag();
+  ComplexScalar eiy = exp(ComplexScalar(0, y));
+  return (eiy - Scalar(1.)) + Scalar(expm1(x)) * eiy;
+}
+
+ComplexScalar log1p(const ComplexScalar &z) {
+  Scalar x = z.real(), y = z.imag();
+  Scalar tmp = y / (x + Scalar(1.));
+  ComplexScalar ans(log1p(x) + .5 * log1p(tmp * tmp), std::arg(z + Scalar(1.)));
+  return ans;
 }
 
 Writer fabs(const Writer &x) {

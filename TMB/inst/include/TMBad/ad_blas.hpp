@@ -24,6 +24,7 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
+#define GLOBAL_MIN_PERIOD_REP 10
 #define INHERIT_CTOR(A, B)                                       \
   A() {}                                                         \
   template <class T1>                                            \
@@ -133,6 +134,8 @@ void matmul(Map<const dmatrix> x, Map<const dmatrix> y, Map<dmatrix> z) {
 
 template <bool XT, bool YT, bool ZT>
 struct MatMul : global::Operator<2, -1> {
+  /** \brief Complex evaluation not yet supported */
+  static const bool is_complex_analytic = false;
   static const bool dynamic = true;
   static const int max_fuse_depth = 0;
   int n1, n2, n3;

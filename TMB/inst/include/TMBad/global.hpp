@@ -5,6 +5,7 @@
 #include <omp.h>
 #include <algorithm>
 #include <cmath>
+#include <complex>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -20,6 +21,7 @@ namespace TMBad {
 typedef unsigned int hash_t;
 typedef unsigned int Index;
 typedef double Scalar;
+typedef std::complex<Scalar> ComplexScalar;
 typedef std::pair<Index, Index> IndexPair;
 typedef std::vector<unsigned int> IndexVector;
 
@@ -172,6 +174,11 @@ struct ForwardArgs : Args<> {
   Type *y_ptr(Index j) { return &values[output(j)]; }
   ForwardArgs(const IndexVector &inputs, TypeVector &values)
       : Args<>(inputs), values(&values[0]) {}
+  template <class T>
+  ForwardArgs(const IndexVector &inputs, std::vector<T> &values)
+      : Args<>(inputs), values(reinterpret_cast<Type *>(values.data())) {
+    static const size_t stride = sizeof(Type) / sizeof(T);
+  }
 };
 /** \brief Access input/output values and derivatives during a reverse
     pass. Write access granted for the input derivative only.
@@ -206,6 +213,17 @@ struct ReverseArgs : Args<> {
       : Args<>(inputs), values(&values[0]), derivs(&derivs[0]) {
     ptr.first = (Index)inputs.size();
     ptr.second = (Index)values.size();
+  }
+  template <class T>
+  ReverseArgs(const IndexVector &inputs, std::vector<T> &values,
+              std::vector<T> &derivs)
+      : Args<>(inputs),
+        values(reinterpret_cast<Type *>(values.data())),
+        derivs(reinterpret_cast<Type *>(derivs.data())) {
+    static const size_t stride = sizeof(Type) / sizeof(T);
+
+    ptr.first = (Index)inputs.size();
+    ptr.second = (Index)(values.size() / stride);
   }
 };
 
@@ -313,7 +331,7 @@ std::string tostr(const Scalar &x);
 struct Writer : std::string {
   static std::ostream *cout;
   Writer(std::string str);
-  Writer(double x);
+  Writer(Scalar x);
   Writer();
 
   template <class V>
@@ -332,8 +350,8 @@ struct Writer : std::string {
   Writer operator*(const Writer &other);
   Writer operator/(const Writer &other);
 
-  Writer operator*(const double &other);
-  Writer operator+(const double &other);
+  Writer operator*(const Scalar &other);
+  Writer operator+(const Scalar &other);
 
   void operator=(const Writer &other);
   void operator+=(const Writer &other);
@@ -365,8 +383,8 @@ struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
   }
   Writer xd(Index j) { return "v[" + tostr(input(j)) + "]"; }
   Writer yd(Index j) { return "v[" + tostr(output(j)) + "]"; }
-  Writer xi(Index j) { return "v[i[" + tostr(ptr.first + j) + "]]"; }
-  Writer yi(Index j) { return "v[o[" + tostr(ptr.second + j) + "]]"; }
+  Writer xi(Index j) { return "v[i[" + tostr(Index(ptr.first + j)) + "]]"; }
+  Writer yi(Index j) { return "v[o[" + tostr(Index(ptr.second + j)) + "]]"; }
   Writer x(Index j) { return (indirect ? xi(j) : xd(j)); }
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
   Writer y_const(Index j) { return tostr(Base::y(j)); }
@@ -389,10 +407,10 @@ struct ReverseArgs<Writer> : Args<> {
   Writer dyd(Index j) { return "d[" + tostr(output(j)) + "]"; }
   Writer xd(Index j) { return "v[" + tostr(input(j)) + "]"; }
   Writer yd(Index j) { return "v[" + tostr(output(j)) + "]"; }
-  Writer dxi(Index j) { return "d[i[" + tostr(ptr.first + j) + "]]"; }
-  Writer dyi(Index j) { return "d[o[" + tostr(ptr.second + j) + "]]"; }
-  Writer xi(Index j) { return "v[i[" + tostr(ptr.first + j) + "]]"; }
-  Writer yi(Index j) { return "v[o[" + tostr(ptr.second + j) + "]]"; }
+  Writer dxi(Index j) { return "d[i[" + tostr(Index(ptr.first + j)) + "]]"; }
+  Writer dyi(Index j) { return "d[o[" + tostr(Index(ptr.second + j)) + "]]"; }
+  Writer xi(Index j) { return "v[i[" + tostr(Index(ptr.first + j)) + "]]"; }
+  Writer yi(Index j) { return "v[o[" + tostr(Index(ptr.second + j)) + "]]"; }
   Writer x(Index j) { return (indirect ? xi(j) : xd(j)); }
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
   Writer dx(Index j) { return (indirect ? dxi(j) : dxd(j)); }
@@ -624,6 +642,14 @@ struct global {
     virtual void forward_incr(ForwardArgs<Writer> &args) = 0;
     /** \brief Source code writer. \copydoc reverse_decr */
     virtual void reverse_decr(ReverseArgs<Writer> &args) = 0;
+    /** \brief Complex case. \copydoc forward */
+    virtual void forward(ForwardArgs<ComplexScalar> &args) = 0;
+    /** \brief Complex case. \copydoc reverse */
+    virtual void reverse(ReverseArgs<ComplexScalar> &args) = 0;
+    /** \brief Complex case. \copydoc forward_incr */
+    virtual void forward_incr(ForwardArgs<ComplexScalar> &args) = 0;
+    /** \brief Complex case. \copydoc reverse_decr */
+    virtual void reverse_decr(ReverseArgs<ComplexScalar> &args) = 0;
     /** \brief Name of this OperatorPure */
     virtual const char *op_name() { return "NoName"; }
     /** \brief Lookup table for operator fusion. Merge this
@@ -751,6 +777,58 @@ struct global {
   /** \brief The three pointers defining the end of the tape */
   Position end();
 
+  template <class T>
+  void array_expand_to() {
+    static const size_t stride = sizeof(T) / sizeof(Scalar);
+    if (stride == 1) return;
+    size_t n = values.size();
+    values.resize(n * stride, 0);
+    for (size_t i = n; i > 0;) {
+      i--;
+      std::swap(values[i * stride], values[i]);
+    }
+  }
+  template <class T>
+  void array_contract_from() {
+    static const size_t stride = sizeof(T) / sizeof(Scalar);
+    if (stride == 1) return;
+    size_t n = values.size() / stride;
+    if (!(stride * n == values.size())) {
+      Rcerr << "ASSERTION FAILED: "
+            << "stride * n == values.size()"
+            << "\n";
+      abort();
+    };
+    for (size_t i = 0; i < n; i++) {
+      values[i] = values[stride * i];
+    }
+    values.resize(n);
+  }
+  /** \brief Reference to i'th input value (parameter) */
+  template <class T>
+  T &value_inv(Index i) {
+    static const size_t stride = sizeof(T) / sizeof(Scalar);
+    return reinterpret_cast<T &>(values[inv_index[i] * stride]);
+  }
+  /** \brief Reference to i'th component of the gradient */
+  template <class T>
+  T &deriv_inv(Index i) {
+    static const size_t stride = sizeof(T) / sizeof(Scalar);
+    return reinterpret_cast<T &>(derivs[inv_index[i] * stride]);
+  }
+  /** \brief Reference to i'th component of the function value */
+  template <class T>
+  T &value_dep(Index i) {
+    static const size_t stride = sizeof(T) / sizeof(Scalar);
+    return reinterpret_cast<T &>(values[dep_index[i] * stride]);
+  }
+  /** \brief Reference to i'th 'range direction' used to seed the derivative  */
+  template <class T>
+  T &deriv_dep(Index i) {
+    static const size_t stride = sizeof(T) / sizeof(Scalar);
+    return reinterpret_cast<T &>(derivs[dep_index[i] * stride]);
+  }
+
   /** \brief Substitute of std::vector<bool> with all elements `true` */
   struct no_filter {
     bool operator[](size_t i) const;
@@ -848,6 +926,16 @@ struct global {
      `global::values`. \param start Specify 'tail sweep' starting from this
      position
   */
+  template <class T>
+  void forward(Position start = Position(0, 0, 0)) {
+    if (forward_compiled != NULL && sizeof(T) == sizeof(Scalar)) {
+      forward_compiled(&values[0]);
+      return;
+    }
+    ForwardArgs<T> args(inputs, values);
+    args.ptr = start.ptr;
+    forward_loop(args, start.node);
+  }
   void forward(Position start = Position(0, 0, 0));
   /** \brief Full or partial reverse sweep through the operation stack. Updates
      `global::derivs`. \param start Specify 'tail sweep' starting from this
@@ -856,6 +944,15 @@ struct global {
      derivative array should be considered as invalidated for indices smaller
      than `start.ptr.second`.
   */
+  template <class T>
+  void reverse(Position start = Position(0, 0, 0)) {
+    if (reverse_compiled != NULL && sizeof(T) == sizeof(Scalar)) {
+      reverse_compiled(&values[0], &derivs[0]);
+      return;
+    }
+    ReverseArgs<Scalar> args(inputs, values, derivs);
+    reverse_loop(args, start.node);
+  }
   void reverse(Position start = Position(0, 0, 0));
   /** \brief Forward sweep along a subgraph. */
   void forward_sub();
@@ -1272,6 +1369,16 @@ struct global {
     static const int max_fuse_depth = 2;
     /** \brief Is this a linear operator ? */
     static const bool is_linear = false;
+    /** \brief Is this a complex analytic function ?
+        \details If `true` it is assumed that the operator implements
+        forward and reverse members applicable to complex
+        numbers. Implementation can either be provided implicitely (as
+        a template) or explicitely. If `false` an autogenerated
+        version that ignores the imaginary part will added and used
+        for complex sweeps. An error will be triggered if a non-zero
+        imaginary input is detected by the forward sweep.
+    */
+    static const bool is_complex_analytic = true;
     /** \brief Is this operator a 'smart pointer' (with reference counting) ? */
     static const bool smart_pointer = false;
     /** \brief How to fuse this operator (self) with another (other) */
@@ -1503,6 +1610,89 @@ struct global {
     static const bool have_dependencies = true;
   };
 
+  /** \brief Add default implementation of mandatory members:
+      `forward` and `reverse` complex versions assuming that Scalar
+      versions exist
+      \details For now we disallow all complex sweeps if
+     `is_complex_analytic=false`
+  */
+  template <class OperatorBase>
+  struct AddComplex : OperatorBase {
+    AddComplex() {}
+    template <class T1>
+    AddComplex(const T1 &x1) : OperatorBase(x1) {}
+    template <class T1, class T2>
+    AddComplex(const T1 &x1, const T2 &x2) : OperatorBase(x1, x2) {}
+    template <class T1, class T2, class T3>
+    AddComplex(const T1 &x1, const T2 &x2, const T3 &x3)
+        : OperatorBase(x1, x2, x3) {}
+    template <class T1, class T2, class T3, class T4>
+    AddComplex(const T1 &x1, const T2 &x2, const T3 &x3, const T4 &x4)
+        : OperatorBase(x1, x2, x3, x4) {}
+
+    template <class Type>
+    void forward(ForwardArgs<Type> &args) {
+      OperatorBase::forward(args);
+    }
+    template <class Type>
+    void reverse(ReverseArgs<Type> &args) {
+      OperatorBase::reverse(args);
+    }
+    template <class Type>
+    void forward_incr(ForwardArgs<Type> &args) {
+      OperatorBase::forward_incr(args);
+    }
+    template <class Type>
+    void reverse_decr(ReverseArgs<Type> &args) {
+      OperatorBase::reverse_decr(args);
+    }
+
+    void forward(ForwardArgs<ComplexScalar> &args) {
+      if (!(false)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Complex evaluation of non-analytic function"
+              << "\n";
+        abort();
+      };
+    }
+    void reverse(ReverseArgs<ComplexScalar> &args) {
+      if (!(false)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Complex evaluation of non-analytic function"
+              << "\n";
+        abort();
+      };
+    }
+    void forward_incr(ForwardArgs<ComplexScalar> &args) {
+      if (!(false)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Complex evaluation of non-analytic function"
+              << "\n";
+        abort();
+      };
+    }
+    void reverse_decr(ReverseArgs<ComplexScalar> &args) {
+      if (!(false)) {
+        Rcerr << "ASSERTION FAILED: "
+              << "false"
+              << "\n";
+        Rcerr << "POSSIBLE REASON: "
+              << "Complex evaluation of non-analytic function"
+              << "\n";
+        abort();
+      };
+    }
+  };
+
   /** \brief Add default implementation of mandatory member:
       `forward` **from** optional member `eval` */
   template <class OperatorBase, int ninput>
@@ -1616,8 +1806,11 @@ struct global {
     /** \copydoc AddForwardReverse */
     typedef typename if_else<test7, AddForwardReverse<Result6>, Result6>::type
         Result7;
+    /** \copydoc Override complex versions */
+    typedef typename if_else<!OperatorBase::is_complex_analytic,
+                             AddComplex<Result7>, Result7>::type Result8;
 
-    typedef Result7 type;
+    typedef Result8 type;
   };
 
   /** \brief Fuse two operators */
@@ -1963,6 +2156,15 @@ struct global {
     void reverse(ReverseArgs<Writer> &args) { Op.reverse(args); }
     void forward_incr(ForwardArgs<Writer> &args) { Op.forward_incr(args); }
     void reverse_decr(ReverseArgs<Writer> &args) { Op.reverse_decr(args); }
+
+    void forward(ForwardArgs<ComplexScalar> &args) { Op.forward(args); }
+    void reverse(ReverseArgs<ComplexScalar> &args) { Op.reverse(args); }
+    void forward_incr(ForwardArgs<ComplexScalar> &args) {
+      Op.forward_incr(args);
+    }
+    void reverse_decr(ReverseArgs<ComplexScalar> &args) {
+      Op.reverse_decr(args);
+    }
     /** \brief Move a stack allocated instance to the heap and let the
        `operation_stack` manage the memory \details This is only useful for
        dynamic operators and therfore disallowed for static operators.
@@ -2177,6 +2379,7 @@ struct global {
     RefOp(global *glob, Index i);
     /** \brief RefOp copies value from other tape */
     void forward(ForwardArgs<Scalar> &args);
+    void forward(ForwardArgs<ComplexScalar> &args);
     /** \brief When replayed it 'resolves' references if applicable */
     void forward(ForwardArgs<Replay> &args);
     /** \brief Reverse mode updates are forbidden until all references are
@@ -2867,6 +3070,7 @@ using std::floor;
 Writer floor(const Writer &x);
 struct FloorOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_complex_analytic = false;
   template <class Type>
   Type eval(Type x) {
     return floor(x);
@@ -2880,6 +3084,7 @@ ad_aug floor(const ad_aug &x);
 Writer ceil(const Writer &x);
 struct CeilOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_complex_analytic = false;
   template <class Type>
   Type eval(Type x) {
     return ceil(x);
@@ -2893,6 +3098,7 @@ ad_aug ceil(const ad_aug &x);
 Writer trunc(const Writer &x);
 struct TruncOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_complex_analytic = false;
   template <class Type>
   Type eval(Type x) {
     return trunc(x);
@@ -2906,6 +3112,7 @@ ad_aug trunc(const ad_aug &x);
 Writer round(const Writer &x);
 struct RoundOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_complex_analytic = false;
   template <class Type>
   Type eval(Type x) {
     return round(x);
@@ -2917,9 +3124,11 @@ struct RoundOp : global::UnaryOperator {
 ad_plain round(const ad_plain &x);
 ad_aug round(const ad_aug &x);
 double sign(const double &x);
+ComplexScalar sign(const ComplexScalar &x);
 Writer sign(const Writer &x);
 struct SignOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_complex_analytic = false;
   template <class Type>
   Type eval(Type x) {
     return sign(x);
@@ -2946,6 +3155,9 @@ using std::sqrt;
 using std::tan;
 using std::tanh;
 
+ComplexScalar expm1(const ComplexScalar &z);
+
+ComplexScalar log1p(const ComplexScalar &z);
 Writer fabs(const Writer &x);
 struct AbsOp : global::UnaryOperator {
   static const bool have_eval = true;
@@ -3472,6 +3684,7 @@ ad_plain logspace_sum(const std::vector<ad_plain> &x);
 struct LogSpaceSumOp : global::DynamicOperator<-1, 1> {
   size_t n;
   static const bool have_input_size_output_size = true;
+  static const bool is_complex_analytic = false;
   Index input_size() const;
   Index output_size() const;
   LogSpaceSumOp(size_t n);
@@ -3498,6 +3711,7 @@ struct LogSpaceSumStrideOp : global::DynamicOperator<-1, 1> {
   std::vector<Index> stride;
   size_t n;
   static const bool have_input_size_output_size = true;
+  static const bool is_complex_analytic = false;
 
   Index number_of_terms() const;
   template <class Type>

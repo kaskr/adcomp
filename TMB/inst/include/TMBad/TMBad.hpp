@@ -24,6 +24,7 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
+#define GLOBAL_MIN_PERIOD_REP 10
 #define INHERIT_CTOR(A, B)                                       \
   A() {}                                                         \
   template <class T1>                                            \
@@ -188,9 +189,10 @@ struct ADFun {
     return xd;
   }
   /** \brief Get most recent result vector from the tape */
-  std::vector<Scalar> RangeVec() {
-    std::vector<Scalar> y(Range());
-    for (size_t i = 0; i < y.size(); i++) y[i] = glob.value_dep(i);
+  template <class T>
+  std::vector<T> RangeVec() {
+    std::vector<T> y(Range());
+    for (size_t i = 0; i < y.size(); i++) y[i] = glob.value_dep<T>(i);
     return y;
   }
   /** \brief Get necessary variables to keep for given input/output selection */
@@ -275,6 +277,12 @@ struct ADFun {
     }
     return Position(0, 0, 0);
   }
+  /** \brief Set the input parameter vector on the tape - complex case */
+  Position DomainVecSet(const std::vector<ComplexScalar> &x) {
+    for (size_t i = 0; i < x.size(); i++)
+      glob.value_inv<ComplexScalar>(i) = x[i];
+    return Position(0, 0, 0);
+  }
   /** \brief Forward sweep any vector class */
   template <class Vector>
   Vector forward(const Vector &x) {
@@ -296,11 +304,23 @@ struct ADFun {
     for (size_t i = 0; i < (size_t)d.size(); i++) d[i] = glob.deriv_inv(i);
     return d;
   }
+
+  template <class T>
+  std::vector<T> eval_template(const std::vector<T> &x) {
+    glob.array_expand_to<T>();
+    Position start = DomainVecSet(x);
+    glob.forward<T>(start);
+    std::vector<T> ans = RangeVec<T>();
+    glob.array_contract_from<T>();
+    return ans;
+  }
   /** \brief Evaluate function for scalar vector input */
   std::vector<Scalar> operator()(const std::vector<Scalar> &x) {
-    Position start = DomainVecSet(x);
-    glob.forward(start);
-    return RangeVec();
+    return eval_template<Scalar>(x);
+  }
+  /** \brief Evaluate function for complex vector input */
+  std::vector<ComplexScalar> operator()(const std::vector<ComplexScalar> &x) {
+    return eval_template<ComplexScalar>(x);
   }
   /** \brief Evaluate function for ad vector input \details Runs a
       forward replay to current active tape `get_glob()`.  \warning
@@ -406,6 +426,22 @@ struct ADFun {
     }
     return ans;
   }
+  template <class T>
+  std::vector<T> Jacobian_template(const std::vector<T> &x,
+                                   const std::vector<T> &w) {
+    ASSERT(x.size() == Domain());
+    ASSERT(w.size() == Range());
+    glob.array_expand_to<T>();
+    DomainVecSet(x);
+    glob.forward<T>();
+    glob.clear_deriv();
+    for (size_t j = 0; j < Range(); j++) glob.deriv_dep<T>(j) = w[j];
+    glob.reverse<T>();
+    std::vector<T> ans(Domain());
+    for (size_t k = 0; k < Domain(); k++) ans[k] = glob.deriv_inv<T>(k);
+    glob.array_contract_from<T>();
+    return ans;
+  }
   /** \brief Evaluate the Jacobian matrix multiplied by a vector
       \details Denote by f:R^n->R^m this function object.
       The Jacobian matrix is the m-by-n derivative matrix stored **row-major**.
@@ -413,17 +449,14 @@ struct ADFun {
   */
   std::vector<Scalar> Jacobian(const std::vector<Scalar> &x,
                                const std::vector<Scalar> &w) {
-    ASSERT(x.size() == Domain());
-    ASSERT(w.size() == Range());
-    DomainVecSet(x);
-    glob.forward();
-    glob.clear_deriv();
-    for (size_t j = 0; j < Range(); j++) glob.deriv_dep(j) = w[j];
-    glob.reverse();
-    std::vector<Scalar> ans(Domain());
-    for (size_t k = 0; k < Domain(); k++) ans[k] = glob.deriv_inv(k);
-    return ans;
+    return Jacobian_template<Scalar>(x, w);
   }
+  /** \brief Evaluate the Jacobian matrix multiplied by a vector */
+  std::vector<ComplexScalar> Jacobian(const std::vector<ComplexScalar> &x,
+                                      const std::vector<ComplexScalar> &w) {
+    return Jacobian_template<ComplexScalar>(x, w);
+  }
+  /** \brief Evaluate the Jacobian matrix multiplied by a vector */
   std::vector<ad> Jacobian(const std::vector<ad> &x, const std::vector<ad> &w) {
     global *cur_glob = get_glob();
 

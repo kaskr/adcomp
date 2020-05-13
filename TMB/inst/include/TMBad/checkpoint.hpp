@@ -24,6 +24,7 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
+#define GLOBAL_MIN_PERIOD_REP 10
 #define INHERIT_CTOR(A, B)                                       \
   A() {}                                                         \
   template <class T1>                                            \
@@ -91,6 +92,8 @@ namespace TMBad {
 */
 template <bool retape = false>
 struct CallOp_ : global::SharedDynamicOperator {
+  /** \brief Complex evaluation not yet supported */
+  static const bool is_complex_analytic = false;
   /** \brief Function value tape */
   global *glob;
   /** \brief Derivative tape. If allocated, it is managed by
