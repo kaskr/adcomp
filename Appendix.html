@@ -90,6 +90,7 @@ $(function() {
 <td>\(\hat u\) </td><td>The posterior mode \(\arg \min_{u} f(u,\beta,\theta)\) </td></tr>
 </table>
 <h2>Profiling the inner problem</h2>
+<p>This section describes the underlying theory of the argument <code>profile</code> to <code>MakeADFun</code> intended to speedup and robustify linear mixed effect models with a large number of fixed effects. With a few common model properties (Assumption 1 and 2 below), which must be checked by the user, one can apply the <code>profile</code> argument to move outer parameters to the inner problem without affecting the model result.</p>
 <p><b>Theorem 1 (Profiling inner problem)</b> Assume that for any \(\beta\) and \(\theta\)</p>
 <ul>
 <li><b>Assumption 1</b> The partial derivative \(\partial_{\beta} f(u,\beta,\theta)\) is a linear function of u.</li>

@@ -274,6 +274,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="profiling-the-inner-problem" class="section level2">
 <h2><span class="header-section-number">16.2</span> Profiling the inner problem</h2>
+<p>This section describes the underlying theory of the argument <code>profile</code>
+to <code>MakeADFun</code> intended to speedup and robustify linear mixed effect
+models with a large number of fixed effects. With a few common model
+properties (Assumption 1 and 2 below), which must be checked by the
+user, one can apply the <code>profile</code> argument to move outer parameters to
+the inner problem without affecting the model result.</p>
 <p><strong>Theorem 1 (Profiling inner problem)</strong>
 Assume that for any <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\theta\)</span></p>
 <ul>
