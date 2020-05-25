@@ -21,6 +21,13 @@ We use the following notation
 
 ## Profiling the inner problem
 
+This section describes the underlying theory of the argument `profile`
+to `MakeADFun` intended to speedup and robustify linear mixed effect
+models with a large number of fixed effects. With a few common model
+properties (Assumption 1 and 2 below), which must be checked by the
+user, one can apply the `profile` argument to move outer parameters to
+the inner problem without affecting the model result.
+
 **Theorem 1 (Profiling inner problem)**
 Assume that for any $\beta$ and $\theta$
 
