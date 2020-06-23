@@ -24,6 +24,7 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
+#define GLOBAL_MIN_PERIOD_REP 10
 #define INHERIT_CTOR(A, B)                                       \
   A() {}                                                         \
   template <class T1>                                            \
@@ -37,6 +38,8 @@
       : B(x1, x2, x3, x4) {}
 #define GLOBAL_SCALAR_TYPE double
 #include "global.hpp"
+#include "graph_transform.hpp"  // subset
+#include "radix.hpp"            // first_occurance
 
 namespace TMBad {
 

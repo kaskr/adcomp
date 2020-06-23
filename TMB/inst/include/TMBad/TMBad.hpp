@@ -24,6 +24,7 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
+#define GLOBAL_MIN_PERIOD_REP 10
 #define INHERIT_CTOR(A, B)                                       \
   A() {}                                                         \
   template <class T1>                                            \
@@ -96,6 +97,39 @@ struct StdWrap {
   }
 };
 
+/** \brief Automatic differentiation function object
+
+    \details
+
+    The ADFun object represents a mapping \f$F:R^n \rightarrow R^m \: (x
+   \rightarrow F(x))\f$
+
+    # API overview
+
+    ### Function object transformations
+
+    | Name                 | Description                             |
+    |----------------------|-----------------------------------------|
+    | JacFun()             | Get Jacobian function object            |
+    | SpJacFun()           | Get Sparse Jacobian function object     |
+    | WgtJacFun()          | Get weighted Jacobian function object   |
+
+    ### Function object evaluators
+
+    | Name                 | Description                             |
+    |----------------------|-----------------------------------------|
+    | operator()()         | Evaluate function object                |
+    | Jacobian()           | Evaluate Jacobian of function object    |
+
+    ### Argument conventions
+
+    - Jacobian matrix is stored as a vector with input dimension fastest running
+   and output dimension slowest running.
+    - Equivalently the Jacobian matrix J is stored row major (OR equivalently
+   t(J) stored column major)
+    - `keep_x`, `keep_y`: Selects *inputs* and *outputs* to corresponding to
+   `J[keep_y, keep_x]`.
+*/
 template <class ad = ad_aug>
 struct ADFun {
   global glob;
@@ -463,17 +497,9 @@ struct ADFun {
     replay.stop();
     return dx;
   }
-  /** \brief Get Jacobian function object
-      \param range_weight If `true` the input vector of the returned function
-     object is expanded to include a range weight. \details Denote by f:R^n->R^m
-     this function object. By default the return value is a new function object
-     f':R^n->R^(m*n) representing the Jacobian. If `range_weight = true` is
-     specified the returned function object R^(n+m)->R^n represents the Jacobian
-     multiplied by a range vector (x,w)->f'*w.
-  */
-  ADFun JacFun(bool range_weight = false,
-               std::vector<bool> keep_x = std::vector<bool>(0),
-               std::vector<bool> keep_y = std::vector<bool>(0)) {
+
+  template <bool range_weight>
+  ADFun JacFun_(std::vector<bool> keep_x, std::vector<bool> keep_y) {
     ADFun ans;
     if (keep_x.size() == 0) keep_x.resize(Domain(), true);
     if (keep_y.size() == 0) keep_y.resize(Range(), true);
@@ -489,29 +515,79 @@ struct ADFun {
     if (!range_weight) {
       if (G.empty()) {
         for (size_t i = 0; i < this->Range(); i++) {
+          if (!keep_y[i]) continue;
           replay.clear_deriv();
           replay.deriv_dep(i) = 1.;
-          replay.reverse(true, false, tail_start, keep);
+          replay.reverse(false, false, tail_start, keep);
+          for (size_t j = 0; j < this->Domain(); j++) {
+            if (keep_x[j]) replay.deriv_inv(j).Dependent();
+          }
         }
       } else {
         replay.clear_deriv();
         for (size_t i = 0; i < this->Range(); i++) {
+          if (!keep_y[i]) continue;
           glob.subgraph_seq.resize(0);
           glob.subgraph_seq.push_back(G.dep2op[i]);
           G.search(glob.subgraph_seq);
           replay.deriv_dep(i) = 1.;
           replay.reverse_sub();
-          for (size_t j = 0; j < this->Domain(); j++)
-            replay.deriv_inv(j).Dependent();
+          for (size_t j = 0; j < this->Domain(); j++) {
+            if (keep_x[j]) replay.deriv_inv(j).Dependent();
+          }
           replay.clear_deriv_sub();
         }
       }
     } else {
       replay.clear_deriv();
-      replay.reverse(true, true, tail_start, keep);
+      replay.reverse(false, true, tail_start, keep);
+      for (size_t j = 0; j < this->Domain(); j++) {
+        if (keep_x[j]) replay.deriv_inv(j).Dependent();
+      }
     }
     replay.stop();
     return ans;
+  }
+  /** \brief Get Jacobian function object
+
+      \details Denote by \f$F:R^n \rightarrow R^m\f$ this function object.
+
+      Let
+
+      - `keep_x` denote a boolean subset of inputs (by default all) with
+     `n_:=keep_x.count()`
+      - `keep_y` denote a boolean subset of outputs (by default all) with
+     `m_:=keep_y.count()`
+
+      \return
+      New function object \f$F':R^n \rightarrow R^{m\_*n\_}\f$ representing the
+     Jacobian (subset).
+
+      \param keep_x If specified, a boolean subset of inputs (Jacobian columns).
+      \param keep_y If specified, a boolean subset of outputs (Jacobian rows).
+  */
+  ADFun JacFun(std::vector<bool> keep_x = std::vector<bool>(0),
+               std::vector<bool> keep_y = std::vector<bool>(0)) {
+    return JacFun_<false>(keep_x, keep_y);
+  }
+  /** \brief Get **weighted** Jacobian function object
+
+      \details Denote by \f$F:R^n \rightarrow R^m\f$ this function object.
+
+      Let
+
+      - `keep_x` denote a boolean subset of inputs (by default all) with
+     `n_:=keep_x.count()`
+      - `keep_y` denote a boolean subset of outputs (by default all) with
+     `m_:=keep_y.count()`
+
+      \return New function object \f$F':R^{n+m} \rightarrow R^{n\_}
+      ((x,w)\rightarrow w^T*F') \f$ representing the Jacobian (subset)
+      multiplied by a weight vector.
+  */
+  ADFun WgtJacFun(std::vector<bool> keep_x = std::vector<bool>(0),
+                  std::vector<bool> keep_y = std::vector<bool>(0)) {
+    return JacFun_<true>(keep_x, keep_y);
   }
   /** \brief Turn this operation sequence into an atomic operator */
   ADFun atomic() {
@@ -662,7 +738,7 @@ struct ADFun {
         if (atomic_jac_row.Domain() == 0) {
           Rcout << "Warning: This is an experimental compression method\n";
           Rcout << "Disable: 'config(tmbad.sparse_hessian_compress=0)'\n";
-          atomic_jac_row = this->JacFun(true, keep_x, keep_y);
+          atomic_jac_row = this->WgtJacFun(keep_x, keep_y);
           atomic_jac_row.optimize();
           atomic_jac_row.glob.set_fuse(true);
           atomic_jac_row.replay();
@@ -907,15 +983,34 @@ struct Decomp2 : std::pair<ADFun, ADFun> {
     composition fg(f, g);
     return ADFun(fg, g.DomainVec());
   }
-  Decomp3<ADFun> JacFun() {
+  /** \brief Calculate a **sparse plus low rank** representation of the Hessian
+      \details Recall that the present object represents a composition f(x,
+     g(x)). Its Hessian is a sum of five terms:
+
+      \f[
+      \nabla_x^2 f(x, g(x)) = f''_{xx}(x, g(x)) + f''_{xy}(x, g(x)) g'(x)
+      + g'(x) f''_{yx}(x, g(x)) + f'_y(x, g(x)) g''(x) + g'(x) f''_{yy}(x, g(x))
+     g'(x) \f]
+
+      The result is a structure of three components
+
+      1. The first four terms are represented by a sparse matrix H
+      2. The g' of the last term represented by a sparse matrix
+      3. f''_{yy} represented by a sparse matrix
+
+      \param keep_rc Rows/cols to keep. If used this mask selects a subset of x.
+  */
+  Decomp3<ADFun> HesFun(std::vector<bool> keep_rc = std::vector<bool>(0)) {
     ADFun &g = this->first;
     ADFun &f = this->second;
     Decomp3<ADFun> ans;
     ASSERT(f.Range() == 1);
 
+    std::vector<bool> keep_f = std::vector<bool>(f.Range(), true);
+    std::vector<bool> keep_g = std::vector<bool>(g.Range(), true);
+
     typedef ad_aug ad;
     global &glob = ans.first.glob;
-
     glob.ad_start();
     std::vector<Scalar> x_ = f.DomainVec();
     size_t k = g.Range();
@@ -930,31 +1025,37 @@ struct Decomp2 : std::pair<ADFun, ADFun> {
     Independent(x);
     std::vector<ad> s = g(x);
     std::vector<ad> s0(s.size());
+
     for (size_t i = 0; i < s.size(); i++) s0[i] = s[i].copy0();
     std::vector<ad> xs(x);
     xs.insert(xs.end(), s.begin(), s.end());
     std::vector<ad> xs0(x);
     xs0.insert(xs0.end(), s0.begin(), s0.end());
+    if (false) {
+      ASSERT(keep_rc.size() == n || keep_rc.size() == 0);
+      std::vector<bool> keep_xy(keep_rc);
+      keep_xy.resize(f.Domain(), true);
+      ADFun f_grad = f.JacFun(keep_xy, keep_f);
+    }
     ADFun f_grad = f.JacFun();
     std::vector<ad> z = subset(f_grad(xs), mask_x);
     std::vector<ad> z0 = subset(f_grad(xs0), mask_s);
     std::vector<ad> xw(x);
     xw.insert(xw.end(), z0.begin(), z0.end());
-    std::vector<ad> z1 = g.JacFun(true)(xw);
+    std::vector<ad> z1 = g.WgtJacFun()(xw);
     for (size_t i = 0; i < n; i++) z[i] += z1[i];
     Dependent(z);
     glob.ad_stop();
-
     glob.eliminate();
     ans.first.glob = glob;
-    ans.first = ans.first.SpJacFun();
+
+    ans.first = ans.first.SpJacFun(keep_rc, keep_rc);
     ans.first.glob.eliminate();
 
-    ans.second = g.SpJacFun();
+    ans.second = g.SpJacFun(keep_rc);
     ans.second.glob.eliminate();
 
-    ADFun B = f_grad.SpJacFun(mask_s, mask_s);
-
+    Sparse<ADFun> B = f_grad.SpJacFun(mask_s, mask_s);
     ans.third.glob.ad_start();
     std::vector<ad> xx(x_.begin(), x_.end() - k);
     Independent(xx);
@@ -965,22 +1066,25 @@ struct Decomp2 : std::pair<ADFun, ADFun> {
     Dependent(z);
     ans.third.glob.ad_stop();
     ans.third.glob.eliminate();
+    ans.third.i = B.i;
+    ans.third.j = B.j;
 
     return ans;
   }
 };
 
 /** \brief Decomposition of computational graph
-    \details This structure holds a decomposition (H,g,H0) of *the Hessian* of a
-   computational graph of the form x -> f(x, g(x)) mapping R^n to R^m. The
-   Hessian of the original function is given by H + grad(g)*H0*grad(g)^T where
+    \details This structure holds a decomposition (H,grad(g),H0) of *the
+   Hessian* of a computational graph of the form x -> f(x, g(x)) mapping R^n to
+   R^m. The Hessian of the original function is given by H +
+   grad(g)*H0*grad(g)^T where
     - The member **first** holds a tape of the sparse matrix H
     - The member **second** holds the tape of the sparse Jacobian grad(g)
     - The member **third** holds the tape of the dense matrix H0
 */
 template <class ADFun>
 struct Decomp3 : Decomp2<Sparse<ADFun> > {
-  ADFun third;
+  Sparse<ADFun> third;
 };
 
 }  // namespace TMBad

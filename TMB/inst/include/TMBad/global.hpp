@@ -13,6 +13,7 @@
 #include <sstream>
 #include <valarray>
 #include <vector>
+#include "radix.hpp"
 /** \brief Test whether the maximum of GLOBAL_INDEX_TYPE has been exceeded */
 /** \brief Namespace of all TMBad classes and functions */
 namespace TMBad {
@@ -313,7 +314,7 @@ std::string tostr(const Scalar &x);
 struct Writer : std::string {
   static std::ostream *cout;
   Writer(std::string str);
-  Writer(double x);
+  Writer(Scalar x);
   Writer();
 
   template <class V>
@@ -332,8 +333,8 @@ struct Writer : std::string {
   Writer operator*(const Writer &other);
   Writer operator/(const Writer &other);
 
-  Writer operator*(const double &other);
-  Writer operator+(const double &other);
+  Writer operator*(const Scalar &other);
+  Writer operator+(const Scalar &other);
 
   void operator=(const Writer &other);
   void operator+=(const Writer &other);
@@ -365,8 +366,8 @@ struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
   }
   Writer xd(Index j) { return "v[" + tostr(input(j)) + "]"; }
   Writer yd(Index j) { return "v[" + tostr(output(j)) + "]"; }
-  Writer xi(Index j) { return "v[i[" + tostr(ptr.first + j) + "]]"; }
-  Writer yi(Index j) { return "v[o[" + tostr(ptr.second + j) + "]]"; }
+  Writer xi(Index j) { return "v[i[" + tostr(Index(ptr.first + j)) + "]]"; }
+  Writer yi(Index j) { return "v[o[" + tostr(Index(ptr.second + j)) + "]]"; }
   Writer x(Index j) { return (indirect ? xi(j) : xd(j)); }
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
   Writer y_const(Index j) { return tostr(Base::y(j)); }
@@ -389,10 +390,10 @@ struct ReverseArgs<Writer> : Args<> {
   Writer dyd(Index j) { return "d[" + tostr(output(j)) + "]"; }
   Writer xd(Index j) { return "v[" + tostr(input(j)) + "]"; }
   Writer yd(Index j) { return "v[" + tostr(output(j)) + "]"; }
-  Writer dxi(Index j) { return "d[i[" + tostr(ptr.first + j) + "]]"; }
-  Writer dyi(Index j) { return "d[o[" + tostr(ptr.second + j) + "]]"; }
-  Writer xi(Index j) { return "v[i[" + tostr(ptr.first + j) + "]]"; }
-  Writer yi(Index j) { return "v[o[" + tostr(ptr.second + j) + "]]"; }
+  Writer dxi(Index j) { return "d[i[" + tostr(Index(ptr.first + j)) + "]]"; }
+  Writer dyi(Index j) { return "d[o[" + tostr(Index(ptr.second + j)) + "]]"; }
+  Writer xi(Index j) { return "v[i[" + tostr(Index(ptr.first + j)) + "]]"; }
+  Writer yi(Index j) { return "v[o[" + tostr(Index(ptr.second + j)) + "]]"; }
   Writer x(Index j) { return (indirect ? xi(j) : xd(j)); }
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
   Writer dx(Index j) { return (indirect ? dxi(j) : dxd(j)); }
@@ -1132,6 +1133,8 @@ struct global {
     bool strong_output;
     /** \brief Reduce returned hash values to one per dependent variable? */
     bool reduce;
+    /** \brief Deterministic hash codes? */
+    bool deterministic;
   };
 
   /** \brief Calculate hash codes of each dependent variable using a

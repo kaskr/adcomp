@@ -24,6 +24,7 @@
     abort();                                     \
   }
 #define GLOBAL_REPLAY_TYPE ad_aug
+#define GLOBAL_MIN_PERIOD_REP 10
 #define INHERIT_CTOR(A, B)                                       \
   A() {}                                                         \
   template <class T1>                                            \

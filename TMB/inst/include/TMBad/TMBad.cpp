@@ -591,7 +591,7 @@ void reorder_sub_expressions(global &glob) {
 }
 
 void compress(global &glob, size_t max_period_size) {
-  size_t min_period_rep = 10;
+  size_t min_period_rep = GLOBAL_MIN_PERIOD_REP;
   periodic<global::OperatorPure *> p(glob.opstack, max_period_size,
                                      min_period_rep);
   std::vector<period> periods = p.find_all();
@@ -697,7 +697,7 @@ std::string tostr(const Scalar &x) {
 
 Writer::Writer(std::string str) : std::string(str) {}
 
-Writer::Writer(double x) : std::string(tostr(x)) {}
+Writer::Writer(Scalar x) : std::string(tostr(x)) {}
 
 Writer::Writer() {}
 
@@ -717,11 +717,11 @@ Writer Writer::operator*(const Writer &other) { return *this + " * " + other; }
 
 Writer Writer::operator/(const Writer &other) { return *this + " / " + other; }
 
-Writer Writer::operator*(const double &other) {
+Writer Writer::operator*(const Scalar &other) {
   return *this + "*" + tostr(other);
 }
 
-Writer Writer::operator+(const double &other) {
+Writer Writer::operator+(const Scalar &other) {
   return p(*this + "+" + tostr(other));
 }
 
@@ -1540,6 +1540,14 @@ hash_t global::hash() const {
 }
 
 std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
+  std::vector<Index> opstack_id;
+  if (cfg.deterministic) {
+    std::vector<size_t> tmp(opstack.size());
+    for (size_t i = 0; i < tmp.size(); i++)
+      tmp[i] = (size_t)opstack[i]->identifier();
+    opstack_id = radix::first_occurance<Index>(tmp);
+  }
+
   std::vector<hash_t> hash_vec(values.size());
   Dependencies dep;
   OperatorPure *constant = getOperator<ConstOp>();
@@ -1564,8 +1572,13 @@ std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
       ;
     }
 
-    hash(h, opstack[i]->identifier());
-    ;
+    if (!cfg.deterministic) {
+      hash(h, opstack[i]->identifier());
+      ;
+    } else {
+      hash(h, opstack_id[i] + 1);
+      ;
+    }
 
     if (opstack[i] == constant && cfg.strong_const) {
       hash(h, values[ptr.second]);
@@ -1593,6 +1606,7 @@ std::vector<hash_t> global::hash_sweep(bool weak) const {
   cfg.strong_const = true;
   cfg.strong_output = true;
   cfg.reduce = weak;
+  cfg.deterministic = false;
   return hash_sweep(cfg);
 }
 
