@@ -37,16 +37,7 @@ struct jacobian_dense_t : TMBad::ADFun<> {
     std::vector<bool> keep_x(n, true); // inner
     keep_x.resize(G.Domain(), false);  // outer
     std::vector<bool> keep_y(n, true); // inner
-    Base::operator= ( G.JacFun(false, keep_x, keep_y) );
-    // FIXME: JacFun proj argument ???
-    // rep(keep, n)
-    std::vector<bool> keep_dep;
-    for (size_t i=0; i<n; i++)
-      keep_dep.insert(keep_dep.begin(),
-                      keep_x.begin(),
-                      keep_x.end());
-    this->glob.dep_index = TMBad::subset(this->glob.dep_index,
-                                         keep_dep);
+    Base::operator= ( G.JacFun(keep_x, keep_y) );
   }
   template<class T>
   matrix<T> as_matrix(const std::vector<T> &Hx) {
@@ -329,8 +320,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     // FIXME: inv_inner and inv_outer are no longer set for grad and hess !!!
     // =========================
     // Grad
-    gradient = function.JacFun(false, keep_inner);
-    gradient.glob.dep_index.resize(n_inner); // FIXME: JacFun should project ???
+    gradient = function.JacFun(keep_inner);
     gradient.optimize();
     // Hessian
     hessian = Hessian_Type(gradient, n_inner);
