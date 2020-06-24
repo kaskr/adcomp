@@ -50,6 +50,18 @@ struct Decomp2;
 template <class ADFun>
 struct Decomp3;
 
+namespace {
+
+template <class I>
+std::vector<I> cumsum0(const std::vector<bool> &x) {
+  std::vector<I> y(x.size(), 0);
+  for (size_t i = 1; i < x.size(); i++) {
+    y[i] = y[i - 1] + x[i - 1];
+  }
+  return y;
+}
+}  // namespace
+
 /** \brief Interoperability with other vector classes
 
     \details The TMBad interface can handle vector to vector mappings
@@ -95,6 +107,13 @@ struct StdWrap {
     std::vector<T> y(yi);
     return y;
   }
+};
+
+/** \brief Configuration parameters for SpJacFun() */
+struct SpJacFun_config {
+  SpJacFun_config();
+  bool compress;
+  bool index_remap;
 };
 
 /** \brief Automatic differentiation function object
@@ -666,7 +685,7 @@ struct ADFun {
   */
   Sparse<ADFun> SpJacFun(std::vector<bool> keep_x = std::vector<bool>(0),
                          std::vector<bool> keep_y = std::vector<bool>(0),
-                         bool compress = false) {
+                         SpJacFun_config config = SpJacFun_config()) {
     ADFun atomic_jac_row;
     std::vector<Index> rowcounts;
 
@@ -694,7 +713,7 @@ struct ADFun {
       G.search(glob.subgraph_seq);
 
       bool do_compress = false;
-      if (compress) {
+      if (config.compress) {
         if (rowcounts.size() == 0) rowcounts = G.rowcounts();
 
         size_t cost1 = 0;
@@ -764,6 +783,16 @@ struct ADFun {
       }
     }
     replay.stop();
+    if (config.index_remap) {
+      if (keep_x.size() > 0) {
+        std::vector<Index> remap_j = cumsum0<Index>(keep_x);
+        ans.j = TMBad::subset(remap_j, ans.j);
+      }
+      if (keep_y.size() > 0) {
+        std::vector<Index> remap_i = cumsum0<Index>(keep_y);
+        ans.i = TMBad::subset(remap_i, ans.i);
+      }
+    }
     return ans;
   }
   /** \brief Integrate as many univariate variables as possible */
