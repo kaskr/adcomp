@@ -691,6 +691,9 @@ struct ADFun {
 
     Sparse<ADFun> ans;
 
+    ans.m = Range();
+    ans.n = Domain();
+
     std::vector<bool> keep_var = get_keep_var(keep_x, keep_y);
 
     graph G = this->glob.reverse_graph(keep_var);
@@ -787,10 +790,12 @@ struct ADFun {
       if (keep_x.size() > 0) {
         std::vector<Index> remap_j = cumsum0<Index>(keep_x);
         ans.j = TMBad::subset(remap_j, ans.j);
+        ans.n = std::count(keep_x.begin(), keep_x.end(), true);
       }
       if (keep_y.size() > 0) {
         std::vector<Index> remap_i = cumsum0<Index>(keep_y);
         ans.i = TMBad::subset(remap_i, ans.i);
+        ans.m = std::count(keep_y.begin(), keep_y.end(), true);
       }
     }
     return ans;
@@ -972,6 +977,8 @@ template <class ADFun>
 struct Sparse : ADFun {
   std::vector<Index> i;
   std::vector<Index> j;
+  Index m;
+  Index n;
   std::vector<Index> a2v(const std::valarray<Index> &x) const {
     return std::vector<Index>(&x[0], &x[0] + x.size());
   }
@@ -984,6 +991,10 @@ struct Sparse : ADFun {
     i = a2v(row()[x]);
     j = a2v(col()[x]);
     this->glob.dep_index = a2v(v2a(this->glob.dep_index)[x]);
+  }
+  void transpose_inplace() {
+    std::swap(i, j);
+    std::swap(m, n);
   }
 };
 
