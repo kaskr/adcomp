@@ -2075,15 +2075,14 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   // NB: Lower triangle, column major =
   //     Transpose of upper triangle, row major
   h.subset_inplace( h.row() <= h.col() ); // Upper triangle, row major
-  if (config.optimize.instantly) h.optimize(); // Optimize later ?
+  h.transpose_inplace();                  // Lower triangle, col major
+  if (config.optimize.instantly)          // Optimize now or later ?
+    h.optimize();
   adfun* phf = new adfun( h );
-  vector<int> rowindex(h.i.size());
-  vector<int> colindex(h.j.size());
-  for (size_t k=0; k<h.i.size(); k++) {
-    rowindex[k] = h.j[k]; // Transpose !
-    colindex[k] = h.i[k]; // Transpose !
-  }
-  sphess ans(phf, rowindex, colindex);
+  // Convert h.i and h.j to vector<int>
+  vector<TMBad::Index> h_i(h.i);
+  vector<TMBad::Index> h_j(h.j);
+  sphess ans(phf, h_i.cast<int>(), h_j.cast<int>());
   return ans;
 } // TMBAD_MakeADHessObject2
 #endif
