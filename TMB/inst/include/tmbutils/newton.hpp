@@ -19,7 +19,7 @@ namespace newton {
    ============================================
 */
 
-/** Methods specific for a dense hessian */
+/** \brief Methods specific for a dense hessian */
 template<class Factorization=Eigen::LLT<Eigen::Matrix<double, -1, -1> > >
 struct jacobian_dense_t : TMBad::ADFun<> {
   typedef TMBad::ADFun<> Base;
@@ -139,6 +139,7 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
 };
 
+/** \brief Operator (H, x) -> solve(H, x) */
 template <class Hessian_Type>
 struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   static const bool have_input_size_output_size = true;
