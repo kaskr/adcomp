@@ -14,7 +14,7 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
   checkParameterOrder = TRUE, regexp = FALSE, silent = FALSE, ...)
 }
 \arguments{
-\item{data}{List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).}
+\item{data}{List of data objects (vectors, matrices, arrays, factors, sparse matrices) required by the user template (order does not matter and un-used components are allowed).}
 
 \item{parameters}{List of all parameter objects required by the user template (both random and fixed effects).}
 
