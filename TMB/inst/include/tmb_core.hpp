@@ -27,42 +27,53 @@
    When total number is zero it is safe to dyn.unload
    the library.
 */
-
-/** \internal \brief TMB: SEXP type */
-struct SEXP_t{
-  SEXP value;				/**< \brief SEXP_t: data entry*/
-  SEXP_t(SEXP x)CSKIP({value=x;})	/**< \brief SEXP_t: assignment*/
-  SEXP_t()CSKIP({value=R_NilValue;})	/**< \brief SEXP_t: default constructor*/
-  operator SEXP()CSKIP({return value;})	/**< \brief SEXP_t:*/
-};
-bool operator<(SEXP_t x, SEXP_t y)CSKIP({return (size_t(x.value)<size_t(y.value));})
+#include <set>
+extern "C" void finalizeDoubleFun(SEXP x);
+extern "C" void finalizeADFun(SEXP x);
+extern "C" void finalizeparallelADFun(SEXP x);
+extern "C" SEXP FreeADFunObject(SEXP f) CSKIP ({
+  SEXP tag = R_ExternalPtrTag(f);
+  if (tag == Rf_install("DoubleFun")) {
+    finalizeDoubleFun(f);
+  }
+  else if (tag == Rf_install("ADFun")) {
+    finalizeADFun(f);
+  }
+  else if (tag == Rf_install("parallelADFun")) {
+    finalizeparallelADFun(f);
+  }
+  else {
+    Rf_error("Unknown external ptr type");
+  }
+  R_ClearExternalPtr(f); // Set pointer to 'nil'
+  return R_NilValue;
+})
 /** \internal \brief Controls the life span of objects created in the C++ template (jointly R/C++)*/
-struct memory_manager_struct{
-  int counter;  /**< \brief Number of objects alive that "memory_manager_struct" has allocated */
-  std::map<SEXP_t,SEXP_t> alive;
-  /** \brief Register "list" in memory_manager_struct */
+struct memory_manager_struct {
+  int counter;
+  /** \brief External pointers 'alive', i.e. not yet garbage collected */
+  std::set<SEXP> alive;
+  /** \brief Register `list` in memory_manager_struct (FIXME: Deprecated) */
   void RegisterCFinalizer(SEXP list);
-  /** \brief Revmoves "x" from memory_manager_struct */
+  /** \brief Removes `x` from memory_manager_struct (FIXME: Rename) */
   void CallCFinalizer(SEXP x);
+  /** \brief Free all pointers and set to 'nil' on R side */
   void clear();
   memory_manager_struct();
 };
 #ifndef WITH_LIBTMB
-void memory_manager_struct::RegisterCFinalizer(SEXP list){
+void memory_manager_struct::RegisterCFinalizer(SEXP x) {
   counter++;
-  SEXP x=VECTOR_ELT(list,0);
-  alive[x]=list;
+  alive.insert(x);
 }
 void memory_manager_struct::CallCFinalizer(SEXP x){
   counter--;
   alive.erase(x);
 }
 void memory_manager_struct::clear(){
-  std::map<SEXP_t,SEXP_t>::iterator it;
-  SEXP list;
-  for(it = alive.begin(); it != alive.end(); it++){
-    list=(*it).second;
-    SET_VECTOR_ELT(list,0,R_NilValue);
+  std::set<SEXP>::iterator it;
+  for(it = alive.begin(); it != alive.end(); it++) {
+    FreeADFunObject(*it);
   }
 }
 memory_manager_struct::memory_manager_struct(){
@@ -92,7 +103,7 @@ SEXP ptrList(SEXP x)
   SET_VECTOR_ELT(ans,0,x);
   SET_STRING_ELT(names,0,Rf_mkChar("ptr"));
   Rf_setAttrib(ans,R_NamesSymbol,names);
-  memory_manager.RegisterCFinalizer(ans);
+  memory_manager.RegisterCFinalizer(x);
   UNPROTECT(2);
   return ans;
 }
@@ -1759,6 +1770,7 @@ extern "C"{
   /* May be used as part of custom calldef tables */
 #define TMB_CALLDEFS                                            \
   {"MakeADFunObject",     (DL_FUNC) &MakeADFunObject,     4},   \
+  {"FreeADFunObject",     (DL_FUNC) &FreeADFunObject,     1},   \
   {"InfoADFunObject",     (DL_FUNC) &InfoADFunObject,     1},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
   {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \
