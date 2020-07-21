@@ -1363,7 +1363,6 @@ extern "C"
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
       Rf_setAttrib(res,Rf_install("range.names"),info);
-      R_RegisterCFinalizer(res,TMBAD_finalizeADFun);
 // }
 
     /* Return list of external pointer and default-parameter */
@@ -1477,7 +1476,6 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     SEXP res;
     PROTECT(res = R_MakeExternalPtr((void*) pf_new,
                                     Rf_install("ADFun"),R_NilValue));
-    R_RegisterCFinalizer(res, TMBAD_finalizeADFun);
     /* Return list of external pointer and default-parameter */
     SEXP ans;
     PROTECT(ans=ptrList(res));
@@ -1957,7 +1955,6 @@ extern "C"
       }
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
-      R_RegisterCFinalizer(res,TMBAD_finalizeADFun);
     // }
 
     /* Return ptrList */
