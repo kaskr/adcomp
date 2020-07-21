@@ -63,6 +63,18 @@ isNullPointer <- function(pointer) {
   .Call("isNullPointer", pointer, PACKAGE="TMB")
 }
 
+## Add external pointer finalizer
+registerFinalizer <- function(ADFun, DLL) {
+    finalizer <- function(ptr) {
+        if ( ! isNullPointer(ptr) ) {
+            .Call("FreeADFunObject", ptr, PACKAGE=DLL)
+        } else {
+            ## Nothing to free
+        }
+    }
+    reg.finalizer(ADFun$ptr, finalizer)
+}
+
 ##' Construct objective functions with derivatives based on the users C++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
@@ -351,6 +363,7 @@ MakeADFun <- function(data, parameters, map=list(),
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      registerFinalizer(Fun, DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
       out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
                    control = list(do_simulate = as.integer(0),
@@ -404,6 +417,8 @@ MakeADFun <- function(data, parameters, map=list(),
     if("ADFun"%in%type){
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
+      if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
+          registerFinalizer(ADFun, DLL)
       if (set.defaults) {
           par <<- attr(ADFun$ptr,"par")
           last.par <<- par
@@ -413,10 +428,14 @@ MakeADFun <- function(data, parameters, map=list(),
           value.best <<- Inf
       }
     }
-    if("Fun"%in%type)
+    if("Fun"%in%type) {
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
-    if("ADGrad"%in%type)
+      registerFinalizer(Fun, DLL)
+    }
+    if("ADGrad"%in%type) {
       ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+      registerFinalizer(ADGrad, DLL)
+    }
     ## Skip fixed effects from the full hessian ?
     ## * Probably more efficient - especially in terms of memory.
     ## * Only possible if a taped gradient is available - see function "ff" below.
@@ -840,8 +859,10 @@ MakeADFun <- function(data, parameters, map=list(),
            ## If no atomics on tape we have all orders implemented:
            if(!atomic) return( f(x,order=2) )
            ## Otherwise, get Hessian as 1st order derivative of gradient:
-           if(is.null(ADGrad))
+           if(is.null(ADGrad)) {
              ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+             registerFinalizer(ADGrad, DLL)
+           }
            f(x,type="ADGrad",order=1)
          },
          hessian=hessian, method=method,
@@ -1443,6 +1464,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                   obj$env$reportenv,
                   skip, ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL)
+  registerFinalizer(ADHess, obj$env$DLL)
   ev <- function(par)
           .Call("EvalADFunObject", ADHess$ptr, par,
                 control = list(
