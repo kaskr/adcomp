@@ -1267,9 +1267,13 @@ extern "C"
 
 #ifdef TMBAD_FRAMEWORK
   /** \internal \brief Garbage collect an ADFun object pointer */
-  void TMBAD_finalizeADFun(SEXP x)
+  void finalizeADFun(SEXP x)
   {
     finalize<TMBad::ADFun<TMBad::ad_aug> > (x);
+  }
+  void finalizeparallelADFun(SEXP x)
+  {
+    Rf_error("finalizeparallelADFun not yet implemented");
   }
 #endif
 
@@ -1279,9 +1283,6 @@ extern "C"
   {
     finalize<ADFun<double> > (x);
   }
-#endif
-
-#ifdef CPPAD_FRAMEWORK
   void finalizeparallelADFun(SEXP x)
   {
     finalize<parallelADFun<double> > (x);
