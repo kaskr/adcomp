@@ -20,6 +20,7 @@ size_t thread_num(){
   return static_cast<size_t>(omp_get_thread_num());
 }
 void start_parallel(){
+  CppAD::thread_alloc::free_all();
   int nthreads=omp_get_max_threads();
   if(config.trace.parallel)
     std::cout << "Using " << nthreads <<  " threads\n";
