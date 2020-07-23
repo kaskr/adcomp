@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+TMB 1.7.17 (2020-07-23)
+------------------------------------------------------------------------
+
+o New function 'FreeADFun()' gives the user more control with memory
+  deallocation. In addition memory management of external pointers
+  have been improved - see '?FreeADFun'.
+
+o Documentation errors in '?sdreport' have been corrected.
+
+o The function 'oneStepPredict()' now calculates residuals in reverse
+  order because it is more stable. Old behaviour can be obtained by
+  passing 'reverse=FALSE'.
+
+------------------------------------------------------------------------
 TMB 1.7.16 (2020-01-15)
 ------------------------------------------------------------------------
 
