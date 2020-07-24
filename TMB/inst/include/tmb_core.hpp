@@ -72,8 +72,8 @@ void memory_manager_struct::CallCFinalizer(SEXP x){
 }
 void memory_manager_struct::clear(){
   std::set<SEXP>::iterator it;
-  for(it = alive.begin(); it != alive.end(); it++) {
-    FreeADFunObject(*it);
+  while (alive.size() > 0) {
+    FreeADFunObject(*alive.begin());
   }
 }
 memory_manager_struct::memory_manager_struct(){
