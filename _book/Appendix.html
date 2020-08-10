@@ -208,8 +208,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a><ul>
 <li class="chapter" data-level="16.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>16.1</b> Notation</a></li>
-<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a></li>
-<li class="chapter" data-level="16.3" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>16.3</b> Example</a></li>
+<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a><ul>
+<li class="chapter" data-level="16.2.1" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>16.2.1</b> Example</a></li>
+</ul></li>
+<li class="chapter" data-level="16.3" data-path="Appendix.html"><a href="Appendix.html#theory-underlying-sdreport"><i class="fa fa-check"></i><b>16.3</b> Theory underlying sdreport</a></li>
 </ul></li>
 </ul>
 
@@ -306,9 +308,8 @@ Assume that for any <span class="math inline">\(\beta\)</span> and <span class="
 \]</span></p>
 <p>where the first equality holds in general and the second equality follows from assumptions (1) and (2).</p>
 <p><span class="math inline">\(\square\)</span></p>
-</div>
-<div id="example" class="section level2">
-<h2><span class="header-section-number">16.3</span> Example</h2>
+<div id="example" class="section level3">
+<h3><span class="header-section-number">16.2.1</span> Example</h3>
 <p>The standard situation for which <strong>assumption 1</strong> holds is when the
 <span class="math inline">\(\beta\)</span>s are the linear fixed effects of a mixed model. In this case
 the joint negative log density takes the form
@@ -319,6 +320,54 @@ for some design matrix <span class="math inline">\(A\)</span> where ‘<span cla
 is thus a linear function of the random effect <span class="math inline">\(u\)</span>.</p>
 <p>In general <strong>assumption 2</strong> holds exact for models with a symmetric
 (e.g. Gaussian) posterior distribution.</p>
+</div>
+</div>
+<div id="theory-underlying-sdreport" class="section level2">
+<h2><span class="header-section-number">16.3</span> Theory underlying sdreport</h2>
+<p>This section supplements the documentation of <code>?sdreport</code> by adding
+some missing details.</p>
+<p>As previously, we consider a general latent variable model with
+parameter vector <span class="math inline">\(\theta\)</span>, random effect vector <span class="math inline">\(u\)</span> and observation
+vector <span class="math inline">\(x\)</span>. The TMB estimation procedure works as follows:</p>
+<ol style="list-style-type: decimal">
+<li>The MLE <span class="math inline">\(\hat\theta=\hat\theta(x)\)</span> is calculated and used as
+estimator of <span class="math inline">\(\theta\)</span>.</li>
+<li>Denote by <span class="math inline">\(\hat u(\theta,x)\)</span> the random effect mode depending on
+<span class="math inline">\(\theta\)</span> and <span class="math inline">\(x\)</span>. Now, <em>plug in</em> the MLE, and we get our estimator
+<span class="math inline">\(\hat u\left(\hat\theta(x),x\right)\)</span> of <span class="math inline">\(u\)</span>.</li>
+</ol>
+<p>In general, we assume that <span class="math inline">\(\hat\theta\)</span> is a consistent estimator of
+<span class="math inline">\(\theta\)</span>. However, we do not in general require <span class="math inline">\(\hat u\)</span> to be
+consistent for <span class="math inline">\(u\)</span>. The purpose of sdreport is, for a given
+realization of the pair <span class="math inline">\((u,x)\)</span>, to quantify the joint uncertainty of
+<span class="math inline">\((\hat u,\hat\theta)\)</span> as estimator of <span class="math inline">\((u,\theta)\)</span>. That is, we are
+interested in the variance matrix of the difference</p>
+<p><span class="math display">\[D:=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - u\\ \hat\theta(x) - \theta\end{pmatrix}\]</span></p>
+<p>An important point of the uncertainty quantification is to account
+for plugging in <span class="math inline">\(\hat\theta\)</span> rather than using the true <span class="math inline">\(\theta\)</span>.</p>
+<p>We calculate the variance using the standard formula:</p>
+<p><span class="math display">\[V[D]=E(V(D|x))+V(E(D|x))\]</span></p>
+<p>Consider <span class="math inline">\(D\)</span> conditionally on <span class="math inline">\(x\)</span>. The second component does not
+depend on <span class="math inline">\(u\)</span> and <span class="math inline">\(\hat u\)</span> is constant given <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[V[D|x]=\begin{pmatrix}V[u|x] &amp; 0 \\ 0 &amp; 0 \end{pmatrix}\]</span></p>
+<p>It follows that</p>
+<p><span class="math display">\[E(V[D|x])=\begin{pmatrix}E(V[u|x]) &amp; 0 \\ 0 &amp; 0 \end{pmatrix}\]</span></p>
+<p>As central estimator of <span class="math inline">\(E(V[u|x])\)</span> we use <span class="math inline">\(V[u|x]\)</span> which is
+approximated by the inverse random effect Hessian <span class="math inline">\(H_{uu}^{-1}\)</span> based
+on the assumption that <span class="math inline">\(u|x\)</span> is well approximated by a Gaussian
+distribution (a reasonable assumption given that we are using the
+Laplace approximation). This explains the first term of variance formula in <code>?sdreport</code>:</p>
+<p><span class="math display">\[E(V[D|x]) \approx \begin{pmatrix} H_{uu}^{-1} &amp; 0 \\ 0 &amp; 0 \end{pmatrix}\]</span></p>
+<p>Likewise,</p>
+<p><span class="math display">\[E[D|x]=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - E(u|x)\\ \hat\theta(x) - \theta\end{pmatrix}\]</span></p>
+<p>Again, asuming a Gaussian approximation of <span class="math inline">\(u|x\)</span>, it follows that <span class="math inline">\(E(u|x) \approx \hat u(\theta,x)\)</span>:</p>
+<p><span class="math display">\[E[D|x]=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - \hat u(\theta,x)\\ \hat\theta(x) - \theta\end{pmatrix}\]</span></p>
+<p>We approximate the expectation using linerization of <span class="math inline">\(\theta \rightarrow \hat u(\theta,x)\)</span> around <span class="math inline">\(\hat\theta(x)\)</span></p>
+<p><span class="math display">\[E[D|x]=J_x \cdot (\hat\theta(x) - \theta)\]</span></p>
+<p>We now have the second term of the variance formula in <code>?sdreport</code>:</p>
+<p><span class="math display">\[V(E[D|x]) \approx J_x V(\hat\theta(x)) J_x&#39;\]</span></p>
+<p>This term becomes negligible if the amount of data is high because of
+the assumed asymptotic consistency of <span class="math inline">\(\hat\theta\)</span>.</p>
 
 <div id="refs" class="references">
 <div>
