@@ -358,6 +358,9 @@ template <>
 struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
   typedef std::vector<Scalar> ScalarVector;
   typedef ForwardArgs<Scalar> Base;
+  /** \brief Write constants in the source code? */
+  bool const_literals;
+  /** \brief Enable indirect local addressing mode within loop? */
   bool indirect;
   void set_indirect() {
     indirect = true;
@@ -370,9 +373,21 @@ struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
   Writer yi(Index j) { return "v[o[" + tostr(Index(ptr.second + j)) + "]]"; }
   Writer x(Index j) { return (indirect ? xi(j) : xd(j)); }
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
-  Writer y_const(Index j) { return tostr(Base::y(j)); }
+  Writer y_const(Index j) {
+    if (!(!indirect)) {
+      Rcerr << "ASSERTION FAILED: "
+            << "!indirect"
+            << "\n";
+      Rcerr << "POSSIBLE REASON: "
+            << "Attempt to write constants within loop?"
+            << "\n";
+      abort();
+    };
+    return tostr(Base::y(j));
+  }
   ForwardArgs(IndexVector &inputs, ScalarVector &values)
       : ForwardArgs<Scalar>(inputs, values) {
+    const_literals = false;
     indirect = false;
   }
 };
@@ -380,6 +395,9 @@ struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
 template <>
 struct ReverseArgs<Writer> : Args<> {
   typedef std::vector<Scalar> ScalarVector;
+  /** \brief Write constants in the source code? */
+  bool const_literals;
+  /** \brief Enable indirect local addressing mode within loop? */
   bool indirect;
   void set_indirect() {
     indirect = true;
@@ -400,6 +418,7 @@ struct ReverseArgs<Writer> : Args<> {
   Writer dy(Index j) { return (indirect ? dyi(j) : dyd(j)); }
 
   ReverseArgs(IndexVector &inputs, ScalarVector &values) : Args<>(inputs) {
+    const_literals = false;
     indirect = false;
     ptr.first = (Index)inputs.size();
     ptr.second = (Index)values.size();

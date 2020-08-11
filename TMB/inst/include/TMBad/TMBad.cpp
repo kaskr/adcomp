@@ -590,7 +590,12 @@ void reorder_sub_expressions(global &glob) {
   std::vector<Index> v2o = glob.var2op();
   glob.subgraph_seq = subset(v2o, ord);
 
-  glob = glob.extract_sub();
+  std::vector<Index> inv_index_old = glob.inv_index;
+  std::vector<Index> dep_index_old = glob.dep_index;
+  std::vector<Index> var_remap;
+  glob = glob.extract_sub(var_remap);
+  glob.inv_index = subset(var_remap, inv_index_old);
+  glob.dep_index = subset(var_remap, dep_index_old);
 }
 
 void compress(global &glob, size_t max_period_size) {
@@ -1724,7 +1729,9 @@ const char *global::DepOp::op_name() { return "DepOp"; }
 const char *global::ConstOp::op_name() { return "ConstOp"; }
 
 void global::ConstOp::forward(ForwardArgs<Writer> &args) {
-  if (!args.indirect) args.y(0) = args.y_const(0);
+  if (args.const_literals) {
+    args.y(0) = args.y_const(0);
+  }
 }
 
 global::NullOp::NullOp() {}
