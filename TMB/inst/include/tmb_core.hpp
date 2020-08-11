@@ -1468,6 +1468,8 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   SEXP tag = R_ExternalPtrTag(f);
   if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
   adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+  if (pf == NULL)
+    Rf_error("Cannot transform '<pointer: (nil)>' (unloaded/reloaded DLL?)");
   std::string method =
     CHAR(STRING_ELT(getListElement(control, "method"), 0));
   // Test adfun copy
