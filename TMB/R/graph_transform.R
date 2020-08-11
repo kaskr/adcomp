@@ -29,9 +29,7 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
                    method="reorder_sub_expressions"), PACKAGE=DLL)
     }
     ## Write source code
-    sink(dll.cpp)
-    qw <- .Call("tmbad_print", ptr, control, PACKAGE = DLL)
-    sink(NULL)
+    sink(dll.cpp); out <- .Call("tmbad_print", ptr, control, PACKAGE = DLL); sink(NULL)
     ## Overload
     compile(dll.cpp, flags=flags)
     dyn.load(dynlib(dll))
@@ -44,4 +42,13 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
                forward_compiled=forward_compiled,
                reverse_compiled=reverse_compiled
                ), PACKAGE=DLL)
+    ## Unload compiled code when no longer needed
+    finalizer <- function(ptr) {
+        dyn.unload(dynlib(dll))
+        file.remove(dynlib(dll))
+        file.remove(paste0(dll, ".o"))
+        file.remove(dll.cpp)
+    }
+    reg.finalizer(ptr, finalizer)
+    NULL
 }
