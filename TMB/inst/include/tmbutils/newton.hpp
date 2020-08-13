@@ -139,6 +139,16 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
 };
 
+namespace {
+// Anonomous Helper
+template<class Args>
+std::vector<typename Args::value_type> get_segment(Args &args, size_t from, size_t size) {
+  std::vector<typename Args::value_type> ans(size);
+  for (size_t i=0; i<size; i++) ans[i] = args.x(from + i);
+  return ans;
+}
+}
+
 /** \brief Operator (H, x) -> solve(H, x) */
 template <class Hessian_Type>
 struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
@@ -149,24 +159,6 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   HessianSolveVector(Hessian_Type* hessian) : hessian(hessian) {}
   TMBad::Index input_size() const { return hessian -> Range() + hessian -> n; }
   TMBad::Index output_size() const { return hessian -> n; }
-  template<class T>
-  std::vector<T> get_segment(TMBad::ForwardArgs<T> &args, size_t from, size_t size) {
-    std::vector<T> ans(size);
-    for (size_t i=0; i<size; i++) ans[i] = args.x(from + i);
-    return ans;
-  }
-  template<class T>
-  std::vector<T> get_segment(TMBad::ReverseArgs<T> &args, size_t from, size_t size) {
-    std::vector<T> ans(size);
-    for (size_t i=0; i<size; i++) ans[i] = args.x(from + i);
-    return ans;
-  }
-  template<class T>
-  std::vector<T> get_segment_y(TMBad::ReverseArgs<T> &args, size_t from, size_t size) {
-    std::vector<T> ans(size);
-    for (size_t i=0; i<size; i++) ans[i] = args.y(from + i);
-    return ans;
-  }
   vector<TMBad::Scalar> eval(const std::vector<TMBad::Scalar> &h,
                              const vector<TMBad::Scalar> &x) {
     typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
@@ -467,18 +459,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
   TMBad::Index output_size() const {
     return function.DomainInner(); // Inner dimension
-  }
-  template<class T>
-  std::vector<T> get_segment(TMBad::ForwardArgs<T> &args, size_t from, size_t size) {
-    std::vector<T> ans(size);
-    for (size_t i=0; i<size; i++) ans[i] = args.x(from + i);
-    return ans;
-  }
-  template<class T>
-  std::vector<T> get_segment(TMBad::ReverseArgs<T> &args, size_t from, size_t size) {
-    std::vector<T> ans(size);
-    for (size_t i=0; i<size; i++) ans[i] = args.x(from + i);
-    return ans;
   }
   void forward(TMBad::ForwardArgs<Scalar> &args) {
     size_t n = function.DomainOuter();
