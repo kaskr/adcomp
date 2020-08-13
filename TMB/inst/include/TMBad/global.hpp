@@ -162,6 +162,7 @@ struct Args {
 template <class Type>
 struct ForwardArgs : Args<> {
   typedef std::vector<Type> TypeVector;
+  typedef Type value_type;
   Type *values;
   /** \brief j'th input variable of this operator */
   const Type &x(Index j) { return values[input(j)]; }
@@ -183,6 +184,7 @@ struct ForwardArgs : Args<> {
 template <class Type>
 struct ReverseArgs : Args<> {
   typedef std::vector<Type> TypeVector;
+  typedef Type value_type;
   Type *values;
   Type *derivs;
   /** \brief j'th input variable of this operator */
