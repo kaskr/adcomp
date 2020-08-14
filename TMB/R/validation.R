@@ -145,10 +145,13 @@ oneStepPredict <- function(obj,
                            parallel = FALSE,
                            trace = TRUE,
                            reverse = (method == "oneStepGaussianOffMode"),
+                           deltaSupport = NULL,
                            ...
                            ){
     if (missing(observation.name))
         stop("'observation.name' must define a data component")
+    if (!is.null(deltaSupport) & method!="cdf" )
+        stop("Can only provide `deltaSupport` when using `cdf` method")
     if (!(observation.name %in% names(obj$env$data)))
         stop("'observation.name' must be in data component")
     method <- match.arg(method)
@@ -308,17 +311,18 @@ oneStepPredict <- function(obj,
         pred$Fx <- 1 / ( 1 + exp(pred$nlcdf.lower - pred$nlcdf.upper) )
         pred$px <- 1 / ( exp(-pred$nlcdf.lower + pred$nll) +
                          exp(-pred$nlcdf.upper + pred$nll) )
-        if(discrete){
+        if(discrete | length(deltaSupport)>0 ){
             if(!is.null(seed)){
                 ## Restore RNG on exit:
                 Random.seed <- .GlobalEnv$.Random.seed
                 on.exit(.GlobalEnv$.Random.seed <- Random.seed)
                 set.seed(seed)
             }
-            U <- runif(nrow(pred))
+            U <- ifelse( pred$obs %in% deltaSupport, runif(nrow(pred)), 0 )
         } else {
-            U <- 0
+            U <- rep(0,nrow(pred))
         }
+        pred$U <- U
         pred$residual <- qnorm(pred$Fx - U * pred$px)
         pred
     }
@@ -452,7 +456,7 @@ oneStepPredict <- function(obj,
                 ##  F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
                 nlcdf.lower = nll - log(F1)
                 nlcdf.upper = nll - log(F2)
-                c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper, mean=mean)
+                c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper, mean=mean, obs=obs[index])
             })
             if(is(ans, "try-error")) ans <- NaN
             ans
@@ -482,7 +486,7 @@ oneStepPredict <- function(obj,
                 F2 <- sum( F[discreteSupport >  obs[index]] )
                 nlcdf.lower = nll - log(F1)
                 nlcdf.upper = nll - log(F2)
-                c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper)
+                c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper, obs=obs[index])
             })
             if(is(ans, "try-error")) ans <- NaN
             ans
@@ -528,10 +532,11 @@ oneStepPredict <- function(obj,
         newobj$fn(p) ## Test eval
         cdf <- function(k){
             tracefun(k)
+            index <- subset[k]
             nll <- newobj$fn(observation(k))
             nlcdf.lower <- newobj$fn(observation(k, lower.cdf = TRUE))
             nlcdf.upper <- newobj$fn(observation(k, upper.cdf = TRUE))
-            c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper)
+            c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper, obs=obs[index])
         }
         pred <- applyMethod(cdf)
     }
