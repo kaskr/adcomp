@@ -311,13 +311,15 @@ oneStepPredict <- function(obj,
         pred$Fx <- 1 / ( 1 + exp(pred$nlcdf.lower - pred$nlcdf.upper) )
         pred$px <- 1 / ( exp(-pred$nlcdf.lower + pred$nll) +
                          exp(-pred$nlcdf.upper + pred$nll) )
-        if(discrete | length(deltaSupport)>0 ){
-            if(!is.null(seed)){
-                ## Restore RNG on exit:
-                Random.seed <- .GlobalEnv$.Random.seed
-                on.exit(.GlobalEnv$.Random.seed <- Random.seed)
-                set.seed(seed)
-            }
+        if(!is.null(seed)){
+            ## Restore RNG on exit:
+            Random.seed <- .GlobalEnv$.Random.seed
+            on.exit(.GlobalEnv$.Random.seed <- Random.seed)
+            set.seed(seed)
+        }
+        if(discrete){
+            U <- runif(nrow(pred))
+        } else if(length(deltaSupport)>0) {
             U <- ifelse( pred$obs %in% deltaSupport, runif(nrow(pred)), 0 )
         } else {
             U <- rep(0,nrow(pred))
