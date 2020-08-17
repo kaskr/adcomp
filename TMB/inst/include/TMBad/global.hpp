@@ -127,8 +127,10 @@ struct Dependencies : std::vector<Index> {
   bool any(const std::vector<bool> &x) const;
 };
 
-enum Member { x_read, y_read, y_write, dx_read, dx_write, dy_read };
-template <class Args, Member m>
+/** \brief Define `segment_ref` array to access inside `ForwardArgs`
+    or `ReverseArgs` */
+enum ArrayAccess { x_read, y_read, y_write, dx_read, dx_write, dy_read };
+template <class Args, ArrayAccess What>
 struct Accessor {};
 template <class Args>
 struct Accessor<Args, x_read> {
@@ -166,10 +168,17 @@ struct Accessor<Args, dy_read> {
     return args.dy(j);
   }
 };
-template <class Args, Member m>
+/** \brief Provide read/write access to an array segment
+
+    This class gives a common interface to vectorized array access
+    during forward or reverse sweeps.  The purpose is to reduce the
+    amount of manually written loops *and* to provide a compile time
+    check for access permissions.
+*/
+template <class Args, ArrayAccess What>
 struct segment_ref {
   typedef typename Args::value_type Type;
-  Accessor<Args, m> element_access;
+  Accessor<Args, What> element_access;
   Args args;
   Index from, n;
   segment_ref(Args &args, Index from, Index n) : args(args), from(from), n(n) {}
