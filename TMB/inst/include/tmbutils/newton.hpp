@@ -216,25 +216,24 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     return ans2;
   }
   void forward(TMBad::ForwardArgs<TMBad::Scalar> &args) {
-    // FIXME: args.get_segment ???
     size_t nnz = hessian -> Range();
-    size_t n = hessian -> n;
-    std::vector<TMBad::Scalar> h = get_segment(args, 0, nnz);
-    vector<TMBad::Scalar> x = get_segment(args, nnz, n);
-    vector<TMBad::Scalar> y = eval(h, x);
-    for (size_t i=0; i<n; i++) args.y(i) = y[i];
+    size_t   n = hessian -> n;
+    std::vector<TMBad::Scalar>
+      h = args.x_segment(0, nnz);
+    vector<TMBad::Scalar>
+      x = args.x_segment(nnz, n);
+    args.y_segment(0, n) = eval(h, x);
   }
   template <class T>
   void reverse(TMBad::ReverseArgs<T> &args) {
 
     size_t nnz = hessian -> Range();
-    size_t n = hessian -> n;
-    std::vector<T> h = get_segment(args, 0, nnz);
-    vector<T> y(n), dy(n);
-    for (size_t i=0; i<n; i++) {
-      y[i] = args.y(i);
-      dy[i] = args.dy(i);
-    }
+    size_t   n = hessian -> n;
+    std::vector<T>
+      h  = args. x_segment(0, nnz);
+    vector<T>
+      y  = args. y_segment(0, n),
+      dy = args.dy_segment(0, n);
     vector<T> y2 = eval(h, dy);
     vector<T> y2y = hessian->crossprod(y2, y);
     for (size_t k=0; k<nnz; k++) {
