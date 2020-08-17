@@ -24,7 +24,8 @@ struct Functor {
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
-  using namespace newton;
+  using newton::newton_config_t;
+  using newton::Newton;
   DATA_MATRIX(m);
   PARAMETER_VECTOR(x);
   DATA_STRUCT(cfg, newton_config_t);
