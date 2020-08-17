@@ -593,7 +593,7 @@ NewtonSolver<Functor,
              Type,
              jacobian_sparse_t<> > NewtonSparse(
                                                 Functor &F,
-                                                vector<Type> start,
+                                                Eigen::Array<Type, Eigen::Dynamic, 1> start,
                                                 newton_config cfg = newton_config() ) {
   NewtonSolver<Functor, Type, jacobian_sparse_t<> > ans(F, start, cfg);
   return ans;
@@ -604,14 +604,15 @@ NewtonSolver<Functor,
              Type,
              jacobian_dense_t<> > NewtonDense(
                                                 Functor &F,
-                                                vector<Type> start,
+                                                Eigen::Array<Type, Eigen::Dynamic, 1> start,
                                                 newton_config cfg = newton_config() ) {
   NewtonSolver<Functor, Type, jacobian_dense_t<> > ans(F, start, cfg);
   return ans;
 }
 
 template<class Functor, class Type>
-vector<Type> Newton(Functor &F, vector<Type> start,
+vector<Type> Newton(Functor &F,
+                    Eigen::Array<Type, Eigen::Dynamic, 1> start,
                     newton_config cfg = newton_config() ) {
   if (cfg.sparse)
     return NewtonSparse(F, start, cfg);
@@ -621,7 +622,8 @@ vector<Type> Newton(Functor &F, vector<Type> start,
 
 /* Laplace */
 template<class Functor, class Type>
-Type Laplace(Functor &F, vector<Type> &start,
+Type Laplace(Functor &F,
+             Eigen::Array<Type, Eigen::Dynamic, 1> &start,
              newton_config cfg = newton_config() ) {
   if (cfg.sparse) {
     auto opt = NewtonSparse(F, start, cfg);
