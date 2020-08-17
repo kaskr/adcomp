@@ -189,6 +189,20 @@ struct segment_ref {
     }
     return *this;
   }
+  template <class Other>
+  segment_ref &operator+=(const Other &other) {
+    for (size_t i = 0; i < n; i++) {
+      element_access(args, from + i) += other[i];
+    }
+    return *this;
+  }
+  template <class Other>
+  segment_ref &operator-=(const Other &other) {
+    for (size_t i = 0; i < n; i++) {
+      element_access(args, from + i) -= other[i];
+    }
+    return *this;
+  }
 };
 
 /** \brief Argument class to handle array access of operator inputs and outputs.
