@@ -177,16 +177,6 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
 };
 
-namespace {
-// Anonomous Helper
-template<class Args>
-std::vector<typename Args::value_type> get_segment(Args &args, size_t from, size_t size) {
-  std::vector<typename Args::value_type> ans(size);
-  for (size_t i=0; i<size; i++) ans[i] = args.x(from + i);
-  return ans;
-}
-}
-
 /** \brief Operator (H, x) -> solve(H, x) */
 template <class Hessian_Type>
 struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
@@ -499,7 +489,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
   void forward(TMBad::ForwardArgs<Scalar> &args) {
     size_t n = function.DomainOuter();
-    std::vector<Scalar> x = get_segment(args, 0, n);
+    std::vector<Scalar>
+      x = args.x_segment(0, n);
     // Set *outer* parameters
     SwapOuter(); // swap
     function.DomainVecSet(x);
@@ -521,7 +512,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     for (size_t i=0; i<sol.size(); i++) sol[i] = args.y(i);
     // NOTE: 'hessian' must have full (inner, outer) vector as input
     size_t n = function.DomainOuter();
-    std::vector<T> x = get_segment(args, 0, n);
+    std::vector<T>
+      x = args.x_segment(0, n);
     std::vector<T> sol_x = sol; sol_x.insert(sol_x.end(), x.begin(), x.end());
     HessianSolveVector<Hessian_Type> solve(&hessian);
     std::vector<T> hv = hessian.eval(sol_x);
