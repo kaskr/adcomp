@@ -127,6 +127,70 @@ struct Dependencies : std::vector<Index> {
   bool any(const std::vector<bool> &x) const;
 };
 
+enum Member { x_read, y_read, y_write, dx_read, dx_write, dy_read };
+template <class Args, Member m>
+struct Accessor {};
+template <class Args>
+struct Accessor<Args, x_read> {
+  typename Args::value_type operator()(Args &args, Index j) {
+    return args.x(j);
+  }
+};
+template <class Args>
+struct Accessor<Args, y_read> {
+  typename Args::value_type operator()(Args &args, Index j) {
+    return args.y(j);
+  }
+};
+template <class Args>
+struct Accessor<Args, y_write> {
+  typename Args::value_type &operator()(Args &args, Index j) {
+    return args.y(j);
+  }
+};
+template <class Args>
+struct Accessor<Args, dx_read> {
+  typename Args::value_type operator()(Args &args, Index j) {
+    return args.dx(j);
+  }
+};
+template <class Args>
+struct Accessor<Args, dx_write> {
+  typename Args::value_type &operator()(Args &args, Index j) {
+    return args.dx(j);
+  }
+};
+template <class Args>
+struct Accessor<Args, dy_read> {
+  typename Args::value_type operator()(Args &args, Index j) {
+    return args.dy(j);
+  }
+};
+template <class Args, Member m>
+struct segment_ref {
+  typedef typename Args::value_type Type;
+  Accessor<Args, m> element_access;
+  Args args;
+  Index from, n;
+  segment_ref(Args &args, Index from, Index n) : args(args), from(from), n(n) {}
+  template <class Other>
+  operator Other() {
+    Other ans(n);
+    for (size_t i = 0; i < n; i++) {
+      ans[i] = element_access(args, from + i);
+    }
+    return ans;
+  }
+  Type operator[](Index i) { return element_access(args, from + i); }
+  template <class Other>
+  segment_ref &operator=(const Other &other) {
+    for (size_t i = 0; i < n; i++) {
+      element_access(args, from + i) = other[i];
+    }
+    return *this;
+  }
+};
+
 /** \brief Argument class to handle array access of operator inputs and outputs.
     - Values (`global::values`) and derivatives (`global::derivs`) are
       stored as two contiguous arrays of the same size.
@@ -172,6 +236,14 @@ struct ForwardArgs : Args<> {
   Type *x_ptr(Index j) { return &values[input(j)]; }
   /** \brief pointer version - use with caution. */
   Type *y_ptr(Index j) { return &values[output(j)]; }
+  /** \brief segment version */
+  segment_ref<ForwardArgs, x_read> x_segment(Index from, Index size) {
+    return segment_ref<ForwardArgs, x_read>(*this, from, size);
+  }
+  /** \brief segment version */
+  segment_ref<ForwardArgs, y_write> y_segment(Index from, Index size) {
+    return segment_ref<ForwardArgs, y_write>(*this, from, size);
+  }
   ForwardArgs(const IndexVector &inputs, TypeVector &values)
       : Args<>(inputs), values(&values[0]) {}
 };
@@ -205,6 +277,22 @@ struct ReverseArgs : Args<> {
   Type *dx_ptr(Index j) { return &derivs[input(j)]; }
   /** \brief pointer version - use with caution. */
   Type *dy_ptr(Index j) { return &derivs[output(j)]; }
+  /** \brief segment version */
+  segment_ref<ReverseArgs, x_read> x_segment(Index from, Index size) {
+    return segment_ref<ReverseArgs, x_read>(*this, from, size);
+  }
+  /** \brief segment version */
+  segment_ref<ReverseArgs, y_read> y_segment(Index from, Index size) {
+    return segment_ref<ReverseArgs, y_read>(*this, from, size);
+  }
+  /** \brief segment version */
+  segment_ref<ReverseArgs, dx_write> dx_segment(Index from, Index size) {
+    return segment_ref<ReverseArgs, dx_write>(*this, from, size);
+  }
+  /** \brief segment version */
+  segment_ref<ReverseArgs, dy_read> dy_segment(Index from, Index size) {
+    return segment_ref<ReverseArgs, dy_read>(*this, from, size);
+  }
   ReverseArgs(const IndexVector &inputs, TypeVector &values, TypeVector &derivs)
       : Args<>(inputs), values(&values[0]), derivs(&derivs[0]) {
     ptr.first = (Index)inputs.size();
