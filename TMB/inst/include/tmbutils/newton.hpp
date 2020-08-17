@@ -2,6 +2,44 @@
 /** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
 namespace newton {
 
+template <class Type>
+struct vector : Eigen::Array<Type, Eigen::Dynamic, 1>
+{
+  typedef Type value_type;
+  typedef Eigen::Array<Type, Eigen::Dynamic, 1> Base;
+
+  vector(void) : Base() {}
+
+  template<class Derived>
+  vector(const Eigen::ArrayBase<Derived> &x) : Base(x) {}
+  template<class Derived>
+  vector(const Eigen::MatrixBase<Derived> &x) : Base(x) {}
+  vector(size_t n) : Base(n) {}
+  // std::vector
+  operator std::vector<Type>() {
+    return std::vector<Type> (Base::data(),
+                              Base::data() + Base::size());
+  }
+  vector(const std::vector<Type> &x) :
+    Base(Eigen::Map<const Base> (x.data(), x.size())) { }
+};
+
+template <class Type>
+struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
+{
+  typedef Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> Base;
+  matrix(void) : Base() {}
+  template<class Derived>
+  matrix(const Eigen::ArrayBase<Derived> &x) : Base(x) {}
+  template<class Derived>
+  matrix(const Eigen::MatrixBase<Derived> &x) : Base(x) {}
+  vector<Type> vec() {
+    Base a(*this);
+    a.resize(a.size(), 1);
+    return a;
+  }
+};
+
 /* =================== TODO ===================
    - Optimize RefOp
    - Cleanup get_segment mess
@@ -41,7 +79,7 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   }
   template<class T>
   matrix<T> as_matrix(const std::vector<T> &Hx) {
-    return asMatrix(vector<T>(Hx), n, n);
+    return Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > (Hx.data(), n, n);
   }
   template<class T>
   std::vector<T> eval(const std::vector<T> &x) {
@@ -373,7 +411,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
                  msg);
     }
     if (cfg.on_failure_return_nan) {
-      x = NAN;
+      x.fill(NAN);
     }
     return msg;
   }
@@ -509,7 +547,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
 
 template<class Type>
 Type log_determinant(const matrix<Type> &H) {
-  return atomic::logdet(H);
+  // FIXME: Depending on TMB atomic
+  return atomic::logdet(tmbutils::matrix<Type>(H));
 }
 template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H) {
