@@ -226,12 +226,8 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
       dy = args.dy_segment(0, n);
     vector<T> y2 = eval(h, dy);
     vector<T> y2y = hessian->crossprod(y2, y);
-    for (size_t k=0; k<nnz; k++) {
-      args.dx(k) -= y2y[k];
-    }
-    for (size_t k=0; k<n; k++) {
-      args.dx(nnz + k) += y2[k];
-    }
+    args.dx_segment(0, nnz) -= y2y;
+    args.dx_segment(nnz, n) += y2;
   }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
