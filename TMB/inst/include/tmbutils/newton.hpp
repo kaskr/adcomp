@@ -498,14 +498,14 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     vector<Scalar> sol = function.DomainVec();
     newton_iterate(sol);
     SwapInner(); // swap back
-    for (size_t i=0; i < (size_t) sol.size(); i++) args.y(i) = sol[i];
+    args.y_segment(0, sol.size()) = sol;
   }
   template<class T>
   void reverse(TMBad::ReverseArgs<T> &args) {
-    vector<T> w(output_size());
-    for (size_t i=0; i < (size_t) w.size(); i++) w[i] = args.dy(i);
-    std::vector<T> sol(output_size());
-    for (size_t i=0; i<sol.size(); i++) sol[i] = args.y(i);
+    vector<T>
+      w   = args.dy_segment(0, output_size());
+    std::vector<T>
+      sol = args. y_segment(0, output_size());
     // NOTE: 'hessian' must have full (inner, outer) vector as input
     size_t n = function.DomainOuter();
     std::vector<T>
@@ -515,8 +515,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     std::vector<T> hv = hessian.eval(sol_x);
     vector<T> w2 = - solve.eval(hv, w);
     vector<T> g = gradient.Jacobian(sol_x, w2);
-    vector<T> g_outer = g.tail(n);
-    for (size_t i=0; i < (size_t) g_outer.size(); i++) args.dx(i) += g_outer[i];
+    args.dx_segment(0, n) += g.tail(n);
   }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
