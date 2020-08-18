@@ -226,18 +226,20 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   }
   template <class T>
   void reverse(TMBad::ReverseArgs<T> &args) {
-
-    size_t nnz = hessian -> Range();
-    size_t   n = hessian -> n;
+    size_t n = output_size();
     std::vector<T>
       h  = args. x_segment(0, nnz);
     vector<T>
       y  = args. y_segment(0, n),
       dy = args.dy_segment(0, n);
     vector<T> y2 = eval(h, dy);
-    vector<T> y2y = hessian->crossprod(y2, y);
-    args.dx_segment(0, nnz) -= y2y;
-    args.dx_segment(nnz, n) += y2;
+    for (size_t j=0; j < x_cols; j++) {
+      vector<T> y_j  = y .segment(j * x_rows, x_rows);
+      vector<T> y2_j = y2.segment(j * x_rows, x_rows);
+      vector<T> y2y_j = hessian -> crossprod(y2_j, y_j);
+      args.dx_segment(0, nnz) -= y2y_j;
+      args.dx_segment(nnz + j * x_rows, x_rows) += y2_j;
+    }
   }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
