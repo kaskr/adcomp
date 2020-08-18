@@ -201,7 +201,9 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
       H = hessian -> as_matrix(h);
     hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
-    vector<TMBad::Scalar> y = hessian -> llt.solve(x.matrix()).array();
+    matrix<TMBad::Scalar> xm = x.matrix();
+    xm.resize(x_rows, x_cols);
+    vector<TMBad::Scalar> y = hessian -> llt.solve(xm).array();
     return y;
   }
   vector<TMBad::Replay> eval(const std::vector<TMBad::Replay> &h,
