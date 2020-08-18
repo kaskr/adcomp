@@ -184,9 +184,18 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   static const bool add_forward_replay_copy = true;
   /** \warning Pointer */
   Hessian_Type* hessian;
-  HessianSolveVector(Hessian_Type* hessian) : hessian(hessian) {}
-  TMBad::Index input_size() const { return hessian -> Range() + hessian -> n; }
-  TMBad::Index output_size() const { return hessian -> n; }
+  size_t nnz, x_rows, x_cols; // Dim(x)
+  HessianSolveVector(Hessian_Type* hessian, size_t x_cols = 1) :
+    hessian ( hessian ),
+    nnz     ( hessian->Range() ),
+    x_rows  ( hessian->n ),
+    x_cols  ( x_cols ) {}
+  TMBad::Index input_size() const {
+    return nnz + x_rows * x_cols;
+  }
+  TMBad::Index output_size() const {
+    return x_rows * x_cols;
+  }
   vector<TMBad::Scalar> eval(const std::vector<TMBad::Scalar> &h,
                              const vector<TMBad::Scalar> &x) {
     typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
