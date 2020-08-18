@@ -217,8 +217,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     return ans2;
   }
   void forward(TMBad::ForwardArgs<TMBad::Scalar> &args) {
-    size_t nnz = hessian -> Range();
-    size_t   n = hessian -> n;
+    size_t   n = output_size();
     std::vector<TMBad::Scalar>
       h = args.x_segment(0, nnz);
     vector<TMBad::Scalar>
