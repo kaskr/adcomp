@@ -16,7 +16,7 @@ struct vector : Eigen::Array<Type, Eigen::Dynamic, 1>
   vector(const Eigen::MatrixBase<Derived> &x) : Base(x) {}
   vector(size_t n) : Base(n) {}
   // std::vector
-  operator std::vector<Type>() {
+  operator std::vector<Type>() const {
     return std::vector<Type> (Base::data(),
                               Base::data() + Base::size());
   }
@@ -196,29 +196,29 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   TMBad::Index output_size() const {
     return x_rows * x_cols;
   }
-  vector<TMBad::Scalar> eval(const std::vector<TMBad::Scalar> &h,
+  vector<TMBad::Scalar> eval(const vector<TMBad::Scalar> &h,
                              const vector<TMBad::Scalar> &x) {
     typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
-      H = hessian -> as_matrix(h);
+      H = hessian -> as_matrix(h.operator std::vector<TMBad::Scalar>());
     hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
     matrix<TMBad::Scalar> xm = x.matrix();
     xm.resize(x_rows, x_cols);
     vector<TMBad::Scalar> y = hessian -> llt.solve(xm).array();
     return y;
   }
-  vector<TMBad::Replay> eval(const std::vector<TMBad::Replay> &h,
-                             const std::vector<TMBad::Replay> &x) {
+  vector<TMBad::Replay> eval(const vector<TMBad::Replay> &h,
+                             const vector<TMBad::Replay> &x) {
     std::vector<TMBad::ad_plain> hx;
-    hx.insert(hx.end(), h.begin(), h.end());
-    hx.insert(hx.end(), x.begin(), x.end());
-    TMBad::global::Complete<HessianSolveVector> solve(*this);
-    std::vector<TMBad::ad_plain> ans = solve(hx);
+    hx.insert(hx.end(), h.data(), h.data() + h.size());
+    hx.insert(hx.end(), x.data(), x.data() + x.size());
+    TMBad::global::Complete<HessianSolveVector> Op(*this);
+    std::vector<TMBad::ad_plain> ans = Op(hx);
     std::vector<TMBad::ad_aug> ans2(ans.begin(), ans.end());
     return ans2;
   }
   void forward(TMBad::ForwardArgs<TMBad::Scalar> &args) {
     size_t   n = output_size();
-    std::vector<TMBad::Scalar>
+    vector<TMBad::Scalar>
       h = args.x_segment(0, nnz);
     vector<TMBad::Scalar>
       x = args.x_segment(nnz, n);
@@ -227,7 +227,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   template <class T>
   void reverse(TMBad::ReverseArgs<T> &args) {
     size_t n = output_size();
-    std::vector<T>
+    vector<T>
       h  = args. x_segment(0, nnz);
     vector<T>
       y  = args. y_segment(0, n),
