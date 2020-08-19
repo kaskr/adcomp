@@ -198,8 +198,8 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   TMBad::Index output_size() const {
     return x_rows * x_cols;
   }
-  vector<TMBad::Scalar> eval(const vector<TMBad::Scalar> &h,
-                             const vector<TMBad::Scalar> &x) {
+  vector<TMBad::Scalar> solve(const vector<TMBad::Scalar> &h,
+                              const vector<TMBad::Scalar> &x) {
     typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
       H = hessian -> as_matrix(h);
     hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
@@ -208,8 +208,8 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     vector<TMBad::Scalar> y = hessian -> llt.solve(xm).array();
     return y;
   }
-  vector<TMBad::Replay> eval(const vector<TMBad::Replay> &h,
-                             const vector<TMBad::Replay> &x) {
+  vector<TMBad::Replay> solve(const vector<TMBad::Replay> &h,
+                              const vector<TMBad::Replay> &x) {
     std::vector<TMBad::ad_plain> hx;
     hx.insert(hx.end(), h.data(), h.data() + h.size());
     hx.insert(hx.end(), x.data(), x.data() + x.size());
@@ -223,7 +223,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     vector<TMBad::Scalar>
       h = args.x_segment(0, nnz),
       x = args.x_segment(nnz, n);
-    args.y_segment(0, n) = eval(h, x);
+    args.y_segment(0, n) = solve(h, x);
   }
   template <class T>
   void reverse(TMBad::ReverseArgs<T> &args) {
@@ -232,7 +232,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
       h  = args. x_segment(0, nnz),
       y  = args. y_segment(0, n),
       dy = args.dy_segment(0, n);
-    vector<T> y2 = eval(h, dy);
+    vector<T> y2 = solve(h, dy);
     for (size_t j=0; j < x_cols; j++) {
       vector<T> y_j  = y .segment(j * x_rows, x_rows);
       vector<T> y2_j = y2.segment(j * x_rows, x_rows);
@@ -523,9 +523,9 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     std::vector<T>
       x = args.x_segment(0, n);
     std::vector<T> sol_x = sol; sol_x.insert(sol_x.end(), x.begin(), x.end());
-    HessianSolveVector<Hessian_Type> solve(&hessian);
+    HessianSolveVector<Hessian_Type> Op(&hessian);
     std::vector<T> hv = hessian.eval(sol_x);
-    vector<T> w2 = - solve.eval(hv, w);
+    vector<T> w2 = - Op.solve(hv, w);
     vector<T> g = gradient.Jacobian(sol_x, w2);
     args.dx_segment(0, n) += g.tail(n);
   }
