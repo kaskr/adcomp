@@ -221,8 +221,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   void forward(TMBad::ForwardArgs<TMBad::Scalar> &args) {
     size_t   n = output_size();
     vector<TMBad::Scalar>
-      h = args.x_segment(0, nnz);
-    vector<TMBad::Scalar>
+      h = args.x_segment(0, nnz),
       x = args.x_segment(nnz, n);
     args.y_segment(0, n) = eval(h, x);
   }
@@ -230,8 +229,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   void reverse(TMBad::ReverseArgs<T> &args) {
     size_t n = output_size();
     vector<T>
-      h  = args. x_segment(0, nnz);
-    vector<T>
+      h  = args. x_segment(0, nnz),
       y  = args. y_segment(0, n),
       dy = args.dy_segment(0, n);
     vector<T> y2 = eval(h, dy);
