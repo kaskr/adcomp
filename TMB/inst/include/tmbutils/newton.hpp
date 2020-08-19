@@ -77,8 +77,9 @@ struct jacobian_dense_t : TMBad::ADFun<> {
     std::vector<bool> keep_y(n, true); // inner
     Base::operator= ( G.JacFun(keep_x, keep_y) );
   }
-  template<class T>
-  matrix<T> as_matrix(const std::vector<T> &Hx) {
+  template<class V>
+  matrix<typename V::value_type> as_matrix(const V &Hx) {
+    typedef typename V::value_type T;
     return Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > (Hx.data(), n, n);
   }
   template<class T>
@@ -138,8 +139,9 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     Base::operator= (G.SpJacFun(keep_x, keep_y));
     init_llt();
   }
-  template<class T>
-  Eigen::SparseMatrix<T> as_matrix(const std::vector<T> &Hx) {
+  template<class V>
+  Eigen::SparseMatrix<typename V::value_type> as_matrix(const V &Hx) {
+    typedef typename V::value_type T;
     typedef Eigen::Triplet<T> T3;
     std::vector<T3> tripletList;
     size_t K = Hx.size();
@@ -199,7 +201,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   vector<TMBad::Scalar> eval(const vector<TMBad::Scalar> &h,
                              const vector<TMBad::Scalar> &x) {
     typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
-      H = hessian -> as_matrix(h.operator std::vector<TMBad::Scalar>());
+      H = hessian -> as_matrix(h);
     hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
     matrix<TMBad::Scalar> xm = x.matrix();
     xm.resize(x_rows, x_cols);
