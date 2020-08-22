@@ -356,12 +356,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     // Hessian
     hessian = Hessian_Type(gradient, n_inner);
     hessian.optimize();
-    // FIXME: Hack
-    std::vector<bool> keep_outer(keep_inner); keep_outer.flip();
-    gradient.inner_inv_index = TMBad::subset(gradient.glob.inv_index, keep_inner);
-    gradient.outer_inv_index = TMBad::subset(gradient.glob.inv_index, keep_outer);
-    hessian.inner_inv_index = TMBad::subset(hessian.glob.inv_index, keep_inner);
-    hessian.outer_inv_index = TMBad::subset(hessian.glob.inv_index, keep_outer);
   }
   // Helper to swap inner/outer
   void SwapInner() {
