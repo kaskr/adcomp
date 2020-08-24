@@ -178,6 +178,9 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   void llt_factorize(const matrix<TMBad::Scalar> &h) {
     llt.compute(h);
   }
+  Eigen::ComputationInfo llt_info() {
+    return llt.info();
+  }
   template<class T>
   vector<T> solve(const vector<T> &h,
                   const vector<T> &x) {
@@ -262,6 +265,9 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   // Sparse.factorize() == Dense.compute()
   void llt_factorize(const Eigen::SparseMatrix<TMBad::Scalar> &h) {
     llt.factorize(h);
+  }
+  Eigen::ComputationInfo llt_info() {
+    return llt.info();
   }
   template<class T>
   vector<T> solve(const vector<T> &h,
@@ -357,6 +363,15 @@ struct jacobian_sparse_plus_lowrank_t {
   template<class T>
   sparse_plus_lowrank<T> operator()(const std::vector<T> &x) {
     return as_matrix(eval(x));
+  }
+  void llt_factorize(const sparse_plus_lowrank<TMBad::Scalar> &h) {
+    H.llt_factorize(h.H);
+  }
+  // FIXME: Diagonal increments should perhaps be applied to both H and H0.
+  Eigen::ComputationInfo llt_info() {
+    // Note: As long as diagonal increments are only applied to H this
+    // is the relevant info:
+    return H.llt_info();
   }
 };
 
@@ -573,7 +588,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         H.diagonal().array() += phi( cfg.ustep );
         // Try to factorize
         hessian.llt_factorize(H);
-        if (hessian.llt.info() == 0) break;
+        if (hessian.llt_info() == 0) break;
         // H not PD ==> Decrease phi
         cfg.ustep = decrease(cfg.ustep);
       }
