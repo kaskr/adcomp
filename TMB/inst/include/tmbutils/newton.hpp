@@ -307,7 +307,7 @@ struct jacobian_sparse_plus_lowrank_t {
   size_t n;
   jacobian_sparse_plus_lowrank_t(TMBad::ADFun<> &F,
                                  TMBad::ADFun<> &G,
-                                 size_t n) {
+                                 size_t n) : n(n) {
     TMBad::Decomp2<TMBad::ADFun<TMBad::ad_aug> >
       F2 = F.decompose("TagOp");
     std::vector<bool> keep_rc(n, true); // inner
@@ -317,6 +317,23 @@ struct jacobian_sparse_plus_lowrank_t {
     H = jacobian_sparse_t<>(F3.first, n);
     G = F3.second;
     H0 = jacobian_dense_t<>(F3.third, n);
+  }
+  // unserialize
+  template<class V>
+  sparse_plus_lowrank<typename V::value_type> as_matrix(const V &Hx) {
+    typedef typename V::value_type T;
+    T* start = Hx.data();
+    std::vector<T> v1(start, start + H.Range());
+    start += H.Range();
+    std::vector<T> v2(start, start + G.Range());
+    start += G.Range();
+    std::vector<T> v3(start, start + H0.Range());
+    sparse_plus_lowrank<T> ans;
+    ans.H = H.as_matrix(v1);
+    ans.G = v2;
+    ans.G.resize(n, v2.size() / n);
+    ans.H0 = H0.as_matrix(v3);
+    return ans;
   }
 };
 
