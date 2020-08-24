@@ -299,11 +299,26 @@ struct jacobian_sparse_plus_lowrank_t {
   jacobian_sparse_t<> H;
   TMBad::ADFun<> G;
   jacobian_dense_t<> H0;
-  // ADFun like methods
+  // ADFun methods that should apply to each of the three tapes
   void optimize() {
     H.optimize();
     G.optimize();
     H0.optimize();
+  }
+  void DomainVecSet(const std::vector<TMBad::Scalar> &x) {
+    H.DomainVecSet(x);
+    G.DomainVecSet(x);
+    H0.DomainVecSet(x);
+  }
+  void SwapInner() {
+    H.SwapInner();
+    G.SwapInner();
+    H0.SwapInner();
+  }
+  void SwapOuter() {
+    H.SwapOuter();
+    G.SwapOuter();
+    H0.SwapOuter();
   }
   // Return type to represent the matrix
   template<class T>
