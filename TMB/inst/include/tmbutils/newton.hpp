@@ -342,6 +342,19 @@ struct jacobian_sparse_plus_lowrank_t {
     ans.H0 = H0.as_matrix(v3);
     return ans;
   }
+  template<class T>
+  std::vector<T> eval(const std::vector<T> &x) {
+    std::vector<T> ans = H.eval(x);
+    std::vector<T> ans2 = G(x);
+    std::vector<T> ans3 = H0.eval(x);
+    ans.insert(ans.end(), ans2.begin(), ans2.end());
+    ans.insert(ans.end(), ans3.begin(), ans3.end());
+    return ans;
+  }
+  template<class T>
+  sparse_plus_lowrank<T> operator()(const std::vector<T> &x) {
+    return as_matrix(eval(x));
+  }
 };
 
 /** \brief Newton configuration parameters */
