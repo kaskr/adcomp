@@ -338,7 +338,7 @@ struct jacobian_sparse_plus_lowrank_t {
   template<class V>
   sparse_plus_lowrank<typename V::value_type> as_matrix(const V &Hx) {
     typedef typename V::value_type T;
-    T* start = Hx.data();
+    const T* start = Hx.data();
     std::vector<T> v1(start, start + H.Range());
     start += H.Range();
     std::vector<T> v2(start, start + G.Range());
