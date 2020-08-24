@@ -305,6 +305,9 @@ struct jacobian_sparse_plus_lowrank_t {
     Eigen::SparseMatrix<T> H;
     matrix<T> G;
     matrix<T> H0;
+    Eigen::Diagonal<Eigen::SparseMatrix<T> > diagonal() {
+      return H.diagonal();
+    }
   };
   template<class T>
   struct MatrixResult {
