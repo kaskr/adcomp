@@ -1,6 +1,10 @@
 #ifdef TMBAD_FRAMEWORK
 /** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
 namespace newton {
+// FIXME: R macro
+#ifdef eval
+#undef eval
+#endif
 
 template <class Type>
 struct vector : Eigen::Array<Type, Eigen::Dynamic, 1>
@@ -255,6 +259,38 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
                   const vector<T> &x) {
     return HessianSolveVector<jacobian_sparse_t>(this).solve(h, x);
   }
+};
+
+/** \brief Tag operator */
+struct TagOp : TMBad::global::Operator<1> {
+  static const bool have_eval = true;
+  static const bool add_forward_replay_copy = true;
+  template<class Type> Type eval(Type x0) {
+    return x0 ;
+  }
+  template<class Type> void reverse(TMBad::ReverseArgs<Type> &args) {
+    args.dx(0) += args.dy(0);
+  }
+  const char* op_name() { return "TagOp"; }
+};
+/** \brief Mark a variable that links to 'many' random effect */
+TMBad::ad_plain Tag(const TMBad::ad_plain &x) {
+  return TMBad::get_glob()->add_to_stack<TagOp>(x);
+}
+
+/** \brief Methods specific for a sparse plus low rank hessian */
+struct jacobian_sparse_plus_lowrank_t {
+  template<class T>
+  struct sparse_plus_lowrank {
+    Eigen::SparseMatrix<T> H;
+    matrix<T> G;
+    matrix<T> H0;
+  };
+  template<class T>
+  struct MatrixResult {
+    typedef sparse_plus_lowrank<T> type;
+  };
+  size_t n;
 };
 
 /** \brief Newton configuration parameters */
