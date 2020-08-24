@@ -138,7 +138,7 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   jacobian_dense_t() {}
   // FIXME: Want const &G
   // -->   JacFun, var2op, get_keep_var  -->  const
-  jacobian_dense_t(TMBad::ADFun<> &G, size_t n) :
+  jacobian_dense_t(TMBad::ADFun<> &F, TMBad::ADFun<> &G, size_t n) :
     n(n) {
     std::vector<bool> keep_x(n, true); // inner
     keep_x.resize(G.Domain(), false);  // outer
@@ -204,7 +204,7 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     llt.analyzePattern(H_dummy);
   }
   // FIXME: G const !!!
-  jacobian_sparse_t(TMBad::ADFun<> &G, size_t n) :
+  jacobian_sparse_t(TMBad::ADFun<> &F, TMBad::ADFun<> &G, size_t n) :
     n(n) {
     std::vector<bool> keep_x(n, true); // inner
     keep_x.resize(G.Domain(), false);  // outer
@@ -368,7 +368,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     gradient = function.JacFun(keep_inner);
     gradient.optimize();
     // Hessian
-    hessian = Hessian_Type(gradient, n_inner);
+    hessian = Hessian_Type(function, gradient, n_inner);
     hessian.optimize();
   }
   // Helper to swap inner/outer
