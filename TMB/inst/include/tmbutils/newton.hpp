@@ -320,6 +320,11 @@ struct jacobian_sparse_plus_lowrank_t {
     G.SwapOuter();
     H0.SwapOuter();
   }
+  void print(TMBad::print_config cfg) {
+    H.print(cfg);
+    G.print(cfg);
+    H0.print(cfg);
+  }
   // Return type to represent the matrix
   template<class T>
   struct sparse_plus_lowrank {
@@ -678,11 +683,11 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   const char* op_name() { return "Newton"; }
   void print(TMBad::global::print_config cfg) {
     Rcout << cfg.prefix << "======== function:\n";
-    function.glob.print(cfg);
+    function.print(cfg);
     Rcout << cfg.prefix << "======== gradient:\n";
-    gradient.glob.print(cfg);
+    gradient.print(cfg);
     Rcout << cfg.prefix << "======== hessian:\n";
-    hessian.glob.print(cfg);
+    hessian.print(cfg);
   }
 };
 
