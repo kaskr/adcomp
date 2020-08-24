@@ -346,7 +346,7 @@ struct jacobian_sparse_plus_lowrank_t {
     std::vector<T> v3(start, start + H0.Range());
     sparse_plus_lowrank<T> ans;
     ans.H = H.as_matrix(v1);
-    ans.G = v2;
+    ans.G = vector<T>(v2);
     ans.G.resize(n, v2.size() / n);
     ans.H0 = H0.as_matrix(v3);
     return ans;
