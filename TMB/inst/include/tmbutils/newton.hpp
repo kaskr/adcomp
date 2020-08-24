@@ -311,6 +311,7 @@ struct jacobian_sparse_plus_lowrank_t {
     typedef sparse_plus_lowrank<T> type;
   };
   size_t n;
+  jacobian_sparse_plus_lowrank_t() {}
   jacobian_sparse_plus_lowrank_t(TMBad::ADFun<> &F,
                                  TMBad::ADFun<> &G,
                                  size_t n) : n(n) {
