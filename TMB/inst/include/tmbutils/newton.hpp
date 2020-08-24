@@ -170,6 +170,11 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   void llt_factorize(const matrix<TMBad::Scalar> &h) {
     llt.compute(h);
   }
+  template<class T>
+  vector<T> solve(const vector<T> &h,
+                  const vector<T> &x) {
+    return HessianSolveVector<jacobian_dense_t>(this).solve(h, x);
+  }
 };
 /** \brief Methods specific for a sparse hessian */
 template<class Factorization=Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > >
@@ -244,6 +249,11 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   // Sparse.factorize() == Dense.compute()
   void llt_factorize(const Eigen::SparseMatrix<TMBad::Scalar> &h) {
     llt.factorize(h);
+  }
+  template<class T>
+  vector<T> solve(const vector<T> &h,
+                  const vector<T> &x) {
+    return HessianSolveVector<jacobian_sparse_t>(this).solve(h, x);
   }
 };
 
@@ -517,9 +527,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     std::vector<T>
       x = args.x_segment(0, n);
     std::vector<T> sol_x = sol; sol_x.insert(sol_x.end(), x.begin(), x.end());
-    HessianSolveVector<Hessian_Type> Op(&hessian);
-    std::vector<T> hv = hessian.eval(sol_x);
-    vector<T> w2 = - Op.solve(hv, w);
+    vector<T> hv = hessian.eval(sol_x);
+    vector<T> w2 = - hessian.solve(hv, w);
     vector<T> g = gradient.Jacobian(sol_x, w2);
     args.dx_segment(0, n) += g.tail(n);
   }
