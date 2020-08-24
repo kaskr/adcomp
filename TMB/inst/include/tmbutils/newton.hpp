@@ -142,6 +142,10 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   jacobian_dense_t() {}
   // FIXME: Want const &G
   // -->   JacFun, var2op, get_keep_var  -->  const
+  jacobian_dense_t(TMBad::ADFun<> &H, size_t n) :
+    n(n) {
+    Base::operator= ( H );
+  }
   jacobian_dense_t(TMBad::ADFun<> &F, TMBad::ADFun<> &G, size_t n) :
     n(n) {
     std::vector<bool> keep_x(n, true); // inner
@@ -208,6 +212,11 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     llt.analyzePattern(H_dummy);
   }
   // FIXME: G const !!!
+  jacobian_sparse_t(TMBad::Sparse<TMBad::ADFun<> > &H, size_t n) :
+    n(n) {
+    Base::operator= ( H );
+    init_llt();
+  }
   jacobian_sparse_t(TMBad::ADFun<> &F, TMBad::ADFun<> &G, size_t n) :
     n(n) {
     std::vector<bool> keep_x(n, true); // inner
