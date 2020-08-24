@@ -293,6 +293,12 @@ struct jacobian_sparse_plus_lowrank_t {
   jacobian_sparse_t<> H;
   TMBad::ADFun<> G;
   jacobian_dense_t<> H0;
+  // ADFun like methods
+  void optimize() {
+    H.optimize();
+    G.optimize();
+    H0.optimize();
+  }
   // Return type to represent the matrix
   template<class T>
   struct sparse_plus_lowrank {
