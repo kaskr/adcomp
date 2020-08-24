@@ -375,6 +375,8 @@ struct newton_config {
       result in much bigger slowdowns.
   */
   bool sparse;
+  /** \brief Detect an additional low rank contribution in sparse case? */
+  bool lowrank;
   bool decompose;
   /** \brief Behaviour on convergence failure: Report nan-solution ? */
   bool on_failure_return_nan;
@@ -393,6 +395,7 @@ struct newton_config {
     SET_DEFAULT(power, 0.5);
     SET_DEFAULT(u0, 1e-04);
     SET_DEFAULT(sparse, false);
+    SET_DEFAULT(lowrank, false);
     SET_DEFAULT(decompose, true);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
@@ -715,11 +718,26 @@ NewtonSolver<Functor,
 }
 
 template<class Functor, class Type>
+NewtonSolver<Functor,
+             Type,
+             jacobian_sparse_plus_lowrank_t> NewtonSparsePlusLowrank(
+                                                                     Functor &F,
+                                                                     Eigen::Array<Type, Eigen::Dynamic, 1> start,
+                                                                     newton_config cfg = newton_config() ) {
+  NewtonSolver<Functor, Type, jacobian_sparse_plus_lowrank_t > ans(F, start, cfg);
+  return ans;
+}
+
+template<class Functor, class Type>
 vector<Type> Newton(Functor &F,
                     Eigen::Array<Type, Eigen::Dynamic, 1> start,
                     newton_config cfg = newton_config() ) {
-  if (cfg.sparse)
-    return NewtonSparse(F, start, cfg);
+  if (cfg.sparse) {
+    if (! cfg.lowrank)
+      return NewtonSparse(F, start, cfg);
+    else
+      return NewtonSparsePlusLowrank(F, start, cfg);
+  }
   else
     return NewtonDense(F, start, cfg);
 }
