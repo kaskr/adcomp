@@ -289,6 +289,11 @@ TMBad::ad_plain Tag(const TMBad::ad_plain &x) {
 
 /** \brief Methods specific for a sparse plus low rank hessian */
 struct jacobian_sparse_plus_lowrank_t {
+  // The three tapes
+  jacobian_sparse_t<> H;
+  TMBad::ADFun<> G;
+  jacobian_dense_t<> H0;
+  // Return type to represent the matrix
   template<class T>
   struct sparse_plus_lowrank {
     Eigen::SparseMatrix<T> H;
@@ -300,6 +305,19 @@ struct jacobian_sparse_plus_lowrank_t {
     typedef sparse_plus_lowrank<T> type;
   };
   size_t n;
+  jacobian_sparse_plus_lowrank_t(TMBad::ADFun<> &F,
+                                 TMBad::ADFun<> &G,
+                                 size_t n) {
+    TMBad::Decomp2<TMBad::ADFun<TMBad::ad_aug> >
+      F2 = F.decompose("TagOp");
+    std::vector<bool> keep_rc(n, true); // inner
+    keep_rc.resize(F.Domain(), false);  // outer
+    TMBad::Decomp3<TMBad::ADFun<TMBad::ad_aug> >
+      F3 = F2.HesFun(keep_rc, true, false, false);
+    H = jacobian_sparse_t<>(F3.first, n);
+    G = F3.second;
+    H0 = jacobian_dense_t<>(F3.third, n);
+  }
 };
 
 /** \brief Newton configuration parameters */
