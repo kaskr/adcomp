@@ -346,21 +346,25 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   NewtonOperator(Functor &F, vector<Type> start, newton_config cfg)
     : cfg(cfg)
   {
+    // Create tape of the user functor and optimize the tape
     function = TMBad::ADFun<> ( FunctorExtend(F), start);
     function.optimize();
+    // The tape may contain expressions that do not depend on the
+    // inner parameters (RefOp and expressions that only depend on
+    // these). Move such expressions to the parent context?
     if (cfg.decompose) {
       function.decompose_refs();
     }
+    // The previous operation does not change the domain vector size.
     size_t n_inner = function.Domain();
     ASSERT(n_inner == (size_t) start.size());
-    par_outer = function.resolve_refs(); // Increases function.Domain()
-    // Mark inner parameter subset
+    // Turn remaining references to parent contexts into outer
+    // parameters. This operation increases function.Domain()
+    par_outer = function.resolve_refs();
+    // Mark inner parameter subset in full parameter vector
     std::vector<bool> keep_inner(n_inner, true);
     keep_inner.resize(function.Domain(), false);
-    // =========================
-    // FIXME: inv_inner and inv_outer are no longer set for grad and hess !!!
-    // =========================
-    // Grad
+    // Gradient function
     gradient = function.JacFun(keep_inner);
     gradient.optimize();
     // Hessian
