@@ -70,7 +70,7 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
     matrix<TMBad::Scalar> xm = x.matrix();
     xm.resize(x_rows, x_cols);
-    vector<TMBad::Scalar> y = hessian -> llt.solve(xm).array();
+    vector<TMBad::Scalar> y = hessian -> llt_solve(xm);
     return y;
   }
   vector<TMBad::Replay> solve(const vector<TMBad::Replay> &h,
@@ -181,6 +181,11 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   Eigen::ComputationInfo llt_info() {
     return llt.info();
   }
+  /** \note Optional: This method allows the assumption that a prior
+      call to `llt_factorize` has been performed for the same H */
+  vector<TMBad::Scalar> llt_solve(const vector<TMBad::Scalar> &x) {
+    return llt.solve(x.matrix()).array();
+  }
   template<class T>
   vector<T> solve(const vector<T> &h,
                   const vector<T> &x) {
@@ -268,6 +273,11 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
   Eigen::ComputationInfo llt_info() {
     return llt.info();
+  }
+  /** \note Optional: This method allows the assumption that a prior
+      call to `llt_factorize` has been performed for the same H */
+  vector<TMBad::Scalar> llt_solve(const vector<TMBad::Scalar> &x) {
+    return llt.solve(x.matrix()).array();
   }
   template<class T>
   vector<T> solve(const vector<T> &h,
@@ -615,7 +625,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       // We now have a PD hessian
       // Let's take a newton step and see if it improves...
       vector<Scalar> x_new =
-        x - hessian.llt.solve( g.matrix() ).array();
+        x - hessian.llt_solve( g );
       Scalar f = function(x_new)[0];
       if (std::isfinite(f) &&
           f < f_previous + 1e-8) { // Improvement
