@@ -40,6 +40,74 @@ struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
   }
 };
 
+/** \brief Operator (H, x) -> solve(H, x) */
+template <class Hessian_Type>
+struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
+  static const bool have_input_size_output_size = true;
+  static const bool add_forward_replay_copy = true;
+  /** \warning Pointer */
+  Hessian_Type* hessian;
+  size_t nnz, x_rows, x_cols; // Dim(x)
+  HessianSolveVector(Hessian_Type* hessian, size_t x_cols = 1) :
+    hessian ( hessian ),
+    nnz     ( hessian->Range() ),
+    x_rows  ( hessian->n ),
+    x_cols  ( x_cols ) {}
+  TMBad::Index input_size() const {
+    return nnz + x_rows * x_cols;
+  }
+  TMBad::Index output_size() const {
+    return x_rows * x_cols;
+  }
+  vector<TMBad::Scalar> solve(const vector<TMBad::Scalar> &h,
+                              const vector<TMBad::Scalar> &x) {
+    typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
+      H = hessian -> as_matrix(h);
+    hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
+    matrix<TMBad::Scalar> xm = x.matrix();
+    xm.resize(x_rows, x_cols);
+    vector<TMBad::Scalar> y = hessian -> llt.solve(xm).array();
+    return y;
+  }
+  vector<TMBad::Replay> solve(const vector<TMBad::Replay> &h,
+                              const vector<TMBad::Replay> &x) {
+    std::vector<TMBad::ad_plain> hx;
+    hx.insert(hx.end(), h.data(), h.data() + h.size());
+    hx.insert(hx.end(), x.data(), x.data() + x.size());
+    TMBad::global::Complete<HessianSolveVector> Op(*this);
+    std::vector<TMBad::ad_plain> ans = Op(hx);
+    std::vector<TMBad::ad_aug> ans2(ans.begin(), ans.end());
+    return ans2;
+  }
+  void forward(TMBad::ForwardArgs<TMBad::Scalar> &args) {
+    size_t   n = output_size();
+    vector<TMBad::Scalar>
+      h = args.x_segment(0, nnz),
+      x = args.x_segment(nnz, n);
+    args.y_segment(0, n) = solve(h, x);
+  }
+  template <class T>
+  void reverse(TMBad::ReverseArgs<T> &args) {
+    size_t n = output_size();
+    vector<T>
+      h  = args. x_segment(0, nnz),
+      y  = args. y_segment(0, n),
+      dy = args.dy_segment(0, n);
+    vector<T> y2 = solve(h, dy);
+    for (size_t j=0; j < x_cols; j++) {
+      vector<T> y_j  = y .segment(j * x_rows, x_rows);
+      vector<T> y2_j = y2.segment(j * x_rows, x_rows);
+      vector<T> y2y_j = hessian -> crossprod(y2_j, y_j);
+      args.dx_segment(0, nnz) -= y2y_j;
+      args.dx_segment(nnz + j * x_rows, x_rows) += y2_j;
+    }
+  }
+  template<class T>
+  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  const char* op_name() { return "JSolve"; }
+};
+
 /* =================== TODO ===================
    - Optimize RefOp
    - Cleanup get_segment mess
@@ -177,74 +245,6 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   void llt_factorize(const Eigen::SparseMatrix<TMBad::Scalar> &h) {
     llt.factorize(h);
   }
-};
-
-/** \brief Operator (H, x) -> solve(H, x) */
-template <class Hessian_Type>
-struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
-  static const bool have_input_size_output_size = true;
-  static const bool add_forward_replay_copy = true;
-  /** \warning Pointer */
-  Hessian_Type* hessian;
-  size_t nnz, x_rows, x_cols; // Dim(x)
-  HessianSolveVector(Hessian_Type* hessian, size_t x_cols = 1) :
-    hessian ( hessian ),
-    nnz     ( hessian->Range() ),
-    x_rows  ( hessian->n ),
-    x_cols  ( x_cols ) {}
-  TMBad::Index input_size() const {
-    return nnz + x_rows * x_cols;
-  }
-  TMBad::Index output_size() const {
-    return x_rows * x_cols;
-  }
-  vector<TMBad::Scalar> solve(const vector<TMBad::Scalar> &h,
-                              const vector<TMBad::Scalar> &x) {
-    typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
-      H = hessian -> as_matrix(h);
-    hessian -> llt_factorize(H); // Assuming analyzePattern(H) has been called once
-    matrix<TMBad::Scalar> xm = x.matrix();
-    xm.resize(x_rows, x_cols);
-    vector<TMBad::Scalar> y = hessian -> llt.solve(xm).array();
-    return y;
-  }
-  vector<TMBad::Replay> solve(const vector<TMBad::Replay> &h,
-                              const vector<TMBad::Replay> &x) {
-    std::vector<TMBad::ad_plain> hx;
-    hx.insert(hx.end(), h.data(), h.data() + h.size());
-    hx.insert(hx.end(), x.data(), x.data() + x.size());
-    TMBad::global::Complete<HessianSolveVector> Op(*this);
-    std::vector<TMBad::ad_plain> ans = Op(hx);
-    std::vector<TMBad::ad_aug> ans2(ans.begin(), ans.end());
-    return ans2;
-  }
-  void forward(TMBad::ForwardArgs<TMBad::Scalar> &args) {
-    size_t   n = output_size();
-    vector<TMBad::Scalar>
-      h = args.x_segment(0, nnz),
-      x = args.x_segment(nnz, n);
-    args.y_segment(0, n) = solve(h, x);
-  }
-  template <class T>
-  void reverse(TMBad::ReverseArgs<T> &args) {
-    size_t n = output_size();
-    vector<T>
-      h  = args. x_segment(0, nnz),
-      y  = args. y_segment(0, n),
-      dy = args.dy_segment(0, n);
-    vector<T> y2 = solve(h, dy);
-    for (size_t j=0; j < x_cols; j++) {
-      vector<T> y_j  = y .segment(j * x_rows, x_rows);
-      vector<T> y2_j = y2.segment(j * x_rows, x_rows);
-      vector<T> y2y_j = hessian -> crossprod(y2_j, y_j);
-      args.dx_segment(0, nnz) -= y2y_j;
-      args.dx_segment(nnz + j * x_rows, x_rows) += y2_j;
-    }
-  }
-  template<class T>
-  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
-  const char* op_name() { return "JSolve"; }
 };
 
 /** \brief Newton configuration parameters */
