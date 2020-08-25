@@ -304,6 +304,9 @@ struct TagOp : TMBad::global::Operator<1> {
 TMBad::ad_plain Tag(const TMBad::ad_plain &x) {
   return TMBad::get_glob()->add_to_stack<TagOp>(x);
 }
+TMBad::Scalar Tag(const TMBad::Scalar &x) {
+  return x;
+}
 
 /** \brief Methods specific for a sparse plus low rank hessian */
 struct jacobian_sparse_plus_lowrank_t {
