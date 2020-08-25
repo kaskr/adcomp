@@ -343,6 +343,8 @@ struct jacobian_sparse_plus_lowrank_t {
     Eigen::SparseMatrix<T> H;
     matrix<T> G;
     matrix<T> H0;
+    // Optional: Store serialized representation of H
+    vector<T> Hvec;
     Eigen::Diagonal<Eigen::SparseMatrix<T> > diagonal() {
       return H.diagonal();
     }
@@ -379,6 +381,7 @@ struct jacobian_sparse_plus_lowrank_t {
     std::vector<T> v3(start, start + H0.Range());
     sparse_plus_lowrank<T> ans;
     ans.H = H.as_matrix(v1);
+    ans.Hvec = v1;
     ans.G = vector<T>(v2);
     ans.G.resize(n, v2.size() / n);
     ans.H0 = H0.as_matrix(v3);
@@ -420,10 +423,9 @@ struct jacobian_sparse_plus_lowrank_t {
   vector<T> solve(const vector<T> &hvec,
                   const vector<T> &xvec) {
     sparse_plus_lowrank<T> h = as_matrix(hvec);
-    vector<T> hvec_ = hvec.segment(0, H.Range());
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(&H, h.G.cols()). // FIXME: Pointer!
-      solve(hvec_, h.G.vec());
+      solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
     W.resize(n, W.size() / n);
     tmbutils::matrix<T> H0 = h.H0.array();
@@ -431,7 +433,7 @@ struct jacobian_sparse_plus_lowrank_t {
     tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
     vector<T> y1 =
       HessianSolveVector<jacobian_sparse_t<> >(&H, 1). // FIXME: Pointer!
-      solve(hvec_, xvec);
+      solve(h.Hvec, xvec);
     tmbutils::matrix<T> iM = atomic::matinv(M); // FIXME: HessianSolveVector
     tmbutils::matrix<T> Wt = W.transpose();
     tmbutils::matrix<T> xmat = xvec.matrix();
