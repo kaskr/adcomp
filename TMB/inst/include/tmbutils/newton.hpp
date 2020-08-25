@@ -420,17 +420,18 @@ struct jacobian_sparse_plus_lowrank_t {
   vector<T> solve(const vector<T> &hvec,
                   const vector<T> &xvec) {
     sparse_plus_lowrank<T> h = as_matrix(hvec);
+    vector<T> hvec_ = hvec.segment(0, H.Range());
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(&H, h.G.cols()). // FIXME: Pointer!
-      solve(hvec, h.G.vec());
+      solve(hvec_, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
     W.resize(n, W.size() / n);
     tmbutils::matrix<T> H0 = h.H0.array();
-    tmbutils::matrix<T> Gt = h.G.transpose().matrix();
+    tmbutils::matrix<T> Gt = h.G.transpose();
     tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
     vector<T> y1 =
       HessianSolveVector<jacobian_sparse_t<> >(&H, 1). // FIXME: Pointer!
-      solve(hvec, xvec);
+      solve(hvec_, xvec);
     tmbutils::matrix<T> iM = atomic::matinv(M); // FIXME: HessianSolveVector
     tmbutils::matrix<T> Wt = W.transpose();
     tmbutils::matrix<T> xmat = xvec.matrix();
@@ -440,6 +441,7 @@ struct jacobian_sparse_plus_lowrank_t {
                                     atomic::matmul(Wt, xmat))).array();
     return y1 - y2;
   }
+  // Scalar case: A bit faster than the above template
   vector<TMBad::Scalar> solve(const vector<TMBad::Scalar> &h,
                               const vector<TMBad::Scalar> &x) {
     sparse_plus_lowrank<TMBad::Scalar> H = as_matrix(h);
