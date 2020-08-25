@@ -37,7 +37,7 @@ struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
   matrix(const Eigen::ArrayBase<Derived> &x) : Base(x) {}
   template<class Derived>
   matrix(const Eigen::MatrixBase<Derived> &x) : Base(x) {}
-  vector<Type> vec() {
+  vector<Type> vec() const {
     Base a(*this);
     a.resize(a.size(), 1);
     return a;
@@ -450,6 +450,19 @@ struct jacobian_sparse_plus_lowrank_t {
     llt_factorize(H);
     return llt_solve(H, x.matrix()).array();
   }
+  // Helper to get determinant: det(H)*det(H0)*det(M)
+  template<class T>
+  tmbutils::matrix<T> getM(const sparse_plus_lowrank<T> &h) {
+    vector<T> s =
+      HessianSolveVector<jacobian_sparse_t<> >(&H, h.G.cols()). // FIXME: Pointer!
+      solve(h.Hvec, h.G.vec());
+    tmbutils::matrix<T> W = s.matrix();
+    W.resize(n, W.size() / n);
+    tmbutils::matrix<T> H0 = h.H0.array();
+    tmbutils::matrix<T> Gt = h.G.transpose();
+    tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
+    return M;
+  }
 };
 
 /** \brief Newton configuration parameters */
@@ -749,18 +762,27 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
 };
 
 template<class Type>
-Type log_determinant(const matrix<Type> &H) {
+Type log_determinant(const matrix<Type> &H, void* ptr = NULL) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
 template<class Type>
-Type log_determinant(const Eigen::SparseMatrix<Type> &H) {
+Type log_determinant(const Eigen::SparseMatrix<Type> &H, void* ptr = NULL) {
   // FIXME: Tape once for 'reasonable' numeric values - then replay
   // (to avoid unpredictable brancing issues)
   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
   //return ldl.vectorD().log().sum();
   vector<Type> D = ldl.vectorD();
   return D.log().sum();
+}
+template<class Type>
+Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
+                     jacobian_sparse_plus_lowrank_t* hessian_ptr) {
+  matrix<Type> M = (hessian_ptr -> getM(H)).array();
+  return
+    log_determinant(H.H) +
+    log_determinant(H.H0) +
+    log_determinant(M);
 }
 
 // Interface
@@ -799,7 +821,8 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
   Type Laplace() {
     return
       value() +
-      .5 * log_determinant( hessian() ) -
+      .5 * log_determinant( hessian(),
+                            &(Base::hessian)) -
       .5 * log(2. * M_PI) * n;
   }
 };
@@ -857,9 +880,15 @@ Type Laplace(Functor &F,
              Eigen::Array<Type, Eigen::Dynamic, 1> &start,
              newton_config cfg = newton_config() ) {
   if (cfg.sparse) {
-    auto opt = NewtonSparse(F, start, cfg);
-    start = opt.solution();
-    return opt.Laplace();
+    if (!cfg.lowrank) {
+      auto opt = NewtonSparse(F, start, cfg);
+      start = opt.solution();
+      return opt.Laplace();
+    } else {
+      auto opt = NewtonSparsePlusLowrank(F, start, cfg);
+      start = opt.solution();
+      return opt.Laplace();
+    }
   } else {
     auto opt = NewtonDense(F, start, cfg);
     start = opt.solution();
