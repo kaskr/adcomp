@@ -417,10 +417,28 @@ struct jacobian_sparse_plus_lowrank_t {
     return y1 - y2;
   }
   template<class T>
-  vector<T> solve(const vector<T> &h,
-                  const vector<T> &x) {
-    std::cout << "================ ooooooooooooooooooops !!!\n";
-    return x;
+  vector<T> solve(const vector<T> &hvec,
+                  const vector<T> &xvec) {
+    sparse_plus_lowrank<T> h = as_matrix(hvec);
+    vector<T> s =
+      HessianSolveVector<jacobian_sparse_t<> >(&H, h.G.cols()). // FIXME: Pointer!
+      solve(hvec, h.G.vec());
+    tmbutils::matrix<T> W = s.matrix();
+    W.resize(n, W.size() / n);
+    tmbutils::matrix<T> H0 = h.H0.array();
+    tmbutils::matrix<T> Gt = h.G.transpose().matrix();
+    tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
+    vector<T> y1 =
+      HessianSolveVector<jacobian_sparse_t<> >(&H, 1). // FIXME: Pointer!
+      solve(hvec, xvec);
+    tmbutils::matrix<T> iM = atomic::matinv(M); // FIXME: HessianSolveVector
+    tmbutils::matrix<T> Wt = W.transpose();
+    tmbutils::matrix<T> xmat = xvec.matrix();
+    vector<T> y2 =
+      atomic::matmul(W,
+                     atomic::matmul(iM,
+                                    atomic::matmul(Wt, xmat))).array();
+    return y1 - y2;
   }
   vector<TMBad::Scalar> solve(const vector<TMBad::Scalar> &h,
                               const vector<TMBad::Scalar> &x) {
