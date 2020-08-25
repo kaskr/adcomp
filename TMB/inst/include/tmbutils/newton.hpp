@@ -405,6 +405,16 @@ struct jacobian_sparse_plus_lowrank_t {
     // is the relevant info:
     return H.llt_info();
   }
+  /** \note Optional: This method allows the assumption that a prior
+      call to `llt_factorize` has been performed for the same H */
+  matrix<TMBad::Scalar> llt_solve(const sparse_plus_lowrank<TMBad::Scalar> &h,
+                                  const matrix<TMBad::Scalar> &x) {
+    matrix<TMBad::Scalar> W = H.llt_solve(h.H, h.G); // n x k
+    matrix<TMBad::Scalar> M = h.H0.inverse() + h.G.transpose() * W;
+    matrix<TMBad::Scalar> y1 = H.llt_solve(h.H, x);
+    matrix<TMBad::Scalar> y2 = W * M.ldlt().solve(W.transpose() * x);
+    return y1 - y2;
+  }
 };
 
 /** \brief Newton configuration parameters */
