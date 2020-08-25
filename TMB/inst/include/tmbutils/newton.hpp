@@ -354,17 +354,18 @@ struct jacobian_sparse_plus_lowrank_t {
   size_t n;
   jacobian_sparse_plus_lowrank_t() {}
   jacobian_sparse_plus_lowrank_t(TMBad::ADFun<> &F,
-                                 TMBad::ADFun<> &G,
+                                 TMBad::ADFun<> &G_,
                                  size_t n) : n(n) {
     TMBad::Decomp2<TMBad::ADFun<TMBad::ad_aug> >
       F2 = F.decompose("TagOp");
+    size_t k = F2.first.Range();
     std::vector<bool> keep_rc(n, true); // inner
     keep_rc.resize(F.Domain(), false);  // outer
     TMBad::Decomp3<TMBad::ADFun<TMBad::ad_aug> >
       F3 = F2.HesFun(keep_rc, true, false, false);
     H = jacobian_sparse_t<>(F3.first, n);
     G = F3.second;
-    H0 = jacobian_dense_t<>(F3.third, n);
+    H0 = jacobian_dense_t<>(F3.third, k);
   }
   // unserialize
   template<class V>
@@ -414,6 +415,18 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<TMBad::Scalar> y1 = H.llt_solve(h.H, x);
     matrix<TMBad::Scalar> y2 = W * M.ldlt().solve(W.transpose() * x);
     return y1 - y2;
+  }
+  template<class T>
+  vector<T> solve(const vector<T> &h,
+                  const vector<T> &x) {
+    std::cout << "================ ooooooooooooooooooops !!!\n";
+    return x;
+  }
+  vector<TMBad::Scalar> solve(const vector<TMBad::Scalar> &h,
+                              const vector<TMBad::Scalar> &x) {
+    sparse_plus_lowrank<TMBad::Scalar> H = as_matrix(h);
+    llt_factorize(H);
+    return llt_solve(H, x.matrix()).array();
   }
 };
 
