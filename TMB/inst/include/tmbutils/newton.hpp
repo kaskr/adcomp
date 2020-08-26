@@ -1,5 +1,6 @@
 #ifdef TMBAD_FRAMEWORK
 /** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
+#include <memory>
 namespace newton {
 // FIXME: R macro
 #ifdef eval
@@ -50,9 +51,9 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   /** \warning Pointer */
-  Hessian_Type* hessian;
+  std::shared_ptr<Hessian_Type> hessian;
   size_t nnz, x_rows, x_cols; // Dim(x)
-  HessianSolveVector(Hessian_Type* hessian, size_t x_cols = 1) :
+  HessianSolveVector(std::shared_ptr<Hessian_Type> hessian, size_t x_cols = 1) :
     hessian ( hessian ),
     nnz     ( hessian->Range() ),
     x_rows  ( hessian->n ),
@@ -188,9 +189,10 @@ struct jacobian_dense_t : TMBad::ADFun<> {
     return llt.solve(x);
   }
   template<class T>
-  vector<T> solve(const vector<T> &h,
+  vector<T> solve(std::shared_ptr<jacobian_dense_t> ptr,
+                  const vector<T> &h,
                   const vector<T> &x) {
-    return HessianSolveVector<jacobian_dense_t>(this).solve(h, x);
+    return HessianSolveVector<jacobian_dense_t>(ptr).solve(h, x);
   }
 };
 /** \brief Methods specific for a sparse hessian */
@@ -282,9 +284,10 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     return llt.solve(x);
   }
   template<class T>
-  vector<T> solve(const vector<T> &h,
+  vector<T> solve(std::shared_ptr<jacobian_sparse_t> ptr,
+                  const vector<T> &h,
                   const vector<T> &x) {
-    return HessianSolveVector<jacobian_sparse_t>(this).solve(h, x);
+    return HessianSolveVector<jacobian_sparse_t>(ptr).solve(h, x);
   }
 };
 
@@ -311,34 +314,34 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) {
 /** \brief Methods specific for a sparse plus low rank hessian */
 struct jacobian_sparse_plus_lowrank_t {
   // The three tapes
-  jacobian_sparse_t<> H;
-  TMBad::ADFun<> G;
-  jacobian_dense_t<> H0;
+  std::shared_ptr<jacobian_sparse_t<> > H;
+  std::shared_ptr<TMBad::ADFun<> > G;
+  std::shared_ptr<jacobian_dense_t<> > H0;
   // ADFun methods that should apply to each of the three tapes
   void optimize() {
-    H.optimize();
-    G.optimize();
-    H0.optimize();
+    H -> optimize();
+    G -> optimize();
+    H0 -> optimize();
   }
   void DomainVecSet(const std::vector<TMBad::Scalar> &x) {
-    H.DomainVecSet(x);
-    G.DomainVecSet(x);
-    H0.DomainVecSet(x);
+    H -> DomainVecSet(x);
+    G -> DomainVecSet(x);
+    H0 -> DomainVecSet(x);
   }
   void SwapInner() {
-    H.SwapInner();
-    G.SwapInner();
-    H0.SwapInner();
+    H -> SwapInner();
+    G -> SwapInner();
+    H0 -> SwapInner();
   }
   void SwapOuter() {
-    H.SwapOuter();
-    G.SwapOuter();
-    H0.SwapOuter();
+    H -> SwapOuter();
+    G -> SwapOuter();
+    H0 -> SwapOuter();
   }
   void print(TMBad::print_config cfg) {
-    H.print(cfg);
-    G.print(cfg);
-    H0.print(cfg);
+    H -> print(cfg);
+    G -> print(cfg);
+    H0 -> print(cfg);
   }
   // Return type to represent the matrix
   template<class T>
@@ -368,33 +371,33 @@ struct jacobian_sparse_plus_lowrank_t {
     keep_rc.resize(F.Domain(), false);  // outer
     TMBad::Decomp3<TMBad::ADFun<TMBad::ad_aug> >
       F3 = F2.HesFun(keep_rc, true, false, false);
-    H = jacobian_sparse_t<>(F3.first, n);
-    G = F3.second;
-    H0 = jacobian_dense_t<>(F3.third, k);
+    H = std::make_shared<jacobian_sparse_t<> >(F3.first, n);
+    G = std::make_shared<TMBad::ADFun<> >(F3.second);
+    H0 = std::make_shared<jacobian_dense_t<> >(F3.third, k);
   }
   // unserialize
   template<class V>
   sparse_plus_lowrank<typename V::value_type> as_matrix(const V &Hx) {
     typedef typename V::value_type T;
     const T* start = Hx.data();
-    std::vector<T> v1(start, start + H.Range());
-    start += H.Range();
-    std::vector<T> v2(start, start + G.Range());
-    start += G.Range();
-    std::vector<T> v3(start, start + H0.Range());
+    std::vector<T> v1(start, start + H -> Range());
+    start += H -> Range();
+    std::vector<T> v2(start, start + G -> Range());
+    start += G -> Range();
+    std::vector<T> v3(start, start + H0 -> Range());
     sparse_plus_lowrank<T> ans;
-    ans.H = H.as_matrix(v1);
+    ans.H = H -> as_matrix(v1);
     ans.Hvec = v1;
     ans.G = vector<T>(v2);
     ans.G.resize(n, v2.size() / n);
-    ans.H0 = H0.as_matrix(v3);
+    ans.H0 = H0 -> as_matrix(v3);
     return ans;
   }
   template<class T>
   std::vector<T> eval(const std::vector<T> &x) {
-    std::vector<T> ans = H.eval(x);
-    std::vector<T> ans2 = G(x);
-    std::vector<T> ans3 = H0.eval(x);
+    std::vector<T> ans = H -> eval(x);
+    std::vector<T> ans2 = (*G)(x);
+    std::vector<T> ans3 = H0 -> eval(x);
     ans.insert(ans.end(), ans2.begin(), ans2.end());
     ans.insert(ans.end(), ans3.begin(), ans3.end());
     return ans;
@@ -404,30 +407,32 @@ struct jacobian_sparse_plus_lowrank_t {
     return as_matrix(eval(x));
   }
   void llt_factorize(const sparse_plus_lowrank<TMBad::Scalar> &h) {
-    H.llt_factorize(h.H);
+    H -> llt_factorize(h.H);
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
   Eigen::ComputationInfo llt_info() {
     // Note: As long as diagonal increments are only applied to H this
     // is the relevant info:
-    return H.llt_info();
+    return H -> llt_info();
   }
   /** \note Optional: This method allows the assumption that a prior
       call to `llt_factorize` has been performed for the same H */
   matrix<TMBad::Scalar> llt_solve(const sparse_plus_lowrank<TMBad::Scalar> &h,
                                   const matrix<TMBad::Scalar> &x) {
-    matrix<TMBad::Scalar> W = H.llt_solve(h.H, h.G); // n x k
+    matrix<TMBad::Scalar> W = H -> llt_solve(h.H, h.G); // n x k
     matrix<TMBad::Scalar> M = h.H0.inverse() + h.G.transpose() * W;
-    matrix<TMBad::Scalar> y1 = H.llt_solve(h.H, x);
+    matrix<TMBad::Scalar> y1 = H -> llt_solve(h.H, x);
     matrix<TMBad::Scalar> y2 = W * M.ldlt().solve(W.transpose() * x);
     return y1 - y2;
   }
   template<class T>
-  vector<T> solve(const vector<T> &hvec,
+  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
+                  const vector<T> &hvec,
                   const vector<T> &xvec) {
     sparse_plus_lowrank<T> h = as_matrix(hvec);
     vector<T> s =
-      HessianSolveVector<jacobian_sparse_t<> >(&H, h.G.cols()). // FIXME: Pointer!
+      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
+                                               h.G.cols()). // FIXME: Pointer!
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
     W.resize(n, W.size() / n);
@@ -435,7 +440,7 @@ struct jacobian_sparse_plus_lowrank_t {
     tmbutils::matrix<T> Gt = h.G.transpose();
     tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
     vector<T> y1 =
-      HessianSolveVector<jacobian_sparse_t<> >(&H, 1). // FIXME: Pointer!
+      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H, 1). // FIXME: Pointer!
       solve(h.Hvec, xvec);
     tmbutils::matrix<T> iM = atomic::matinv(M); // FIXME: HessianSolveVector
     tmbutils::matrix<T> Wt = W.transpose();
@@ -455,9 +460,11 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   // Helper to get determinant: det(H)*det(H0)*det(M)
   template<class T>
-  tmbutils::matrix<T> getM(const sparse_plus_lowrank<T> &h) {
+  tmbutils::matrix<T> getM(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
+                           const sparse_plus_lowrank<T> &h) {
     vector<T> s =
-      HessianSolveVector<jacobian_sparse_t<> >(&H, h.G.cols()). // FIXME: Pointer!
+      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
+                                               h.G.cols()). // FIXME: Pointer!
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
     W.resize(n, W.size() / n);
@@ -552,7 +559,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   typedef TMBad::Scalar Scalar;
   typedef TMBad::StdWrap<Functor, vector<TMBad::ad_aug> > FunctorExtend;
   TMBad::ADFun<> function, gradient;
-  Hessian_Type hessian;
+  std::shared_ptr<Hessian_Type> hessian;
   // Control convergence
   newton_config cfg;
   // Outer parameters
@@ -582,19 +589,19 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     gradient = function.JacFun(keep_inner);
     gradient.optimize();
     // Hessian
-    hessian = Hessian_Type(function, gradient, n_inner);
-    hessian.optimize();
+    hessian = std::make_shared<Hessian_Type>(function, gradient, n_inner);
+    hessian -> optimize();
   }
   // Helper to swap inner/outer
   void SwapInner() {
     function.SwapInner();
     gradient.SwapInner();
-    hessian.SwapInner();
+    hessian -> SwapInner();
   }
   void SwapOuter() {
     function.SwapOuter();
     gradient.SwapOuter();
-    hessian.SwapOuter();
+    hessian -> SwapOuter();
   }
   // Put it self on tape
   vector<TMBad::ad_aug> add_to_tape() {
@@ -672,7 +679,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         return msg;
       }
       typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
-        H = hessian(std::vector<Scalar>(x));
+        H = (*hessian)(std::vector<Scalar>(x));
       if (cfg.trace) std::cout << "ustep=" << cfg.ustep << " ";
       vector<Scalar> diag_cpy = H.diagonal().array();
       while (true) { // FIXME: Infinite loop
@@ -680,15 +687,15 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         H.diagonal().array() = diag_cpy;
         H.diagonal().array() += phi( cfg.ustep );
         // Try to factorize
-        hessian.llt_factorize(H);
-        if (hessian.llt_info() == 0) break;
+        hessian -> llt_factorize(H);
+        if (hessian -> llt_info() == 0) break;
         // H not PD ==> Decrease phi
         cfg.ustep = decrease(cfg.ustep);
       }
       // We now have a PD hessian
       // Let's take a newton step and see if it improves...
       vector<Scalar> x_new =
-        x - hessian.llt_solve(H, g).array();
+        x - hessian -> llt_solve(H, g).array();
       Scalar f = function(x_new)[0];
       if (std::isfinite(f) &&
           f < f_previous + 1e-8) { // Improvement
@@ -725,7 +732,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     SwapOuter(); // swap
     function.DomainVecSet(x);
     gradient.DomainVecSet(x);
-    hessian.DomainVecSet(x);
+    hessian -> DomainVecSet(x);
     SwapOuter(); // swap back
     // Run *inner* iterations
     SwapInner(); // swap
@@ -745,8 +752,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     std::vector<T>
       x = args.x_segment(0, n);
     std::vector<T> sol_x = sol; sol_x.insert(sol_x.end(), x.begin(), x.end());
-    vector<T> hv = hessian.eval(sol_x);
-    vector<T> w2 = - hessian.solve(hv, w);
+    vector<T> hv = hessian -> eval(sol_x);
+    vector<T> w2 = - hessian -> solve(hessian, hv, w);
     vector<T> g = gradient.Jacobian(sol_x, w2);
     args.dx_segment(0, n) += g.tail(n);
   }
@@ -760,17 +767,17 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     Rcout << cfg.prefix << "======== gradient:\n";
     gradient.print(cfg);
     Rcout << cfg.prefix << "======== hessian:\n";
-    hessian.print(cfg);
+    hessian -> print(cfg);
   }
 };
 
-template<class Type>
-Type log_determinant(const matrix<Type> &H, void* ptr = NULL) {
+template<class Type, class PTR>
+Type log_determinant(const matrix<Type> &H, PTR ptr) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
-template<class Type>
-Type log_determinant(const Eigen::SparseMatrix<Type> &H, void* ptr = NULL) {
+template<class Type, class PTR>
+Type log_determinant(const Eigen::SparseMatrix<Type> &H, PTR ptr) {
   // FIXME: Tape once for 'reasonable' numeric values - then replay
   // (to avoid unpredictable brancing issues)
   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
@@ -780,12 +787,12 @@ Type log_determinant(const Eigen::SparseMatrix<Type> &H, void* ptr = NULL) {
 }
 template<class Type>
 Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
-                     jacobian_sparse_plus_lowrank_t* hessian_ptr) {
-  matrix<Type> M = (hessian_ptr -> getM(H)).array();
+                     std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr) {
+  matrix<Type> M = (ptr -> getM(ptr, H)).array();
   return
-    log_determinant(H.H) +
-    log_determinant(H.H0) +
-    log_determinant(M);
+    log_determinant(H.H, NULL) +
+    log_determinant(H.H0, NULL) +
+    log_determinant(M, NULL);
 }
 
 // Interface
@@ -819,13 +826,13 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
     return Base::function(std::vector<Type>(sol))[0];
   }
   hessian_t hessian() {
-    return Base::hessian(std::vector<Type>(sol));
+    return (*(Base::hessian))(std::vector<Type>(sol));
   }
   Type Laplace() {
     return
       value() +
       .5 * log_determinant( hessian(),
-                            &(Base::hessian)) -
+                            Base::hessian) -
       .5 * log(2. * M_PI) * n;
   }
 };
