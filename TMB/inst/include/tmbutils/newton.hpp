@@ -1,6 +1,15 @@
 #ifdef TMBAD_FRAMEWORK
-/** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
+
+/* =================== TODO ===================
+   - Move entire code to TMBad ?
+   - Option for saddlepoint solver ?
+   - Generalize HessianSolveVector to handle non-symmetric jacobian
+   - log_determinant of sparse matrix avoid branching issue
+   ============================================
+*/
+
 #include <memory>
+/** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
 namespace newton {
 // FIXME: R macro
 #ifdef eval
@@ -45,12 +54,15 @@ struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
   }
 };
 
-/** \brief Operator (H, x) -> solve(H, x) */
+/** \brief Operator (H, x) -> solve(H, x)
+
+    Helper operator required to differentiate a newton solver. The
+    matrix type `Hessian_Type` can be sparse or dense.
+*/
 template <class Hessian_Type>
 struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
-  /** \warning Pointer */
   std::shared_ptr<Hessian_Type> hessian;
   size_t nnz, x_rows, x_cols; // Dim(x)
   HessianSolveVector(std::shared_ptr<Hessian_Type> hessian, size_t x_cols = 1) :
@@ -113,22 +125,11 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
   const char* op_name() { return "JSolve"; }
 };
 
-/* =================== TODO ===================
-   - Optimize RefOp
-   - Cleanup get_segment mess
-   - Optimize sparsematrix CTOR: Only do 'setFromTriplets' once !
-   - Graph permutation: outer - inner trick.
-   - SparseMatrix: Diagonal must always be part of pattern !
-   - Configurable factorization type - add as template parameter to hessian_types
-   - Option for saddlepoint solver ?
-   - Move entire code to TMBad ?
-   - Interface considerations:
-   ---> In addition to solution one wants the hessian evaluated in the optimum. And function value.
-   ---> However, the type of the hessian depends on sparse/dense flag.
-   - 'hessian_type_dense' rename 'jacobian_dense_t' and similar
-   - Generalize HessianSolveVector to handle non-symmetric jacobian
-   ============================================
-*/
+/* ======================================================================== */
+/* === Matrix types that can be used by the Newton solver ================= */
+/* ======================================================================== */
+
+/* --- Dense Hessian ------------------------------------------------------ */
 
 /** \brief Methods specific for a dense hessian */
 template<class Factorization=Eigen::LLT<Eigen::Matrix<double, -1, -1> > >
@@ -141,7 +142,7 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   size_t n;
   Factorization llt;
   jacobian_dense_t() {}
-  // FIXME: Want const &G
+  // FIXME: Want const &F, &G, &H
   // -->   JacFun, var2op, get_keep_var  -->  const
   jacobian_dense_t(TMBad::ADFun<> &H, size_t n) :
     n(n) {
@@ -195,6 +196,9 @@ struct jacobian_dense_t : TMBad::ADFun<> {
     return HessianSolveVector<jacobian_dense_t>(ptr).solve(h, x);
   }
 };
+
+/* --- Sparse Hessian ----------------------------------------------------- */
+
 /** \brief Methods specific for a sparse hessian */
 template<class Factorization=Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > >
 struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
@@ -204,16 +208,15 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     typedef Eigen::SparseMatrix<T> type;
   };
   size_t n;
-  // FIXME: llt.analyzePattern(H) on construct !!!
   Factorization llt;
   jacobian_sparse_t& operator=(const jacobian_sparse_t &other) {
     Base::operator=(other);
     n = other.n;
-    init_llt();
+    init_llt(); // llt.analyzePattern(H)
     return *this;
   }
   jacobian_sparse_t (const jacobian_sparse_t &other) : Base(other), n(other.n) {
-    init_llt();
+    init_llt(); // llt.analyzePattern(H)
   }
   jacobian_sparse_t() {}
   void init_llt() {
@@ -222,11 +225,11 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     Eigen::SparseMatrix<TMBad::Scalar> H_dummy = as_matrix(dummy);
     llt.analyzePattern(H_dummy);
   }
-  // FIXME: G const !!!
+  // FIXME: &F, &G, &H const !!!
   jacobian_sparse_t(TMBad::Sparse<TMBad::ADFun<> > &H, size_t n) :
     n(n) {
     Base::operator= ( H );
-    init_llt();
+    init_llt(); // llt.analyzePattern(H)
   }
   jacobian_sparse_t(TMBad::ADFun<> &F, TMBad::ADFun<> &G, size_t n) :
     n(n) {
@@ -236,6 +239,8 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     Base::operator= (G.SpJacFun(keep_x, keep_y));
     init_llt();
   }
+  // FIXME: Optimize sparsematrix CTOR by only doing 'setFromTriplets' once?
+  // FIXME: Diagonal must always be part of pattern - add check?
   template<class V>
   Eigen::SparseMatrix<typename V::value_type> as_matrix(const V &Hx) {
     typedef typename V::value_type T;
@@ -291,7 +296,10 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
 };
 
-/** \brief Tag operator */
+/* --- Sparse Plus Low Rank Hessian --------------------------------------- */
+
+/** \brief Operator to mark intermediate variables on the tape */
+template<class dummy = void>
 struct TagOp : TMBad::global::Operator<1> {
   static const bool have_eval = true;
   static const bool add_forward_replay_copy = true;
@@ -303,15 +311,50 @@ struct TagOp : TMBad::global::Operator<1> {
   }
   const char* op_name() { return "TagOp"; }
 };
-/** \brief Mark a variable that links to 'many' random effect */
-TMBad::ad_plain Tag(const TMBad::ad_plain &x) {
-  return TMBad::get_glob()->add_to_stack<TagOp>(x);
-}
-TMBad::Scalar Tag(const TMBad::Scalar &x) {
+/** \brief Mark a variable during taping */
+TMBad::ad_plain Tag(const TMBad::ad_plain &x) CSKIP( {
+  return TMBad::get_glob()->add_to_stack<TagOp<> >(x);
+} )
+/** \brief Otherwise ignore marks  */
+TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
   return x;
-}
+} )
 
-/** \brief Methods specific for a sparse plus low rank hessian */
+/** \brief Methods specific for a sparse plus low rank hessian
+
+    Represents a matrix of the form
+
+    `H + G * H0 * G^T`
+
+    where
+
+    - H is sparse n-by-n
+    - G is a dense n-by-k low rank matrix
+    - H0 is dense k-by-k
+
+    To detect this structure one must use the `Tag` function to select
+    k intermediate variables which will be used to decompose the
+    computational graph.
+
+    Formulas
+    ========
+
+    The following formulas are applied internally to perform the solve
+
+    ## Solve
+
+    ```
+    W <- solve(H, G)
+    M <- solve(H0) + t(G) %*% W
+    solve(H) - W %*% solve(M) %*% t(W)
+    ```
+
+    ## determinant
+
+    ```
+    det(H) * det(H0) * det(M)
+    ```
+*/
 struct jacobian_sparse_plus_lowrank_t {
   // The three tapes
   std::shared_ptr<jacobian_sparse_t<> > H;
@@ -432,7 +475,7 @@ struct jacobian_sparse_plus_lowrank_t {
     sparse_plus_lowrank<T> h = as_matrix(hvec);
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
-                                               h.G.cols()). // FIXME: Pointer!
+                                               h.G.cols()).
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
     W.resize(n, W.size() / n);
@@ -440,7 +483,7 @@ struct jacobian_sparse_plus_lowrank_t {
     tmbutils::matrix<T> Gt = h.G.transpose();
     tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
     vector<T> y1 =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H, 1). // FIXME: Pointer!
+      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H, 1).
       solve(h.Hvec, xvec);
     tmbutils::matrix<T> iM = atomic::matinv(M); // FIXME: HessianSolveVector
     tmbutils::matrix<T> Wt = W.transpose();
@@ -464,7 +507,7 @@ struct jacobian_sparse_plus_lowrank_t {
                            const sparse_plus_lowrank<T> &h) {
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
-                                               h.G.cols()). // FIXME: Pointer!
+                                               h.G.cols()).
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
     W.resize(n, W.size() / n);
@@ -474,6 +517,12 @@ struct jacobian_sparse_plus_lowrank_t {
     return M;
   }
 };
+
+/* ======================================================================== */
+/* === Newton solver ====================================================== */
+/* ======================================================================== */
+
+/* --- Configuration ------------------------------------------------------ */
 
 /** \brief Newton configuration parameters */
 struct newton_config {
@@ -551,7 +600,9 @@ struct newton_config_t : newton_config {
   newton_config_t(SEXP x) : newton_config(x) {}
 };
 
-/* Generalized newton solver similar to R function TMB:::newton */
+/* --- Newton Operator ---------------------------------------------------- */
+
+/** \brief Generalized newton solver similar to R function TMB:::newton */
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
@@ -870,6 +921,17 @@ NewtonSolver<Functor,
   return ans;
 }
 
+/** \brief Tape a functor and return solution
+
+    Can be used anywhere in a template. Inner and outer parameters are
+    automatically detected.
+
+    \param F Function to minimize
+    \param start Vector with initial guess
+    \param cfg Configuration parameters for solver
+
+    \return Vector with solution
+*/
 template<class Functor, class Type>
 vector<Type> Newton(Functor &F,
                     Eigen::Array<Type, Eigen::Dynamic, 1> start,
@@ -884,7 +946,17 @@ vector<Type> Newton(Functor &F,
     return NewtonDense(F, start, cfg);
 }
 
-/* Laplace */
+/** \brief Tape a functor and return Laplace Approximation
+
+    Can be used anywhere in a template. Inner and outer parameters are
+    automatically detected.
+
+    \param F Function to minimize
+    \param start Vector with initial guess
+    \param cfg Configuration parameters for solver
+
+    \return Scalar with Laplace Approximation
+*/
 template<class Functor, class Type>
 Type Laplace(Functor &F,
              Eigen::Array<Type, Eigen::Dynamic, 1> &start,
