@@ -1018,6 +1018,9 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
       chartr("\\", "/", shortPathName(ans))
     }
   }
+  qsystem.file <- function(...) {
+      paste0('"', system.file(...), '"')
+  }
   ## Cannot use the pre-compiled library when enabling sweep tracing
   if (tracesweep) libtmb <- FALSE
   ## libtmb existence
@@ -1080,9 +1083,9 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   ## Includes and preprocessor flags specific for the template
   useRcppEigen <- !file.exists( system.file("include/Eigen",package="TMB") )
   useContrib   <-  file.exists( system.file("include/contrib",package="TMB") )
-  ppflags <- paste(paste0("-I",system.file("include",package="TMB")),
-                   paste0("-I",system.file("include",package="RcppEigen"))[useRcppEigen],
-                   paste0("-I",system.file("include/contrib",package="TMB"))[useContrib],
+  ppflags <- paste(paste0("-I",qsystem.file("include",package="TMB")),
+                   paste0("-I",qsystem.file("include",package="RcppEigen"))[useRcppEigen],
+                   paste0("-I",qsystem.file("include/contrib",package="TMB"))[useContrib],
                    "-DTMB_SAFEBOUNDS"[safebounds],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb],
