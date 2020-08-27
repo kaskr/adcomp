@@ -35,6 +35,7 @@ struct array:Map< Array<Type,Dynamic,1> >{
 
   Base vectorcopy; /* Array data */
 
+  /** \brief Sets dimension attribute and updates internal stride. **Must** be used when e.g. collapsing array dimensions. */
   void setdim(vector<int> dim_){
     dim=dim_;
     mult.resize(dim.size());

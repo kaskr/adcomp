@@ -42,4 +42,3 @@ previous selections.
 \seealso{
 \code{\link{precompile}}
 }
-

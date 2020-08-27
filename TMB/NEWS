@@ -1,4 +1,76 @@
 ------------------------------------------------------------------------
+TMB 1.7.18 (2020-07-24)
+------------------------------------------------------------------------
+
+o Fix clang-ASAN issue caused by memory management changes
+
+------------------------------------------------------------------------
+TMB 1.7.17 (2020-07-23)
+------------------------------------------------------------------------
+
+o New function 'FreeADFun()' gives the user more control with memory
+  deallocation. In addition memory management of external pointers
+  have been improved - see '?FreeADFun'.
+
+o Documentation errors in '?sdreport' have been corrected.
+
+o The function 'oneStepPredict()' now calculates residuals in reverse
+  order because it is more stable. Old behaviour can be obtained by
+  passing 'reverse=FALSE'.
+
+------------------------------------------------------------------------
+TMB 1.7.16 (2020-01-15)
+------------------------------------------------------------------------
+
+o Fixed memory leaks in sparse hessian.
+
+o logspace_add: Added some edge case reductions.
+
+o 'oneStepPredict' no longer overwrites mapping of random effects.
+
+o Fix isfinite, isinf, isnan etc (github #297).
+
+o Add support for other object names to 'gdbsource'.
+
+o dbinom: Handle edge cases 0*log(0).
+
+o Add segment method to vector_indicator.
+
+o data_indicator: Add default CTOR.
+
+o splinefun: fix memleak + add vector evaluation.
+
+o Saved models from old TMB versions should now be usable in new TMB
+  versions without giving the INTEGER(...) error.
+
+o checkConsistency bugfix: did not work for mapped random effects.
+
+------------------------------------------------------------------------
+TMB 1.7.15 (2018-11-08)
+------------------------------------------------------------------------
+
+o Allow report array of any type (similar to vector case)
+
+o Solve 'rck' issue from CRAN
+
+o Fix bug in separable simulate
+
+------------------------------------------------------------------------
+TMB 1.7.14 (2018-06-23)
+------------------------------------------------------------------------
+
+o Fix performance bug triggered by R-devel.
+
+o Fixed bug in sparsity detection algorithm.
+
+o Tweedie atomic function speedup.
+
+o Fix save/reload model object. Loaded object no longer overwrites
+  fitted parameters when running e.g. obj$report() or obj$simulate().
+
+o New function 'tmbroot' computes likelihood profile confidence intervals.
+
+------------------------------------------------------------------------
 TMB 1.7.13 (2018-03-22)
 ------------------------------------------------------------------------
 

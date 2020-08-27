@@ -113,6 +113,46 @@ Type objective_function<Type>::operator() ()
     SEPARABLE( density::ARk(phi2), density::AR1(phi1) ).simulate(x);
     ans += SEPARABLE( density::ARk(phi2), density::AR1(phi1) )(x);
   }
+  else if (distr == "GMRF") {
+    PARAMETER(delta);
+    matrix<Type> Q0(5, 5);
+    Q0 <<
+      1,-1, 0, 0, 0,
+     -1, 2,-1, 0, 0,
+      0,-1, 2,-1, 0,
+      0, 0,-1, 2,-1,
+      0, 0, 0,-1, 1;
+    Q0.diagonal().array() += delta;
+    Eigen::SparseMatrix<Type> Q = asSparseMatrix(Q0);
+    vector<Type> x(5);
+    for(int i = 0; i<n; i++) {
+      density::GMRF(Q).simulate(x);
+      ans += density::GMRF(Q)(x);
+    }
+  }
+  else if (distr == "SEPARABLE_NESTED") {
+    PARAMETER(phi1);
+    PARAMETER(phi2);
+    PARAMETER(delta);
+    matrix<Type> Q0(5, 5);
+    Q0 <<
+      1,-1, 0, 0, 0,
+     -1, 2,-1, 0, 0,
+      0,-1, 2,-1, 0,
+      0, 0,-1, 2,-1,
+      0, 0, 0,-1, 1;
+    Q0.diagonal().array() += delta;
+    Eigen::SparseMatrix<Type> Q = asSparseMatrix(Q0);
+    array<Type> x(5, 6, 7);
+    for(int i = 0; i<n; i++) {
+      SEPARABLE(density::AR1(phi2),
+                SEPARABLE(density::AR1(phi1),
+                          density::GMRF(Q) ) ).simulate(x);
+      ans += SEPARABLE(density::AR1(phi2),
+                       SEPARABLE(density::AR1(phi1),
+                                 density::GMRF(Q) ) )(x);
+    }
+  }
   else error( ("Invalid distribution '" + distr + "'").c_str() );
   return ans;
 }

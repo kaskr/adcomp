@@ -42,4 +42,3 @@ precompile()
 runExample(all = TRUE)
 }
 }
-

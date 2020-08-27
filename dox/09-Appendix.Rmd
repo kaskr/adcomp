@@ -21,6 +21,13 @@ We use the following notation
 
 ## Profiling the inner problem
 
+This section describes the underlying theory of the argument `profile`
+to `MakeADFun` intended to speedup and robustify linear mixed effect
+models with a large number of fixed effects. With a few common model
+properties (Assumption 1 and 2 below), which must be checked by the
+user, one can apply the `profile` argument to move outer parameters to
+the inner problem without affecting the model result.
+
 **Theorem 1 (Profiling inner problem)**
 Assume that for any $\beta$ and $\theta$
 
@@ -57,7 +64,7 @@ where the first equality holds in general and the second equality follows from a
 
 $\square$
 
-## Example
+### Example
 
 The standard situation for which **assumption 1** holds is when the
 $\beta$s are the linear fixed effects of a mixed model. In this case
@@ -70,3 +77,70 @@ is thus a linear function of the random effect $u$.
 
 In general **assumption 2** holds exact for models with a symmetric
 (e.g. Gaussian) posterior distribution.
+
+## Theory underlying sdreport
+
+This section supplements the documentation of `?sdreport` by adding
+some missing details.
+
+As previously, we consider a general latent variable model with
+parameter vector $\theta$, random effect vector $u$ and observation
+vector $x$. The TMB estimation procedure works as follows:
+
+1. The MLE $\hat\theta=\hat\theta(x)$ is calculated and used as
+   estimator of $\theta$.
+2. Denote by $\hat u(\theta,x)$ the random effect mode depending on
+   $\theta$ and $x$. Now, *plug in* the MLE, and we get our estimator
+   $\hat u\left(\hat\theta(x),x\right)$ of $u$.
+
+In general, we assume that $\hat\theta$ is a consistent estimator of
+$\theta$. However, we do not in general require $\hat u$ to be
+consistent for $u$.  The purpose of sdreport is, for a given
+realization of the pair $(u,x)$, to quantify the joint uncertainty of
+$(\hat u,\hat\theta)$ as estimator of $(u,\theta)$. That is, we are
+interested in the variance matrix of the difference
+
+\[D:=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - u\\ \hat\theta(x) - \theta\end{pmatrix}\]
+
+An important point of the uncertainty quantification is to account
+for plugging in $\hat\theta$ rather than using the true $\theta$.
+
+We calculate the variance using the standard formula:
+
+\[V[D]=E(V(D|x))+V(E(D|x))\]
+
+Consider $D$ conditionally on $x$. The second component does not
+depend on $u$ and $\hat u$ is constant given $x$:
+
+\[V[D|x]=\begin{pmatrix}V[u|x] & 0 \\ 0 & 0 \end{pmatrix}\]
+
+It follows that
+
+\[E(V[D|x])=\begin{pmatrix}E(V[u|x]) & 0 \\ 0 & 0 \end{pmatrix}\]
+
+As central estimator of $E(V[u|x])$ we use $V[u|x]$ which is
+approximated by the inverse random effect Hessian $H_{uu}^{-1}$ based
+on the assumption that $u|x$ is well approximated by a Gaussian
+distribution (a reasonable assumption given that we are using the
+Laplace approximation). This explains the first term of variance formula in `?sdreport`:
+
+\[E(V[D|x]) \approx \begin{pmatrix} H_{uu}^{-1} & 0 \\ 0 & 0 \end{pmatrix}\]
+
+Likewise,
+
+\[E[D|x]=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - E(u|x)\\ \hat\theta(x) - \theta\end{pmatrix}\]
+
+Again, asuming a Gaussian approximation of $u|x$, it follows that $E(u|x) \approx \hat u(\theta,x)$:
+
+\[E[D|x]=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - \hat u(\theta,x)\\ \hat\theta(x) - \theta\end{pmatrix}\]
+
+We approximate the expectation using linerization of $\theta \rightarrow \hat u(\theta,x)$ around $\hat\theta(x)$
+
+\[E[D|x]=J_x \cdot (\hat\theta(x) - \theta)\]
+
+We now have the second term of the variance formula in `?sdreport`:
+
+\[V(E[D|x]) \approx J_x V(\hat\theta(x)) J_x'\]
+
+This term becomes negligible if the amount of data is high because of
+the assumed asymptotic consistency of $\hat\theta$.

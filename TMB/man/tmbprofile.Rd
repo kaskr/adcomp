@@ -28,7 +28,8 @@ profile. By default a unit vector corresponding to \code{name}.}
 
 \item{slice}{Do slicing rather than profiling?}
 
-\item{trace}{Trace progress?}
+\item{trace}{Trace progress? (TRUE, or a numeric value of 1,
+gives basic tracing: numeric values > 1 give more information)}
 
 \item{...}{Unused}
 }
@@ -67,4 +68,3 @@ confint(prof2)
 \seealso{
 \code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
 }
-

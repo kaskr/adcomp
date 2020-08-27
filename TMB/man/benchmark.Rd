@@ -56,4 +56,3 @@ ben <- benchmark(obj,n=10,cores=1:4,expr=expression(do.call("optim",obj)))
 plot(ben)
 }
 }
-

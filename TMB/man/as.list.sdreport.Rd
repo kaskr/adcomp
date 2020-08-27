@@ -50,4 +50,3 @@ as.list(rep, "Estimate", report=TRUE)
 as.list(rep, "Est. (bias.correct)", report=TRUE)
 }
 }
-

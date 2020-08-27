@@ -63,6 +63,18 @@ isNullPointer <- function(pointer) {
   .Call("isNullPointer", pointer, PACKAGE="TMB")
 }
 
+## Add external pointer finalizer
+registerFinalizer <- function(ADFun, DLL) {
+    finalizer <- function(ptr) {
+        if ( ! isNullPointer(ptr) ) {
+            .Call("FreeADFunObject", ptr, PACKAGE=DLL)
+        } else {
+            ## Nothing to free
+        }
+    }
+    reg.finalizer(ADFun$ptr, finalizer)
+}
+
 ##' Construct objective functions with derivatives based on the users C++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
@@ -133,9 +145,11 @@ isNullPointer <- function(pointer) {
 ##' A high level of tracing information will be output by default when evaluating the objective function and gradient.
 ##' This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 ##' \code{silent=TRUE} to the \code{MakeADFun} call.
-##' 
+##'
+##' @note Do not rely upon the default arguments of any of the functions in the model object \code{obj$fn}, \code{obj$gr}, \code{obj$he}, \code{obj$report}. I.e. always use the explicit form \code{obj$fn(obj$par)} rather than \code{obj$fn()}.
+##'
 ##' @title Construct objective functions with derivatives based on a compiled C++ template.
-##' @param data List of data objects (vectors,matrices,arrays,factors,sparse matrices) required by the user template (order does not matter and un-used components are allowed).
+##' @param data List of data objects (vectors, matrices, arrays, factors, sparse matrices) required by the user template (order does not matter and un-used components are allowed).
 ##' @param parameters List of all parameter objects required by the user template (both random and fixed effects).
 ##' @param map List defining how to optionally collect and fix parameters - see details.
 ##' @param type Character vector defining which operation stacks are generated from the users template - see details.
@@ -343,11 +357,13 @@ MakeADFun <- function(data, parameters, map=list(),
 
   ## All external pointers are created in function "retape" and can be re-created
   ## by running retape() if e.g. the number of openmp threads is changed.
-  retape <- function(){
+  ## set.defaults: reset internal parameters to their default values.
+  retape <- function(set.defaults = TRUE){
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
+      registerFinalizer(Fun, DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
       out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
                    control = list(do_simulate = as.integer(0),
@@ -394,21 +410,32 @@ MakeADFun <- function(data, parameters, map=list(),
           tmp[profile] <- 1L
           profile <<- tmp
       }
-      par <<- unlist(parameters)
+      if (set.defaults) {
+          par <<- unlist(parameters)
+      }
     }
     if("ADFun"%in%type){
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
-      par <<- attr(ADFun$ptr,"par")
-      last.par <<- par
-      last.par1 <<- par
-      last.par2 <<- par
-      last.par.best <<- par
+      if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
+          registerFinalizer(ADFun, DLL)
+      if (set.defaults) {
+          par <<- attr(ADFun$ptr,"par")
+          last.par <<- par
+          last.par1 <<- par
+          last.par2 <<- par
+          last.par.best <<- par
+          value.best <<- Inf
+      }
     }
-    if("Fun"%in%type)
+    if("Fun"%in%type) {
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,PACKAGE=DLL)
-    if("ADGrad"%in%type)
+      registerFinalizer(Fun, DLL)
+    }
+    if("ADGrad"%in%type) {
       ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+      registerFinalizer(ADGrad, DLL)
+    }
     ## Skip fixed effects from the full hessian ?
     ## * Probably more efficient - especially in terms of memory.
     ## * Only possible if a taped gradient is available - see function "ff" below.
@@ -417,7 +444,7 @@ MakeADFun <- function(data, parameters, map=list(),
                   assign.env = env)
   }## end{retape}
 
-  retape()
+  retape(set.defaults = TRUE)
 
   ## Has atomic functions been generated for the tapes ?
   usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
@@ -428,7 +455,9 @@ MakeADFun <- function(data, parameters, map=list(),
                 dumpstack=0, doforward=1, do_simulate=0) {
     if(isNullPointer(ADFun$ptr)) {
         if(silent)beSilent()
-        retape()
+        ## Loaded or deep copied object: Only restore external
+        ## pointers. Don't touch last.par/last.par.best etc:
+        retape(set.defaults = FALSE)
     }
     switch(type,
            "ADdouble" = {
@@ -830,8 +859,10 @@ MakeADFun <- function(data, parameters, map=list(),
            ## If no atomics on tape we have all orders implemented:
            if(!atomic) return( f(x,order=2) )
            ## Otherwise, get Hessian as 1st order derivative of gradient:
-           if(is.null(ADGrad))
+           if(is.null(ADGrad)) {
              ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,PACKAGE=DLL)
+             registerFinalizer(ADGrad, DLL)
+           }
            f(x,type="ADGrad",order=1)
          },
          hessian=hessian, method=method,
@@ -879,6 +910,58 @@ MakeADFun <- function(data, parameters, map=list(),
          simulate=simulate, ...)
   }
 }## end{ MakeADFun }
+
+##' Free memory allocated on the C++ side by \code{MakeADFun}.
+##'
+##' @note
+##' This function is normally not needed.
+##' @details
+##' An object returned by \code{MakeADFun} contains pointers to
+##' structures allocated on the C++ side. These are managed by R's
+##' garbage collector which for the most cases is sufficient. However,
+##' because the garbage collector is unware of the C++ object sizes,
+##' it may fail to release memory to the system as frequently as
+##' necessary. In such cases one can manually call
+##' \code{FreeADFun(obj)} to release the resources.
+##' @section Memory management:
+##' Memory allocated on the C++ side by \code{MakeADFun} is
+##' represented by external pointers. Each such pointer has an
+##' associated 'finalizer' (see \code{reg.finalizer}) that deallocates
+##' the external pointer when \code{gc()} decides the pointer is no
+##' longer needed.  Deallocated pointers are recognized on the R
+##' side as external null pointers \code{<pointer: (nil)>}. This is
+##' important as it provides a way to prevent the finalizers from
+##' freeing pointers that have already been deallocated \emph{even if
+##' the deallocation C-code has been unloaded}.
+##' The user DLL maintains a list of all external pointers on the C
+##' side. Three events can reduce the list:
+##' \itemize{
+##'   \item Garbage collection of an external pointer that is no longer needed (triggers corresponding finalizer).
+##'   \item Explicit deallocation of external pointers using \code{FreeADFun()} (corresponding finalizers are untriggered but harmless).
+##'   \item Unload/reload of the user's DLL deallocates all external pointers (corresponding finalizers are untriggered but harmless).
+##' }
+##' @title Free memory allocated on the C++ side by \code{MakeADFun}.
+##' @param obj Object returned by \code{MakeADFun}
+##' @return NULL
+##' @examples
+##' runExample("simple", thisR = TRUE)          ## Create 'obj'
+##' FreeADFun(obj)                              ## Free external pointers
+##' obj$fn()                                    ## Re-allocate external pointers
+FreeADFun <- function(obj) {
+    free <- function(ADFun) {
+        if (! is.null(ADFun) ) {
+            if ( ! isNullPointer(ADFun$ptr) ) {
+                .Call("FreeADFunObject", ADFun$ptr, PACKAGE = obj$env$DLL)
+            }
+        }
+    }
+    free(obj$env$Fun)
+    free(obj$env$ADFun)
+    free(obj$env$ADGrad)
+    ADHess <- environment(obj$env$spHess)$ADHess
+    free(ADHess)
+    return(NULL)
+}
 
 .removeComments <- function(x){
   x <- paste(x,collapse="\n")
@@ -1283,7 +1366,6 @@ newton <- function (par,fn,gr,he,
   g <- h <- NULL
   ## pd.check: Quick test for hessian being positive definite
   iterate <- function(par,pd.check=FALSE) {
-    if(file.exists(".Rbreakpoint"))browser() ## secret backdoor to poke around...
     if(pd.check){
       if(is.null(h))return(TRUE)
       h <<- he(par) ## Make sure hessian is updated
@@ -1434,6 +1516,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                   obj$env$reportenv,
                   skip, ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL)
+  registerFinalizer(ADHess, obj$env$DLL)
   ev <- function(par)
           .Call("EvalADFunObject", ADHess$ptr, par,
                 control = list(

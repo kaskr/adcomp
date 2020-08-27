@@ -167,6 +167,10 @@ Type min(const vector<Type> &x)
     Calculates \f$log( exp(logx) + exp(logy) )\f$ without causing
     unnecessary overflows or throwing away too much accuracy (see
     'writing R-extensions').
+    The following reductions are applied while taping:
+
+    - `log(exp(logx) + exp(-INFINITY)) = logx`
+    - `log(exp(-INFINITY) + exp(logy)) = logy`
 
     \param logx The logarithm of x.
     \param logy The logarithm of y.
@@ -175,6 +179,10 @@ Type min(const vector<Type> &x)
 */
 template<class Type>
 Type logspace_add(Type logx, Type logy) {
+  if ( !CppAD::Variable(logx) && logx == Type(-INFINITY) )
+    return logy;
+  if ( !CppAD::Variable(logy) && logy == Type(-INFINITY) )
+    return logx;
   CppAD::vector<Type> tx(3);
   tx[0] = logx;
   tx[1] = logy;

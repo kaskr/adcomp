@@ -4,10 +4,12 @@
 \alias{summary.checkConsistency}
 \title{Summarize output from \code{\link{checkConsistency}}}
 \usage{
-\method{summary}{checkConsistency}(object, ...)
+\method{summary}{checkConsistency}(object, na.rm = FALSE, ...)
 }
 \arguments{
 \item{object}{Output from \code{\link{checkConsistency}}}
+
+\item{na.rm}{Logical; Remove failed simulations ?}
 
 \item{...}{Not used}
 }
@@ -17,4 +19,3 @@ List of diagnostics
 \description{
 Summarize output from \code{\link{checkConsistency}}
 }
-

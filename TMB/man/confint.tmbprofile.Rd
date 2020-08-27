@@ -21,4 +21,3 @@ Lower and upper limit as a matrix.
 \description{
 Calculate confidence interval from a likelihood profile.
 }
-

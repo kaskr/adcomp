@@ -59,9 +59,9 @@ TMB_BIND_ATOMIC(bessel_y,
  * Adding 'dtweedie'
  ********************************************************************/
 #include "tweedie/tweedie.hpp"
-TMB_BIND_ATOMIC(log_dtweedie,
-		0111,
-		tweedie_utils::dtweedie(x[0], x[1], x[2], x[3], true) )
+TMB_BIND_ATOMIC(tweedie_logW,
+		011,
+		tweedie_utils::tweedie_logW(x[0], x[1], x[2]) )
 
 /********************************************************************
  * Adding numerically robust utility functions

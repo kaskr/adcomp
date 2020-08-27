@@ -1,4 +1,10 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
+# bash function that rename files by regexp. Ignoring 1st arg.
+rename() {
+    for f in ${@:3}; do mv "$f" $(echo "$f" | sed $2); done
+}
+# ----------------------------------------------------------------------------
 
 BRANCH1=$1
 BRANCH2=$2
@@ -52,6 +58,10 @@ make report
 echo '
 files1 <- dir(pattern="*.logpid1$", recursive=TRUE)
 files2 <- dir(pattern="*.logpid2$", recursive=TRUE)
+files  <- intersect(sub(".logpid1$","",files1),
+                    sub(".logpid2$","",files2))
+files1 <- paste0(files, ".logpid1")
+files2 <- paste0(files, ".logpid2")
 f <- function(f1, f2) {
     x <- read.table(f1, TRUE)
     y <- read.table(f2, TRUE)
@@ -61,13 +71,16 @@ f <- function(f1, f2) {
     t <- seq_len(nrow(m)) - 1
     t <- t / 10
     matplot(t, m, type="b", ylab="Memory (percent)", xlab="Time (sec)")
-    legend("bottomright", legend=1:2 ,1:2, col=1:2, lty=1)
+    legend("bottomright", legend=c("BRANCH1", "BRANCH2"), col=1:2, lty=1, lwd=2)
     title(sub(".logpid1$", "", f1))
 }
 pdf("memory.pdf")
 invisible(Map(f, files1, files2))
 dev.off()
-' | R --slave
+' |
+sed s/BRANCH1/${BRANCH1}/g |
+sed s/BRANCH2/${BRANCH2}/g |
+R --slave
 
 echo
 echo "Output generated:"

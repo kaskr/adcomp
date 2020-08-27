@@ -26,6 +26,7 @@ stopifnot( identical(rep$c, c) )
 stopifnot( identical(rep$d, d) )
 stopifnot( identical(rep$p, p) )
 stopifnot( identical(rep$voa, list(c, c)) )
+stopifnot( identical(rep$aoa, array(list(c, c), c(1,1,2,1))) )
 
 ## ADREPORT()
 ## Check objects are unchanged when passed back to R

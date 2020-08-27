@@ -27,42 +27,53 @@
    When total number is zero it is safe to dyn.unload
    the library.
 */
-
-/** \internal \brief TMB: SEXP type */
-struct SEXP_t{
-  SEXP value;				/**< \brief SEXP_t: data entry*/
-  SEXP_t(SEXP x)CSKIP({value=x;})	/**< \brief SEXP_t: assignment*/
-  SEXP_t()CSKIP({value=R_NilValue;})	/**< \brief SEXP_t: default constructor*/
-  operator SEXP()CSKIP({return value;})	/**< \brief SEXP_t:*/
-};
-bool operator<(SEXP_t x, SEXP_t y)CSKIP({return (size_t(x.value)<size_t(y.value));})
+#include <set>
+extern "C" void finalizeDoubleFun(SEXP x);
+extern "C" void finalizeADFun(SEXP x);
+extern "C" void finalizeparallelADFun(SEXP x);
+extern "C" SEXP FreeADFunObject(SEXP f) CSKIP ({
+  SEXP tag = R_ExternalPtrTag(f);
+  if (tag == Rf_install("DoubleFun")) {
+    finalizeDoubleFun(f);
+  }
+  else if (tag == Rf_install("ADFun")) {
+    finalizeADFun(f);
+  }
+  else if (tag == Rf_install("parallelADFun")) {
+    finalizeparallelADFun(f);
+  }
+  else {
+    Rf_error("Unknown external ptr type");
+  }
+  R_ClearExternalPtr(f); // Set pointer to 'nil'
+  return R_NilValue;
+})
 /** \internal \brief Controls the life span of objects created in the C++ template (jointly R/C++)*/
-struct memory_manager_struct{
-  int counter;  /**< \brief Number of objects alive that "memory_manager_struct" has allocated */
-  std::map<SEXP_t,SEXP_t> alive;
-  /** \brief Register "list" in memory_manager_struct */
+struct memory_manager_struct {
+  int counter;
+  /** \brief External pointers 'alive', i.e. not yet garbage collected */
+  std::set<SEXP> alive;
+  /** \brief Register `list` in memory_manager_struct (FIXME: Deprecated) */
   void RegisterCFinalizer(SEXP list);
-  /** \brief Revmoves "x" from memory_manager_struct */
+  /** \brief Removes `x` from memory_manager_struct (FIXME: Rename) */
   void CallCFinalizer(SEXP x);
+  /** \brief Free all pointers and set to 'nil' on R side */
   void clear();
   memory_manager_struct();
 };
 #ifndef WITH_LIBTMB
-void memory_manager_struct::RegisterCFinalizer(SEXP list){
+void memory_manager_struct::RegisterCFinalizer(SEXP x) {
   counter++;
-  SEXP x=VECTOR_ELT(list,0);
-  alive[x]=list;
+  alive.insert(x);
 }
 void memory_manager_struct::CallCFinalizer(SEXP x){
   counter--;
   alive.erase(x);
 }
 void memory_manager_struct::clear(){
-  std::map<SEXP_t,SEXP_t>::iterator it;
-  SEXP list;
-  for(it = alive.begin(); it != alive.end(); it++){
-    list=(*it).second;
-    SET_VECTOR_ELT(list,0,R_NilValue);
+  std::set<SEXP>::iterator it;
+  while (alive.size() > 0) {
+    FreeADFunObject(*alive.begin());
   }
 }
 memory_manager_struct::memory_manager_struct(){
@@ -92,7 +103,7 @@ SEXP ptrList(SEXP x)
   SET_VECTOR_ELT(ans,0,x);
   SET_STRING_ELT(names,0,Rf_mkChar("ptr"));
   Rf_setAttrib(ans,R_NamesSymbol,names);
-  memory_manager.RegisterCFinalizer(ans);
+  memory_manager.RegisterCFinalizer(x);
   UNPROTECT(2);
   return ans;
 }
@@ -434,45 +445,65 @@ Type objective_function<Type>::operator() ()
 #define DATA_STRUCT(name, struct)                                       \
 struct<Type> name(getListElement(TMB_OBJECTIVE_PTR -> data, #name));
 
-/** \brief Utilities for OSA residuals */
+/** \brief Utilities for OSA residuals
+    \tparam VT Can be **vector<Type>** or **array<Type>**
+    \warning When extracting subsets of a `data_indicator` note that in general the subset is not applied to `cdf_lower` and `cdf_upper`.
+*/
 template<class VT, class Type>
 struct data_indicator : VT{
-  VT cdf_lower, cdf_upper;
-  /* Construct from observation */
-  data_indicator(VT obs){
-    VT::operator=(obs); VT::fill(Type(1.0));
+  /** \brief **Logarithm** of lower CDF */
+  VT cdf_lower;
+  /** \brief **Logarithm** of upper CDF */
+  VT cdf_upper;
+  /** \brief Default CTOR */
+  data_indicator() { }
+  /** \brief Construct from observation vector
+      \param obs Observation vector or array
+      \param init_one If true the data_indicator will be filled with ones signifying that all observations should be enabled.
+  */
+  data_indicator(VT obs, bool init_one = false){
+    VT::operator=(obs);
+    if (init_one) VT::fill(Type(1.0));
     cdf_lower = obs; cdf_lower.setZero();
     cdf_upper = obs; cdf_upper.setZero();
   }
-  /* Fill with parameter vector */
+  /** \brief Fill with parameter vector */
   void fill(vector<Type> p){
     int n = (*this).size();
     if(p.size() >= n  ) VT::operator=(p.segment(0, n));
     if(p.size() >= 2*n) cdf_lower = p.segment(n, n);
     if(p.size() >= 3*n) cdf_upper = p.segment(2 * n, n);
   }
+  /** \brief Extract segment of indicator vector or array
+      \note For this method the segment **is** applied to `cdf_lower` and `cdf_upper`. */
+  data_indicator segment(int pos, int n) {
+    data_indicator ans ( VT::segment(pos, n) );
+    ans.cdf_lower = cdf_lower.segment(pos, n);
+    ans.cdf_upper = cdf_upper.segment(pos, n);
+    return ans;
+  }
 };
 
-/** \brief Declare an indicator array 'name' of same shape as 'obs'.
-
+/** \brief Declare an indicator array 'name' of same shape as 'obs'. By default, the indicator array is filled with ones indicating that all observations are enabled.
+    \details
     This is used in conjunction with one-step-ahead residuals - see
     ?oneStepPredict
     \ingroup macros */
 #define DATA_ARRAY_INDICATOR(name, obs)                                 \
-data_indicator<tmbutils::array<Type>, Type > name(obs);                 \
+data_indicator<tmbutils::array<Type>, Type > name(obs, true);           \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
                                            #name) );                    \
 }
 
-/** \brief Declare an indicator vector 'name' of same shape as 'obs'.
-
+/** \brief Declare an indicator vector 'name' of same shape as 'obs'. By default, the indicator vector is filled with ones indicating that all observations are enabled.
+    \details
     This is used in conjunction with one-step-ahead residuals - see
     ?oneStepPredict
     \ingroup macros */
 #define DATA_VECTOR_INDICATOR(name, obs)                                \
-data_indicator<tmbutils::vector<Type>, Type > name(obs);                \
+data_indicator<tmbutils::vector<Type>, Type > name(obs, true);          \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
@@ -502,6 +533,7 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
 /** \internal \brief Get list element named "str", or return NULL */
 #ifdef WITH_LIBTMB
 SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL);
+int  getListInteger(SEXP list, const char *str, int default_value = 0);
 #else
 SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
 {
@@ -518,6 +550,14 @@ SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
   if(config.debug.getListElement)std::cout << "\n";
   RObjectTestExpectedType(elmt, expectedtype, str);
   return elmt; 
+}
+int getListInteger(SEXP list, const char *str, int default_value = 0) {
+  SEXP tmp = getListElement(list, str);
+  if ( tmp == R_NilValue ) {
+    Rf_warning("Missing integer variable '%s'. Using default: %d. (Perhaps you are using a model object created with an old TMB version?)", str, default_value);
+    return default_value;
+  }
+  return INTEGER(tmp)[0];
 }
 #endif
 
@@ -988,16 +1028,16 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   int m=pf->Range();
   if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
   // Do forwardsweep ?
-  int doforward=INTEGER(getListElement(control,"doforward"))[0];
+  int doforward = getListInteger(control, "doforward", 1);
   //R-index -> C-index
-  int rangecomponent=INTEGER(getListElement(control,"rangecomponent"))[0]-1;
+  int rangecomponent = getListInteger(control, "rangecomponent", 1) - 1;
   if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
     Rf_error("Wrong range component.");
-  int order = INTEGER(getListElement(control,"order"))[0];
+  int order = getListInteger(control, "order");
   if((order!=0) & (order!=1) & (order!=2) & (order!=3))
     Rf_error("order can be 0, 1, 2 or 3");
-  int sparsitypattern=INTEGER(getListElement(control,"sparsitypattern"))[0];
-  int dumpstack=INTEGER(getListElement(control,"dumpstack"))[0];
+  int sparsitypattern = getListInteger(control, "sparsitypattern");
+  int dumpstack = getListInteger(control, "dumpstack");
   SEXP hessiancols; // Hessian columns
   PROTECT(hessiancols=getListElement(control,"hessiancols"));
   int ncols=Rf_length(hessiancols);
@@ -1088,7 +1128,7 @@ ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
 {
-  int returnReport = INTEGER(getListElement(control,"report"))[0];
+  int returnReport = getListInteger(control, "report");
   /* Create objective_function "dummy"-object */
   objective_function< AD<double> > F(data,parameters,report);
   F.set_parallel_region(parallel_region);
@@ -1138,7 +1178,7 @@ extern "C"
     if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
     if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
     if(!Rf_isNewList(control))Rf_error("'control' must be a list");
-    int returnReport = INTEGER(getListElement(control,"report"))[0];
+    int returnReport = getListInteger(control, "report");
 
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL,info;
@@ -1177,8 +1217,7 @@ extern "C"
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
-      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_mkChar("parallelADFun"),R_NilValue));
-      R_RegisterCFinalizer(res,finalizeparallelADFun);
+      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
 #endif
     } else { // Serial mode
       TMB_TRY{
@@ -1192,9 +1231,8 @@ extern "C"
 	TMB_ERROR_BAD_ALLOC;
       }
       /* Convert ADFun pointer to R_ExternalPtr */
-      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_mkChar("ADFun"),R_NilValue));
+      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
       Rf_setAttrib(res,Rf_install("range.names"),info);
-      R_RegisterCFinalizer(res,finalizeADFun);
     }
 
     /* Return list of external pointer and default-parameter */
@@ -1240,12 +1278,12 @@ extern "C"
   SEXP optimizeADFunObject(SEXP f)
   {
     SEXP tag=R_ExternalPtrTag(f);
-    if(!strcmp(CHAR(tag), "ADFun")){
+    if(tag == Rf_install("ADFun")){
       ADFun<double>* pf;
       pf=(ADFun<double>*)R_ExternalPtrAddr(f);
       pf->optimize();
     }
-    if(!strcmp(CHAR(tag), "parallelADFun")){
+    if(tag == Rf_install("parallelADFun")){
       parallelADFun<double>* pf;
       pf=(parallelADFun<double>*)R_ExternalPtrAddr(f);
       pf->optimize();      
@@ -1263,9 +1301,9 @@ extern "C"
     TMB_TRY {
       if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
       SEXP tag=R_ExternalPtrTag(f);
-      if(!strcmp(CHAR(tag), "ADFun"))
+      if(tag == Rf_install("ADFun"))
 	return EvalADFunObjectTemplate<ADFun<double> >(f,theta,control);
-      if(!strcmp(CHAR(tag), "parallelADFun"))
+      if(tag == Rf_install("parallelADFun"))
 	return EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
       Rf_error("NOT A KNOWN FUNCTION POINTER");
     }
@@ -1307,8 +1345,7 @@ extern "C"
 
     /* Convert DoubleFun pointer to R_ExternalPtr */
     SEXP res,ans;
-    PROTECT(res=R_MakeExternalPtr((void*) pF,Rf_mkChar("DoubleFun"),R_NilValue));
-    R_RegisterCFinalizer(res,finalizeDoubleFun);
+    PROTECT(res=R_MakeExternalPtr((void*) pF,Rf_install("DoubleFun"),R_NilValue));
     PROTECT(ans=ptrList(res));
     UNPROTECT(2);
     return ans;
@@ -1318,8 +1355,8 @@ extern "C"
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
-      int do_simulate = INTEGER(getListElement(control, "do_simulate"))[0];
-      int get_reportdims = INTEGER(getListElement(control, "get_reportdims"))[0];
+      int do_simulate = getListInteger(control, "do_simulate");
+      int get_reportdims = getListInteger(control, "get_reportdims");
       objective_function<double>* pf;
       pf = (objective_function<double>*) R_ExternalPtrAddr(f);
       pf -> sync_data();
@@ -1442,8 +1479,7 @@ extern "C"
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
-      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_mkChar("parallelADFun"),R_NilValue));
-      R_RegisterCFinalizer(res,finalizeparallelADFun);
+      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
@@ -1457,8 +1493,7 @@ extern "C"
 	TMB_ERROR_BAD_ALLOC;
       }
       /* Convert ADFun pointer to R_ExternalPtr */
-      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_mkChar("ADFun"),R_NilValue));
-      R_RegisterCFinalizer(res,finalizeADFun);
+      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
     }
 
     /* Return ptrList */
@@ -1569,8 +1604,7 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
     par=R_NilValue;
     /* Convert ADFun pointer to R_ExternalPtr */
     SEXP res;
-    PROTECT( res = R_MakeExternalPtr((void*) H.pf, Rf_mkChar(tag), R_NilValue) );
-    R_RegisterCFinalizer(res, finalize<ADFunType>);
+    PROTECT( res = R_MakeExternalPtr((void*) H.pf, Rf_install(tag), R_NilValue) );
     /* Return list */
     SEXP ans;
     /* Implicitly protected temporaries */
@@ -1621,15 +1655,21 @@ extern "C"
       TMB_ERROR_BAD_ALLOC;
     }
     parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
-    return asSEXP(tmp->convert(),"parallelADFun");
+    for(int i=0; i<n; i++) {
+      delete Hvec[i];
+    }
+    // Adds finalizer for 'tmp' !!! (so, don't delete tmp...)
+    SEXP ans = asSEXP(tmp->convert(),"parallelADFun");
+    return ans;
   } // MakeADHessObject2
 #else
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
     sphess* pH = NULL;
+    SEXP ans;
     TMB_TRY {
       pH = new sphess( MakeADHessObject2_(data, parameters, report, skip, -1) );
       optimizeTape( pH->pf );
-      return asSEXP(*pH, "ADFun");
+      ans = asSEXP(*pH, "ADFun");
     }
     TMB_CATCH {
       if (pH != NULL) {
@@ -1638,6 +1678,8 @@ extern "C"
       }
       TMB_ERROR_BAD_ALLOC;
     }
+    delete pH;
+    return ans;
   } // MakeADHessObject2
 #endif
 }
@@ -1657,12 +1699,12 @@ extern "C"
 {
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y) {
     SEXP tag=R_ExternalPtrTag(f);
-    if(!strcmp(CHAR(tag), "ADFun")) {
+    if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
       pf = (ADFun<double>*) R_ExternalPtrAddr(f);
       y = pf->Forward(0, x);
     } else
-      if(!strcmp(CHAR(tag), "parallelADFun")) {
+      if(tag == Rf_install("parallelADFun")) {
         parallelADFun<double>* pf;
         pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
         y = pf->Forward(0, x);
@@ -1671,12 +1713,12 @@ extern "C"
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
     SEXP tag=R_ExternalPtrTag(f);
-    if(!strcmp(CHAR(tag), "ADFun")) {
+    if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
       pf = (ADFun<double>*) R_ExternalPtrAddr(f);
       y = pf->Reverse(1, v);
     } else
-      if(!strcmp(CHAR(tag), "parallelADFun")) {
+      if(tag == Rf_install("parallelADFun")) {
         parallelADFun<double>* pf;
         pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
         y = pf->Reverse(1, v);
@@ -1722,6 +1764,7 @@ extern "C"{
   /* May be used as part of custom calldef tables */
 #define TMB_CALLDEFS                                            \
   {"MakeADFunObject",     (DL_FUNC) &MakeADFunObject,     4},   \
+  {"FreeADFunObject",     (DL_FUNC) &FreeADFunObject,     1},   \
   {"InfoADFunObject",     (DL_FUNC) &InfoADFunObject,     1},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
   {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \

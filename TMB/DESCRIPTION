@@ -1,8 +1,8 @@
 Package: TMB
 Type: Package
 Title: Template Model Builder: A General Random Effect Tool Inspired by 'ADMB'
-Version: 1.7.13
-Date: 2018-03-14
+Version: 1.7.18
+Date: 2020-07-24
 Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr@dtu.dk"),
              person("Brad","Bell",role="cph"),
              person("Hans","Skaug",role="ctb"),
@@ -29,11 +29,11 @@ Author: Kasper Kristensen [aut, cre, cph],
     Christoffer Moesgaard Albertsen [ctb],
     Cole Monnahan [ctb]
 Copyright: See the file COPYRIGHTS
-Description: With this tool, a user should be able to quickly implement complex
-    random effect models through simple C++ templates. The package combines
+Description: With this tool, a user should be able to quickly implement
+    complex random effect models through simple C++ templates. The package combines
     'CppAD' (C++ automatic differentiation), 'Eigen' (templated matrix-vector
-    library) and 'CHOLMOD' (sparse matrix routines available from R) to obtain an
-    efficient implementation of the applied Laplace approximation with exact
+    library) and 'CHOLMOD' (sparse matrix routines available from R) to obtain
+    an efficient implementation of the applied Laplace approximation with exact
     derivatives. Key features are: Automatic sparseness detection, parallelism
     through 'BLAS' and parallel user templates.
 License: GPL-2
@@ -51,4 +51,4 @@ LinkingTo: Matrix
 Suggests:
     numDeriv,
     parallel
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

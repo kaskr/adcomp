@@ -178,13 +178,17 @@ VECTORIZE3_ttt(qweibull)
 	\param size Number of trials.
 	\param prob Probability of success.
 	\param give_log true if one wants the log-probability, false otherwise.
-	*/
+*/
 template<class Type> 
 Type dbinom(Type k, Type size, Type prob, int give_log=0)
 {
-	Type logres = lgamma(size+1)-lgamma(k+1)-lgamma(size-k+1)+k*log(prob)+(size-k)*log(1-prob);
-	if(!give_log) return exp(logres);
-	else return logres;
+  Type logres = lgamma(size + 1) - lgamma(k + 1) - lgamma(size - k + 1);
+  // Add 'k * log(prob)' only if k > 0
+  logres += CppAD::CondExpGt(k, Type(0), k * log(prob), Type(0) );
+  // Add '(size - k) * log(1 - prob)' only if size > k
+  logres += CppAD::CondExpGt(size, k, (size - k) * log(1 - prob), Type(0) );
+  if (!give_log) return exp(logres);
+  else return logres;
 }
 
 // Vectorize dbinom
@@ -545,13 +549,17 @@ VECTORIZE2_tt(besselY)
 */
 template<class Type>
 Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
-  CppAD::vector<Type> tx(5);
-  tx[0] = y;
-  tx[1] = mu;
-  tx[2] = phi;
-  tx[3] = p;
-  tx[4] = 0;
-  Type ans = atomic::log_dtweedie(tx)[0];
+  Type p1 = p - 1.0, p2 = 2.0 - p;
+  Type ans = -pow(mu, p2) / (phi * p2); // log(prob(y=0))
+  if (y > 0) {
+    CppAD::vector<Type> tx(4);
+    tx[0] = y;
+    tx[1] = phi;
+    tx[2] = p;
+    tx[3] = 0;
+    ans += atomic::tweedie_logW(tx)[0];
+    ans += -y / (phi * p1 * pow(mu, p1)) - log(y);
+  }
   return ( give_log ? ans : exp(ans) );
 }
 
@@ -601,7 +609,7 @@ VECTORIZE2_tt(compois_calc_loglambda)
     \f[ (0 \leq x) \land (0 < \lambda) \land (0 < \nu) \f] .
 
     \param x Observation
-    \param mode Approximate mode \f$ \lambda^\nu \f$
+    \param mode Approximate mode \f$ \lambda^\frac{1}{\nu} \f$
     \param nu   \f$ \nu \f$
 
     \ingroup R_style_distribution

@@ -66,8 +66,7 @@ gdbsource <- function(file,interactive=FALSE){
 }
 
 ##' If \code{gdbsource} is run non-interactively (the default) only
-##' the relevant information will be printed. Note that this will only
-##' work if the cpp file and the R file share the same base name.
+##' the relevant information will be printed. 
 ##'
 ##' @title Print problematic cpp line number.
 ##' @param x Backtrace from \code{gdbsource}
@@ -77,11 +76,14 @@ gdbsource <- function(file,interactive=FALSE){
 ##' @S3method print backtrace
 ##' @return NULL
 print.backtrace <- function(x,...){
-  ## Backtrace begins here
-  line <- grep("#0",x)
-  ## Assume cpp file same name as r file
-  pattern <- gsub("[R|r]$","",attr(x,"file"))
-  x <- x[line:length(x)]
-  x <- grep(pattern,x,value=TRUE)
-  cat(paste(x,"\n"))  
+    ## Both gdb and lldb use the output format
+    ##   ' at file.cpp:123'
+    ## to specify the problematic source lines:
+    pattern <- "\\ at\\ .*\\.cpp\\:[0-9]+"
+    x <- grep(pattern, x, value=TRUE)
+    if (length(x) == 0)
+        x <- "Program returned without errors"
+    else
+        x <- c("Errors:", x)
+    cat(paste(x,"\n"))
 }

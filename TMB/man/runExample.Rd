@@ -27,4 +27,3 @@ runExample(name = NULL, all = FALSE, thisR = TRUE, clean = FALSE,
 \description{
 Compile and run a test example (\code{runExample()} shows all available examples).
 }
-

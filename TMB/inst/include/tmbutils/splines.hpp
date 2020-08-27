@@ -44,6 +44,13 @@
  *	Choleski is more efficient.
  */
 
+/**  \brief Spline Interpolation
+
+     R's spline function wrapped into template class that can be used with TMB.
+
+     \warning Spline evaluation involves branching on the x-values and
+     may thus be problematic for parameter dependent inputs.
+*/
 template <class Type>
 class splinefun
 {
@@ -61,24 +68,31 @@ private:
   /* Not used */
   //int errno, EDOM;
 
-public:
-  /* Construct spline */
-  splinefun(){
-    //std::cout << "spline empty constructor\n";
-    x=y=b=c=d=e=NULL;
-    *method = *n = 0;
-  };
-  splinefun(const splinefun &fun){
-    //std::cout << "spline copy constructor\n";
-    *method = fun.method[0];
-    *n = fun.n[0];
+  /* Memory management helpers */
+  void clear() {
+    if (*n != 0) {
+      delete [] x;
+      delete [] y;
+      delete [] b;
+      delete [] c;
+      delete [] d;
+      delete [] e;
+    }
+  }
+  void alloc(int n_) {
+    *n = n_;
     x = new Type[*n];
     y = new Type[*n];
     b = new Type[*n];
     c = new Type[*n];
     d = new Type[*n];
     e = new Type[*n];
-    for(int i=0;i<*n;i++){
+  }
+  void copy_from(const splinefun &fun) {
+    *method = fun.method[0];
+    *n = fun.n[0];
+    alloc(*n);
+    for(int i = 0; i < *n; i++) {
       x[i] = fun.x[i];
       y[i] = fun.y[i];
       b[i] = fun.b[i];
@@ -87,52 +101,64 @@ public:
       e[i] = fun.e[i];
     }
   }
-  splinefun(const vector<Type> &x_, 
-	    const vector<Type> &y_, 
-	    int method_=3){
-    construct(x_,y_,method_);
-  }
-  void erase_data(){
-    // if(x!=NULL)delete [] x;
-    // if(y!=NULL)delete [] y;
-    // if(b!=NULL)delete [] b;
-    // if(c!=NULL)delete [] c;
-    // if(d!=NULL)delete [] d;
-    // if(e!=NULL)delete [] e;
-  }
-  ~splinefun(){
-    erase_data();
+
+public:
+  /* Construct spline */
+  splinefun() {
+    x = y = b = c = d = e = NULL;
+    *method = *n = 0;
   };
-  /* Use this method initialize empty splinefun */
-  void construct(const vector<Type> &x_, 
-		 const vector<Type> &y_, 
-		 int method_=3){
-    erase_data();
-    method[0]=method_;
-    n[0]=x_.size();
-    x = new Type[*n];
-    y = new Type[*n];
-    b = new Type[*n];
-    c = new Type[*n];
-    d = new Type[*n];
-    e = new Type[*n];
-    for(int i=0;i<*n;i++){
-      x[i]=x_[i];
-      y[i]=y_[i];
+  splinefun(const splinefun &fun){
+    copy_from(fun);
+  }
+  splinefun& operator=(const splinefun &x) {
+    if (this != &x) {
+      (*this).clear();
+      (*this).copy_from(x);
     }
-    spline_coef(method,n,x,y,b,c,d,e);
+    return *this;
+  }
+  ~splinefun() {
+    clear();
+  };
+  /** \brief Construct spline function object
+      \param x_ x values values
+      \param y_ y values - same length as x.
+      \param method Integer determining the spline type:
+      1. Natural splines.
+      2. Periodic splines
+      3. Splines with end-conditions determined by fitting
+         cubics in the start and end intervals (Forsythe et al).
+   */
+  splinefun(const vector<Type> &x_,
+            const vector<Type> &y_,
+            int method_ = 3) {
+    method[0] = method_;
+    n[0] = x_.size();
+    alloc( x_.size() );
+    for(int i=0; i < *n; i++) {
+      x[i] = x_[i];
+      y[i] = y_[i];
+    }
+    spline_coef(method, n, x, y, b, c, d, e);
   }
 
-  /* Evaluate spline */
-  Type operator()(const Type &x_){
+  /** \brief Evaluate spline - scalar argument case */
+  Type operator()(const Type &x_) {
     Type u[1];
     Type v[1];
     int nu[1];
-    u[0]=x_;
-    nu[0]=1;
+    u[0] = x_;
+    nu[0] = 1;
     spline_eval(method, nu, u, v,
 		n, x, y, b, c, d);
     return v[0];
+  }
+  /** \brief Evaluate spline - vector argument case */
+  vector<Type> operator() (const vector<Type> &x) {
+    vector<Type> y(x.size());
+    for (int i=0; i<x.size(); i++) y[i] = (*this)(x[i]);
+    return y;
   }
 
   /* ------------------------------------------------------------------ 

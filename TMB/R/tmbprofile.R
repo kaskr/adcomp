@@ -22,7 +22,8 @@
 ##' @param maxit Max number of iterations for adaptive algorithm.
 ##' @param slice Do slicing rather than profiling?
 ##' @param parm.range Valid parameter range.
-##' @param trace Trace progress?
+##' @param trace Trace progress? (TRUE, or a numeric value of 1,
+##' gives basic tracing: numeric values > 1 give more information)
 ##' @param ... Unused
 ##' @return data.frame with parameter and function values.
 ##' @seealso \code{\link{plot.tmbprofile}}, \code{\link{confint.tmbprofile}}
@@ -101,7 +102,7 @@ tmbprofile <- function(obj,
     ## * Evaluate and store next function value x1=x0+h, y1=f(x1).
     ## * Repeat as long as abs(y1-y.init)<ytol
     ## * If change is too small double the step size h.
-    if(slice){ ## Simple slice case
+    if (slice) { ## Simple slice case
       f <- function(x){
         par <- par + x*direction
         obj$fn(par)
@@ -124,7 +125,10 @@ tmbprofile <- function(obj,
         control <- list(step.min=1e-3)
         ans <- nlminb(start,newfn,newgr,control=control)
         start <<- ans$par
-        if (trace) cat("Profile value:",ans$objective,"\n")
+        if (trace>0) {
+            if (trace>1) cat("Profile displacement:",x*direction,"\n")
+            cat("Profile value:",ans$objective,"\n")
+        }
         ans$objective
       }
     }
@@ -145,28 +149,48 @@ tmbprofile <- function(obj,
             xcurrent <- tail(x,1)
             ycurrent <- tail(y,1)
             xnext <- xcurrent+h
-            if(xnext + that < parm.range[1])                break;
-            if(               parm.range[2] < xnext + that) break;
+            if(xnext + that < parm.range[1])  {
+                if (trace>1) cat("below minimum value: break\n")
+                break
+            }
+            if(               parm.range[2] < xnext + that) {
+                if (trace>1) cat("above maximum value: break\n")
+                break
+            }
             ynext <- f(xnext)
             x <- c(x,xnext)
             y <- c(y,ynext)
-            if( is.na(ynext) )            break;
-            if( abs(ynext-yinit) > ytol ) break;
+            if( is.na(ynext) ) {
+                if (trace>1) cat("y is NA: break\n")
+                break
+            }
+            if( (ydiff <- abs(ynext-yinit)) > ytol ) {
+                if (trace>1) cat(sprintf("delta y=%f > %f: break\n",
+                                         ydiff,ytol))
+                break
+            }
             speedMax <- ystep
             speedMin <-
                 if(ynext >= yinit) ystep/4     ## 'tail-part'
                 else               ystep/8     ## 'center-part' => slow down
-            if( abs(ynext-ycurrent) > speedMax )
+            if( abs(ynext-ycurrent) > speedMax ) {
                 h <- h / 2
-            if( abs(ynext-ycurrent) < speedMin )
+                if (trace>1) cat(sprintf("halve step size (to %f)\n",h))
+                
+            }
+            if( abs(ynext-ycurrent) < speedMin ) {
                 h <- h * 2
+                if (trace>1) cat(sprintf("double step size (to %f)\n",h))
+            }
         }
         ans <- data.frame(x=x+that, y=y)
         names(ans) <- c(name,"value")
         ans
     }
+    if (trace>1) cat("profile up\n")
     ans1 <- evalAlongLine(h)
     restore.oldvars()
+    if (trace>1) cat("profile down\n")
     ans2 <- evalAlongLine(-h)
     ans <- rbind(ans1,ans2)
     ord <- order(ans[[1]])

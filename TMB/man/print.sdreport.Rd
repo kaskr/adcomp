@@ -15,4 +15,3 @@
 Print parameter estimates and give convergence diagnostic based on
 gradient and Hessian.
 }
-

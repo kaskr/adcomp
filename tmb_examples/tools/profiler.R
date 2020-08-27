@@ -60,7 +60,7 @@ if (!is.na(match(type, amplxe.options))) {
                  " -- ",
                  Rexe,
                  " --vanilla < ",
-                 example,".R",sep="")
+                 example,".clean_exit.R",sep="")
 } else {
     stop("Unknown option collect type: ", type)
 }

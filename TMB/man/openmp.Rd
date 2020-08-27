@@ -15,4 +15,3 @@ Number of threads.
 \description{
 Control number of openmp threads.
 }
-

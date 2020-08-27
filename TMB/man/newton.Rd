@@ -75,4 +75,3 @@ arguments \code{ustep}, \code{power} and \code{u0}.
 \seealso{
 \code{\link{newtonOption}}
 }
-
