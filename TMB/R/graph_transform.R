@@ -31,7 +31,7 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
     ## Write source code
     sink(dll.cpp); out <- .Call("tmbad_print", ptr, control, PACKAGE = DLL); sink(NULL)
     ## Overload
-    compile(dll.cpp, flags=flags)
+    compile(dll.cpp, flags=flags, libtmb=FALSE)
     dyn.load(dynlib(dll))
     dllinfo <- getLoadedDLLs()[[basename(dll)]]
     forward_compiled <- getNativeSymbolInfo("forward",PACKAGE=dllinfo)$address
