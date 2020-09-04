@@ -110,6 +110,9 @@ tmbprofile <- function(obj,
     } else { ## Tough profile case
       f <- function(x){
         par <- par + x*direction
+        if (length(C)==0) {
+            return(obj$fn(par))
+        }
         newfn <- function(par0){
           par <- par + as.vector( C %*% par0 )
           obj$fn(par)
