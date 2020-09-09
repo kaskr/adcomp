@@ -13,7 +13,8 @@
 ##' @param parm.range lower and upper limits; if \code{NA},
 ##' a value will be guessed based on the parameter value and \code{sd.range}
 ##' @param sd.range in the absence of explicit \code{parm.range} values,
-##' the range chosen will be the parameter value plus or minus \code{sd.range}.
+##' the range chosen will be the parameter value plus or minus \code{sd.range}
+##' times the corresponding standard deviation.
 ##' May be specified as a two-element vector for different ranges below and
 ##' above the parameter value.
 ##' @param trace report information?
