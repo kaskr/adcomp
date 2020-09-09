@@ -76,6 +76,9 @@ function (obj, name, target=0.5*qchisq(0.95,df=1),
     that <- sum(lincomb * par)
     f <- function(x) {
         par <- par + x * direction
+        if (length(C)==0) {
+            return(obj$fn(par))
+        }
         newfn <- function(par0) {
             par <- par + as.vector(C %*% par0)
             obj$fn(par)
