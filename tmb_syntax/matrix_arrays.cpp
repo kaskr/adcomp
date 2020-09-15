@@ -52,6 +52,8 @@ Type objective_function<Type>::operator() ()
   Type v1_mincoeff = min(v1);    // minimum value in v1
   REPORT(v1_mincoeff);
 
+  matrix<Type> v2_matrix = v2.matrix(); //vector-to-matrix conversion
+  REPORT(v2_matrix);
 
   // Matrices =======================================================
 
@@ -116,9 +118,6 @@ Type objective_function<Type>::operator() ()
 
   vector<Type> m1_times_v1 = m1*v1;     // matrix-vector product
   REPORT(m1_times_v1);                  // R:  m1 %*% v1
-
-  matrix<Type> v2_matrix = v2.matrix(); //matrix-to-vector conversion
-  REPORT(v2_matrix);
 
  // Extracting parts of matrices
 
