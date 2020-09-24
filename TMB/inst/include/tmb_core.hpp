@@ -1513,8 +1513,17 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     }
     else if (method == "marginal_greedy")
       *pf = pf -> marginal_greedy(random);
-    else if (method == "marginal_sr")
-      *pf = pf -> marginal_sr(random);
+    else if (method == "marginal_sr") {
+      SEXP grid = getListElement(control, "grid");
+      SEXP x = getListElement(grid, "x");
+      SEXP w = getListElement(grid, "w");
+      if (LENGTH(x) != LENGTH(w))
+        Rf_error("Length of grid$x and grid$w must be equal");
+      TMBad::sr_grid grid_sr;
+      grid_sr.x = std::vector<double>(REAL(x), REAL(x) + LENGTH(x));
+      grid_sr.w = std::vector<double>(REAL(w), REAL(w) + LENGTH(w));
+      *pf = pf -> marginal_sr(random, grid_sr);
+    }
     else if (method == "parallelize")
       *pf = pf -> parallelize(2);
     else if (method == "compress") {
