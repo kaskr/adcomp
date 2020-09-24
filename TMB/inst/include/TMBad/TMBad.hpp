@@ -826,13 +826,14 @@ struct ADFun {
     return ans;
   }
   /** \brief Integrate using sequential reduction */
-  ADFun marginal_sr(const std::vector<Index> &random) {
+  ADFun marginal_sr(const std::vector<Index> &random,
+                    sr_grid grid = sr_grid()) {
     ADFun ans;
     old_state os(this->glob);
     aggregate(this->glob, -1);
     global glob_split = accumulation_tree_split(this->glob);
     os.restore();
-    sequential_reduction SR(glob_split, random);
+    sequential_reduction SR(glob_split, random, grid);
     ans.glob = SR.marginal();
     aggregate(ans.glob, -1);
     return ans;
