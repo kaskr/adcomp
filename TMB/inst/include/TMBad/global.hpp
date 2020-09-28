@@ -1267,6 +1267,8 @@ struct global {
     bool reduce;
     /** \brief Deterministic hash codes? */
     bool deterministic;
+    /** \brief Optionally control seeding of InvOp in case `strong_inv=true` */
+    std::vector<Index> inv_seed;
   };
 
   /** \brief Calculate hash codes of each dependent variable using a
@@ -2262,6 +2264,7 @@ struct global {
     static const bool is_linear = true;
     template <class Type>
     void forward(ForwardArgs<Type> &args) {}
+    void forward(ForwardArgs<Replay> &args);
     template <class Type>
     void reverse(ReverseArgs<Type> &args) {}
     const char *op_name();
@@ -2542,6 +2545,7 @@ struct global {
       Type eval(Type x0) {
         return x0;
       }
+      Replay eval(Replay x0);
       template <class Type>
       void reverse(ReverseArgs<Type> &args) {
         args.dx(0) += args.dy(0);

@@ -570,6 +570,7 @@ void reorder_sub_expressions(global &glob) {
   cfg.strong_const = false;
   cfg.strong_output = false;
   cfg.reduce = false;
+  cfg.deterministic = false;
   std::vector<hash_t> h = glob.hash_sweep(cfg);
   std::vector<Index> remap = radix::first_occurance<Index>(h);
 
@@ -1556,21 +1557,38 @@ std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
     opstack_id = radix::first_occurance<Index>(tmp);
   }
 
-  std::vector<hash_t> hash_vec(values.size());
+  std::vector<hash_t> hash_vec(values.size(), 37);
   Dependencies dep;
+  OperatorPure *inv = getOperator<InvOp>();
   OperatorPure *constant = getOperator<ConstOp>();
-  OperatorPure *invop = getOperator<InvOp>();
+
+  if (cfg.strong_inv) {
+    bool have_inv_seed = (cfg.inv_seed.size() > 0);
+    if (have_inv_seed) {
+      if (!(cfg.inv_seed.size() == inv_index.size())) {
+        Rcerr << "ASSERTION FAILED: "
+              << "cfg.inv_seed.size() == inv_index.size()"
+              << "\n";
+        abort();
+      };
+    }
+    for (size_t i = 0; i < inv_index.size(); i++) {
+      hash_vec[inv_index[i]] += (have_inv_seed ? cfg.inv_seed[i] + 1 : (i + 1));
+    }
+  }
+
   Args<> args(inputs);
   IndexPair &ptr = args.ptr;
   for (size_t i = 0; i < opstack.size(); i++) {
+    if (opstack[i] == inv) {
+      opstack[i]->increment(ptr);
+      continue;
+    }
     dep.clear();
 
     opstack[i]->dependencies(args, dep);
 
     hash_t h = 37;
-    if (opstack[i] == invop && cfg.strong_inv) {
-      h += i + 1;
-    }
     for (size_t j = 0; j < dep.size(); j++) {
       if (j == 0)
         h = hash_vec[dep[0]];
@@ -1726,6 +1744,10 @@ const char *global::InvOp::op_name() { return "InvOp"; }
 
 const char *global::DepOp::op_name() { return "DepOp"; }
 
+void global::ConstOp::forward(ForwardArgs<Replay> &args) {
+  args.y(0).addToTape();
+}
+
 const char *global::ConstOp::op_name() { return "ConstOp"; }
 
 void global::ConstOp::forward(ForwardArgs<Writer> &args) {
@@ -1808,6 +1830,8 @@ global::ad_plain::ad_plain(ad_aug x) {
   x.addToTape();
   *this = x.taped_value;
 }
+
+Replay global::ad_plain::CopyOp::eval(Replay x0) { return x0.copy(); }
 
 const char *global::ad_plain::CopyOp::op_name() { return "CopyOp"; }
 
@@ -3313,52 +3337,21 @@ void old_state::restore() {
   }
 }
 
-global term_info::get_subgraph(graph &reverse_graph,
-                               std::vector<Index> &var_remap, Index dep_idx) {
-  std::vector<Index> &subgraph = glob.subgraph_seq;
-  subgraph.resize(0);
-  subgraph.push_back(reverse_graph.dep2op[dep_idx]);
-  reverse_graph.search(subgraph);
-  return glob.extract_sub(var_remap);
+term_info::term_info(global &glob, bool do_init) : glob(glob) {
+  if (do_init) initialize();
 }
 
-term_info::term_info(global &glob) : glob(glob) {
-  graph reverse_graph = glob.reverse_graph();
-  std::vector<Index> subgraph;
-
-  std::vector<hash_t> h = glob.hash_sweep();
-
-  std::vector<size_t> ord = order(h);
-  std::vector<size_t> rh(h.size());
-  size_t v = 0;
-  for (size_t i = 0; i < h.size(); i++) {
-    if (i > 0 && (h[ord[i]] != h[ord[i - 1]])) {
-      v++;
-    }
-    rh[ord[i]] = v;
+void term_info::initialize(std::vector<Index> inv_remap) {
+  if (inv_remap.size() == 0) inv_remap.resize(glob.inv_index.size(), 0);
+  inv_remap = radix::factor<Index>(inv_remap);
+  std::vector<Index> remap = remap_identical_sub_expressions(glob, inv_remap);
+  std::vector<Index> term_ids = subset(remap, glob.dep_index);
+  id = radix::factor<Index>(term_ids);
+  Index max_id = *std::max_element(id.begin(), id.end());
+  count.resize(max_id + 1, 0);
+  for (size_t i = 0; i < id.size(); i++) {
+    count[id[i]]++;
   }
-
-  std::vector<Index> var_remap(glob.values.size());
-  for (size_t i = 1; i < rh.size(); i++) {
-    size_t t1 = ord[i - 1], t2 = ord[i];
-    if (h[t1] == h[t2]) {
-      global g1 = get_subgraph(reverse_graph, var_remap, t1);
-      global g2 = get_subgraph(reverse_graph, var_remap, t2);
-      if (!g1.identical(g2)) {
-        v++;
-        rh[t2] = v;
-      } else {
-        rh[t2] = rh[t1];
-      }
-    }
-  }
-
-  count.resize(v + 1, 0);
-  for (size_t i = 0; i < rh.size(); i++) {
-    count[rh[i]]++;
-  }
-
-  id = rh;
 }
 
 integrate_subgraph::integrate_subgraph(global &glob, std::vector<Index> random)
@@ -3600,7 +3593,7 @@ sequential_reduction::sequential_reduction(global &glob,
       glob(glob),
       random(random),
       replay(glob, new_glob),
-      tinfo(glob) {
+      tinfo(glob, false) {
   mark.resize(glob.values.size(), false);
   for (size_t i = 0; i < random.size(); i++)
     mark[glob.inv_index[random[i]]] = true;
@@ -3617,6 +3610,12 @@ sequential_reduction::sequential_reduction(global &glob,
   op2dep_idx = glob.op2idx(glob.dep_index, NA);
 
   terms_done.resize(glob.dep_index.size(), false);
+
+  std::vector<Index> inv_remap(glob.inv_index.size());
+  for (size_t i = 0; i < inv_remap.size(); i++) inv_remap[i] = i;
+  for (size_t i = 0; i < random.size(); i++) inv_remap[random[i]] = -1;
+  inv_remap = radix::factor<Index>(inv_remap);
+  tinfo.initialize(inv_remap);
 }
 
 std::vector<ad_aug> sequential_reduction::tabulate(std::vector<Index> inv_index,
@@ -3951,8 +3950,16 @@ void ParalOp::print(global::print_config cfg) {
   }
 }
 
-std::vector<Index> get_likely_expression_duplicates(const global &glob) {
-  std::vector<hash_t> h = glob.hash_sweep(false);
+std::vector<Index> get_likely_expression_duplicates(
+    const global &glob, std::vector<Index> inv_remap) {
+  global::hash_config cfg;
+  cfg.strong_inv = true;
+  cfg.strong_const = true;
+  cfg.strong_output = true;
+  cfg.reduce = false;
+  cfg.deterministic = false;
+  cfg.inv_seed = inv_remap;
+  std::vector<hash_t> h = glob.hash_sweep(cfg);
   return radix::first_occurance<Index>(h);
 }
 
@@ -3968,8 +3975,20 @@ bool all_allow_remap(const global &glob) {
   return true;
 }
 
-void remap_identical_sub_expressions(global &glob, bool all_allow_remap) {
-  std::vector<Index> remap = get_likely_expression_duplicates(glob);
+std::vector<Index> remap_identical_sub_expressions(
+    global &glob, std::vector<Index> inv_remap) {
+  std::vector<Index> remap = get_likely_expression_duplicates(glob, inv_remap);
+
+  for (size_t i = 0; i < glob.inv_index.size(); i++) {
+    bool accept = false;
+    Index var_i = glob.inv_index[i];
+    if (inv_remap.size() > 0) {
+      Index j = inv_remap[i];
+      Index var_j = glob.inv_index[j];
+      accept = remap[var_i] == remap[var_j];
+    }
+    if (!accept) remap[var_i] = var_i;
+  }
 
   std::vector<Index> v2o = glob.var2op();
   std::vector<Index> dep;
@@ -3997,7 +4016,7 @@ void remap_identical_sub_expressions(global &glob, bool all_allow_remap) {
       for (size_t k = i; k < i + nout; k++)
         ok &= (glob.opstack[v2o[k]]->identifier() ==
                glob.opstack[v2o[remap[k]]]->identifier());
-      if (ok) {
+      if (false) {
         if (glob.opstack[v2o[i]] == invop) {
           ok = false;
         }
@@ -4042,7 +4061,7 @@ void remap_identical_sub_expressions(global &glob, bool all_allow_remap) {
     ASSERT(remap[remap[i]] == remap[i]);
   }
 
-  if (!all_allow_remap) {
+  if (true) {
     Args<> args(glob.inputs);
     intervals<Index> visited;
     for (size_t i = 0; i < glob.opstack.size(); i++) {
@@ -4063,6 +4082,13 @@ void remap_identical_sub_expressions(global &glob, bool all_allow_remap) {
   if (reject > 0) {
     Rcout << "Rejected remappings: " << reject << " of " << total << "\n";
   }
+
+  return remap;
+}
+
+void remap_identical_sub_expressions(global &glob) {
+  std::vector<Index> inv_remap(0);
+  std::vector<Index> remap = remap_identical_sub_expressions(glob, inv_remap);
 
   for (size_t i = 0; i < glob.inputs.size(); i++) {
     glob.inputs[i] = remap[glob.inputs[i]];
