@@ -110,5 +110,21 @@ std::vector<I> first_occurance(const std::vector<T>& x) {
   return radix<T, I>(x).first_occurance();
 }
 
+/** \brief Replace each element in a vector by an integer code such that
+    `x[i] == x[j]` implies `f[i] == f[j]`
+*/
+template <class I, class T>
+std::vector<I> factor(const std::vector<T>& x) {
+  std::vector<I> y = first_occurance<I>(x);
+  std::vector<I> tab(y.size());
+  for (size_t i = 0, k = 0; i < y.size(); i++) {
+    if (y[i] == i)
+      tab[i] = k++;
+    else
+      tab[i] = tab[y[i]];
+  }
+  return tab;
+}
+
 }  // namespace radix
 #endif  // HAVE_RADIX_HPP
