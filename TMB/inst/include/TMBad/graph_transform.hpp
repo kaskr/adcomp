@@ -225,13 +225,14 @@ struct old_state {
   void restore();
 };
 
+std::vector<Index> remap_identical_sub_expressions(
+    global &glob, std::vector<Index> inv_remap);
 struct term_info {
   global &glob;
-  std::vector<size_t> id;
+  std::vector<Index> id;
   std::vector<size_t> count;
-  global get_subgraph(graph &reverse_graph, std::vector<Index> &var_remap,
-                      Index dep_idx);
-  term_info(global &glob);
+  term_info(global &glob, bool do_init = true);
+  void initialize(std::vector<Index> inv_remap = std::vector<Index>(0));
 };
 
 template <class Float = ad_adapt>
@@ -683,7 +684,8 @@ struct ParalOp : global::DynamicOperator<-1, -1> {
   void print(global::print_config cfg);
 };
 
-std::vector<Index> get_likely_expression_duplicates(const global &glob);
+std::vector<Index> get_likely_expression_duplicates(
+    const global &glob, std::vector<Index> inv_remap);
 
 /** \brief Test if all operators in the stack allow input remapping
 
@@ -767,8 +769,10 @@ struct forbid_remap {
     \param glob Function object to be modified
     \param all_allow_remap Skip extra check
 */
-void remap_identical_sub_expressions(global &glob,
-                                     bool all_allow_remap = false);
+std::vector<Index> remap_identical_sub_expressions(
+    global &glob, std::vector<Index> inv_remap);
+
+void remap_identical_sub_expressions(global &glob);
 
 std::vector<Position> inv_positions(global &glob);
 
