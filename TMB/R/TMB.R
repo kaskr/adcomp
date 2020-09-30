@@ -65,6 +65,7 @@ isNullPointer <- function(pointer) {
 
 ## Add external pointer finalizer
 registerFinalizer <- function(ADFun, DLL) {
+    ADFun$DLL <- DLL
     finalizer <- function(ptr) {
         if ( ! isNullPointer(ptr) ) {
             .Call("FreeADFunObject", ptr, PACKAGE=DLL)
@@ -73,6 +74,7 @@ registerFinalizer <- function(ADFun, DLL) {
         }
     }
     reg.finalizer(ADFun$ptr, finalizer)
+    ADFun
 }
 
 ##' Construct objective functions with derivatives based on the users C++ template.
@@ -365,7 +367,7 @@ MakeADFun <- function(data, parameters, map=list(),
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
       Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-      registerFinalizer(Fun, DLL)
+      Fun <<- registerFinalizer(Fun, DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
       out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
                    control = list(do_simulate = as.integer(0),
@@ -420,7 +422,7 @@ MakeADFun <- function(data, parameters, map=list(),
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
       if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
-          registerFinalizer(ADFun, DLL)
+          ADFun <<- registerFinalizer(ADFun, DLL)
       if (intern) {
           cfg <- inner.control
           if (is.null(cfg$sparse)) cfg$sparse <- TRUE
@@ -469,7 +471,7 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     if("Fun"%in%type) {
         Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-        registerFinalizer(Fun, DLL)
+        Fun <<- registerFinalizer(Fun, DLL)
     }
     if("ADGrad"%in%type) {
         retape_adgrad(lazy = TRUE)
@@ -489,7 +491,7 @@ MakeADFun <- function(data, parameters, map=list(),
       if (lazy && !is.null(random))
           control$random <- as.integer(random)
       ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,control,PACKAGE=DLL)
-      registerFinalizer(ADGrad, DLL)
+      ADGrad <<- registerFinalizer(ADGrad, DLL)
   }
   retape(set.defaults = TRUE)
   ## Has atomic functions been generated for the tapes ?
@@ -1573,7 +1575,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                   obj$env$reportenv,
                   list(gf=obj$env$ADGrad$ptr, skip=skip), ## <-- Skip this index vector of parameters
                   PACKAGE=obj$env$DLL)
-  registerFinalizer(ADHess, obj$env$DLL)
+  ADHess <- registerFinalizer(ADHess, obj$env$DLL)
   ## Experiment !
   .Call("TransformADFunObject", ADHess$ptr, list(random_order = r, method="reorder_random", mustWork=0L, max_period_size=1024L), PACKAGE=obj$env$DLL)
   ev <- function(par, set_tail=0)
