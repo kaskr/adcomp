@@ -1,3 +1,13 @@
+TransformADFunObject <- function(ADFun,
+                                 method,
+                                 ...
+                                 ) {
+    .Call("TransformADFunObject",
+          f = ADFun$ptr,
+          control = list(method = as.character(method), ...),
+          PACKAGE = ADFun$DLL)
+}
+
 ## Utility
 tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL()) {
     if (is.list(x)) x <- x$ptr
