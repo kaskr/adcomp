@@ -17,63 +17,21 @@ parameters <- list(
   logR = 0
 )
 
-## Fit model Laplace
-if (FALSE) {
-    obj <- MakeADFun(data, parameters, random="X", DLL="thetalog")
-    newtonOption(obj, smartsearch=FALSE)
-    obj$fn()
-    obj$gr()
-    system.time(opt <- nlminb(obj$par, obj$fn, obj$gr))
-    range(obj$env$last.par.best[1:length(Y)])
-}
+## Specify configuration for sequential reduction
+integrate <- list("X" = list("SR", "continuous", seq(0, 10, length=100)))
 
-obj <- MakeADFun(data, parameters, DLL="thetalog")
-random <- 1:length(Y)
-
-#######
-DLL <- "thetalog"
-x <- seq(0,10,length=100)
-w <- rep(diff(x)[1],length(x))
-grid <- list(x=x,w=w)
-## Construct HMM filter
-con <- list(random_order = random, 
-            method = "marginal_sr",
-            grid = grid,
-            mustWork = 1L,
-            max_period_size = 1024L)
-.Call("TransformADFunObject",
-      obj$env$ADFun$ptr,
-      con,
-      PACKAGE = DLL)
-
-## Remove random parameters from funciton objects
-.Call("TransformADFunObject",
-      obj$env$ADFun$ptr,
-      list(method = "remove_random_parameters", 
-           random_order = random,
-           mustWork = 1L,
-           max_period_size = 1024L), 
-      PACKAGE = DLL)
-attr(obj$env$ADFun$ptr, "par") <- attr(obj$env$ADFun$ptr, "par")[-random]
-obj$env$par <- obj$env$par[-random]
-obj$par <- obj$env$par
-obj$env$random <- NULL
+## Construct object with 'X' integrated by sequential reduction
+obj <- MakeADFun(data, parameters, random="X", integrate=integrate, DLL="thetalog")
 
 ## Fit model
-system.time(qw <- nlminb(obj$par, obj$fn, obj$gr)) ## 67.620
-qw$evaluations
+system.time(opt <- nlminb(obj$par, obj$fn, obj$gr))
 
 ## Turn on epsilon method to get posterior mean
 data <- list(Y=Y, flag=1)
 parameters$eps <- parameters$X * 0
 ##parameters$scale <- 1
-obj <- MakeADFun(data, parameters, DLL="thetalog")
-random <- 1:length(Y)
-.Call("TransformADFunObject",
-      obj$env$ADFun$ptr,
-      con,
-      PACKAGE = DLL)
-obj$par[-(c(1:length(Y)))][1:5] <- qw$par
+obj <- MakeADFun(data, parameters, random="X", integrate=integrate, DLL="thetalog")
+obj$par[1:5] <- opt$par
 obj$fn(obj$par)
 g <- obj$gr(obj$par)
 
