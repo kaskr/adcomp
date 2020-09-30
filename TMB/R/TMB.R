@@ -77,6 +77,28 @@ registerFinalizer <- function(ADFun, DLL) {
     ADFun
 }
 
+## Sequential reduction grid constructor
+## Lebesgue measure (continuous) or counting measure (discrete)
+SR <- function(type = c("continuous", "discrete"), x) {
+    type <- match.arg(type)
+    x <- as.numeric(x)
+    if (is.unsorted(x)) stop("'x' must be sorted")
+    if (type == "continuous") {
+        w <- diff(x)
+        x <- head(x, -1) + w / 2
+    }
+    if (type == "discrete") {
+        w <- rep(1., length(x))
+    }
+    list(x=x, w=w)
+}
+
+## TODO: Gauss Kronrod config
+GK <- function(...) {}
+
+## TODO: Laplace approx config
+LA <- function(...) {}
+
 ##' Construct objective functions with derivatives based on the users C++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
