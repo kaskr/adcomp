@@ -193,6 +193,7 @@ LA <- function(...) {}
 ##' @param regexp Match random effects by regular expressions?
 ##' @param silent Disable all tracing information?
 ##' @param intern Do Laplace approximation on C++ side ? (Experimental - may change without notice)
+##' @param integrate Specify alternative integration method(s) for random effects (see details)
 ##' @param ... Currently unused.
 ##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data, parameters, map=list(),
@@ -212,6 +213,7 @@ MakeADFun <- function(data, parameters, map=list(),
                       regexp=FALSE,
                       silent=FALSE,
                       intern=FALSE,
+                      integrate=NULL,
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
