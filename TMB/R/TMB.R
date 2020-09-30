@@ -99,6 +99,17 @@ GK <- function(...) {}
 ## TODO: Laplace approx config
 LA <- function(...) {}
 
+## 'parse' MakeADFun argument 'integrate'
+parseIntegrate <- function(arg, name) {
+    i <- sapply(arg, function(x) (x[[1]] == name))
+    arg <- arg[i]
+    for (i in seq_along(arg)) {
+        arg[[i]][[1]] <- as.name(arg[[i]][[1]])
+        arg[[i]] <- eval(as.call(arg[[i]]))
+    }
+    arg
+}
+
 ##' Construct objective functions with derivatives based on the users C++ template.
 ##'
 ##' A call to \code{MakeADFun} will return an object that, based on the users DLL code (specified through \code{DLL}), contains functions to calculate the objective function
@@ -447,6 +458,37 @@ MakeADFun <- function(data, parameters, map=list(),
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
       if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
           ADFun <<- registerFinalizer(ADFun, DLL)
+      if (!is.null(integrate)) {
+          sr_integrate <- parseIntegrate(integrate, "SR")
+          nm <- sapply(parameters, length)
+          nmpar <- rep(names(nm), nm)
+          ok <- all(names(sr_integrate) %in% nmpar[random])
+          if (!ok)
+              stop("Names to be 'integrate'd must be among the random parameters")
+          w <- which(nmpar[random] %in% names(sr_integrate))
+          ## Integrate parameter subset out of the likelihood
+          TransformADFunObject(ADFun,
+                               method = "marginal_sr",
+                               random_order = random[w],
+                               grid = sr_integrate[[1]], ## FIXME - pass all grids!
+                               mustWork = 1L)
+          ## Integrated parameters must no longer be present
+          TransformADFunObject(ADFun,
+                               method="remove_random_parameters",
+                               random_order = random[w],
+                               mustWork = 1L)
+          ## Adjust 'random' and 'par' accordingly
+          attr(ADFun$ptr, "par") <- attr(ADFun$ptr, "par")[-random[w]]
+          par_mask <- rep(FALSE, length(par))
+          par_mask[random] <- TRUE
+          par <<- par[-random[w]]
+          par_mask <- par_mask[-random[w]]
+          random <<- which(par_mask)
+          if (length(random) == 0) {
+              random <<- NULL
+              type <<- setdiff(type, "ADGrad")
+          }
+      }
       if (intern) {
           cfg <- inner.control
           if (is.null(cfg$sparse)) cfg$sparse <- TRUE
