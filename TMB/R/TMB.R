@@ -427,19 +427,15 @@ MakeADFun <- function(data, parameters, map=list(),
           cfg <- inner.control
           if (is.null(cfg$sparse)) cfg$sparse <- TRUE
           cfg <- lapply(cfg, as.double)
-          .Call("TransformADFunObject", ADFun$ptr, list(newton_cfg=cfg,
-                                                        random_order = random,
-                                                        method="laplace",
-                                                        mustWork=1L,
-                                                        max_period_size=1024L),
-                PACKAGE=DLL)
-          .Call("TransformADFunObject", ADFun$ptr,
-                list(
-                    method="remove_random_parameters",
-                    random_order = random,
-                    mustWork=1L,
-                    max_period_size=1024L),
-                PACKAGE=DLL)
+          TransformADFunObject(ADFun,
+                               method = "laplace",
+                               newton_cfg = cfg,
+                               random_order = random,
+                               mustWork = 1L)
+          TransformADFunObject(ADFun,
+                               method="remove_random_parameters",
+                               random_order = random,
+                               mustWork = 1L)
           ## FIXME: Should be done by above .Call
           attr(ADFun$ptr,"par") <- attr(ADFun$ptr,"par")[-random]
           ##
@@ -447,13 +443,9 @@ MakeADFun <- function(data, parameters, map=list(),
           random <<- NULL
           ## Run tape optimizer
           if (config(DLL=DLL)$optimize.instantly) {
-              .Call("TransformADFunObject", ADFun$ptr,
-                    list(
-                        method="optimize",
-                        random_order=integer(0),
-                        mustWork=1L,
-                        max_period_size=1024L),
-                    PACKAGE=DLL)
+              TransformADFunObject(ADFun,
+                                   method = "optimize",
+                                   mustWork = 1L)
           }
       }
       if (set.defaults) {
@@ -467,7 +459,10 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     if (length(random) > 0) {
         ## Experiment !
-        .Call("TransformADFunObject", ADFun$ptr, list(random_order = random, method="reorder_random", mustWork=0L, max_period_size=1024L), PACKAGE=DLL)
+        TransformADFunObject(ADFun,
+                             method = "reorder_random",
+                             random_order = random,
+                             mustWork = 0L)
     }
     if("Fun"%in%type) {
         Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
@@ -1577,7 +1572,10 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                   PACKAGE=obj$env$DLL)
   ADHess <- registerFinalizer(ADHess, obj$env$DLL)
   ## Experiment !
-  .Call("TransformADFunObject", ADHess$ptr, list(random_order = r, method="reorder_random", mustWork=0L, max_period_size=1024L), PACKAGE=obj$env$DLL)
+  TransformADFunObject(ADHess,
+                       method = "reorder_random",
+                       random_order = r,
+                       mustWork = 0L)
   ev <- function(par, set_tail=0)
           .Call("EvalADFunObject", ADHess$ptr, par,
                 control = list(
