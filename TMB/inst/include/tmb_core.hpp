@@ -1496,8 +1496,13 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   }
   SEXP random_order = getListElement(control, "random_order");
   int nr = LENGTH(random_order);
-  std::vector<TMBad::Index> random(INTEGER(random_order), INTEGER(random_order) + nr);
-  for (size_t i=0; i<random.size(); i++) random[i] -= 1 ; // R index -> C index
+  std::vector<TMBad::Index> random;
+  if (nr != 0) {
+    random = std::vector<TMBad::Index>(INTEGER(random_order),
+                                       INTEGER(random_order) + nr);
+    for (size_t i=0; i<random.size(); i++)
+      random[i] -= 1 ; // R index -> C index
+  }
   TMB_TRY {
     if (method == "remove_random_parameters") {
       std::vector<bool> mask(pf->Domain(), true);
