@@ -26,6 +26,10 @@ Type objective_function<Type>::operator() ()
   vector<Type> v3_segment = v3.segment(2,3); //segment of 3 elements,
   REPORT(v3_segment);                     // starting at 3rd element
 
+  vector<Type> v_concat_v1_v2(v1.size()+v2.size()); // Result vector must be allocated in advance!
+  v_concat_v1_v2 << v1,v2;              // Syntax for concatination of v1 and v2
+  REPORT(v_concat_v1_v2);
+
   Type v1_sum = v1.sum();               // sum of all cells in v1
   REPORT(v1_sum);
 
