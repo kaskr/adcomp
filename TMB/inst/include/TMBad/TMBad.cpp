@@ -3588,12 +3588,19 @@ ad_plain sr_grid::logw_offset() {
 
 sequential_reduction::sequential_reduction(global &glob,
                                            std::vector<Index> random,
-                                           sr_grid grid)
+                                           std::vector<sr_grid> grid,
+                                           std::vector<Index> random2grid,
+                                           bool perm)
     : grid(grid),
       glob(glob),
       random(random),
       replay(glob, new_glob),
       tinfo(glob, false) {
+  inv2grid.resize(glob.inv_index.size(), 0);
+  for (size_t i = 0; i < random2grid.size(); i++) {
+    inv2grid[random[i]] = random2grid[i];
+  }
+
   mark.resize(glob.values.size(), false);
   for (size_t i = 0; i < random.size(); i++)
     mark[glob.inv_index[random[i]]] = true;
@@ -3609,13 +3616,66 @@ sequential_reduction::sequential_reduction(global &glob,
   op2inv_idx = glob.op2idx(glob.inv_index, NA);
   op2dep_idx = glob.op2idx(glob.dep_index, NA);
 
+  if (perm) reorder_random();
+
   terms_done.resize(glob.dep_index.size(), false);
 
   std::vector<Index> inv_remap(glob.inv_index.size());
-  for (size_t i = 0; i < inv_remap.size(); i++) inv_remap[i] = i;
-  for (size_t i = 0; i < random.size(); i++) inv_remap[random[i]] = -1;
+  for (size_t i = 0; i < inv_remap.size(); i++) inv_remap[i] = -(i + 1);
+  for (size_t i = 0; i < random.size(); i++)
+    inv_remap[random[i]] = inv2grid[random[i]];
   inv_remap = radix::factor<Index>(inv_remap);
   tinfo.initialize(inv_remap);
+}
+
+void sequential_reduction::reorder_random() {
+  std::vector<IndexPair> edges;
+  std::vector<Index> &inv2op = forward_graph.inv2op;
+
+  for (size_t i = 0; i < random.size(); i++) {
+    std::vector<Index> subgraph(1, inv2op[random[i]]);
+    forward_graph.search(subgraph);
+    reverse_graph.search(subgraph);
+    for (size_t l = 0; l < subgraph.size(); l++) {
+      Index inv_other = op2inv_idx[subgraph[l]];
+      if (inv_other != NA) {
+        IndexPair edge(random[i], inv_other);
+        edges.push_back(edge);
+      }
+    }
+  }
+
+  size_t num_nodes = glob.inv_index.size();
+  graph G(num_nodes, edges);
+
+  std::vector<bool> visited(num_nodes, false);
+  std::vector<Index> subgraph;
+  for (size_t i = 0; i < random.size(); i++) {
+    if (visited[random[i]]) break;
+    std::vector<Index> sg(1, random[i]);
+    G.search(sg, visited, false, false);
+    subgraph.insert(subgraph.end(), sg.begin(), sg.end());
+  }
+  std::reverse(subgraph.begin(), subgraph.end());
+  random = subgraph;
+}
+
+std::vector<size_t> sequential_reduction::get_grid_bounds(
+    std::vector<Index> inv_index) {
+  std::vector<size_t> ans(inv_index.size());
+  for (size_t i = 0; i < inv_index.size(); i++) {
+    ans[i] = grid[inv2grid[inv_index[i]]].size();
+  }
+  return ans;
+}
+
+std::vector<sr_grid *> sequential_reduction::get_grid(
+    std::vector<Index> inv_index) {
+  std::vector<sr_grid *> ans(inv_index.size());
+  for (size_t i = 0; i < inv_index.size(); i++) {
+    ans[i] = &(grid[inv2grid[inv_index[i]]]);
+  }
+  return ans;
 }
 
 std::vector<ad_aug> sequential_reduction::tabulate(std::vector<Index> inv_index,
@@ -3629,11 +3689,13 @@ std::vector<ad_aug> sequential_reduction::tabulate(std::vector<Index> inv_index,
     }
   }
 
-  multivariate_index mv(grid.size(), inv_index.size());
+  std::vector<sr_grid *> inv_grid = get_grid(inv_index);
+  std::vector<size_t> grid_bounds = get_grid_bounds(inv_index);
+  multivariate_index mv(grid_bounds);
   std::vector<ad_aug> ans(mv.count());
   for (size_t i = 0; i < ans.size(); i++, ++mv) {
     for (size_t j = 0; j < inv_index.size(); j++) {
-      replay.value_inv(inv_index[j]) = grid.x[mv.index(j)];
+      replay.value_inv(inv_index[j]) = inv_grid[j]->x[mv.index(j)];
     }
     replay.forward_sub();
     ans[i] = replay.value_dep(dep_index);
@@ -3662,7 +3724,7 @@ void sequential_reduction::merge(Index i) {
   std::vector<Index> stride_by_clique(c);
   clique C;
   C.indices = super;
-  C.dim.resize(super.size(), grid.size());
+  C.dim = get_grid_bounds(super);
   std::list<clique>::iterator it = cliques.begin();
   c = 0;
   while (it != cliques.end()) {
@@ -3680,7 +3742,7 @@ void sequential_reduction::merge(Index i) {
   C.subset_inplace(mask);
   C.logsum_init();
 
-  grid.logw_offset();
+  grid[inv2grid[i]].logw_offset();
   size_t v_begin = get_glob()->values.size();
   for (size_t j = 0; j < C.logsum.size(); j++) {
     std::vector<ad_plain> x;
@@ -3690,9 +3752,9 @@ void sequential_reduction::merge(Index i) {
       stride.push_back(stride_by_clique[k]);
     }
 
-    x.push_back(grid.logw_offset());
+    x.push_back(grid[inv2grid[i]].logw_offset());
     stride.push_back(1);
-    C.logsum[j] = logspace_sum_stride(x, stride, grid.size());
+    C.logsum[j] = logspace_sum_stride(x, stride, grid[inv2grid[i]].size());
   }
   size_t v_end = get_glob()->values.size();
   ASSERT(v_end - v_begin == C.logsum.size());
@@ -3731,7 +3793,7 @@ void sequential_reduction::update(Index i) {
 
     clique C;
     C.indices = inv_clique;
-    C.dim.resize(inv_clique.size(), grid.size());
+    C.dim = get_grid_bounds(inv_clique);
     C.logsum = tabulate(inv_clique, dep_clique[k]);
 
     cliques.push_back(C);
