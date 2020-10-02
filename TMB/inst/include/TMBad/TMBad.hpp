@@ -826,17 +826,23 @@ struct ADFun {
     return ans;
   }
   /** \brief Integrate using sequential reduction */
-  ADFun marginal_sr(const std::vector<Index> &random,
-                    sr_grid grid = sr_grid()) {
+  ADFun marginal_sr(const std::vector<Index> &random, std::vector<sr_grid> grid,
+                    const std::vector<Index> &random2grid, bool perm = true) {
     ADFun ans;
     old_state os(this->glob);
     aggregate(this->glob, -1);
     global glob_split = accumulation_tree_split(this->glob);
     os.restore();
-    sequential_reduction SR(glob_split, random, grid);
+    sequential_reduction SR(glob_split, random, grid, random2grid, perm);
     ans.glob = SR.marginal();
     aggregate(ans.glob, -1);
     return ans;
+  }
+  /** \brief Integrate using sequential reduction */
+  ADFun marginal_sr(const std::vector<Index> &random,
+                    sr_grid grid = sr_grid()) {
+    return marginal_sr(random, std::vector<sr_grid>(1, grid),
+                       std::vector<Index>(0));
   }
   /** \brief Decompose this computational graph
       \note This function preserves the inner/outer parameter categories if in
