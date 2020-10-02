@@ -1518,15 +1518,25 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     else if (method == "marginal_greedy")
       *pf = pf -> marginal_greedy(random);
     else if (method == "marginal_sr") {
+      std::vector<TMBad::sr_grid> grids;
       SEXP grid = getListElement(control, "grid");
-      SEXP x = getListElement(grid, "x");
-      SEXP w = getListElement(grid, "w");
-      if (LENGTH(x) != LENGTH(w))
-        Rf_error("Length of grid$x and grid$w must be equal");
-      TMBad::sr_grid grid_sr;
-      grid_sr.x = std::vector<double>(REAL(x), REAL(x) + LENGTH(x));
-      grid_sr.w = std::vector<double>(REAL(w), REAL(w) + LENGTH(w));
-      *pf = pf -> marginal_sr(random, grid_sr);
+      SEXP random2grid = getListElement(control, "random2grid");
+      for (int i=0; i<LENGTH(grid); i++) {
+        SEXP grid_i = VECTOR_ELT(grid, i);
+        SEXP x = getListElement(grid_i, "x");
+        SEXP w = getListElement(grid_i, "w");
+        if (LENGTH(x) != LENGTH(w))
+          Rf_error("Length of grid$x and grid$w must be equal");
+        TMBad::sr_grid grid_sr;
+        grid_sr.x = std::vector<double>(REAL(x), REAL(x) + LENGTH(x));
+        grid_sr.w = std::vector<double>(REAL(w), REAL(w) + LENGTH(w));
+        grids.push_back(grid_sr);
+      }
+      std::vector<TMBad::Index> r2g(INTEGER(random2grid),
+                                    INTEGER(random2grid) + LENGTH(random2grid));
+      for (size_t i=0; i<r2g.size(); i++)
+        r2g[i] -= 1 ; // R index -> C index
+      *pf = pf -> marginal_sr(random, grids, r2g, true);
     }
     else if (method == "parallelize")
       *pf = pf -> parallelize(2);
