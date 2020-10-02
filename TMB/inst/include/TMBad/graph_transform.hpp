@@ -479,7 +479,8 @@ struct sr_grid {
 */
 struct sequential_reduction {
   std::list<clique> cliques;
-  sr_grid grid;
+  std::vector<sr_grid> grid;
+  std::vector<Index> inv2grid;
   global &glob;
   global new_glob;
   std::vector<Index> random;
@@ -505,8 +506,16 @@ struct sequential_reduction {
      order.
   */
   sequential_reduction(global &glob, std::vector<Index> random,
-                       sr_grid grid = sr_grid(-20, 20, 200));
+                       std::vector<sr_grid> grid =
+                           std::vector<sr_grid>(1, sr_grid(-20, 20, 200)),
+                       std::vector<Index> random2grid = std::vector<Index>(0),
+                       bool perm = true);
 
+  void reorder_random();
+
+  std::vector<size_t> get_grid_bounds(std::vector<Index> inv_index);
+
+  std::vector<sr_grid *> get_grid(std::vector<Index> inv_index);
   /** \brief tabulate each combination of variables of a subgraph
 
       It is assumed that a subgraph has been made. The subgraph has a certain
