@@ -4176,8 +4176,8 @@ std::vector<Position> inv_positions(global &glob) {
   return ans;
 }
 
-void reorder_graph(global &glob, std::vector<Index> inv_idx,
-                   bool all_allow_remap) {
+void reorder_graph(global &glob, std::vector<Index> inv_idx) {
+  if (!all_allow_remap(glob)) return;
   for (size_t i = 1; i < inv_idx.size(); i++) {
     ASSERT(inv_idx[i] > inv_idx[i - 1]);
   }

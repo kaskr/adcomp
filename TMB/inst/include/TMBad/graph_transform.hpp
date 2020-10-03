@@ -786,11 +786,11 @@ void remap_identical_sub_expressions(global &glob);
 std::vector<Position> inv_positions(global &glob);
 
 /** \brief Reorder computational graph such that selected independent variables
-   come last \param inv_idx Sorted vector of independent variables. \warning
-   FIXME Not yet working for operators with pointer input
+   come last \param inv_idx Sorted vector of independent variables. \note
+   Nothing is done if **any operators with pointer inputs are detected on the
+   tape**. (FIXME: Not optimal)
 */
-void reorder_graph(global &glob, std::vector<Index> inv_idx,
-                   bool all_allow_remap = false);
+void reorder_graph(global &glob, std::vector<Index> inv_idx);
 
 }  // namespace TMBad
 #endif  // HAVE_GRAPH_TRANSFORM_HPP
