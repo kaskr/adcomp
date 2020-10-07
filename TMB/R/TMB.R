@@ -77,20 +77,24 @@ registerFinalizer <- function(ADFun, DLL) {
     ADFun
 }
 
-## Sequential reduction grid constructor
-## Lebesgue measure (continuous) or counting measure (discrete)
-SR <- function(type = c("continuous", "discrete"), x) {
-    type <- match.arg(type)
+##' Sequential reduction configuration
+##'
+##' Helper function to specify an integration grid used by the
+##' sequential reduction algorithm available through the argument
+##' \code{integrate} to \code{MakeADFun}.
+##' @param x Breaks defining the domain of integration
+##' @param discrete Boolean defining integration wrt Lebesgue measure (\code{discrete=FALSE}) or counting measure \code{discrete=TRUE}.
+SR <- function(x, discrete=FALSE) {
+    if (is(x, "SR")) return (x)
     x <- as.numeric(x)
     if (is.unsorted(x)) stop("'x' must be sorted")
-    if (type == "continuous") {
+    if (discrete) {
+        w <- rep(1., length(x))
+    } else {
         w <- diff(x)
         x <- head(x, -1) + w / 2
     }
-    if (type == "discrete") {
-        w <- rep(1., length(x))
-    }
-    list(x=x, w=w)
+    structure(list(x=x, w=w), class="SR")
 }
 
 ## TODO: Gauss Kronrod config
@@ -101,13 +105,8 @@ LA <- function(...) {}
 
 ## 'parse' MakeADFun argument 'integrate'
 parseIntegrate <- function(arg, name) {
-    i <- sapply(arg, function(x) (x[[1]] == name))
-    arg <- arg[i]
-    for (i in seq_along(arg)) {
-        arg[[i]][[1]] <- as.name(arg[[i]][[1]])
-        arg[[i]] <- eval(as.call(arg[[i]]))
-    }
-    arg
+    i <- sapply(arg, function(x) is(x, name))
+    arg[i]
 }
 
 ##' Construct objective functions with derivatives based on the users C++ template.
