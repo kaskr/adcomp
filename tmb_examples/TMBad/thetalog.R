@@ -18,7 +18,9 @@ parameters <- list(
 )
 
 ## Specify configuration for sequential reduction
-integrate <- list("X" = list("SR", "continuous", seq(0, 10, length=100)))
+integrate <- list(
+    "X" = SR(seq(0, 10, length=100))
+)
 
 ## Construct object with 'X' integrated by sequential reduction
 obj <- MakeADFun(data, parameters, random="X", integrate=integrate, DLL="thetalog")
