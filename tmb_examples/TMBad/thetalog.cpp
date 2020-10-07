@@ -33,9 +33,9 @@ Type objective_function<Type>::operator() ()
     // Epsilon method
     PARAMETER_VECTOR(eps);
     // scale=1:   Get mean
-    // scale=Inf: Get mode (not working yet)
-    // PARAMETER(scale);
-    // ans *= scale;
+    // scale=Inf: Get mode
+    DATA_SCALAR(scale);
+    ans *= scale;
     ans += (eps * X).sum();
   }
   return ans;
