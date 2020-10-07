@@ -1869,6 +1869,12 @@ ad_plain global::ad_plain::operator*(const ad_plain &other) const {
   return ans;
 }
 
+ad_plain global::ad_plain::operator*(const Scalar &other) const {
+  ad_plain ans =
+      get_glob()->add_to_stack<MulOp_<true, false> >(*this, ad_plain(other));
+  return ans;
+}
+
 ad_plain global::ad_plain::operator/(const ad_plain &other) const {
   ad_plain ans = get_glob()->add_to_stack<DivOp>(*this, other);
   return ans;
@@ -2099,6 +2105,8 @@ ad_aug global::ad_aug::operator*(const ad_aug &other) const {
   if (other.identicalZero()) return other;
   if (this->identicalOne()) return other;
   if (other.identicalOne()) return *this;
+  if (this->constant()) return ad_plain(other) * Scalar(this->data.value);
+  if (other.constant()) return ad_plain(*this) * Scalar(other.data.value);
   return ad_plain(*this) * ad_plain(other);
 }
 
@@ -3317,7 +3325,6 @@ void aggregate(global &glob, int sign) {
   glob.dep_index.resize(0);
   y.Dependent();
   glob.ad_stop();
-  glob.forward_replay();
 }
 
 old_state::old_state(global &glob) : glob(glob) {

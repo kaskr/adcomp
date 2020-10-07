@@ -2641,6 +2641,7 @@ struct global {
     template <bool left_var, bool right_var>
     struct MulOp_ : BinaryOperator {
       static const bool have_eval = true;
+      static const bool is_linear = !left_var || !right_var;
       template <class Type>
       Type eval(Type x0, Type x1) {
         return x0 * x1;
@@ -2654,6 +2655,7 @@ struct global {
     };
     typedef MulOp_<true, true> MulOp;
     ad_plain operator*(const ad_plain &other) const;
+    ad_plain operator*(const Scalar &other) const;
 
     template <bool left_var, bool right_var>
     struct DivOp_ : BinaryOperator {
