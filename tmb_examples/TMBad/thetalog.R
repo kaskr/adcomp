@@ -27,9 +27,8 @@ obj <- MakeADFun(data, parameters, random="X", integrate=integrate, DLL="thetalo
 system.time(opt <- nlminb(obj$par, obj$fn, obj$gr))
 
 ## Turn on epsilon method to get posterior mean
-data <- list(Y=Y, flag=1)
+data <- list(Y=Y, flag=1, scale=1)
 parameters$eps <- parameters$X * 0
-##parameters$scale <- 1
 obj <- MakeADFun(data, parameters, random="X", integrate=integrate, DLL="thetalog")
 obj$par[1:5] <- opt$par
 obj$fn(obj$par)
@@ -38,3 +37,12 @@ g <- obj$gr(obj$par)
 plot(tail(as.vector(g),length(Y)))
 ## load("../thetalog.expected.RData")
 ## points(tail(summary(.results$`TMB::sdreport`)[,1], length(Y)), col="red", pch=".")
+
+## Get posterior *mode*
+data$scale <- 1e100
+obj <- MakeADFun(data, parameters, random="X", integrate=integrate, DLL="thetalog")
+obj$par[1:5] <- opt$par
+obj$fn(obj$par)
+g <- obj$gr(obj$par)
+
+points(tail(as.vector(g),length(Y)), col="red")
