@@ -67,6 +67,7 @@ void eigen_REprintf(const char* x);
    CppAD when compiling with '-std=c++11'. */
 #include <R.h>
 #include <Rinternals.h>
+#include "toggle_thread_safe_R.hpp"
 void eigen_REprintf(const char* x)CSKIP({REprintf(x);})
 
 #include "tmbutils/tmbutils.hpp"
