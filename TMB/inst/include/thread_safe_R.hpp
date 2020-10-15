@@ -34,6 +34,15 @@ const char* Ts_CHAR(SEXP x) {
   return ans;
 }
 
+SEXP Ts_VECTOR_ELT(SEXP x, size_t i) {
+  SEXP ans;
+#pragma omp critical
+  {
+    ans = VECTOR_ELT(x, i);
+  }
+  return ans;
+}
+
 extern "C"
 void Ts_GetRNGstate() {
 #pragma omp critical
@@ -47,4 +56,5 @@ void Ts_GetRNGstate() {
 #define STRING_ELT     Ts_STRING_ELT
 #undef  CHAR
 #define CHAR           Ts_CHAR
+#define VECTOR_ELT     Ts_VECTOR_ELT
 #define GetRNGstate    Ts_GetRNGstate
