@@ -100,6 +100,7 @@ namespace CppAD{
 #include "dnorm.hpp"   // harmless
 #include "lgamma.hpp"  // harmless
 #include "start_parallel.hpp"
+#include "thread_safe_R.hpp"
 #include "tmb_core.hpp"
 #include "distributions_R.hpp"
 #include "convenience.hpp"    // Requires besselK
