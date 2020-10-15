@@ -1,7 +1,12 @@
 #ifdef _OPENMP
 
-/* Override R API with thread safe versions.
-   FIXME: Still some missing e.g. XLENGTH */
+/* Override R-API with thread safe versions.
+
+   FIXME: Still some missing e.g. XLENGTH
+
+   FIXME: To minimize overhead one should use as few R-API calls as
+   possible, i.e. avoid doing REAL(x)[i] in a loop.
+*/
 
 inline SEXP Ts_getAttrib(SEXP x, SEXP y) {
   SEXP ans;
