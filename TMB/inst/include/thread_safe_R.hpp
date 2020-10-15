@@ -7,7 +7,7 @@
 // REAL
 // GetRNGstate
 
-Ts_getAttrib(SEXP x, SEXP y) {
+SEXP Ts_getAttrib(SEXP x, SEXP y) {
   SEXP ans;
 #pragma omp critical
   {
