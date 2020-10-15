@@ -1044,7 +1044,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   SEXP hessianrows; // Hessian rows
   PROTECT(hessianrows=getListElement(control,"hessianrows"));
   int nrows=Rf_length(hessianrows);
-  if((nrows>0)&(nrows!=ncols))Rf_error("hessianrows and hessianrows must have same length");
+  if((nrows>0)&(nrows!=ncols))Rf_error("hessianrows and hessiancols must have same length");
   vector<size_t> cols(ncols);
   vector<size_t> cols0(ncols);
   vector<size_t> rows(nrows);

@@ -5,19 +5,16 @@
   \brief  Convert vector/matrix-Types to double SEXP types 
 */
 
-#ifdef WITH_LIBTMB
-double asDouble(int x);
-double asDouble(double x);
-double asDouble(AD<double> x);
-double asDouble(AD<AD<double> > x);
-double asDouble(AD<AD<AD<double> > > x);
-#else
-double asDouble(int x){return double(x);}
-double asDouble(double x){return x;}
-double asDouble(AD<double> x){return CppAD::Value(x);}
-double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
-double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
-#endif
+inline double asDouble(double const x){
+  return x;
+}
+inline double asDouble(int const x){
+  return x;
+}
+template<class T>
+double asDouble(AD<T> const x){
+  return asDouble(CppAD::Value(x));
+}
 
 /** \brief Convert TMB matrix, vector, scalar or int to R style */
 template<class Type>
@@ -28,8 +25,8 @@ SEXP asSEXP(const matrix<Type> &a)
    SEXP val;
    PROTECT(val = Rf_allocMatrix(REALSXP, nr, nc));
    double *p = REAL(val);
-   for(R_xlen_t i=0; i<nr; i++)
-     for(R_xlen_t j=0; j<nc; j++)
+   for(R_xlen_t j=0; j<nc; j++)
+     for(R_xlen_t i=0; i<nr; i++)
        p[i + j * nr] = asDouble(a(i,j));
    UNPROTECT(1);
    return val;
@@ -118,8 +115,8 @@ matrix<Type> asMatrix(SEXP x)
    R_xlen_t nr = Rf_nrows(x); // nrows is int
    R_xlen_t nc = Rf_ncols(x); // ncols is int
    matrix<Type> y(nr, nc);
-   for(R_xlen_t i=0; i<nr; i++)
-     for(R_xlen_t j=0; j<nc; j++)
+   for(R_xlen_t j=0; j<nc; j++)
+     for(R_xlen_t i=0; i<nr; i++)
        y(i, j) = Type(REAL(x)[i + nr * j]);
    return y;
 }
