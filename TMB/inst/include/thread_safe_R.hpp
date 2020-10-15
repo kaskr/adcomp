@@ -43,6 +43,15 @@ SEXP Ts_VECTOR_ELT(SEXP x, size_t i) {
   return ans;
 }
 
+R_len_t Ts_length(SEXP x) {
+  R_len_t ans;
+#pragma omp critical
+  {
+    ans = Rf_length(x);
+  }
+  return ans;
+}
+
 extern "C"
 void Ts_GetRNGstate() {
 #pragma omp critical
@@ -57,4 +66,5 @@ void Ts_GetRNGstate() {
 #undef  CHAR
 #define CHAR           Ts_CHAR
 #define VECTOR_ELT     Ts_VECTOR_ELT
+#define Rf_length      Ts_length
 #define GetRNGstate    Ts_GetRNGstate
