@@ -75,10 +75,12 @@ inline double* Ts_REAL(SEXP x) {
 
 extern "C"
 inline void Ts_GetRNGstate() {
-#pragma omp critical
+#pragma omp master
   {
     GetRNGstate();
   }
+  // Threads wait for master
+#pragma omp barrier
 }
 
 inline Rboolean Ts_isNumeric(SEXP x) {
