@@ -10,7 +10,7 @@
 // LENGTH
 // Rf_install
 
-SEXP Ts_getAttrib(SEXP x, SEXP y) {
+inline SEXP Ts_getAttrib(SEXP x, SEXP y) {
   SEXP ans;
 #pragma omp critical
   {
@@ -19,7 +19,7 @@ SEXP Ts_getAttrib(SEXP x, SEXP y) {
   return ans;
 }
 
-SEXP Ts_STRING_ELT(SEXP x, size_t i) {
+inline SEXP Ts_STRING_ELT(SEXP x, size_t i) {
   SEXP ans;
 #pragma omp critical
   {
@@ -28,7 +28,7 @@ SEXP Ts_STRING_ELT(SEXP x, size_t i) {
   return ans;
 }
 
-const char* Ts_CHAR(SEXP x) {
+inline const char* Ts_CHAR(SEXP x) {
   const char* ans;
 #pragma omp critical
   {
@@ -37,7 +37,7 @@ const char* Ts_CHAR(SEXP x) {
   return ans;
 }
 
-SEXP Ts_VECTOR_ELT(SEXP x, size_t i) {
+inline SEXP Ts_VECTOR_ELT(SEXP x, size_t i) {
   SEXP ans;
 #pragma omp critical
   {
@@ -46,7 +46,7 @@ SEXP Ts_VECTOR_ELT(SEXP x, size_t i) {
   return ans;
 }
 
-R_len_t Ts_length(SEXP x) {
+inline R_len_t Ts_length(SEXP x) {
   R_len_t ans;
 #pragma omp critical
   {
@@ -55,7 +55,7 @@ R_len_t Ts_length(SEXP x) {
   return ans;
 }
 
-int* Ts_INTEGER(SEXP x) {
+inline int* Ts_INTEGER(SEXP x) {
   int* ans;
 #pragma omp critical
   {
@@ -64,7 +64,7 @@ int* Ts_INTEGER(SEXP x) {
   return ans;
 }
 
-double* Ts_REAL(SEXP x) {
+inline double* Ts_REAL(SEXP x) {
   double* ans;
 #pragma omp critical
   {
@@ -74,14 +74,14 @@ double* Ts_REAL(SEXP x) {
 }
 
 extern "C"
-void Ts_GetRNGstate() {
+inline void Ts_GetRNGstate() {
 #pragma omp critical
   {
     GetRNGstate();
   }
 }
 
-Rboolean Ts_isNumeric(SEXP x) {
+inline Rboolean Ts_isNumeric(SEXP x) {
   Rboolean ans;
 #pragma omp critical
   {
@@ -90,7 +90,7 @@ Rboolean Ts_isNumeric(SEXP x) {
   return ans;
 }
 
-int Ts_LENGTH(SEXP x) {
+inline int Ts_LENGTH(SEXP x) {
   int ans;
 #pragma omp critical
   {
@@ -99,7 +99,7 @@ int Ts_LENGTH(SEXP x) {
   return ans;
 }
 
-SEXP Ts_install(const char *x) {
+inline SEXP Ts_install(const char *x) {
   SEXP ans;
 #pragma omp critical
   {
