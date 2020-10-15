@@ -8,9 +8,10 @@
 // GetRNGstate
 
 Ts_getAttrib(SEXP x, SEXP y) {
+  SEXP ans;
 #pragma omp critical
   {
-    SEXP ans = Rf_getAttrib(x, y);
+    ans = Rf_getAttrib(x, y);
   }
   return ans;
 }
