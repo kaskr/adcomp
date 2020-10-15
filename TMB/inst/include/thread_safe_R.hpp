@@ -8,6 +8,7 @@
 // GetRNGstate
 // Rf_isNumeric
 // LENGTH
+// Rf_install
 
 SEXP Ts_getAttrib(SEXP x, SEXP y) {
   SEXP ans;
@@ -98,6 +99,15 @@ int Ts_LENGTH(SEXP x) {
   return ans;
 }
 
+SEXP Ts_install(const char *x) {
+  SEXP ans;
+#pragma omp critical
+  {
+    ans = Rf_install(x);
+  }
+  return ans;
+}
+
 // Redefine
 #define Rf_getAttrib   Ts_getAttrib
 #define STRING_ELT     Ts_STRING_ELT
@@ -110,3 +120,4 @@ int Ts_LENGTH(SEXP x) {
 #define GetRNGstate    Ts_GetRNGstate
 #define Rf_isNumeric   Ts_isNumeric
 #define LENGTH         Ts_LENGTH
+#define Rf_install     Ts_install
