@@ -52,6 +52,15 @@ R_len_t Ts_length(SEXP x) {
   return ans;
 }
 
+int* Ts_INTEGER(SEXP x) {
+  int* ans;
+#pragma omp critical
+  {
+    ans = INTEGER(x);
+  }
+  return ans;
+}
+
 extern "C"
 void Ts_GetRNGstate() {
 #pragma omp critical
@@ -67,4 +76,5 @@ void Ts_GetRNGstate() {
 #define CHAR           Ts_CHAR
 #define VECTOR_ELT     Ts_VECTOR_ELT
 #define Rf_length      Ts_length
+#define INTEGER        Ts_INTEGER
 #define GetRNGstate    Ts_GetRNGstate
