@@ -1,14 +1,7 @@
-// Rf_getAttrib
-// STRING_ELT
-// CHAR
-// VECTOR_ELT
-// Rf_length
-// INTEGER
-// REAL
-// GetRNGstate
-// Rf_isNumeric
-// LENGTH
-// Rf_install
+#ifdef _OPENMP
+
+/* Override R API with thread safe versions.
+   FIXME: Still some missing e.g. XLENGTH */
 
 inline SEXP Ts_getAttrib(SEXP x, SEXP y) {
   SEXP ans;
@@ -123,3 +116,5 @@ inline SEXP Ts_install(const char *x) {
 #define Rf_isNumeric   Ts_isNumeric
 #define LENGTH         Ts_LENGTH
 #define Rf_install     Ts_install
+
+#endif // _OPENMP
