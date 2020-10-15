@@ -61,6 +61,15 @@ int* Ts_INTEGER(SEXP x) {
   return ans;
 }
 
+double* Ts_REAL(SEXP x) {
+  double* ans;
+#pragma omp critical
+  {
+    ans = REAL(x);
+  }
+  return ans;
+}
+
 extern "C"
 void Ts_GetRNGstate() {
 #pragma omp critical
@@ -77,4 +86,5 @@ void Ts_GetRNGstate() {
 #define VECTOR_ELT     Ts_VECTOR_ELT
 #define Rf_length      Ts_length
 #define INTEGER        Ts_INTEGER
+#define REAL           Ts_REAL
 #define GetRNGstate    Ts_GetRNGstate
