@@ -16,6 +16,15 @@ SEXP Ts_getAttrib(SEXP x, SEXP y) {
   return ans;
 }
 
+SEXP Ts_STRING_ELT(SEXP x, size_t i) {
+  SEXP ans;
+#pragma omp critical
+  {
+    ans = STRING_ELT(x, i);
+  }
+  return ans;
+}
+
 void Ts_GetRNGstate() {
 #pragma omp critical
   {
