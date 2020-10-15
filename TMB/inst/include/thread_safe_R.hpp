@@ -1,4 +1,4 @@
-// getAttrib
+// Rf_getAttrib
 // STRING_ELT
 // CHAR
 // VECTOR_ELT
@@ -25,9 +25,15 @@ SEXP Ts_STRING_ELT(SEXP x, size_t i) {
   return ans;
 }
 
+extern "C"
 void Ts_GetRNGstate() {
 #pragma omp critical
   {
     GetRNGstate();
   }
 }
+
+// Redefine
+#define Rf_getAttrib Ts_getAttrib
+#define GetRNGstate Ts_GetRNGstate
+
