@@ -34,6 +34,6 @@ void Ts_GetRNGstate() {
 }
 
 // Redefine
-#define Rf_getAttrib Ts_getAttrib
-#define GetRNGstate Ts_GetRNGstate
-
+#define Rf_getAttrib   Ts_getAttrib
+#define STRING_ELT     Ts_STRING_ELT
+#define GetRNGstate    Ts_GetRNGstate
