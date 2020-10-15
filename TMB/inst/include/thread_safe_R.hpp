@@ -6,6 +6,8 @@
 // INTEGER
 // REAL
 // GetRNGstate
+// Rf_isNumeric
+// LENGTH
 
 SEXP Ts_getAttrib(SEXP x, SEXP y) {
   SEXP ans;
@@ -78,6 +80,24 @@ void Ts_GetRNGstate() {
   }
 }
 
+Rboolean Ts_isNumeric(SEXP x) {
+  Rboolean ans;
+#pragma omp critical
+  {
+    ans = Rf_isNumeric(x);
+  }
+  return ans;
+}
+
+int Ts_LENGTH(SEXP x) {
+  int ans;
+#pragma omp critical
+  {
+    ans = LENGTH(x);
+  }
+  return ans;
+}
+
 // Redefine
 #define Rf_getAttrib   Ts_getAttrib
 #define STRING_ELT     Ts_STRING_ELT
@@ -88,3 +108,5 @@ void Ts_GetRNGstate() {
 #define INTEGER        Ts_INTEGER
 #define REAL           Ts_REAL
 #define GetRNGstate    Ts_GetRNGstate
+#define Rf_isNumeric   Ts_isNumeric
+#define LENGTH         Ts_LENGTH
