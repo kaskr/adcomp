@@ -740,22 +740,21 @@ public:
      ADFun-object.
   */
   /** \brief Constructor which among other things gives a value to "theta" */
-  objective_function(SEXP data_, SEXP parameters_, SEXP report_)
+  objective_function(SEXP data, SEXP parameters, SEXP report) :
+    data(data), parameters(parameters), report(report), index(0)
   {
-    report=report_;
-    data=data_;
-    parameters=parameters_;
     /* Fill theta with the default parameters. 
        Pass R-matrices column major. */
-    theta.resize(nparms(parameters_));
-    index=0;
-    int counter=0;
-    SEXP obj=parameters_;
-    for(int i=0;i<Rf_length(obj);i++){
-      for(int j=0;j<Rf_length(VECTOR_ELT(obj,i));j++)
-	{
-	  theta[counter++]=Type(REAL(VECTOR_ELT(obj,i))[j]);
-	}
+    theta.resize(nparms(parameters));
+    int length_parlist = Rf_length(parameters);
+    for(int i = 0, counter = 0; i < length_parlist; i++) {
+      // x = parameters[[i]]
+      SEXP x = VECTOR_ELT(parameters, i);
+      int nx = Rf_length(x);
+      double* px = REAL(x);
+      for(int j = 0; j < nx; j++) {
+        theta[counter++] = Type( px[j] );
+      }
     }
     thetanames.resize(theta.size());
     for(int i=0;i<thetanames.size();i++)thetanames[i]="";
