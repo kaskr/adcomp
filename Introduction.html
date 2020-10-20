@@ -341,7 +341,14 @@ Compilation and run time errors </h1>
 <p>#1 0x00007ffff0e7eb09 in objective_function&lt;double&gt;::operator() (this=&lt;optimized out&gt;=""&gt;) at nan_error_ex.cpp:14 </p>
 </blockquote>
 <p>This enabling of floating point errors applies to R as well as the TMB program. For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script before the floating point exception in the TMB program (i.e. the problem of interest) happens. To circumvent this problem one can run without NaN debugging enabled and save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation), then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type="double")</code>.</p>
-<h1><a class="anchor" id="Toolbox"></a>
+<h3>Missing casts for vectorized functions</h3>
+<p>TMB vectorized functions cannot be called directly with expressions, for example the following will fail to compile:</p>
+<div class="fragment"><div class="line"><a class="code" href="group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</div><div class="line"><span class="comment">// Don&#39;t do this! Doesn&#39;t compile</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> out = <a class="code" href="group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(x + 1);</div></div><!-- fragment --><blockquote class="doxtable">
+<p>error: could not convert ‘atomic::D_lgamma(const CppAD::vector&lt;Type&gt;&amp;) ... from ‘double’ to ‘Eigen::CwiseBinaryOp&lt;Eigen::internal::scalar_sum_op&lt;double, double&gt;, ... &gt;’ </p>
+</blockquote>
+<p>Eigen lazy-evaluates expressions, and the templating of lgamma means we expect to return a "x + y"-typed object, which it obviously can't do.</p>
+<p>To work around this, cast the input:</p>
+<div class="fragment"><div class="line"><a class="code" href="group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> out = <a class="code" href="group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="structvector.html">vector&lt;Type&gt;</a>(x + 1));</div></div><!-- fragment --><h1><a class="anchor" id="Toolbox"></a>
 Toolbox </h1>
 <p>First read the <em>Statistical Modelling</em> section of <a href="#Tutorial">Tutorial</a>.</p>
 <h3>Non-normal latent variables (random effects)</h3>

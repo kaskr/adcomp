@@ -156,6 +156,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a><ul>
 <li class="chapter" data-level="8.2.1" data-path="Errors.html"><a href="Errors.html#out-of-bounds-error"><i class="fa fa-check"></i><b>8.2.1</b> Out-of-bounds error</a></li>
 <li class="chapter" data-level="8.2.2" data-path="Errors.html"><a href="Errors.html#floating-point-exception"><i class="fa fa-check"></i><b>8.2.2</b> Floating point exception</a></li>
+<li class="chapter" data-level="8.2.3" data-path="Errors.html"><a href="Errors.html#missing-casts-for-vectorized-functions"><i class="fa fa-check"></i><b>8.2.3</b> Missing casts for vectorized functions</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a><ul>
@@ -326,6 +327,21 @@ before the floating point exception in the TMB program (i.e. the problem of int
 To circumvent this problem one can run without NaN debugging enabled and
 save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation),
 then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type=&quot;double&quot;)</code>.</p>
+</div>
+<div id="missing-casts-for-vectorized-functions" class="section level3">
+<h3><span class="header-section-number">8.2.3</span> Missing casts for vectorized functions</h3>
+<p>TMB vectorized functions cannot be called directly with expressions, for example the following will fail to compile:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb27-1" data-line-number="1"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="co">// Don&#39;t do this! Doesn&#39;t compile</span></a>
+<a class="sourceLine" id="cb27-3" data-line-number="3"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(x + <span class="dv">1</span>);</a></code></pre></div>
+<blockquote>
+<p>error: could not convert ‘atomic::D_lgamma(const CppAD::vector<Type>&amp;) …
+from ‘double’ to ‘Eigen::CwiseBinaryOp&lt;Eigen::internal::scalar_sum_op&lt;double, double&gt;, … &gt;’</p>
+</blockquote>
+<p>Eigen lazy-evaluates expressions, and the templating of lgamma means we expect to return a “x + y”-typed object, which it obviously can’t do.</p>
+<p>To work around this, cast the input:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb28-1" data-line-number="1"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structvector.html">vector</a>&lt;Type&gt;(x + <span class="dv">1</span>));</a></code></pre></div>
 </div>
 </div>
 </div>
