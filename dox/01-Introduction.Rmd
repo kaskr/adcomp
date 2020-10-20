@@ -595,7 +595,27 @@ To circumvent this problem one can run without NaN debugging enabled and
  save the parameter vector that gave the floating point exception (e.g. `badpar <- obj$env$last.par` after the NaN evaluation),
 then enable NaN debugging, re-compile, and evaluate `obj$env$f( badpar, type="double")`.
 
+### Missing casts for vectorized functions
 
+TMB vectorized functions cannot be called directly with expressions, for example the following will fail to compile:
+
+```{.cpp}
+DATA_VECTOR(x);
+// Don't do this! Doesn't compile
+vector<Type> out = lgamma(x + 1);
+```
+
+> error: could not convert ‘atomic::D_lgamma(const CppAD::vector<Type>&) ...
+>   from ‘double’ to ‘Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double, double>, ... >’
+
+Eigen lazy-evaluates expressions, and the templating of lgamma means we expect to return a "x + y"-typed object, which it obviously can't do.
+
+To work around this, cast the input:
+
+```{.cpp}
+DATA_VECTOR(x);
+vector<Type> out = lgamma(vector<Type>(x + 1));
+```
 
 
 Toolbox {#Toolbox}
