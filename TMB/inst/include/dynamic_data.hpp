@@ -110,7 +110,8 @@ namespace dynamic_data {
                                         "number of items to replace (%i) "
                                         "does not match replacement length (%i)",
                                         ty.size(), n);
-                             for (int i = 0; i<n; i++) ty[i] = REAL(data)[i];
+                             double* pdata = REAL(data);
+                             for (int i = 0; i<n; i++) ty[i] = pdata[i];
                              ,
                              // reverse
                              px[0] = 0;
