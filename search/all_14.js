@@ -6,5 +6,6 @@ var searchData=
   ['tmb_5fobjective_5fptr',['TMB_OBJECTIVE_PTR',['../group__macros.html#ga50653183cdc71e3cb81b410768f23efb',1,'tmb_core.hpp']]],
   ['tmbutils',['tmbutils',['../namespacetmbutils.html',1,'']]],
   ['tmbutils_2ehpp',['tmbutils.hpp',['../tmbutils_8hpp.html',1,'']]],
+  ['toggle_5fthread_5fsafe_5fr_2ehpp',['toggle_thread_safe_R.hpp',['../toggle__thread__safe__R_8hpp.html',1,'']]],
   ['transpose',['transpose',['../structarray.html#a9f0df57cc5403f71194f2159ec80bd66',1,'array::transpose()'],['../structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050',1,'tmbutils::array::transpose()']]]
 ];
