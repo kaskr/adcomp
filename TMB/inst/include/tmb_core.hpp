@@ -1310,11 +1310,11 @@ extern "C"
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL,info;
     objective_function< double > F(data,parameters,report);
-// #ifdef _OPENMP
-//     int n=F.count_parallel_regions(); // Evaluates user template
-// #else
+#ifdef _OPENMP
+    int n=F.count_parallel_regions(); // Evaluates user template
+#else
     F.count_parallel_regions(); // Evaluates user template
-// #endif
+#endif
     if(returnReport && F.reportvector.size()==0){
       /* Told to report, but no ADREPORT in template: Get out quickly */
       return R_NilValue;
@@ -1322,35 +1322,35 @@ extern "C"
     PROTECT(par=F.defaultpar());
     PROTECT(info=R_NilValue); // Important
 
-//     if(_openmp && !returnReport){ // Parallel mode
-// #ifdef _OPENMP
-//       if(config.trace.parallel)
-// 	std::cout << n << " regions found.\n";
-//       //start_parallel(); /* Start threads */
-//       vector< adfun* > pfvec(n);
-//       bool bad_thread_alloc = false;
-// #pragma omp parallel for if (config.tape.parallel)
-//       for(int i=0;i<n;i++){
-// 	TMB_TRY {
-// 	  pfvec[i] = NULL;
-// 	  pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
-// 	  if (config.optimize.instantly) pfvec[i]->glob.optimize();
-// 	}
-// 	TMB_CATCH { bad_thread_alloc = true; }
-//       }
-//       if(bad_thread_alloc){
-// 	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-// 	TMB_ERROR_BAD_ALLOC;
-//       }
+    if(_openmp && !returnReport){ // Parallel mode
+#ifdef _OPENMP
+      if(config.trace.parallel)
+        std::cout << n << " regions found.\n";
+      start_parallel(); /* FIXME: NOT NEEDED */
+      vector< adfun* > pfvec(n);
+      bool bad_thread_alloc = false;
+#pragma omp parallel for if (config.tape.parallel)
+      for(int i = 0; i < n; i++) {
+        TMB_TRY {
+          pfvec[i] = NULL;
+          pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
+          if (config.optimize.instantly) pfvec[i]->optimize();
+        }
+        TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if (bad_thread_alloc) {
+        for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+        TMB_ERROR_BAD_ALLOC;
+      }
 
-//       // FIXME: NOT DONE YET
+      // FIXME: NOT DONE YET
 
-//       //parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
-//       /* Convert parallel ADFun pointer to R_ExternalPtr */
-//       //PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-//       //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
-// #endif
-//     } else { // Serial mode
+      parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+      /* Convert parallel ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+      //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+#endif
+    } else { // Serial mode
       TMB_TRY{
 	/* Actual work: tape creation */
 	pf = NULL;
@@ -1364,7 +1364,7 @@ extern "C"
       /* Convert ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
       Rf_setAttrib(res,Rf_install("range.names"),info);
-// }
+    }
 
     /* Return list of external pointer and default-parameter */
     SEXP ans;
