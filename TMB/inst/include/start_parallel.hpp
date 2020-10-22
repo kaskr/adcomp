@@ -20,15 +20,19 @@ size_t thread_num(){
   return static_cast<size_t>(omp_get_thread_num());
 }
 void start_parallel(){
+#ifdef CPPAD_FRAMEWORK
   CppAD::thread_alloc::free_all();
+#endif // CPPAD_FRAMEWORK
   int nthreads=omp_get_max_threads();
   if(config.trace.parallel)
     std::cout << "Using " << nthreads <<  " threads\n";
+#ifdef CPPAD_FRAMEWORK
   CppAD::thread_alloc::parallel_setup(nthreads,in_parallel,thread_num);
   CppAD::parallel_ad<AD<AD<AD<double> > > >();
   CppAD::parallel_ad<AD<AD<double> > >();
   CppAD::parallel_ad<AD<double> >();
   CppAD::parallel_ad<double >();
+#endif // CPPAD_FRAMEWORK
 }
 #endif
 #endif
@@ -47,9 +51,15 @@ struct sphess_t{
   vector<int> j;
 };
 
-/** \brief sphess_t<ADFun<double> > sphess */
-typedef sphess_t<ADFun<double> > sphess;
+#ifdef CPPAD_FRAMEWORK
+#define ADFUN ADFun<double>
+#endif // CPPAD_FRAMEWORK
+#ifdef TMBAD_FRAMEWORK
+#define ADFUN TMBad::ADFun<TMBad::ad_aug>
+#endif // TMBAD_FRAMEWORK
 
+/** \brief sphess_t<ADFun<double> > sphess */
+typedef sphess_t<ADFUN > sphess;
 
 /*
   Suppose we have a mapping F:R^n->R^m which may be written as F=F1+...+Fk.
@@ -60,8 +70,8 @@ typedef sphess_t<ADFun<double> > sphess;
   corresponding full taped version of F.
  */
 template <class Type>
-struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont complain about missing members */
-  typedef ADFun<Type> Base;
+struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complain about missing members */
+  typedef ADFUN Base;
   /* Following five members must be defined by constructor.
      Outer vectors are indexed by the chunk number.
      E.g. for tape number i vecind[i] is a vector of numbers in the 
@@ -184,6 +194,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   size_t Domain(){return domain;}
   size_t Range(){return range;}
 
+#ifdef CPPAD_FRAMEWORK
   /* p=order, p+1 taylorcoefficients per variable, x=domain vector 
      x contains p'th order taylor coefficients of input (length n). 
      Output contains (p+1)'th order taylor coefficients (length m).
@@ -250,5 +261,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     for(int i=0;i<ntapes;i++)vecpf(i)->optimize();
     if(config.trace.optimize)std::cout << "Done\n";
   }
+#endif // CPPAD_FRAMEWORK
+
 };
 
