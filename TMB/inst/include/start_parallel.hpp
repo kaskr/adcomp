@@ -263,5 +263,38 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   }
 #endif // CPPAD_FRAMEWORK
 
+#ifdef TMBAD_FRAMEWORK
+  void forward() {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> forward();
+  }
+  void reverse() {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> reverse();
+  }
+  void unset_tail() {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> unset_tail();
+  }
+  void set_tail(const std::vector<TMBad::Index> &r) {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> set_tail(r);
+  }
+  void DomainVecSet(const std::vector<TMBad::Scalar> &x) {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> DomainVecSet(x);
+  }
+
+#endif // TMBAD_FRAMEWORK
 };
 
