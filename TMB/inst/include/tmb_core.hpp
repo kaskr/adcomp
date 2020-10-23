@@ -974,16 +974,16 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
     if(LENGTH(rangeweight)!=m)Rf_error("rangeweight must have length equal to range dimension");
     if (doforward) {
       pf->DomainVecSet(x);
-      pf->glob.forward();
+      pf->forward();
     }
-    pf->glob.clear_deriv();
+    pf->clear_deriv();
     for (int i=0; i<LENGTH(rangeweight); i++) {
-      pf->glob.deriv_dep(i) = REAL(rangeweight)[i];
+      pf->deriv_dep(i) = REAL(rangeweight)[i];
     }
-    pf->glob.reverse();
+    pf->reverse();
     vector<double> ans(pf->Domain());
     for (int i=0; i<ans.size(); i++)
-      ans(i) = pf->glob.deriv_inv(i);
+      ans(i) = pf->deriv_inv(i);
     res = asSEXP(ans);
     UNPROTECT(3);
     return res;
