@@ -204,6 +204,12 @@ struct ADFun {
 
   ADFun() {}
 
+  void forward() { glob.forward(); }
+  void reverse() { glob.reverse(); }
+  void clear_deriv() { glob.clear_deriv(); }
+  Scalar &deriv_inv(Index i) { return glob.deriv_inv(i); }
+  Scalar &deriv_dep(Index i) { return glob.deriv_dep(i); }
+
   /** \brief Print AD workspace */
   void print(print_config cfg = print_config()) { glob.print(cfg); }
 
