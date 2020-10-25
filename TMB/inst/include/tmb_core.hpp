@@ -929,7 +929,7 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   pf=(ADFunType*)R_ExternalPtrAddr(f);
   int data_changed = getListInteger(control, "data_changed", 0);
   if (data_changed) {
-    pf->force_update = true;
+    pf->force_update();
   }
   int set_tail = getListInteger(control, "set_tail", 0) - 1;
   if (set_tail == -1) {
