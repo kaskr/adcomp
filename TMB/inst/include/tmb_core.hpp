@@ -927,6 +927,10 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   if(!Rf_isNewList(control))Rf_error("'control' must be a list");
   ADFunType* pf;
   pf=(ADFunType*)R_ExternalPtrAddr(f);
+  int data_changed = getListInteger(control, "data_changed", 0);
+  if (data_changed) {
+    pf->force_update = true;
+  }
   int set_tail = getListInteger(control, "set_tail", 0) - 1;
   if (set_tail == -1) {
     pf -> unset_tail();
