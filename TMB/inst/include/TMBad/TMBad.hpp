@@ -295,6 +295,17 @@ struct ADFun {
       Only used by teh reverse sweep.
   */
   Position tail_start;
+  /** \brief Are the independent variable indices consecutive?
+      \details Cheep test to guarantee that independent variable
+      indicies are consecutive.
+  */
+  bool inv_index_is_consecutive() {
+    if (glob.inv_index.size() == 0) return true;
+
+    bool is_sorted = (inv_pos.size() == 0);
+    return is_sorted && (glob.inv_index.size() ==
+                         1 + glob.inv_index.back() - glob.inv_index.front());
+  }
   /** \brief Set start position needed to get selected independent variable
    * derivatives */
   void set_tail(const std::vector<Index> &random) {
@@ -328,7 +339,10 @@ struct ADFun {
         return inv_pos[i_min];
     }
     if (x.size() > 0) {
-      if (x.size() == 1 + glob.inv_index.back() - glob.inv_index.front()) {
+      if (inv_index_is_consecutive()) {
+        bool no_change = std::equal(
+            x.begin(), x.end(), glob.values.data() + glob.inv_index.front());
+        if (no_change) return glob.end();
         std::copy(x.begin(), x.end(),
                   glob.values.data() + glob.inv_index.front());
       } else {
@@ -477,8 +491,8 @@ struct ADFun {
                                const std::vector<Scalar> &w) {
     ASSERT(x.size() == Domain());
     ASSERT(w.size() == Range());
-    DomainVecSet(x);
-    glob.forward();
+    Position start = DomainVecSet(x);
+    glob.forward(start);
     glob.clear_deriv();
     for (size_t j = 0; j < Range(); j++) glob.deriv_dep(j) = w[j];
     glob.reverse();
