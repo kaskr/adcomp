@@ -155,7 +155,7 @@ struct ADFun {
 
   /** \brief Constructor of vector input / vector output function */
   template <class Functor, class ScalarVector>
-  ADFun(Functor F, const ScalarVector &x_) : force_update(false) {
+  ADFun(Functor F, const ScalarVector &x_) : force_update_flag(false) {
     std::vector<ad> x(x_.size());
     for (size_t i = 0; i < x.size(); i++) x[i] = Value(x_[i]);
     global *glob_begin = get_glob();
@@ -172,7 +172,7 @@ struct ADFun {
       \warning Experimental - may be removed
   */
   template <class Functor>
-  ADFun(Functor F, Scalar x0_) : force_update(false) {
+  ADFun(Functor F, Scalar x0_) : force_update_flag(false) {
     global *glob_begin = get_glob();
     this->glob.ad_start();
     ad x0(x0_);
@@ -188,7 +188,7 @@ struct ADFun {
       \warning Experimental - may be removed
   */
   template <class Functor>
-  ADFun(Functor F, Scalar x0_, Scalar x1_) : force_update(false) {
+  ADFun(Functor F, Scalar x0_, Scalar x1_) : force_update_flag(false) {
     global *glob_begin = get_glob();
     this->glob.ad_start();
     ad x0(x0_);
@@ -202,7 +202,7 @@ struct ADFun {
     ASSERT(glob_begin == glob_end);
   }
 
-  ADFun() : force_update(false) {}
+  ADFun() : force_update_flag(false) {}
 
   void forward() { glob.forward(); }
   void reverse() { glob.reverse(); }
@@ -320,13 +320,14 @@ struct ADFun {
    * variables */
   void unset_tail() { tail_start = Position(0, 0, 0); }
   /** \brief Next forward pass must traverse the full graph */
-  bool force_update;
+  void force_update() { force_update_flag = true; }
+  bool force_update_flag;
   /** \brief Set the input parameter vector on the tape */
   Position DomainVecSet(const std::vector<Scalar> &x) {
     ASSERT(x.size() == Domain());
-    if (force_update) {
+    if (force_update_flag) {
       for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i];
-      force_update = false;
+      force_update_flag = false;
       return Position(0, 0, 0);
     }
     if (inv_pos.size() > 0) {
