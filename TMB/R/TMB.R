@@ -559,6 +559,7 @@ MakeADFun <- function(data, parameters, map=list(),
   ## Has atomic functions been generated for the tapes ?
   usingAtomics <- function().Call("usingAtomics", PACKAGE=DLL)
 
+  .data <- NULL
   f <- function(theta=par, order=0, type="ADdouble",
                 cols=NULL, rows=NULL,
                 sparsitypattern=0, rangecomponent=1, rangeweight=NULL,
@@ -569,6 +570,11 @@ MakeADFun <- function(data, parameters, map=list(),
         ## Loaded or deep copied object: Only restore external
         ## pointers. Don't touch last.par/last.par.best etc:
         retape(set.defaults = FALSE)
+    }
+    ## User has changed the data => Next forward pass must traverse whole graph !
+    data_changed <- !identical(.data, data) ## Fast to check if identical (i.e. most of the time)
+    if (data_changed) {
+        .data <<- data ## Shallow copy (fast)
     }
     switch(type,
            "ADdouble" = {
@@ -583,7 +589,8 @@ MakeADFun <- function(data, parameters, map=list(),
                                  dumpstack=as.integer(dumpstack),
                                  doforward=as.integer(doforward),
                                  do_simulate=as.integer(do_simulate),
-                                 set_tail = as.integer(set_tail)
+                                 set_tail = as.integer(set_tail),
+                                 data_changed = as.integer(data_changed)
                                ),
                        PACKAGE=DLL
                        )
@@ -609,7 +616,10 @@ MakeADFun <- function(data, parameters, map=list(),
                                     doforward=as.integer(doforward),
                                     set_tail = as.integer(set_tail),
                                     keepx=as.integer(keepx),
-                                    keepy=as.integer(keepy)),PACKAGE=DLL)
+                                    keepy=as.integer(keepy),
+                                    data_changed = as.integer(data_changed)
+                                    ),
+                       PACKAGE=DLL)
         },
         stop("invalid 'type'")) # end{ switch() }
     res
