@@ -942,8 +942,6 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   int n=pf->Domain();
   int m=pf->Range();
   if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
-  // Do forwardsweep ?
-  int doforward = getListInteger(control, "doforward", 1);
   //R-index -> C-index
   int rangecomponent = getListInteger(control, "rangecomponent", 1) - 1;
   if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
@@ -976,18 +974,9 @@ SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   SEXP rangeweight=getListElement(control,"rangeweight");
   if(rangeweight!=R_NilValue){
     if(LENGTH(rangeweight)!=m)Rf_error("rangeweight must have length equal to range dimension");
-    if (doforward) {
-      pf->DomainVecSet(x);
-      pf->forward();
-    }
-    pf->clear_deriv();
-    for (int i=0; i<LENGTH(rangeweight); i++) {
-      pf->deriv_dep(i) = REAL(rangeweight)[i];
-    }
-    pf->reverse();
-    vector<double> ans(pf->Domain());
-    for (int i=0; i<ans.size(); i++)
-      ans(i) = pf->deriv_inv(i);
+    std::vector<double> w(REAL(rangeweight),
+                          REAL(rangeweight) + LENGTH(rangeweight));
+    vector<double> ans = pf->Jacobian(x, w);
     res = asSEXP(ans);
     UNPROTECT(3);
     return res;
