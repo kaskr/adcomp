@@ -325,6 +325,7 @@ struct ADFun {
   Position DomainVecSet(const std::vector<Scalar> &x) {
     ASSERT(x.size() == Domain());
     if (force_update) {
+      for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i];
       force_update = false;
       return Position(0, 0, 0);
     }
