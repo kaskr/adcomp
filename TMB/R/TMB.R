@@ -713,7 +713,8 @@ MakeADFun <- function(data, parameters, map=list(),
                         rangeweight=as.double(w),
                         dumpstack=as.integer(0),
                         doforward=as.integer(1),
-                        set_tail = as.integer(0)
+                        set_tail = as.integer(0),
+                        data_changed = as.integer(0)
                       ),
               PACKAGE=DLL)
     }## order == 1
@@ -1663,7 +1664,8 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                             rangecomponent = as.integer(1),
                             dumpstack=as.integer(0),
                             doforward=as.integer(1),
-                            set_tail = as.integer(set_tail)
+                            set_tail = as.integer(set_tail),
+                            data_changed = as.integer(0)
                 ), PACKAGE=obj$env$DLL)
   n <- as.integer(length(obj$env$par))
   M <- new("dsTMatrix",
