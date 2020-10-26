@@ -1450,19 +1450,13 @@ extern "C"
   /* --- TransformADFunObject ----------------------------------------------- */
 
 #ifdef TMBAD_FRAMEWORK
-/** \internal \brief Transform an existing ADFun object */
-SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
+SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
 {
-  //TMBad::ADFun< TMBad::ad_aug >*
+  if (pf == NULL)
+    Rf_error("Cannot transform '<pointer: (nil)>' (unloaded/reloaded DLL?)");
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
   // FIXME: Must require non parallel object !!!
-  if (Rf_isNull(f)) Rf_error("Expected external pointer - got NULL");
-  SEXP tag = R_ExternalPtrTag(f);
-  if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
-  adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-  if (pf == NULL)
-    Rf_error("Cannot transform '<pointer: (nil)>' (unloaded/reloaded DLL?)");
   std::string method =
     CHAR(STRING_ELT(getListElement(control, "method"), 0));
   // Test adfun copy
@@ -1571,6 +1565,34 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   }
   // for (size_t i=0; i<random.size(); i++) random[i] += 1 ; // C index -> R index
   // Rf_setAttrib(f, Rf_install("random_order"), asSEXP(random));
+  return R_NilValue;
+}
+/** \internal \brief Transform an existing ADFun object */
+SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
+{
+  if (Rf_isNull(f))
+    Rf_error("Expected external pointer - got NULL");
+  SEXP tag = R_ExternalPtrTag(f);
+  if (tag != Rf_install("ADFun"))
+    if (tag != Rf_install("parallelADFun"))
+      Rf_error("Expected ADFun or parallelADFun pointer");
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  if(tag == Rf_install("ADFun")) {
+    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+    TMBAD_TransformADFunObjectTemplate(pf, control);
+  } else if (tag == Rf_install("parallelADFun")) {
+    // Warning: Most no meaningful for parallel models!:
+    // OK      : reorder_random etc
+    // NOT OK  : copy, set_compiled, marginal_sr etc
+    parallelADFun<double>* ppf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+    for (int i=0; i<ppf->ntapes; i++) {
+      adfun* pf = (ppf->vecpf)[i];
+      TMBAD_TransformADFunObjectTemplate(pf, control);
+    }
+  } else {
+    Rf_error("Unknown function pointer");
+  }
   return R_NilValue;
 }
 #endif
