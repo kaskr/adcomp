@@ -1692,8 +1692,8 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       SEXP tag=R_ExternalPtrTag(f);
       if(tag == Rf_install("ADFun"))
 	return TMBAD_EvalADFunObjectTemplate< adfun >(f,theta,control);
-      // if(tag == Rf_install("parallelADFun"))
-      //   return EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
+      if(tag == Rf_install("parallelADFun"))
+        return TMBAD_EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
       Rf_error("NOT A KNOWN FUNCTION POINTER");
     }
     TMB_CATCH {
