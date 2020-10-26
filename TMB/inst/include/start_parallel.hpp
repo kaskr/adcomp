@@ -264,22 +264,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
 #endif // CPPAD_FRAMEWORK
 
 #ifdef TMBAD_FRAMEWORK
-  void forward() {
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-    for(int i=0; i<ntapes; i++) vecpf(i) -> forward();
-  }
-  void reverse() {
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-    for(int i=0; i<ntapes; i++) vecpf(i) -> reverse();
-  }
   void unset_tail() {
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
     for(int i=0; i<ntapes; i++) vecpf(i) -> unset_tail();
   }
   void set_tail(const std::vector<TMBad::Index> &r) {
@@ -288,13 +273,52 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
 #endif
     for(int i=0; i<ntapes; i++) vecpf(i) -> set_tail(r);
   }
-  void DomainVecSet(const std::vector<TMBad::Scalar> &x) {
+  void force_update() {
+    for(int i=0; i<ntapes; i++) vecpf(i) -> unset_tail();
+  }
+  vector<double> operator()(const std::vector<double> &x) {
+    vector<vector<double> > ans(ntapes);
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-    for(int i=0; i<ntapes; i++) vecpf(i) -> DomainVecSet(x);
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->operator()(x));
+    vector<double> out(range);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) addinsert(out, ans(i), i);
+    return out;
   }
-
+  vector<double> Jacobian(const std::vector<double> &x) {
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->Jacobian(x));
+    vector<double> out( domain * range ); // domain fastest running
+    out.setZero();
+    for(int i=0; i<ntapes; i++) addinsert(out, ans(i), i, domain);
+    return out;
+  }
+  vector<double> Jacobian(const std::vector<double> &x,
+                          const std::vector<bool> &keep_x,
+                          const std::vector<bool> &keep_y ) {
+    Rf_error("Not yet implemented");
+    return vector<double>(0);
+  }
+  vector<double> Jacobian(const std::vector<double> &x,
+                          const vector<double> &w) {
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->Jacobian(x, subset(w, i)));
+    vector<double> out(domain);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) out = out + ans(i);
+    return out;
+  }
 #endif // TMBAD_FRAMEWORK
 };
 
