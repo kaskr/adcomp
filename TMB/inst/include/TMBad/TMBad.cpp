@@ -4149,7 +4149,6 @@ std::vector<Index> remap_identical_sub_expressions(
     visited.apply(fb);
   }
   if (reject > 0) {
-    Rcout << "Rejected remappings: " << reject << " of " << total << "\n";
   }
 
   return remap;
