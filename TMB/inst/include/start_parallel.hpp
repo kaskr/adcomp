@@ -177,17 +177,17 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   VectorBase subset(const VectorBase& x, size_t tapeid, int p=1){
     VectorBase y;
     y.resize(vecind(tapeid).size()*p);
-    for(int i=0;i<y.size()/p;i++)
+    for(int i=0;i<(int)y.size()/p;i++)
       for(int j=0;j<p;j++)
-	{y(i*p+j)=x(vecind(tapeid)[i]*p+j);}
+	{y[i*p+j]=x[vecind(tapeid)[i]*p+j];}
     return y;
   }
   /* Inverse operation of the subset above */
   template <typename VectorBase>
   void addinsert(VectorBase& x, const VectorBase& y, size_t tapeid, int p=1){
-    for(int i=0;i<y.size()/p;i++)
+    for(int i=0;i<(int)y.size()/p;i++)
       for(int j=0;j<p;j++)
-	{x(vecind(tapeid)[i]*p+j)+=y(i*p+j);}
+	{x[vecind(tapeid)[i]*p+j]+=y[i*p+j];}
   }
 
   /* Overload methods */
@@ -303,8 +303,35 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   vector<double> Jacobian(const std::vector<double> &x,
                           const std::vector<bool> &keep_x,
                           const std::vector<bool> &keep_y ) {
-    Rf_error("Not yet implemented");
-    return vector<double>(0);
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->Jacobian(x, keep_x, subset(keep_y, i)));
+    // Calculate indices into row space of resulting jacobian (subset)
+    vector<vector<size_t> > vecind2(vecind.size());
+    std::vector<size_t> remap = TMBad::cumsum0<size_t> (keep_y);
+    for(int i=0; i<ntapes; i++) {
+      std::vector<bool>
+        sub = subset(keep_y, i); // Bool mask into vecind(i)
+      std::vector<size_t>
+        vecind_i(vecind(i));
+      std::vector<size_t>
+        vecind_i_sub = TMBad::subset(vecind_i, sub); // remaining vecind(i)
+      std::vector<size_t>
+        vecind_i_sub_remap = TMBad::subset(remap, vecind_i_sub); // Remap
+      vecind2(i) = vector<size_t> (vecind_i_sub_remap);
+    }
+    // Fill into result matrix
+    int dim_x = std::count(keep_x.begin(), keep_x.end(), true);
+    int dim_y = std::count(keep_y.begin(), keep_y.end(), true);
+    vector<double> out( dim_x * dim_y );
+    out.setZero();
+    std::swap(vecind, vecind2);
+    for (int i=0; i<ntapes; i++) addinsert(out, ans(i), i, dim_x);
+    std::swap(vecind, vecind2);
+    return out;
   }
   vector<double> Jacobian(const std::vector<double> &x,
                           const vector<double> &w) {
