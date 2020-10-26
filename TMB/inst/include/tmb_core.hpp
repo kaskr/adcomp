@@ -1266,7 +1266,7 @@ extern "C"
   }
   void finalizeparallelADFun(SEXP x)
   {
-    Rf_error("finalizeparallelADFun not yet implemented");
+    finalize<parallelADFun<double> > (x);
   }
 #endif
 
