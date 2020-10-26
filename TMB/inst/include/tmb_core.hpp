@@ -2097,7 +2097,10 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   adfun* pgf;
   bool allocate_new_pgf = ( gf == R_NilValue );
   if ( ! allocate_new_pgf ) {
-    pgf = (adfun*) R_ExternalPtrAddr(gf);
+    if (parallel_region == -1)
+      pgf = (adfun*) R_ExternalPtrAddr(gf);
+    else
+      pgf = ((parallelADFun<double>*) R_ExternalPtrAddr(gf))->vecpf[parallel_region];
   } else {
     SEXP control_adgrad = R_NilValue;
     pgf = TMBAD_MakeADGradObject_(data, parameters, report, control_adgrad, parallel_region);
