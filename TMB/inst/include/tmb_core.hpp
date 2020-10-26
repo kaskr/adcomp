@@ -1495,7 +1495,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     return R_NilValue;
   }
   SEXP random_order = getListElement(control, "random_order");
-  int nr = LENGTH(random_order);
+  int nr = (isNull(random_order) ? 0 : LENGTH(random_order));
   std::vector<TMBad::Index> random;
   if (nr != 0) {
     random = std::vector<TMBad::Index>(INTEGER(random_order),
