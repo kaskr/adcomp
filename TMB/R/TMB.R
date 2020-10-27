@@ -204,6 +204,7 @@ parseIntegrate <- function(arg, name) {
 ##' @param silent Disable all tracing information?
 ##' @param intern Do Laplace approximation on C++ side ? (Experimental - may change without notice)
 ##' @param integrate Specify alternative integration method(s) for random effects (see details)
+##' @param autopar Enable automatic parallization? (Experimental)
 ##' @param ... Currently unused.
 ##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data, parameters, map=list(),
@@ -224,6 +225,7 @@ MakeADFun <- function(data, parameters, map=list(),
                       silent=FALSE,
                       intern=FALSE,
                       integrate=NULL,
+                      autopar=FALSE,
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
@@ -523,6 +525,13 @@ MakeADFun <- function(data, parameters, map=list(),
           last.par.best <<- par
           value.best <<- Inf
       }
+    }
+    if (autopar) {
+        ## Experiment !
+        TransformADFunObject(ADFun,
+                             method = "parallel_accumulate",
+                             num_threads = 2L,
+                             mustWork = 0L)
     }
     if (length(random) > 0) {
         ## Experiment !
