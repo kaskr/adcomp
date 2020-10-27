@@ -92,7 +92,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
      In the case of a vector of ADFun pointers we assume that
      they all have equal domain and range dimensions.
    */
-  parallelADFun(vector<Base*> vecpf_){
+  void CTOR(vector<Base*> vecpf_) {
     size_t n=vecpf_.size();
     ntapes=n;
     vecpf.resize(n);
@@ -106,6 +106,16 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
 	vecind(i)[j]=j;
       }
     }
+  }
+  parallelADFun(vector<Base*> vecpf_) {
+    CTOR(vecpf_);
+  }
+  parallelADFun(const std::vector<Base> &vecf) {
+    vector<Base*> vecpf(vecf.size());
+    for (int i=0; i<vecpf.size(); i++) {
+      vecpf[i] = new Base(vecf[i]);
+    }
+    CTOR(vecpf);
   }
   /* Constructor:
      In the case of a vector of sphess pointers the range dimensions are allowed
