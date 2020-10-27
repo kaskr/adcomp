@@ -1942,6 +1942,15 @@ ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP
 extern "C"
 {
 #ifdef TMBAD_FRAMEWORK
+  inline int get_num_tapes(SEXP f) {
+    if (isNull(f))
+      return 0;
+    SEXP tag = R_ExternalPtrTag(f);
+    if (tag != Rf_install("parallelADFun"))
+      return 0;
+    return
+      ((parallelADFun<double>*) R_ExternalPtrAddr(f))->ntapes;
+  }
   /** \internal \brief Tape the gradient using nested AD types */
   SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
@@ -1958,7 +1967,10 @@ extern "C"
     SEXP par,res=NULL;
     objective_function< double > F(data,parameters,report);
 #ifdef _OPENMP
-    int n=F.count_parallel_regions(); // Evaluates user template
+    SEXP f = getListElement(control, "f");
+    int n = get_num_tapes(f);
+    if (n==0) // No tapes? Count!
+      n = F.count_parallel_regions(); // Evaluates user template
 #else
     F.count_parallel_regions(); // Evaluates user template
 #endif
@@ -2265,7 +2277,10 @@ extern "C"
     if(config.trace.parallel)
       std::cout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
-    int n=F.count_parallel_regions();
+    SEXP gf = getListElement(control, "gf");
+    int n = get_num_tapes(gf);
+    if (n==0) // No tapes? Count!
+      n = F.count_parallel_regions(); // Evaluates user template
     if(config.trace.parallel)
       std::cout << n << " regions found.\n";
     if (n==0) n++; // No explicit parallel accumulation
