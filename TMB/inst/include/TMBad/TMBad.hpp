@@ -325,6 +325,7 @@ struct ADFun {
   /** \brief Set the input parameter vector on the tape */
   Position DomainVecSet(const std::vector<Scalar> &x) {
     ASSERT(x.size() == Domain());
+    if (inner_outer_in_use()) force_update();
     if (force_update_flag) {
       for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i];
       force_update_flag = false;
@@ -1008,6 +1009,10 @@ struct ADFun {
       \warning Don't forget to swap back when done!
   */
   void SwapOuter() { std::swap(glob.inv_index, outer_inv_index); }
+  /** \brief Helper: Does tape have inner/outer information ? */
+  bool inner_outer_in_use() {
+    return (DomainInner() > 0) || (DomainOuter() > 0);
+  }
   /** \brief Helper: Pass on inner/outer information to a new tape.
       Some parameters are marked as 'outer parameters'. All other
       prameters are 'inner'.  This function passes on inner/outer
@@ -1016,8 +1021,7 @@ struct ADFun {
       list**.
   */
   void set_inner_outer(ADFun &ans) {
-    bool inner_outer_in_use = (DomainInner() > 0) || (DomainOuter() > 0);
-    if (inner_outer_in_use) {
+    if (inner_outer_in_use()) {
       std::vector<bool> mark_outer =
           glob.mark_space(glob.values.size(), outer_inv_index);
       mark_outer = subset(mark_outer, glob.inv_index);
