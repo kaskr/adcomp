@@ -1323,7 +1323,7 @@ extern "C"
       start_parallel(); /* FIXME: NOT NEEDED */
       vector< adfun* > pfvec(n);
       bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
       for(int i = 0; i < n; i++) {
         TMB_TRY {
           pfvec[i] = NULL;
@@ -1406,7 +1406,7 @@ extern "C"
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
@@ -2006,7 +2006,7 @@ extern "C"
       start_parallel(); /* Start threads */
       vector< adfun* > pfvec(n);
       bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
@@ -2076,7 +2076,7 @@ extern "C"
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
@@ -2310,7 +2310,7 @@ extern "C"
     /* parallel test */
     bool bad_thread_alloc = false;
     vector<sphess*> Hvec(n);
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
@@ -2372,7 +2372,7 @@ extern "C"
     /* parallel test */
     bool bad_thread_alloc = false;
     vector<sphess*> Hvec(n);
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
