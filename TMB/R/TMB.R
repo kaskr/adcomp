@@ -530,7 +530,7 @@ MakeADFun <- function(data, parameters, map=list(),
         ## Experiment !
         TransformADFunObject(ADFun,
                              method = "parallel_accumulate",
-                             num_threads = 2L,
+                             num_threads = as.integer(openmp()),
                              mustWork = 0L)
     }
     if (length(random) > 0) {
