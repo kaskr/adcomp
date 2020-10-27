@@ -1319,6 +1319,7 @@ extern "C"
 #ifdef _OPENMP
       if(config.trace.parallel)
         std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* FIXME: NOT NEEDED */
       vector< adfun* > pfvec(n);
       bool bad_thread_alloc = false;
@@ -1401,6 +1402,7 @@ extern "C"
 #ifdef _OPENMP
       if(config.trace.parallel)
 	std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
@@ -1966,6 +1968,7 @@ extern "C"
 #ifdef _OPENMP
       if(config.trace.parallel)
 	std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< adfun* > pfvec(n);
       bool bad_thread_alloc = false;
@@ -2035,6 +2038,7 @@ extern "C"
 #ifdef _OPENMP
       if(config.trace.parallel)
 	std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
@@ -2264,6 +2268,7 @@ extern "C"
     int n=F.count_parallel_regions();
     if(config.trace.parallel)
       std::cout << n << " regions found.\n";
+    if (n==0) n++; // No explicit parallel accumulation
     start_parallel(); /* FIXME: not needed */
     /* parallel test */
     bool bad_thread_alloc = false;
@@ -2323,6 +2328,7 @@ extern "C"
     int n=F.count_parallel_regions();
     if(config.trace.parallel)
       std::cout << n << " regions found.\n";
+    if (n==0) n++; // No explicit parallel accumulation
 
     start_parallel(); /* Start threads */
 
