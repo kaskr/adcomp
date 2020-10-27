@@ -1452,6 +1452,15 @@ extern "C"
   /* --- TransformADFunObject ----------------------------------------------- */
 
 #ifdef TMBAD_FRAMEWORK
+inline int get_num_tapes(SEXP f) {
+  if (isNull(f))
+    return 0;
+  SEXP tag = R_ExternalPtrTag(f);
+  if (tag != Rf_install("parallelADFun"))
+    return 0;
+  return
+    ((parallelADFun<double>*) R_ExternalPtrAddr(f))->ntapes;
+}
 SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
 {
   if (pf == NULL)
@@ -1588,6 +1597,21 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     // OK      : reorder_random etc
     // NOT OK  : copy, set_compiled, marginal_sr etc
     parallelADFun<double>* ppf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+    // Apply method for each component except for one special case:
+    // 'Parallel accumulate'
+    std::string method =
+      CHAR(STRING_ELT(getListElement(control, "method"), 0));
+    if (method == "parallel_accumulate") {
+      if (get_num_tapes(f) != 1)
+        Rf_error("Already parallel?");
+      adfun* pf = (ppf->vecpf)[0]; // One tape - get it
+      int num_threads = getListInteger(control, "num_threads", 2);
+      std::vector<adfun> vf = pf->parallel_accumulate(num_threads);
+      parallelADFun<double>* new_ppf = new parallelADFun<double>(vf);
+      delete ppf;
+      R_SetExternalPtrAddr(f, new_ppf);
+      return R_NilValue;
+    }
     for (int i=0; i<ppf->ntapes; i++) {
       adfun* pf = (ppf->vecpf)[i];
       TMBAD_TransformADFunObjectTemplate(pf, control);
@@ -1942,15 +1966,6 @@ ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP
 extern "C"
 {
 #ifdef TMBAD_FRAMEWORK
-  inline int get_num_tapes(SEXP f) {
-    if (isNull(f))
-      return 0;
-    SEXP tag = R_ExternalPtrTag(f);
-    if (tag != Rf_install("parallelADFun"))
-      return 0;
-    return
-      ((parallelADFun<double>*) R_ExternalPtrAddr(f))->ntapes;
-  }
   /** \internal \brief Tape the gradient using nested AD types */
   SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
