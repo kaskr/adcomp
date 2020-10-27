@@ -1773,8 +1773,15 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
 #ifdef TMBAD_FRAMEWORK
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
+    int num_tapes = get_num_tapes(f);
     adfun* pf;
-    pf = (adfun*) R_ExternalPtrAddr(f);
+    if (num_tapes == 0)
+      pf = (adfun*) R_ExternalPtrAddr(f);
+    else {
+      int i = getListInteger(control, "i", 0);
+      Rcout << "## Tape i=" << i << " of " << num_tapes << "\n";
+      pf = ( (parallelADFun<double>*) R_ExternalPtrAddr(f) ) -> vecpf[i];
+    }
     std::string method =
       CHAR(STRING_ELT(getListElement(control, "method"), 0));
     if (method == "tape") { // Print tape
