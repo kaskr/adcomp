@@ -3911,12 +3911,14 @@ void autopar::run() {
     node_split[thread_assign[ord[i]]].push_back(reverse_graph.dep2op[i]);
   }
 
+  Rcout << "Autopar work split\n";
   for (size_t i = 0; i < num_threads; i++) {
     if (keep_all_inv)
       node_split[i].insert(node_split[i].begin(), reverse_graph.inv2op.begin(),
                            reverse_graph.inv2op.end());
     reverse_graph.search(node_split[i]);
-    Rcout << node_split[i].size() << "\n";
+    Rcout << "Chunk " << i << ": ";
+    Rcout << (double)node_split[i].size() / glob.opstack.size() << "\n";
   }
 }
 
