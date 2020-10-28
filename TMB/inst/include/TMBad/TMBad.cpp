@@ -3289,7 +3289,9 @@ global accumulation_tree_split(global glob, bool sum_) {
   glob_tree.eliminate();
 
   size_t n = glob_tree.inv_index.size();
-  for (size_t i = 0; i < n; i++) glob_tree.value_inv(i) = 0;
+
+  std::vector<Scalar> x0(n);
+  for (size_t i = 0; i < n; i++) x0[i] = glob_tree.value_inv(i);
   glob_tree.forward();
   glob_tree.clear_deriv();
   glob_tree.deriv_dep(0) = 1;
@@ -3303,7 +3305,7 @@ global accumulation_tree_split(global glob, bool sum_) {
   glob.ad_start();
   std::vector<ad_aug_index> res(vars.begin(), vars.end());
   for (size_t i = 0; i < vars.size(); i++) {
-    res[i] = res[i] * J[i];
+    res[i] = (res[i] - x0[i]) * J[i];
     if (i == 0) res[i] += V;
     if (!sum_) res[i].Dependent();
   }
