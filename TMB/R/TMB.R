@@ -225,7 +225,7 @@ MakeADFun <- function(data, parameters, map=list(),
                       silent=FALSE,
                       intern=FALSE,
                       integrate=NULL,
-                      autopar=FALSE,
+                      autopar=isParallelDLL(DLL),
                       ...){
   env <- environment() ## This environment
   if(!is.list(data))
@@ -1110,6 +1110,10 @@ isParallelTemplate <- function(file){
   code <- .removeComments(code)
   length(grep("^[ \t]*PARALLEL_",code))>0  ||
   length(grep("^[ \t]*parallel_accumulator",code))>0
+}
+
+isParallelDLL <- function(DLL) {
+    attr( .Call("getFramework", PACKAGE = DLL), "openmp")
 }
 
 ##' Control number of openmp threads.
