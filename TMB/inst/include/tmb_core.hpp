@@ -2443,13 +2443,27 @@ extern "C"
 #endif
 
   SEXP getFramework() {
+    SEXP ans;
+    PROTECT(ans = R_NilValue);
 #ifdef TMBAD_FRAMEWORK
-    return mkString("TMBad");
+    ans = mkString("TMBad");
+#elif  CPPAD_FRAMEWORK
+    ans = mkString("CppAD");
+#else
+    ans = mkString("Unknown");
 #endif
-#ifdef CPPAD_FRAMEWORK
-    return mkString("CppAD");
+    SEXP openmp_sym, openmp_res;
+    PROTECT(openmp_sym = R_NilValue);
+    PROTECT(openmp_res = R_NilValue);
+    openmp_sym = Rf_install("openmp");
+#ifdef _OPENMP
+    openmp_res = ScalarLogical(1);
+#else
+    openmp_res = ScalarLogical(0);
 #endif
-    return mkString("Unknown");
+    Rf_setAttrib(ans, openmp_sym, openmp_res);
+    UNPROTECT(3);
+    return ans;
   }
 }
 
