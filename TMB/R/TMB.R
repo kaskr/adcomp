@@ -457,8 +457,8 @@ MakeADFun <- function(data, parameters, map=list(),
     if("ADFun"%in%type){
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
-      if (!is.null(ADFun)) ## ADFun=NULL used by sdreport
-          ADFun <<- registerFinalizer(ADFun, DLL)
+      if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
+      ADFun <<- registerFinalizer(ADFun, DLL)
       if (!is.null(integrate)) {
           sr_integrate <- parseIntegrate(integrate, "SR")
           nm <- sapply(parameters, length)
