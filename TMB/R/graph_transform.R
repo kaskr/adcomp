@@ -9,9 +9,9 @@ TransformADFunObject <- function(ADFun,
 }
 
 ## Utility
-tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL()) {
+tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL(), ...) {
     if (is.list(x)) x <- x$ptr
-    control <- list(depth=as.integer(depth), method=as.character(method))
+    control <- list(depth=as.integer(depth), method=as.character(method), ...)
     .Call("tmbad_print", x, control, PACKAGE=DLL)
 }
 
