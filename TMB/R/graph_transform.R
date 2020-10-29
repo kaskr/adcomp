@@ -15,6 +15,15 @@ tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL(), ...) {
     .Call("tmbad_print", x, control, PACKAGE=DLL)
 }
 
+op_table <- function(ADFun) {
+    ntapes <- TMB:::tape_print(ADFun, method="num_tapes", DLL=ADFun$DLL, i=as.integer(0))
+    ntapes <- max(1, ntapes)
+    f <- function(i)TMB:::tape_print(ADFun$ptr, method="opname", DLL=ADFun$DLL, i=as.integer(i))
+    g <- function(i)data.frame(tape=i, opname=f(i), stringsAsFactors=FALSE)
+    df <- do.call("rbind", lapply(seq_len(ntapes) - 1L, g))
+    table(opname = df$opname, tape = df$tape)
+}
+
 src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
                           flags = "-O3", perm=TRUE) {
     if(.Platform$OS.type=="windows"){
