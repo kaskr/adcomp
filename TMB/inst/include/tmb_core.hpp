@@ -1597,10 +1597,16 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
     std::string method =
       CHAR(STRING_ELT(getListElement(control, "method"), 0));
     if (method == "parallel_accumulate") {
-      if (get_num_tapes(f) != 1)
-        Rf_error("Already parallel?");
-      adfun* pf = (ppf->vecpf)[0]; // One tape - get it
       int num_threads = getListInteger(control, "num_threads", 2);
+      if (num_threads == 1) {
+        // No need to parallelize
+        return R_NilValue;
+      }
+      if (get_num_tapes(f) > 1) {
+        // Already parallel (via parallel_accumulator or similar)
+        return R_NilValue;
+      }
+      adfun* pf = (ppf->vecpf)[0]; // One tape - get it
       std::vector<adfun> vf = pf->parallel_accumulate(num_threads);
       parallelADFun<double>* new_ppf = new parallelADFun<double>(vf);
       delete ppf;
