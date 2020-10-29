@@ -284,7 +284,10 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
     for(int i=0; i<ntapes; i++) vecpf(i) -> set_tail(r);
   }
   void force_update() {
-    for(int i=0; i<ntapes; i++) vecpf(i) -> unset_tail();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> force_update();
   }
   vector<double> operator()(const std::vector<double> &x) {
     vector<vector<double> > ans(ntapes);
