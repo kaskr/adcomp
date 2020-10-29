@@ -1783,12 +1783,14 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       pf = (adfun*) R_ExternalPtrAddr(f);
     else {
       int i = getListInteger(control, "i", 0);
-      Rcout << "## Tape i=" << i << " of " << num_tapes << "\n";
       pf = ( (parallelADFun<double>*) R_ExternalPtrAddr(f) ) -> vecpf[i];
     }
     std::string method =
       CHAR(STRING_ELT(getListElement(control, "method"), 0));
-    if (method == "tape") { // Print tape
+    if (method == "num_tapes") { // Get number of tapes
+      return ScalarInteger(num_tapes);
+    }
+    else if (method == "tape") { // Print tape
       int depth = getListInteger(control, "depth", 1);
       TMBad::global::print_config cfg;
       cfg.depth = depth;
