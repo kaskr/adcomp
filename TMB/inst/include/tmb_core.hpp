@@ -1472,16 +1472,8 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
     CHAR(STRING_ELT(getListElement(control, "method"), 0));
   // Test adfun copy
   if (method == "copy") {
-    adfun* pf_new = new adfun(*pf);
-    /* Convert ADFun pointer to R_ExternalPtr */
-    SEXP res;
-    PROTECT(res = R_MakeExternalPtr((void*) pf_new,
-                                    Rf_install("ADFun"),R_NilValue));
-    /* Return list of external pointer and default-parameter */
-    SEXP ans;
-    PROTECT(ans=ptrList(res));
-    UNPROTECT(2);
-    return ans;
+    *pf = adfun(*pf);
+    return R_NilValue;
   }
   if (method == "set_compiled") {
     typedef void(*fct_ptr1)(double*);
@@ -1615,6 +1607,9 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       R_SetExternalPtrAddr(f, new_ppf);
       return R_NilValue;
     }
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
     for (int i=0; i<ppf->ntapes; i++) {
       adfun* pf = (ppf->vecpf)[i];
       TMBAD_TransformADFunObjectTemplate(pf, control);
