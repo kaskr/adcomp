@@ -4195,7 +4195,7 @@ void reorder_graph(global &glob, std::vector<Index> inv_idx) {
   for (size_t i = 0; i < inv_idx.size(); i++)
     marks[glob.inv_index[inv_idx[i]]] = true;
   glob.forward_dense(marks);
-  if (true) {
+  if (false) {
     int c = std::count(marks.begin(), marks.end(), true);
     Rcout << "marked proportion:" << (double)c / (double)marks.size() << "\n";
   }
