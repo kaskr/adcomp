@@ -43,7 +43,7 @@ benchmark <- function(obj,n=10,expr=NULL,cores=NULL){
   }
   else if(is.null(names(expr)))
     names(expr) <- vapply(expr, function(.) deparse(.)[[1L]], "")
-  addLoopToExpression <- function(y) substitute(for (i in seq_len(n)) { EE }, list(EE=y))
+  addLoopToExpression <- function(y) substitute(for (i in seq_len(n)) { obj$env$.data <- NULL; EE }, list(EE=y))
   expr <- lapply(expr, addLoopToExpression)
   if(!is.null(obj$env$random)){
     h <- obj$env$spHess() ## Avoid timing the construction
