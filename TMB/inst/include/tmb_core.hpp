@@ -1811,6 +1811,15 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       write_forward(glob, cfg);
       write_reverse(glob, cfg);
     }
+    else if (method == "opname") {
+      size_t n = pf->glob.opstack.size();
+      SEXP ans = PROTECT(allocVector(STRSXP, n));
+      for (size_t i=0; i<n; i++) {
+        SET_STRING_ELT(ans, i, mkChar(pf->glob.opstack[i]->op_name()));
+      }
+      UNPROTECT(1);
+      return ans;
+    }
     else {
       Rf_error("Unknown method: ", method.c_str());
     }
