@@ -112,6 +112,9 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   }
   parallelADFun(const std::vector<Base> &vecf) {
     vector<Base*> vecpf(vecf.size());
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
     for (int i=0; i<vecpf.size(); i++) {
       vecpf[i] = new Base(vecf[i]);
     }
