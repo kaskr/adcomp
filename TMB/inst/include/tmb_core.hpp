@@ -1813,11 +1813,21 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       write_forward(glob, cfg);
       write_reverse(glob, cfg);
     }
-    else if (method == "opname") {
+    else if (method == "op") {
+      int name = getListInteger(control, "name", 0);
+      int address = getListInteger(control, "address", 0);
+      int input_size = getListInteger(control, "input_size", 0);
+      int output_size = getListInteger(control, "output_size", 0);
       size_t n = pf->glob.opstack.size();
       SEXP ans = PROTECT(allocVector(STRSXP, n));
       for (size_t i=0; i<n; i++) {
-        SET_STRING_ELT(ans, i, mkChar(pf->glob.opstack[i]->op_name()));
+        std::stringstream strm;
+        if (address)     strm << (void*) pf->glob.opstack[i] << " ";
+        if (name)        strm << pf->glob.opstack[i]->op_name() << " ";
+        if (input_size)  strm << pf->glob.opstack[i]->input_size();
+        if (output_size) strm << pf->glob.opstack[i]->output_size();
+        const std::string& tmp = strm.str();
+        SET_STRING_ELT(ans, i, mkChar(tmp.c_str()));
       }
       UNPROTECT(1);
       return ans;
