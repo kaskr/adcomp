@@ -634,13 +634,26 @@ struct graph {
 struct global;
 global *get_glob();
 
+static struct {
+  char data[4096];
+  size_t n = 0;
+  template <class S>
+  S *insert(S x) {
+    Rcout << n << "\n";
+    void *ans = &(data[n]);
+    char *px = (char *)static_cast<void *>(&x);
+    for (size_t i = 0; i < sizeof(S); i++) data[n++] = px[i];
+    return static_cast<S *>(ans);
+  }
+} static_op_table;
+
 namespace {
 template <class CompleteOperator, bool dynamic>
 struct constructOperator {};
 template <class CompleteOperator>
 struct constructOperator<CompleteOperator, false> {
   CompleteOperator *operator()() {
-    static CompleteOperator *pOp = new CompleteOperator();
+    static CompleteOperator *pOp = static_op_table.insert(CompleteOperator());
     return pOp;
   }
 };
