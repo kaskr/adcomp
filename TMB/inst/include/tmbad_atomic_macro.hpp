@@ -24,11 +24,11 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
   const char* op_name() { return #ATOMIC_NAME; }                        \
   static const bool add_static_identifier = true;                       \
   void forward(TMBad::ForwardArgs<TMBad::Scalar> _args_) {              \
-    CppAD::vector<TMBad::Scalar> tx(this->input_size());                \
-    CppAD::vector<TMBad::Scalar> ty(this->output_size());               \
-    for (size_t i=0; i<tx.size(); i++) tx[i] = _args_.x(i);             \
+    vector<TMBad::Scalar> tx(this->input_size());                       \
+    vector<TMBad::Scalar> ty(this->output_size());                      \
+    for (size_t i=0; i<(size_t)tx.size(); i++) tx[i] = _args_.x(i);     \
     ATOMIC_DOUBLE;                                                      \
-    for (size_t i=0; i<ty.size(); i++) _args_.y(i) = ty[i];             \
+    for (size_t i=0; i<(size_t)ty.size(); i++) _args_.y(i) = ty[i];     \
   }                                                                     \
   void forward(TMBad::ForwardArgs<TMBad::Replay> _args_) {              \
     CppAD::vector<TMBad::Replay> tx(this->input_size());                \
@@ -37,15 +37,15 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
     for (size_t i=0; i<ty.size(); i++) _args_.y(i) = ty[i];             \
   }                                                                     \
   template<class Type> void reverse(TMBad::ReverseArgs<Type> _args_) {  \
-    CppAD::vector<Type> tx(this->input_size());                         \
-    CppAD::vector<Type> ty(this->output_size());                        \
-    CppAD::vector<Type> px(this->input_size());                         \
-    CppAD::vector<Type> py(this->output_size());                        \
-    for (size_t i=0; i<tx.size(); i++) tx[i] = _args_.x(i);             \
-    for (size_t i=0; i<ty.size(); i++) ty[i] = _args_.y(i);             \
-    for (size_t i=0; i<py.size(); i++) py[i] = _args_.dy(i);            \
+    vector<Type> tx(this->input_size());                                \
+    vector<Type> ty(this->output_size());                               \
+    vector<Type> px(this->input_size());                                \
+    vector<Type> py(this->output_size());                               \
+    for (size_t i=0; i<(size_t)tx.size(); i++) tx[i] = _args_.x(i);     \
+    for (size_t i=0; i<(size_t)ty.size(); i++) ty[i] = _args_.y(i);     \
+    for (size_t i=0; i<(size_t)py.size(); i++) py[i] = _args_.dy(i);    \
     ATOMIC_REVERSE;                                                     \
-    for (size_t i=0; i<px.size(); i++) _args_.dx(i) += px[i];           \
+    for (size_t i=0; i<(size_t)px.size(); i++) _args_.dx(i) += px[i];   \
   }                                                                     \
   void forward(TMBad::ForwardArgs<TMBad::Writer> &args) { ASSERT(false); } \
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); } \
