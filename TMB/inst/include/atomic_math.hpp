@@ -181,6 +181,12 @@ typename TypeDefs<Type>::ConstMapMatrix vec2mat(const CppAD::vector<Type> &x, in
   ConstMapMatrix_t res(&x[offset], m, n);
   return res;
 }
+template<class Type>
+typename TypeDefs<Type>::ConstMapMatrix vec2mat(const vector<Type> &x, int m, int n, int offset=0){
+  typedef typename TypeDefs<Type>::ConstMapMatrix ConstMapMatrix_t;
+  ConstMapMatrix_t res(&x[offset], m, n);
+  return res;
+}
 
 /** \internal \brief Convert Eigen::Matrix to CppAD::vector by stacking the matrix columns.
     \param x Input matrix.
@@ -462,6 +468,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[0] = 0; px[1] = 0;
 			   )
 
+/** \cond */
+template<class Type> /* Header of matinv interface */
+matrix<Type> matinv(matrix<Type> x);
+/** \endcond */
+
 /** \brief Atomic version of matrix inversion.
     Inverts n-by-n matrix by LU-decomposition.
     \param x Input vector of length n*n.
@@ -498,24 +509,26 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \return Vector of length 1.
 */
 TMB_ATOMIC_VECTOR_FUNCTION(
-			   // ATOMIC_NAME
-			   logdet
-			   ,
-			   // OUTPUT_DIM
-			   1
-			   ,
-			   // ATOMIC_DOUBLE
-			   int n=sqrt((double)tx.size());
-			   matrix<double> X=vec2mat(tx,n,n);
-			   matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
-			   vector<double> LUdiag = LU.diagonal();
-			   double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
-			   ty[0] = res;
-			   ,
-			   // ATOMIC_REVERSE  (X^-1*W[0])
-			   CppAD::vector<Type> invX = matinv(tx);
-			   for(size_t i=0; i<tx.size(); i++) px[i] = invX[i] * py[0];
-			   )
+                           // ATOMIC_NAME
+                           logdet
+                           ,
+                           // OUTPUT_DIM
+                           1
+                           ,
+                           // ATOMIC_DOUBLE
+                           int n=sqrt((double)tx.size());
+                           matrix<double> X=vec2mat(tx,n,n);
+                           matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
+                           vector<double> LUdiag = LU.diagonal();
+                           double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
+                           ty[0] = res;
+                           ,
+                           // ATOMIC_REVERSE  (X^-1*W[0])
+                           int n = sqrt((double)tx.size());
+                           matrix<Type> X=vec2mat(tx,n,n);
+                           vector<Type> invX = matinv(X).vec();
+                           for(size_t i=0; i<(size_t)tx.size(); i++) px[i] = invX[i] * py[0];
+                           )
 
 /** \brief Atomic version of log determinant *and* inverse of positive definite n-by-n matrix.
     Calculated by Cholesky decomposition.
@@ -552,7 +565,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   matrix<Type> tmp=matmul(W2,Yt);    // W2*f2(X)^T
 			   matrix<Type> res=-matmul(Yt,tmp);  // -f2(X)^T*W2*f2(X)^T
 			   res = res + Y*W1;
-			   px=mat2vec(res);
+			   px=res.vec();
 			   )
 
 /* ================================== INTERFACES
