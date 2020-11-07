@@ -132,7 +132,9 @@ TMB_ATOMIC_VECTOR_FUNCTION(						\
 #ifdef TMBAD_FRAMEWORK
 
 #undef TMB_BIND_ATOMIC
+#ifndef TMB_MAX_ORDER
 #define TMB_MAX_ORDER 3
+#endif
 
 #define TMB_BIND_ATOMIC(NAME,MASK,CALL)                                 \
 template<int order, int ninput, int noutput, long int mask>             \
@@ -195,7 +197,7 @@ struct NAME ## Op : TMBad::global::Operator<ninput, noutput> {          \
   }                                                                     \
   template<class Type>                                                  \
   void forward(TMBad::ForwardArgs<Type> &args) {                        \
-    abort();                                                            \
+    Rf_error("Un-implemented method request");                          \
   }                                                                     \
   void forward(TMBad::ForwardArgs<double> &args) {                      \
     double x[ninput];                                                   \
@@ -217,7 +219,7 @@ struct NAME ## Op : TMBad::global::Operator<ninput, noutput> {          \
     for (size_t i=0; i<ninput; i++) args.dx(i) += tmp[i];               \
   }                                                                     \
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) {               \
-    abort();                                                            \
+    Rf_error("Un-implemented method request");                          \
   }                                                                     \
   const char* op_name() { return #NAME ; }                              \
 };                                                                      \
@@ -230,16 +232,17 @@ struct NAME ## Op<TMB_MAX_ORDER+1, ninput, noutput, mask> {             \
   Eigen::Matrix<TMBad::ad_aug, nvar, noutput / nvar>                    \
   operator()(const Eigen::Array<TMBad::ad_aug, ninput, 1> &x) {         \
     Eigen::Matrix<TMBad::ad_aug, nvar, noutput / nvar> ans;             \
-    Rf_error("Order not implemented. Please increase MAX_ORDER");       \
+    Rf_error("Order not implemented. Please increase TMB_MAX_ORDER");   \
     return ans;                                                         \
   }                                                                     \
   Eigen::Matrix<double, nvar, noutput / nvar>                           \
   operator()(const Eigen::Array<double, ninput, 1> &x) {                \
     Eigen::Matrix<double, nvar, noutput / nvar> ans;                    \
-    Rf_error("Order not implemented. Please increase MAX_ORDER");       \
+    Rf_error("Order not implemented. Please increase TMB_MAX_ORDER");   \
     return ans;                                                         \
   }                                                                     \
 };                                                                      \
+template<class dummy=void>                                              \
 CppAD::vector<TMBad::ad_aug>                                            \
 NAME (const CppAD::vector<TMBad::ad_aug> &x) {                          \
   int n = x.size() - 1;                                                 \
@@ -250,6 +253,7 @@ NAME (const CppAD::vector<TMBad::ad_aug> &x) {                          \
   for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
   return y;                                                             \
 }                                                                       \
+template<class dummy=void>                                              \
 CppAD::vector<double>                                                   \
 NAME (const CppAD::vector<double> &x) {                                 \
   CppAD::vector<double> y(1);                                           \
