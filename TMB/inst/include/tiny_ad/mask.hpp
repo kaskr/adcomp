@@ -145,7 +145,7 @@ struct NAME ## Eval {                                                   \
   static const int nvar = mask_type::count;                             \
   template <class S, class T>                                           \
   void operator()(S* tx, T* ty) {                                       \
-    typedef tiny_ad::variable<order, nvar> Float;                       \
+    typedef atomic::tiny_ad::variable<order, nvar> Float;               \
     atomic::tiny_vec_ref<double> tyref(&(ty[0]), noutput);              \
     Float x[ninput];                                                    \
     mask_.activate_derivs(x, tx);                                       \
