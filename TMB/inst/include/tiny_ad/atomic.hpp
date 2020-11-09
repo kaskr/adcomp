@@ -106,12 +106,12 @@ Type dbeta(Type x, Type shape1, Type shape2) {
     (shape1 - 1.) * log(x) + (shape2 - 1.) * log(1. - x);
   return exp(logres);
 }
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   qbeta
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   3
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0] = Rf_qbeta(tx[0], tx[1], tx[2], 1, 0);
