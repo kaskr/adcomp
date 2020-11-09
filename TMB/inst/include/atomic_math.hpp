@@ -365,7 +365,7 @@ TMB_ATOMIC_STATIC_FUNCTION(
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   bessel_k_10
 			   ,
@@ -392,7 +392,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   bessel_i_10
 			   ,
