@@ -91,3 +91,30 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
     ATOMIC_NAME(tx, ty);                                                      \
     return ty;                                                                \
   }
+
+#define TMB_ATOMIC_STATIC_FUNCTION(                                     \
+  ATOMIC_NAME,                                                          \
+  INPUT_SIZE,                                                           \
+  ATOMIC_DOUBLE,                                                        \
+  ATOMIC_REVERSE                                                        \
+)                                                                       \
+template<class dummy=void>                                              \
+double ATOMIC_NAME (const double *tx) {                                 \
+  double ty[1];                                                         \
+  ATOMIC_DOUBLE;                                                        \
+  return ty[0];                                                         \
+}                                                                       \
+template <class Type>                                                   \
+CppAD::vector<AD<Type> > ATOMIC_NAME(const CppAD::vector<AD<Type> >& tx);\
+template<class Type>                                                    \
+Type ATOMIC_NAME (const Type *tx) {                                     \
+  CppAD::vector<Type> tx_(INPUT_SIZE);                                  \
+  for (size_t i=0; i<INPUT_SIZE; i++) tx_[i]=tx[i];                     \
+  return ATOMIC_NAME(tx_)[0];                                           \
+}                                                                       \
+TMB_ATOMIC_VECTOR_FUNCTION(                                             \
+  ATOMIC_NAME,                                                          \
+  1,                                                                    \
+  ATOMIC_DOUBLE,                                                        \
+  ATOMIC_REVERSE                                                        \
+)
