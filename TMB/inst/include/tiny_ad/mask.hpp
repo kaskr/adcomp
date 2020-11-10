@@ -168,7 +168,7 @@ struct NAME ## Op : TMBad::global::Operator<ninput, noutput> {          \
   mask_type mask_;                                                      \
   static const int nvar = mask_type::count;                             \
   template <class S, class T>                                           \
-  void eval(S* tx, T* ty) {                                             \
+  void eval(S* tx, T* ty) const {                                       \
     NAME ## Eval<order, ninput, noutput, mask>()(tx, ty);               \
   }                                                                     \
   std::vector<TMBad::ad_plain>                                          \
@@ -269,8 +269,8 @@ CppAD::vector<double>                                                   \
 NAME (const CppAD::vector<double> &x) {                                 \
   int n = x.size() - 1;                                                 \
   int order = CppAD::Integer(x[n]);                                     \
-  NAME ## Op<0, NCHAR(MASK),         1, OCTAL(MASK)> foo0;              \
-  NAME ## Op<1, NCHAR(MASK), foo0.nvar, OCTAL(MASK)> foo1;              \
+  constexpr NAME ## Op<0, NCHAR(MASK),         1, OCTAL(MASK)> foo0;    \
+  constexpr NAME ## Op<1, NCHAR(MASK), foo0.nvar, OCTAL(MASK)> foo1;    \
   if (order==0) {                                                       \
     CppAD::vector<double> y(1);                                         \
     y[0] = CALL;                                                        \
