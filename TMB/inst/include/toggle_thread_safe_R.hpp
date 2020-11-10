@@ -152,6 +152,12 @@ inline SEXP Ts_ENCLOS(SEXP x) {
   return ans;
 }
 
+inline void Ts_warning(const char *x, ...) {
+  if (omp_get_thread_num() == 0) {
+    Rf_warning(x);
+  }
+}
+
 /* --- Re-define ---------------------------------------------------------- */
 #define TMB_HAVE_THREAD_SAFE_R
 #define Rf_getAttrib   Ts_getAttrib
@@ -169,6 +175,7 @@ inline SEXP Ts_ENCLOS(SEXP x) {
 #define Rf_install     Ts_install
 #define Rf_findVar     Ts_findVar
 #define ENCLOS         Ts_ENCLOS
+#define Rf_warning     Ts_warning
 
 #else
 
@@ -189,6 +196,7 @@ inline SEXP Ts_ENCLOS(SEXP x) {
 #undef Rf_install
 #undef Rf_findVar
 #undef ENCLOS
+#undef Rf_warning
 
 #endif // TMB_HAVE_THREAD_SAFE_R
 
