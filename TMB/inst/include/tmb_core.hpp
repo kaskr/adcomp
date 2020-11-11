@@ -1620,6 +1620,17 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
       adfun* pf = (ppf->vecpf)[i];
       TMBAD_TransformADFunObjectTemplate(pf, control);
     }
+    // Some methods change Domain or Range of individual tapes. This
+    // is allowed when there is only one tape.
+    if (ppf->ntapes == 1) {
+      ppf->domain = (ppf->vecpf)[0]->Domain();
+      ppf->range  = (ppf->vecpf)[0]->Range();
+    }
+    // Now, check that it's ok. FIXME: Range() is not checked
+    for (int i=0; i<ppf->ntapes; i++) {
+      if (ppf->domain != (ppf->vecpf)[i]->Domain())
+        Rf_warning("Domain has changed in an invalid way");
+    }
   } else {
     Rf_error("Unknown function pointer");
   }
