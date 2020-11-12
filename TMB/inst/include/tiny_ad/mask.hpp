@@ -269,15 +269,17 @@ CppAD::vector<double>                                                   \
 NAME (const CppAD::vector<double> &x) {                                 \
   int n = x.size() - 1;                                                 \
   int order = CppAD::Integer(x[n]);                                     \
-  constexpr NAME ## Op<0, NCHAR(MASK),         1, OCTAL(MASK)> foo0;    \
-  constexpr NAME ## Op<1, NCHAR(MASK), foo0.nvar, OCTAL(MASK)> foo1;    \
+  typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
+  static const int nvar = Foo0::nvar;                                   \
+  typedef NAME ## Op<1, NCHAR(MASK), nvar, OCTAL(MASK)> Foo1;           \
   if (order==0) {                                                       \
     CppAD::vector<double> y(1);                                         \
     y[0] = CALL;                                                        \
     return y;                                                           \
   }                                                                     \
   else if (order==1) {                                                  \
-    CppAD::vector<double> y(foo0.nvar);                                 \
+    Foo1 foo1;                                                          \
+    CppAD::vector<double> y(nvar);                                      \
     foo1.eval(&x[0], &y[0]);                                            \
     return y;                                                           \
   }                                                                     \
