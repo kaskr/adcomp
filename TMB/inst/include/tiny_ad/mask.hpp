@@ -249,12 +249,15 @@ NAME (const CppAD::vector<TMBad::ad_aug> &x) {                          \
   int order = CppAD::Integer(x[n]);                                     \
   std::vector<TMBad::ad_plain> x_(&(x[0]), &(x[0]) + n);                \
   std::vector<TMBad::ad_plain> y_;                                      \
-  NAME ## Op<0, NCHAR(MASK),         1, OCTAL(MASK)> foo0;              \
-  NAME ## Op<1, NCHAR(MASK), foo0.nvar, OCTAL(MASK)> foo1;              \
+  typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
+  static const int nvar = Foo0::nvar;                                   \
+  typedef NAME ## Op<1, NCHAR(MASK), nvar, OCTAL(MASK)> Foo1;           \
   if (order==0) {                                                       \
+    Foo0 foo0;                                                          \
     y_ = foo0(x_);                                                      \
   }                                                                     \
   else if (order==1) {                                                  \
+    Foo1 foo1;                                                          \
     y_ = foo1(x_);                                                      \
   }                                                                     \
   else {                                                                \
