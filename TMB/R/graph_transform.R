@@ -28,7 +28,7 @@ op_table <- function(ADFun, name=TRUE, address=FALSE, input_size=FALSE, output_s
     table(opname = df$opname, tape = df$tape)
 }
 
-src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
+src_transform <- function(ADFun,
                           flags = "-O3", perm=TRUE) {
     if(.Platform$OS.type=="windows"){
         ## Overload tempfile
@@ -37,41 +37,54 @@ src_transform <- function(obj, what=c("ADFun", "ADGrad", "ADHess"),
             chartr("\\", "/", shortPathName(ans))
         }
     }
-    what <- match.arg(what)
-    DLL <- obj$env$DLL
+    ntapes <- TMB:::tape_print(ADFun, method="num_tapes",
+                               DLL=ADFun$DLL,
+                               i=as.integer(0))
+    ntapes <- max(1, ntapes)
+    tapes <- seq.int(from=0, length.out=ntapes)
     control <- list(method="src")
-    dll <- tempfile()
+    dll <- tempfile(fileext=paste0("_",tapes))
     dll.cpp <- paste0(dll, ".cpp")
-    ptr <- get(what, obj$env)$ptr
     ## Reorder graph
     if (perm) {
-        .Call("TransformADFunObject",
-              ptr,
-              list(random_order=integer(0),
-                   max_period_size=1024L,
-                   method="reorder_sub_expressions"), PACKAGE=DLL)
+        TMB:::TransformADFunObject(
+                  ADFun,
+                  method="reorder_sub_expressions",
+                  random_order=integer(0),
+                  max_period_size=1024L)
+    }
+    ## Write redefs
+    forward <- paste0("forward", tapes)
+    reverse <- paste0("reverse", tapes)
+    redef <- function(i) {
+        cat("#define forward", forward[i+1], "\n")
+        cat("#define reverse", reverse[i+1], "\n")
     }
     ## Write source code
-    sink(dll.cpp); out <- .Call("tmbad_print", ptr, control, PACKAGE = DLL); sink(NULL)
+    for (i in tapes) {
+        control$i <- i
+        sink(dll.cpp[i+1]); redef(i); out <- .Call("tmbad_print", ADFun$ptr, control, PACKAGE = ADFun$DLL); sink(NULL)
+    }
     ## Overload
     compile(dll.cpp, flags=flags, libtmb=FALSE)
-    dyn.load(dynlib(dll))
-    dllinfo <- getLoadedDLLs()[[basename(dll)]]
-    forward_compiled <- getNativeSymbolInfo("forward",PACKAGE=dllinfo)$address
-    reverse_compiled <- getNativeSymbolInfo("reverse",PACKAGE=dllinfo)$address
-    .Call("TransformADFunObject",
-          ptr,
-          list(method="set_compiled",
-               forward_compiled=forward_compiled,
-               reverse_compiled=reverse_compiled
-               ), PACKAGE=DLL)
+    dyn.load(dynlib(dll)[1])
+    dllinfo <- getLoadedDLLs()[[basename(dll[1])]]
+    forward_compiled <-
+        lapply(forward, function(x)getNativeSymbolInfo(x,PACKAGE=dllinfo)$address)
+    reverse_compiled <-
+        lapply(reverse, function(x)getNativeSymbolInfo(x,PACKAGE=dllinfo)$address)
+    TMB:::TransformADFunObject(
+              ADFun,
+              method="set_compiled",
+              forward_compiled=forward_compiled,
+              reverse_compiled=reverse_compiled)
     ## Unload compiled code when no longer needed
     finalizer <- function(ptr) {
-        dyn.unload(dynlib(dll))
-        file.remove(dynlib(dll))
+        dyn.unload(dynlib(dll[1]))
+        file.remove(dynlib(dll[1]))
         file.remove(paste0(dll, ".o"))
         file.remove(dll.cpp)
     }
-    reg.finalizer(ptr, finalizer)
+    reg.finalizer(ADFun$ptr, finalizer)
     NULL
 }
