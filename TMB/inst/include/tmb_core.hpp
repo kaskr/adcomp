@@ -1476,12 +1476,16 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
     return R_NilValue;
   }
   if (method == "set_compiled") {
+    int i = 0;
+#ifdef _OPENMP
+    i = omp_get_thread_num();
+#endif
     typedef void(*fct_ptr1)(double*);
     typedef void(*fct_ptr2)(double*,double*);
     pf->glob.forward_compiled =
-      (fct_ptr1) R_ExternalPtrAddr(getListElement(control, "forward_compiled"));
+      (fct_ptr1) R_ExternalPtrAddr(VECTOR_ELT(getListElement(control, "forward_compiled"), i));
     pf->glob.reverse_compiled =
-      (fct_ptr2) R_ExternalPtrAddr(getListElement(control, "reverse_compiled"));
+      (fct_ptr2) R_ExternalPtrAddr(VECTOR_ELT(getListElement(control, "reverse_compiled"), i));
     return R_NilValue;
   }
   SEXP random_order = getListElement(control, "random_order");
