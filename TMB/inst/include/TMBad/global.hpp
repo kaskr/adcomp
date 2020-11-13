@@ -886,7 +886,7 @@ struct global {
 
   /** \brief Substitute of std::vector<bool> with all elements `true` */
   struct no_filter {
-    bool operator[](size_t i) const;
+    constexpr bool operator[](size_t i) const;
   };
   /** \brief Generic forward sweep
       \param begin Skip operators up to this point.
