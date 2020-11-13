@@ -953,7 +953,7 @@ Position global::end() {
   return Position(opstack.size(), inputs.size(), values.size());
 }
 
-bool global::no_filter::operator[](size_t i) const { return true; }
+constexpr bool global::no_filter::operator[](size_t i) const { return true; }
 
 void global::forward(Position start) {
   if (forward_compiled != NULL) {
