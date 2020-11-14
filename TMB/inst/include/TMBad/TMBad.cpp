@@ -3322,7 +3322,8 @@ void aggregate(global &glob, int sign) {
   ASSERT((sign == 1) || (sign == -1));
   glob.ad_start();
   std::vector<ad_aug_index> x(glob.dep_index.begin(), glob.dep_index.end());
-  ad_aug y = sum(x);
+  ad_aug y = 0;
+  for (size_t i = 0; i < x.size(); i++) y += x[i];
   if (sign < 0) y = -y;
   glob.dep_index.resize(0);
   y.Dependent();
