@@ -29,7 +29,7 @@ op_table <- function(ADFun, name=TRUE, address=FALSE, input_size=FALSE, output_s
 }
 
 src_transform <- function(ADFun,
-                          flags = "-O3", perm=TRUE) {
+                          flags = "-O3", ..., perm=TRUE) {
     if(.Platform$OS.type=="windows"){
         ## Overload tempfile
         tempfile <- function(...){
@@ -66,7 +66,7 @@ src_transform <- function(ADFun,
         sink(dll.cpp[i+1]); redef(i); out <- .Call("tmbad_print", ADFun$ptr, control, PACKAGE = ADFun$DLL); sink(NULL)
     }
     ## Overload
-    compile(dll.cpp, flags=flags, libtmb=FALSE)
+    compile(dll.cpp, flags=flags, ..., libtmb=FALSE)
     dyn.load(dynlib(dll)[1])
     dllinfo <- getLoadedDLLs()[[basename(dll[1])]]
     forward_compiled <-
