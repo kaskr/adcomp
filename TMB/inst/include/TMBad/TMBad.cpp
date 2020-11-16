@@ -477,15 +477,19 @@ void StackOp::forward(ForwardArgs<Writer> &args) {
 
   if (np > 0) {
     w << "    ";
-    w << "for (int k=0; k<" << np
-      << "; k++) ip[wp[k]] = pd[po[k] + count % ps[k]];\n";
+    for (int k = 0; k < np; k++)
+      w << "ip[wp[" << k << "]] = pd[po[" << k << "] + count % ps[" << k
+        << "]]; ";
+    w << "\n";
   }
   if (n > 0) {
     w << "    ";
-    w << "for (int k=0; k<" << n << "; k++) i[k] += ip[k];\n";
+    for (size_t k = 0; k < n; k++) w << "i[" << k << "] += ip[" << k << "]; ";
+    w << "\n";
   }
   w << "    ";
-  w << "for (int k=0; k<" << m << "; k++) o[k] += " << m << ";\n";
+  for (size_t k = 0; k < m; k++) w << "o[" << k << "] += " << m << "; ";
+  w << "\n";
 
   w << "  ";
   w << "}";
@@ -527,15 +531,19 @@ void StackOp::reverse(ReverseArgs<Writer> &args) {
   w << "count--;\n";
   if (np > 0) {
     w << "    ";
-    w << "for (int k=0; k<" << np
-      << "; k++) ip[wp[k]] = pd[po[k] + count % ps[k]];\n";
+    for (int k = 0; k < np; k++)
+      w << "ip[wp[" << k << "]] = pd[po[" << k << "] + count % ps[" << k
+        << "]]; ";
+    w << "\n";
   }
   if (n > 0) {
     w << "    ";
-    w << "for (int k=0; k<" << n << "; k++) i[k] -= ip[k];\n";
+    for (size_t k = 0; k < n; k++) w << "i[" << k << "] -= ip[" << k << "]; ";
+    w << "\n";
   }
   w << "    ";
-  w << "for (int k=0; k<" << m << "; k++) o[k] -= " << m << ";\n";
+  for (size_t k = 0; k < m; k++) w << "o[" << k << "] -= " << m << "; ";
+  w << "\n";
 
   w << "    ";
 
