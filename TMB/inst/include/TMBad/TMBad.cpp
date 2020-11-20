@@ -477,7 +477,7 @@ void StackOp::forward(ForwardArgs<Writer> &args) {
 
   if (np > 0) {
     w << "    ";
-    for (int k = 0; k < np; k++)
+    for (size_t k = 0; k < np; k++)
       w << "ip[wp[" << k << "]] = pd[po[" << k << "] + count % ps[" << k
         << "]]; ";
     w << "\n";
@@ -531,7 +531,7 @@ void StackOp::reverse(ReverseArgs<Writer> &args) {
   w << "count--;\n";
   if (np > 0) {
     w << "    ";
-    for (int k = 0; k < np; k++)
+    for (size_t k = 0; k < np; k++)
       w << "ip[wp[" << k << "]] = pd[po[" << k << "] + count % ps[" << k
         << "]]; ";
     w << "\n";
@@ -1563,6 +1563,9 @@ std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
     for (size_t i = 0; i < tmp.size(); i++)
       tmp[i] = (size_t)opstack[i]->identifier();
     opstack_id = radix::first_occurance<Index>(tmp);
+    hash_t spread = (hash_t(1) << (sizeof(hash_t) * 4)) - 1;
+    for (size_t i = 0; i < opstack_id.size(); i++)
+      opstack_id[i] = (opstack_id[i] + 1) * spread;
   }
 
   std::vector<hash_t> hash_vec(values.size(), 37);
@@ -1601,8 +1604,7 @@ std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
       if (j == 0)
         h = hash_vec[dep[0]];
       else
-
-        hash(h, hash_vec[dep[j]] - hash_vec[dep[0]]);
+        hash(h, hash_vec[dep[j]]);
       ;
     }
 
@@ -1610,12 +1612,15 @@ std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
       hash(h, opstack[i]->identifier());
       ;
     } else {
-      hash(h, opstack_id[i] + 1);
+      hash(h, opstack_id[i]);
       ;
     }
 
     if (opstack[i] == constant && cfg.strong_const) {
       hash(h, values[ptr.second]);
+      ;
+
+      hash(h, values[ptr.second] > 0);
       ;
     }
 

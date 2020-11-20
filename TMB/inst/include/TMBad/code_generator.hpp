@@ -9,6 +9,7 @@
 #define THREAD_NUM 0
 #define GLOBAL_INDEX_VECTOR std::vector<GLOBAL_INDEX_TYPE>
 #define GLOBAL_INDEX_TYPE unsigned int
+#define CONSTEXPR constexpr
 #define ASSERT2(x, msg)                          \
   if (!(x)) {                                    \
     Rcerr << "ASSERTION FAILED: " << #x << "\n"; \
