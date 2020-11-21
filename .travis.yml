@@ -67,6 +67,10 @@ jobs:
         - tar zxf doxygen-1.8.12.linux.bin.tar.gz
         - export PATH=`pwd`/doxygen-1.8.12/bin:$PATH
         - doxygen -v
+        - wget https://github.com/jgm/pandoc/releases/download/2.11.2/pandoc-2.11.2-linux-amd64.tar.gz
+        - tar zxf pandoc-2.11.2-linux-amd64.tar.gz
+        - export PATH=`pwd`/pandoc-2.11.2/bin:$PATH
+        - pandoc -v
       script:
         - make doxygen
         - ./bin/deploy.sh
