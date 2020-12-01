@@ -26,6 +26,6 @@ var searchData=
   ['vectorize3_5ftti',['VECTORIZE3_tti',['../Vectorize_8hpp.html#a818e57b625224c92607abc3085bb581a',1,'Vectorize.hpp']]],
   ['vectorize3_5fttt',['VECTORIZE3_ttt',['../Vectorize_8hpp.html#ade6dd41e27833e6b25ead49dbdb1a517',1,'Vectorize.hpp']]],
   ['vectorize4_5fttti',['VECTORIZE4_ttti',['../Vectorize_8hpp.html#aaa831df2ce539aea822c9f13c83df800',1,'Vectorize.hpp']]],
-  ['vectorize5_5ftttti',['VECTORIZE5_tttti',['../Vectorize_8hpp.html#a1e2b122cebab00e4e187c8179d33c29b',1,'VECTORIZE5_tttti():&#160;Vectorize.hpp'],['../distributions__R_8hpp.html#aa2de91144781727e924d23746850caf1',1,'VECTORIZE5_tttti(dtweedie) template&lt; class Type &gt; Type compois_calc_logZ(Type loglambda:&#160;distributions_R.hpp']]],
+  ['vectorize5_5ftttti',['VECTORIZE5_tttti',['../Vectorize_8hpp.html#a1e2b122cebab00e4e187c8179d33c29b',1,'Vectorize.hpp']]],
   ['vectorize6_5fttttti',['VECTORIZE6_ttttti',['../Vectorize_8hpp.html#a0b60df753ce9a1d5fd2d0220411b3b80',1,'Vectorize.hpp']]]
 ];
