@@ -52,6 +52,13 @@ checkSimulation(obj)
 
 ######################################################################
 
+data <- list(distr="tweedie", n=n)
+parameters <- list(mu=10, phi=10, p=1.5)
+obj <- MakeADFun(data, parameters)
+checkSimulation(obj)
+
+######################################################################
+
 data <- list(distr="compois2", n=n)
 parameters <- list(mean=3, nu=0.1)
 obj <- MakeADFun(data, parameters)
