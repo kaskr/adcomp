@@ -15,6 +15,7 @@ var searchData=
   ['rows',['rows',['../structarray.html#addd5d17ec312d77a1aa7e701089224b9',1,'array::rows()'],['../structtmbutils_1_1array.html#acb5b2b5cc97e59ab32636cff1f017fe3',1,'tmbutils::array::rows()']]],
   ['rpois',['rpois',['../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e',1,'distributions_R.hpp']]],
   ['rt',['rt',['../distributions__R_8hpp.html#af610012a7bedea646cc43a7dff276639',1,'distributions_R.hpp']]],
+  ['rtweedie',['rtweedie',['../distributions__R_8hpp.html#ada07d8e0e57f901b42640684c3b3d2c3',1,'distributions_R.hpp']]],
   ['runif',['runif',['../distributions__R_8hpp.html#a6bba21a2132e3504e183cdcd3e3e30cd',1,'distributions_R.hpp']]],
   ['rweibull',['rweibull',['../distributions__R_8hpp.html#a2f3b0e14bca65b9153d89e797bdc37dd',1,'distributions_R.hpp']]]
 ];

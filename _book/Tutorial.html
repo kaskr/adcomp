@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2 Tutorial | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2 Tutorial | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -31,6 +31,7 @@
   
 <link rel="prev" href="Introduction.html"/>
 <link rel="next" href="Structure-TMB.html"/>
+<script src="libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -48,30 +49,31 @@
 
 
 
+<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +82,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -128,8 +130,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="Introduction.html"><a href="Introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
-<li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a><ul>
-<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a><ul>
+<li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a>
+<ul>
 <li class="chapter" data-level="2.1.1" data-path="Tutorial.html"><a href="Tutorial.html#list-of-data-macros"><i class="fa fa-check"></i><b>2.1.1</b> List of data macros</a></li>
 <li class="chapter" data-level="2.1.2" data-path="Tutorial.html"><a href="Tutorial.html#list-of-parameter-macros"><i class="fa fa-check"></i><b>2.1.2</b> List of parameter macros</a></li>
 </ul></li>
@@ -137,42 +141,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="Structure-TMB.html"><a href="Structure-TMB.html"><i class="fa fa-check"></i><b>3</b> The structure of TMB</a></li>
-<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a><ul>
+<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a>
+<ul>
 <li class="chapter" data-level="4.1" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>4.1</b> Relationship to R</a></li>
 <li class="chapter" data-level="4.2" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>4.2</b> Relationship to Eigen</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="R-style-distribution.html"><a href="R-style-distribution.html"><i class="fa fa-check"></i><b>5</b> R style probability distributions</a></li>
-<li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a><ul>
+<li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="Densities.html"><a href="Densities.html#multivariate-normal-distributions"><i class="fa fa-check"></i><b>6.1</b> Multivariate normal distributions</a></li>
 <li class="chapter" data-level="6.2" data-path="Densities.html"><a href="Densities.html#autoregressive-processes"><i class="fa fa-check"></i><b>6.2</b> Autoregressive processes</a></li>
 <li class="chapter" data-level="6.3" data-path="Densities.html"><a href="Densities.html#gaussian-markov-random-fields-gmrf"><i class="fa fa-check"></i><b>6.3</b> Gaussian Markov random fields (GMRF)</a></li>
 <li class="chapter" data-level="6.4" data-path="Densities.html"><a href="Densities.html#separable-construction-of-covariance-precision-matrices"><i class="fa fa-check"></i><b>6.4</b> Separable construction of covariance (precision) matrices</a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>7</b> Example collection</a><ul>
+<li class="chapter" data-level="7" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>7</b> Example collection</a>
+<ul>
 <li class="chapter" data-level="7.1" data-path="Examples.html"><a href="Examples.html#example-overview"><i class="fa fa-check"></i><b>7.1</b> Example overview</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>8</b> Compilation and run time errors</a><ul>
+<li class="chapter" data-level="8" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>8</b> Compilation and run time errors</a>
+<ul>
 <li class="chapter" data-level="8.1" data-path="Errors.html"><a href="Errors.html#compilation-errors"><i class="fa fa-check"></i><b>8.1</b> Compilation errors</a></li>
-<li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a><ul>
+<li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a>
+<ul>
 <li class="chapter" data-level="8.2.1" data-path="Errors.html"><a href="Errors.html#out-of-bounds-error"><i class="fa fa-check"></i><b>8.2.1</b> Out-of-bounds error</a></li>
 <li class="chapter" data-level="8.2.2" data-path="Errors.html"><a href="Errors.html#floating-point-exception"><i class="fa fa-check"></i><b>8.2.2</b> Floating point exception</a></li>
 <li class="chapter" data-level="8.2.3" data-path="Errors.html"><a href="Errors.html#missing-casts-for-vectorized-functions"><i class="fa fa-check"></i><b>8.2.3</b> Missing casts for vectorized functions</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a><ul>
+<li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a>
+<ul>
 <li class="chapter" data-level="9.0.1" data-path="Toolbox.html"><a href="Toolbox.html#non-normal-latent-variables-random-effects"><i class="fa fa-check"></i><b>9.0.1</b> Non-normal latent variables (random effects)</a></li>
 <li class="chapter" data-level="9.0.2" data-path="Toolbox.html"><a href="Toolbox.html#discrete-latent-variables"><i class="fa fa-check"></i><b>9.0.2</b> Discrete latent variables</a></li>
 <li class="chapter" data-level="9.0.3" data-path="Toolbox.html"><a href="Toolbox.html#mixture-models"><i class="fa fa-check"></i><b>9.0.3</b> Mixture models</a></li>
 <li class="chapter" data-level="9.0.4" data-path="Toolbox.html"><a href="Toolbox.html#time-series"><i class="fa fa-check"></i><b>9.0.4</b> Time series</a></li>
 <li class="chapter" data-level="9.0.5" data-path="Toolbox.html"><a href="Toolbox.html#spatial-models"><i class="fa fa-check"></i><b>9.0.5</b> Spatial models</a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>10</b> C++ tutorial</a><ul>
+<li class="chapter" data-level="10" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>10</b> C++ tutorial</a>
+<ul>
 <li class="chapter" data-level="10.0.1" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-r-but-not-c"><i class="fa fa-check"></i><b>10.0.1</b> I know R but not C++</a></li>
 <li class="chapter" data-level="10.0.2" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-c"><i class="fa fa-check"></i><b>10.0.2</b> I know C++</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="ModelObject.html"><a href="ModelObject.html"><i class="fa fa-check"></i><b>11</b> Model object</a></li>
-<li class="chapter" data-level="12" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>12</b> Sparsity</a><ul>
-<li class="chapter" data-level="12.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>12.1</b> Conditional independence graphs and DAGs</a><ul>
+<li class="chapter" data-level="12" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>12</b> Sparsity</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>12.1</b> Conditional independence graphs and DAGs</a>
+<ul>
 <li class="chapter" data-level="12.1.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence"><i class="fa fa-check"></i><b>12.1.1</b> Conditional independence</a></li>
 <li class="chapter" data-level="12.1.2" data-path="Sparsity.html"><a href="Sparsity.html#node-removal-properties"><i class="fa fa-check"></i><b>12.1.2</b> Node removal properties</a></li>
 <li class="chapter" data-level="12.1.3" data-path="Sparsity.html"><a href="Sparsity.html#directed-acyclic-graph"><i class="fa fa-check"></i><b>12.1.3</b> Directed acyclic graph</a></li>
@@ -180,36 +193,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="Sparsity.html"><a href="Sparsity.html#the-theta-logistic-example"><i class="fa fa-check"></i><b>12.2</b> The theta logistic example</a></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>13</b> Simulation</a><ul>
-<li class="chapter" data-level="13.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>13.1</b> Overview of simulation methods in TMB</a><ul>
+<li class="chapter" data-level="13" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>13</b> Simulation</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>13.1</b> Overview of simulation methods in TMB</a>
+<ul>
 <li class="chapter" data-level="13.1.1" data-path="Simulation.html"><a href="Simulation.html#standard-generators"><i class="fa fa-check"></i><b>13.1.1</b> Standard generators</a></li>
 <li class="chapter" data-level="13.1.2" data-path="Simulation.html"><a href="Simulation.html#generators-for-density-objects"><i class="fa fa-check"></i><b>13.1.2</b> Generators for density objects</a></li>
 <li class="chapter" data-level="13.1.3" data-path="Simulation.html"><a href="Simulation.html#controlling-the-random-seed"><i class="fa fa-check"></i><b>13.1.3</b> Controlling the random seed</a></li>
 </ul></li>
-<li class="chapter" data-level="13.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>13.2</b> Simulation blocks</a><ul>
+<li class="chapter" data-level="13.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>13.2</b> Simulation blocks</a>
+<ul>
 <li class="chapter" data-level="13.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>13.2.1</b> A linear regression example</a></li>
 <li class="chapter" data-level="13.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>13.2.2</b> A simulation study</a></li>
 <li class="chapter" data-level="13.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>13.2.3</b> Advanced examples</a></li>
 <li class="chapter" data-level="13.2.4" data-path="Simulation.html"><a href="Simulation.html#further-notes"><i class="fa fa-check"></i><b>13.2.4</b> Further notes</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a><ul>
-<li class="chapter" data-level="14.1" data-path="Validation.html"><a href="Validation.html#residuals"><i class="fa fa-check"></i><b>14.1</b> Residuals</a><ul>
+<li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="Validation.html"><a href="Validation.html#residuals"><i class="fa fa-check"></i><b>14.1</b> Residuals</a>
+<ul>
 <li class="chapter" data-level="14.1.1" data-path="Validation.html"><a href="Validation.html#models-without-random-effects"><i class="fa fa-check"></i><b>14.1.1</b> Models without random effects</a></li>
 <li class="chapter" data-level="14.1.2" data-path="Validation.html"><a href="Validation.html#models-with-random-effects"><i class="fa fa-check"></i><b>14.1.2</b> Models with random effects</a></li>
 </ul></li>
 <li class="chapter" data-level="14.2" data-path="Validation.html"><a href="Validation.html#checking-the-laplace-approximation"><i class="fa fa-check"></i><b>14.2</b> Checking the Laplace approximation</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a><ul>
+<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a>
+<ul>
 <li class="chapter" data-level="15.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#reverse-mode-differentiation"><i class="fa fa-check"></i><b>15.1</b> Reverse mode differentiation</a></li>
-<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a><ul>
+<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a>
+<ul>
 <li class="chapter" data-level="15.2.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#testing-the-primitive-function"><i class="fa fa-check"></i><b>15.2.1</b> Testing the primitive function</a></li>
 </ul></li>
 <li class="chapter" data-level="15.3" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#other-approaches"><i class="fa fa-check"></i><b>15.3</b> Other approaches</a></li>
 </ul></li>
-<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a><ul>
+<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a>
+<ul>
 <li class="chapter" data-level="16.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>16.1</b> Notation</a></li>
-<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a><ul>
+<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a>
+<ul>
 <li class="chapter" data-level="16.2.1" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>16.2.1</b> Example</a></li>
 </ul></li>
 <li class="chapter" data-level="16.3" data-path="Appendix.html"><a href="Appendix.html#theory-underlying-sdreport"><i class="fa fa-check"></i><b>16.3</b> Theory underlying sdreport</a></li>
@@ -231,7 +253,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Tutorial" class="section level1">
+<div id="Tutorial" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Tutorial</h1>
 <p>A TMB project consists of an R file (<em>.R) and a C++ file (</em>.cpp). The
 R file does pre- and post processing of data in addition to maximizing
@@ -244,13 +266,13 @@ i.e. the negative log-likelihood of the model. The program is compiled
 and called from R, where it can be fed to a function minimizer like
 <code>nlminb()</code>.</p>
 <p>The objective function should be of the following C++ type:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">{</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">.... Here goes your C++ code ..... </a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">}</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="Tutorial.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></span>
+<span id="cb1-2"><a href="Tutorial.html#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="Tutorial.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</span>
+<span id="cb1-4"><a href="Tutorial.html#cb1-4" aria-hidden="true" tabindex="-1"></a>Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</span>
+<span id="cb1-5"><a href="Tutorial.html#cb1-5" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb1-6"><a href="Tutorial.html#cb1-6" aria-hidden="true" tabindex="-1"></a>.... Here goes your C++ code ..... </span>
+<span id="cb1-7"><a href="Tutorial.html#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>The first line includes the source code for the whole TMB package (and
 all its dependencies). The objective function is a templated class
 where <code>&lt;Type&gt;</code> is the data type of both the input values and
@@ -262,20 +284,20 @@ technical aspects of this are hidden from the user. There is however
 one aspect that surprises the new TMB user. When a constant like “1.2”
 is used in a calculation that affects the return value it must be
 “cast” to Type:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb2-1" data-line-number="1">Type nll;           <span class="co">// Define variable that holds the return value (neg. log. lik)</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">nll = Type(<span class="fl">1.2</span>);    <span class="co">// Assign value 1.2; a cast is needed.</span></a></code></pre></div>
-<div id="obtaining-data-and-parameter-values-from-r" class="section level2">
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="Tutorial.html#cb2-1" aria-hidden="true" tabindex="-1"></a>Type nll;           <span class="co">// Define variable that holds the return value (neg. log. lik)</span></span>
+<span id="cb2-2"><a href="Tutorial.html#cb2-2" aria-hidden="true" tabindex="-1"></a>nll = Type(<span class="fl">1.2</span>);    <span class="co">// Assign value 1.2; a cast is needed.</span></span></code></pre></div>
+<div id="obtaining-data-and-parameter-values-from-r" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Obtaining data and parameter values from R</h2>
 <p>Obviously, we will need to pass both data and parameter values to the
 objective function. This is done through a set of macros that TMB
 defines for us.</p>
-<div id="list-of-data-macros" class="section level3">
+<div id="list-of-data-macros" class="section level3" number="2.1.1">
 <h3><span class="header-section-number">2.1.1</span> List of data macros</h3>
 <blockquote>
 <p><code><a class="code" href="../group__macros.html#ga97c14a26ca75571090d332f15130ae4b">DATA_ARRAY</a>()</code>, <code><a class="code" href="../group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>()</code>, <code><a class="code" href="../group__macros.html#gaf5fe8a4b8a5134f341fa63844abb6fdc">DATA_IARRAY</a>()</code>, <code>DATA_IMATRIX()</code>, <code><a class="code" href="../group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>()</code>, <code><a class="code" href="../group__macros.html#ga7889208e14a95d21cf630157cf0e2c80">DATA_IVECTOR</a>()</code>, <code><a class="code" href="../group__macros.html#gada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>()</code>, <code><a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>()</code>, <code>DATA_SPARSE_MATRIX()</code>, <code><a class="code" href="../group__macros.html#gaba52ba9bd5c88f42a0ce96432aa6e688">DATA_STRING</a>()</code>, <code><a class="code" href="../group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>()</code>, <code>DATA_UPDATE()</code>, <code><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>()</code></p>
 </blockquote>
 </div>
-<div id="list-of-parameter-macros" class="section level3">
+<div id="list-of-parameter-macros" class="section level3" number="2.1.2">
 <h3><span class="header-section-number">2.1.2</span> List of parameter macros</h3>
 <blockquote>
 <p><code><a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>()</code>, <code><a class="code" href="../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>()</code>, <code>PARAMETER_MATRIX()</code>, <code><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>()</code></p>
@@ -285,14 +307,14 @@ defines for us.</p>
 your browser (you may need to refresh the browser window between each
 time you make a new search). A simple example if you want to read a
 vector of numbers (doubles) is the following</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb3-1" data-line-number="1"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);     <span class="co">// Vector x(0),x(1),...,x(n-1), where n is the length of x</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="Tutorial.html#cb3-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);     <span class="co">// Vector x(0),x(1),...,x(n-1), where n is the length of x</span></span></code></pre></div>
 <p>Note that all vectors and matrices in TMB uses a <strong>zero-based</strong>
 indexing scheme. It is not necessary to explicitly pass the dimension
 of <code>x</code>, as it can be retrieved inside the C++ program:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="dt">int</span> n = x.size();</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="Tutorial.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = x.size();</span></code></pre></div>
 </div>
 </div>
-<div id="an-extended-c-language" class="section level2">
+<div id="an-extended-c-language" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> An extended C++ language</h2>
 <p>TMB extends C++ with functionality that is important for formulating
 likelihood functions. You have different toolboxes available:</p>
@@ -305,13 +327,13 @@ likelihood functions. You have different toolboxes available:</p>
 <code>PARAMETER_</code> macros there can be “local” variables, for which
 ordinary C++ scoping rules apply. There must also be a variable that
 holds the return value (neg. log. likelihood).</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb5-1" data-line-number="1"><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);               <span class="co">// Vector x(0), x(1), ..., x(n-1)</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">Type tmp = x(<span class="dv">1</span>);</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">Type nll = tmp * tmp; </a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="Tutorial.html#cb5-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);               <span class="co">// Vector x(0), x(1), ..., x(n-1)</span></span>
+<span id="cb5-2"><a href="Tutorial.html#cb5-2" aria-hidden="true" tabindex="-1"></a>Type tmp = x(<span class="dv">1</span>);</span>
+<span id="cb5-3"><a href="Tutorial.html#cb5-3" aria-hidden="true" tabindex="-1"></a>Type nll = tmp * tmp; </span></code></pre></div>
 <p>As in ordinary C++ local variable tmp must be assigned a value before
 it can enter into a calculation.</p>
 </div>
-<div id="statistical-modelling" class="section level2">
+<div id="statistical-modelling" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> Statistical modelling</h2>
 <p>TMB can handle complex statistical problems with hierarchical
 structure (latent random variables) and multiple data sources. Latent
@@ -335,9 +357,9 @@ density of data and latent random variables. Each datum and individual
 latent random effect gives a contribution to log likelihood, which may
 be though of as a “distribution assignment” by users familiar with
 software in the BUGS family.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb6-1" data-line-number="1"><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);          <span class="co">// Latent random variable </span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">Type nll = Type(<span class="dv">0</span>);           <span class="co">// Return value</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">nll -= dnorm(u(<span class="dv">0</span>),<span class="dv">0</span>,<span class="dv">1</span>,<span class="kw">true</span>)   <span class="co">// Distributional assignment: u(0) ~ N(0,1) </span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="Tutorial.html#cb6-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>(u);          <span class="co">// Latent random variable </span></span>
+<span id="cb6-2"><a href="Tutorial.html#cb6-2" aria-hidden="true" tabindex="-1"></a>Type nll = Type(<span class="dv">0</span>);           <span class="co">// Return value</span></span>
+<span id="cb6-3"><a href="Tutorial.html#cb6-3" aria-hidden="true" tabindex="-1"></a>nll -= dnorm(u(<span class="dv">0</span>),<span class="dv">0</span>,<span class="dv">1</span>,<span class="kw">true</span>)   <span class="co">// Distributional assignment: u(0) ~ N(0,1) </span></span></code></pre></div>
 <p>The following rules apply:</p>
 <ul>
 <li>Distribution assignments do not need to take place before the latent
@@ -354,7 +376,7 @@ continuous) are allowed. If a non-gaussian latent is needed the
 many probability distributions, including multivariate normal
 distributions. For probability distributions not available from
 these libraries, the user can use raw C++ code:
-<code>{.cpp}   <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);                   // Data <a class="code" href="../structvector.html">vector</a>   Type nll = Type(0);               // Return value   nll -= <a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(-log(Type(1.0)+y*y));  // y are i.i.d. Cauchy distributed</code></li>
+<code>{.cpp}     <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(y);                   // Data <a class="code" href="../structvector.html">vector</a>     Type nll = Type(0);               // Return value     nll -= <a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(-log(Type(1.0)+y*y));  // y are i.i.d. Cauchy distributed</code></li>
 </ul>
 <p>See <a href="Toolbox.html#Toolbox">Toolbox</a> for more about statistical modelling.</p>
 </div>

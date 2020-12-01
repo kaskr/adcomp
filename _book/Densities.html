@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6 Multivariate distributions | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6 Multivariate distributions | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -31,6 +31,7 @@
   
 <link rel="prev" href="R-style-distribution.html"/>
 <link rel="next" href="Examples.html"/>
+<script src="libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -48,30 +49,31 @@
 
 
 
+<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +82,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -128,8 +130,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="Introduction.html"><a href="Introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
-<li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a><ul>
-<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a><ul>
+<li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a>
+<ul>
 <li class="chapter" data-level="2.1.1" data-path="Tutorial.html"><a href="Tutorial.html#list-of-data-macros"><i class="fa fa-check"></i><b>2.1.1</b> List of data macros</a></li>
 <li class="chapter" data-level="2.1.2" data-path="Tutorial.html"><a href="Tutorial.html#list-of-parameter-macros"><i class="fa fa-check"></i><b>2.1.2</b> List of parameter macros</a></li>
 </ul></li>
@@ -137,42 +141,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="Structure-TMB.html"><a href="Structure-TMB.html"><i class="fa fa-check"></i><b>3</b> The structure of TMB</a></li>
-<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a><ul>
+<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a>
+<ul>
 <li class="chapter" data-level="4.1" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>4.1</b> Relationship to R</a></li>
 <li class="chapter" data-level="4.2" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>4.2</b> Relationship to Eigen</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="R-style-distribution.html"><a href="R-style-distribution.html"><i class="fa fa-check"></i><b>5</b> R style probability distributions</a></li>
-<li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a><ul>
+<li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="Densities.html"><a href="Densities.html#multivariate-normal-distributions"><i class="fa fa-check"></i><b>6.1</b> Multivariate normal distributions</a></li>
 <li class="chapter" data-level="6.2" data-path="Densities.html"><a href="Densities.html#autoregressive-processes"><i class="fa fa-check"></i><b>6.2</b> Autoregressive processes</a></li>
 <li class="chapter" data-level="6.3" data-path="Densities.html"><a href="Densities.html#gaussian-markov-random-fields-gmrf"><i class="fa fa-check"></i><b>6.3</b> Gaussian Markov random fields (GMRF)</a></li>
 <li class="chapter" data-level="6.4" data-path="Densities.html"><a href="Densities.html#separable-construction-of-covariance-precision-matrices"><i class="fa fa-check"></i><b>6.4</b> Separable construction of covariance (precision) matrices</a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>7</b> Example collection</a><ul>
+<li class="chapter" data-level="7" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>7</b> Example collection</a>
+<ul>
 <li class="chapter" data-level="7.1" data-path="Examples.html"><a href="Examples.html#example-overview"><i class="fa fa-check"></i><b>7.1</b> Example overview</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>8</b> Compilation and run time errors</a><ul>
+<li class="chapter" data-level="8" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>8</b> Compilation and run time errors</a>
+<ul>
 <li class="chapter" data-level="8.1" data-path="Errors.html"><a href="Errors.html#compilation-errors"><i class="fa fa-check"></i><b>8.1</b> Compilation errors</a></li>
-<li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a><ul>
+<li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a>
+<ul>
 <li class="chapter" data-level="8.2.1" data-path="Errors.html"><a href="Errors.html#out-of-bounds-error"><i class="fa fa-check"></i><b>8.2.1</b> Out-of-bounds error</a></li>
 <li class="chapter" data-level="8.2.2" data-path="Errors.html"><a href="Errors.html#floating-point-exception"><i class="fa fa-check"></i><b>8.2.2</b> Floating point exception</a></li>
 <li class="chapter" data-level="8.2.3" data-path="Errors.html"><a href="Errors.html#missing-casts-for-vectorized-functions"><i class="fa fa-check"></i><b>8.2.3</b> Missing casts for vectorized functions</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a><ul>
+<li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a>
+<ul>
 <li class="chapter" data-level="9.0.1" data-path="Toolbox.html"><a href="Toolbox.html#non-normal-latent-variables-random-effects"><i class="fa fa-check"></i><b>9.0.1</b> Non-normal latent variables (random effects)</a></li>
 <li class="chapter" data-level="9.0.2" data-path="Toolbox.html"><a href="Toolbox.html#discrete-latent-variables"><i class="fa fa-check"></i><b>9.0.2</b> Discrete latent variables</a></li>
 <li class="chapter" data-level="9.0.3" data-path="Toolbox.html"><a href="Toolbox.html#mixture-models"><i class="fa fa-check"></i><b>9.0.3</b> Mixture models</a></li>
 <li class="chapter" data-level="9.0.4" data-path="Toolbox.html"><a href="Toolbox.html#time-series"><i class="fa fa-check"></i><b>9.0.4</b> Time series</a></li>
 <li class="chapter" data-level="9.0.5" data-path="Toolbox.html"><a href="Toolbox.html#spatial-models"><i class="fa fa-check"></i><b>9.0.5</b> Spatial models</a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>10</b> C++ tutorial</a><ul>
+<li class="chapter" data-level="10" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>10</b> C++ tutorial</a>
+<ul>
 <li class="chapter" data-level="10.0.1" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-r-but-not-c"><i class="fa fa-check"></i><b>10.0.1</b> I know R but not C++</a></li>
 <li class="chapter" data-level="10.0.2" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-c"><i class="fa fa-check"></i><b>10.0.2</b> I know C++</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="ModelObject.html"><a href="ModelObject.html"><i class="fa fa-check"></i><b>11</b> Model object</a></li>
-<li class="chapter" data-level="12" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>12</b> Sparsity</a><ul>
-<li class="chapter" data-level="12.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>12.1</b> Conditional independence graphs and DAGs</a><ul>
+<li class="chapter" data-level="12" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>12</b> Sparsity</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>12.1</b> Conditional independence graphs and DAGs</a>
+<ul>
 <li class="chapter" data-level="12.1.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence"><i class="fa fa-check"></i><b>12.1.1</b> Conditional independence</a></li>
 <li class="chapter" data-level="12.1.2" data-path="Sparsity.html"><a href="Sparsity.html#node-removal-properties"><i class="fa fa-check"></i><b>12.1.2</b> Node removal properties</a></li>
 <li class="chapter" data-level="12.1.3" data-path="Sparsity.html"><a href="Sparsity.html#directed-acyclic-graph"><i class="fa fa-check"></i><b>12.1.3</b> Directed acyclic graph</a></li>
@@ -180,36 +193,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="Sparsity.html"><a href="Sparsity.html#the-theta-logistic-example"><i class="fa fa-check"></i><b>12.2</b> The theta logistic example</a></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>13</b> Simulation</a><ul>
-<li class="chapter" data-level="13.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>13.1</b> Overview of simulation methods in TMB</a><ul>
+<li class="chapter" data-level="13" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>13</b> Simulation</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>13.1</b> Overview of simulation methods in TMB</a>
+<ul>
 <li class="chapter" data-level="13.1.1" data-path="Simulation.html"><a href="Simulation.html#standard-generators"><i class="fa fa-check"></i><b>13.1.1</b> Standard generators</a></li>
 <li class="chapter" data-level="13.1.2" data-path="Simulation.html"><a href="Simulation.html#generators-for-density-objects"><i class="fa fa-check"></i><b>13.1.2</b> Generators for density objects</a></li>
 <li class="chapter" data-level="13.1.3" data-path="Simulation.html"><a href="Simulation.html#controlling-the-random-seed"><i class="fa fa-check"></i><b>13.1.3</b> Controlling the random seed</a></li>
 </ul></li>
-<li class="chapter" data-level="13.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>13.2</b> Simulation blocks</a><ul>
+<li class="chapter" data-level="13.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>13.2</b> Simulation blocks</a>
+<ul>
 <li class="chapter" data-level="13.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>13.2.1</b> A linear regression example</a></li>
 <li class="chapter" data-level="13.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>13.2.2</b> A simulation study</a></li>
 <li class="chapter" data-level="13.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>13.2.3</b> Advanced examples</a></li>
 <li class="chapter" data-level="13.2.4" data-path="Simulation.html"><a href="Simulation.html#further-notes"><i class="fa fa-check"></i><b>13.2.4</b> Further notes</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a><ul>
-<li class="chapter" data-level="14.1" data-path="Validation.html"><a href="Validation.html#residuals"><i class="fa fa-check"></i><b>14.1</b> Residuals</a><ul>
+<li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="Validation.html"><a href="Validation.html#residuals"><i class="fa fa-check"></i><b>14.1</b> Residuals</a>
+<ul>
 <li class="chapter" data-level="14.1.1" data-path="Validation.html"><a href="Validation.html#models-without-random-effects"><i class="fa fa-check"></i><b>14.1.1</b> Models without random effects</a></li>
 <li class="chapter" data-level="14.1.2" data-path="Validation.html"><a href="Validation.html#models-with-random-effects"><i class="fa fa-check"></i><b>14.1.2</b> Models with random effects</a></li>
 </ul></li>
 <li class="chapter" data-level="14.2" data-path="Validation.html"><a href="Validation.html#checking-the-laplace-approximation"><i class="fa fa-check"></i><b>14.2</b> Checking the Laplace approximation</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a><ul>
+<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a>
+<ul>
 <li class="chapter" data-level="15.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#reverse-mode-differentiation"><i class="fa fa-check"></i><b>15.1</b> Reverse mode differentiation</a></li>
-<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a><ul>
+<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a>
+<ul>
 <li class="chapter" data-level="15.2.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#testing-the-primitive-function"><i class="fa fa-check"></i><b>15.2.1</b> Testing the primitive function</a></li>
 </ul></li>
 <li class="chapter" data-level="15.3" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#other-approaches"><i class="fa fa-check"></i><b>15.3</b> Other approaches</a></li>
 </ul></li>
-<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a><ul>
+<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a>
+<ul>
 <li class="chapter" data-level="16.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>16.1</b> Notation</a></li>
-<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a><ul>
+<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a>
+<ul>
 <li class="chapter" data-level="16.2.1" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>16.2.1</b> Example</a></li>
 </ul></li>
 <li class="chapter" data-level="16.3" data-path="Appendix.html"><a href="Appendix.html#theory-underlying-sdreport"><i class="fa fa-check"></i><b>16.3</b> Theory underlying sdreport</a></li>
@@ -231,10 +253,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Densities" class="section level1">
+<div id="Densities" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Multivariate distributions</h1>
 <p>The namespace</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="Densities.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span></code></pre></div>
 <p>gives access to a variety of multivariate normal distributions:</p>
 <ul>
 <li>Multivariate normal distributions specified via a covariance matrix
@@ -256,25 +278,25 @@ distributions we note the following which is of practical importance:</p>
 <li>All members in the <code>density</code> namespace return the <strong>negative</strong> log
 density, opposed to the univariate densities in <a href="R-style-distribution.html#R_style_distribution">R style distributions</a>.</li>
 </ul>
-<div id="multivariate-normal-distributions" class="section level2">
+<div id="multivariate-normal-distributions" class="section level2" number="6.1">
 <h2><span class="header-section-number">6.1</span> Multivariate normal distributions</h2>
 <p>Consider a zero-mean multivariate normal distribution
 with covariance matrix <em>Sigma</em> (symmetric positive definite),
 that we want to evaluate at <em>x</em>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="dt">int</span> n = <span class="dv">10</span>;</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point           </span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="Densities.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = <span class="dv">10</span>;</span>
+<span id="cb8-2"><a href="Densities.html#cb8-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point           </span></span>
+<span id="cb8-3"><a href="Densities.html#cb8-3" aria-hidden="true" tabindex="-1"></a>x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></span></code></pre></div>
 <p>The negative log-normal density is evaluated as follows:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">// ..... User must assign value to Sigma here</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4">res = <a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(x);      <span class="co">// Evaluate negative log likelihod</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="Densities.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span>
+<span id="cb9-2"><a href="Densities.html#cb9-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span></span>
+<span id="cb9-3"><a href="Densities.html#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// ..... User must assign value to Sigma here</span></span>
+<span id="cb9-4"><a href="Densities.html#cb9-4" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(x);      <span class="co">// Evaluate negative log likelihod</span></span></code></pre></div>
 <p>In the last line <code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)</code> should be interpreted as a
 multivariate density, which via the last parenthesis <code>(x)</code> is
 evaluated at <code>x</code>. A less compact way of expressing this is</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">res = your_dmnorm(x);</a></code></pre></div>
-<p>in which <code>your_dmnorm</code> is a variable that holds the “density”.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="Densities.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);</span>
+<span id="cb10-2"><a href="Densities.html#cb10-2" aria-hidden="true" tabindex="-1"></a>res = your_dmnorm(x);</span></code></pre></div>
+<p>in which <code>your_dmnorm</code> is a variable that holds the “density.”</p>
 <p>Note, that the latter way (using the <code>MVNORM_t</code>) is <em>more efficient</em>
 when you need to evaluate the density more than once, i.e. for different values of <code>x</code>.</p>
 <p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of
@@ -285,21 +307,21 @@ these freely (modulo the positive definite constraint) you can use
 <code><a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>()</code> to specify variances. <code><a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>()</code> takes as
 input a vector a dummy parameters that internally is used to build the
 correlation matrix via its cholesky factor.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="dt">int</span> n = <span class="dv">10</span>;</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; unconstrained_params(n*(n<span class="dv">-1</span>)/<span class="dv">2</span>);  <span class="co">// Dummy parameterization of correlation matrix</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; sds(n);                           <span class="co">// Standard deviations</span></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">res = <a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>(<a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="Densities.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span>
+<span id="cb11-2"><a href="Densities.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = <span class="dv">10</span>;</span>
+<span id="cb11-3"><a href="Densities.html#cb11-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; unconstrained_params(n*(n-<span class="dv">1</span>)/<span class="dv">2</span>);  <span class="co">// Dummy parameterization of correlation matrix</span></span>
+<span id="cb11-4"><a href="Densities.html#cb11-4" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; sds(n);                           <span class="co">// Standard deviations</span></span>
+<span id="cb11-5"><a href="Densities.html#cb11-5" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>(<a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</span></code></pre></div>
 <p>If all elements of <code>dummy_params</code> are estimated we are in effect
 estimating a full correlation matrix without any constraints on its
 elements (except for the mandatory positive definiteness). The actual
 value of the correlation matrix, but not the full covariance matrix,
 can easily be assessed using the <code>.<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>()</code> operator</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb12-1" data-line-number="1"><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to R session</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="Densities.html#cb12-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);</span>
+<span id="cb12-2"><a href="Densities.html#cb12-2" aria-hidden="true" tabindex="-1"></a>Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();</span>
+<span id="cb12-3"><a href="Densities.html#cb12-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to R session</span></span></code></pre></div>
 </div>
-<div id="autoregressive-processes" class="section level2">
+<div id="autoregressive-processes" class="section level2" number="6.2">
 <h2><span class="header-section-number">6.2</span> Autoregressive processes</h2>
 <p>Consider a stationary univariate Gaussian AR1 process
 <em>x(t),t=0,…,n-1</em>. The stationary distribution is choosen so that:</p>
@@ -307,13 +329,13 @@ can easily be assessed using the <code>.<a class="code" href="../classMVNORM__t.
 <li><em>x(t)</em> has mean 0 and variance 1 (for all <em>t</em>).</li>
 </ul>
 <p>The multivariate density of the vector <em>x</em> can be evaluated as follows</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="dt">int</span> n = <span class="dv">10</span>;</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"> </a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point</span></a>
-<a class="sourceLine" id="cb13-5" data-line-number="5">x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">Type rho = <span class="fl">0.2</span>;              <span class="co">// Correlation parameter</span></a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">res = AR1(rho)(x);           <span class="co">// Evaluate negative log-<a class="code" href="../namespacedensity.html">density</a> of AR1 process at point x </span></a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="Densities.html#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = <span class="dv">10</span>;</span>
+<span id="cb13-2"><a href="Densities.html#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span>
+<span id="cb13-3"><a href="Densities.html#cb13-3" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb13-4"><a href="Densities.html#cb13-4" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; x(n);           <span class="co">// Evaluation point</span></span>
+<span id="cb13-5"><a href="Densities.html#cb13-5" aria-hidden="true" tabindex="-1"></a>x.<a class="code" href="../structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a>(<span class="fl">0.0</span>);                 <span class="co">// Point of evaluation: x = (0,0,...,0)</span></span>
+<span id="cb13-6"><a href="Densities.html#cb13-6" aria-hidden="true" tabindex="-1"></a>Type rho = <span class="fl">0.2</span>;              <span class="co">// Correlation parameter</span></span>
+<span id="cb13-7"><a href="Densities.html#cb13-7" aria-hidden="true" tabindex="-1"></a>res = AR1(rho)(x);           <span class="co">// Evaluate negative log-<a class="code" href="../namespacedensity.html">density</a> of AR1 process at point x </span></span></code></pre></div>
 <p>Due to the assumed stationarity the correlation parameter must
 satisfy:</p>
 <ul>
@@ -321,23 +343,23 @@ satisfy:</p>
 </ul>
 <p>Note that <em>cor[x(t),x(t-1)] = rho</em>.</p>
 <p>The <code>SCALE()</code> function can be used to set the standard deviation.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb14-1" data-line-number="1">Type sigma = <span class="fl">2.1</span>;            <span class="co">// standard deviation of x</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">res = SCALE(AR1(rho),sigma)(x);</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="Densities.html#cb14-1" aria-hidden="true" tabindex="-1"></a>Type sigma = <span class="fl">2.1</span>;            <span class="co">// standard deviation of x</span></span>
+<span id="cb14-2"><a href="Densities.html#cb14-2" aria-hidden="true" tabindex="-1"></a>res = SCALE(AR1(rho),sigma)(x);</span></code></pre></div>
 <p>Now, <em>var[x(t)] = sigma^2</em>. Because all elements of <code>x</code> are scaled by
 the same constant we use SCALE rather than VECSCALE.</p>
-<div id="multivariate-ar1-processes" class="section level4">
+<div id="multivariate-ar1-processes" class="section level4" number="6.2.0.1">
 <h4><span class="header-section-number">6.2.0.1</span> Multivariate AR1 processes</h4>
 <p>This is the first real illustration of how distributions can be used
 as building blocks to obtain more complex distributions. Consider the
 <em>p</em> dimensional AR1 process</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="dt">int</span> n = <span class="dv">10</span>;                   <span class="co">// Number of time steps</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="dt">int</span> p=<span class="dv">3</span>;                      <span class="co">// dim(x)</span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(p,n);           <span class="co">// Evaluation point</span></a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="Densities.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = <span class="dv">10</span>;                   <span class="co">// Number of time steps</span></span>
+<span id="cb15-2"><a href="Densities.html#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> p=<span class="dv">3</span>;                      <span class="co">// dim(x)</span></span>
+<span id="cb15-3"><a href="Densities.html#cb15-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(p,n);           <span class="co">// Evaluation point</span></span></code></pre></div>
 <p>The columns in <code>x</code> refer to the different time points. We then
 evaluate the (negative log) joint density of the time series.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);  <span class="co">// Density of x(t) </span></a>
-<a class="sourceLine" id="cb16-2" data-line-number="2">Type phi;                           <span class="co">// Correlation parameter</span></a>
-<a class="sourceLine" id="cb16-3" data-line-number="3">res = AR1(phi,your_dmnorm)(x);</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb16-1"><a href="Densities.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);  <span class="co">// Density of x(t) </span></span>
+<span id="cb16-2"><a href="Densities.html#cb16-2" aria-hidden="true" tabindex="-1"></a>Type phi;                           <span class="co">// Correlation parameter</span></span>
+<span id="cb16-3"><a href="Densities.html#cb16-3" aria-hidden="true" tabindex="-1"></a>res = AR1(phi,your_dmnorm)(x);</span></code></pre></div>
 <p>Note the following:</p>
 <ul>
 <li>We have introduced an intermediate variable <code>your_dmnorm</code>, which
@@ -348,12 +370,12 @@ zero-mean normal density with covariance matrix <code>Sigma</code>.</li>
 the univariate AR1 process described above.</li>
 </ul>
 </div>
-<div id="higher-order-ar-processes" class="section level4">
+<div id="higher-order-ar-processes" class="section level4" number="6.2.0.2">
 <h4><span class="header-section-number">6.2.0.2</span> Higher order AR processes</h4>
 <p>There also exists <code>ARk_t</code> of arbitrary autoregressive order.</p>
 </div>
 </div>
-<div id="gaussian-markov-random-fields-gmrf" class="section level2">
+<div id="gaussian-markov-random-fields-gmrf" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Gaussian Markov random fields (GMRF)</h2>
 <p>GMRF may be defined in two ways:</p>
 <ol style="list-style-type: decimal">
@@ -364,7 +386,7 @@ the univariate AR1 process described above.</li>
 corresponding to a Matern covariance function can be obtained via the
 <code>R_inla</code> namespace.</p>
 </div>
-<div id="separable-construction-of-covariance-precision-matrices" class="section level2">
+<div id="separable-construction-of-covariance-precision-matrices" class="section level2" number="6.4">
 <h2><span class="header-section-number">6.4</span> Separable construction of covariance (precision) matrices</h2>
 <p>A typical use of separability is to create space-time models with a
 sparse precision matrix. Details are given in <code>SEPARABLE_t</code>. Here
@@ -379,16 +401,16 @@ space by a distance <code>ds</code> and in time by a distance <code>dt</code>, h
 correlation given by</p>
 <p><code>rho_s^ds*rho_t^dt</code></p>
 <p>This is implemented as</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</a>
-<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="dt">int</span> n_s = <span class="dv">10</span>;                   <span class="co">// Number of grid points in space</span></a>
-<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="dt">int</span> <span class="dt">n_t</span> = <span class="dv">10</span>;                   <span class="co">// Number of grid points in time</span></a>
-<a class="sourceLine" id="cb17-4" data-line-number="4">Type rho_s = <span class="fl">0.2</span>;               <span class="co">// Correlation in space</span></a>
-<a class="sourceLine" id="cb17-5" data-line-number="5">Type <span class="dt">rho_t</span> = <span class="fl">0.4</span>;               <span class="co">// Correlation in time</span></a>
-<a class="sourceLine" id="cb17-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb17-7" data-line-number="7"><a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(n_s,<span class="dt">n_t</span>);</a>
-<a class="sourceLine" id="cb17-8" data-line-number="8">x.setZero();                    <span class="co">// x = 0</span></a>
-<a class="sourceLine" id="cb17-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb17-10" data-line-number="10">res = <a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(<span class="dt">rho_t</span>),AR1(rho_s))(x);</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb17-1"><a href="Densities.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span>
+<span id="cb17-2"><a href="Densities.html#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n_s = <span class="dv">10</span>;                   <span class="co">// Number of grid points in space</span></span>
+<span id="cb17-3"><a href="Densities.html#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> <span class="dt">n_t</span> = <span class="dv">10</span>;                   <span class="co">// Number of grid points in time</span></span>
+<span id="cb17-4"><a href="Densities.html#cb17-4" aria-hidden="true" tabindex="-1"></a>Type rho_s = <span class="fl">0.2</span>;               <span class="co">// Correlation in space</span></span>
+<span id="cb17-5"><a href="Densities.html#cb17-5" aria-hidden="true" tabindex="-1"></a>Type <span class="dt">rho_t</span> = <span class="fl">0.4</span>;               <span class="co">// Correlation in time</span></span>
+<span id="cb17-6"><a href="Densities.html#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="Densities.html#cb17-7" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html">array</a>&lt;Type&gt; x(n_s,<span class="dt">n_t</span>);</span>
+<span id="cb17-8"><a href="Densities.html#cb17-8" aria-hidden="true" tabindex="-1"></a>x.setZero();                    <span class="co">// x = 0</span></span>
+<span id="cb17-9"><a href="Densities.html#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="Densities.html#cb17-10" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(<span class="dt">rho_t</span>),AR1(rho_s))(x);</span></code></pre></div>
 <p>Note that the arguments to <code><a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>()</code> are given in the opposite order
 to the dimensions of <code>x</code>.</p>
 </div>

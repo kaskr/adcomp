@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>16 Appendix | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
   <meta property="og:title" content="16 Appendix | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -31,6 +31,7 @@
   
 <link rel="prev" href="AtomicFunctions.html"/>
 
+<script src="libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -48,30 +49,31 @@
 
 
 
+<link href="libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +82,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -128,8 +130,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="Introduction.html"><a href="Introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
-<li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a><ul>
-<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a><ul>
+<li class="chapter" data-level="2" data-path="Tutorial.html"><a href="Tutorial.html"><i class="fa fa-check"></i><b>2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="Tutorial.html"><a href="Tutorial.html#obtaining-data-and-parameter-values-from-r"><i class="fa fa-check"></i><b>2.1</b> Obtaining data and parameter values from R</a>
+<ul>
 <li class="chapter" data-level="2.1.1" data-path="Tutorial.html"><a href="Tutorial.html#list-of-data-macros"><i class="fa fa-check"></i><b>2.1.1</b> List of data macros</a></li>
 <li class="chapter" data-level="2.1.2" data-path="Tutorial.html"><a href="Tutorial.html#list-of-parameter-macros"><i class="fa fa-check"></i><b>2.1.2</b> List of parameter macros</a></li>
 </ul></li>
@@ -137,42 +141,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="Structure-TMB.html"><a href="Structure-TMB.html"><i class="fa fa-check"></i><b>3</b> The structure of TMB</a></li>
-<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a><ul>
+<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a>
+<ul>
 <li class="chapter" data-level="4.1" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>4.1</b> Relationship to R</a></li>
 <li class="chapter" data-level="4.2" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>4.2</b> Relationship to Eigen</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="R-style-distribution.html"><a href="R-style-distribution.html"><i class="fa fa-check"></i><b>5</b> R style probability distributions</a></li>
-<li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a><ul>
+<li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="Densities.html"><a href="Densities.html#multivariate-normal-distributions"><i class="fa fa-check"></i><b>6.1</b> Multivariate normal distributions</a></li>
 <li class="chapter" data-level="6.2" data-path="Densities.html"><a href="Densities.html#autoregressive-processes"><i class="fa fa-check"></i><b>6.2</b> Autoregressive processes</a></li>
 <li class="chapter" data-level="6.3" data-path="Densities.html"><a href="Densities.html#gaussian-markov-random-fields-gmrf"><i class="fa fa-check"></i><b>6.3</b> Gaussian Markov random fields (GMRF)</a></li>
 <li class="chapter" data-level="6.4" data-path="Densities.html"><a href="Densities.html#separable-construction-of-covariance-precision-matrices"><i class="fa fa-check"></i><b>6.4</b> Separable construction of covariance (precision) matrices</a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>7</b> Example collection</a><ul>
+<li class="chapter" data-level="7" data-path="Examples.html"><a href="Examples.html"><i class="fa fa-check"></i><b>7</b> Example collection</a>
+<ul>
 <li class="chapter" data-level="7.1" data-path="Examples.html"><a href="Examples.html#example-overview"><i class="fa fa-check"></i><b>7.1</b> Example overview</a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>8</b> Compilation and run time errors</a><ul>
+<li class="chapter" data-level="8" data-path="Errors.html"><a href="Errors.html"><i class="fa fa-check"></i><b>8</b> Compilation and run time errors</a>
+<ul>
 <li class="chapter" data-level="8.1" data-path="Errors.html"><a href="Errors.html#compilation-errors"><i class="fa fa-check"></i><b>8.1</b> Compilation errors</a></li>
-<li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a><ul>
+<li class="chapter" data-level="8.2" data-path="Errors.html"><a href="Errors.html#run-time-errors"><i class="fa fa-check"></i><b>8.2</b> Run time errors</a>
+<ul>
 <li class="chapter" data-level="8.2.1" data-path="Errors.html"><a href="Errors.html#out-of-bounds-error"><i class="fa fa-check"></i><b>8.2.1</b> Out-of-bounds error</a></li>
 <li class="chapter" data-level="8.2.2" data-path="Errors.html"><a href="Errors.html#floating-point-exception"><i class="fa fa-check"></i><b>8.2.2</b> Floating point exception</a></li>
 <li class="chapter" data-level="8.2.3" data-path="Errors.html"><a href="Errors.html#missing-casts-for-vectorized-functions"><i class="fa fa-check"></i><b>8.2.3</b> Missing casts for vectorized functions</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a><ul>
+<li class="chapter" data-level="9" data-path="Toolbox.html"><a href="Toolbox.html"><i class="fa fa-check"></i><b>9</b> Toolbox</a>
+<ul>
 <li class="chapter" data-level="9.0.1" data-path="Toolbox.html"><a href="Toolbox.html#non-normal-latent-variables-random-effects"><i class="fa fa-check"></i><b>9.0.1</b> Non-normal latent variables (random effects)</a></li>
 <li class="chapter" data-level="9.0.2" data-path="Toolbox.html"><a href="Toolbox.html#discrete-latent-variables"><i class="fa fa-check"></i><b>9.0.2</b> Discrete latent variables</a></li>
 <li class="chapter" data-level="9.0.3" data-path="Toolbox.html"><a href="Toolbox.html#mixture-models"><i class="fa fa-check"></i><b>9.0.3</b> Mixture models</a></li>
 <li class="chapter" data-level="9.0.4" data-path="Toolbox.html"><a href="Toolbox.html#time-series"><i class="fa fa-check"></i><b>9.0.4</b> Time series</a></li>
 <li class="chapter" data-level="9.0.5" data-path="Toolbox.html"><a href="Toolbox.html#spatial-models"><i class="fa fa-check"></i><b>9.0.5</b> Spatial models</a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>10</b> C++ tutorial</a><ul>
+<li class="chapter" data-level="10" data-path="CppTutorial.html"><a href="CppTutorial.html"><i class="fa fa-check"></i><b>10</b> C++ tutorial</a>
+<ul>
 <li class="chapter" data-level="10.0.1" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-r-but-not-c"><i class="fa fa-check"></i><b>10.0.1</b> I know R but not C++</a></li>
 <li class="chapter" data-level="10.0.2" data-path="CppTutorial.html"><a href="CppTutorial.html#i-know-c"><i class="fa fa-check"></i><b>10.0.2</b> I know C++</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="ModelObject.html"><a href="ModelObject.html"><i class="fa fa-check"></i><b>11</b> Model object</a></li>
-<li class="chapter" data-level="12" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>12</b> Sparsity</a><ul>
-<li class="chapter" data-level="12.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>12.1</b> Conditional independence graphs and DAGs</a><ul>
+<li class="chapter" data-level="12" data-path="Sparsity.html"><a href="Sparsity.html"><i class="fa fa-check"></i><b>12</b> Sparsity</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence-graphs-and-dags"><i class="fa fa-check"></i><b>12.1</b> Conditional independence graphs and DAGs</a>
+<ul>
 <li class="chapter" data-level="12.1.1" data-path="Sparsity.html"><a href="Sparsity.html#conditional-independence"><i class="fa fa-check"></i><b>12.1.1</b> Conditional independence</a></li>
 <li class="chapter" data-level="12.1.2" data-path="Sparsity.html"><a href="Sparsity.html#node-removal-properties"><i class="fa fa-check"></i><b>12.1.2</b> Node removal properties</a></li>
 <li class="chapter" data-level="12.1.3" data-path="Sparsity.html"><a href="Sparsity.html#directed-acyclic-graph"><i class="fa fa-check"></i><b>12.1.3</b> Directed acyclic graph</a></li>
@@ -180,36 +193,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12.2" data-path="Sparsity.html"><a href="Sparsity.html#the-theta-logistic-example"><i class="fa fa-check"></i><b>12.2</b> The theta logistic example</a></li>
 </ul></li>
-<li class="chapter" data-level="13" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>13</b> Simulation</a><ul>
-<li class="chapter" data-level="13.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>13.1</b> Overview of simulation methods in TMB</a><ul>
+<li class="chapter" data-level="13" data-path="Simulation.html"><a href="Simulation.html"><i class="fa fa-check"></i><b>13</b> Simulation</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="Simulation.html"><a href="Simulation.html#overview-of-simulation-methods-in-tmb"><i class="fa fa-check"></i><b>13.1</b> Overview of simulation methods in TMB</a>
+<ul>
 <li class="chapter" data-level="13.1.1" data-path="Simulation.html"><a href="Simulation.html#standard-generators"><i class="fa fa-check"></i><b>13.1.1</b> Standard generators</a></li>
 <li class="chapter" data-level="13.1.2" data-path="Simulation.html"><a href="Simulation.html#generators-for-density-objects"><i class="fa fa-check"></i><b>13.1.2</b> Generators for density objects</a></li>
 <li class="chapter" data-level="13.1.3" data-path="Simulation.html"><a href="Simulation.html#controlling-the-random-seed"><i class="fa fa-check"></i><b>13.1.3</b> Controlling the random seed</a></li>
 </ul></li>
-<li class="chapter" data-level="13.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>13.2</b> Simulation blocks</a><ul>
+<li class="chapter" data-level="13.2" data-path="Simulation.html"><a href="Simulation.html#simulation-blocks"><i class="fa fa-check"></i><b>13.2</b> Simulation blocks</a>
+<ul>
 <li class="chapter" data-level="13.2.1" data-path="Simulation.html"><a href="Simulation.html#a-linear-regression-example"><i class="fa fa-check"></i><b>13.2.1</b> A linear regression example</a></li>
 <li class="chapter" data-level="13.2.2" data-path="Simulation.html"><a href="Simulation.html#a-simulation-study"><i class="fa fa-check"></i><b>13.2.2</b> A simulation study</a></li>
 <li class="chapter" data-level="13.2.3" data-path="Simulation.html"><a href="Simulation.html#advanced-examples"><i class="fa fa-check"></i><b>13.2.3</b> Advanced examples</a></li>
 <li class="chapter" data-level="13.2.4" data-path="Simulation.html"><a href="Simulation.html#further-notes"><i class="fa fa-check"></i><b>13.2.4</b> Further notes</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a><ul>
-<li class="chapter" data-level="14.1" data-path="Validation.html"><a href="Validation.html#residuals"><i class="fa fa-check"></i><b>14.1</b> Residuals</a><ul>
+<li class="chapter" data-level="14" data-path="Validation.html"><a href="Validation.html"><i class="fa fa-check"></i><b>14</b> Validation</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="Validation.html"><a href="Validation.html#residuals"><i class="fa fa-check"></i><b>14.1</b> Residuals</a>
+<ul>
 <li class="chapter" data-level="14.1.1" data-path="Validation.html"><a href="Validation.html#models-without-random-effects"><i class="fa fa-check"></i><b>14.1.1</b> Models without random effects</a></li>
 <li class="chapter" data-level="14.1.2" data-path="Validation.html"><a href="Validation.html#models-with-random-effects"><i class="fa fa-check"></i><b>14.1.2</b> Models with random effects</a></li>
 </ul></li>
 <li class="chapter" data-level="14.2" data-path="Validation.html"><a href="Validation.html#checking-the-laplace-approximation"><i class="fa fa-check"></i><b>14.2</b> Checking the Laplace approximation</a></li>
 </ul></li>
-<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a><ul>
+<li class="chapter" data-level="15" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html"><i class="fa fa-check"></i><b>15</b> Atomic functions</a>
+<ul>
 <li class="chapter" data-level="15.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#reverse-mode-differentiation"><i class="fa fa-check"></i><b>15.1</b> Reverse mode differentiation</a></li>
-<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a><ul>
+<li class="chapter" data-level="15.2" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives"><i class="fa fa-check"></i><b>15.2</b> Example: Adding new primitive function with known derivatives</a>
+<ul>
 <li class="chapter" data-level="15.2.1" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#testing-the-primitive-function"><i class="fa fa-check"></i><b>15.2.1</b> Testing the primitive function</a></li>
 </ul></li>
 <li class="chapter" data-level="15.3" data-path="AtomicFunctions.html"><a href="AtomicFunctions.html#other-approaches"><i class="fa fa-check"></i><b>15.3</b> Other approaches</a></li>
 </ul></li>
-<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a><ul>
+<li class="chapter" data-level="16" data-path="Appendix.html"><a href="Appendix.html"><i class="fa fa-check"></i><b>16</b> Appendix</a>
+<ul>
 <li class="chapter" data-level="16.1" data-path="Appendix.html"><a href="Appendix.html#notation"><i class="fa fa-check"></i><b>16.1</b> Notation</a></li>
-<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a><ul>
+<li class="chapter" data-level="16.2" data-path="Appendix.html"><a href="Appendix.html#profiling-the-inner-problem"><i class="fa fa-check"></i><b>16.2</b> Profiling the inner problem</a>
+<ul>
 <li class="chapter" data-level="16.2.1" data-path="Appendix.html"><a href="Appendix.html#example"><i class="fa fa-check"></i><b>16.2.1</b> Example</a></li>
 </ul></li>
 <li class="chapter" data-level="16.3" data-path="Appendix.html"><a href="Appendix.html#theory-underlying-sdreport"><i class="fa fa-check"></i><b>16.3</b> Theory underlying sdreport</a></li>
@@ -231,9 +253,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Appendix" class="section level1">
+<div id="Appendix" class="section level1" number="16">
 <h1><span class="header-section-number">16</span> Appendix</h1>
-<div id="notation" class="section level2">
+<div id="notation" class="section level2" number="16.1">
 <h2><span class="header-section-number">16.1</span> Notation</h2>
 <p>We use the following notation</p>
 <table>
@@ -275,7 +297,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 </div>
-<div id="profiling-the-inner-problem" class="section level2">
+<div id="profiling-the-inner-problem" class="section level2" number="16.2">
 <h2><span class="header-section-number">16.2</span> Profiling the inner problem</h2>
 <p>This section describes the underlying theory of the argument <code>profile</code>
 to <code>MakeADFun</code> intended to speedup and robustify linear mixed effect
@@ -309,13 +331,13 @@ Assume that for any <span class="math inline">\(\beta\)</span> and <span class="
 \]</span></p>
 <p>where the first equality holds in general and the second equality follows from assumptions (1) and (2).</p>
 <p><span class="math inline">\(\square\)</span></p>
-<div id="example" class="section level3">
+<div id="example" class="section level3" number="16.2.1">
 <h3><span class="header-section-number">16.2.1</span> Example</h3>
 <p>The standard situation for which <strong>assumption 1</strong> holds is when the
 <span class="math inline">\(\beta\)</span>s are the linear fixed effects of a mixed model. In this case
 the joint negative log density takes the form
 <span class="math display">\[ f(u,\beta,\theta) = \frac{1}{2}(u-A\beta)&#39;\Sigma_{\theta}^{-1}(u-A\beta) + ... \]</span>
-for some design matrix <span class="math inline">\(A\)</span> where ‘<span class="math inline">\(...\)</span>’ does not depend on
+for some design matrix <span class="math inline">\(A\)</span> where ’ <span class="math inline">\(...\)</span> ’ does not depend on
 <span class="math inline">\(\beta\)</span>. The derivative
 <span class="math display">\[ \partial_{\beta} f(u,\beta,\theta) = A&#39;\Sigma_{\theta}^{-1}(u-A\beta) \]</span>
 is thus a linear function of the random effect <span class="math inline">\(u\)</span>.</p>
@@ -323,7 +345,7 @@ is thus a linear function of the random effect <span class="math inline">\(u\)</
 (e.g. Gaussian) posterior distribution.</p>
 </div>
 </div>
-<div id="theory-underlying-sdreport" class="section level2">
+<div id="theory-underlying-sdreport" class="section level2" number="16.3">
 <h2><span class="header-section-number">16.3</span> Theory underlying sdreport</h2>
 <p>This section supplements the documentation of <code>?sdreport</code> by adding
 some missing details.</p>
@@ -370,12 +392,12 @@ Laplace approximation). This explains the first term of variance formula in <cod
 <p>This term becomes negligible if the amount of data is high because of
 the assumed asymptotic consistency of <span class="math inline">\(\hat\theta\)</span>.</p>
 
-<div id="refs" class="references">
-<div>
-<p>Pedersen, Martin Wæver, Casper Willestofte Berg, Uffe Høgsbro Thygesen, Anders Nielsen, and Henrik Madsen. 2011. “Estimation Methods for Nonlinear State-Space Models in Ecology.” <em>Ecological Modelling</em> 222 (8). Elsevier: 1394–1400.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-pedersen2011estimation" class="csl-entry">
+Pedersen, Martin Wæver, Casper Willestofte Berg, Uffe Høgsbro Thygesen, Anders Nielsen, and Henrik Madsen. 2011. <span>“Estimation Methods for Nonlinear State-Space Models in Ecology.”</span> <em>Ecological Modelling</em> 222 (8): 1394–1400.
 </div>
-<div>
-<p>Thygesen, Uffe Høgsbro, Christoffer Moesgaard Albertsen, Casper Willestofte Berg, Kasper Kristensen, and Anders Nielsen. 2017. “Validation of Ecological State Space Models Using the Laplace Approximation.” <em>Environmental and Ecological Statistics</em> 24 (2). Springer US: 317–39.</p>
+<div id="ref-thygesen2017validation" class="csl-entry">
+Thygesen, Uffe Høgsbro, Christoffer Moesgaard Albertsen, Casper Willestofte Berg, Kasper Kristensen, and Anders Nielsen. 2017. <span>“Validation of Ecological State Space Models Using the Laplace Approximation.”</span> <em>Environmental and Ecological Statistics</em> 24 (2): 317–39.
 </div>
 </div>
 </div>
