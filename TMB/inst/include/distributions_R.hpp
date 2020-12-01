@@ -816,3 +816,17 @@ vector<Type> rcompois2(int n, Type mean, Type nu)
   Type mode = exp(loglambda / nu);
   return rcompois(n, mode, nu);
 }
+
+/** \brief Simulate from tweedie distribution */
+template<class Type>
+Type rtweedie(Type mu, Type phi, Type p) {
+  // Copied from R function tweedie::rtweedie
+  Type lambda = pow(mu, 2. - p) / (phi * (2. - p));
+  Type alpha  = (2. - p) / (1. - p);
+  Type gam = phi * (p - 1.) * pow(mu, p - 1.);
+  int N = (int) asDouble(rpois(lambda));
+  Type ans = rgamma(N, -alpha /* shape */, gam /* scale */).sum();
+  return ans;
+}
+VECTORIZE3_ttt(rtweedie)
+VECTORIZE3_n(rtweedie)
