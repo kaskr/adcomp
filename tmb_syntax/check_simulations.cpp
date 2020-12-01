@@ -36,6 +36,13 @@ Type objective_function<Type>::operator() ()
     vector<Type> x = rcompois2(n, mean, nu);
     ans -= dcompois2(x, mean, nu, true).sum();
   }
+  else if (distr == "tweedie") {
+    PARAMETER(mu);
+    PARAMETER(phi);
+    PARAMETER(p);
+    vector<Type> x = rtweedie(n, mu, phi, p);
+    ans -= dtweedie(x, mu, phi, p, true).sum();
+  }
   else if (distr == "nbinom") {
     PARAMETER(size);
     PARAMETER(prob);
