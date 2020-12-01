@@ -159,6 +159,16 @@ vector<Type> FUN(int n, Type arg1, Type arg2) {         \
   return ans;                                           \
 }
 
+/** \brief Add the 'n' integer argument to a simulation method with
+    three arguments */
+#define VECTORIZE3_n(FUN)                                       \
+template<class Type>                                            \
+vector<Type> FUN(int n, Type arg1, Type arg2, Type arg3) {      \
+  vector<Type> ans(n);                                          \
+  for(int i=0; i<n; i++) ans(i) = FUN(arg1, arg2, arg3);        \
+  return ans;                                                   \
+}
+
 using CppAD::abs;
 VECTORIZE1_t(abs)
 VECTORIZE1_t(acos)
