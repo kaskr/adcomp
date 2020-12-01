@@ -111,6 +111,20 @@ vector<Type> FUN( declare##Type1(arg1) comma##Type2			\
   GVECTORIZE(FUN,V,T,V,I,N,N)			\
   GVECTORIZE(FUN,V,V,V,I,N,N)
 
+/** \brief Vectorize 5-argument functions.
+
+    For Five-arguments functions (Type, Type, Type, Type, int),
+    vectorize first four arguments.
+*/
+#define VECTORIZE5_tttti(FUN)			\
+  GVECTORIZE(FUN,V,T,T,T,I,N)			\
+  GVECTORIZE(FUN,T,V,T,T,I,N)			\
+  GVECTORIZE(FUN,T,T,V,T,I,N)			\
+  GVECTORIZE(FUN,V,V,T,T,I,N)			\
+  GVECTORIZE(FUN,T,V,V,T,I,N)			\
+  GVECTORIZE(FUN,V,T,V,T,I,N)			\
+  GVECTORIZE(FUN,V,V,V,T,I,N)
+
 /** \brief Vectorize 6-argument functions.
 
     For Six-arguments functions (Type, Type, Type, Type, Type, int),

@@ -562,6 +562,7 @@ Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
   }
   return ( give_log ? ans : exp(ans) );
 }
+VECTORIZE5_tttti(dtweedie)
 
 
 /** \brief Conway-Maxwell-Poisson log normalizing constant.
