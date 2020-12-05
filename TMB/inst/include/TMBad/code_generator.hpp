@@ -42,6 +42,7 @@
 #include <iostream>
 #include <sstream>
 #include "global.hpp"
+
 namespace TMBad {
 
 void searchReplace(std::string &str, const std::string &oldStr,
