@@ -344,6 +344,52 @@ struct toposort_remap {
 */
 void reorder_sub_expressions(global &glob);
 
+template <class T>
+struct temporaries_remap {
+  std::vector<T> &remap;
+  T i;
+  temporaries_remap(std::vector<T> &remap, T i) : remap(remap), i(i) {}
+  void operator()(Index k) {
+    if (remap[k] == T(-1)) {
+      if (i > k + 1) remap[k] = i;
+      return;
+    }
+
+    remap[k] = k;
+  }
+};
+
+/** \brief Re-order computational graph to make it more compressible
+
+    \details Potential re-ordering to be applied **after**
+    `reorder_sub_expressions`.  Pushes all temporaries forward. Here a
+    *temporary* is defined as a variable which is only used once as
+    input to an operator.
+*/
+void reorder_temporaries(global &glob);
+
+template <class T>
+struct dfs_add_to_stack {
+  std::vector<T> &stack;
+  std::vector<bool> &visited;
+  std::vector<T> &v2o;
+  dfs_add_to_stack(std::vector<T> &stack, std::vector<bool> &visited,
+                   std::vector<T> &v2o)
+      : stack(stack), visited(visited), v2o(v2o) {}
+  void operator()(T var) {
+    Index op = v2o[var];
+    if (!visited[op]) {
+      stack.push_back(op);
+      visited[op] = true;
+    }
+  }
+};
+
+/** \brief Depth-first reordering of computational graph
+    \details Application: Register optimization for GPU
+*/
+void reorder_depth_first(global &glob);
+
 void compress(global &glob, size_t max_period_size = 1024);
 
 }  // namespace TMBad
