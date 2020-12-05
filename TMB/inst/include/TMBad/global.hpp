@@ -624,10 +624,6 @@ struct graph {
   /** \brief Construct a graph
       \param num_nodes Number of nodes
       \param edges Graph edges represented as node pairs
-      FIXME: Document that pairs must be sorted
-      {(12, 14), (12, 16), (12, 18), (10, 8), (10, 6), (10, 4)}
-      gave the connections
-      12:  14 16 18 8 6 4
   */
   graph(size_t num_nodes, const std::vector<IndexPair> &edges);
 };
@@ -1095,8 +1091,9 @@ struct global {
   void forward_replay(bool inv_tags = true, bool dep_tags = true);
 
   /** \brief Cache array pointers required by all subgraph routines
-      \note Requires a sweep through the full computational graph. In addition a
-     workspace of `sizeof(IndexPair) * opstack.size()` is allocated.
+      \note Requires a sweep through the full computational graph. In
+      addition a workspace of `sizeof(IndexPair) * opstack.size()` is
+      allocated.
   */
   void subgraph_cache_ptr() const;
   /** \brief Convert selected variables to a subgraph sequence
@@ -1121,6 +1118,17 @@ struct global {
   void clear_deriv_sub();
   /** \brief Extract a subgraph as a new global object. Fast when
       called many times.
+
+      \details Sub-graph can either be *sorted* (common case) or just
+      *topologically sorted* (e.g. for graph permutations). In both
+      cases the subgraph may or may not include all independent/dependent
+      variables.
+
+      It's important to note that this routine permutes `inv_index`
+      and `dep_index` to reflect the original parameter order (which
+      is only relevant in the un-sorted case). FIXME: Correct the
+      code!
+
       \param var_remap Workspace containing garbage on output. Can be
       used to avoid re-allocating.
       \param new_glob Target of extraction. Empty by default.
