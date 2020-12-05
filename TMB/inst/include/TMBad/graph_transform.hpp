@@ -45,6 +45,7 @@
 #include "global.hpp"
 #include "integrate.hpp"
 #include "radix.hpp"
+
 namespace TMBad {
 
 /** \brief Match x vector in y vector
@@ -176,17 +177,9 @@ std::vector<bool> reverse_boundary(global &glob, const std::vector<bool> &vars);
 */
 std::vector<Index> get_accumulation_tree(global &glob, bool boundary = false);
 
-/** \brief Substitution operator
-    \details The substitution operator is a helper class for the
-    `substitute` function. The operator has one single purpose: When
-    it is replayed it turns all **operator output variables** into
-    independent variables. The corresponding `global::values` indices
-    are stored during the process.
-*/
 /** \brief Find nodes by name */
 std::vector<Index> find_op_by_name(global &glob, const char *name);
 
-/** \brief Turn node sequence into variable sequence */
 /** \brief substitute node index sequence by independent variables
     \note Currently all operators in sequence must be different from InvOp
 */
@@ -572,39 +565,37 @@ struct sequential_reduction {
 };
 
 /** \brief Split a computational graph using a simple heuristic
-    \details A thread is selected to move work **from**. Initially,
-    all work (nodes in the computational graph) is assigned to the
-    selected thread. The objective function is the total number of
-    nodes per thread maximized across threads. The goal is the
-    minimize this objective.  For each output node (i) find its
-    reverse dependency tree. Try to move the tree to any other
-    thread. Accept the best move or reject if there is no improvement.
 
-    Denote by T(dep(i)) the reverse tree starting from output node dep(i).
-    The set of all nodes N = Union T(dep(i))
-    The size of the tree |T(dep(i))| is the approximate work to calculate
-   dep(i). For some given ordering of the dependent variables dep(1),...,dep(n)
-   we define the work
+    \details Given a function object representing a mapping
+    `f:R^n->R^m`.  Assign each of the `m` outputs to threads and split
+    the function `f` into `m` new functions that can be evaluated in
+    parallel.
 
-    Work(dep(i)) = |T(dep(i))|
+    Let `dep(1), ...,dep(m)` denote the dependendent variables and let
+    `T(dep(i))` be the reverse tree starting from output node
+    `dep(i)`.
+
+    For some given ordering of the dependent variables
+    `dep(1),...,dep(n)` we define the work
+
+    `Work(dep(i)) = |T(dep(i))|`
 
     as the size of the i'th sub tree and
 
-    dWork(dep(i)) = | T(dep(i)) \ Union_(j<i) T(dep(j)) |
+    `dWork(dep(i)) = | T(dep(i)) \ Union_(j<i) T(dep(j)) |`
 
-    i.e. the amount of extra work to calculate dep(i) assuming that all previous
-   dep(j) have been calculated.
+    i.e. the amount of extra work to calculate `dep(i)` assuming that
+    all previous `dep(j)` have been calculated.
 
-    If a dep(i) node is moved from one thread to another we have:
-    * Destination thread work decreases *at least* dWork(dep(i))
-    * Target thread work increase *at most* Work(dep(i))
+    The idea beind the algorithm is to sort the work in decreasing
+    order and assign dependent variables to threads as follows:
 
-    Approximation: It is in general expensive to calculate the size of all trees
-   |T(i)|. We can obtain an approximation (upper bound) in linear time
+    - If `dWork(i)` is 'small' assign `dep(i)` to current thread
+    - Otherwise, switch to the thread with the smallest assigned work
 
-    \note We only need to store *one* vector of node counts
-    corresponding to the thread to move *from*. All other threads just
-    need a boolean vector of the same length.
+    However, we approximate `|Work(dep(i))|` by the maximum tree depth of
+    `T(dep(i))` (because it's easier to compute).  The assigned work
+    by thread is also replaced by a crude approximation.
 */
 struct autopar {
   global &glob;
@@ -623,25 +614,8 @@ struct autopar {
   /** \brief Result: Vector of computational graphs */
   std::vector<global> vglob;
   autopar(global &glob, size_t num_threads);
-  /** \brief Give an estimate (upper bound) of the size of each reverse sub
-     tree. \details The upper bound is found by recursively adding the upper
-     bounds of the input nodes plus one.
-
-      Example:
-
-      Case A: Backtracking the final node gives an exact count of 7 (identical
-     to the upper bound). Case B: Backtracking the final node gives an exact
-     count of 6. Equality does not hold because there are overlapping sub-trees.
-
-            A             B
-
-      1   1   1   1   1   1   1
-      |   |   |   |   |   |   |
-      +-3-+   +-3-+   +-3-+-3-+
-        |       |       |   |
-        +---7---+       +-7-+
-
-  */
+  /** \brief Give an estimate (maximum tree depth) of the size of each
+      reverse sub tree. */
   std::vector<size_t> max_tree_depth();
 
   template <class T>
