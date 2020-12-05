@@ -1561,6 +1561,12 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
     else if (method == "reorder_sub_expressions") {
       TMBad::reorder_sub_expressions(pf->glob);
     }
+    else if (method == "reorder_depth_first") {
+      TMBad::reorder_depth_first(pf->glob);
+    }
+    else if (method == "reorder_temporaries") {
+      TMBad::reorder_temporaries(pf->glob);
+    }
     else if (method == "parallel_accumulate") {
       // Known method - done elsewhere
     }
