@@ -1509,8 +1509,8 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
       newton::newton_config cfg(newton_cfg);
       *pf = newton::Laplace_(*pf, random, cfg);
     }
-    else if (method == "marginal_greedy")
-      *pf = pf -> marginal_greedy(random);
+    else if (method == "marginal_gk")
+      *pf = pf -> marginal_gk(random);
     else if (method == "marginal_sr") {
       std::vector<TMBad::sr_grid> grids;
       SEXP grid = getListElement(control, "grid");
