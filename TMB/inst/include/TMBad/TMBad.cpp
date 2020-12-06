@@ -3516,7 +3516,7 @@ global &integrate_subgraph::try_integrate_variable(Index i) {
   return glob;
 }
 
-global &integrate_subgraph::greedy() {
+global &integrate_subgraph::gk() {
   for (Index i = 0; i < random.size(); i++) {
     try_integrate_variable(random[i]);
   }

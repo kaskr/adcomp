@@ -307,7 +307,7 @@ struct integrate_subgraph {
   integrate_subgraph(global &glob, std::vector<Index> random);
 
   global &try_integrate_variable(Index i);
-  global &greedy();
+  global &gk();
 };
 
 /** \brief Utilility class for `sequential_reduction`.
