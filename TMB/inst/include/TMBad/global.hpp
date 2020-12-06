@@ -14,8 +14,9 @@
 #include <valarray>
 #include <vector>
 #include "radix.hpp"
-/** \brief Test whether the maximum of GLOBAL_INDEX_TYPE has been exceeded */
-/** \brief Namespace of all TMBad classes and functions */
+/** \brief Automatic differentiation library designed for TMB
+    \details See `TMBad::ADFun`.
+*/
 namespace TMBad {
 
 typedef unsigned int hash_t;
