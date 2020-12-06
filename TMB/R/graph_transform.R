@@ -16,9 +16,9 @@ tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL(), ...) {
 }
 
 op_table <- function(ADFun, name=TRUE, address=FALSE, input_size=FALSE, output_size=FALSE) {
-    ntapes <- TMB:::tape_print(ADFun, method="num_tapes", DLL=ADFun$DLL, i=as.integer(0))
+    ntapes <- tape_print(ADFun, method="num_tapes", DLL=ADFun$DLL, i=as.integer(0))
     ntapes <- max(1, ntapes)
-    f <- function(i)TMB:::tape_print(ADFun$ptr, method="op", DLL=ADFun$DLL, i=as.integer(i),
+    f <- function(i)tape_print(ADFun$ptr, method="op", DLL=ADFun$DLL, i=as.integer(i),
                                      name=as.integer(name),
                                      address=as.integer(address),
                                      input_size=as.integer(input_size),
@@ -37,7 +37,7 @@ src_transform <- function(ADFun,
             chartr("\\", "/", shortPathName(ans))
         }
     }
-    ntapes <- TMB:::tape_print(ADFun, method="num_tapes",
+    ntapes <- tape_print(ADFun, method="num_tapes",
                                DLL=ADFun$DLL,
                                i=as.integer(0))
     ntapes <- max(1, ntapes)
@@ -47,7 +47,7 @@ src_transform <- function(ADFun,
     dll.cpp <- paste0(dll, ".cpp")
     ## Reorder graph
     if (perm) {
-        TMB:::TransformADFunObject(
+        TransformADFunObject(
                   ADFun,
                   method="reorder_sub_expressions",
                   random_order=integer(0),
@@ -73,7 +73,7 @@ src_transform <- function(ADFun,
         lapply(forward, function(x)getNativeSymbolInfo(x,PACKAGE=dllinfo)$address)
     reverse_compiled <-
         lapply(reverse, function(x)getNativeSymbolInfo(x,PACKAGE=dllinfo)$address)
-    TMB:::TransformADFunObject(
+    TransformADFunObject(
               ADFun,
               method="set_compiled",
               forward_compiled=forward_compiled,
