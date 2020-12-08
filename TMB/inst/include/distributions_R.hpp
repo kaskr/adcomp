@@ -824,8 +824,8 @@ Type rtweedie(Type mu, Type phi, Type p) {
   Type lambda = pow(mu, 2. - p) / (phi * (2. - p));
   Type alpha  = (2. - p) / (1. - p);
   Type gam = phi * (p - 1.) * pow(mu, p - 1.);
-  int N = (int) asDouble(rpois(lambda));
-  Type ans = rgamma(N, -alpha /* shape */, gam /* scale */).sum();
+  Type N = rpois(lambda);
+  Type ans = rgamma( -alpha * N /* shape */, gam /* scale */);
   return ans;
 }
 VECTORIZE3_ttt(rtweedie)
