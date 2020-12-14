@@ -43,7 +43,7 @@ unlock:
 ## Select version that match R's Matrix package
 SUITESPARSE = SuiteSparse-4.2.1
 METIS = metis-4.0.3
-WGET = curl -O
+WGET = curl -OL
 OS = $(shell uname)
 
 $(SUITESPARSE).tar.gz :
