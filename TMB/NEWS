@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+TMB 1.7.19 (2021-02-05)
+------------------------------------------------------------------------
+
+o 'sdreport()' failed in a special case (GH #333)
+
+o Improved implementation of 'rtweedie()'
+
+o Fixed thread safety issues (GH #330)
+
+o Fixed 'tmbroot()' and 'tmbprofile()' for single-parameter models
+
+o Function 'compile()' now quotes more paths (GH #323)
+
+------------------------------------------------------------------------
 TMB 1.7.18 (2020-07-24)
 ------------------------------------------------------------------------
 
