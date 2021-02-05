@@ -37,7 +37,7 @@ Description: With this tool, a user should be able to quickly implement
     derivatives. Key features are: Automatic sparseness detection, parallelism
     through 'BLAS' and parallel user templates.
 License: GPL-2
-URL: http://tmb-project.org
+URL: https://github.com/kaskr/adcomp/wiki
 BugReports: https://github.com/kaskr/adcomp/issues
 Depends:
     R (>= 3.0.0)
