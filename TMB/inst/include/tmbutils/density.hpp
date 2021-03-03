@@ -12,7 +12,7 @@ public:						\
 typedef scalartype_ scalartype;			\
 typedef vector<scalartype> vectortype;		\
 typedef matrix<scalartype> matrixtype;		\
-typedef array<scalartype> arraytype
+typedef tmbutils::array<scalartype> arraytype
 
 #define VARIANCE_NOT_YET_IMPLEMENTED            \
 private:                                        \
@@ -730,7 +730,7 @@ public:
   scalartype operator()(vectortype x){ /* x.dim=[2,n] */
     vector<int> dim(2);
     dim << 2 , x.size()/2 ;
-    array<scalartype> y(x,dim);
+    tmbutils::array<scalartype> y(x,dim);
     y=y.transpose();
     return this->operator()(y.col(0),y.col(1));
   }

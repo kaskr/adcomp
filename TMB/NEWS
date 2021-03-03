@@ -1,4 +1,37 @@
 ------------------------------------------------------------------------
+TMB 1.7.19-2 (2021-03-03)
+*** FORKED PATCH VERSION ***
+------------------------------------------------------------------------
+
+* Forked repository to work around namespace clash for 'array' between
+  Eigen:: and tmbutils:: when Eigen/Tensor headers are included.
+
+  > TMB/include/tmbutils/density.hpp:106:3: error: 
+  >    reference to 'array' is ambiguous
+
+1. Explicitly reference tmbutils::array in tmbutils/density.hpp and
+   tmbutils/R_inla.hpp.
+
+2. Must include <unsupported/Eigen/CXX11/Tensor> before including <TMB.hpp>.
+
+   If this <TMB.hpp> is included before <Tensor>, compiler throws an
+   error (compiler Apple clang version 12.0.0):
+   
+   >  unsupported/Eigen/CXX11/src/Tensor/TensorTraits.h:122:8: error: 
+   >    explicit specialization of non-template struct 'Rf_eval'
+
+   Not investigated the cause / solution for this.
+
+3. Add compiler flag -Wno-invalid-partial-specialization.
+
+   This is an error in an earlier Eigen release that has been patched:
+   https://github.com/owlbarn/eigen/issues/2#issuecomment-353763166
+
+   Updating the Eigen headers included with TMB might resolve.
+
+   
+
+------------------------------------------------------------------------
 TMB 1.7.19 (2021-02-05)
 ------------------------------------------------------------------------
 
