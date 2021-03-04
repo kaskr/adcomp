@@ -131,7 +131,7 @@ SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult)
       /* -> ./CHOLMOD/Cholesky/cholmod_factorize.c */
       error("cholmod_factorize_p failed: status %d, minor %d of ncol %d",
             c.status, f->minor, f->n);
-    int ok = (c.status == CHOLMOD_OK);
+    int ok = (f->minor == f->n); // WAS: (c.status == CHOLMOD_OK);
     return ScalarLogical(ok);
 }
 
