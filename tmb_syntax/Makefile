@@ -38,9 +38,9 @@ clean :
 
 ## Check that syntax is not broken for projects that depend on TMB
 glmmTMB:
-	wget http://rawgit.com/glmmTMB/glmmTMB/master/glmmTMB/src/glmmTMB.cpp
-	wget http://rawgit.com/glmmTMB/glmmTMB/master/glmmTMB/src/init.h
-	echo 'TMB:::compile("glmmTMB.cpp",libinit=FALSE)' | $(R) --slave
+	wget https://github.com/glmmTMB/glmmTMB/archive/master.zip
+	unzip master.zip; rm master.zip
+	echo 'TMB:::compile("glmmTMB-master/glmmTMB/src/glmmTMB.cpp",libinit=FALSE)' | $(R) --slave
 spict:
 	wget http://rawgit.com/mawp/spict/master/spict/src/spict.cpp
 	echo 'TMB:::compile("spict.cpp",CXX="g++")' | $(R) --slave
