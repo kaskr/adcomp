@@ -46,8 +46,8 @@ spict:
 	echo 'TMB:::compile("spict.cpp",CXX="g++ -std=c++11")' | $(R) --slave
 
 VAST:
-	wget http://rawgit.com/James-Thorson/VAST/master/inst/executables/VAST_v8_0_0.cpp
-	echo 'TMB:::compile("VAST_v8_0_0.cpp",CXX="g++ -std=c++11")' | $(R) --slave
+	wget http://rawgit.com/James-Thorson/VAST/master/inst/executables/VAST_v13_0_0.cpp
+	echo 'TMB:::compile("VAST_v13_0_0.cpp",CXX="g++ -std=c++11")' | $(R) --slave
 
 test:
 	make test_UsrapOp
