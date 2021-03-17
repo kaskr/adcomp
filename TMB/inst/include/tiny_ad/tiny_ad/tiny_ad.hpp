@@ -269,6 +269,48 @@ namespace tiny_ad {
     return os;
   }
 
+#define VARIABLE(order, nvar, scalartype) variable<order, nvar, scalartype>
+template<int order, int nvar, class Double=double>
+struct variable;
+
+template<int order, int nvar, class Double>
+struct traits {
+  typedef ad< VARIABLE(order-1, nvar, Double),
+              TINY_VECTOR( VARIABLE(order-1, nvar, Double) , nvar) > Base;
+  typedef VARIABLE(order-1, nvar, Double) Type;
+  static const int result_size = nvar * order;
+  template<class T>
+  TINY_VECTOR(Double, result_size) getDeriv(const T &x){
+    TINY_VECTOR(Double, result_size) ans;
+    int stride = result_size / nvar;
+    for(int i=0; i<nvar; i++)
+      ans.segment(i * stride, stride) = x.deriv[i].getDeriv();
+    return ans;
+  }
+  template<class T>
+  void setid(T &x, int i0, int count = 0){
+    x.value.setid(i0, count);
+    x.deriv[i0].setid(i0, count + 1);
+  }
+};
+template<int nvar, class Double>
+struct traits<1, nvar, Double> {
+  typedef ad<Double, TINY_VECTOR(Double, nvar) > Base;
+  typedef Double Type;
+  static const int result_size = nvar;
+  template<class T>
+  TINY_VECTOR(Double, result_size) getDeriv(const T &x){
+    return x.deriv;
+  }
+  template<class T>
+  void setid(T &x, int i0, int count = 0){
+    if(count == 0)
+      x.deriv[i0] = 1.0;
+    if(count == 1)
+      x.value = 1.0;
+  }
+};
+
   /* Interface to higher order derivatives. Example:
 
      typedef tiny_ad::variable<3, 2> Float; // Track 3rd order derivs wrt. 2 parameters
@@ -277,14 +319,14 @@ namespace tiny_ad {
      Float y = sin(a + b);                  // Run the algorithm
      y.getDeriv();                          // Get all 3rd order derivatives
   */
-#define VARIABLE(order, nvar, scalartype) variable<order, nvar, scalartype>
-  template<int order, int nvar, class Double=double>
-  struct variable : ad< VARIABLE(order-1, nvar, Double),
-			TINY_VECTOR( VARIABLE(order-1, nvar, Double) , nvar) > {
-    typedef ad< VARIABLE(order-1, nvar, Double),
-		TINY_VECTOR(VARIABLE(order-1, nvar, Double), nvar) > Base;
-    typedef variable<order-1, nvar, Double> Type;
-    static const int result_size = nvar * Type::result_size;
+
+  template<int order, int nvar, class Double>
+  struct variable :
+    traits<order, nvar, Double>::Base
+  {
+    typedef typename traits<order, nvar, Double>::Base Base;
+    typedef typename traits<order, nvar, Double>::Type Type;
+    static const int result_size = nvar * order;
     variable() { /* Do not zero-initialize */ }
     variable(Base x) : Base(x) {}
     variable(double x) : Base(x) {}
@@ -300,48 +342,15 @@ namespace tiny_ad {
       Base::value = x; Base::deriv.setZero();
       setid(id);
     }
-    void setid(int i0, int count = 0){
-      this->value.setid(i0, count);
-      this->deriv[i0].setid(i0, count + 1);
+    traits<order, nvar, Double> tr;
+    TINY_VECTOR(Double, result_size) getDeriv() {
+      return tr.getDeriv(*this);
     }
-    TINY_VECTOR(Double, result_size) getDeriv(){
-      TINY_VECTOR(Double, result_size) ans;
-      int stride = result_size / nvar;
-      for(int i=0; i<nvar; i++)
-	ans.segment(i * stride, stride) = this->deriv[i].getDeriv();
-      return ans;
+    void setid(int i0, int count = 0){
+      tr.setid(*this, i0, count);
     }
   };
 #undef VARIABLE
-  template<int nvar, class Double>
-  struct variable<1, nvar, Double> : ad<Double, TINY_VECTOR(Double,nvar) >{
-    typedef ad<Double, TINY_VECTOR(Double,nvar) > Base;
-    static const int result_size = nvar;
-    variable<1, nvar, Double>() { /* Do not zero-initialize */ }
-    variable<1, nvar, Double>(Base x) : Base(x) {}
-    variable<1, nvar, Double>(double x) : Base(x) {}
-    variable<1, nvar, Double>(double x, int id) : Base(x) {
-      setid(id);
-    }
-    template<class Constant>
-    variable<1, nvar, Double>(Constant x) {
-      Base::value = x; Base::deriv.setZero();
-    }
-    template<class Constant>
-    variable<1, nvar, Double>(Constant x, int id) {
-      Base::value = x; Base::deriv.setZero();
-      setid(id);
-    }
-    void setid(int i0, int count = 0){
-      if(count == 0)
-	this->deriv[i0] = 1.0;
-      if(count == 1)
-	this->value = 1.0;
-    }
-    TINY_VECTOR(Double, nvar) getDeriv(){
-      return this->deriv;
-    }
-  };
 #undef TINY_VECTOR
 } // End namespace tiny_ad
 
