@@ -292,12 +292,21 @@ namespace tiny_ad {
     variable(double x, int id) : Base(x) {      \
       setid(id);                                \
     }                                           \
-    template<class Constant>                    \
-    variable(Constant x) {                      \
+    template<int T1, int T2, class T3>          \
+    variable(variable<T1,T2,T3> x) {            \
       Base::value = x; Base::deriv.setZero();   \
     }                                           \
-    template<class Constant>                    \
-    variable(Constant x, int id) {              \
+    template<class T1, class T2>                \
+    variable(ad<T1,T2> x) {                     \
+      Base::value = x; Base::deriv.setZero();   \
+    }                                           \
+    template<int T1, int T2, class T3>          \
+    variable(variable<T1,T2,T3> x, int id) {    \
+      Base::value = x; Base::deriv.setZero();   \
+      setid(id);                                \
+    }                                           \
+    template<class T1, class T2>                \
+    variable(ad<T1,T2> x, int id) {             \
       Base::value = x; Base::deriv.setZero();   \
       setid(id);                                \
     }
