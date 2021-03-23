@@ -58,5 +58,5 @@ test:
 	make report
 	make glmmTMB
 	make spict
-	make VAST
+##	make VAST
 	make matrix_arrays
