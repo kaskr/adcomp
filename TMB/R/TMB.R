@@ -281,17 +281,21 @@ MakeADFun <- function(data, parameters, map=list(),
     keepAttrib( parameters[names(map)] ) <- param.map
   }
 
+  lrandom <- function() {
+      ans <- logical(length(par))
+      ans[random] <- TRUE
+      ans
+  }
+  lfixed <- function() {
+      !lrandom()
+  }
   ## Utility to get back parameter list in original shape
-  parList <- function(x=par[-random],par=last.par){
+  parList <- function(x=par[lfixed()],par=last.par){
     ans <- parameters
     nonemp <- sapply(ans,function(x)length(x)>0) ## Workaround utils::relist bug for empty list items
     nonempindex <- which(nonemp)
     skeleton <- as.relistable(ans[nonemp])
-    if(any(random)){
-      par[-random] <- x
-    } else {
-      par[] <- x
-    }
+    par[lfixed()] <- x
     li <- relist(par,skeleton)
     reshape <- function(x){
       if(is.null(attr(x,"map")))return(x)
