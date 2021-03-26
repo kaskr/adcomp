@@ -28,40 +28,46 @@ jobs:
       r: devel
       install: true
       script:
+        - export TMB_AD_FRAMEWORK=TMBad
         - ./bin/install_and_check.sh
 
     - stage: Install and check the package
       r: release
       install: true
       script:
+        - export TMB_AD_FRAMEWORK=CppAD
         - ./bin/install_and_check.sh
 
     - stage: Run more checks
       r: devel
       install: true
       script:
+        - export TMB_AD_FRAMEWORK=TMBad
         - ./bin/run_more_checks.sh
 
     - stage: Run more checks
       r: release
       install: true
       script:
+        - export TMB_AD_FRAMEWORK=CppAD
         - ./bin/run_more_checks.sh
 
     - stage: Run full example suite
       r: devel
       install: true
       script:
+        - export TMB_AD_FRAMEWORK=TMBad
         - ./bin/run_full_example_suite.sh
 
     - stage: Run full example suite
       r: release
       install: true
       script:
+        - export TMB_AD_FRAMEWORK=CppAD
         - ./bin/run_full_example_suite.sh
 
     - stage: Build and deploy documentation
-      r: release
+      r: devel
       install:
         - wget http://www.student.dtu.dk/~kaskr/doxygen-1.8.12.linux.bin.tar.gz
         - tar zxf doxygen-1.8.12.linux.bin.tar.gz
@@ -72,6 +78,7 @@ jobs:
         - export PATH=`pwd`/pandoc-2.11.2/bin:$PATH
         - pandoc -v
       script:
+        - export TMB_AD_FRAMEWORK=TMBad
         - make doxygen
         - ./bin/deploy.sh
 
