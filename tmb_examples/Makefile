@@ -1,4 +1,9 @@
 excludes = lr_test
+## If testing with CppAD we must exclude folder TMBad
+ifeq ($(TMB_AD_FRAMEWORK), CppAD)
+tmbad_examples = $(basename $(wildcard TMBad/*.cpp))
+excludes += $(tmbad_examples)
+endif
 rfiles = $(basename $(wildcard *.R)) $(basename $(wildcard */*.R))
 cppfiles = $(basename $(wildcard *.cpp)) $(basename $(wildcard */*.cpp))
 all_examples = $(filter $(rfiles), $(cppfiles))
