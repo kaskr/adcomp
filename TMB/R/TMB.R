@@ -1148,14 +1148,14 @@ openmp <- function(n=NULL){
 ##' @param libtmb Use precompiled TMB library if available (to speed up compilation)?
 ##' @param libinit Turn on preprocessor flag to register native routines?
 ##' @param tracesweep Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})
-##' @param framework Which AD framework to use
+##' @param framework Which AD framework to use ('TMBad' or 'CppAD')
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file[1]),libtmb=TRUE,
-                    libinit=TRUE,tracesweep=FALSE,framework=c("TMBad", "CppAD"),
+                    libinit=TRUE,tracesweep=FALSE,framework=getOption("tmb.ad.framework"),
                     ...){
-  framework <- match.arg(framework)
+  framework <- match.arg(framework, c("CppAD", "TMBad"))
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
