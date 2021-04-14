@@ -2534,9 +2534,17 @@ extern "C"
 #ifdef TMBAD_FRAMEWORK
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
-    //SEXP tag=R_ExternalPtrTag(f);
-    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-    y = pf->forward(x);
+    SEXP tag=R_ExternalPtrTag(f);
+    if(tag == Rf_install("ADFun")) {
+      adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+      y = pf->forward(x);
+    } else
+      if(tag == Rf_install("parallelADFun")) {
+        parallelADFun<double>* pf;
+        pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+        y = pf->forward(x);
+      } else
+        Rf_error("Unknown function pointer");
 #endif
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
@@ -2557,9 +2565,17 @@ extern "C"
 #ifdef TMBAD_FRAMEWORK
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
-    //SEXP tag=R_ExternalPtrTag(f);
-    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-    y = pf->reverse(v);
+    SEXP tag=R_ExternalPtrTag(f);
+    if(tag == Rf_install("ADFun")) {
+      adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+      y = pf->reverse(v);
+    } else
+      if(tag == Rf_install("parallelADFun")) {
+        parallelADFun<double>* pf;
+        pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+        y = pf->reverse(v);
+      } else
+        Rf_error("Unknown function pointer");
 #endif
   }
 }
