@@ -362,6 +362,32 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
     for(int i=0; i<ntapes; i++) out = out + ans(i);
     return out;
   }
+  // Used by tmbstan (tmb_forward and tmb_reverse)
+  // Assuming one-dimensional output.
+  template<class Vector>
+  Vector forward(const Vector &x) {
+    vector<Vector> ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) ans(i) = vecpf(i)->forward(x);
+    Vector out(1);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) out = out + ans(i);
+    return out;
+  }
+  template<class Vector>
+  Vector reverse(const Vector &w) {
+    vector<Vector> ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) ans(i) = vecpf(i)->reverse(w);
+    Vector out(domain);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) out = out + ans(i);
+    return out;
+  }
 #endif // TMBAD_FRAMEWORK
 };
 
