@@ -3746,12 +3746,13 @@ void sequential_reduction::reorder_random() {
   std::vector<bool> visited(num_nodes, false);
   std::vector<Index> subgraph;
   for (size_t i = 0; i < random.size(); i++) {
-    if (visited[random[i]]) break;
+    if (visited[random[i]]) continue;
     std::vector<Index> sg(1, random[i]);
     G.search(sg, visited, false, false);
     subgraph.insert(subgraph.end(), sg.begin(), sg.end());
   }
   std::reverse(subgraph.begin(), subgraph.end());
+  ASSERT(random.size() == subgraph.size());
   random = subgraph;
 }
 
