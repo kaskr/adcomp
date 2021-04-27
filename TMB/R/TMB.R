@@ -402,7 +402,9 @@ MakeADFun <- function(data, parameters, map=list(),
   ## All external pointers are created in function "retape" and can be re-created
   ## by running retape() if e.g. the number of openmp threads is changed.
   ## set.defaults: reset internal parameters to their default values.
+  .random <- random
   retape <- function(set.defaults = TRUE){
+    random <<- .random ## Restore original 'random' argument
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
