@@ -979,76 +979,69 @@ MakeADFun <- function(data, parameters, map=list(),
   }
 
   ## return :
-  if(is.null(random)) {  ## Output if pure fixed effect model
-    list(par=par,
-         fn=function(x=last.par,...){
-           if(tracepar){cat("par:\n");print(x)}
-           if(!validpar(x))return(NaN)
-           res <- f(x,order=0)
-           if(!ADreport) {
-               if(is.finite(res) && res < value.best) {
-                   last.par.best <<- x; value.best <<- res
-               }
-           }
-           res
-         },
-         gr=function(x=last.par,...){
-           ans <- f(x,order=1)
-           if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
-           ans
-         },
-         he=function(x=last.par,atomic=usingAtomics()){
-           ## If no atomics on tape we have all orders implemented:
-           if(!atomic) return( f(x,order=2) )
-           ## Otherwise, get Hessian as 1st order derivative of gradient:
-           if(is.null(ADGrad))
-             retape_adgrad()
-           f(x,type="ADGrad",order=1)
-         },
-         hessian=hessian, method=method,
-         retape=retape, env=env,
-         report=report,
-         simulate=simulate,...)
-  }
-  else { ## !is.null(random) :  Output if random effect model
-    list(par=par[-random],
-         fn=function(x=last.par[-random],...){
-           if(tracepar){cat("par:\n");print(x)}
-           if(!validpar(x))return(NaN)
-           ans <- try({
-             if(MCcontrol$doMC){
-               ff(x,order=0)
-               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=0)
-             } else
-               ff(x,order=0)
-           },silent=silent)
-           if(is.character(ans))NaN else ans
-         },
-         gr=function(x=last.par[-random],...){
-           ans <- try( {
-             if(MCcontrol$doMC){
-               ff(x,order=0)
-               MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=1)
-             } else
-               ff(x,order=1)
-           }, silent=silent)
-           if(is.character(ans)) ans <- rep(NaN, length(x))
-           if(tracemgc)cat("outer mgc: ",max(abs(ans)),"\n")
-           ans
-         },
-         he=function(x=last.par[-random],...){
-           stop("Hessian not yet implemented for models with random effects.")
-           if(MCcontrol$doMC){
-             ff(x,order=0)
-             MC(last.par,n=MCcontrol$n,seed=MCcontrol$seed,order=2)
-           } else
-             ff(x,order=2)
-         },
-         hessian=hessian, method=method,
-         retape=retape, env=env,
-         report=report,
-         simulate=simulate, ...)
-  }
+  list(
+      ## Default parameter vector
+      par = par[lfixed()],
+      ## Objective function
+      fn = function(x = last.par[lfixed()], ...) {
+          if (tracepar) { cat("par:\n"); print(x) }
+          if (!validpar(x)) return(NaN)
+          if (is.null(random)) {
+              ans <- f(x,order=0)
+              if (!ADreport) {
+                  if (is.finite(ans) && ans < value.best) {
+                      last.par.best <<- x; value.best <<- ans
+                  }
+              }
+          } else {
+              ans <- try({
+                  if(MCcontrol$doMC){
+                      ff(x, order=0)
+                      MC(last.par, n=MCcontrol$n, seed=MCcontrol$seed, order=0)
+                  } else
+                      ff(x,order=0)
+              }, silent=silent)
+              if (is.character(ans)) ans <- NaN
+          }
+          ans
+      },
+      ## Gradient of objective function
+      gr = function(x = last.par[lfixed()], ...) {
+          if (is.null(random)) {
+              ans <- f(x, order=1)
+          } else {
+              ans <- try( {
+                  if (MCcontrol$doMC) {
+                      ff(x,order=0)
+                      MC(last.par, n=MCcontrol$n, seed=MCcontrol$seed, order=1)
+                  } else
+                      ff(x,order=1)
+              }, silent=silent)
+              if(is.character(ans)) ans <- rep(NaN, length(x))
+          }
+          if (tracemgc) cat("outer mgc: ", max(abs(ans)), "\n")
+          ans
+      },
+      ## Hessian of objective function
+      he = function(x = last.par[lfixed()], atomic=usingAtomics()) {
+          if (is.null(random)) {
+              ## If no atomics on tape we have all orders implemented:
+              if(!atomic) return( f(x,order=2) )
+              ## Otherwise, get Hessian as 1st order derivative of gradient:
+              if(is.null(ADGrad))
+                  retape_adgrad()
+              return( f(x, type="ADGrad", order=1) )
+          } else {
+              stop("Hessian not yet implemented for models with random effects.")
+          }
+      },
+      ## Other methods and flags
+      hessian=hessian,
+      method=method,
+      retape=retape,
+      env=env,
+      report=report,
+      simulate=simulate,...)
 }## end{ MakeADFun }
 
 ##' Free memory allocated on the C++ side by \code{MakeADFun}.
