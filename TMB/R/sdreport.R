@@ -490,6 +490,7 @@ print.sdreport <- function(x, ...)
 ##' as.list(rep, "Est. (bias.correct)", report=TRUE)
 ##' }
 as.list.sdreport <- function(x, what = "", report=FALSE, ...) {
+    if (what == "") return (x)
     if (!report) {
         ans <- x$env$parameters
         random <- x$env$random
