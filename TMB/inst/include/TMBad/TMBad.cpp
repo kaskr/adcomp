@@ -1262,7 +1262,13 @@ void global::clear_deriv_sub() { clear_array_subgraph(derivs); }
 
 global global::extract_sub(std::vector<Index> &var_remap, global new_glob) {
   subgraph_cache_ptr();
-  var_remap.resize(values.size());
+  if (!(var_remap.size() == 0 || var_remap.size() == values.size())) {
+    Rcerr << "ASSERTION FAILED: "
+          << "var_remap.size() == 0 || var_remap.size() == values.size()"
+          << "\n";
+    abort();
+  };
+  var_remap.resize(values.size(), 0);
   std::vector<bool> independent_variable = inv_marks();
   std::vector<bool> dependent_variable = dep_marks();
   ForwardArgs<Scalar> args(inputs, values);
@@ -1324,9 +1330,8 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
   intervals<Index> marked_intervals;
   ForwardArgs<bool> args(inputs, marks, marked_intervals);
   size_t s = 0, s_input = 0;
-  inv_index.resize(0);
-  dep_index.resize(0);
   std::vector<bool> opstack_deallocate(opstack.size(), false);
+
   for (size_t i = 0; i < opstack.size(); i++) {
     size_t nout = opstack[i]->output_size();
     bool any_marked_output = false;
@@ -1341,10 +1346,10 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
         var_remap[old_index] = new_index;
         values[new_index] = values[old_index];
         if (independent_variable[old_index]) {
-          inv_index.push_back(new_index);
+          independent_variable[old_index] = false;
         }
         if (dependent_variable[old_index]) {
-          dep_index.push_back(new_index);
+          dependent_variable[old_index] = false;
         }
         s++;
       }
@@ -1360,6 +1365,24 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
       opstack_deallocate[i] = true;
     }
   }
+
+  independent_variable.flip();
+  dependent_variable.flip();
+  std::vector<Index> new_inv_index;
+  for (size_t i = 0; i < inv_index.size(); i++) {
+    Index old_var = inv_index[i];
+    if (independent_variable[old_var])
+      new_inv_index.push_back(var_remap[old_var]);
+  }
+  inv_index = new_inv_index;
+  std::vector<Index> new_dep_index;
+  for (size_t i = 0; i < dep_index.size(); i++) {
+    Index old_var = dep_index[i];
+    if (dependent_variable[old_var])
+      new_dep_index.push_back(var_remap[old_var]);
+  }
+  dep_index = new_dep_index;
+
   inputs.resize(s_input);
   values.resize(s);
   size_t k = 0;
@@ -3455,13 +3478,15 @@ integrate_subgraph::integrate_subgraph(global &glob, std::vector<Index> random)
       forward_graph(glob.forward_graph()),
       reverse_graph(glob.reverse_graph()) {
   glob.subgraph_cache_ptr();
-  var_remap.resize(glob.values.size());
   mark.resize(glob.opstack.size(), false);
 }
 
 global &integrate_subgraph::try_integrate_variable(Index i) {
+  const std::vector<Index> &inv2op = forward_graph.inv2op;
+
+  Index start_node = inv2op[i];
   glob.subgraph_seq.resize(0);
-  glob.subgraph_seq.push_back(glob.inv_index[i]);
+  glob.subgraph_seq.push_back(start_node);
   forward_graph.search(glob.subgraph_seq);
 
   if (glob.subgraph_seq.size() == 1) return glob;
@@ -3481,6 +3506,7 @@ global &integrate_subgraph::try_integrate_variable(Index i) {
   std::vector<Index> boundary = reverse_graph.boundary(glob.subgraph_seq);
 
   global new_glob;
+  var_remap.resize(glob.values.size());
   new_glob.ad_start();
   Index total_boundary_vars = 0;
   std::vector<ad_plain> boundary_vars;
@@ -3859,7 +3885,10 @@ void sequential_reduction::merge(Index i) {
 }
 
 void sequential_reduction::update(Index i) {
-  std::vector<Index> subgraph(1, i);
+  const std::vector<Index> &inv2op = forward_graph.inv2op;
+
+  Index start_node = inv2op[i];
+  std::vector<Index> subgraph(1, start_node);
   forward_graph.search(subgraph);
 
   std::vector<Index> dep_clique;
