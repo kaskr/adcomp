@@ -305,7 +305,9 @@ struct integrate_subgraph {
       \param glob Output from `accumulation_tree_split()`.
   */
   integrate_subgraph(global &glob, std::vector<Index> random);
-
+  /** \brief Attempt to integrate i'th independent variable
+      \param i Integrate `inv_index[i]`.
+  */
   global &try_integrate_variable(Index i);
   global &gk();
 };
@@ -497,14 +499,25 @@ struct sequential_reduction {
       order'.
       \param glob Output from `accumulation_tree_split()`.
       \param random Which independent variables to integrate out and in what
-     order.
+     order (if `perm=false`). To be specific, the order of integration is
+     `inv_index[random[0]]`, `inv_index[random[1]]`, ... \param grid Vector of
+     grids to be used by individual random effects - see `random2grid`. \param
+     random2grid Factor determining the grid to be used for each random effect.
+     To be specific, the i'th random effect `random[i]` uses the grid
+     `grid[random2grid[i]]`. \param perm Apply a permutation of `random` based
+     on a simple heuristic (see `reorder_random()`).
   */
   sequential_reduction(global &glob, std::vector<Index> random,
                        std::vector<sr_grid> grid =
                            std::vector<sr_grid>(1, sr_grid(-20, 20, 200)),
                        std::vector<Index> random2grid = std::vector<Index>(0),
                        bool perm = true);
+  /** \brief Re-order random effects
 
+     Two random effects are *connected* if they both affect the same
+     term. This function finds a fill-reducing permutation of the
+     corresponding un-directed graph.
+  */
   void reorder_random();
 
   std::vector<size_t> get_grid_bounds(std::vector<Index> inv_index);
@@ -546,7 +559,7 @@ struct sequential_reduction {
   */
   void merge(Index i);
 
-  /** \brief Integrate independent variable number i
+  /** \brief Integrate independent variable number i, (`inv_index[i]`).
       \details The algorithm works as follows:
       1. Identify all factors (terms in logspace) that depend on x_i **and**
      have not yet been integrated.
