@@ -1820,6 +1820,14 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     else if (method == "dot") { // Print dot format
       graph2dot(pf->glob, true, Rcout);
     }
+    else if (method == "inv_index") { // Print member
+      using TMBad::operator<<;
+      Rcout << pf->glob.inv_index << "\n";
+    }
+    else if (method == "dep_index") { // Print member
+      using TMBad::operator<<;
+      Rcout << pf->glob.dep_index << "\n";
+    }
     else if (method == "src") { // Print C src code
       TMBad::code_config cfg;
       cfg.gpu = false;
