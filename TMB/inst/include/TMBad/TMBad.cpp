@@ -1212,11 +1212,17 @@ void global::forward_replay(bool inv_tags, bool dep_tags) {
 
 void global::subgraph_cache_ptr() const {
   if (subgraph_ptr.size() == opstack.size()) return;
-  subgraph_ptr.resize(0);
-  IndexPair ptr(0, 0);
-  for (size_t i = 0; i < opstack.size(); i++) {
+  if (!(subgraph_ptr.size() < opstack.size())) {
+    Rcerr << "ASSERTION FAILED: "
+          << "subgraph_ptr.size() < opstack.size()"
+          << "\n";
+    abort();
+  };
+  if (subgraph_ptr.size() == 0) subgraph_ptr.push_back(IndexPair(0, 0));
+  for (size_t i = subgraph_ptr.size(); i < opstack.size(); i++) {
+    IndexPair ptr = subgraph_ptr[i - 1];
+    opstack[i - 1]->increment(ptr);
     subgraph_ptr.push_back(ptr);
-    opstack[i]->increment(ptr);
   }
 }
 
@@ -3472,11 +3478,13 @@ void term_info::initialize(std::vector<Index> inv_remap) {
   }
 }
 
-integrate_subgraph::integrate_subgraph(global &glob, std::vector<Index> random)
+integrate_subgraph::integrate_subgraph(global &glob, std::vector<Index> random,
+                                       bool adaptive)
     : glob(glob),
       random(random),
       forward_graph(glob.forward_graph()),
-      reverse_graph(glob.reverse_graph()) {
+      reverse_graph(glob.reverse_graph()),
+      adaptive(adaptive) {
   glob.subgraph_cache_ptr();
   mark.resize(glob.opstack.size(), false);
 }
@@ -3534,10 +3542,14 @@ global &integrate_subgraph::try_integrate_variable(Index i) {
   aggregate(new_glob);
 
   logIntegrate_t<> taped_integral(new_glob);
-  AdapOp<logIntegrate_t<> > taped_integral_operator(taped_integral);
 
   glob.ad_start();
-  taped_integral_operator(boundary_vars)[0].Dependent();
+  if (adaptive) {
+    AdapOp<logIntegrate_t<> > taped_integral_operator(taped_integral);
+    taped_integral_operator(boundary_vars)[0].Dependent();
+  } else {
+    taped_integral(boundary_vars)[0].Dependent();
+  }
   glob.ad_stop();
   return glob;
 }
