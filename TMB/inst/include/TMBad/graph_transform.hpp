@@ -301,10 +301,12 @@ struct integrate_subgraph {
   graph reverse_graph;
   std::vector<Index> var_remap;
   std::vector<bool> mark;
+  bool adaptive;
   /** \brief CTOR of adaptive integrated subgraph
       \param glob Output from `accumulation_tree_split()`.
   */
-  integrate_subgraph(global &glob, std::vector<Index> random);
+  integrate_subgraph(global &glob, std::vector<Index> random,
+                     bool adaptive = false);
   /** \brief Attempt to integrate i'th independent variable
       \param i Integrate `inv_index[i]`.
   */
