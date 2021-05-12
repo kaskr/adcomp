@@ -37,6 +37,11 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
     for (size_t i=0; i<ty.size(); i++) _args_.y(i) = ty[i];             \
   }                                                                     \
   template<class Type> void reverse(TMBad::ReverseArgs<Type> _args_) {  \
+    if (isDouble<Type>::value &&                                        \
+          this->output_size() == 1 &&                                   \
+            _args_.dy(0) == Type(0)) {                                  \
+              return;                                                   \
+    }                                                                   \
     CppAD::vector<Type> tx(this->input_size());                         \
     CppAD::vector<Type> ty(this->output_size());                        \
     CppAD::vector<Type> px(this->input_size());                         \
