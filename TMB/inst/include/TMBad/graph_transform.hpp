@@ -229,19 +229,32 @@ struct term_info {
   void initialize(std::vector<Index> inv_remap = std::vector<Index>(0));
 };
 
+struct gk_config {
+  bool debug;
+  bool adaptive;
+  double ytol;
+  double dx;
+  gk_config();
+};
+
 template <class Float = ad_adapt>
 struct logIntegrate_t {
   typedef Float Scalar;
   global glob;
   double mu, sigma, f_mu;
+  gk_config cfg;
   double f(double x) {
     Index k = glob.inv_index.size();
     glob.value_inv(k - 1) = x;
     glob.forward();
     return glob.value_dep(0);
   }
-  double g(double x) { return f(x + .5) - f(x - .5); }
-  double h(double x) { return g(x + .5) - g(x - .5); }
+  double g(double x) {
+    return (f(x + .5 * cfg.dx) - f(x - .5 * cfg.dx)) / cfg.dx;
+  }
+  double h(double x) {
+    return (g(x + .5 * cfg.dx) - g(x - .5 * cfg.dx)) / cfg.dx;
+  }
   /** \brief Rescale integrand
       \f[
       \log\left(\int_{-\infty}^{\infty} \exp(f(x))\:dx\right)=
@@ -249,22 +262,47 @@ struct logIntegrate_t {
      \mu)-f(\mu))\:du\right) + \log(\sigma) + f(\mu) \f]
   */
   void rescale_integrand(const std::vector<ad_plain> &x) {
+    ASSERT(x.size() + 1 == glob.inv_index.size());
+    if (cfg.debug) Rcout << "rescale integrand:\n";
     for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i].Value();
+    mu = glob.value_inv(x.size());
     f_mu = f(mu);
-    for (int i = 0; i < 100; i++) {
-      double mu_new = mu - g(mu) / h(mu);
+    int i = 0;
+    for (; i < 100; i++) {
+      double g_mu = g(mu);
+      double h_mu = h(mu);
+      if (std::isfinite(f_mu) && !std::isfinite(h_mu)) {
+        cfg.dx = cfg.dx * .5;
+        continue;
+      }
+      double mu_new;
+      if (h_mu < 0)
+        mu_new = mu - g_mu / h_mu;
+      else
+        mu_new = mu + (g_mu > 0 ? cfg.dx : -cfg.dx);
       double f_mu_new = f(mu_new);
-      if (f_mu_new - f_mu > 1) {
+      if (cfg.debug) {
+        Rcout << "mu=" << mu << " mu_new=" << mu_new << " g_mu=" << g_mu
+              << " h_mu=" << h_mu << " f_mu=" << f_mu
+              << " f_mu_new=" << f_mu_new << "\n";
+      }
+      if (f_mu_new > f_mu + cfg.ytol) {
         mu = mu_new;
         f_mu = f_mu_new;
       } else {
         break;
       }
     }
-    sigma = 1. / sqrt(std::max(-h(mu), 1e-8));
+    sigma = 1. / sqrt(-h(mu));
+    if (!std::isfinite(sigma)) sigma = 10000;
+    if (cfg.debug)
+      Rcout << "==>  i=" << i << " mu=" << mu << " f_mu=" << f_mu
+            << " sigma=" << sigma << "\n";
   }
 
-  logIntegrate_t(global &glob) : glob(glob), mu(0), sigma(1), f_mu(0) {
+  logIntegrate_t(global &glob, gk_config cfg)
+      : glob(glob), mu(0), sigma(1), f_mu(0), cfg(cfg) {
+    ASSERT(glob.inv_index.size() >= 1);
     ASSERT(glob.dep_index.size() == 1);
   }
   logIntegrate_t() {}
@@ -301,12 +339,12 @@ struct integrate_subgraph {
   graph reverse_graph;
   std::vector<Index> var_remap;
   std::vector<bool> mark;
-  bool adaptive;
+  gk_config cfg;
   /** \brief CTOR of adaptive integrated subgraph
       \param glob Output from `accumulation_tree_split()`.
   */
   integrate_subgraph(global &glob, std::vector<Index> random,
-                     bool adaptive = false);
+                     gk_config cfg = gk_config());
   /** \brief Attempt to integrate i'th independent variable
       \param i Integrate `inv_index[i]`.
   */
