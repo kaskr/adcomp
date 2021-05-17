@@ -3478,13 +3478,15 @@ void term_info::initialize(std::vector<Index> inv_remap) {
   }
 }
 
+gk_config::gk_config() : debug(false), adaptive(false), ytol(1e-2), dx(1) {}
+
 integrate_subgraph::integrate_subgraph(global &glob, std::vector<Index> random,
-                                       bool adaptive)
+                                       gk_config cfg)
     : glob(glob),
       random(random),
       forward_graph(glob.forward_graph()),
       reverse_graph(glob.reverse_graph()),
-      adaptive(adaptive) {
+      cfg(cfg) {
   glob.subgraph_cache_ptr();
   mark.resize(glob.opstack.size(), false);
 }
@@ -3541,10 +3543,10 @@ global &integrate_subgraph::try_integrate_variable(Index i) {
 
   aggregate(new_glob);
 
-  logIntegrate_t<> taped_integral(new_glob);
+  logIntegrate_t<> taped_integral(new_glob, cfg);
 
   glob.ad_start();
-  if (adaptive) {
+  if (cfg.adaptive) {
     AdapOp<logIntegrate_t<> > taped_integral_operator(taped_integral);
     taped_integral_operator(boundary_vars)[0].Dependent();
   } else {

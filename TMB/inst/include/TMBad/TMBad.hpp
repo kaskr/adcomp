@@ -844,13 +844,14 @@ struct ADFun {
     return ans;
   }
   /** \brief Integrate as many univariate variables as possible */
-  ADFun marginal_gk(const std::vector<Index> &random) {
+  ADFun marginal_gk(const std::vector<Index> &random,
+                    gk_config cfg = gk_config()) {
     ADFun ans;
     old_state os(this->glob);
     aggregate(this->glob, -1);
     global glob_split = accumulation_tree_split(this->glob);
     os.restore();
-    integrate_subgraph i_s(glob_split, random);
+    integrate_subgraph i_s(glob_split, random, cfg);
     ans.glob = i_s.gk();
     aggregate(ans.glob, -1);
     return ans;
