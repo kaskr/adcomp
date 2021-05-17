@@ -1508,8 +1508,15 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
       newton::newton_config cfg(newton_cfg);
       *pf = newton::Laplace_(*pf, random, cfg);
     }
-    else if (method == "marginal_gk")
-      *pf = pf -> marginal_gk(random);
+    else if (method == "marginal_gk") {
+      TMBad::gk_config cfg;
+      SEXP gk_config = getListElement(control, "gk_config");
+      if (!Rf_isNull(gk_config)) {
+        cfg.adaptive = getListInteger(gk_config, "adaptive", 0);
+        cfg.debug = getListInteger(gk_config, "debug", 0);
+      }
+      *pf = pf -> marginal_gk(random, cfg);
+    }
     else if (method == "marginal_sr") {
       std::vector<TMBad::sr_grid> grids;
       SEXP grid = getListElement(control, "grid");
