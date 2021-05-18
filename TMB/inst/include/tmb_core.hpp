@@ -1579,7 +1579,7 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
     else if (method == "optimize") {
       pf->optimize();
     } else {
-      Rf_error("Method unknown: ", method.c_str());
+      Rf_error("Method unknown: '%s'", method.c_str());
     }
   }
   TMB_CATCH {
