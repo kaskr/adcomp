@@ -1673,9 +1673,15 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     if (Rf_isNull(f)) Rf_error("Expected external pointer - got NULL");
-    SEXP tag = R_ExternalPtrTag(f);
-    if(tag != Rf_install("ADFun")) Rf_error("Expected ADFun pointer");
-    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+    int num_tapes = get_num_tapes(f);
+    if (num_tapes >= 2)
+      Rf_error("'InfoADFunObject' is only available for tapes with one thread");
+    adfun* pf;
+    if (num_tapes == 0)
+      pf = (adfun*) R_ExternalPtrAddr(f);
+    else {
+      pf = ( (parallelADFun<double>*) R_ExternalPtrAddr(f) ) -> vecpf[0];
+    }
     SEXP ans, names;
     PROTECT(ans = Rf_allocVector(VECSXP, 6));
     PROTECT(names = Rf_allocVector(STRSXP, 6));
@@ -1685,9 +1691,10 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     SET_STRING_ELT(names, i, Rf_mkChar(#EXPR)); \
     i++;
     // begin
-    int opstack_accumulation_tree_size =
-      TMBad::get_accumulation_tree(pf->glob).size();
-    GET_INFO(opstack_accumulation_tree_size);
+    std::vector<bool> a = pf -> activeDomain();
+    std::vector<int> ai(a.begin(), a.end());
+    vector<int> activeDomain(ai);
+    GET_INFO(activeDomain);
     int opstack_size = pf->glob.opstack.size();
     GET_INFO(opstack_size);
     int values_size = pf->glob.values.size();
