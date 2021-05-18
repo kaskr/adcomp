@@ -244,6 +244,22 @@ struct ADFun {
 
   size_t Domain() const { return glob.inv_index.size(); }
   size_t Range() const { return glob.dep_index.size(); }
+  /** \brief Which inputs are affecting *some* outputs */
+  std::vector<bool> activeDomain() {
+    std::vector<bool> mark(glob.values.size(), false);
+    for (size_t i = 0; i < glob.dep_index.size(); i++)
+      mark[glob.dep_index[i]] = true;
+    glob.reverse(mark);
+    return subset(mark, glob.inv_index);
+  }
+  /** \brief Which outputs are affected by *some* inputs */
+  std::vector<bool> activeRange() {
+    std::vector<bool> mark(glob.values.size(), false);
+    for (size_t i = 0; i < glob.inv_index.size(); i++)
+      mark[glob.inv_index[i]] = true;
+    glob.forward(mark);
+    return subset(mark, glob.dep_index);
+  }
   /** \brief Get most recent input parameter vector from the tape */
   std::vector<Scalar> DomainVec() {
     std::vector<Scalar> xd(Domain());
@@ -843,7 +859,10 @@ struct ADFun {
     set_inner_outer(ans);
     return ans;
   }
-  /** \brief Integrate as many univariate variables as possible */
+  /** \brief Integrate as many univariate variables as possible
+      \note Use `activeDomain()` to identify which variables have been
+      integrated (integrated variables are no longer active).
+  */
   ADFun marginal_gk(const std::vector<Index> &random,
                     gk_config cfg = gk_config()) {
     ADFun ans;
