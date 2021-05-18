@@ -97,8 +97,19 @@ SR <- function(x, discrete=FALSE) {
     structure(list(x=x, w=w), class="SR")
 }
 
-## TODO: Gauss Kronrod config
-GK <- function(...) {}
+##' Gauss Kronrod configuration
+##'
+##' Helper function to specify parameters used by the Gauss Kronrod
+##' integration available through the argument \code{integrate} to
+##' \code{MakeADFun}.
+##' @param ... See source code
+GK <- function(...) {
+    ans <- list(dim=1, adaptive=FALSE, debug=FALSE)
+    args <- list(...)
+    ans[names(args)] <- args
+    class(ans) <- "GK"
+    ans
+}
 
 ## TODO: Laplace approx config
 LA <- function(...) {}
