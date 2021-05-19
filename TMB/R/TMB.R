@@ -485,12 +485,15 @@ MakeADFun <- function(data, parameters, map=list(),
               stop("Names to be 'integrate'd must be among the random parameters")
           w <- which(nmpar[random] %in% names(sr_integrate))
           fac <- factor(nmpar[random[w]], levels=names(sr_integrate))
+          cfg <- list(
+              grid = sr_integrate,
+              random2grid = fac
+          )
           ## Integrate parameter subset out of the likelihood
           TransformADFunObject(ADFun,
                                method = "marginal_sr",
                                random_order = random[w],
-                               grid = sr_integrate,
-                               random2grid = fac,
+                               config = cfg,
                                mustWork = 1L)
           ## Integrated parameters must no longer be present
           TransformADFunObject(ADFun,
@@ -515,7 +518,7 @@ MakeADFun <- function(data, parameters, map=list(),
           cfg <- lapply(cfg, as.double)
           TransformADFunObject(ADFun,
                                method = "laplace",
-                               newton_cfg = cfg,
+                               config = cfg,
                                random_order = random,
                                mustWork = 1L)
           TransformADFunObject(ADFun,
