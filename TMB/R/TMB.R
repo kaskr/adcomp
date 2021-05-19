@@ -1426,18 +1426,6 @@ Rinterface <- function(file){
   cat(paste(txt,collapse="\n"))
 }
 
-## Get some info about the ADFun pointers
-info <- function(obj) {
-  if(!is.environment(obj$env)) stop("Wrong object")
-  env <- obj$env
-  fun <- function(name){
-    if(is.null(get(name,env)))return(NA)
-    unlist(.Call("InfoADFunObject",get(name,env),PACKAGE=obj$env$DLL))
-  }
-  names <- ls(env,pattern="ptr")
-  lapply(names,fun)
-}
-
 ## Recommended settings:
 ## * General non-convex case: smartsearch=TRUE
 ## * Strictly convex case:    smartsearch=FALSE and maxit=20
