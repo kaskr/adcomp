@@ -1504,23 +1504,24 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
       pf->glob.inv_index = TMBad::subset(pf->glob.inv_index, mask);
     }
     else if (method == "laplace") {
-      SEXP newton_cfg = getListElement(control, "newton_cfg");
-      newton::newton_config cfg(newton_cfg);
+      SEXP config = getListElement(control, "config");
+      newton::newton_config cfg(config);
       *pf = newton::Laplace_(*pf, random, cfg);
     }
     else if (method == "marginal_gk") {
       TMBad::gk_config cfg;
-      SEXP gk_config = getListElement(control, "gk_config");
-      if (!Rf_isNull(gk_config)) {
-        cfg.adaptive = getListInteger(gk_config, "adaptive", 0);
-        cfg.debug = getListInteger(gk_config, "debug", 0);
+      SEXP config = getListElement(control, "config");
+      if (!Rf_isNull(config)) {
+        cfg.adaptive = getListInteger(config, "adaptive", 0);
+        cfg.debug    = getListInteger(config, "debug", 0);
       }
       *pf = pf -> marginal_gk(random, cfg);
     }
     else if (method == "marginal_sr") {
+      SEXP config = getListElement(control, "config");
       std::vector<TMBad::sr_grid> grids;
-      SEXP grid = getListElement(control, "grid");
-      SEXP random2grid = getListElement(control, "random2grid");
+      SEXP grid        = getListElement(config, "grid");
+      SEXP random2grid = getListElement(config, "random2grid");
       for (int i=0; i<LENGTH(grid); i++) {
         SEXP grid_i = VECTOR_ELT(grid, i);
         SEXP x = getListElement(grid_i, "x");
