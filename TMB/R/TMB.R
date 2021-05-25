@@ -94,7 +94,7 @@ SR <- function(x, discrete=FALSE) {
         w <- diff(x)
         x <- head(x, -1) + w / 2
     }
-    structure(list(x=x, w=w), class="SR")
+    structure(list(x=x, w=w, method="marginal_sr"), class="SR")
 }
 
 ##' Gauss Kronrod configuration
@@ -107,12 +107,18 @@ GK <- function(...) {
     ans <- list(dim=1, adaptive=FALSE, debug=FALSE)
     args <- list(...)
     ans[names(args)] <- args
+    ans$method <- "marginal_gk"
     class(ans) <- "GK"
     ans
 }
 
 ## TODO: Laplace approx config
-LA <- function(...) {}
+LA <- function(...) {
+    ans <- list(...)
+    ans$method <- "laplace"
+    class(ans) <- "LA"
+    ans
+}
 
 ## 'parse' MakeADFun argument 'integrate'
 parseIntegrate <- function(arg, name) {
@@ -477,39 +483,65 @@ MakeADFun <- function(data, parameters, map=list(),
       if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
       ADFun <<- registerFinalizer(ADFun, DLL)
       if (!is.null(integrate)) {
-          sr_integrate <- parseIntegrate(integrate, "SR")
           nm <- sapply(parameters, length)
           nmpar <- rep(names(nm), nm)
-          ok <- all(names(sr_integrate) %in% nmpar[random])
-          if (!ok)
-              stop("Names to be 'integrate'd must be among the random parameters")
-          w <- which(nmpar[random] %in% names(sr_integrate))
-          fac <- factor(nmpar[random[w]], levels=names(sr_integrate))
-          cfg <- list(
-              grid = sr_integrate,
-              random2grid = fac
-          )
-          ## Integrate parameter subset out of the likelihood
-          TransformADFunObject(ADFun,
-                               method = "marginal_sr",
-                               random_order = random[w],
-                               config = cfg,
-                               mustWork = 1L)
-          ## Integrated parameters must no longer be present
-          TransformADFunObject(ADFun,
-                               method="remove_random_parameters",
-                               random_order = random[w],
-                               mustWork = 1L)
-          ## Adjust 'random' and 'par' accordingly
-          attr(ADFun$ptr, "par") <- attr(ADFun$ptr, "par")[-random[w]]
-          par_mask <- rep(FALSE, length(par))
-          par_mask[random] <- TRUE
-          par <<- par[-random[w]]
-          par_mask <- par_mask[-random[w]]
-          random <<- which(par_mask)
-          if (length(random) == 0) {
-              random <<- NULL
-              type <<- setdiff(type, "ADGrad")
+          for (i in seq_along(integrate)) {
+              I <- integrate[i]
+              ## Special case: joint integration list
+              if (is.null(names(I)) || names(I) == "") {
+                  I <- I[[1]]
+              }
+              ok <- all(names(I) %in% nmpar[random])
+              if (!ok)
+                  stop("Names to be 'integrate'd must be among the random parameters")
+              w <- which(nmpar[random] %in% names(I))
+              method <- sapply(I, function(x) x$method)
+              ok <- all(duplicated(method)[-1])
+              if (!ok)
+                  stop("Grouping only allowed for identical methods")
+              method <- method[1]
+              cfg <- NULL
+              if (method == "marginal_sr") {
+                  ## SR has special support for joint integration
+                  fac <- factor(nmpar[random[w]],
+                                levels=names(I))
+                  cfg <- list(
+                      grid = I,
+                      random2grid = fac
+                  )
+              } else {
+                  ## For other methods we use the first
+                  ## (FIXME: Test no contradicting choices)
+                  cfg <- I[[1]]
+              }
+              stopifnot (is.list(cfg))
+              ## Integrate parameter subset out of the likelihood
+              TransformADFunObject(ADFun,
+                                   method = method,
+                                   random_order = random[w],
+                                   config = cfg,
+                                   mustWork = 1L)
+              ## Find out what variables have been integrated
+              ## (only GK might not integrate all random[w])
+              activeDomain <- as.logical(info(ADFun)$activeDomain)
+              random_remove <- random[w][!activeDomain[random[w]]]
+              ## Integrated parameters must no longer be present
+              TransformADFunObject(ADFun,
+                                   method="remove_random_parameters",
+                                   random_order = random_remove,
+                                   mustWork = 1L)
+              ## Adjust 'random' and 'par' accordingly
+              attr(ADFun$ptr, "par") <- attr(ADFun$ptr, "par")[-random_remove]
+              par_mask <- rep(FALSE, length(attr(ADFun$ptr, "par")))
+              par_mask[random] <- TRUE
+              par <<- par[-random_remove]
+              nmpar <- nmpar[-random_remove]
+              par_mask <- par_mask[-random_remove]
+              random <<- which(par_mask)
+              if (length(random) == 0) {
+                  random <<- NULL
+                  type <<- setdiff(type, "ADGrad")
+              }
           }
       }
       if (intern) {
