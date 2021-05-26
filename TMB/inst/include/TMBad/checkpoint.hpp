@@ -132,7 +132,14 @@ struct CallOp_ : global::SharedDynamicOperator {
   Index input_size() const { return glob->inv_index.size(); }
   Index output_size() const { return glob->dep_index.size(); }
   const char *op_name() { return "CallOp"; }
-  void print(global::print_config cfg) { this->glob->print(cfg); }
+  void print(global::print_config cfg) {
+    Rcout << cfg.prefix;
+    Rcout << "root_var=" << root_var << " ";
+    Rcout << "self=" << self << " ";
+    Rcout << "self_replay=" << self_replay << " ";
+    Rcout << "Dglob=" << Dglob << "\n";
+    this->glob->print(cfg);
+  }
   CallOp_(global glob) : Dglob(NULL), self_replay(NULL), root_var(-1) {
     this->glob = new global(glob);
   }
@@ -188,10 +195,11 @@ struct CallOp_ : global::SharedDynamicOperator {
       Dglob = new global::Complete<CallOp_>(glob);
       Dglob->Op.self = Dglob;
       protect_child();
-      Dglob->Op.root_var = this->root_var;
     } else {
       if (next_glob() != NULL) next_glob()->clear();
     }
+
+    Dglob->Op.root_var = this->root_var;
 
     global *newglob = next_glob();
     global::replay replay(*glob, *newglob);
