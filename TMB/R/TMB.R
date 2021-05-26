@@ -542,6 +542,12 @@ MakeADFun <- function(data, parameters, map=list(),
                   random <<- NULL
                   type <<- setdiff(type, "ADGrad")
               }
+              ## Run tape optimizer
+              if (config(DLL=DLL)$optimize.instantly) {
+                  TransformADFunObject(ADFun,
+                                       method = "optimize",
+                                       mustWork = 1L)
+              }
           }
       }
       if (intern) {
