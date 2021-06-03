@@ -3478,7 +3478,8 @@ void term_info::initialize(std::vector<Index> inv_remap) {
   }
 }
 
-gk_config::gk_config() : debug(false), adaptive(false), ytol(1e-2), dx(1) {}
+gk_config::gk_config()
+    : debug(false), adaptive(false), nan2zero(true), ytol(1e-2), dx(1) {}
 
 integrate_subgraph::integrate_subgraph(global &glob, std::vector<Index> random,
                                        gk_config cfg)
