@@ -495,6 +495,10 @@ MakeADFun <- function(data, parameters, map=list(),
               if (!ok)
                   stop("Names to be 'integrate'd must be among the random parameters")
               w <- which(nmpar[random] %in% names(I))
+              ## Argument 'which' is common to all methods
+              arg_which <- I[[1]]$which
+              if ( ! is.null(arg_which) )
+                  w <- w[arg_which]
               method <- sapply(I, function(x) x$method)
               ok <- all(duplicated(method)[-1])
               if (!ok)
