@@ -232,6 +232,11 @@ struct term_info {
 struct gk_config {
   bool debug;
   bool adaptive;
+  bool nan2zero; /**< Signify that `nan` values of the log-integrand
+                    can be replaced by zero to handle numerically
+                    fragile implementations such as for example
+                    `log(f(x))=-exp(x)+log(exp(x))` which returns nan
+                    for large x. */
   double ytol;
   double dx;
   gk_config();
@@ -313,7 +318,7 @@ struct logIntegrate_t {
     p_replay->value_inv(k - 1) = sigma * u + mu;
     p_replay->forward(false, false);
     Float ans = exp(p_replay->value_dep(0) - f_mu);
-    if (ans == INFINITY) ans = INFINITY;
+    if (cfg.nan2zero && ans != ans) ans = 0;
     return ans;
   }
 
@@ -325,7 +330,6 @@ struct logIntegrate_t {
     Index k = glob.inv_index.size();
     for (Index i = 0; i < k - 1; i++) replay.value_inv(i) = x[i];
     Float I = integrate(*this);
-    if (I == INFINITY) I = 0;
     Float ans = log(I) + log(sigma) + f_mu;
     replay.stop();
     return std::vector<ad_plain>(1, ans);
