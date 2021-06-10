@@ -407,9 +407,10 @@ struct ADFun {
   /** \brief Evaluate function for ad vector input \details Runs a
       forward replay to current active tape `get_glob()`.  \warning
       There must be an active tape and the ad inputs must correspond
-      to the active tape.
+      to the active tape (FIXME: This comment is outdated I think).
   */
-  std::vector<ad> operator()(const std::vector<ad> &x) const {
+  std::vector<ad> operator()(const std::vector<ad> &x_) const {
+    std::vector<ad> x(x_.begin(), x_.end());
     ASSERT(x.size() == Domain());
     for (size_t i = 0; i < x.size(); i++) {
       x[i].addToTape();
@@ -526,7 +527,10 @@ struct ADFun {
     for (size_t k = 0; k < Domain(); k++) ans[k] = glob.deriv_inv(k);
     return ans;
   }
-  std::vector<ad> Jacobian(const std::vector<ad> &x, const std::vector<ad> &w) {
+  std::vector<ad> Jacobian(const std::vector<ad> &x_,
+                           const std::vector<ad> &w_) {
+    std::vector<ad> x(x_.begin(), x_.end());
+    std::vector<ad> w(w_.begin(), w_.end());
     global *cur_glob = get_glob();
 
     ASSERT(x.size() == Domain());
