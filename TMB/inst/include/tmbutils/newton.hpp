@@ -559,6 +559,8 @@ struct newton_config {
   /** \brief Detect an additional low rank contribution in sparse case? */
   bool lowrank;
   bool decompose;
+  /** \brief Detect and apply 'dead gradients' simplification */
+  bool simplify;
   /** \brief Behaviour on convergence failure: Report nan-solution ? */
   bool on_failure_return_nan;
   /** \brief Behaviour on convergence failure: Throw warning ?*/
@@ -578,6 +580,7 @@ struct newton_config {
     SET_DEFAULT(sparse, false);
     SET_DEFAULT(lowrank, false);
     SET_DEFAULT(decompose, true);
+    SET_DEFAULT(simplify, false);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
 #undef SET_DEFAULT
@@ -638,6 +641,24 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     keep_inner.resize(function.Domain(), false);
     // Gradient function
     gradient = function.JacFun(keep_inner);
+    if (cfg.simplify) {
+      // Masks
+      std::vector<bool> active = gradient.activeDomain();
+      for (size_t i=0; i<n_inner; i++) active[i] = true;
+      std::vector<bool> active_inner(active.begin(), active.begin() + n_inner);
+      std::vector<bool> active_outer(active.begin() + n_inner, active.end());
+      // update function
+      function.glob.inv_index = TMBad::subset(function.glob.inv_index, active);
+      function.inner_inv_index = TMBad::subset(function.inner_inv_index, active_inner);
+      function.outer_inv_index = TMBad::subset(function.outer_inv_index, active_outer);
+      // update gradient
+      gradient.glob.inv_index = TMBad::subset(gradient.glob.inv_index, active);
+      gradient.inner_inv_index = TMBad::subset(gradient.inner_inv_index, active_inner);
+      gradient.outer_inv_index = TMBad::subset(gradient.outer_inv_index, active_outer);
+      // update other stuff
+      par_outer = TMBad::subset(par_outer, active_outer);
+      ASSERT(n_inner == (size_t) function.inner_inv_index.size());
+    }
     gradient.optimize();
     // Hessian
     hessian = std::make_shared<Hessian_Type>(function, gradient, n_inner);
@@ -862,8 +883,9 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
   typedef typename Hessian_Type::template MatrixResult<Type>::type hessian_t;
   vector<Type> sol; // c(sol, par_outer)
   size_t n; // Number of inner parameters
+  Functor& F;
   NewtonSolver(Functor &F, vector<Type> start, newton_config cfg) :
-    Base(F, start, cfg), n(start.size()) {
+    Base(F, start, cfg), n(start.size()), F(F) {
     Newton_CTOR_Hook(*this, start);
   }
   // Get solution
@@ -874,7 +896,11 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
     return sol.head(n);
   }
   Type value() {
-    return Base::function(std::vector<Type>(sol))[0];
+    if (Base::cfg.simplify) {
+      return F(solution())[0];
+    } else {
+      return Base::function(std::vector<Type>(sol))[0];
+    }
   }
   hessian_t hessian() {
     return (*(Base::hessian))(std::vector<Type>(sol));
