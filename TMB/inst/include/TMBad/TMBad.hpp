@@ -230,8 +230,20 @@ struct ADFun {
     ASSERT2(inv_pos.size() == 0,
             "Tape has 'cached independent variable positions' which would be "
             "invalidated by the optimizer");
+
+    std::vector<bool> outer_mask;
+    if (inner_outer_in_use()) {
+      outer_mask = DomainOuterMask();
+    }
+
     remap_identical_sub_expressions(glob);
+
     glob.eliminate();
+
+    if (inner_outer_in_use()) {
+      ASSERT(outer_mask.size() == Domain());
+      set_inner_outer(*this, outer_mask);
+    }
   }
   /** \brief Reorder computational graph
       Let random effects come last
@@ -1038,6 +1050,12 @@ struct ADFun {
   bool inner_outer_in_use() {
     return (DomainInner() > 0) || (DomainOuter() > 0);
   }
+  /** \brief Helper: Boolean mask of outer parameters */
+  std::vector<bool> DomainOuterMask() {
+    std::vector<bool> mark_outer =
+        glob.mark_space(glob.values.size(), outer_inv_index);
+    return subset(mark_outer, glob.inv_index);
+  }
   /** \brief Helper: Pass on inner/outer information to a new tape.
       Some parameters are marked as 'outer parameters'. All other
       prameters are 'inner'.  This function passes on inner/outer
@@ -1045,16 +1063,28 @@ struct ADFun {
       parameter ordering** but **may increase or reduce the parameter
       list**.
   */
+  void set_inner_outer(ADFun &ans, const std::vector<bool> &outer_mask) {
+    if (inner_outer_in_use()) {
+      std::vector<bool> mark(outer_mask);
+      mark.resize(ans.Domain(), false);
+
+      ans.outer_inv_index = subset(ans.glob.inv_index, mark);
+
+      mark.flip();
+
+      ans.inner_inv_index = subset(ans.glob.inv_index, mark);
+    }
+  }
   void set_inner_outer(ADFun &ans) {
     if (inner_outer_in_use()) {
-      std::vector<bool> mark_outer =
-          glob.mark_space(glob.values.size(), outer_inv_index);
-      mark_outer = subset(mark_outer, glob.inv_index);
-      mark_outer.resize(ans.Domain(), false);
-      ans.outer_inv_index = subset(ans.glob.inv_index, mark_outer);
-      mark_outer.flip();
-      ans.inner_inv_index = subset(ans.glob.inv_index, mark_outer);
+      set_inner_outer(ans, DomainOuterMask());
     }
+  }
+  void DomainReduce(const std::vector<bool> &inv_keep) {
+    std::vector<bool> outer_mask = DomainOuterMask();
+    outer_mask = subset(outer_mask, inv_keep);
+    glob.inv_index = subset(glob.inv_index, inv_keep);
+    set_inner_outer(*this, outer_mask);
   }
 };
 
