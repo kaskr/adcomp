@@ -580,7 +580,7 @@ struct newton_config {
     SET_DEFAULT(sparse, false);
     SET_DEFAULT(lowrank, false);
     SET_DEFAULT(decompose, true);
-    SET_DEFAULT(simplify, false);
+    SET_DEFAULT(simplify, true);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
 #undef SET_DEFAULT
@@ -650,6 +650,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       std::vector<bool> active_outer(active.begin() + n_inner, active.end());
       par_outer = TMBad::subset(par_outer, active_outer);
       ASSERT(n_inner == (size_t) function.inner_inv_index.size());
+      function.optimize();
     }
     gradient.optimize();
     // Hessian
