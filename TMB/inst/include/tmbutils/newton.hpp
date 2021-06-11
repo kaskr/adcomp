@@ -644,18 +644,10 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     if (cfg.simplify) {
       // Masks
       std::vector<bool> active = gradient.activeDomain();
-      for (size_t i=0; i<n_inner; i++) active[i] = true;
-      std::vector<bool> active_inner(active.begin(), active.begin() + n_inner);
+      for (size_t i=0; i<n_inner; i++) active[i] = true; // just in case ...
+      function.DomainReduce(active);
+      gradient.DomainReduce(active);
       std::vector<bool> active_outer(active.begin() + n_inner, active.end());
-      // update function
-      function.glob.inv_index = TMBad::subset(function.glob.inv_index, active);
-      function.inner_inv_index = TMBad::subset(function.inner_inv_index, active_inner);
-      function.outer_inv_index = TMBad::subset(function.outer_inv_index, active_outer);
-      // update gradient
-      gradient.glob.inv_index = TMBad::subset(gradient.glob.inv_index, active);
-      gradient.inner_inv_index = TMBad::subset(gradient.inner_inv_index, active_inner);
-      gradient.outer_inv_index = TMBad::subset(gradient.outer_inv_index, active_outer);
-      // update other stuff
       par_outer = TMBad::subset(par_outer, active_outer);
       ASSERT(n_inner == (size_t) function.inner_inv_index.size());
     }
