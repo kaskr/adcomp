@@ -718,7 +718,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         return
           convergence_fail("Invalid initial guess", x);
       }
-      if (function(x_start)[0] < function(x)[0])
+      if (f_x_start < f_x || ! std::isfinite(f_x))
         x = x_start;
     }
     for (int i=0; i < cfg.maxit; i++) {
