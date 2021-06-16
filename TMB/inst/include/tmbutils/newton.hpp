@@ -530,6 +530,8 @@ struct newton_config {
   int maxit;
   /** \brief Max number of allowed rejections */
   int max_reject;
+  /** \brief `max_reject` exceeded is convergence success **provided** that Hessian is PD? */
+  int ok_exit_if_pdhess;
   /** \brief Print trace info? */
   int trace;
   /** \brief Convergence tolerance of max gradient component */
@@ -569,6 +571,7 @@ struct newton_config {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
     SET_DEFAULT(max_reject, 10);
+    SET_DEFAULT(ok_exit_if_pdhess, 1);
     SET_DEFAULT(trace, 0);
     SET_DEFAULT(grad_tol, 1e-8);
     SET_DEFAULT(step_tol, 1e-8);
@@ -782,9 +785,17 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         // Reject
         cfg.ustep = decrease(cfg.ustep);
         reject_counter ++;
-        if (reject_counter > cfg.max_reject)
+        if (reject_counter > cfg.max_reject) {
+          if (cfg.ok_exit_if_pdhess) {
+            H = (*hessian)(std::vector<Scalar>(x));
+            // Try to factorize
+            hessian -> llt_factorize(H);
+            bool PD = (hessian -> llt_info() == 0);
+            if (PD) return msg;
+          }
           return
             convergence_fail("Max number of rejections exceeded", x);
+        }
       }
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "reject=" << reject_counter << " ";
