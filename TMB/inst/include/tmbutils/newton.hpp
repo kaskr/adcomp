@@ -710,17 +710,20 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     int reject_counter = 0;
     Scalar f_previous = INFINITY;
     const char* msg = NULL;
+    Scalar f_x = function(x)[0];
     if (x_start.size() == x.size()) {
       Scalar f_x_start = function(x_start)[0];
-      Scalar f_x = function(x)[0];
       if ( ! std::isfinite(f_x_start) &&
            ! std::isfinite(f_x) ) {
         return
           convergence_fail("Invalid initial guess", x);
       }
-      if (f_x_start < f_x || ! std::isfinite(f_x))
+      if (f_x_start < f_x || ! std::isfinite(f_x)) {
         x = x_start;
+        f_x = f_x_start;
+      }
     }
+    if (cfg.trace) std::cout << "f_start=" << f_x << "\n";
     for (int i=0; i < cfg.maxit; i++) {
       vector<Scalar> g = gradient(x);
       Scalar mgc = g.abs().maxCoeff();
@@ -745,8 +748,14 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       }
       typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
         H = (*hessian)(std::vector<Scalar>(x));
-      if (cfg.trace) std::cout << "ustep=" << cfg.ustep << " ";
       vector<Scalar> diag_cpy = H.diagonal().array();
+      // Quick ustep reduction based on Hessian diagonal
+      Scalar m = diag_cpy.minCoeff();
+      if (std::isfinite(m) && m < 0) {
+        Scalar ustep_max = invphi(-m);
+        cfg.ustep = std::min(cfg.ustep, ustep_max);
+      }
+      if (cfg.trace) std::cout << "ustep=" << cfg.ustep << " ";
       while (true) { // FIXME: Infinite loop
         // H := H + phi * I
         H.diagonal().array() = diag_cpy;
@@ -778,6 +787,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
             convergence_fail("Max number of rejections exceeded", x);
       }
       if (cfg.trace) std::cout << "f=" << f << " ";
+      if (cfg.trace) std::cout << "reject=" << reject_counter << " ";
       if (cfg.trace) std::cout << "\n";
     }
     return
