@@ -58,7 +58,8 @@ Float tweedie_logW(Float y, Float phi, Float p){
 
   /* set limit for # terms in the sum */
   int nterms = imin2(imax(&jd, 1), TWEEDIE_NTERM), iterm ;
-  Float *ww = Calloc(nterms, Float) ;
+  std::vector<Float> wrk(nterms, 0.);
+  Float* ww = wrk.data();
   /* evaluate series using the finite sum*/
   /* y > 0 */
   sum_ww = 0.0 ;
@@ -71,7 +72,6 @@ Float tweedie_logW(Float y, Float phi, Float p){
   for (int k = 0; k < iterm; k++)
     sum_ww += exp(ww[k] - ww_max);
   Float ans = log(sum_ww) + ww_max  ;
-  Free(ww);
 
   return ans;
 }
