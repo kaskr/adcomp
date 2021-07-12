@@ -768,7 +768,12 @@ struct ADFun {
     ans.m = Range();
     ans.n = Domain();
 
+    if (keep_x.size() == 0) keep_x.resize(Domain(), true);
+    if (keep_y.size() == 0) keep_y.resize(Range(), true);
     std::vector<bool> keep_var = get_keep_var(keep_x, keep_y);
+
+    size_t keep_x_count = std::count(keep_x.begin(), keep_x.end(), true);
+    size_t keep_y_count = std::count(keep_y.begin(), keep_y.end(), true);
 
     graph G = this->glob.reverse_graph(keep_var);
 
@@ -844,6 +849,9 @@ struct ADFun {
 
           replay.clear_deriv_sub();
           Rcout << "done\n";
+
+          ASSERT(atomic_jac_row.Domain() == this->Domain() + this->Range());
+          ASSERT(atomic_jac_row.Range() == keep_x_count);
         }
         std::vector<Replay> vec(atomic_jac_row.Domain(), Replay(0));
         for (size_t i = 0; i < this->Domain(); i++) {
@@ -851,8 +859,9 @@ struct ADFun {
         }
         vec[this->Domain() + k] = 1.;
         std::vector<Replay> r = atomic_jac_row(vec);
+        size_t r_idx = 0;
         for (size_t i = 0; i < this->Domain(); i++) {
-          replay.deriv_inv(i) = r[i];
+          if (keep_x[i]) replay.deriv_inv(i) = r[r_idx++];
         }
       }
       for (size_t l = 0; l < col_idx.size(); l++) {
@@ -864,12 +873,12 @@ struct ADFun {
       if (keep_x.size() > 0) {
         std::vector<Index> remap_j = cumsum0<Index>(keep_x);
         ans.j = TMBad::subset(remap_j, ans.j);
-        ans.n = std::count(keep_x.begin(), keep_x.end(), true);
+        ans.n = keep_x_count;
       }
       if (keep_y.size() > 0) {
         std::vector<Index> remap_i = cumsum0<Index>(keep_y);
         ans.i = TMBad::subset(remap_i, ans.i);
-        ans.m = std::count(keep_y.begin(), keep_y.end(), true);
+        ans.m = keep_y_count;
       }
     }
     set_inner_outer(ans);
