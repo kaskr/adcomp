@@ -8,6 +8,13 @@
    ============================================
 */
 
+#ifdef TMBAD_SUPERNODAL
+#include "supernodal_inverse_subset.hpp"
+typedef Eigen::Accessible_CholmodSupernodalLLT DEFAULT_SPARSE_FACTORIZATION;
+#else
+typedef Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > DEFAULT_SPARSE_FACTORIZATION;
+#endif
+
 #include <memory>
 /** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
 namespace newton {
@@ -200,7 +207,7 @@ struct jacobian_dense_t : TMBad::ADFun<> {
 /* --- Sparse Hessian ----------------------------------------------------- */
 
 /** \brief Methods specific for a sparse hessian */
-template<class Factorization=Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > >
+template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
 struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   typedef TMBad::Sparse<TMBad::ADFun<> > Base;
   template<class T>
@@ -880,6 +887,61 @@ Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<T
     log_determinant(H.H0, NULL) +
     log_determinant(M, NULL);
 }
+
+#ifdef TMBAD_SUPERNODAL
+typedef jacobian_sparse_t< Eigen::Accessible_CholmodSupernodalLLT > jacobian_sparse_supernodal_t;
+struct LogDetOperator : TMBad::global::SharedDynamicOperator {
+  static const bool have_input_size_output_size = true;
+  static const bool add_forward_replay_copy = true;
+  typedef TMBad::Scalar Scalar;
+  std::shared_ptr< jacobian_sparse_supernodal_t > hessian; // Has Factorization
+  Eigen::SupernodalInverseSubset<double> ihessian;
+  LogDetOperator(std::shared_ptr< jacobian_sparse_supernodal_t > hessian) : hessian(hessian), ihessian(&(hessian->llt)) { }
+  TMBad::Index input_size() const {
+    return hessian->Range();
+  }
+  TMBad::Index output_size() const {
+    return 1;
+  }
+  void forward(TMBad::ForwardArgs<Scalar> &args) {
+    size_t n = input_size();
+    std::vector<Scalar>
+      x = args.x_segment(0, n);
+    Eigen::SparseMatrix<Scalar> h = hessian->template as_matrix(x);
+    hessian->llt_factorize(h);
+    args.y(0) = (hessian->llt).logDeterminant();
+  }
+  void reverse(TMBad::ReverseArgs<Scalar> &args) {
+    size_t n = input_size();
+    std::vector<Scalar> x(n, 0);
+    Eigen::SparseMatrix<Scalar> ih = hessian->template as_matrix(x);
+    // Inverse subset
+    ihessian.chol_get_cached_values(); // Skip forward recursions
+    ihessian.chol2inv();
+    ihessian.values<Eigen::SupernodalInverseSubset<double>::Get> (ih);
+    ih.diagonal() *= .5;
+    ih *= 2.;
+    ih *= args.dy(0);
+    args.dx_segment(0, n) += ih.valuePtr();
+  }
+  template<class T>
+  void reverse(TMBad::ReverseArgs<T> &args) { ASSERT(false); }
+  template<class T>
+  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  const char* op_name() { return "logDet"; }
+};
+template<class Type>
+Type log_determinant(const Eigen::SparseMatrix<Type> &H,
+                     std::shared_ptr< jacobian_sparse_supernodal_t > ptr) {
+  const Type* vptr = H.valuePtr();
+  size_t n = ptr -> Range();
+  std::vector<Type> x(vptr, vptr + n);
+  TMBad::global::Complete<LogDetOperator> LD(ptr);
+  std::vector<Type> y = LD(x);
+  return y[0];
+}
+#endif
 
 // Interface
 template<class Newton>
