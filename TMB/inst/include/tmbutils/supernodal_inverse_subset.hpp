@@ -264,13 +264,20 @@ struct SupernodalInverseSubset {
       }
     }
   }
-  std::vector<T> check_chol() {
-    double* x = chm->get_x();
-    for (size_t i=0; i<ans.size(); i++)
-      ans[i] -= x[i];
-    return ans;
+  SpMat operator()(SpMat x) {
+    // forward recursions (use cached values if T=double)
+    if (isDouble<T>::value) {
+      chol_get_cached_values();
+    } else {
+      chol(x);
+    }
+    // Reverse
+    chol2inv();
+    // Get result
+    x = x * 0;
+    values<Get> (x);
+    return x;
   }
-  // Note: CTOR requires double - not templated scalar type !
   SupernodalInverseSubset(Base* chm) :
     chm(chm) { }
   void print_common() {
