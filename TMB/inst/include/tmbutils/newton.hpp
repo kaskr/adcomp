@@ -890,6 +890,63 @@ Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<T
 
 #ifdef TMBAD_SUPERNODAL
 typedef jacobian_sparse_t< Eigen::Accessible_CholmodSupernodalLLT > jacobian_sparse_supernodal_t;
+struct InvSubOperator : TMBad::global::SharedDynamicOperator {
+  static const bool have_input_size_output_size = true;
+  static const bool add_forward_replay_copy = true;
+  typedef TMBad::Scalar Scalar;
+  std::shared_ptr< jacobian_sparse_supernodal_t > hessian; // Has Factorization
+  Eigen::SupernodalInverseSubset<double> ihessian;
+  //typedef Eigen::AutoDiffScalar<Eigen::Array<double, 1, 1> > ad1;
+  typedef atomic::tiny_ad::variable<1,1> ad1;
+  Eigen::SupernodalInverseSubset<ad1> D_ihessian;
+  InvSubOperator(std::shared_ptr< jacobian_sparse_supernodal_t > hessian) :
+    hessian(hessian), ihessian(&(hessian->llt)), D_ihessian(&(hessian->llt)) { }
+  TMBad::Index input_size() const {
+    return hessian->Range();
+  }
+  TMBad::Index output_size() const {
+    return hessian->Range();
+  }
+  void forward(TMBad::ForwardArgs<Scalar> &args) {
+    size_t n = input_size();
+    std::vector<Scalar>
+      x = args.x_segment(0, n);
+    Eigen::SparseMatrix<Scalar> h = hessian->template as_matrix(x);
+    hessian->llt_factorize(h); // Update shared factorization
+    h = ihessian(h);
+    args.y_segment(0, n) = h.valuePtr();
+  }
+  void reverse(TMBad::ReverseArgs<Scalar> &args) {
+    size_t n = input_size();
+    std::vector<Scalar> x  = args. x_segment(0, n);
+    std::vector<Scalar> dy = args.dy_segment(0, n);
+    Eigen::SparseMatrix<Scalar> dy_mat = hessian->template as_matrix(dy);
+    // Symmetry correction (range direction)
+    dy_mat.diagonal() *= 2.; dy_mat *= .5;
+    std::vector<ad1> x_ (n);
+    for (size_t i=0; i<n; i++) {
+      x_[i].value = x[i];
+      x_[i].deriv[0] = dy_mat.valuePtr()[i];
+    }
+    Eigen::SparseMatrix<ad1> h_ = hessian->template as_matrix(x_);
+    // Inverse subset
+    h_ = D_ihessian(h_);
+    // Symmetry correction
+    h_.diagonal() *= .5; h_ *= 2.;
+    // Gather result
+    std::vector<Scalar> dx(n);
+    for (size_t i=0; i<n; i++) {
+      dx[i] = h_.valuePtr()[i].deriv[0];
+    }
+    args.dx_segment(0, n) += dx;
+  }
+  template<class T>
+  void reverse(TMBad::ReverseArgs<T> &args) { ASSERT(false); }
+  template<class T>
+  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  const char* op_name() { return "InvSub"; }
+};
 struct LogDetOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
@@ -916,16 +973,23 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
     std::vector<Scalar> x(n, 0);
     Eigen::SparseMatrix<Scalar> ih = hessian->template as_matrix(x);
     // Inverse subset
-    ihessian.chol_get_cached_values(); // Skip forward recursions
-    ihessian.chol2inv();
-    ihessian.values<Eigen::SupernodalInverseSubset<double>::Get> (ih);
-    ih.diagonal() *= .5;
-    ih *= 2.;
+    ih = ihessian(ih);
+    // Symmetry correction
+    ih.diagonal() *= .5; ih *= 2.;
     ih *= args.dy(0);
     args.dx_segment(0, n) += ih.valuePtr();
   }
-  template<class T>
-  void reverse(TMBad::ReverseArgs<T> &args) { ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::ad_aug> &args) {
+    size_t n = input_size();
+    TMBad::global::Complete<InvSubOperator> IS(hessian);
+    std::vector<TMBad::ad_aug> x = args.x_segment(0, n);
+    std::vector<TMBad::ad_aug> y = IS(x);
+    Eigen::SparseMatrix<TMBad::ad_aug> ih = hessian->template as_matrix(y);
+    // Symmetry correction
+    ih.diagonal() *= .5; ih *= 2.;
+    ih *= args.dy(0);
+    args.dx_segment(0, n) += ih.valuePtr();
+  }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
