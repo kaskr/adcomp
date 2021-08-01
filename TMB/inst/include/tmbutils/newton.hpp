@@ -147,16 +147,16 @@ struct jacobian_dense_t : TMBad::ADFun<> {
     typedef matrix<T> type;
   };
   size_t n;
-  Factorization llt;
+  std::shared_ptr<Factorization> llt;
   jacobian_dense_t() {}
   // FIXME: Want const &F, &G, &H
   // -->   JacFun, var2op, get_keep_var  -->  const
   jacobian_dense_t(TMBad::ADFun<> &H, size_t n) :
-    n(n) {
+    n(n), llt(std::make_shared<Factorization>()) {
     Base::operator= ( H );
   }
   jacobian_dense_t(TMBad::ADFun<> &F, TMBad::ADFun<> &G, size_t n) :
-    n(n) {
+    n(n), llt(std::make_shared<Factorization>()) {
     std::vector<bool> keep_x(n, true); // inner
     keep_x.resize(G.Domain(), false);  // outer
     std::vector<bool> keep_y(n, true); // inner
@@ -185,16 +185,16 @@ struct jacobian_dense_t : TMBad::ADFun<> {
   }
   // Sparse.factorize() == Dense.compute()
   void llt_factorize(const matrix<TMBad::Scalar> &h) {
-    llt.compute(h);
+    llt->compute(h);
   }
   Eigen::ComputationInfo llt_info() {
-    return llt.info();
+    return llt->info();
   }
   /** \note Optional: This method allows the assumption that a prior
       call to `llt_factorize` has been performed for the same H */
   matrix<TMBad::Scalar> llt_solve(const matrix<TMBad::Scalar> &H,
                                   const matrix<TMBad::Scalar> &x) {
-    return llt.solve(x);
+    return llt->solve(x);
   }
   template<class T>
   vector<T> solve(std::shared_ptr<jacobian_dense_t> ptr,
@@ -215,7 +215,7 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     typedef Eigen::SparseMatrix<T> type;
   };
   size_t n;
-  Factorization llt;
+  std::shared_ptr<Factorization> llt;
   jacobian_sparse_t& operator=(const jacobian_sparse_t &other) {
     Base::operator=(other);
     n = other.n;
@@ -227,10 +227,11 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
   jacobian_sparse_t() {}
   void init_llt() {
+    llt = std::make_shared<Factorization>();
     // Analyze pattern
     std::vector<TMBad::Scalar> dummy(this->Range(), 0);
     Eigen::SparseMatrix<TMBad::Scalar> H_dummy = as_matrix(dummy);
-    llt.analyzePattern(H_dummy);
+    llt->analyzePattern(H_dummy);
   }
   // FIXME: &F, &G, &H const !!!
   jacobian_sparse_t(TMBad::Sparse<TMBad::ADFun<> > &H, size_t n) :
@@ -284,16 +285,16 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
   }
   // Sparse.factorize() == Dense.compute()
   void llt_factorize(const Eigen::SparseMatrix<TMBad::Scalar> &h) {
-    llt.factorize(h);
+    llt->factorize(h);
   }
   Eigen::ComputationInfo llt_info() {
-    return llt.info();
+    return llt->info();
   }
   /** \note Optional: This method allows the assumption that a prior
       call to `llt_factorize` has been performed for the same H */
   matrix<TMBad::Scalar> llt_solve(const Eigen::SparseMatrix<TMBad::Scalar> &H,
                                   const matrix<TMBad::Scalar> &x) {
-    return llt.solve(x);
+    return llt->solve(x);
   }
   template<class T>
   vector<T> solve(std::shared_ptr<jacobian_sparse_t> ptr,
@@ -900,7 +901,7 @@ struct InvSubOperator : TMBad::global::SharedDynamicOperator {
   typedef atomic::tiny_ad::variable<1,1> ad1;
   Eigen::SupernodalInverseSubset<ad1> D_ihessian;
   InvSubOperator(std::shared_ptr< jacobian_sparse_supernodal_t > hessian) :
-    hessian(hessian), ihessian(&(hessian->llt)), D_ihessian(&(hessian->llt)) { }
+    hessian(hessian), ihessian(hessian->llt), D_ihessian(hessian->llt) { }
   TMBad::Index input_size() const {
     return hessian->Range();
   }
@@ -953,7 +954,7 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
   typedef TMBad::Scalar Scalar;
   std::shared_ptr< jacobian_sparse_supernodal_t > hessian; // Has Factorization
   Eigen::SupernodalInverseSubset<double> ihessian;
-  LogDetOperator(std::shared_ptr< jacobian_sparse_supernodal_t > hessian) : hessian(hessian), ihessian(&(hessian->llt)) { }
+  LogDetOperator(std::shared_ptr< jacobian_sparse_supernodal_t > hessian) : hessian(hessian), ihessian(hessian->llt) { }
   TMBad::Index input_size() const {
     return hessian->Range();
   }
@@ -966,7 +967,7 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
       x = args.x_segment(0, n);
     Eigen::SparseMatrix<Scalar> h = hessian->template as_matrix(x);
     hessian->llt_factorize(h);
-    args.y(0) = (hessian->llt).logDeterminant();
+    args.y(0) = hessian->llt->logDeterminant();
   }
   void reverse(TMBad::ReverseArgs<Scalar> &args) {
     size_t n = input_size();
