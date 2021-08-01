@@ -54,7 +54,7 @@ struct SupernodalInverseSubset {
     Update
   };
   // workspaces
-  Base* chm;
+  std::shared_ptr<Base> chm;
   std::vector<StorageIndex> col2super;
   std::vector<StorageIndex> col2offset;
   std::vector<StorageIndex> idg;
@@ -278,7 +278,7 @@ struct SupernodalInverseSubset {
     values<Get> (x);
     return x;
   }
-  SupernodalInverseSubset(Base* chm) :
+  SupernodalInverseSubset(std::shared_ptr<Base> chm) :
     chm(chm) { }
   void print_common() {
     cholmod_print_common("C", &(chm->cholmod()));
