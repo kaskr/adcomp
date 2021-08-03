@@ -1024,11 +1024,27 @@ template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H,
                      std::shared_ptr< jacobian_sparse_supernodal_t > ptr) {
   const Type* vptr = H.valuePtr();
-  size_t n = ptr -> Range();
+  size_t n = H.nonZeros();
   std::vector<Type> x(vptr, vptr + n);
   TMBad::global::Complete<LogDetOperator> LD(pattern<double>(H), ptr->llt);
   std::vector<Type> y = LD(x);
   return y[0];
+}
+template<class Type>
+Type log_determinant(const Eigen::SparseMatrix<Type> &H) {
+  const Type* vptr = H.valuePtr();
+  size_t n = H.nonZeros();
+  std::vector<Type> x(vptr, vptr + n);
+  Eigen::SparseMatrix<double> H_pattern = pattern<double>(H);
+  std::shared_ptr< DEFAULT_SPARSE_FACTORIZATION > llt =
+    std::make_shared< DEFAULT_SPARSE_FACTORIZATION > (H_pattern);
+  TMBad::global::Complete<LogDetOperator> LD(H_pattern, llt);
+  std::vector<Type> y = LD(x);
+  return y[0];
+}
+double log_determinant(const Eigen::SparseMatrix<double> &H) {
+  DEFAULT_SPARSE_FACTORIZATION llt(H);
+  return llt.logDeterminant();
 }
 #endif
 
