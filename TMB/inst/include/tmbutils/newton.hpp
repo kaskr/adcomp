@@ -29,9 +29,18 @@ Eigen::SparseMatrix<NewType> pattern(const Eigen::SparseMatrix<OldType> &S,
 
 #ifdef TMBAD_SUPERNODAL
 #include "supernodal_inverse_subset.hpp"
+#define INVERSE_SUBSET_TEMPLATE Eigen::SupernodalInverseSubset
 typedef Eigen::Accessible_CholmodSupernodalLLT DEFAULT_SPARSE_FACTORIZATION;
+inline double logDeterminant(const DEFAULT_SPARSE_FACTORIZATION &llt) {
+  return llt.logDeterminant();
+}
 #else
+#include "simplicial_inverse_subset.hpp"
+#define INVERSE_SUBSET_TEMPLATE Eigen::SimplicialInverseSubset
 typedef Eigen::SimplicialLLT<Eigen::SparseMatrix<double> > DEFAULT_SPARSE_FACTORIZATION;
+inline double logDeterminant(const DEFAULT_SPARSE_FACTORIZATION &llt) {
+  return 2. * llt.matrixL().nestedExpression().diagonal().array().log().sum();
+}
 #endif
 
 #include <memory>
@@ -908,20 +917,22 @@ Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<T
     log_determinant(M, NULL);
 }
 
-#ifdef TMBAD_SUPERNODAL
-typedef jacobian_sparse_t< Eigen::Accessible_CholmodSupernodalLLT > jacobian_sparse_supernodal_t;
+// FIXME: jacobian_sparse_supernodal_t RENAME !!!
+typedef jacobian_sparse_t< DEFAULT_SPARSE_FACTORIZATION > jacobian_sparse_supernodal_t;
+
+template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
 struct InvSubOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   typedef TMBad::Scalar Scalar;
   Eigen::SparseMatrix<Scalar> hessian; // Pattern
-  std::shared_ptr< DEFAULT_SPARSE_FACTORIZATION > llt; // Factorization
-  Eigen::SupernodalInverseSubset<double> ihessian;
+  std::shared_ptr< Factorization > llt; // Factorization
+  INVERSE_SUBSET_TEMPLATE<double> ihessian;
   //typedef Eigen::AutoDiffScalar<Eigen::Array<double, 1, 1> > ad1;
   typedef atomic::tiny_ad::variable<1,1> ad1;
-  Eigen::SupernodalInverseSubset<ad1> D_ihessian;
+  INVERSE_SUBSET_TEMPLATE<ad1> D_ihessian;
   InvSubOperator(const Eigen::SparseMatrix<Scalar> &hessian,
-                 std::shared_ptr< DEFAULT_SPARSE_FACTORIZATION > llt) :
+                 std::shared_ptr< Factorization > llt) :
     hessian(hessian), llt(llt), ihessian(llt), D_ihessian(llt) { }
   TMBad::Index input_size() const {
     return hessian.nonZeros();
@@ -969,15 +980,16 @@ struct InvSubOperator : TMBad::global::SharedDynamicOperator {
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
   const char* op_name() { return "InvSub"; }
 };
+template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
 struct LogDetOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   typedef TMBad::Scalar Scalar;
   Eigen::SparseMatrix<Scalar> hessian; // Pattern
-  std::shared_ptr< DEFAULT_SPARSE_FACTORIZATION > llt; // Factorization
-  Eigen::SupernodalInverseSubset<double> ihessian;
+  std::shared_ptr< Factorization > llt; // Factorization
+  INVERSE_SUBSET_TEMPLATE<double> ihessian;
   LogDetOperator(const Eigen::SparseMatrix<Scalar> &hessian,
-                 std::shared_ptr< DEFAULT_SPARSE_FACTORIZATION > llt) :
+                 std::shared_ptr< Factorization > llt) :
     hessian(hessian), llt(llt), ihessian(llt) { }
   TMBad::Index input_size() const {
     return hessian.nonZeros();
@@ -991,11 +1003,11 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
       x = args.x_segment(0, n);
     Eigen::SparseMatrix<Scalar> h = pattern(hessian, x);
     llt->factorize(h);
-    args.y(0) = llt->logDeterminant();
+    args.y(0) = logDeterminant(*llt);
   }
   void reverse(TMBad::ReverseArgs<Scalar> &args) {
     size_t n = input_size();
-    std::vector<Scalar> x(n, 0);
+    std::vector<Scalar> x = args.x_segment(0, n);
     Eigen::SparseMatrix<Scalar> ih = pattern(hessian, x);
     // Inverse subset
     ih = ihessian(ih);
@@ -1006,7 +1018,7 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
   }
   void reverse(TMBad::ReverseArgs<TMBad::ad_aug> &args) {
     size_t n = input_size();
-    TMBad::global::Complete<InvSubOperator> IS(hessian, llt);
+    TMBad::global::Complete< InvSubOperator<Factorization> > IS(hessian, llt);
     std::vector<TMBad::ad_aug> x = args.x_segment(0, n);
     std::vector<TMBad::ad_aug> y = IS(x);
     Eigen::SparseMatrix<TMBad::ad_aug> ih = pattern(hessian, y);
@@ -1026,7 +1038,7 @@ Type log_determinant(const Eigen::SparseMatrix<Type> &H,
   const Type* vptr = H.valuePtr();
   size_t n = H.nonZeros();
   std::vector<Type> x(vptr, vptr + n);
-  TMBad::global::Complete<LogDetOperator> LD(pattern<double>(H), ptr->llt);
+  TMBad::global::Complete<LogDetOperator<> > LD(pattern<double>(H), ptr->llt);
   std::vector<Type> y = LD(x);
   return y[0];
 }
@@ -1038,15 +1050,14 @@ Type log_determinant(const Eigen::SparseMatrix<Type> &H) {
   Eigen::SparseMatrix<double> H_pattern = pattern<double>(H);
   std::shared_ptr< DEFAULT_SPARSE_FACTORIZATION > llt =
     std::make_shared< DEFAULT_SPARSE_FACTORIZATION > (H_pattern);
-  TMBad::global::Complete<LogDetOperator> LD(H_pattern, llt);
+  TMBad::global::Complete<LogDetOperator<> > LD(H_pattern, llt);
   std::vector<Type> y = LD(x);
   return y[0];
 }
-double log_determinant(const Eigen::SparseMatrix<double> &H) {
+inline double log_determinant(const Eigen::SparseMatrix<double> &H) {
   DEFAULT_SPARSE_FACTORIZATION llt(H);
-  return llt.logDeterminant();
+  return logDeterminant(llt);
 }
-#endif
 
 // Interface
 template<class Newton>
