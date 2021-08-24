@@ -859,7 +859,7 @@ public:
   void setQ(Eigen::SparseMatrix<scalartype> Q_, int order=1, bool normalize=true){
     Q = Q_;
     if (normalize) {
-#ifndef TMBAD_SUPERNODAL
+#ifndef TMBAD_FRAMEWORK
       Eigen::SimplicialLDLT< Eigen::SparseMatrix<scalartype> > ldl(Q);
       vectortype D = ldl.vectorD();
       logdetQ = (log(D)).sum();
