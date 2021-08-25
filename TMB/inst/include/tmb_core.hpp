@@ -857,7 +857,21 @@ public:
        that the un-used theta parameters are reserved for an inner product contribution
        with the numbers reported via ADREPORT. */
     if(index != theta.size()){
+      // Vector of (0,0,...)
       PARAMETER_VECTOR( TMB_epsilon_ );
+      // moment=1:  Get E(phi  |data)
+      // moment=2:  Get E(phi^2|data)
+      DATA_INTEGER    ( TMB_epsilon_moment_ );
+      // scale=1:   Get posterior mean
+      // scale=Inf: Get posterior mode
+      DATA_SCALAR     ( TMB_epsilon_scale_ );
+      ans *= TMB_epsilon_scale_;
+      if (TMB_epsilon_moment_ != 1) {
+        if (TMB_epsilon_moment_ == 2)
+          this->reportvector.result *= this->reportvector.result;
+        else
+          Rf_error("'TMB_epsilon_moment_' can be 1 or 2");
+      }
       ans += ( this->reportvector.result * TMB_epsilon_ ).sum();
     }
     return ans;

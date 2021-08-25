@@ -259,7 +259,10 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       epsilon <- rep(0,length(phi))
       names(epsilon) <- names(phi)
       parameters <- obj$env$parameters
+      data <- obj$env$data
       parameters$TMB_epsilon_ <- epsilon ## Appends to list without changing attributes
+      data$TMB_epsilon_scale_ <- 1
+      data$TMB_epsilon_moment_ <- 1
       doEpsilonMethod <- function(chunk = NULL) {
           if(!is.null(chunk)) { ## Only do *chunk*
               mapfac <- rep(NA, length(phi))
