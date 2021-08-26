@@ -407,8 +407,10 @@ sdreport_intern <- function(obj,
                             par.fixed=NULL,
                             hessian.fixed=NULL,
                             getReportCovariance=FALSE,
-                            type = c("mean", "mode")) {
+                            type = c("mean", "mode"),
+                            what = c("reportvector", "theta")) {
     type <- match.arg(type)
+    what <- match.arg(what)
     ans <- list()
     if(is.null(par.fixed))
         par.fixed <- obj$env$last.par.best
@@ -418,13 +420,19 @@ sdreport_intern <- function(obj,
     parameters <- obj$env$parameters
     data <- obj$env$data
     ## Get number vars to adreport (FIXME: 'map' argument not handled)
-    tmp <- MakeADFun(data, parameters, ADreport=TRUE, checkParameterOrder = FALSE, DLL=obj$env$DLL)
-    n <- sum(sapply(tmp$env$ADreportDims, prod))
+    ## Or the number of parameters
+    if (what == "reportvector") {
+        tmp <- MakeADFun(data, parameters, ADreport=TRUE, checkParameterOrder = FALSE, DLL=obj$env$DLL)
+        n <- sum(sapply(tmp$env$ADreportDims, prod))
+    } else {
+        ## FIXME: Not accounting for mapped parameters
+        n <- length(unlist(obj$env$parameters))
+    }
     ## For epsilon method
     parameters$TMB_epsilon_ <- rep(0, n)
     p <- c(par.fixed, parameters$TMB_epsilon_)
     ## First moment object
-    data <- TMB_epsilon(data, moment=1, scale=1, what="reportvector")
+    data <- TMB_epsilon(data, moment=1, scale=1, what=what)
     obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
                       DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
                       silent=TRUE)
@@ -444,7 +452,7 @@ sdreport_intern <- function(obj,
     }
     ## If type=="mode" overwrite 'obj1'
     if (type == "mode") {
-        data <- TMB_epsilon(data, moment=1, scale=1e6, what="reportvector")
+        data <- TMB_epsilon(data, moment=1, scale=1e6, what=what)
         obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
                           DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
                           silent=TRUE)
@@ -456,7 +464,7 @@ sdreport_intern <- function(obj,
     JT <- obj1$env$f(theta=p, type="ADGrad", order=1, keepx=leps, keepy=lpar)
     ## Second moment object
     ## (FIXME: Could be avoided if we could calculate hessian diagonals wrt epsilon)
-    data <- TMB_epsilon(data, moment=2, scale=1, what="reportvector")
+    data <- TMB_epsilon(data, moment=2, scale=1, what=what)
     obj2 <- MakeADFun(data, parameters, random=obj$env$.random,
                       DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
                       silent=TRUE)
