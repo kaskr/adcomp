@@ -865,14 +865,31 @@ public:
       // scale=1:   Get posterior mean
       // scale=Inf: Get posterior mode
       DATA_SCALAR     ( TMB_epsilon_scale_ );
+      // What to report
+      DATA_STRING     ( TMB_epsilon_what_ );
+      // Which theta to report
+      DATA_IVECTOR    ( TMB_epsilon_which_ );
       ans *= TMB_epsilon_scale_;
+      vector<Type> v;
+      if ( TMB_epsilon_what_ == "reportvector" ) {
+        v = this->reportvector.result;
+      }
+      else if ( TMB_epsilon_what_ == "theta" ) {
+        TMB_epsilon_which_ -= 1; // R-index
+        v = (this->theta)(TMB_epsilon_which_);
+      }
+      else {
+        Rf_error("Invalid 'TMB_epsilon_what_'");
+      }
+      if (v.size() != TMB_epsilon_.size())
+        Rf_error("Invalid 'TMB_epsilon_' length not matching 'TMB_epsilon_what_' length" );
       if (TMB_epsilon_moment_ != 1) {
         if (TMB_epsilon_moment_ == 2)
-          this->reportvector.result *= this->reportvector.result;
+          v *= v;
         else
           Rf_error("'TMB_epsilon_moment_' can be 1 or 2");
       }
-      ans += ( this->reportvector.result * TMB_epsilon_ ).sum();
+      ans += ( v * TMB_epsilon_ ).sum();
     }
     return ans;
   }
