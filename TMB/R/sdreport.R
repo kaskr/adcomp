@@ -259,10 +259,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       epsilon <- rep(0,length(phi))
       names(epsilon) <- names(phi)
       parameters <- obj$env$parameters
-      data <- obj$env$data
+      data <- TMB_epsilon(obj$env$data)
       parameters$TMB_epsilon_ <- epsilon ## Appends to list without changing attributes
-      data$TMB_epsilon_scale_ <- 1
-      data$TMB_epsilon_moment_ <- 1
       doEpsilonMethod <- function(chunk = NULL) {
           if(!is.null(chunk)) { ## Only do *chunk*
               mapfac <- rep(NA, length(phi))
@@ -270,7 +268,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               parameters$TMB_epsilon_ <- updateMap(parameters$TMB_epsilon_,
                                                    factor(mapfac) )
           }
-          obj3 <- MakeADFun(obj$env$data,
+          obj3 <- MakeADFun(data,
                             parameters,
                             random = obj$env$random,
                             checkParameterOrder = FALSE,
@@ -393,6 +391,88 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   ans$env$ADreportDims <- obj2$env$ADreportDims
   class(ans) <- "sdreport"
   ans
+}
+
+## Helper for epsilon method
+TMB_epsilon <- function(data, moment=1, scale=1, what = c("reportvector", "theta")) {
+    what <- match.arg(what)
+    data$TMB_epsilon_moment_ <- moment
+    data$TMB_epsilon_scale_ <- scale
+    data$TMB_epsilon_what_ <- what
+    data
+}
+
+## Helper: sdreport that works for all integration methods
+sdreport_intern <- function(obj,
+                            par.fixed=NULL,
+                            hessian.fixed=NULL,
+                            getReportCovariance=FALSE,
+                            type = c("mean", "mode")) {
+    type <- match.arg(type)
+    ans <- list()
+    if(is.null(par.fixed))
+        par.fixed <- obj$env$last.par.best
+    if(is.null(hessian.fixed))
+        hessian.fixed <- obj$he(par.fixed)
+    ## FIXME: parameters should be obj$env$parList(par.fixed) but broken
+    parameters <- obj$env$parameters
+    data <- obj$env$data
+    ## Get number vars to adreport (FIXME: 'map' argument not handled)
+    tmp <- MakeADFun(data, parameters, ADreport=TRUE, checkParameterOrder = FALSE, DLL=obj$env$DLL)
+    n <- sum(sapply(tmp$env$ADreportDims, prod))
+    ## For epsilon method
+    parameters$TMB_epsilon_ <- rep(0, n)
+    p <- c(par.fixed, parameters$TMB_epsilon_)
+    ## First moment object
+    data <- TMB_epsilon(data, moment=1, scale=1, what="reportvector")
+    obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
+                      DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
+                      silent=TRUE)
+    ## Some helper objects
+    all <- seq_len(length(obj1$par))
+    lpar <- head(all, length(par.fixed))
+    leps <- tail(all, n)
+    ## Mean always needed
+    a_mean <- tail(as.vector(obj1$gr(p)), n)
+    a_mode <- NULL
+    ## Full cov requested ?
+    cov <- matrix(NA)
+    if (getReportCovariance) {
+        obj1$env$retape_adgrad()
+        ## V(phi(u,x)|x) = - D2_eps (f)
+        B <- -obj1$env$f(theta=p, type="ADGrad", order=1, keepx=leps, keepy=leps)
+    }
+    ## If type=="mode" overwrite 'obj1'
+    if (type == "mode") {
+        data <- TMB_epsilon(data, moment=1, scale=1e6, what="reportvector")
+        obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
+                          DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
+                          silent=TRUE)
+        a_mode <- tail(as.vector(obj1$gr(p)), n)
+    }
+    ## Get (transposed) jacobian of *either* a_mean or a_mode:
+    ## Note: interchanging 'keepx' and 'keepy' gives same result but usually slower
+    obj1$env$retape_adgrad()
+    JT <- obj1$env$f(theta=p, type="ADGrad", order=1, keepx=leps, keepy=lpar)
+    ## Second moment object
+    ## (FIXME: Could be avoided if we could calculate hessian diagonals wrt epsilon)
+    data <- TMB_epsilon(data, moment=2, scale=1, what="reportvector")
+    obj2 <- MakeADFun(data, parameters, random=obj$env$.random,
+                      DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
+                      silent=TRUE)
+    b <- tail(as.vector(obj2$gr(p)), n)
+    ## Full covariance
+    if (getReportCovariance) {
+        cov <- t(JT) %*% Vtheta %*% JT + B
+    }
+    ## Put pieces together
+    Vtheta <- solve(hessian.fixed)
+    diag.term1 <- colSums( JT * (Vtheta %*% JT) )
+    diag.term2 <- b-a_mean^2
+    ans$value <- if (type == "mean") a_mean else a_mode
+    ans$sd <- sqrt(diag.term1 + diag.term2)
+    ans$cov <- cov
+    ans
 }
 
 ##' Extract parameters, random effects and reported variables along
