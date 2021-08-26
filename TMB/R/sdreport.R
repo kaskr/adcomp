@@ -124,6 +124,18 @@
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=NULL), ignore.parm.uncertainty = FALSE,
                      getReportCovariance=TRUE, skip.delta.method=FALSE){
+    ## Handle 'intern' integration LA/GK/SR
+    intern <- obj$env$intern || length(obj$env$integrate)
+    if (intern) {
+        if ( !is.null(obj$env$random) )
+            stop("Currently 'intern' sdreport only works when *all* random effects are intern")
+        ## last.par.best is 'short'
+        if(is.null(par.fixed))
+            par.fixed <- obj$env$last.par.best
+        ## AD Hessian is available
+        if(is.null(hessian.fixed))
+            hessian.fixed <- obj$he(par.fixed)
+    }
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -382,6 +394,30 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       warning("Could not report sd's of full randomeffect vector.")
     }
   }
+    ## Finally handle 'intern' case
+    if (intern) {
+        ## Random effects
+        tmp <- sdreport_intern(obj,
+                               par.fixed,
+                               hessian.fixed,
+                               getReportCovariance=FALSE,
+                               type = "mean",
+                               what = "theta")
+        ans$par.random <- tmp$value
+        ans$diag.cov.random <- tmp$sd^2
+        ## Something to report
+        if (length(obj$env$ADreportDims) > 0) {
+            tmp <- sdreport_intern(obj,
+                                   par.fixed,
+                                   hessian.fixed,
+                                   getReportCovariance=getReportCovariance,
+                                   type = "mean",
+                                   what = "reportvector")
+            ans[names(tmp)] <- tmp
+        }
+        ## FIXME: Not accounting for mapped parameters (copied from sdreport_intern)
+        obj$env$random <- which(rep( names(parameters), sapply(parameters, length) ) %in% obj$env$.random)
+    }
   ## Copy a few selected members of the environment 'env'. In
   ## particular we need the 'skeleton' objects that allow us to put
   ## results back in same shape as original parameter list.
@@ -474,12 +510,13 @@ sdreport_intern <- function(obj,
                       DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
                       silent=TRUE)
     b <- tail(as.vector(obj2$gr(p)), n)
+    ## FIXME: ignore.theta.uncertainty
+    Vtheta <- solve(hessian.fixed)
     ## Full covariance
     if (getReportCovariance) {
         cov <- t(JT) %*% Vtheta %*% JT + B
     }
     ## Put pieces together
-    Vtheta <- solve(hessian.fixed)
     diag.term1 <- colSums( JT * (Vtheta %*% JT) )
     diag.term2 <- b-a_mean^2
     ans$value <- if (type == "mean") a_mean else a_mode
