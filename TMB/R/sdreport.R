@@ -105,6 +105,7 @@
 ##' @param ignore.parm.uncertainty Optional. Ignore estimation variance of parameters?
 ##' @param getReportCovariance Get full covariance matrix of ADREPORTed variables?
 ##' @param skip.delta.method Skip the delta method? (\code{FALSE} by default)
+##' @param ... Experimental
 ##' @return Object of class \code{sdreport}
 ##' @seealso \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}
 ##' @examples
@@ -123,7 +124,7 @@
 ##' summary(rep, "report")                      ## Include bias correction
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=NULL), ignore.parm.uncertainty = FALSE,
-                     getReportCovariance=TRUE, skip.delta.method=FALSE){
+                     getReportCovariance=TRUE, skip.delta.method=FALSE, ...){
     ## Handle 'intern' integration LA/GK/SR
     intern <- obj$env$intern || length(obj$env$integrate)
     if (intern) {
@@ -132,9 +133,9 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
         ## last.par.best is 'short'
         if(is.null(par.fixed))
             par.fixed <- obj$env$last.par.best
-        ## AD Hessian is available
-        if(is.null(hessian.fixed))
-            hessian.fixed <- obj$he(par.fixed)
+        ## AD Hessian is available (but don't use it by default)
+        ## if(is.null(hessian.fixed))
+        ##     hessian.fixed <- obj$he(par.fixed)
     }
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
@@ -401,8 +402,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
                                par.fixed,
                                hessian.fixed,
                                getReportCovariance=FALSE,
-                               type = "mean",
-                               what = "theta")
+                               what = "theta", ...)
         ans$par.random <- tmp$value
         ans$diag.cov.random <- tmp$sd^2
         ## Something to report
@@ -411,8 +411,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
                                    par.fixed,
                                    hessian.fixed,
                                    getReportCovariance=getReportCovariance,
-                                   type = "mean",
-                                   what = "reportvector")
+                                   what = "reportvector",
+                                   ...)
             ans[names(tmp)] <- tmp
         }
         ## FIXME: Not accounting for mapped parameters (copied from sdreport_intern)
@@ -475,7 +475,8 @@ sdreport_intern <- function(obj,
     ## First moment object
     data <- TMB_epsilon(data, moment=1, scale=1, what=what, which=which)
     obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
-                      DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
+                      integrate = obj$env$integrate,
+                      DLL=obj$env$DLL, intern=obj$env$intern, checkParameterOrder = FALSE,
                       silent=TRUE)
     ## Some helper objects
     all <- seq_len(length(obj1$par))
@@ -495,7 +496,8 @@ sdreport_intern <- function(obj,
     if (type == "mode") {
         data <- TMB_epsilon(data, moment=1, scale=1e6, what=what, which=which)
         obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
-                          DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
+                          integrate = obj$env$integrate,
+                          DLL=obj$env$DLL, intern=obj$env$intern, checkParameterOrder = FALSE,
                           silent=TRUE)
         a_mode <- tail(as.vector(obj1$gr(p)), n)
     }
@@ -507,7 +509,8 @@ sdreport_intern <- function(obj,
     ## (FIXME: Could be avoided if we could calculate hessian diagonals wrt epsilon)
     data <- TMB_epsilon(data, moment=2, scale=1, what=what, which=which)
     obj2 <- MakeADFun(data, parameters, random=obj$env$.random,
-                      DLL=obj$env$DLL, intern=TRUE, checkParameterOrder = FALSE,
+                      integrate = obj$env$integrate,
+                      DLL=obj$env$DLL, intern=obj$env$intern, checkParameterOrder = FALSE,
                       silent=TRUE)
     b <- tail(as.vector(obj2$gr(p)), n)
     ## FIXME: ignore.theta.uncertainty
