@@ -7,7 +7,6 @@
    ================================================ 
 */
 #ifdef _OPENMP
-#include <omp.h>
 #ifdef WITH_LIBTMB
 bool in_parallel();
 size_t thread_num();

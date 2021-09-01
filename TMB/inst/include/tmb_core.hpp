@@ -964,7 +964,6 @@ struct parallel_accumulator{
     result=Type(0);
     obj=obj_;
 #ifdef _OPENMP
-#include <omp.h>
     obj->max_parallel_regions=omp_get_max_threads();
 #endif
   }
