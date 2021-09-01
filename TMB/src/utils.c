@@ -1,11 +1,11 @@
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
 
-# include <R.h>
-# include <Rinternals.h>
 # ifdef _OPENMP
 #include <omp.h>
 # endif
+# include <R.h>
+# include <Rinternals.h>
 
 /* openmp controller */
 SEXP omp_num_threads(SEXP x) {
