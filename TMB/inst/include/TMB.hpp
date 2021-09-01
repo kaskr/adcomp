@@ -31,6 +31,11 @@ struct isDouble<double>{
 #define IF_TMB_PRECOMPILE(x)
 #endif
 
+/* Must come before Rinternals.h */
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 /* Early inclusion of Rprintf and REprintf */
 #include <R_ext/Print.h>
 #include "Rstream.hpp"
