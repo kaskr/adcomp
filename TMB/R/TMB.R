@@ -1190,6 +1190,14 @@ openmp <- function(n=NULL){
 ##' the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
 ##' Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 ##' previous selections.
+##'
+##' Experimental support for linking to a custom \code{suitesparse} installation is available via \code{supernodal=TRUE}.
+##' This will affect speed of Laplace approximation when run internally (using arguments \code{intern} or \code{integrate} to \code{MakeADFun}).
+##' In addition it should enable the longint cholmod versions not currently available from the Matrix package.
+##' On Windows a suitesparse installation can be installed (from R) by:
+##' \code{system("pacman -Sy")} followed by
+##' \code{system("pacman -S  mingw-w64-{i686,x86_64}-suitesparse")}
+##' while on Linux one should look for the package \code{libsuitesparse-dev}.
 ##' @title Compile a C++ template to DLL suitable for MakeADFun.
 ##' @param file C++ file.
 ##' @param flags Character with compile flags.
@@ -1200,13 +1208,21 @@ openmp <- function(n=NULL){
 ##' @param libinit Turn on preprocessor flag to register native routines?
 ##' @param tracesweep Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})
 ##' @param framework Which AD framework to use ('TMBad' or 'CppAD')
+##' @param supernodal Use supernodal sparse Cholesky/Inverse from system wide suitesparse library
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file[1]),libtmb=TRUE,
                     libinit=TRUE,tracesweep=FALSE,framework=getOption("tmb.ad.framework"),
+                    supernodal=FALSE,
                     ...){
   framework <- match.arg(framework, c("CppAD", "TMBad"))
+  ## Handle extra list(...) arguments plus modifications
+  dotargs <- list(...)
+  '%+=%' <- function(VAR, x) {
+      VAR <- deparse(substitute(VAR))
+      dotargs[[VAR]] <<- paste(dotargs[[VAR]], x)
+  }
   if(.Platform$OS.type=="windows"){
     ## Overload system.file
     system.file <- function(...){
@@ -1289,13 +1305,31 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                    "-DCPPAD_FORWARD0SWEEP_TRACE"[tracesweep],
                    paste0("-D",toupper(framework),"_FRAMEWORK")
                    )
+  ## *Very* primitive guess of suitesparse configuration
+  ## (If wrong set supernodal=FALSE and tweak manually)
+  if (supernodal) {
+      if (framework != "TMBad")
+          stop("'supernodal=TRUE' only works when framework='TMBad'")
+      CPPFLAGS %+=%
+          "-DTMBAD_SUPERNODAL -DEIGEN_USE_BLAS -DEIGEN_USE_LAPACKE"
+      PKG_LIBS %+=%
+          if (.Platform$OS.type=="windows")
+              "-lcholmod -lcolamd -lamd -lsuitesparseconfig -lopenblas $(SHLIB_OPENMP_CXXFLAGS)"
+          else
+              "-lcholmod"
+      CLINK_CPPFLAGS %+=%
+          if (.Platform$OS.type=="windows")
+              ""
+          else
+              "-I/usr/include/suitesparse"
+  }
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
                      PKG_LIBS=paste(
                        "$(SHLIB_OPENMP_CXXFLAGS)"[openmp] ),
                      PKG_CXXFLAGS="$(SHLIB_OPENMP_CXXFLAGS)"[openmp],
                      CXXFLAGS=flags[flags!=""], ## Optionally override cxxflags
-                     ...
+                     dotargs
                      )
   on.exit(file.remove(mvfile),add=TRUE)
   status <- .shlib_internal(file)  ## Was: tools:::.shlib_internal(file)
