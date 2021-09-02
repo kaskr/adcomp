@@ -406,7 +406,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
         ans$par.random <- tmp$value
         ans$diag.cov.random <- tmp$sd^2
         ## Something to report
-        if (length(obj$env$ADreportDims) > 0) {
+        if (length(obj2$env$ADreportDims) > 0) {
             tmp <- sdreport_intern(obj,
                                    par.fixed,
                                    hessian.fixed,
