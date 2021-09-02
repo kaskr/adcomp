@@ -416,7 +416,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
             ans[names(tmp)] <- tmp
         }
         ## FIXME: Not accounting for mapped parameters (copied from sdreport_intern)
-        r <- which(rep( names(parameters), sapply(parameters, length) ) %in% obj$env$.random)
+        r <- which(rep( names(obj$env$parameters), sapply(obj$env$parameters, length) ) %in% obj$env$.random)
     }
   ## Copy a few selected members of the environment 'env'. In
   ## particular we need the 'skeleton' objects that allow us to put
