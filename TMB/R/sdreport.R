@@ -413,6 +413,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
                                    getReportCovariance=getReportCovariance,
                                    what = "reportvector",
                                    ...)
+            names(tmp$value) <- names(obj2$fn()) ## FIXME: hack
             ans[names(tmp)] <- tmp
         }
         ## FIXME: Not accounting for mapped parameters (copied from sdreport_intern)
