@@ -1,4 +1,14 @@
 ------------------------------------------------------------------------
+TMB 1.7.21 (2021-09-06)
+------------------------------------------------------------------------
+
+o Fix CRAN build issue triggered by clang 13.0.0 (omp.h)
+
+o Fix tweedie thread safety on Windows (https://github.com/glmmTMB/glmmTMB/issues/714)
+
+o Fix as.list(.) for class 'sdreport' (https://github.com/glmmTMB/glmmTMB/issues/692)
+
+------------------------------------------------------------------------
 TMB 1.7.20 (2021-04-08)
 ------------------------------------------------------------------------
 
