@@ -6,12 +6,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>10 C++ tutorial | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="10 C++ tutorial | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
-  <meta property="og:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
+  <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
 
@@ -19,7 +19,7 @@
   <meta name="twitter:title" content="10 C++ tutorial | The comprehensive TMB documentation" />
   
   <meta name="twitter:description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="twitter:image" content="https://kaskr.github.io/adcomp/images/cover.png" />
+  <meta name="twitter:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
 
 
 
@@ -31,8 +31,9 @@
   
 <link rel="prev" href="Toolbox.html"/>
 <link rel="next" href="ModelObject.html"/>
-<script src="libs/header-attrs-2.7/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -48,7 +49,8 @@
 
 
 
-
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -115,6 +117,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 </head>
 
 <body>
@@ -138,13 +163,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.2" data-path="Tutorial.html"><a href="Tutorial.html#an-extended-c-language"><i class="fa fa-check"></i><b>2.2</b> An extended C++ language</a></li>
 <li class="chapter" data-level="2.3" data-path="Tutorial.html"><a href="Tutorial.html#statistical-modelling"><i class="fa fa-check"></i><b>2.3</b> Statistical modelling</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="Structure-TMB.html"><a href="Structure-TMB.html"><i class="fa fa-check"></i><b>3</b> The structure of TMB</a></li>
-<li class="chapter" data-level="4" data-path="matrix-arrays.html"><a href="matrix-arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a>
+<li class="chapter" data-level="3" data-path="Structure_TMB.html"><a href="Structure_TMB.html"><i class="fa fa-check"></i><b>3</b> The structure of TMB</a></li>
+<li class="chapter" data-level="4" data-path="matrix_arrays.html"><a href="matrix_arrays.html"><i class="fa fa-check"></i><b>4</b> Matrices and arrays</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>4.1</b> Relationship to R</a></li>
-<li class="chapter" data-level="4.2" data-path="matrix-arrays.html"><a href="matrix-arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>4.2</b> Relationship to Eigen</a></li>
+<li class="chapter" data-level="4.1" data-path="matrix_arrays.html"><a href="matrix_arrays.html#relationship-to-r"><i class="fa fa-check"></i><b>4.1</b> Relationship to R</a></li>
+<li class="chapter" data-level="4.2" data-path="matrix_arrays.html"><a href="matrix_arrays.html#relationship-to-eigen"><i class="fa fa-check"></i><b>4.2</b> Relationship to Eigen</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="R-style-distribution.html"><a href="R-style-distribution.html"><i class="fa fa-check"></i><b>5</b> R style probability distributions</a></li>
+<li class="chapter" data-level="5" data-path="R_style_distribution.html"><a href="R_style_distribution.html"><i class="fa fa-check"></i><b>5</b> R style probability distributions</a></li>
 <li class="chapter" data-level="6" data-path="Densities.html"><a href="Densities.html"><i class="fa fa-check"></i><b>6</b> Multivariate distributions</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="Densities.html"><a href="Densities.html#multivariate-normal-distributions"><i class="fa fa-check"></i><b>6.1</b> Multivariate normal distributions</a></li>
@@ -293,7 +318,6 @@ statement, so the code will produce unexpected results.</p>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -312,6 +336,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -332,6 +357,10 @@ gitbook.start({
 "text": null
 },
 "download": ["_main.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }
