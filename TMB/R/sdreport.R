@@ -495,6 +495,7 @@ sdreport_intern <- function(obj,
     obj1 <- MakeADFun(data, parameters, random=obj$env$.random,
                       integrate = obj$env$integrate,
                       DLL=obj$env$DLL, intern=obj$env$intern, checkParameterOrder = FALSE,
+                      inner.control=list(skip_laplace_get_minimum=1),
                       silent=TRUE)
     ## Some helper objects
     all <- seq_len(length(obj1$par))
@@ -529,6 +530,7 @@ sdreport_intern <- function(obj,
     obj2 <- MakeADFun(data, parameters, random=obj$env$.random,
                       integrate = obj$env$integrate,
                       DLL=obj$env$DLL, intern=obj$env$intern, checkParameterOrder = FALSE,
+                      inner.control=list(skip_laplace_get_minimum=1),
                       silent=TRUE)
     b <- tail(as.vector(obj2$gr(p)), n)
     ## FIXME: ignore.theta.uncertainty

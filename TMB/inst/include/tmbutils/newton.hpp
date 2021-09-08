@@ -821,6 +821,8 @@ struct newton_config {
       For this to work the inner objective function must return the
       negative log **MGF** rather than **density** */
   bool SPA;
+  /** \brief Workaround that doesn't belong here: Get f(u_hat) rather than Laplace */
+  bool skip_laplace_get_minimum;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
@@ -844,6 +846,7 @@ struct newton_config {
     SET_DEFAULT(signif_abs_reduction, 1e-6);
     SET_DEFAULT(signif_rel_reduction, .5);
     SET_DEFAULT(SPA, false);
+    SET_DEFAULT(skip_laplace_get_minimum, false);
 #undef SET_DEFAULT
   }
   newton_config() {
@@ -1446,6 +1449,11 @@ struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
     return (*(Base::hessian))(std::vector<Type>(sol));
   }
   Type Laplace() {
+    // Quick hack:
+    if (Base::cfg.skip_laplace_get_minimum) {
+      return value();
+    }
+    // Else
     double sign = (Base::cfg.SPA ? -1 : 1);
     return
       sign * value() +
