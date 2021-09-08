@@ -810,8 +810,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       vector<Scalar> x_new =
         x - hessian -> llt_solve(H, g).array();
       Scalar f = function(x_new)[0];
-      if (std::isfinite(f) &&
-          f < f_previous + 1e-8) { // Improvement
+      if ( ( std::isfinite(f) && f <= f_previous + 1e-8 ) ||
+           ( vector<Scalar>(gradient(x_new)).abs().maxCoeff() / mgc < 1e-1 ) ) { // Improvement
         // Accept
         cfg.ustep = increase(cfg.ustep);
         f_previous = f;
