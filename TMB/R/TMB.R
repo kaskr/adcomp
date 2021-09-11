@@ -9,6 +9,9 @@ grepRandomParameters <- function(parameters,random){
   which(as.logical(unlist(tmp)))
 }
 
+## unlist name handling is extremely slow and we *almost* never use it
+formals(unlist)$use.names <- FALSE
+
 ## Assign without losing other attributes than 'names' (which may get
 ## overwritten when subsetting)
 "keepAttrib<-" <- function(x, value){
@@ -1263,7 +1266,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   }
   makevars <- function(...){
     file <- tempfile()
-    args <- unlist(list(...))
+    args <- unlist(list(...), use.names=TRUE)
     txt <- paste(names(args),args,sep="=")
     if(!is.na(mvuser)){
       if(file.exists(mvuser)){
