@@ -56,7 +56,20 @@ void eigen_REprintf(const char* x);
 #define NDEBUG 1
 #endif
 #include <Eigen/Dense>
+
+// Default: Include Eigen/Sparse normally
+#ifndef TMB_SPARSE_STORAGE_INDEX
 #include <Eigen/Sparse>
+#else
+// Alternative: Include Eigen/Sparse with custom sparse matrix integer type
+#define SparseMatrix SparseMatrix_rename
+#include <Eigen/Sparse>
+#undef SparseMatrix
+namespace Eigen {
+template<class T, int Flags = 0, class StorageIndex = TMB_SPARSE_STORAGE_INDEX>
+using SparseMatrix = SparseMatrix_rename<T, Flags, StorageIndex>;
+}
+#endif
 
 /* Workaround side effect when -DEIGEN_USE_LAPACKE is set */
 #undef I
