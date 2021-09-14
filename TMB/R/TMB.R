@@ -1329,7 +1329,11 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   }
   ## Long integer support
   if (longint) {
-      CPPFLAGS %+=% "-DTMB_SPARSE_STORAGE_INDEX='long int'"
+      CPPFLAGS %+=%
+          if (.Platform$OS.type=="windows")
+              "-DTMB_SPARSE_STORAGE_INDEX='long long'"
+          else
+              "-DTMB_SPARSE_STORAGE_INDEX='long int'"
   }
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
