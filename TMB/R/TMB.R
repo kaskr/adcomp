@@ -1212,12 +1212,13 @@ openmp <- function(n=NULL){
 ##' @param tracesweep Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})
 ##' @param framework Which AD framework to use ('TMBad' or 'CppAD')
 ##' @param supernodal Use supernodal sparse Cholesky/Inverse from system wide suitesparse library
+##' @param longint Use long integers for Eigen's SparseMatrix StorageIndex
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file[1]),libtmb=TRUE,
                     libinit=TRUE,tracesweep=FALSE,framework=getOption("tmb.ad.framework"),
-                    supernodal=FALSE,
+                    supernodal=FALSE,longint=FALSE,
                     ...){
   framework <- match.arg(framework, c("CppAD", "TMBad"))
   ## Handle extra list(...) arguments plus modifications
@@ -1325,6 +1326,10 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
               ""
           else
               "-I/usr/include/suitesparse"
+  }
+  ## Long integer support
+  if (longint) {
+      CPPFLAGS %+=% "-DTMB_SPARSE_STORAGE_INDEX='long int'"
   }
   ## Makevars specific for template
   mvfile <- makevars(PKG_CPPFLAGS=ppflags,
