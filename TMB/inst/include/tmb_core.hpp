@@ -1546,8 +1546,8 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
       TMBad::compress(pf->glob, max_period_size);
     }
     else if (method == "compress_and_compile") {
-      int max_period_size = getListInteger(control, "max_period_size", 1024);
 #ifdef HAVE_COMPILE_HPP
+      int max_period_size = getListInteger(control, "max_period_size", 1024);
       TMBad::compress(pf->glob, max_period_size);
       // if (config.optimize.instantly) pf->glob.eliminate();
       TMBad::compile(pf->glob);
