@@ -1194,13 +1194,23 @@ openmp <- function(n=NULL){
 ##' Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 ##' previous selections.
 ##'
-##' Experimental support for linking to a custom \code{suitesparse} installation is available via \code{supernodal=TRUE}.
-##' This will affect speed of Laplace approximation when run internally (using arguments \code{intern} or \code{integrate} to \code{MakeADFun}).
-##' In addition it should enable the longint cholmod versions not currently available from the Matrix package.
-##' On Windows a suitesparse installation can be installed (from R) by:
-##' \code{system("pacman -Sy")} followed by
-##' \code{system("pacman -S  mingw-w64-{i686,x86_64}-suitesparse")}
-##' while on Linux one should look for the package \code{libsuitesparse-dev}.
+##' @section Using a custom SuiteSparse installation:
+##' Experimental support for linking to a custom \code{SuiteSparse}
+##' installation is available by setting \code{supernodal=TRUE}. This
+##' will affect speed of Laplace approximation when run internally
+##' (using arguments \code{intern} or \code{integrate} to
+##' \code{\link{MakeADFun}}).  In addition it facilitates the long
+##' integer cholmod versions (via \code{longint=TRUE}) not currently
+##' available from the Matrix package. However, note that Eigen
+##' version at least 3.4 is required for this to work.
+##'
+##' On Windows a SuiteSparse installation can be installed (from R)
+##' using the Rtools package manager:
+##' \code{system("pacman -Sy")}
+##' followed by
+##' \code{system("pacman -S mingw-w64-{i686,x86_64}-suitesparse")}
+##'
+##' On Linux one should look for the package \code{libsuitesparse-dev}.
 ##' @title Compile a C++ template to DLL suitable for MakeADFun.
 ##' @param file C++ file.
 ##' @param flags Character with compile flags.
@@ -1211,8 +1221,8 @@ openmp <- function(n=NULL){
 ##' @param libinit Turn on preprocessor flag to register native routines?
 ##' @param tracesweep Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})
 ##' @param framework Which AD framework to use ('TMBad' or 'CppAD')
-##' @param supernodal Use supernodal sparse Cholesky/Inverse from system wide suitesparse library
-##' @param longint Use long integers for Eigen's SparseMatrix StorageIndex
+##' @param supernodal Turn on preprocessor flag to use supernodal sparse Cholesky/Inverse from system wide suitesparse library
+##' @param longint Turn on preprocessor flag to use long integers for Eigen's SparseMatrix StorageIndex
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
