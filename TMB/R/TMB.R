@@ -1195,20 +1195,22 @@ openmp <- function(n=NULL){
 ##' previous selections.
 ##'
 ##' @section Using a custom SuiteSparse installation:
-##' Experimental support for linking to a custom \code{SuiteSparse}
-##' installation is available by setting \code{supernodal=TRUE}. This
-##' will affect speed of Laplace approximation when run internally
-##' (using arguments \code{intern} or \code{integrate} to
-##' \code{\link{MakeADFun}}).  In addition it facilitates the long
-##' integer cholmod versions (via \code{longint=TRUE}) not currently
-##' available from the Matrix package. However, note that Eigen
-##' version at least 3.4 is required for this to work.
+##' Sparse matrix calculations play an important role in TMB. By default TMB uses a small subset of \code{SuiteSparse} available through the R package \code{Matrix}. This is sufficient for most use cases, however for some very large models the following extra features are worth considering:
 ##'
-##' On Windows a SuiteSparse installation can be installed (from R)
-##' using the Rtools package manager:
-##' \code{system("pacman -Sy")}
-##' followed by
-##' \code{system("pacman -S mingw-w64-{i686,x86_64}-suitesparse")}
+##' \itemize{
+##'   \item Some large models benefit from an extended set of graph reordering algorithms (especially METIS) not part of \code{Matrix}. It is common that these orderings can provide quite big speedups.
+##'   \item Some large models need sparse matrices with number of nonzeros exceeding the current 32 bit limitation of \code{Matrix}. Normally such cases will result in the cholmod error 'problem too large'. \code{SuiteSparse} includes 64 bit integer routines to address this problem.
+##' }
+##'
+##' Experimental support for linking to a \emph{custom} \code{SuiteSparse} installation is available through two arguments to the \code{\link{compile}} function. The first argument \code{supernodal=TRUE} tells TMB to use the supernodal Cholesky factorization from the system wide \code{SuiteSparse} on the C++ side. This will affect the speed of the Laplace approximation when run internally (using arguments \code{intern} or \code{integrate} to \code{\link{MakeADFun}}).
+##'
+##' The second argument \code{longint=TRUE} tells TMB to use 64 bit integers for sparse matrices on the C++ side. This works in combination with \code{supernodal=TRUE} from Eigen version 3.4.
+##'
+##' On Windows a \code{SuiteSparse} installation can be obtained (from R) using the \code{Rtools} package manager:
+##' \preformatted{
+##'   system("pacman -Sy")
+##'   system("pacman -S mingw-w64-{i686,x86_64}-suitesparse")
+##' }
 ##'
 ##' On Linux one should look for the package \code{libsuitesparse-dev}.
 ##' @title Compile a C++ template to DLL suitable for MakeADFun.
