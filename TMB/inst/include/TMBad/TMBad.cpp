@@ -4220,10 +4220,13 @@ std::vector<Index> remap_identical_sub_expressions(
       for (size_t k = i; k < i + nout; k++)
         ok &= (glob.opstack[v2o[k]]->identifier() ==
                glob.opstack[v2o[remap[k]]]->identifier());
-      if (false) {
-        if (glob.opstack[v2o[i]] == invop) {
-          ok = false;
-        }
+
+      if (ok && (nout > 1)) {
+        for (size_t k = 0; k < nout; k++) ok &= (remap[i + k] = remap[i] + k);
+      }
+
+      if (glob.opstack[v2o[i]] == invop) {
+        ok = false;
       }
       if (ok) {
         if (glob.opstack[v2o[i]] == constant) {
