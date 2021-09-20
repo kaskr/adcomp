@@ -684,6 +684,13 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       // Masks
       std::vector<bool> active = gradient.activeDomain();
       for (size_t i=0; i<n_inner; i++) active[i] = true; // just in case ...
+      if (cfg.trace) {
+	std::cout << "Dead indices:\n";
+	for (size_t i=0; i<active.size(); i++) {
+	  if (!active[i]) std::cout << i << " ";
+	}
+	std::cout << "\n";
+      }
       function.DomainReduce(active);
       gradient.DomainReduce(active);
       std::vector<bool> active_outer(active.begin() + n_inner, active.end());
@@ -746,6 +753,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     return msg;
   }
   const char* newton_iterate(vector<Scalar> &x) {
+    if (cfg.trace == 10) std::cout << "x_start=" << x << "\n";
     int reject_counter = 0;
     Scalar f_previous = INFINITY;
     const char* msg = NULL;
@@ -791,6 +799,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       // Quick ustep reduction based on Hessian diagonal
       Scalar m = diag_cpy.minCoeff();
       if (std::isfinite(m) && m < 0) {
+	if (cfg.trace) std::cout << "m=" << m << " ";
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
       }
@@ -810,29 +819,66 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       vector<Scalar> x_new =
         x - hessian -> llt_solve(H, g).array();
       Scalar f = function(x_new)[0];
-      if ( ( std::isfinite(f) && f <= f_previous + 1e-8 ) ||
-           ( vector<Scalar>(gradient(x_new)).abs().maxCoeff() / mgc < 1e-1 ) ) { // Improvement
+      /* =========== Step Accept/Reject
+	Must account for two contradicting situations:
+
+	0. fnew=nan ===> REJECT!
+	1. (f=1e6,mgc=1e-3)  --> (f=1.00001e6,mgc=1e-4) ACCEPT !
+	2. (f,mgc) are both almost the same REJECT !
+
+	warning: f_previous + 1e-8 is BAD because it might reduce to f_previous...
+
+
+
+	New definitions:
+
+	* A step can be ACCEPTED if there's a tiny improvement in f and mgc
+	* We count the number of steps that are either REJECTED or POOR. When count is high we try early exit.
+      */
+      // If nan REJECT!
+      bool accept = std::isfinite(f);
+      if (accept) {
+	// ACCEPT if there's a value improvement:
+	accept =
+	  (f < f_previous);
+	// OR...
+	if (! accept) {
+	  // Accept if relative mgc reduction is substantial without increasing value too much
+	  accept =
+	    (f - f_previous <= 1e-6 ) &&
+	    vector<Scalar>(gradient(x_new)).abs().maxCoeff() / mgc < .5;
+	}
+	// Assess the quality of the update
+	if ( accept && (f_previous - f > 1e-4) ) {
+	  reject_counter = 0;
+	} else {
+	  reject_counter++;
+	}
+      }
+      // Take action depending on accept/reject 
+      if ( accept ) { // Improvement
         // Accept
         cfg.ustep = increase(cfg.ustep);
         f_previous = f;
         x = x_new;
-        reject_counter = 0;
       } else { // No improvement
         // Reject
         cfg.ustep = decrease(cfg.ustep);
-        reject_counter ++;
-        if (reject_counter > cfg.max_reject) {
-          if (cfg.ok_exit_if_pdhess) {
-            H = (*hessian)(std::vector<Scalar>(x));
-            // Try to factorize
-            hessian -> llt_factorize(H);
-            bool PD = (hessian -> llt_info() == 0);
-            if (PD) return msg;
-          }
-          return
-            convergence_fail("Max number of rejections exceeded", x);
-        }
       }
+      // Handle long runs without improvement
+      if (reject_counter > cfg.max_reject) {
+	if (cfg.ok_exit_if_pdhess) {
+	  H = (*hessian)(std::vector<Scalar>(x));
+	  // Try to factorize
+	  hessian -> llt_factorize(H);
+	  bool PD = (hessian -> llt_info() == 0);
+	  if (cfg.trace) std::cout << "Trying early exit - PD Hess? " << PD << "\n";
+	  if (PD) return msg;
+	}
+	return
+	  convergence_fail("Max number of rejections exceeded", x);
+      }
+      // Tracing info
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "reject=" << reject_counter << " ";
       if (cfg.trace) std::cout << "\n";
