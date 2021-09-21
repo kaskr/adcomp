@@ -4217,24 +4217,34 @@ std::vector<Index> remap_identical_sub_expressions(
       bool ok = true;
       total += nout;
 
-      for (size_t k = i; k < i + nout; k++)
-        ok &= (glob.opstack[v2o[k]]->identifier() ==
-               glob.opstack[v2o[remap[k]]]->identifier());
+      global::OperatorPure *CurOp = glob.opstack[v2o[i]];
+      global::OperatorPure *RemOp = glob.opstack[v2o[remap[i]]];
+      ok &= (CurOp->identifier() == RemOp->identifier());
+
+      ok &= (CurOp->input_size() == RemOp->input_size());
+      ok &= (CurOp->output_size() == RemOp->output_size());
 
       if (ok && (nout > 1)) {
-        for (size_t k = 0; k < nout; k++) ok &= (remap[i + k] = remap[i] + k);
+        for (size_t k = 1; k < nout; k++) {
+          ok &= (remap[i + k] < i);
+
+          ok &= (v2o[remap[i + k]] == v2o[remap[i]]);
+
+          ok &= (remap[i + k] == remap[i] + k);
+        }
       }
 
-      if (glob.opstack[v2o[i]] == invop) {
+      if (CurOp == invop) {
         ok = false;
       }
       if (ok) {
-        if (glob.opstack[v2o[i]] == constant) {
+        if (CurOp == constant) {
           if (glob.values[i] != glob.values[remap[i]]) {
             ok = false;
           }
         }
       }
+
       if (ok) {
         glob.subgraph_cache_ptr();
 
