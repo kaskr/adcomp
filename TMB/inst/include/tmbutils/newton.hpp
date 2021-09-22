@@ -760,7 +760,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
   const char* newton_iterate(vector<Scalar> &x) {
     int reject_counter = 0;
-    Scalar f_previous = INFINITY;
     const char* msg = NULL;
     Scalar f_x = function(x)[0];
     if (x_start.size() == x.size()) {
@@ -775,6 +774,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         f_x = f_x_start;
       }
     }
+    Scalar f_previous = f_x;
     if (cfg.trace) std::cout << "f_start=" << f_x << "\n";
     for (int i=0; i < cfg.maxit; i++) {
       vector<Scalar> g = gradient(x);
@@ -825,7 +825,9 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       Scalar f = function(x_new)[0];
       // Accept/Reject rules
       bool accept = std::isfinite(f);
-      if (accept) {
+      if ( ! accept ) {
+        reject_counter++;
+      } else {
 	// Accept if there's a value improvement:
 	accept =
 	  (f < f_previous);
