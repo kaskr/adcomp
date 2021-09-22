@@ -249,9 +249,18 @@ struct ADFun {
       Let random effects come last
   */
   void reorder(std::vector<Index> random) {
+    std::vector<bool> outer_mask;
+    if (inner_outer_in_use()) {
+      outer_mask = DomainOuterMask();
+    }
     reorder_graph(glob, random);
     std::vector<Position> pos = inv_positions(glob);
     inv_pos = subset(pos, invperm(order(glob.inv_index)));
+
+    if (inner_outer_in_use()) {
+      ASSERT(outer_mask.size() == Domain());
+      set_inner_outer(*this, outer_mask);
+    }
   }
 
   size_t Domain() const { return glob.inv_index.size(); }
@@ -319,6 +328,13 @@ struct ADFun {
      start[i].ptr.second`. \note `inv_index` need not be sorted !
   */
   std::vector<Position> inv_pos;
+  /** \brief Helper to find the tape position of an independent variable */
+  Position find_pos(Index inv) {
+    for (size_t i = 0; i < inv_pos.size(); i++) {
+      if (inv_pos[i].ptr.second == inv) return inv_pos[i];
+    }
+    return Position(0, 0, 0);
+  }
   /** \brief Mark the tail of the operation sequence
       A 'tail sweep' is on the subsequence `tail_start:end`.
       Only used by teh reverse sweep.
@@ -331,7 +347,7 @@ struct ADFun {
   bool inv_index_is_consecutive() {
     if (glob.inv_index.size() == 0) return true;
 
-    bool is_sorted = (inv_pos.size() == 0);
+    bool is_sorted = (inv_pos.size() == 0 && !inner_outer_in_use());
     return is_sorted && (glob.inv_index.size() ==
                          1 + glob.inv_index.back() - glob.inv_index.front());
   }
@@ -354,13 +370,18 @@ struct ADFun {
   /** \brief Set the input parameter vector on the tape */
   Position DomainVecSet(const std::vector<Scalar> &x) {
     ASSERT(x.size() == Domain());
-    if (inner_outer_in_use()) force_update();
     if (force_update_flag) {
       for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i];
       force_update_flag = false;
       return Position(0, 0, 0);
     }
     if (inv_pos.size() > 0) {
+      if (inner_outer_in_use()) {
+        for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i];
+        Index min_inv =
+            *std::min_element(glob.inv_index.begin(), glob.inv_index.end());
+        return find_pos(min_inv);
+      }
       ASSERT(inv_pos.size() == Domain());
       size_t min_var_changed = -1;
       size_t i_min = -1;
@@ -1050,11 +1071,17 @@ struct ADFun {
   /** \brief Temporarily regard this object as function of inner parameters
       \warning Don't forget to swap back when done!
   */
-  void SwapInner() { std::swap(glob.inv_index, inner_inv_index); }
+  void SwapInner() {
+    std::swap(glob.inv_index, inner_inv_index);
+    force_update();
+  }
   /** \brief Temporarily regard this object as function of outer parameters
       \warning Don't forget to swap back when done!
   */
-  void SwapOuter() { std::swap(glob.inv_index, outer_inv_index); }
+  void SwapOuter() {
+    std::swap(glob.inv_index, outer_inv_index);
+    force_update();
+  }
   /** \brief Helper: Does tape have inner/outer information ? */
   bool inner_outer_in_use() {
     return (DomainInner() > 0) || (DomainOuter() > 0);

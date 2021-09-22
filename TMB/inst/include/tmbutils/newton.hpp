@@ -704,7 +704,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     std::vector<TMBad::Index> wi = TMBad::which<TMBad::Index>(keep_inner);
     function.reorder(wi);
     gradient.reorder(wi);
-    //hessian -> reorder(wi);
+    hessian -> reorder(wi);
   }
   // Helper to swap inner/outer
   void SwapInner() {
