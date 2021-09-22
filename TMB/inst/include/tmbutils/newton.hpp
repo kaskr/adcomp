@@ -422,6 +422,11 @@ struct jacobian_sparse_plus_lowrank_t {
     G -> print(cfg);
     H0 -> print(cfg);
   }
+  void reorder(std::vector<TMBad::Index> random) {
+    H -> optimize();
+    G -> optimize();
+    H0 -> optimize();
+  }
   // Return type to represent the matrix
   template<class T>
   struct sparse_plus_lowrank {
@@ -695,6 +700,11 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     // Hessian
     hessian = std::make_shared<Hessian_Type>(function, gradient, n_inner);
     hessian -> optimize();
+    // Reorder random
+    std::vector<TMBad::Index> wi = TMBad::which<TMBad::Index>(keep_inner);
+    function.reorder(wi);
+    gradient.reorder(wi);
+    //hessian -> reorder(wi);
   }
   // Helper to swap inner/outer
   void SwapInner() {
