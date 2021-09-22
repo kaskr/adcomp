@@ -603,6 +603,10 @@ struct newton_config {
   bool on_failure_return_nan;
   /** \brief Behaviour on convergence failure: Throw warning ?*/
   bool on_failure_give_warning;
+  /** \brief Consider this absolute reduction 'significant' */
+  double signif_abs_reduction;
+  /** \brief Consider this relative reduction 'significant' */
+  double signif_rel_reduction;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
@@ -622,6 +626,8 @@ struct newton_config {
     SET_DEFAULT(simplify, true);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
+    SET_DEFAULT(signif_abs_reduction, 1e-6);
+    SET_DEFAULT(signif_rel_reduction, .5);
 #undef SET_DEFAULT
   }
   newton_config() {
@@ -684,19 +690,19 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       // Masks
       std::vector<bool> active = gradient.activeDomain();
       for (size_t i=0; i<n_inner; i++) active[i] = true; // just in case ...
+      size_t num_inactive = std::count(active.begin(), active.end(), false);
       if (cfg.trace) {
-	std::cout << "Dead indices:\n";
-	for (size_t i=0; i<active.size(); i++) {
-	  if (!active[i]) std::cout << i << " ";
-	}
-	std::cout << "\n";
+	std::cout << "Dead gradient args to 'simplify': ";
+	std::cout << num_inactive << "\n";
       }
-      function.DomainReduce(active);
-      gradient.DomainReduce(active);
-      std::vector<bool> active_outer(active.begin() + n_inner, active.end());
-      par_outer = TMBad::subset(par_outer, active_outer);
-      ASSERT(n_inner == (size_t) function.inner_inv_index.size());
-      function.optimize();
+      if (num_inactive > 0) {
+	function.DomainReduce(active);
+	gradient.DomainReduce(active);
+	std::vector<bool> active_outer(active.begin() + n_inner, active.end());
+	par_outer = TMBad::subset(par_outer, active_outer);
+	ASSERT(n_inner == (size_t) function.inner_inv_index.size());
+	function.optimize();
+      }
     }
     gradient.optimize();
     // Hessian
@@ -753,7 +759,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     return msg;
   }
   const char* newton_iterate(vector<Scalar> &x) {
-    if (cfg.trace == 10) std::cout << "x_start=" << x << "\n";
     int reject_counter = 0;
     Scalar f_previous = INFINITY;
     const char* msg = NULL;
@@ -799,7 +804,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       // Quick ustep reduction based on Hessian diagonal
       Scalar m = diag_cpy.minCoeff();
       if (std::isfinite(m) && m < 0) {
-	if (cfg.trace) std::cout << "m=" << m << " ";
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
       }
@@ -819,43 +823,27 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       vector<Scalar> x_new =
         x - hessian -> llt_solve(H, g).array();
       Scalar f = function(x_new)[0];
-      /* =========== Step Accept/Reject
-	Must account for two contradicting situations:
-
-	0. fnew=nan ===> REJECT!
-	1. (f=1e6,mgc=1e-3)  --> (f=1.00001e6,mgc=1e-4) ACCEPT !
-	2. (f,mgc) are both almost the same REJECT !
-
-	warning: f_previous + 1e-8 is BAD because it might reduce to f_previous...
-
-
-
-	New definitions:
-
-	* A step can be ACCEPTED if there's a tiny improvement in f and mgc
-	* We count the number of steps that are either REJECTED or POOR. When count is high we try early exit.
-      */
-      // If nan REJECT!
+      // Accept/Reject rules
       bool accept = std::isfinite(f);
       if (accept) {
-	// ACCEPT if there's a value improvement:
+	// Accept if there's a value improvement:
 	accept =
 	  (f < f_previous);
 	// OR...
 	if (! accept) {
-	  // Accept if relative mgc reduction is substantial without increasing value too much
+	  // Accept if relative mgc reduction is substantial without increasing value 'too much'
 	  accept =
-	    (f - f_previous <= 1e-6 ) &&
-	    vector<Scalar>(gradient(x_new)).abs().maxCoeff() / mgc < .5;
+	    (f - f_previous <= cfg.signif_abs_reduction ) &&
+	    vector<Scalar>(gradient(x_new)).abs().maxCoeff() / mgc < 1. - cfg.signif_rel_reduction;
 	}
 	// Assess the quality of the update
-	if ( accept && (f_previous - f > 1e-4) ) {
+	if ( accept && (f_previous - f > cfg.signif_abs_reduction) ) {
 	  reject_counter = 0;
 	} else {
 	  reject_counter++;
 	}
       }
-      // Take action depending on accept/reject 
+      // Take action depending on accept/reject
       if ( accept ) { // Improvement
         // Accept
         cfg.ustep = increase(cfg.ustep);
