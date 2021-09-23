@@ -603,6 +603,10 @@ struct newton_config {
   bool on_failure_return_nan;
   /** \brief Behaviour on convergence failure: Throw warning ?*/
   bool on_failure_give_warning;
+  /** \brief Consider this absolute reduction 'significant' */
+  double signif_abs_reduction;
+  /** \brief Consider this relative reduction 'significant' */
+  double signif_rel_reduction;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
@@ -622,6 +626,8 @@ struct newton_config {
     SET_DEFAULT(simplify, true);
     SET_DEFAULT(on_failure_return_nan, true);
     SET_DEFAULT(on_failure_give_warning, true);
+    SET_DEFAULT(signif_abs_reduction, 1e-6);
+    SET_DEFAULT(signif_rel_reduction, .5);
 #undef SET_DEFAULT
   }
   newton_config() {
@@ -684,12 +690,19 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       // Masks
       std::vector<bool> active = gradient.activeDomain();
       for (size_t i=0; i<n_inner; i++) active[i] = true; // just in case ...
-      function.DomainReduce(active);
-      gradient.DomainReduce(active);
-      std::vector<bool> active_outer(active.begin() + n_inner, active.end());
-      par_outer = TMBad::subset(par_outer, active_outer);
-      ASSERT(n_inner == (size_t) function.inner_inv_index.size());
-      function.optimize();
+      size_t num_inactive = std::count(active.begin(), active.end(), false);
+      if (cfg.trace) {
+	std::cout << "Dead gradient args to 'simplify': ";
+	std::cout << num_inactive << "\n";
+      }
+      if (num_inactive > 0) {
+	function.DomainReduce(active);
+	gradient.DomainReduce(active);
+	std::vector<bool> active_outer(active.begin() + n_inner, active.end());
+	par_outer = TMBad::subset(par_outer, active_outer);
+	ASSERT(n_inner == (size_t) function.inner_inv_index.size());
+	function.optimize();
+      }
     }
     gradient.optimize();
     // Hessian
@@ -747,7 +760,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
   const char* newton_iterate(vector<Scalar> &x) {
     int reject_counter = 0;
-    Scalar f_previous = INFINITY;
     const char* msg = NULL;
     Scalar f_x = function(x)[0];
     if (x_start.size() == x.size()) {
@@ -762,6 +774,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
         f_x = f_x_start;
       }
     }
+    Scalar f_previous = f_x;
     if (cfg.trace) std::cout << "f_start=" << f_x << "\n";
     for (int i=0; i < cfg.maxit; i++) {
       vector<Scalar> g = gradient(x);
@@ -810,29 +823,52 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
       vector<Scalar> x_new =
         x - hessian -> llt_solve(H, g).array();
       Scalar f = function(x_new)[0];
-      if (std::isfinite(f) &&
-          f < f_previous + 1e-8) { // Improvement
+      // Accept/Reject rules
+      bool accept = std::isfinite(f);
+      if ( ! accept ) {
+        reject_counter++;
+      } else {
+	// Accept if there's a value improvement:
+	accept =
+	  (f < f_previous);
+	// OR...
+	if (! accept) {
+	  // Accept if relative mgc reduction is substantial without increasing value 'too much'
+	  accept =
+	    (f - f_previous <= cfg.signif_abs_reduction ) &&
+	    vector<Scalar>(gradient(x_new)).abs().maxCoeff() / mgc < 1. - cfg.signif_rel_reduction;
+	}
+	// Assess the quality of the update
+	if ( accept && (f_previous - f > cfg.signif_abs_reduction) ) {
+	  reject_counter = 0;
+	} else {
+	  reject_counter++;
+	}
+      }
+      // Take action depending on accept/reject
+      if ( accept ) { // Improvement
         // Accept
         cfg.ustep = increase(cfg.ustep);
         f_previous = f;
         x = x_new;
-        reject_counter = 0;
       } else { // No improvement
         // Reject
         cfg.ustep = decrease(cfg.ustep);
-        reject_counter ++;
-        if (reject_counter > cfg.max_reject) {
-          if (cfg.ok_exit_if_pdhess) {
-            H = (*hessian)(std::vector<Scalar>(x));
-            // Try to factorize
-            hessian -> llt_factorize(H);
-            bool PD = (hessian -> llt_info() == 0);
-            if (PD) return msg;
-          }
-          return
-            convergence_fail("Max number of rejections exceeded", x);
-        }
       }
+      // Handle long runs without improvement
+      if (reject_counter > cfg.max_reject) {
+	if (cfg.ok_exit_if_pdhess) {
+	  H = (*hessian)(std::vector<Scalar>(x));
+	  // Try to factorize
+	  hessian -> llt_factorize(H);
+	  bool PD = (hessian -> llt_info() == 0);
+	  if (cfg.trace) std::cout << "Trying early exit - PD Hess? " << PD << "\n";
+	  if (PD) return msg;
+	}
+	return
+	  convergence_fail("Max number of rejections exceeded", x);
+      }
+      // Tracing info
       if (cfg.trace) std::cout << "f=" << f << " ";
       if (cfg.trace) std::cout << "reject=" << reject_counter << " ";
       if (cfg.trace) std::cout << "\n";
