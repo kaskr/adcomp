@@ -125,7 +125,7 @@ struct array:Map< Array<Type,Dynamic,1> >{
   /* Templated CTOR above may be ignored by the
      compiler. E.g. clang-13 used a compiler generated default copy
      CTOR which did not synchronize the MapBase::data() pointer (!) */
-  array(const array &x) : MapBase(NULL,0), vectorcopy(x.vectorcopy) {
+  array(const array &x) : MapBase(NULL,0), vectorcopy(x) {
     if ( x.size() > 0 ) {
       // sync pointer
       new (this) MapBase(&vectorcopy[0], x.size());
