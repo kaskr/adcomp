@@ -43,10 +43,13 @@
   
    ========================================================== 
 */
-
+#define USE_FC_LEN_T
 #include <R.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
+#ifndef FCONE
+# define FCONE
+#endif
 #include "Matrix.h"
 
 /* Copy-pasted from "Writing R Extensions". A similar spell is present
@@ -221,16 +224,25 @@ void tmb_recursion_super(CHM_SP Lsparse, int k, CHM_FR L, cholmod_common *c){
   double *wrk=malloc(nq*ns*sizeof(double));
   double *wrkps=wrk+ns;
   if(np>0){
-    F77_CALL(dtrsm)("Right","Lower","No transpose","Not unit",
-		    &np,&ns,&MONE,Lss,&nq,Lps,&nq);
+    F77_CALL(dtrsm)("R", "L", "N", "N",
+		    &np, &ns, &MONE, Lss, &nq, Lps, &nq
+                    FCONE FCONE FCONE FCONE);
     for(i=ns;i<nq;i++){for(j=0;j<ns;j++)Lss[j+nq*i] = Lss[i+nq*j];} /* Copy Transpose*/
     memcpy(wrk,Lss,nq*ns*sizeof(double));    
-    F77_CALL(dsymm)("Left","Lower",&np,&ns,&ONE,Spp,&nq,Lps,&nq,&ZERO,wrkps,&nq);
+    F77_CALL(dsymm)("L", "L",
+                    &np, &ns, &ONE, Spp, &nq, Lps, &nq, &ZERO, wrkps, &nq
+                    FCONE FCONE);
     memcpy(Lss,wrk,nq*ns*sizeof(double));
-    F77_CALL(dpotri)("L",&ns,Lss,&nq,&info);
-    F77_CALL(dgemm)("N","N",&ns,&ns,&np,&ONE,Ssp,&nq,Lps,&nq,&ONE,Lss,&nq);
+    F77_CALL(dpotri)("L",
+                     &ns, Lss, &nq, &info
+                     FCONE);
+    F77_CALL(dgemm)("N", "N",
+                    &ns, &ns, &np, &ONE, Ssp, &nq, Lps, &nq, &ONE, Lss, &nq
+                    FCONE FCONE);
   } else {
-    F77_CALL(dpotri)("L",&ns,Lss,&nq,&info);
+    F77_CALL(dpotri)("L",
+                     &ns, Lss, &nq, &info
+                     FCONE);
   }
   /* ----------- Fill results into L(q,s) -------*/
   double *Lx=Lsparse->x;
