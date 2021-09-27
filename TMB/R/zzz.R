@@ -34,6 +34,10 @@ checkMatrixPackageVersion <- function() {
     checkMatrixPackageVersion()
 }
 
+.onUnload <- function(libpath) {
+    library.dynam.unload("TMB", libpath)
+}
+
 ## .LastLib <- function(libpath)
 ## {
 ##   library.dynam.unload("TMB", libpath)
