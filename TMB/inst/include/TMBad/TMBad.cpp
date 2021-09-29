@@ -968,6 +968,7 @@ void global::operation_stack::copy_from(const operation_stack &x) {
     for (size_t i = 0; i < x.size(); i++)
       (*this).push_back(x[i]->copy(), false);
   } else {
+    this->any_dynamic = false;
     std::vector<OperatorPure *>::operator=(x);
   }
 }
