@@ -929,30 +929,6 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
 };
 
-template<class Type, class PTR>
-Type log_determinant(const matrix<Type> &H, PTR ptr) {
-  // FIXME: Depending on TMB atomic
-  return atomic::logdet(tmbutils::matrix<Type>(H));
-}
-template<class Type, class PTR>
-Type log_determinant(const Eigen::SparseMatrix<Type> &H, PTR ptr) {
-  // FIXME: Tape once for 'reasonable' numeric values - then replay
-  // (to avoid unpredictable brancing issues)
-  Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
-  //return ldl.vectorD().log().sum();
-  vector<Type> D = ldl.vectorD();
-  return D.log().sum();
-}
-template<class Type>
-Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
-                     std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr) {
-  matrix<Type> M = (ptr -> getM(ptr, H)).array();
-  return
-    log_determinant(H.H, NULL) +
-    log_determinant(H.H0, NULL) +
-    log_determinant(M, NULL);
-}
-
 // FIXME: jacobian_sparse_supernodal_t RENAME !!!
 typedef jacobian_sparse_t< DEFAULT_SPARSE_FACTORIZATION > jacobian_sparse_supernodal_t;
 
@@ -1094,6 +1070,31 @@ inline double log_determinant(const Eigen::SparseMatrix<double> &H) {
   DEFAULT_SPARSE_FACTORIZATION llt(H);
   return logDeterminant(llt);
 }
+
+template<class Type, class PTR>
+Type log_determinant(const matrix<Type> &H, PTR ptr) {
+  // FIXME: Depending on TMB atomic
+  return atomic::logdet(tmbutils::matrix<Type>(H));
+}
+// template<class Type, class PTR>
+// Type log_determinant(const Eigen::SparseMatrix<Type> &H, PTR ptr) {
+//   // FIXME: Tape once for 'reasonable' numeric values - then replay
+//   // (to avoid unpredictable brancing issues)
+//   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
+//   //return ldl.vectorD().log().sum();
+//   vector<Type> D = ldl.vectorD();
+//   return D.log().sum();
+// }
+template<class Type>
+Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
+                     std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr) {
+  matrix<Type> M = (ptr -> getM(ptr, H)).array();
+  return
+    log_determinant(H.H, ptr->H) +
+    log_determinant(H.H0, NULL) +
+    log_determinant(M, NULL);
+}
+
 
 // Interface
 template<class Newton>
