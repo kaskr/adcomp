@@ -986,7 +986,9 @@ struct InvSubOperator : TMBad::global::SharedDynamicOperator {
     args.dx_segment(0, n) += dx;
   }
   template<class T>
-  void reverse(TMBad::ReverseArgs<T> &args) { ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<T> &args) {
+    Rf_error("Inverse subset: order 2 not yet implemented (try changing config())");
+  }
   template<class T>
   void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
