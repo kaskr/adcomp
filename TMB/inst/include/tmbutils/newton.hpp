@@ -1045,8 +1045,19 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
   const char* op_name() { return "logDet"; }
 };
 template<class Type>
+Type log_determinant_simple(const Eigen::SparseMatrix<Type> &H) {
+  // FIXME: Tape once for 'reasonable' numeric values - then replay
+  // (to avoid unpredictable brancing issues)
+  Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
+  //return ldl.vectorD().log().sum();
+  vector<Type> D = ldl.vectorD();
+  return D.log().sum();
+}
+template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H,
                      std::shared_ptr< jacobian_sparse_supernodal_t > ptr) {
+  if (!config.tmbad.atomic_sparse_log_determinant)
+    return log_determinant_simple(H);
   const Type* vptr = H.valuePtr();
   size_t n = H.nonZeros();
   std::vector<Type> x(vptr, vptr + n);
@@ -1076,15 +1087,6 @@ Type log_determinant(const matrix<Type> &H, PTR ptr) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
-// template<class Type, class PTR>
-// Type log_determinant(const Eigen::SparseMatrix<Type> &H, PTR ptr) {
-//   // FIXME: Tape once for 'reasonable' numeric values - then replay
-//   // (to avoid unpredictable brancing issues)
-//   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
-//   //return ldl.vectorD().log().sum();
-//   vector<Type> D = ldl.vectorD();
-//   return D.log().sum();
-// }
 template<class Type>
 Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
                      std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr) {
