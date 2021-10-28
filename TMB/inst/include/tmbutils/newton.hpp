@@ -607,6 +607,11 @@ struct newton_config {
   double signif_abs_reduction;
   /** \brief Consider this relative reduction 'significant' */
   double signif_rel_reduction;
+  /** \brief Modify Laplace approximation to return saddlepoint approximation?
+      \details
+      For this to work the inner objective function must return the
+      negative log **MGF** rather than **density** */
+  bool SPA;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
@@ -628,6 +633,7 @@ struct newton_config {
     SET_DEFAULT(on_failure_give_warning, true);
     SET_DEFAULT(signif_abs_reduction, 1e-6);
     SET_DEFAULT(signif_rel_reduction, .5);
+    SET_DEFAULT(SPA, false);
 #undef SET_DEFAULT
   }
   newton_config() {
@@ -1139,11 +1145,12 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
     return (*(Base::hessian))(std::vector<Type>(sol));
   }
   Type Laplace() {
+    double sign = (Base::cfg.SPA ? -1 : 1);
     return
-      value() +
+      sign * value() +
       .5 * log_determinant( hessian(),
                             Base::hessian) -
-      .5 * log(2. * M_PI) * n;
+      sign * .5 * log(2. * M_PI) * n;
   }
 };
 
