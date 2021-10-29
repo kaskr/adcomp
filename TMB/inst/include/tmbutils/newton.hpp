@@ -1142,7 +1142,7 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
   }
   Type value() {
     if (Base::cfg.simplify) {
-      return F(solution())[0];
+      return F(solution());
     } else {
       return Base::function(std::vector<Type>(sol))[0];
     }
@@ -1264,10 +1264,10 @@ struct slice {
   }
   typedef TMBad::ad_aug T;
   std::vector<TMBad::ad_aug> x;
-  std::vector<T> operator()(const std::vector<T> &x_random) {
+  T operator()(const std::vector<T> &x_random) {
     for (size_t i=0; i<random.size(); i++)
       x[random[i]] = x_random[i];
-    return F(x);
+    return F(x)[0];
   }
   ADFun Laplace_(newton_config cfg = newton_config()) {
     ADFun ans;
