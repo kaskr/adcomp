@@ -1258,7 +1258,10 @@ struct slice {
   slice(ADFun &F,
         //std::vector<TMBad::ad_aug> x,
         std::vector<TMBad::Index> random) :
-    F(F), random(random) {}
+    F(F), random(random) {
+    ASSERT2(F.Range() == 1,
+            "Laplace approximation is for scalar valued functions");
+  }
   typedef TMBad::ad_aug T;
   std::vector<TMBad::ad_aug> x;
   std::vector<T> operator()(const std::vector<T> &x_random) {
