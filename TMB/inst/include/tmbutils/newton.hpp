@@ -1122,6 +1122,21 @@ template<class Newton>
 void Newton_CTOR_Hook(Newton &F, const vector<TMBad::ad_aug> &start) {
   F.sol = F.add_to_tape();
 }
+
+template<class Type>
+struct cast_value {
+  Type get(TMBad::ad_aug x) {
+    ASSERT2(x.constant(),
+            "Invalid cast from ad_aug to double?");
+    return x.Value();
+  }
+};
+template<>
+struct cast_value<TMBad::ad_aug> {
+   TMBad::ad_aug get(TMBad::ad_aug x) {
+     return x;
+   }
+};
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
   typedef NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > Base;
@@ -1137,12 +1152,12 @@ struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
   operator vector<Type>() const {
     return sol.head(n);
   }
-  vector<Type> solution() {
+  tmbutils::vector<Type> solution() {
     return sol.head(n);
   }
   Type value() {
     if (Base::cfg.simplify) {
-      return F(solution());
+      return cast_value<Type>().get(F(solution()));
     } else {
       return Base::function(std::vector<Type>(sol))[0];
     }
