@@ -1089,6 +1089,12 @@ inline double log_determinant(const Eigen::SparseMatrix<double> &H) {
   DEFAULT_SPARSE_FACTORIZATION llt(H);
   return logDeterminant(llt);
 }
+inline double log_determinant(const Eigen::SparseMatrix<double> &H,
+                              std::shared_ptr<jacobian_sparse_supernodal_t> ptr) {
+  // FIXME: Use ptr llt
+  DEFAULT_SPARSE_FACTORIZATION llt(H);
+  return logDeterminant(llt);
+}
 
 template<class Type, class PTR>
 Type log_determinant(const matrix<Type> &H, PTR ptr) {
