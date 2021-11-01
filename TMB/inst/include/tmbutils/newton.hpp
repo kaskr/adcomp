@@ -44,7 +44,17 @@ inline double logDeterminant(const DEFAULT_SPARSE_FACTORIZATION &llt) {
 #endif
 
 #include <memory>
-/** \brief Sparse and dense versions of atomic Newton solver and Laplace approximation */
+/** \brief Highly flexible atomic `Newton()` solver and `Laplace()` approximation
+
+    ### Supported features
+
+    - Supports several hessian structures: Sparse, dense and sparse plus lowrank.
+    - Supports unlimited nesting (Newton solver within newton solver within ...)
+    - Supports AD to any order at runtime
+    - Supports AD Hessian of Laplace approximation (because inverse subset derivatives are implemented).
+    - Supports sparse hessian of either simplicial or supernodal kind.
+    - Supports 64 bit cholmod integers for very large problems.
+*/
 namespace newton {
 // FIXME: R macro
 #ifdef eval
