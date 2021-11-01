@@ -1159,19 +1159,22 @@ void Newton_CTOR_Hook(Newton &F, const vector<TMBad::ad_aug> &start) {
   F.sol = F.add_to_tape();
 }
 
+// Helper to simplify user interface of Functor by making ad_aug version work for doubles as well 
 template<class Type>
-struct cast_value {
-  Type get(TMBad::ad_aug x) {
-    ASSERT2(x.constant(),
+struct unsafe_cast : TMBad::ad_aug {
+  unsafe_cast(TMBad::ad_aug x) : TMBad::ad_aug(x) {}
+  operator Type() {
+    ASSERT2(this->constant(),
             "Invalid cast from ad_aug to double?");
-    return x.Value();
+    return this->Value();
   }
 };
 template<>
-struct cast_value<TMBad::ad_aug> {
-   TMBad::ad_aug get(TMBad::ad_aug x) {
-     return x;
-   }
+struct unsafe_cast<TMBad::ad_aug> : TMBad::ad_aug {
+  unsafe_cast(TMBad::ad_aug x) : TMBad::ad_aug(x) {}
+  operator TMBad::ad_aug () {
+    return *this;
+  }
 };
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
@@ -1193,7 +1196,7 @@ struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
   }
   Type value() {
     if (Base::cfg.simplify) {
-      return cast_value<Type>().get(F(solution()));
+      return unsafe_cast<Type> ( F(solution()) );
     } else {
       return Base::function(std::vector<Type>(sol))[0];
     }
