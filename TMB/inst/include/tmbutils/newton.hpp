@@ -686,7 +686,7 @@ struct newton_config_t : newton_config {
     removed from the list of outer parameters, effectively reducing the
     input dimension of the Newton operator.
 */
-template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
+template<class Functor, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
@@ -698,7 +698,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   newton_config cfg;
   // Outer parameters
   std::vector<TMBad::ad_aug> par_outer;
-  NewtonOperator(Functor &F, vector<Type> start, newton_config cfg)
+  NewtonOperator(Functor &F, vector<TMBad::ad_aug> start, newton_config cfg)
     : cfg(cfg)
   {
     // Create tape of the user functor and optimize the tape
@@ -1167,8 +1167,8 @@ struct cast_value<TMBad::ad_aug> {
    }
 };
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
-struct NewtonSolver : NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > {
-  typedef NewtonOperator<Functor, TMBad::ad_aug, Hessian_Type > Base;
+struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
+  typedef NewtonOperator<Functor, Hessian_Type > Base;
   typedef typename Hessian_Type::template MatrixResult<Type>::type hessian_t;
   vector<Type> sol; // c(sol, par_outer)
   size_t n; // Number of inner parameters
