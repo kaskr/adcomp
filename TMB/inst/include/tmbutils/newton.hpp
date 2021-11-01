@@ -656,7 +656,36 @@ struct newton_config_t : newton_config {
 
 /* --- Newton Operator ---------------------------------------------------- */
 
-/** \brief Generalized newton solver similar to R function TMB:::newton */
+/** \brief Generalized newton solver similar to TMB R function 'newton'
+    \details This operator represents a Newton solver that can be put
+    on the AD tape. Using the notation
+    \f[
+    f(u,\theta)
+    \f]
+    for an objective function with 'inner' parameters \f$u\f$ and
+    'outer' parameters \f$\theta\f$, the operator is defined by
+    \f[
+    \theta \rightarrow \hat{u}(\theta) := \text{argmin}_u f(u, \theta)
+    \f].
+
+    ### Applied optimizations
+
+    1. If `cfg.decompose=true` (default), all sub-expressions of
+    \f$f(u,\theta)\f$ that do *not* depend on \f$u\f$ are moved out of
+    the solver, effecively corresponding to a re-parameterization of
+    the outer parameters. An example could be that the objective
+    function calculates a determinant that only depends on
+    \f$\theta\f$. In this situation the result of the determinant
+    becomes the new outer parameter rather than \f$\theta\f$.
+
+    2. A sligthly overlapping, but different, optimization is applied
+    if `cfg.simplify=true` (default). We call it a 'dead gradient'
+    analysis because it detects which \f$\theta_i\f$ do not affect the
+    gradient of the objective wrt \f$u\f$. Such \f$\theta_i\f$ cannot
+    affect the solution \f$\hat{u}\f$ either and can therefore be
+    removed from the list of outer parameters, effectively reducing the
+    input dimension of the Newton operator.
+*/
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   static const bool have_input_size_output_size = true;
