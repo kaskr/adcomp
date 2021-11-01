@@ -685,6 +685,9 @@ struct newton_config_t : newton_config {
     affect the solution \f$\hat{u}\f$ either and can therefore be
     removed from the list of outer parameters, effectively reducing the
     input dimension of the Newton operator.
+
+    \tparam Functor Class of the objective function.
+    \tparam Hessian_Type Class of the hessian structure (sparse, dense or sparse_plus_lowrank).
 */
 template<class Functor, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonOperator : TMBad::global::SharedDynamicOperator {
@@ -698,6 +701,11 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   newton_config cfg;
   // Outer parameters
   std::vector<TMBad::ad_aug> par_outer;
+  /** \brief Constructor
+      \param F Objective function taking `vector<TMBad::ad_aug>` as input and `TMBad::ad_aug` as output.
+      \param start Initial guess for the optimizer.
+      \param cfg Configuration parameters - see `newton_config`.
+  */
   NewtonOperator(Functor &F, vector<TMBad::ad_aug> start, newton_config cfg)
     : cfg(cfg)
   {
