@@ -972,8 +972,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
   }
 };
 
-// FIXME: jacobian_sparse_supernodal_t RENAME !!!
-typedef jacobian_sparse_t< DEFAULT_SPARSE_FACTORIZATION > jacobian_sparse_supernodal_t;
+typedef jacobian_sparse_t< DEFAULT_SPARSE_FACTORIZATION > jacobian_sparse_default_t;
 
 template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
 struct InvSubOperator : TMBad::global::SharedDynamicOperator {
@@ -1100,7 +1099,7 @@ Type log_determinant_simple(const Eigen::SparseMatrix<Type> &H) {
 }
 template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H,
-                     std::shared_ptr< jacobian_sparse_supernodal_t > ptr) {
+                     std::shared_ptr< jacobian_sparse_default_t > ptr) {
   if (!config.tmbad.atomic_sparse_log_determinant)
     return log_determinant_simple(H);
   const Type* vptr = H.valuePtr();
@@ -1127,7 +1126,7 @@ inline double log_determinant(const Eigen::SparseMatrix<double> &H) {
   return logDeterminant(llt);
 }
 inline double log_determinant(const Eigen::SparseMatrix<double> &H,
-                              std::shared_ptr<jacobian_sparse_supernodal_t> ptr) {
+                              std::shared_ptr<jacobian_sparse_default_t> ptr) {
   // FIXME: Use ptr llt
   DEFAULT_SPARSE_FACTORIZATION llt(H);
   return logDeterminant(llt);
