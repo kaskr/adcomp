@@ -52,8 +52,8 @@ inline double logDeterminant(const DEFAULT_SPARSE_FACTORIZATION &llt) {
     - Supports unlimited nesting (Newton solver within newton solver within ...)
     - Supports AD to any order at runtime
     - Supports AD Hessian of Laplace approximation (because inverse subset derivatives are implemented).
-    - Supports sparse hessian of either simplicial or supernodal kind.
-    - Supports 64 bit cholmod integers for very large problems.
+    - Supports sparse hessian of either simplicial or supernodal kind (via preprocessor flag `TMBAD_SUPERNODAL`).
+    - Supports CHOLMOD 64 bit integer versions for very large problems (from Eigen version 3.4).
 */
 namespace newton {
 // FIXME: R macro
