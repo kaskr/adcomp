@@ -1292,6 +1292,9 @@ vector<Type> Newton(Functor &F,
     \param cfg Configuration parameters for solver
 
     \return Scalar with Laplace Approximation
+
+    \note `start` is passed by reference and contains the inner
+    problem mode on output
 */
 template<class Functor, class Type>
 Type Laplace(Functor &F,
