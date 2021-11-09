@@ -60,4 +60,4 @@ differentiation for large dense matrices.
 \example matrix_arrays.cpp
 \example multivariate_distributions.cpp
 
-`r paste("\\example", basename(dir("../tmb_examples", pattern=".cpp", recursive=TRUE)), collapse="\n")`
+`r paste("\\example", dir("../tmb_examples", pattern=".cpp", recursive=TRUE), collapse="\n")`
