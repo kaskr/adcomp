@@ -368,15 +368,15 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
 
 /** \brief Methods specific for a sparse plus low rank hessian
 
-    Represents a matrix of the form
+    Represents a positive definite matrix of the form
 
     `H + G * H0 * G^T`
 
     where
 
-    - H is sparse n-by-n
+    - H is sparse n-by-n (positive definite)
     - G is a dense n-by-k low rank matrix
-    - H0 is dense k-by-k
+    - H0 is dense k-by-k (preferably negative definite)
 
     To detect this structure one must use the `Tag` function to select
     k intermediate variables which will be used to decompose the
@@ -386,19 +386,38 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
     ========
 
     The following formulas are applied internally to perform the solve
+    (Woodbury matrix identity) and determinant (Matrix determinant
+    lemma).
 
     ## Solve
 
     ```
-    W <- solve(H, G)
-    M <- solve(H0) + t(G) %*% W
-    solve(H) - W %*% solve(M) %*% t(W)
+    W = solve(H, G)
+    M = solve(H0) + G^T * W
+    solve(H + G * H0 * G^T) = solve(H) - W * solve(M) * W^T
     ```
 
     ## determinant
 
     ```
-    det(H) * det(H0) * det(M)
+    det(H + G * H0 * G^T) = det(H) * det(H0) * det(M)
+    ```
+
+    However, we use the substitution `H0M := H0 * M` for numerical
+    robustness. These formulas are valid even when `H0 = 0`:
+
+    ## Solve
+
+    ```
+    W <- solve(H, G)
+    H0M = I + H0 * t(G) * W
+    solve(H + G * H0 * G^T) = solve(H) - W * solve(H0M) * H0 * t(W)
+    ```
+
+    ## Determinant
+
+    ```
+    det(H + G * H0 * G^T) = det(H) * det(H0M)
     ```
 */
 struct jacobian_sparse_plus_lowrank_t {
@@ -509,15 +528,18 @@ struct jacobian_sparse_plus_lowrank_t {
   matrix<TMBad::Scalar> llt_solve(const sparse_plus_lowrank<TMBad::Scalar> &h,
                                   const matrix<TMBad::Scalar> &x) {
     matrix<TMBad::Scalar> W = H -> llt_solve(h.H, h.G); // n x k
-    matrix<TMBad::Scalar> M = h.H0.inverse() + h.G.transpose() * W;
+    matrix<TMBad::Scalar> H0M = h.H0 * h.G.transpose() * W;
+    H0M.diagonal().array() += TMBad::Scalar(1.);
     matrix<TMBad::Scalar> y1 = H -> llt_solve(h.H, x);
-    matrix<TMBad::Scalar> y2 = W * M.ldlt().solve(W.transpose() * x);
+    matrix<TMBad::Scalar> y2 = W * H0M.ldlt().solve(h.H0 * W.transpose() * x);
     return y1 - y2;
   }
   template<class T>
   vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
                   const vector<T> &hvec,
                   const vector<T> &xvec) {
+    using atomic::matmul;
+    using atomic::matinv;
     sparse_plus_lowrank<T> h = as_matrix(hvec);
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
@@ -527,17 +549,23 @@ struct jacobian_sparse_plus_lowrank_t {
     W.resize(n, W.size() / n);
     tmbutils::matrix<T> H0 = h.H0.array();
     tmbutils::matrix<T> Gt = h.G.transpose();
-    tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
+    tmbutils::matrix<T> H0M =
+      matmul(H0,
+             matmul(Gt,
+                    W));
+    H0M.diagonal().array() += T(1.);
     vector<T> y1 =
       HessianSolveVector<jacobian_sparse_t<> >(ptr -> H, 1).
       solve(h.Hvec, xvec);
-    tmbutils::matrix<T> iM = atomic::matinv(M); // FIXME: HessianSolveVector
+    tmbutils::matrix<T> iH0M = matinv(H0M);
     tmbutils::matrix<T> Wt = W.transpose();
     tmbutils::matrix<T> xmat = xvec.matrix();
     vector<T> y2 =
-      atomic::matmul(W,
-                     atomic::matmul(iM,
-                                    atomic::matmul(Wt, xmat))).array();
+      matmul(W,
+             matmul(iH0M,
+                    matmul(H0,
+                           matmul(Wt,
+                                  xmat)))).array();
     return y1 - y2;
   }
   // Scalar case: A bit faster than the above template
@@ -549,8 +577,8 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   // Helper to get determinant: det(H)*det(H0)*det(M)
   template<class T>
-  tmbutils::matrix<T> getM(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
-                           const sparse_plus_lowrank<T> &h) {
+  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
+                             const sparse_plus_lowrank<T> &h) {
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
                                                h.G.cols()).
@@ -559,8 +587,9 @@ struct jacobian_sparse_plus_lowrank_t {
     W.resize(n, W.size() / n);
     tmbutils::matrix<T> H0 = h.H0.array();
     tmbutils::matrix<T> Gt = h.G.transpose();
-    tmbutils::matrix<T> M = atomic::matinv(H0) + atomic::matmul(Gt, W);
-    return M;
+    tmbutils::matrix<T> H0M = atomic::matmul(H0, atomic::matmul(Gt, W));
+    H0M.diagonal().array() += T(1.);
+    return H0M;
   }
 };
 
@@ -1150,11 +1179,10 @@ Type log_determinant(const matrix<Type> &H, PTR ptr) {
 template<class Type>
 Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
                      std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr) {
-  matrix<Type> M = (ptr -> getM(ptr, H)).array();
+  matrix<Type> H0M = (ptr -> getH0M(ptr, H)).array();
   return
     log_determinant(H.H, ptr->H) +
-    log_determinant(H.H0, NULL) +
-    log_determinant(M, NULL);
+    log_determinant(H0M, NULL);
 }
 
 
