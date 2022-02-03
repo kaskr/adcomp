@@ -444,7 +444,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   typedef TypeDefs<double>::ConstMapMatrix ConstMapMatrix_t;
 			   int n1 = CppAD::Integer(tx[0]);
 			   int n3 = CppAD::Integer(tx[1]);
-			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   int n2 = ( n1 + n3 > 0 ? (tx.size() - 2) / (n1 + n3) : 0 );
 			   ConstMapMatrix_t X(&tx[2      ], n1, n2);
 			   ConstMapMatrix_t Y(&tx[2+n1*n2], n2, n3);
 			   MapMatrix_t      Z(&ty[0      ], n1, n3);
@@ -454,7 +454,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   typedef typename TypeDefs<Type>::MapMatrix MapMatrix_t;
 			   int n1 = CppAD::Integer(tx[0]);
 			   int n3 = CppAD::Integer(tx[1]);
-			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   int n2 = ( n1 + n3 > 0 ? (tx.size() - 2) / (n1 + n3) : 0 );
 			   matrix<Type> Xt = vec2mat(tx, n1, n2, 2).transpose();
 			   matrix<Type> Yt = vec2mat(tx, n2, n3, 2 + n1*n2).transpose();
 			   matrix<Type> W = vec2mat(py, n1, n3);
