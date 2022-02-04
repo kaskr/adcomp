@@ -35,7 +35,7 @@ checkMatrixPackageVersion <- function() {
     ## Select AD framework (CppAD or TMBad) used by TMB::compile
     tmb.ad.framework <- getOption("tmb.ad.framework", NULL)
     if (is.null(tmb.ad.framework))
-        tmb.ad.framework <- Sys.getenv("TMB_AD_FRAMEWORK", "TMBad")
+        tmb.ad.framework <- Sys.getenv("TMB_AD_FRAMEWORK", "CppAD")
     options("tmb.ad.framework" = tmb.ad.framework)
 }
 
