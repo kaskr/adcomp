@@ -77,7 +77,7 @@ using SparseMatrix = SparseMatrix_rename<T, Flags, StorageIndex>;
 /* Select AD framework: TMBAD or CPPAD  */
 #ifndef CPPAD_FRAMEWORK
 #ifndef TMBAD_FRAMEWORK
-#define CPPAD_FRAMEWORK
+#define TMBAD_FRAMEWORK
 #endif
 #endif
 
