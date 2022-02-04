@@ -357,7 +357,36 @@ struct TagOp : TMBad::global::Operator<1> {
   }
   const char* op_name() { return "TagOp"; }
 };
-/** \brief Mark a variable during taping */
+/** \brief Mark a variable during taping
+
+    \details The 'sparse plus low rank' Hessian
+    (`jacobian_sparse_plus_lowrank_t`) requires the user to manually
+    mark variables used to identify the low rank contribution.
+
+    For any intermediate variable `s(x)` we can write the objective
+    function `f(x)` as `f(x,s(x))`. The hessian takes the form
+
+    ```
+    hessian( f(x, s(x)) ) = jac(s)^T * f''_yy * jac(s) + R(x)
+    ```
+
+    where the first term is referred to as a 'lowrank contribution'
+    and `R(x)` is the remainder term. The user must choose `s(x)` in a
+    way such that the remainder term becomes a sparse matrix. A good
+    heuristic is (which you'll see by expanding the remainder term):
+
+    - Choose `s(x)` that links to *many* random effects
+    - Choose `s(x)` such that `hessian(s)` is sparse
+
+    Example (incomplete) of use:
+    \code
+    PARAMETER_VECTOR(x);
+    Type S = x.exp().sum(); // hessian(S) is sparse!
+    S = Tag(S);             // Mark S for lowrank contribution
+    Type logS = log(S);     // hessian(log(S)) is not sparse!
+    return logS;
+    \endcode
+*/
 TMBad::ad_plain Tag(const TMBad::ad_plain &x) CSKIP( {
   return TMBad::get_glob()->add_to_stack<TagOp<> >(x);
 } )
@@ -378,7 +407,7 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
     - G is a dense n-by-k low rank matrix
     - H0 is dense k-by-k (preferably negative definite)
 
-    To detect this structure one must use the `Tag` function to select
+    To detect this structure one must use the `Tag()` function to select
     k intermediate variables which will be used to decompose the
     computational graph.
 
