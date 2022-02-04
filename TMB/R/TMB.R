@@ -1214,6 +1214,10 @@ openmp <- function(n=NULL){
 ##' }
 ##'
 ##' On Linux one should look for the package \code{libsuitesparse-dev}.
+##'
+##' @section Selecting the AD framework:
+##' TMB supports two different AD libraries 'CppAD' and 'TMBad' selected via the argument \code{framework} which works as a switch to set one of two C++ preprocessor flags: 'CPPAD_FRAMEWORK' or 'TMBAD_FRAMEWORK'. The default value of \code{framework} can be set from R by \code{options("tmb.ad.framework")} or alternatively from the shell via the environment variable 'TMB_AD_FRAMEWORK'. Packages linking to TMB should set one of the two C++ preprocessor flags in Makevars.
+##'
 ##' @title Compile a C++ template to DLL suitable for MakeADFun.
 ##' @param file C++ file.
 ##' @param flags Character with compile flags.
