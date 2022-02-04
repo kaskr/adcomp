@@ -2,6 +2,21 @@ var searchData=
 [
   ['n01',['N01',['../classdensity_1_1N01.html',1,'density']]],
   ['n01',['N01',['../classN01.html',1,'']]],
+  ['newton',['newton',['../namespacenewton.html',1,'newton'],['../namespacenewton.html#ace0d0afa0de08ecca62779979470290b',1,'newton::Newton()']]],
+  ['newton_5fconfig',['newton_config',['../structnewton_1_1newton__config.html',1,'newton']]],
+  ['newtonoperator',['NewtonOperator',['../structnewton_1_1NewtonOperator.html',1,'newton']]],
+  ['newtonoperator',['NewtonOperator',['../structnewton_1_1NewtonOperator.html#ab160781dc5fa76fc4151b4777d1fcab0',1,'newton::NewtonOperator']]],
+  ['next_5fcallop',['next_CallOp',['../structTMBad_1_1CallOp__.html#afc4dfb756832a70fe5c428d433ded360',1,'TMBad::CallOp_']]],
+  ['next_5fdglob',['next_Dglob',['../structTMBad_1_1CallOp__.html#a09f4313e95a881306f1e528a9ced5a0e',1,'TMBad::CallOp_']]],
+  ['next_5fglob',['next_glob',['../structTMBad_1_1CallOp__.html#a0356ec2d9628acc786f4d1153588499f',1,'TMBad::CallOp_']]],
+  ['ninput',['ninput',['../structTMBad_1_1global_1_1Operator.html#a80fca2ec1b06e53ff3e49fa1f223e9d6',1,'TMBad::global::Operator']]],
   ['nlevels',['NLEVELS',['../group__macros.html#ga504bc706acd806509d7f324dfeb114f1',1,'tmb_core.hpp']]],
-  ['norm2shasho',['norm2SHASHo',['../group__R__style__distribution.html#gade4395b202724cba14e180062b749f0a',1,'distributions_R.hpp']]]
+  ['no_5ffilter',['no_filter',['../structTMBad_1_1global_1_1no__filter.html',1,'TMBad::global']]],
+  ['node_5fsplit',['node_split',['../structTMBad_1_1autopar.html#aec13820c9cb5062da65438b2e5ee97f3',1,'TMBad::autopar']]],
+  ['norm2shasho',['norm2SHASHo',['../group__R__style__distribution.html#gade4395b202724cba14e180062b749f0a',1,'distributions_R.hpp']]],
+  ['noutput',['noutput',['../structTMBad_1_1global_1_1Operator.html#a7aa5a9105c7d6ade1404a762159314e6',1,'TMBad::global::Operator']]],
+  ['nullop',['NullOp',['../structTMBad_1_1global_1_1NullOp.html',1,'TMBad::global']]],
+  ['nullop2',['NullOp2',['../structTMBad_1_1global_1_1NullOp2.html',1,'TMBad::global']]],
+  ['num_5fkeys',['num_keys',['../structradix_1_1radix.html#a8ad00d957ce8235baa8ff0d8ea6aa023',1,'radix::radix']]],
+  ['numrep_5fperiod',['numrep_period',['../structTMBad_1_1periodic.html#a8317fa18a8feb2ba3423849ca7579086',1,'TMBad::periodic']]]
 ];

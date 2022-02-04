@@ -69,6 +69,8 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#namespaces">Namespaces</a>  </div>
   <div class="headertitle">
 <div class="title">TMB.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -81,12 +83,20 @@ $(function() {
 <code>#include &lt;Eigen/Dense&gt;</code><br />
 <code>#include &lt;Eigen/Sparse&gt;</code><br />
 <code>#include &quot;cppad/cppad.hpp&quot;</code><br />
+<code>#include &quot;TMBad/TMBad.hpp&quot;</code><br />
+<code>#include &quot;TMBad/tmbad_allow_comparison.hpp&quot;</code><br />
+<code>#include &quot;TMBad/eigen_numtraits.hpp&quot;</code><br />
+<code>#include &quot;TMBad/compile.hpp&quot;</code><br />
+<code>#include &quot;TMBad/graph2dot.hpp&quot;</code><br />
+<code>#include &quot;TMBad/compression.hpp&quot;</code><br />
+<code>#include &quot;TMBad/TMBad.cpp&quot;</code><br />
 <code>#include &lt;R.h&gt;</code><br />
 <code>#include &lt;Rinternals.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="toggle__thread__safe__R_8hpp_source.html">toggle_thread_safe_R.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="tmbutils_8hpp_source.html">tmbutils/tmbutils.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="convert_8hpp_source.html">convert.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="config_8hpp_source.html">config.hpp</a>&quot;</code><br />
+<code>#include &quot;tmbutils/getListElement.hpp&quot;</code><br />
 <code>#include &quot;atomic_math.hpp&quot;</code><br />
 <code>#include &quot;expm.hpp&quot;</code><br />
 <code>#include &quot;atomic_convolve.hpp&quot;</code><br />
@@ -97,6 +107,7 @@ $(function() {
 <code>#include &quot;<a class="el" href="dnorm_8hpp_source.html">dnorm.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="lgamma_8hpp_source.html">lgamma.hpp</a>&quot;</code><br />
 <code>#include &quot;start_parallel.hpp&quot;</code><br />
+<code>#include &quot;tmbutils/newton.hpp&quot;</code><br />
 <code>#include &quot;<a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="convenience_8hpp_source.html">convenience.hpp</a>&quot;</code><br />
@@ -105,6 +116,13 @@ $(function() {
 <code>#include &quot;precompile.hpp&quot;</code><br />
 </div>
 <p><a href="TMB_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceTMBad"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html">TMBad</a></td></tr>
+<tr class="memdesc:namespaceTMBad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Automatic differentiation library designed for TMB. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Includes and sets all stuff needed to compile the user defined objective function. </p>
 

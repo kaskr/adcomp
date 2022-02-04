@@ -1,6 +1,8 @@
 var searchData=
 [
   ['validation',['Validation',['../Validation.html',1,'']]],
+  ['valop',['ValOp',['../structTMBad_1_1global_1_1ad__plain_1_1ValOp.html',1,'TMBad::global::ad_plain']]],
+  ['value',['Value',['../structTMBad_1_1global_1_1ad__aug.html#aac20713a81cee713f11ecf8b8144fcba',1,'TMBad::global::ad_aug::Value()'],['../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02',1,'TMBad::value()']]],
   ['vec',['vec',['../structarray.html#a73c905d02300879a7c8ed576f2c1d84f',1,'array::vec()'],['../structtmbutils_1_1matrix.html#a5479cff1a0b3231b1c4270c07759e83e',1,'tmbutils::matrix::vec()'],['../structtmbutils_1_1array.html#a53bb19235e5edf965c52bbd26a3fdea0',1,'tmbutils::array::vec()'],['../structmatrix.html#aff2bcb64bc91137b9635369a6cee82b6',1,'matrix::vec()']]],
   ['vecscale',['VECSCALE',['../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e',1,'VECSCALE():&#160;density.hpp'],['../namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680',1,'density::VECSCALE()']]],
   ['vecscale_5ft',['VECSCALE_t',['../classVECSCALE__t.html',1,'']]],
@@ -27,5 +29,6 @@ var searchData=
   ['vectorize3_5fttt',['VECTORIZE3_ttt',['../Vectorize_8hpp.html#ade6dd41e27833e6b25ead49dbdb1a517',1,'Vectorize.hpp']]],
   ['vectorize4_5fttti',['VECTORIZE4_ttti',['../Vectorize_8hpp.html#aaa831df2ce539aea822c9f13c83df800',1,'Vectorize.hpp']]],
   ['vectorize5_5ftttti',['VECTORIZE5_tttti',['../Vectorize_8hpp.html#a1e2b122cebab00e4e187c8179d33c29b',1,'Vectorize.hpp']]],
-  ['vectorize6_5fttttti',['VECTORIZE6_ttttti',['../Vectorize_8hpp.html#a0b60df753ce9a1d5fd2d0220411b3b80',1,'Vectorize.hpp']]]
+  ['vectorize6_5fttttti',['VECTORIZE6_ttttti',['../Vectorize_8hpp.html#a0b60df753ce9a1d5fd2d0220411b3b80',1,'Vectorize.hpp']]],
+  ['vglob',['vglob',['../structTMBad_1_1autopar.html#a4c029a4873dc12389211b6e99f8c0ffe',1,'TMBad::autopar::vglob()'],['../structTMBad_1_1ParalOp.html#af0f5b3c48c513146eb61363f35a59a41',1,'TMBad::ParalOp::vglob()']]]
 ];

@@ -166,8 +166,7 @@ template&lt;class vectortype , class distribution &gt; </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                        \</div><div class="line">vectortype sqrt_cov_scale(vectortype x){}       \</div><div class="line">void <a class="code" href="atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">simulate</a>(vectortype &amp;u){}                  \</div><div class="line">vectortype <a class="code" href="atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">simulate</a>(){}                         \</div><div class="line">public:</div><div class="ttc" id="atomic_8hpp_html_ad0e80df47530e00880f7396e7fde2782"><div class="ttname"><a href="atomic_8hpp.html#ad0e80df47530e00880f7396e7fde2782">atomic::compois_utils::simulate</a></div><div class="ttdeci">double simulate(double loglambda, double nu)</div><div class="ttdoc">Conway-Maxwell-Poisson. Rejection sampler using a Piecewise log-linear envelope. Does not require the...</div><div class="ttdef"><b>Definition:</b> <a href="atomic_8hpp_source.html#l00158">atomic.hpp:158</a></div></div>
-</div><!-- fragment --><p>Conventions for simulation: </p>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">private</span>:                                        \</div><div class="line">vectortype sqrt_cov_scale(vectortype x){}       \</div><div class="line">void simulate(vectortype &amp;u){}                  \</div><div class="line">vectortype simulate(){}                         \</div><div class="line">public:</div></div><!-- fragment --><p>Conventions for simulation: </p>
 
 <p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00048">48</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
 
@@ -217,9 +216,9 @@ template&lt;class scalartype &gt; </div>
   </table>
   </dd>
 </dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="spde_8cpp-example.html#a8">spde.cpp</a>, <a class="el" href="spde_aniso_8cpp-example.html#a10">spde_aniso.cpp</a>, and <a class="el" href="spde_aniso_speedup_8cpp-example.html#a11">spde_aniso_speedup.cpp</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="spde_8cpp-example.html#a8">spde.cpp</a>, <a class="el" href="spde_aniso_8cpp-example.html#a10">spde_aniso.cpp</a>, <a class="el" href="spde_aniso_speedup_8cpp-example.html#a11">spde_aniso_speedup.cpp</a>, and <a class="el" href="TMBad_2spde_epsilon_8cpp-example.html#a8">TMBad/spde_epsilon.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l00923">923</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00927">927</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -303,7 +302,7 @@ template&lt;class distribution1 , class distribution2 &gt; </div>
 </dl>
 <p>Shortform version to combine two densities using the class <a class="el" href="classSEPARABLE__t.html">SEPARABLE_t</a> . Typical use: </p><div class="fragment"><div class="line"><a class="code" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(x); <span class="comment">// 2D array</span></div><div class="line"><a class="code" href="density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(phi), <a class="code" href="density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma))(x);</div></div><!-- fragment --><p> where <code>MVNORM(Sigma)</code> acts in the first dimension of x and <code>AR1(phi)</code> acts in the second dimension of x. </p><dl class="section note"><dt>Note</dt><dd>The order of array dimensions is reversed in the sense that f_ acts in the <em>second</em> dimension and g_ acts in the <em>first</em> dimension (This order is consistent with how Kronecker products work in R). </dd></dl>
 
-<p>Definition at line <a class="el" href="density_8hpp_source.html#l01236">1236</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l01240">1240</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>

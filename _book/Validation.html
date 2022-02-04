@@ -31,7 +31,7 @@
   
 <link rel="prev" href="Simulation.html"/>
 <link rel="next" href="AtomicFunctions.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -294,20 +294,20 @@ div.csl-indent {
 <span id="cb46-4"><a href="Validation.html#cb46-4" aria-hidden="true" tabindex="-1"></a>Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</span>
 <span id="cb46-5"><a href="Validation.html#cb46-5" aria-hidden="true" tabindex="-1"></a>{</span>
 <span id="cb46-6"><a href="Validation.html#cb46-6" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(Y);</span>
-<span id="cb46-7"><a href="Validation.html#cb46-7" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(x);</span>
+<span id="cb46-7"><a href="Validation.html#cb46-7" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span>
 <span id="cb46-8"><a href="Validation.html#cb46-8" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(a);</span>
 <span id="cb46-9"><a href="Validation.html#cb46-9" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);</span>
 <span id="cb46-10"><a href="Validation.html#cb46-10" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(logSigma);</span>
 <span id="cb46-11"><a href="Validation.html#cb46-11" aria-hidden="true" tabindex="-1"></a>  Type sigma = exp(logSigma);</span>
-<span id="cb46-12"><a href="Validation.html#cb46-12" aria-hidden="true" tabindex="-1"></a>  Vector&lt;Type&gt; pred = a + b*x;</span>
-<span id="cb46-13"><a href="Validation.html#cb46-13" aria-hidden="true" tabindex="-1"></a>  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(Y, a+b*x, sigma, <span class="kw">true</span>));</span>
+<span id="cb46-12"><a href="Validation.html#cb46-12" aria-hidden="true" tabindex="-1"></a>  Vector&lt;Type&gt; pred = a + b*<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>;</span>
+<span id="cb46-13"><a href="Validation.html#cb46-13" aria-hidden="true" tabindex="-1"></a>  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(Y, a+b*<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>, sigma, <span class="kw">true</span>));</span>
 <span id="cb46-14"><a href="Validation.html#cb46-14" aria-hidden="true" tabindex="-1"></a>  Vector&lt;Type&gt; residuals = (Y - pred)/sigma;  </span>
 <span id="cb46-15"><a href="Validation.html#cb46-15" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(residuals);  </span>
 <span id="cb46-16"><a href="Validation.html#cb46-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> nll;</span>
 <span id="cb46-17"><a href="Validation.html#cb46-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Assuming that the model parameters have been fitted, and the model object is called <code>obj</code>, the standardized residuals can now be extracted from the model object usinig the <code>report()</code> function and inspected for normality as follows:</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="Validation.html#cb47-1" aria-hidden="true" tabindex="-1"></a>... </span>
-<span id="cb47-2"><a href="Validation.html#cb47-2" aria-hidden="true" tabindex="-1"></a>rep <span class="ot">&lt;-</span> obj<span class="sc">$</span><span class="fu">report</span>()</span>
+<span id="cb47-2"><a href="Validation.html#cb47-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structTMBad_1_1period.html#a3dd83b9ecc7587b29c4361b99b9e4b97">rep</a> <span class="ot">&lt;-</span> obj<span class="sc">$</span><span class="fu">report</span>()</span>
 <span id="cb47-3"><a href="Validation.html#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(rep<span class="sc">$</span>residuals)</span>
 <span id="cb47-4"><a href="Validation.html#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span></code></pre></div>
 </div>
@@ -337,9 +337,9 @@ Residuals that are standard normal distributed given that the model is correct, 
 <p>For discrete probability distributions the transformation trick can also be used, but an element of randomization must be added in order to obtain residuals that are truly Gaussian.</p>
 <p>Assume that you have a series of observed counts <code>y</code> and you have fitted some TMB model using a Poisson likelihood, and the predicted values from that model have been reported and saved in a vector called <code>mu</code>.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="Validation.html#cb49-1" aria-hidden="true" tabindex="-1"></a>... </span>
-<span id="cb49-2"><a href="Validation.html#cb49-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">ppois</span>(y <span class="sc">-</span> <span class="dv">1</span>, mu)</span>
-<span id="cb49-3"><a href="Validation.html#cb49-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">ppois</span>(y, mu)</span>
-<span id="cb49-4"><a href="Validation.html#cb49-4" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n =</span> <span class="fu">length</span>(y), <span class="at"><a class="code" href="../convenience_8hpp.html#a6ced780585902c59301c9e0e80044dd2">min</a> =</span> a, <span class="at"><a class="code" href="../convenience_8hpp.html#afb69053836ddd714014bb5bf321a138c">max</a> =</span> b)</span>
+<span id="cb49-2"><a href="Validation.html#cb49-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">ppois</span>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a> <span class="sc">-</span> <span class="dv">1</span>, mu)</span>
+<span id="cb49-3"><a href="Validation.html#cb49-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">ppois</span>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>, mu)</span>
+<span id="cb49-4"><a href="Validation.html#cb49-4" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n =</span> <span class="fu">length</span>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>), <span class="at"><a class="code" href="../convenience_8hpp.html#a6ced780585902c59301c9e0e80044dd2">min</a> =</span> a, <span class="at"><a class="code" href="../convenience_8hpp.html#afb69053836ddd714014bb5bf321a138c">max</a> =</span> b)</span>
 <span id="cb49-5"><a href="Validation.html#cb49-5" aria-hidden="true" tabindex="-1"></a>residuals <span class="ot">&lt;-</span> <span class="fu">qnorm</span>(u)</span></code></pre></div>
 </div>
 </div>

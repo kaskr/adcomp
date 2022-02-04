@@ -1,16 +1,10 @@
 var searchData=
 [
-  ['vecscale_5ft',['VECSCALE_t',['../classVECSCALE__t.html',1,'']]],
-  ['vecscale_5ft',['VECSCALE_t',['../classdensity_1_1VECSCALE__t.html',1,'density']]],
-  ['vector',['vector',['../structtmbutils_1_1vector.html',1,'tmbutils']]],
-  ['vector',['vector',['../structvector.html',1,'']]],
-  ['vector_3c_20base_20_2a_3e',['vector&lt; Base *&gt;',['../structvector.html',1,'']]],
-  ['vector_3c_20const_20char_20_2a_3e',['vector&lt; const char *&gt;',['../structvector.html',1,'']]],
-  ['vector_3c_20density_3a_3amvnorm_5ft_3c_20scalartype_20_3e_20_3e',['vector&lt; density::MVNORM_t&lt; scalartype &gt; &gt;',['../structtmbutils_1_1vector.html',1,'tmbutils']]],
-  ['vector_3c_20int_20_3e',['vector&lt; int &gt;',['../structtmbutils_1_1vector.html',1,'tmbutils']]],
-  ['vector_3c_20matrix2x2_20_3e',['vector&lt; matrix2x2 &gt;',['../structvector.html',1,'vector&lt; matrix2x2 &gt;'],['../structtmbutils_1_1vector.html',1,'tmbutils::vector&lt; matrix2x2 &gt;']]],
-  ['vector_3c_20mvnorm_5ft_3c_20scalartype_20_3e_20_3e',['vector&lt; MVNORM_t&lt; scalartype &gt; &gt;',['../structvector.html',1,'']]],
-  ['vector_3c_20sphess_20_2a_20_3e',['vector&lt; sphess * &gt;',['../structvector.html',1,'']]],
-  ['vector_3c_20vector_3c_20int_20_3e_20_3e',['vector&lt; vector&lt; int &gt; &gt;',['../structvector.html',1,'']]],
-  ['vector_3c_20vector_3c_20size_5ft_20_3e_20_3e',['vector&lt; vector&lt; size_t &gt; &gt;',['../structvector.html',1,'']]]
+  ['parallel_5faccumulator',['parallel_accumulator',['../structparallel__accumulator.html',1,'']]],
+  ['paralop',['ParalOp',['../structTMBad_1_1ParalOp.html',1,'TMBad']]],
+  ['period',['period',['../structTMBad_1_1period.html',1,'TMBad']]],
+  ['periodic',['periodic',['../structTMBad_1_1periodic.html',1,'TMBad']]],
+  ['print_5fconfig',['print_config',['../structTMBad_1_1global_1_1print__config.html',1,'TMBad::global']]],
+  ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]],
+  ['proj_5ft',['PROJ_t',['../classPROJ__t.html',1,'']]]
 ];
