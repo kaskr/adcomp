@@ -1207,10 +1207,10 @@ openmp <- function(n=NULL){
 ##'
 ##' The second argument \code{longint=TRUE} tells TMB to use 64 bit integers for sparse matrices on the C++ side. This works in combination with \code{supernodal=TRUE} from Eigen version 3.4.
 ##'
-##' On Windows a \code{SuiteSparse} installation can be obtained (from R) using the \code{Rtools} package manager:
+##' On Windows a \code{SuiteSparse} installation can be obtained using the \code{Rtools} package manager. Start 'Rtools Bash' terminal and run:
 ##' \preformatted{
-##'   system("pacman -Sy")
-##'   system("pacman -S mingw-w64-{i686,x86_64}-suitesparse")
+##'   pacman -Sy
+##'   pacman -S mingw-w64-{i686,x86_64}-suitesparse
 ##' }
 ##'
 ##' On Linux one should look for the package \code{libsuitesparse-dev}.
