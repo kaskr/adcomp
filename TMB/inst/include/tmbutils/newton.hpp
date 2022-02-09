@@ -1240,9 +1240,6 @@ struct unsafe_cast : TMBad::ad_aug {
 template<>
 struct unsafe_cast<TMBad::ad_aug> : TMBad::ad_aug {
   unsafe_cast(TMBad::ad_aug x) : TMBad::ad_aug(x) {}
-  operator TMBad::ad_aug () {
-    return *this;
-  }
 };
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
