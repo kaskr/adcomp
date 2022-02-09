@@ -299,7 +299,7 @@ different:</p>
 distribution. Unlike R this works for <strong>scalar parameters only</strong>.</li>
 <li><code><a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(mu, sd)</code> is a TMB specific variant that works for
 <strong>mixed scalar and vector input</strong>. Output length follows the length of the
-longest input (no re-cycling) hence is consistent with <code>dnorm(mu, sd)</code>.</li>
+longest input (no re-cycling) hence is consistent with <code><a class="code" href="../group__R__style__distribution.html#ga5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(mu, sd)</code>.</li>
 </ol>
 <p>Currently the following simulators are implemented:</p>
 <blockquote>
@@ -354,7 +354,7 @@ with simulation code is:</p>
 <span id="cb35-9"><a href="Simulation.html#cb35-9" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(b);</span>
 <span id="cb35-10"><a href="Simulation.html#cb35-10" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(sd);</span>
 <span id="cb35-11"><a href="Simulation.html#cb35-11" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; mu = a + b * <a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>;</span>
-<span id="cb35-12"><a href="Simulation.html#cb35-12" aria-hidden="true" tabindex="-1"></a>  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(dnorm(<a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>, mu, sd, <span class="kw">true</span>));</span>
+<span id="cb35-12"><a href="Simulation.html#cb35-12" aria-hidden="true" tabindex="-1"></a>  Type nll = -<a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>(<a class="code" href="../group__R__style__distribution.html#ga5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>, mu, sd, <span class="kw">true</span>));</span>
 <span id="cb35-13"><a href="Simulation.html#cb35-13" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {</span>
 <span id="cb35-14"><a href="Simulation.html#cb35-14" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a> = <a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(mu, sd);  <span class="co">// Simulate response</span></span>
 <span id="cb35-15"><a href="Simulation.html#cb35-15" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>);          <span class="co">// Report the simulation</span></span>

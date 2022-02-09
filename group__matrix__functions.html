@@ -91,7 +91,7 @@ template&lt;class Type &gt; </td></tr>
 <tr class="memdesc:gacf8e4c3cd2dc2c2859f8c52ad40ccec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix inverse.  <a href="group__matrix__functions.html#gacf8e4c3cd2dc2c2859f8c52ad40ccec0">More...</a><br /></td></tr>
 <tr class="separator:gacf8e4c3cd2dc2c2859f8c52ad40ccec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga06aed041873dea3426da0d0bac628583"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
-<tr class="memitem:ga06aed041873dea3426da0d0bac628583"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#ga06aed041873dea3426da0d0bac628583">atomic::matinvpd</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x, Type &amp;<a class="el" href="group__matrix__functions.html#gae5555ee5c905915a566d47d7f2830424">logdet</a>)</td></tr>
+<tr class="memitem:ga06aed041873dea3426da0d0bac628583"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#ga06aed041873dea3426da0d0bac628583">atomic::matinvpd</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x, Type &amp;<a class="el" href="namespaceatomic.html#af7937bd97f9d5a2e80c00d03faf3a7c2">logdet</a>)</td></tr>
 <tr class="memdesc:ga06aed041873dea3426da0d0bac628583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix inverse and determinant.  <a href="group__matrix__functions.html#ga06aed041873dea3426da0d0bac628583">More...</a><br /></td></tr>
 <tr class="separator:ga06aed041873dea3426da0d0bac628583"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga481538cdd18f419396ee65eaec62c0ba"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
@@ -150,12 +150,11 @@ template&lt;class Type &gt; </div>
 
 <p>Matrix inverse. </p>
 <p>Invert a matrix by LU-decomposition.</p>
-<div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> x;</div><div class="line"><a class="code" href="group__matrix__functions.html#gacf8e4c3cd2dc2c2859f8c52ad40ccec0">atomic::matinv</a>(x);</div></div><!-- fragment --><p>For small matrices use</p>
-<div class="fragment"><div class="line">x.inverse();</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="laplace_8cpp-example.html#a4">laplace.cpp</a>.</dd>
-</dl>
+<div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> x;</div><div class="line"><a class="code" href="namespaceatomic.html#a4991f5af63e94ad38f54c99a81823efc">atomic::matinv</a>(x);</div></div><!-- fragment --><p>For small matrices use</p>
+<div class="fragment"><div class="line">x.inverse();</div></div><!-- fragment --> 
 <p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00611">611</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="structnewton_1_1jacobian__sparse__plus__lowrank__t.html#a21f6ea898816c2e45985008d22981e70">newton::jacobian_sparse_plus_lowrank_t::llt_solve()</a>, and <a class="el" href="group__matrix__functions.html#gae5555ee5c905915a566d47d7f2830424">atomic::logdet()</a>.</p>
+<p>Referenced by <a class="el" href="structnewton_1_1jacobian__sparse__plus__lowrank__t.html#a21f6ea898816c2e45985008d22981e70">newton::jacobian_sparse_plus_lowrank_t::llt_solve()</a>.</p>
 
 </div>
 </div>
@@ -226,7 +225,7 @@ template&lt;class Type &gt; </div>
 
 <p>Matrix multiply. </p>
 <p>Matrix multiplication of large dense matrices.</p>
-<div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> x;</div><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> y;</div><div class="line"><a class="code" href="group__matrix__functions.html#ga481538cdd18f419396ee65eaec62c0ba">atomic::matmul</a>(x, y);</div></div><!-- fragment --><p>For small matrices use</p>
+<div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> x;</div><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> y;</div><div class="line"><a class="code" href="namespaceatomic.html#a1ea1a599dfa8b5b10af52c40be19210e">atomic::matmul</a>(x, y);</div></div><!-- fragment --><p>For small matrices use</p>
 <div class="fragment"><div class="line">x * y;</div></div><!-- fragment --> 
 <p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00583">583</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
 

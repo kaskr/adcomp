@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['d_5fincpl_5fgamma_5fshape',['D_incpl_gamma_shape',['../namespaceatomic.html#ab86d10e39e1b3aebc1fbd26aa26346d4',1,'atomic']]],
+  ['d_5flgamma',['D_lgamma',['../namespaceatomic.html#a3b1fbc500a01972017dabccfbcd6ebc1',1,'atomic']]],
   ['data_5findicator',['data_indicator',['../structdata__indicator.html#aca9cc66e90faebe0972beb8d880fb80e',1,'data_indicator::data_indicator()'],['../structdata__indicator.html#a1ae65647bfa39c414e677ad57bca6f0d',1,'data_indicator::data_indicator(VT obs, bool init_one=false)']]],
   ['dbeta',['dbeta',['../group__R__style__distribution.html#ga5324c83759d5211c7c2fbbad37fa8e59',1,'distributions_R.hpp']]],
   ['dbinom',['dbinom',['../group__R__style__distribution.html#gaee11f805f02bc1febc6d7bf0487671be',1,'distributions_R.hpp']]],
@@ -23,6 +25,7 @@ var searchData=
   ['dnbinom',['dnbinom',['../group__R__style__distribution.html#ga947a34bca02919fb470f803abdf0f479',1,'lgamma.hpp']]],
   ['dnbinom2',['dnbinom2',['../group__R__style__distribution.html#ga76266c19046e04b651fce93aa0810351',1,'lgamma.hpp']]],
   ['dnbinom_5frobust',['dnbinom_robust',['../group__R__style__distribution.html#gaa23e3ede4669d941b0b54314ed42a75c',1,'lgamma.hpp']]],
+  ['dnorm',['dnorm',['../group__R__style__distribution.html#ga5eb914782c488bd3ec4a50d4e4a73394',1,'dnorm.hpp']]],
   ['domaininner',['DomainInner',['../structTMBad_1_1ADFun.html#a75b681515de533af45c0a647915182ee',1,'TMBad::ADFun']]],
   ['domainouter',['DomainOuter',['../structTMBad_1_1ADFun.html#abe55c3acf1d239c4bb513b8b97be7cb4',1,'TMBad::ADFun']]],
   ['domainoutermask',['DomainOuterMask',['../structTMBad_1_1ADFun.html#a12a4cc17527e9cf25fe7846f901c76f0',1,'TMBad::ADFun']]],

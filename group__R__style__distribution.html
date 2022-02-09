@@ -140,6 +140,10 @@ template&lt;class Type &gt; </td></tr>
 <tr class="memitem:gaa23e3ede4669d941b0b54314ed42a75c"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#gaa23e3ede4669d941b0b54314ed42a75c">dnbinom_robust</a> (const Type &amp;x, const Type &amp;log_mu, const Type &amp;log_var_minus_mu, int give_log=0)</td></tr>
 <tr class="memdesc:gaa23e3ede4669d941b0b54314ed42a75c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Negative binomial probability function.  <a href="#gaa23e3ede4669d941b0b54314ed42a75c">More...</a><br /></td></tr>
 <tr class="separator:gaa23e3ede4669d941b0b54314ed42a75c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5eb914782c488bd3ec4a50d4e4a73394"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:ga5eb914782c488bd3ec4a50d4e4a73394"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#ga5eb914782c488bd3ec4a50d4e4a73394">dnorm</a> (Type x, Type mean, Type sd, int give_log=0)</td></tr>
+<tr class="memdesc:ga5eb914782c488bd3ec4a50d4e4a73394"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probability density function of the normal distribution.  <a href="#ga5eb914782c488bd3ec4a50d4e4a73394">More...</a><br /></td></tr>
+<tr class="separator:ga5eb914782c488bd3ec4a50d4e4a73394"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa1ed15503e1441a381102a8c4c9baaf1"><td class="memTemplParams" colspan="2"><a id="gaa1ed15503e1441a381102a8c4c9baaf1"></a>
 template&lt;class Type &gt; </td></tr>
 <tr class="memitem:gaa1ed15503e1441a381102a8c4c9baaf1"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__R__style__distribution.html#gaa1ed15503e1441a381102a8c4c9baaf1">dpois</a> (const Type &amp;x, const Type &amp;lambda, int give_log=0)</td></tr>
@@ -793,6 +797,64 @@ template&lt;class Type &gt; </div>
 <p>More robust parameterization through \(log(\mu)\) and \(log(\sigma^2-\mu)\) parameters. </p>
 
 <p>Definition at line <a class="el" href="lgamma_8hpp_source.html#l00103">103</a> of file <a class="el" href="lgamma_8hpp_source.html">lgamma.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ga5eb914782c488bd3ec4a50d4e4a73394"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5eb914782c488bd3ec4a50d4e4a73394">&sect;&nbsp;</a></span>dnorm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">Type dnorm </td>
+          <td>(</td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>mean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Type&#160;</td>
+          <td class="paramname"><em>sd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>give_log</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Probability density function of the normal distribution. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>vector of observations </td></tr>
+    <tr><td class="paramname">mean</td><td>mean of the normal distribution </td></tr>
+    <tr><td class="paramname">sd</td><td>standard deviation of the normal distribution. must be strictly positive. </td></tr>
+    <tr><td class="paramname">give_log</td><td>true if one wants the log-probability, false otherwise. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="adaptive_integration_8cpp-example.html#a0">adaptive_integration.cpp</a>, <a class="el" href="linreg_8cpp-example.html#a4">linreg.cpp</a>, <a class="el" href="linreg_parallel_8cpp-example.html#a3">linreg_parallel.cpp</a>, <a class="el" href="longlinreg_8cpp-example.html#a4">longlinreg.cpp</a>, <a class="el" href="lr_test_8cpp-example.html#a3">lr_test.cpp</a>, <a class="el" href="mvrw_8cpp-example.html#a7">mvrw.cpp</a>, <a class="el" href="mvrw_sparse_8cpp-example.html#a7">mvrw_sparse.cpp</a>, <a class="el" href="register_atomic_8cpp-example.html#a0">register_atomic.cpp</a>, <a class="el" href="register_atomic_parallel_8cpp-example.html#a0">register_atomic_parallel.cpp</a>, <a class="el" href="sam_8cpp-example.html#a12">sam.cpp</a>, <a class="el" href="sde_linear_8cpp-example.html#a5">sde_linear.cpp</a>, <a class="el" href="sdv_multi_8cpp-example.html#a6">sdv_multi.cpp</a>, <a class="el" href="socatt_8cpp-example.html#a7">socatt.cpp</a>, <a class="el" href="thetalog_8cpp-example.html#a3">thetalog.cpp</a>, <a class="el" href="TMBad_2sam_8cpp-example.html#a12">TMBad/sam.cpp</a>, <a class="el" href="TMBad_2thetalog_8cpp-example.html#a3">TMBad/thetalog.cpp</a>, <a class="el" href="transform_8cpp-example.html#a6">transform.cpp</a>, <a class="el" href="transform2_8cpp-example.html#a6">transform2.cpp</a>, <a class="el" href="transform_parallel_8cpp-example.html#a7">transform_parallel.cpp</a>, <a class="el" href="validation_2MVRandomWalkValidation_8cpp-example.html#a8">validation/MVRandomWalkValidation.cpp</a>, <a class="el" href="validation_2randomwalkvalidation_8cpp-example.html#a5">validation/randomwalkvalidation.cpp</a>, and <a class="el" href="validation_2rickervalidation_8cpp-example.html#a4">validation/rickervalidation.cpp</a>.</dd>
+</dl>
+<p>Definition at line <a class="el" href="dnorm_8hpp_source.html#l00017">17</a> of file <a class="el" href="dnorm_8hpp_source.html">dnorm.hpp</a>.</p>
+
+<p>Referenced by <a class="el" href="classARk__t.html#a7a53d57817410df961ecb36c3a6ca14e">ARk_t&lt; scalartype_ &gt;::operator()()</a>.</p>
 
 </div>
 </div>
