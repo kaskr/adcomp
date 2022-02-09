@@ -822,8 +822,11 @@ MakeADFun <- function(data, parameters, map=list(),
                                  inner.control)
                           ), silent=silent
                  )
-      if(!is.list(opt)         ||
-         !is.finite(opt$value)) return(NaN)
+      if (inherits(opt, "try-error") || !is.finite(opt$value)) {
+        if (order==0) return(NaN)
+        if (order==1) stop("inner newton optimization failed during gradient calculation")
+        stop("invalid 'order'")
+      }
     } else {
       opt <- optim(eval(random.start),fn=f0,gr=function(x)f0(x,order=1),
                    method=inner.method,control=inner.control)
