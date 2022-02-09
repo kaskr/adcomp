@@ -5,6 +5,14 @@
     \brief Univariate normal density
     \ingroup R_style_distribution
 */
+
+/** \brief Probability density function of the normal distribution
+    \ingroup R_style_distribution
+    \param x vector of observations
+    \param mean mean of the normal distribution
+    \param sd standard deviation of the normal distribution. must be strictly positive.
+    \param give_log true if one wants the log-probability, false otherwise.
+*/
 template<class Type>
 Type dnorm(Type x, Type mean, Type sd, int give_log=0)
 {
