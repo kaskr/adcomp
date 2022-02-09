@@ -2058,6 +2058,7 @@ PREDEFINED             =        VECTORIZE1_t(f)=       \
                                 VECTORIZE3_n(f)=       \
                                 CSKIP(body)=;          \
                                 "TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
+                                "TMB_ATOMIC_STATIC_FUNCTION(name,arg2,arg3,arg4)=TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)" \
                                 "TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
                                 TMBAD_FRAMEWORK=1
 

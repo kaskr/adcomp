@@ -1,7 +1,4 @@
 
-#ifdef TMB_ATOMIC_VECTOR_FUNCTION
-#undef TMB_ATOMIC_VECTOR_FUNCTION
-#endif
 
 /** \brief Construct atomic vector function based on known derivatives */
 #define TMB_ATOMIC_VECTOR_FUNCTION(                                     \
