@@ -10,7 +10,10 @@ grepRandomParameters <- function(parameters,random){
 }
 
 ## unlist name handling is extremely slow and we *almost* never use it
-formals(unlist)$use.names <- FALSE
+## New default: use.names=FALSE
+unlist <- function (x, recursive = TRUE, use.names = FALSE) {
+    base::unlist(x, recursive, use.names)
+}
 
 ## Assign without losing other attributes than 'names' (which may get
 ## overwritten when subsetting)
@@ -1243,6 +1246,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
   framework <- match.arg(framework, c("CppAD", "TMBad"))
   ## Handle extra list(...) arguments plus modifications
   dotargs <- list(...)
+  CPPFLAGS <- PKG_LIBS <- CLINK_CPPFLAGS <- NULL ## Visible binding (CRAN)
   '%+=%' <- function(VAR, x) {
       VAR <- deparse(substitute(VAR))
       dotargs[[VAR]] <<- paste(dotargs[[VAR]], x)
