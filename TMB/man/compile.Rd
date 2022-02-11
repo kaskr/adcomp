@@ -7,7 +7,7 @@
 compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
   openmp = isParallelTemplate(file[1]), libtmb = TRUE, libinit = TRUE,
   tracesweep = FALSE, framework = getOption("tmb.ad.framework"),
-  supernodal = FALSE, longint = FALSE, ...)
+  supernodal = FALSE, longint = FALSE, eigen.disable.warnings = TRUE, ...)
 }
 \arguments{
 \item{file}{C++ file.}
@@ -31,6 +31,8 @@ compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
 \item{supernodal}{Turn on preprocessor flag to use supernodal sparse Cholesky/Inverse from system wide suitesparse library}
 
 \item{longint}{Turn on preprocessor flag to use long integers for Eigen's SparseMatrix StorageIndex}
+
+\item{eigen.disable.warnings}{Turn on preprocessor flag to disable nuisance warnings. Note that this is not allowed for code to be compiled on CRAN.}
 
 \item{...}{Passed as Makeconf variables.}
 }
