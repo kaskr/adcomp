@@ -109,11 +109,11 @@ cran-version:
 	echo "PKG_LIBS = \$$(LAPACK_LIBS) \$$(BLAS_LIBS) \$$(FLIBS) \$$(SHLIB_OPENMP_CFLAGS)" > TMB/src/Makevars
 	echo "PKG_CFLAGS = \$$(SHLIB_OPENMP_CFLAGS)"                                         >> TMB/src/Makevars
 	sed -i /^SystemRequirements.*/d TMB/DESCRIPTION
-	echo ".onAttach <- function(lib, pkg) {"                                                      >> TMB/R/zzz.R
-	echo "  exfolder <- system.file(\"examples\", package = \"TMB\")"                             >> TMB/R/zzz.R
-	echo "  dll <- paste0(exfolder, Sys.getenv(\"R_ARCH\"), \"/simple\", .Platform\$$dynlib.ext)" >> TMB/R/zzz.R
-	echo "  if(!file.exists(dll)) runExample(\"simple\", dontrun=TRUE)"                           >> TMB/R/zzz.R
-	echo "}"                                                                                      >> TMB/R/zzz.R
+	echo ".onAttach <- function(lib, pkg) {"                                                          >> TMB/R/zzz.R
+	echo "  exfolder <- system.file(\"examples\", package = \"TMB\")"                                 >> TMB/R/zzz.R
+	echo "  dll <- paste0(exfolder, Sys.getenv(\"R_ARCH\"), \"/simple\", .Platform\$$dynlib.ext)"     >> TMB/R/zzz.R
+	echo "  if(!file.exists(dll)) runExample(\"simple\", dontrun=TRUE, eigen.disable.warnings=FALSE)" >> TMB/R/zzz.R
+	echo "}"                                                                                          >> TMB/R/zzz.R
 	make eliminate-cout
 	make doc-update
 	make build-package

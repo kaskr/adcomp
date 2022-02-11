@@ -817,6 +817,7 @@ RECURSIVE              = YES
 EXCLUDE                = ../TMB/inst/include/Eigen \
                          ../TMB/inst/include/unsupported \
                          ../TMB/inst/include/cppad \
+                         ../TMB/inst/include/EigenWarnings \
                          layout README.md 00-BookConfig.md
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or

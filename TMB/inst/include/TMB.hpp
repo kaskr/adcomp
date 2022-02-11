@@ -55,6 +55,12 @@ void eigen_REprintf(const char* x);
 #undef NDEBUG
 #define NDEBUG 1
 #endif
+/* Provide access to file 'DisableStupidWarnings.h' which has been
+   patched by RcppEigen to satisfy CRAN policy. This file may need
+   regular updating. The renaming is to aviod a CRAN note. */
+#ifdef TMB_EIGEN_DISABLE_WARNINGS
+#include "EigenWarnings/DisableStupidWarnings"
+#endif
 #include <Eigen/Dense>
 
 // Default: Include Eigen/Sparse normally

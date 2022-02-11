@@ -1236,12 +1236,14 @@ openmp <- function(n=NULL){
 ##' @param framework Which AD framework to use ('TMBad' or 'CppAD')
 ##' @param supernodal Turn on preprocessor flag to use supernodal sparse Cholesky/Inverse from system wide suitesparse library
 ##' @param longint Turn on preprocessor flag to use long integers for Eigen's SparseMatrix StorageIndex
+##' @param eigen.disable.warnings Turn on preprocessor flag to disable nuisance warnings. Note that this is not allowed for code to be compiled on CRAN.
 ##' @param ... Passed as Makeconf variables.
 ##' @seealso \code{\link{precompile}}
 compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                     openmp=isParallelTemplate(file[1]),libtmb=TRUE,
                     libinit=TRUE,tracesweep=FALSE,framework=getOption("tmb.ad.framework"),
                     supernodal=FALSE,longint=FALSE,
+                    eigen.disable.warnings=TRUE,
                     ...){
   framework <- match.arg(framework, c("CppAD", "TMBad"))
   ## Handle extra list(...) arguments plus modifications
@@ -1327,6 +1329,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
                    paste0("-I",qsystem.file("include",package="RcppEigen"))[useRcppEigen],
                    paste0("-I",qsystem.file("include/contrib",package="TMB"))[useContrib],
                    "-DTMB_SAFEBOUNDS"[safebounds],
+                   "-DTMB_EIGEN_DISABLE_WARNINGS"[eigen.disable.warnings],
                    paste0("-DLIB_UNLOAD=R_unload_",libname)[safeunload],
                    "-DWITH_LIBTMB"[libtmb],
                    paste0("-DTMB_LIB_INIT=R_init_",libname)[libinit],
