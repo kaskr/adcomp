@@ -285,21 +285,32 @@ namespace tiny_ad {
 		TINY_VECTOR(VARIABLE(order-1, nvar, Double), nvar) > Base;
     typedef variable<order-1, nvar, Double> Type;
     static const int result_size = nvar * Type::result_size;
-    variable() { /* Do not zero-initialize */ }
-    variable(Base x) : Base(x) {}
-    variable(double x) : Base(x) {}
-    variable(double x, int id) : Base(x) {
-      setid(id);
+#define ___COMMON_CTORS___                      \
+    variable() {}                               \
+    variable(Base x) : Base(x) {}               \
+    variable(double x) : Base(x) {}             \
+    variable(double x, int id) : Base(x) {      \
+      setid(id);                                \
+    }                                           \
+    template<int T1, int T2, class T3>          \
+    variable(variable<T1,T2,T3> x) {            \
+      Base::value = x; Base::deriv.setZero();   \
+    }                                           \
+    template<class T1, class T2>                \
+    variable(ad<T1,T2> x) {                     \
+      Base::value = x; Base::deriv.setZero();   \
+    }                                           \
+    template<int T1, int T2, class T3>          \
+    variable(variable<T1,T2,T3> x, int id) {    \
+      Base::value = x; Base::deriv.setZero();   \
+      setid(id);                                \
+    }                                           \
+    template<class T1, class T2>                \
+    variable(ad<T1,T2> x, int id) {             \
+      Base::value = x; Base::deriv.setZero();   \
+      setid(id);                                \
     }
-    template<class Constant>
-    variable(Constant x) {
-      Base::value = x; Base::deriv.setZero();
-    }
-    template<class Constant>
-    variable(Constant x, int id) {
-      Base::value = x; Base::deriv.setZero();
-      setid(id);
-    }
+    ___COMMON_CTORS___
     void setid(int i0, int count = 0){
       this->value.setid(i0, count);
       this->deriv[i0].setid(i0, count + 1);
@@ -317,21 +328,7 @@ namespace tiny_ad {
   struct variable<1, nvar, Double> : ad<Double, TINY_VECTOR(Double,nvar) >{
     typedef ad<Double, TINY_VECTOR(Double,nvar) > Base;
     static const int result_size = nvar;
-    variable<1, nvar, Double>() { /* Do not zero-initialize */ }
-    variable<1, nvar, Double>(Base x) : Base(x) {}
-    variable<1, nvar, Double>(double x) : Base(x) {}
-    variable<1, nvar, Double>(double x, int id) : Base(x) {
-      setid(id);
-    }
-    template<class Constant>
-    variable<1, nvar, Double>(Constant x) {
-      Base::value = x; Base::deriv.setZero();
-    }
-    template<class Constant>
-    variable<1, nvar, Double>(Constant x, int id) {
-      Base::value = x; Base::deriv.setZero();
-      setid(id);
-    }
+    ___COMMON_CTORS___
     void setid(int i0, int count = 0){
       if(count == 0)
 	this->deriv[i0] = 1.0;
@@ -342,6 +339,7 @@ namespace tiny_ad {
       return this->deriv;
     }
   };
+#undef ___COMMON_CTORS___
 #undef TINY_VECTOR
 } // End namespace tiny_ad
 

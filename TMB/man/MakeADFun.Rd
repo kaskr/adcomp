@@ -5,13 +5,15 @@
 \title{Construct objective functions with derivatives based on a compiled C++ template.}
 \usage{
 MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
-  "ADGrad"[!is.null(random) || !is.null(profile)]), random = NULL,
-  profile = NULL, random.start = expression(last.par.best[random]),
-  hessian = FALSE, method = "BFGS", inner.method = "newton",
-  inner.control = list(maxit = 1000), MCcontrol = list(doMC = FALSE, seed =
-  123, n = 100), ADreport = FALSE, atomic = TRUE,
-  LaplaceNonZeroGradient = FALSE, DLL = getUserDLL(),
-  checkParameterOrder = TRUE, regexp = FALSE, silent = FALSE, ...)
+  "ADGrad"[!intern && (!is.null(random) || !is.null(profile))]),
+  random = NULL, profile = NULL,
+  random.start = expression(last.par.best[random]), hessian = FALSE,
+  method = "BFGS", inner.method = "newton", inner.control = list(maxit =
+  1000), MCcontrol = list(doMC = FALSE, seed = 123, n = 100),
+  ADreport = FALSE, atomic = TRUE, LaplaceNonZeroGradient = FALSE,
+  DLL = getUserDLL(), checkParameterOrder = TRUE, regexp = FALSE,
+  silent = FALSE, intern = FALSE, integrate = NULL,
+  autopar = isParallelDLL(DLL), ...)
 }
 \arguments{
 \item{data}{List of data objects (vectors, matrices, arrays, factors, sparse matrices) required by the user template (order does not matter and un-used components are allowed).}
@@ -52,6 +54,12 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 
 \item{silent}{Disable all tracing information?}
 
+\item{intern}{Do Laplace approximation on C++ side ? See details (Experimental - may change without notice)}
+
+\item{integrate}{Specify alternative integration method(s) for random effects (see details)}
+
+\item{autopar}{Enable automatic parallization? (Experimental)}
+
 \item{...}{Currently unused.}
 }
 \value{
@@ -74,6 +82,11 @@ and is thus ready for a call to an R optimizer, such as \code{nlminb} or \code{o
 Data (\code{data}) and parameters (\code{parameters}) are directly read by the user template via the macros beginning with DATA_
 and PARAMETER_. The order of the PARAMETER_ macros defines the order of parameters in the final objective function.
 There are no restrictions on the order of random parameters, fixed parameters or data in the template.
+}
+\note{
+Do not rely upon the default arguments of any of the functions in the model object \code{obj$fn}, \code{obj$gr}, \code{obj$he}, \code{obj$report}. I.e. always use the explicit form \code{obj$fn(obj$par)} rather than \code{obj$fn()}.
+}
+\section{Parameter mapping}{
 
 Optionally, a simple mechanism for collecting and fixing parameters from R is available through the \code{map} argument. A map is a named list
 of factors with the following properties:
@@ -84,6 +97,9 @@ of factors with the following properties:
   \item Parameter entries with equal factor level are collected to a common value.
 }
 More advanced parameter mapping, such as collecting parameters between different vectors etc., must be implemented from the template.
+}
+
+\section{Specifying random effects}{
 
 Random effects are specified via the argument \code{random}: A component of the parameter list is marked as random if its name is matched
 by any of the characters of the vector \code{random} (Regular expression match is performed if \code{regexp=TRUE}).
@@ -102,6 +118,9 @@ be obtained by the argument \code{inner.control} which is a list of control para
   \item Strictly-convex: \code{smartsearch=FALSE} and \code{maxit=20}.
   \item Quadratic: \code{smartsearch=FALSE} and \code{maxit=1}.
 }
+}
+
+\section{The model environment \code{env}}{
 
 Technically, the user template is processed several times by inserting
 different types as template parameter, selected by argument \code{type}:
@@ -125,11 +144,17 @@ list format.
   \item \code{tracemgc} Trace maximum gradient component of every gradient evaluation ?
   \item \code{silent} Pass 'silent=TRUE' to all try-calls ?
 }
+}
+
+\section{The argument \code{intern}}{
+
+By passing \code{intern=TRUE} the entire Laplace approximation (including sparse matrix calculations) is done within the AD machinery on the C++ side. This requires the model to be compiled using the 'TMBad framework' - see \code{\link{compile}}. For any serious use of this option one should consider compiling with \code{supernodal=TRUE} - again see \code{\link{compile}} - in order to get performance comparable to R's matrix calculations. The benefit of the 'intern' LA is that it may be faster in some cases and that it provides an autodiff hessian (\code{obj$he}) wrt. the fixed effects which would otherwise not work for random effect models. Another benefit is that it gives access to fast computations with certain hessian structures that do not meet the usual sparsity requirement. A detailed list of options are found in the online doxygen documentation in the 'newton' namespace under the 'newton_config' struct. All these options can be passed from R via the `inner.control` argument. However, there are some drawbacks of running the LA on the C++ side. Notably, random effects are no longer visible in the model environment which may break assumptions on the layout of internal vectors (`par`, `last.par`, etc). In addition, model debugging becomes harder when calculations are moved to C++.
+}
+
+\section{Controlling tracing}{
 
 A high level of tracing information will be output by default when evaluating the objective function and gradient.
 This is useful while developing a model, but may eventually become annoying. Disable all tracing by passing
 \code{silent=TRUE} to the \code{MakeADFun} call.
 }
-\note{
-Do not rely upon the default arguments of any of the functions in the model object \code{obj$fn}, \code{obj$gr}, \code{obj$he}, \code{obj$report}. I.e. always use the explicit form \code{obj$fn(obj$par)} rather than \code{obj$fn()}.
-}
+

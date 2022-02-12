@@ -40,6 +40,12 @@ struct config_struct{
   struct {
     bool getListElement;
   } debug;
+  struct {
+    /** \brief Reduce memory of sparse hessian even if reducing speed ? */
+    bool sparse_hessian_compress;
+    /** \brief Use atomic sparse log determinant (faster but limited order) ? */
+    bool atomic_sparse_log_determinant;
+  } tmbad;
 
   int cmd;
   SEXP envir; /* PROTECTed because function argument - see
@@ -64,6 +70,8 @@ struct config_struct{
     SET(optimize.instantly,true);
     SET(optimize.parallel,false);
     SET(tape.parallel,true);
+    SET(tmbad.sparse_hessian_compress,false);
+    SET(tmbad.atomic_sparse_log_determinant,true);
   })
 #undef SET
   config_struct() CSKIP(

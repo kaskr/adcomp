@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
-TMB 1.7.19-2 (2021-03-03)
+TMB 1.7.22-2 (2021-03-03)
 *** FORKED PATCH VERSION ***
 ------------------------------------------------------------------------
 
@@ -30,6 +30,35 @@ TMB 1.7.19-2 (2021-03-03)
    Updating the Eigen headers included with TMB might resolve.
 
    
+------------------------------------------------------------------------
+TMB 1.7.22 (2021-09-28)
+------------------------------------------------------------------------
+
+o Fortran character strings: use 'FCONE' macro
+
+o Add .onUnload() (GH #353)
+
+o Fix tmbutils::array ASAN issue triggered by at least clang-13
+
+------------------------------------------------------------------------
+TMB 1.7.21 (2021-09-06)
+------------------------------------------------------------------------
+
+o Fix CRAN build issue triggered by clang 13.0.0 (omp.h)
+
+o Fix tweedie thread safety on Windows (https://github.com/glmmTMB/glmmTMB/issues/714)
+
+o Fix as.list(.) for class 'sdreport' (https://github.com/glmmTMB/glmmTMB/issues/692)
+
+------------------------------------------------------------------------
+TMB 1.7.20 (2021-04-08)
+------------------------------------------------------------------------
+
+o Make parList() work in more edge cases.
+
+o Make tiny_ad variables work (again) with Eigen types.
+
+o Avoid header issues in Matrix 1.3-0 due to SuiteSparse update (#340)
 
 ------------------------------------------------------------------------
 TMB 1.7.19 (2021-02-05)

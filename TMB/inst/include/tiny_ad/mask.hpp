@@ -125,3 +125,170 @@ TMB_ATOMIC_VECTOR_FUNCTION(						\
   mask.copy(px, px_);							\
   px[NCHAR(MASK)] = 0;							\
   )
+
+// ======================================================================
+
+
+#ifdef TMBAD_FRAMEWORK
+
+#undef TMB_BIND_ATOMIC
+#ifndef TMB_MAX_ORDER
+#define TMB_MAX_ORDER 3
+#endif
+
+#define TMB_BIND_ATOMIC(NAME,MASK,CALL)                                 \
+template<int order, int ninput, int noutput, long int mask>             \
+struct NAME ## Eval {                                                   \
+  typedef typename                                                      \
+  atomic::mask_t<mask>::template set_length<ninput> mask_type;          \
+  mask_type mask_;                                                      \
+  static const int nvar = mask_type::count;                             \
+  template <class S, class T>                                           \
+  void operator()(S* tx, T* ty) {                                       \
+    typedef atomic::tiny_ad::variable<order, nvar> Float;               \
+    atomic::tiny_vec_ref<double> tyref(&(ty[0]), noutput);              \
+    Float x[ninput];                                                    \
+    mask_.activate_derivs(x, tx);                                       \
+    tyref = (CALL).getDeriv();                                          \
+  }                                                                     \
+};                                                                      \
+template<int ninput, int noutput, long int mask>                        \
+struct NAME ## Eval<0, ninput, noutput, mask> {                         \
+  template <class S, class T>                                           \
+  void operator()(S* tx, T* ty) {                                       \
+    S* x = tx;                                                          \
+    ty[0] = (CALL);                                                     \
+  }                                                                     \
+};                                                                      \
+template<int order, int ninput, int noutput, long int mask>             \
+struct NAME ## Op : TMBad::global::Operator<ninput, noutput> {          \
+  static const bool add_forward_replay_copy = true;                     \
+  typedef typename                                                      \
+  atomic::mask_t<mask>::template set_length<ninput> mask_type;          \
+  mask_type mask_;                                                      \
+  static const int nvar = mask_type::count;                             \
+  template <class S, class T>                                           \
+  void eval(S* tx, T* ty) const {                                       \
+    NAME ## Eval<order, ninput, noutput, mask>()(tx, ty);               \
+  }                                                                     \
+  std::vector<TMBad::ad_plain>                                          \
+  add_to_tape(const std::vector<TMBad::ad_plain> &x) {                  \
+    TMBad::OperatorPure* pOp = TMBad::get_glob()->getOperator<NAME ## Op>(); \
+    return                                                              \
+      TMBad::get_glob()->add_to_stack<NAME ## Op>(pOp, x);              \
+  }                                                                     \
+  std::vector<TMBad::ad_plain>                                          \
+  operator()(const std::vector<TMBad::ad_plain> &x) {                   \
+    return add_to_tape(x);                                              \
+  }                                                                     \
+  Eigen::Matrix<TMBad::ad_aug, nvar, noutput / nvar>                    \
+  operator()(const Eigen::Array<TMBad::ad_aug, ninput, 1> &x) {         \
+    std::vector<TMBad::ad_plain> x_(&(x(0)), &(x(0)) + x.size());       \
+    Eigen::Matrix<TMBad::ad_aug, nvar, noutput / nvar> ans;             \
+    std::vector<TMBad::ad_plain> y = add_to_tape(x_);                   \
+    for (size_t i=0; i<y.size(); i++) ans(i) = y[i];                    \
+    return ans;                                                         \
+  }                                                                     \
+  Eigen::Matrix<double, nvar, noutput / nvar>                           \
+  operator()(const Eigen::Array<double, ninput, 1> &x) {                \
+    Eigen::Matrix<double, nvar, noutput / nvar> ans;                    \
+    eval(&(x(0)), &(ans(0)));                                           \
+    return ans;                                                         \
+  }                                                                     \
+  template<class Type>                                                  \
+  void forward(TMBad::ForwardArgs<Type> &args) {                        \
+    Rf_error("Un-implemented method request");                          \
+  }                                                                     \
+  void forward(TMBad::ForwardArgs<double> &args) {                      \
+    double x[ninput];                                                   \
+    for (size_t i=0; i<ninput; i++) x[i] = args.x(i);                   \
+    eval(x, &(args.y(0)));                                              \
+  }                                                                     \
+  template<class Type>                                                  \
+  void reverse(TMBad::ReverseArgs<Type> &args) {                        \
+    Eigen::Array<Type, ninput, 1> tx;                                   \
+    for (size_t i=0; i<ninput; i++) tx(i) = args.x(i);                  \
+    Eigen::Matrix<Type, noutput, 1> w;                                  \
+    for (size_t i=0; i<noutput; i++) w(i) = args.dy(i);                 \
+    NAME ## Op<order+1, ninput, noutput * nvar, mask> foo;              \
+    Eigen::Matrix<Type, nvar, noutput> ty;                              \
+    ty = foo(tx);                                                       \
+    Eigen::Matrix<Type, nvar, 1> tyw = ty * w;                          \
+    Type tmp[ninput];                                                   \
+    mask_.copy(tmp, &(tyw[0]));                                         \
+    for (size_t i=0; i<ninput; i++) args.dx(i) += tmp[i];               \
+  }                                                                     \
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) {               \
+    Rf_error("Un-implemented method request");                          \
+  }                                                                     \
+  const char* op_name() { return #NAME ; }                              \
+};                                                                      \
+template<int ninput, int noutput, long int mask>                        \
+struct NAME ## Op<TMB_MAX_ORDER+1, ninput, noutput, mask> {             \
+  typedef typename                                                      \
+  atomic::mask_t<mask>::template set_length<ninput> mask_type;          \
+  mask_type mask_;                                                      \
+  static const int nvar = mask_type::count;                             \
+  Eigen::Matrix<TMBad::ad_aug, nvar, noutput / nvar>                    \
+  operator()(const Eigen::Array<TMBad::ad_aug, ninput, 1> &x) {         \
+    Eigen::Matrix<TMBad::ad_aug, nvar, noutput / nvar> ans;             \
+    Rf_error("Order not implemented. Please increase TMB_MAX_ORDER");   \
+    return ans;                                                         \
+  }                                                                     \
+  Eigen::Matrix<double, nvar, noutput / nvar>                           \
+  operator()(const Eigen::Array<double, ninput, 1> &x) {                \
+    Eigen::Matrix<double, nvar, noutput / nvar> ans;                    \
+    Rf_error("Order not implemented. Please increase TMB_MAX_ORDER");   \
+    return ans;                                                         \
+  }                                                                     \
+};                                                                      \
+template<class dummy=void>                                              \
+CppAD::vector<TMBad::ad_aug>                                            \
+NAME (const CppAD::vector<TMBad::ad_aug> &x) {                          \
+  int n = x.size() - 1;                                                 \
+  int order = CppAD::Integer(x[n]);                                     \
+  std::vector<TMBad::ad_plain> x_(&(x[0]), &(x[0]) + n);                \
+  std::vector<TMBad::ad_plain> y_;                                      \
+  typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
+  static const int nvar = Foo0::nvar;                                   \
+  typedef NAME ## Op<1, NCHAR(MASK), nvar, OCTAL(MASK)> Foo1;           \
+  if (order==0) {                                                       \
+    Foo0 foo0;                                                          \
+    y_ = foo0(x_);                                                      \
+  }                                                                     \
+  else if (order==1) {                                                  \
+    Foo1 foo1;                                                          \
+    y_ = foo1(x_);                                                      \
+  }                                                                     \
+  else {                                                                \
+    Rf_error("This interface is limited to 0th and 1st deriv order");   \
+  }                                                                     \
+  CppAD::vector<TMBad::ad_aug> y(y_.size());                            \
+  for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
+  return y;                                                             \
+}                                                                       \
+template<class dummy=void>                                              \
+CppAD::vector<double>                                                   \
+NAME (const CppAD::vector<double> &x) {                                 \
+  int n = x.size() - 1;                                                 \
+  int order = CppAD::Integer(x[n]);                                     \
+  typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
+  static const int nvar = Foo0::nvar;                                   \
+  typedef NAME ## Op<1, NCHAR(MASK), nvar, OCTAL(MASK)> Foo1;           \
+  if (order==0) {                                                       \
+    CppAD::vector<double> y(1);                                         \
+    y[0] = CALL;                                                        \
+    return y;                                                           \
+  }                                                                     \
+  else if (order==1) {                                                  \
+    Foo1 foo1;                                                          \
+    CppAD::vector<double> y(nvar);                                      \
+    foo1.eval(&x[0], &y[0]);                                            \
+    return y;                                                           \
+  }                                                                     \
+  else {                                                                \
+    Rf_error("This interface is limited to 0th and 1st deriv order");   \
+  }                                                                     \
+}
+
+#endif // TMBAD_FRAMEWORK

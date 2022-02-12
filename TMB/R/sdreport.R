@@ -345,7 +345,11 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               f(par, order = 1, type = "ADGrad", rangeweight = w, doforward=0)[r]
           }
           nonr <- setdiff(seq_along(par), r)
-          tmp <- sapply(nonr,reverse.sweep)
+          framework <- .Call("getFramework", PACKAGE=obj$env$DLL)
+          if (framework != "TMBad")
+              tmp <- sapply(nonr,reverse.sweep)
+          else
+              tmp <- f(par, order = 1, type = "ADGrad", keepx=nonr, keepy=r) ## TMBad only !!!
           if(!is.matrix(tmp)) ## Happens if length(r)==1
               tmp <- matrix(tmp, ncol=length(nonr) )
           A <- solve(hessian.random, tmp)
@@ -490,6 +494,7 @@ print.sdreport <- function(x, ...)
 ##' as.list(rep, "Est. (bias.correct)", report=TRUE)
 ##' }
 as.list.sdreport <- function(x, what = "", report=FALSE, ...) {
+    if (what == "") return (x)
     if (!report) {
         ans <- x$env$parameters
         random <- x$env$random

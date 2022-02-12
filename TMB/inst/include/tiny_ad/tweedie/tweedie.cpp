@@ -22,7 +22,8 @@ Float tweedie_logW(Float y, Float phi, Float p){
 
   Float p1 = p - 1.0, p2 = 2.0 - p;
   Float a = - p2 / p1, a1 = 1.0 / p1;
-  Float cc, w, sum_ww = 0.0, ww_max ;
+  Float cc, w, sum_ww = 0.0;
+  double ww_max = -INFINITY ;
   double j;
 
   /* only need the lower bound and the # terms to be stored */
@@ -57,21 +58,20 @@ Float tweedie_logW(Float y, Float phi, Float p){
   jd = jh - jl + 1;
 
   /* set limit for # terms in the sum */
-  int nterms = imin2(imax(&jd, 1), TWEEDIE_NTERM), iterm ;
-  Float *ww = Calloc(nterms, Float) ;
+  int nterms = imin2(jd, TWEEDIE_NTERM) ;
+  std::vector<Float> ww(nterms);
   /* evaluate series using the finite sum*/
   /* y > 0 */
   sum_ww = 0.0 ;
-  iterm = imin2(jd, nterms) ;
+  int iterm = imin2(jd, nterms) ;
   for (int k = 0; k < iterm; k++) {
     j = k + jl ;
     ww[k] = j * logz - lgamma(1 + j) - lgamma(-a * j);
+    ww_max = fmax2( ww_max, asDouble(ww[k]) );
   }
-  ww_max = dmax(ww, iterm) ;
   for (int k = 0; k < iterm; k++)
     sum_ww += exp(ww[k] - ww_max);
   Float ans = log(sum_ww) + ww_max  ;
-  Free(ww);
 
   return ans;
 }

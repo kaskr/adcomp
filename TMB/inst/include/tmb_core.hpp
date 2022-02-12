@@ -158,40 +158,6 @@ void optimizeTape(ADFunPointer pf){
     }
 }
 
-/* Helpers, to check that data and parameters are of the right types.
-   "RObjectTester" denotes the type of a pointer to a test function.
-   Examples of test functions are "isMatrix", "Rf_isArray", "isNumeric",
-   etc (see Rinternals.h).
-*/
-typedef Rboolean (*RObjectTester)(SEXP);
-#ifdef WITH_LIBTMB
-void RObjectTestExpectedType(SEXP x, RObjectTester expectedtype, const char *nam);
-Rboolean isValidSparseMatrix(SEXP x);
-Rboolean isNumericScalar(SEXP x);
-#else
-void RObjectTestExpectedType(SEXP x, RObjectTester expectedtype, const char *nam){
-  if(expectedtype != NULL){
-    if(!expectedtype(x)){
-      if(Rf_isNull(x)){
-	Rf_warning("Expected object. Got NULL.");
-      }
-      Rf_error("Error when reading the variable: '%s'. Please check data and parameters.",nam);
-    }
-  }
-}
-Rboolean isValidSparseMatrix(SEXP x){
-  if(!Rf_inherits(x,"dgTMatrix"))Rf_warning("Expected sparse matrix of class 'dgTMatrix'.");
-  return Rf_inherits(x,"dgTMatrix");
-}
-Rboolean isNumericScalar(SEXP x){
-  if(LENGTH(x)!=1){
-    Rf_warning("Expected scalar. Got length=%i",LENGTH(x));
-    return FALSE;
-  }
-  return Rf_isNumeric(x);
-}
-#endif
-
 /* Macros to obtain data and parameters from R */
 
 /** \brief Pointer to objective function used by DATA and PARAMETER
@@ -530,37 +496,6 @@ matrix<int> HessianSparsityPattern(ADFun<Type> *pf){
   return asMatrix(tmp, n, n);
 }
 
-/** \internal \brief Get list element named "str", or return NULL */
-#ifdef WITH_LIBTMB
-SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL);
-int  getListInteger(SEXP list, const char *str, int default_value = 0);
-#else
-SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
-{
-  if(config.debug.getListElement)std::cout << "getListElement: " << str << " ";
-  SEXP elmt = R_NilValue, names = Rf_getAttrib(list, R_NamesSymbol);
-  int i; 
-  for (i = 0; i < Rf_length(list); i++)
-    if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) 
-      {
-	elmt = VECTOR_ELT(list, i); 
-	break; 
-      }
-  if(config.debug.getListElement)std::cout << "Length: " << LENGTH(elmt) << " ";
-  if(config.debug.getListElement)std::cout << "\n";
-  RObjectTestExpectedType(elmt, expectedtype, str);
-  return elmt; 
-}
-int getListInteger(SEXP list, const char *str, int default_value = 0) {
-  SEXP tmp = getListElement(list, str);
-  if ( tmp == R_NilValue ) {
-    Rf_warning("Missing integer variable '%s'. Using default: %d. (Perhaps you are using a model object created with an old TMB version?)", str, default_value);
-    return default_value;
-  }
-  return INTEGER(tmp)[0];
-}
-#endif
-
 /** \internal \brief Do nothing if we are trying to tape non AD-types */
 void Independent(vector<double> x)CSKIP({})
 
@@ -825,6 +760,9 @@ public:
   double value(AD<double> x){return CppAD::Value(x);}
   double value(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
   double value(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+#ifdef TMBAD_FRAMEWORK
+  double value(TMBad::ad_aug x){return x.Value();}
+#endif
   /** @} */
 
   /** \brief Find the length of theta, i.e. in application obj=parameters */
@@ -964,7 +902,6 @@ struct parallel_accumulator{
     result=Type(0);
     obj=obj_;
 #ifdef _OPENMP
-#include <omp.h>
     obj->max_parallel_regions=omp_get_max_threads();
 #endif
   }
@@ -982,6 +919,136 @@ struct parallel_accumulator{
 
 #ifndef WITH_LIBTMB
 
+#ifdef TMBAD_FRAMEWORK
+template<class ADFunType>
+SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
+{
+  if(!Rf_isNewList(control))Rf_error("'control' must be a list");
+  ADFunType* pf;
+  pf=(ADFunType*)R_ExternalPtrAddr(f);
+  int data_changed = getListInteger(control, "data_changed", 0);
+  if (data_changed) {
+    pf->force_update();
+  }
+  int set_tail = getListInteger(control, "set_tail", 0) - 1;
+  if (set_tail == -1) {
+    pf -> unset_tail();
+  } else {
+    std::vector<TMBad::Index> r(1, set_tail);
+    pf -> set_tail(r);
+  }
+  PROTECT(theta=Rf_coerceVector(theta,REALSXP));
+  int n=pf->Domain();
+  int m=pf->Range();
+  if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
+  //R-index -> C-index
+  int rangecomponent = getListInteger(control, "rangecomponent", 1) - 1;
+  if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
+    Rf_error("Wrong range component.");
+  int order = getListInteger(control, "order");
+  if((order!=0) & (order!=1) & (order!=2) & (order!=3))
+    Rf_error("order can be 0, 1, 2 or 3");
+  //int sparsitypattern = getListInteger(control, "sparsitypattern");
+  //int dumpstack = getListInteger(control, "dumpstack");
+  SEXP hessiancols; // Hessian columns
+  PROTECT(hessiancols=getListElement(control,"hessiancols"));
+  int ncols=Rf_length(hessiancols);
+  SEXP hessianrows; // Hessian rows
+  PROTECT(hessianrows=getListElement(control,"hessianrows"));
+  int nrows=Rf_length(hessianrows);
+  if((nrows>0)&(nrows!=ncols))Rf_error("hessianrows and hessianrows must have same length");
+  vector<size_t> cols(ncols);
+  vector<size_t> cols0(ncols);
+  vector<size_t> rows(nrows);
+  if(ncols>0){
+    for(int i=0;i<ncols;i++){
+      cols[i]=INTEGER(hessiancols)[i]-1; //R-index -> C-index
+      cols0[i]=0;
+      if(nrows>0)rows[i]=INTEGER(hessianrows)[i]-1; //R-index -> C-index
+    }
+  }
+  std::vector<double> x(REAL(theta), REAL(theta) + LENGTH(theta));
+
+  SEXP res=R_NilValue;
+  SEXP rangeweight=getListElement(control,"rangeweight");
+  if(rangeweight!=R_NilValue){
+    if(LENGTH(rangeweight)!=m)Rf_error("rangeweight must have length equal to range dimension");
+    std::vector<double> w(REAL(rangeweight),
+                          REAL(rangeweight) + LENGTH(rangeweight));
+    vector<double> ans = pf->Jacobian(x, w);
+    res = asSEXP(ans);
+    UNPROTECT(3);
+    return res;
+  }
+  if(order==3){
+    Rf_error("Not implemented for TMBad");
+    // vector<double> w(1);
+    // w[0]=1;
+    // if((nrows!=1) | (ncols!=1))Rf_error("For 3rd order derivatives a single hessian coordinate must be specified.");
+    // pf->ForTwo(x,rows,cols); /* Compute forward directions */
+    // PROTECT(res=asSEXP(asMatrix(pf->Reverse(3,w),n,3)));
+  }
+  if(order==0){
+    //if(dumpstack)CppAD::traceforward0sweep(1);
+    std::vector<double> ans = pf->operator()(x);
+    PROTECT(res=asSEXP(ans));
+    //if(dumpstack)CppAD::traceforward0sweep(0);
+    SEXP rangenames=Rf_getAttrib(f,Rf_install("range.names"));
+    if(LENGTH(res)==LENGTH(rangenames)){
+      Rf_setAttrib(res,R_NamesSymbol,rangenames);
+    }
+  }
+  if(order==1){
+    std::vector<double> jvec;
+    SEXP keepx = getListElement(control, "keepx");
+    if (keepx != R_NilValue && LENGTH(keepx) > 0) {
+      SEXP keepy = getListElement(control, "keepy");
+      std::vector<bool> keep_x(pf->Domain(), false);
+      std::vector<bool> keep_y(pf->Range(), false);
+      for (int i=0; i<LENGTH(keepx); i++) {
+        keep_x[INTEGER(keepx)[i] - 1] = true;
+      }
+      for (int i=0; i<LENGTH(keepy); i++) {
+        keep_y[INTEGER(keepy)[i] - 1] = true;
+      }
+      n = LENGTH(keepx);
+      m = LENGTH(keepy);
+      jvec = pf->Jacobian(x, keep_x, keep_y);
+    } else {
+      jvec = pf->Jacobian(x);
+    }
+    // if(doforward)pf->Forward(0,x);
+    matrix<double> jac(m, n);
+    int k=0;
+    for (int i=0; i<m; i++) {
+      for (int j=0; j<n; j++) {
+        jac(i, j) = jvec[k];
+        k++;
+      }
+    }
+    PROTECT( res = asSEXP(jac) );
+  }
+  //if(order==2)res=asSEXP(pf->Hessian(x,0),1);
+  if(order==2){
+    // if(ncols==0){
+    //   if(sparsitypattern){
+    //     PROTECT(res=asSEXP(HessianSparsityPattern(pf)));  
+    //   } else {
+    //     PROTECT(res=asSEXP(asMatrix(pf->Hessian(x,rangecomponent),n,n)));
+    //   }
+    // }
+    // else if (nrows==0){
+    //   /* Fixme: the cols0 argument should be user changeable */
+    //   PROTECT(res=asSEXP(asMatrix(pf->RevTwo(x,cols0,cols),n,ncols)));
+    // }
+    // else PROTECT(res=asSEXP(asMatrix(pf->ForTwo(x,rows,cols),m,ncols)));
+  }
+  UNPROTECT(4);
+  return res;
+} // EvalADFunObjectTemplate
+#endif
+
+#ifdef CPPAD_FRAMEWORK
 /** \internal \brief Evaluates an ADFun object from R
 
    Template argument can be "ADFun" or an object extending
@@ -1111,6 +1178,7 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   UNPROTECT(4);
   return res;
 } // EvalADFunObjectTemplate
+#endif
 
 /** \internal \brief Garbage collect an ADFun or parallelADFun object pointer */
 template <class ADFunType>
@@ -1121,7 +1189,43 @@ void finalize(SEXP x)
   memory_manager.CallCFinalizer(x);
 }
 
+#ifdef TMBAD_FRAMEWORK
+/** \internal \brief Construct ADFun object */
+TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters,
+			       SEXP report, SEXP control, int parallel_region=-1,
+			       SEXP &info=R_NilValue)
+{
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  int returnReport = (control!=R_NilValue) && getListInteger(control, "report");
+  /* Create objective_function "dummy"-object */
+  objective_function< ad > F(data,parameters,report);
+  F.set_parallel_region(parallel_region);
+  /* Create ADFun pointer.
+     We have the option to tape either the value returned by the
+     objective_function template or the vector reported using the
+     macro "ADREPORT" */
+  adfun* pf = new adfun();
+  pf->glob.ad_start();
+  //TMBad::Independent(F.theta);  // In both cases theta is the independent variable
+  for (int i=0; i<F.theta.size(); i++) F.theta(i).Independent();
+  if(!returnReport){ // Default case: no ad report - parallel run allowed
+    vector< ad > y(1);
+    y[0] = F.evalUserTemplate();
+    //TMBad::Dependent(y);
+    for (int i=0; i<y.size(); i++) y[i].Dependent();
+  } else { // ad report case
+    F(); // Run through user template (modifies reportvector)
+    //TMBad::Dependent(F.reportvector.result);
+    for (int i=0; i<F.reportvector.result.size(); i++) F.reportvector.result[i].Dependent();
+    info=F.reportvector.reportnames(); // parallel run *not* allowed
+  }
+  pf->glob.ad_stop();
+  return pf;
+}
+#endif
 
+#ifdef CPPAD_FRAMEWORK
 /** \internal \brief Construct ADFun object */
 ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
@@ -1148,28 +1252,127 @@ ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
   }
   return pf;
 }
-
+#endif
 
 extern "C"
 {
 
+#ifdef TMBAD_FRAMEWORK
   /** \internal \brief Garbage collect an ADFun object pointer */
   void finalizeADFun(SEXP x)
   {
-    ADFun<double>* ptr=(ADFun<double>*)R_ExternalPtrAddr(x);
-    if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer(x);
+    finalize<TMBad::ADFun<TMBad::ad_aug> > (x);
   }
   void finalizeparallelADFun(SEXP x)
   {
-    parallelADFun<double>* ptr=(parallelADFun<double>*)R_ExternalPtrAddr(x);
-    if(ptr!=NULL)delete ptr;
-    memory_manager.CallCFinalizer(x);
+    finalize<parallelADFun<double> > (x);
   }
+#endif
 
+#ifdef CPPAD_FRAMEWORK
+  /** \internal \brief Garbage collect an ADFun object pointer */
+  void finalizeADFun(SEXP x)
+  {
+    finalize<ADFun<double> > (x);
+  }
+  void finalizeparallelADFun(SEXP x)
+  {
+    finalize<parallelADFun<double> > (x);
+  }
+#endif
+
+  /* --- MakeADFunObject ----------------------------------------------- */
+
+#ifdef TMBAD_FRAMEWORK
   /** \internal \brief Construct ADFun object */
-  SEXP MakeADFunObject(SEXP data, SEXP parameters,
+  SEXP TMBAD_MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
+  {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+
+    adfun* pf = NULL;
+    /* Some type checking */
+    if(!Rf_isNewList(data))Rf_error("'data' must be a list");
+    if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
+    if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
+    if(!Rf_isNewList(control))Rf_error("'control' must be a list");
+    int returnReport = getListInteger(control, "report");
+
+    /* Get the default parameter vector (tiny overhead) */
+    SEXP par,res=NULL,info;
+    objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
+    int n=F.count_parallel_regions(); // Evaluates user template
+#else
+    F.count_parallel_regions(); // Evaluates user template
+#endif
+    if(returnReport && F.reportvector.size()==0){
+      /* Told to report, but no ADREPORT in template: Get out quickly */
+      return R_NilValue;
+    }
+    PROTECT(par=F.defaultpar());
+    PROTECT(info=R_NilValue); // Important
+
+    if(_openmp && !returnReport){ // Parallel mode
+#ifdef _OPENMP
+      if(config.trace.parallel)
+        std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
+      start_parallel(); /* FIXME: NOT NEEDED */
+      vector< adfun* > pfvec(n);
+      bool bad_thread_alloc = false;
+#pragma omp parallel for if (config.tape.parallel && n>1)
+      for(int i = 0; i < n; i++) {
+        TMB_TRY {
+          pfvec[i] = NULL;
+          pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
+          if (config.optimize.instantly) pfvec[i]->optimize();
+        }
+        TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if (bad_thread_alloc) {
+        for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+        TMB_ERROR_BAD_ALLOC;
+      }
+
+      // FIXME: NOT DONE YET
+
+      parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+      /* Convert parallel ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+      //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+#endif
+    } else { // Serial mode
+      TMB_TRY{
+	/* Actual work: tape creation */
+	pf = NULL;
+	pf = TMBAD_MakeADFunObject_(data, parameters, report, control, -1, info);
+	if (config.optimize.instantly) pf->optimize();
+      }
+      TMB_CATCH {
+	if (pf != NULL) delete pf;
+	TMB_ERROR_BAD_ALLOC;
+      }
+      /* Convert ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
+      Rf_setAttrib(res,Rf_install("range.names"),info);
+    }
+
+    /* Return list of external pointer and default-parameter */
+    SEXP ans;
+    Rf_setAttrib(res,Rf_install("par"),par);
+    PROTECT(ans=ptrList(res));
+    UNPROTECT(4);
+
+    return ans;
+  } // TMBAD_MakeADFunObject
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+  /** \internal \brief Construct ADFun object */
+  SEXP CPPAD_MakeADFunObject(SEXP data, SEXP parameters,
+                             SEXP report, SEXP control)
   {
     ADFun<double>* pf = NULL;
     /* Some type checking */
@@ -1198,10 +1401,11 @@ extern "C"
 #ifdef _OPENMP
       if(config.trace.parallel)
 	std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
@@ -1242,7 +1446,274 @@ extern "C"
 
     return ans;
   } // MakeADFunObject
-  
+#endif
+
+  /* --- TransformADFunObject ----------------------------------------------- */
+
+#ifdef TMBAD_FRAMEWORK
+inline int get_num_tapes(SEXP f) {
+  if (isNull(f))
+    return 0;
+  SEXP tag = R_ExternalPtrTag(f);
+  if (tag != Rf_install("parallelADFun"))
+    return 0;
+  return
+    ((parallelADFun<double>*) R_ExternalPtrAddr(f))->ntapes;
+}
+SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
+{
+  if (pf == NULL)
+    Rf_error("Cannot transform '<pointer: (nil)>' (unloaded/reloaded DLL?)");
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  // FIXME: Must require non parallel object !!!
+  std::string method =
+    CHAR(STRING_ELT(getListElement(control, "method"), 0));
+  // Test adfun copy
+  if (method == "copy") {
+    *pf = adfun(*pf);
+    return R_NilValue;
+  }
+  if (method == "set_compiled") {
+    int i = 0;
+#ifdef _OPENMP
+    i = omp_get_thread_num();
+#endif
+    typedef void(*fct_ptr1)(double*);
+    typedef void(*fct_ptr2)(double*,double*);
+    pf->glob.forward_compiled =
+      (fct_ptr1) R_ExternalPtrAddr(VECTOR_ELT(getListElement(control, "forward_compiled"), i));
+    pf->glob.reverse_compiled =
+      (fct_ptr2) R_ExternalPtrAddr(VECTOR_ELT(getListElement(control, "reverse_compiled"), i));
+    return R_NilValue;
+  }
+  SEXP random_order = getListElement(control, "random_order");
+  int nr = (isNull(random_order) ? 0 : LENGTH(random_order));
+  std::vector<TMBad::Index> random;
+  if (nr != 0) {
+    random = std::vector<TMBad::Index>(INTEGER(random_order),
+                                       INTEGER(random_order) + nr);
+    for (size_t i=0; i<random.size(); i++)
+      random[i] -= 1 ; // R index -> C index
+  }
+  TMB_TRY {
+    if (method == "remove_random_parameters") {
+      std::vector<bool> mask(pf->Domain(), true);
+      for (size_t i = 0; i<random.size(); i++)
+        mask[random[i]] = false;
+      pf->glob.inv_index = TMBad::subset(pf->glob.inv_index, mask);
+    }
+    else if (method == "laplace") {
+      SEXP config = getListElement(control, "config");
+      newton::newton_config cfg(config);
+      *pf = newton::Laplace_(*pf, random, cfg);
+    }
+    else if (method == "marginal_gk") {
+      TMBad::gk_config cfg;
+      SEXP config = getListElement(control, "config");
+      if (!Rf_isNull(config)) {
+        cfg.adaptive = getListInteger(config, "adaptive", 0);
+        cfg.debug    = getListInteger(config, "debug", 0);
+      }
+      *pf = pf -> marginal_gk(random, cfg);
+    }
+    else if (method == "marginal_sr") {
+      SEXP config = getListElement(control, "config");
+      std::vector<TMBad::sr_grid> grids;
+      SEXP grid        = getListElement(config, "grid");
+      SEXP random2grid = getListElement(config, "random2grid");
+      for (int i=0; i<LENGTH(grid); i++) {
+        SEXP grid_i = VECTOR_ELT(grid, i);
+        SEXP x = getListElement(grid_i, "x");
+        SEXP w = getListElement(grid_i, "w");
+        if (LENGTH(x) != LENGTH(w))
+          Rf_error("Length of grid$x and grid$w must be equal");
+        TMBad::sr_grid grid_sr;
+        grid_sr.x = std::vector<double>(REAL(x), REAL(x) + LENGTH(x));
+        grid_sr.w = std::vector<double>(REAL(w), REAL(w) + LENGTH(w));
+        grids.push_back(grid_sr);
+      }
+      std::vector<TMBad::Index> r2g(INTEGER(random2grid),
+                                    INTEGER(random2grid) + LENGTH(random2grid));
+      for (size_t i=0; i<r2g.size(); i++)
+        r2g[i] -= 1 ; // R index -> C index
+      *pf = pf -> marginal_sr(random, grids, r2g, true);
+    }
+    else if (method == "parallelize")
+      *pf = pf -> parallelize(2);
+    else if (method == "compress") {
+      int max_period_size = getListInteger(control, "max_period_size", 1024);
+      TMBad::compress(pf->glob, max_period_size);
+    }
+    else if (method == "compress_and_compile") {
+#ifdef HAVE_COMPILE_HPP
+      int max_period_size = getListInteger(control, "max_period_size", 1024);
+      TMBad::compress(pf->glob, max_period_size);
+      // if (config.optimize.instantly) pf->glob.eliminate();
+      TMBad::compile(pf->glob);
+#else
+      Rf_error("TMBad::compile() is unavailable");
+#endif
+    }
+    else if (method == "accumulation_tree_split")
+      pf->glob = accumulation_tree_split(pf->glob, true);
+    else if (method == "fuse_and_replay") {
+      pf->glob.set_fuse(true);
+      pf->replay();
+      pf->glob.set_fuse(false);
+    }
+    else if (method == "reorder_random") {
+      pf->reorder(random);
+    }
+    else if (method == "reorder_sub_expressions") {
+      TMBad::reorder_sub_expressions(pf->glob);
+    }
+    else if (method == "reorder_depth_first") {
+      TMBad::reorder_depth_first(pf->glob);
+    }
+    else if (method == "reorder_temporaries") {
+      TMBad::reorder_temporaries(pf->glob);
+    }
+    else if (method == "parallel_accumulate") {
+      // Known method - done elsewhere
+    }
+    else if (method == "optimize") {
+      pf->optimize();
+    } else {
+      Rf_error("Method unknown: '%s'", method.c_str());
+    }
+  }
+  TMB_CATCH {
+    TMB_ERROR_BAD_ALLOC;
+  }
+  // for (size_t i=0; i<random.size(); i++) random[i] += 1 ; // C index -> R index
+  // Rf_setAttrib(f, Rf_install("random_order"), asSEXP(random));
+  return R_NilValue;
+}
+/** \internal \brief Transform an existing ADFun object */
+SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
+{
+  if (Rf_isNull(f))
+    Rf_error("Expected external pointer - got NULL");
+  SEXP tag = R_ExternalPtrTag(f);
+  if (tag != Rf_install("ADFun"))
+    if (tag != Rf_install("parallelADFun"))
+      Rf_error("Expected ADFun or parallelADFun pointer");
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  if(tag == Rf_install("ADFun")) {
+    adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+    TMBAD_TransformADFunObjectTemplate(pf, control);
+  } else if (tag == Rf_install("parallelADFun")) {
+    // Warning: Most no meaningful for parallel models!:
+    // OK      : reorder_random etc
+    // NOT OK  : copy, set_compiled, marginal_sr etc
+    parallelADFun<double>* ppf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+    // Apply method for each component except for one special case:
+    // 'Parallel accumulate'
+    std::string method =
+      CHAR(STRING_ELT(getListElement(control, "method"), 0));
+    if (method == "parallel_accumulate") {
+      int num_threads = getListInteger(control, "num_threads", 2);
+      if (num_threads == 1) {
+        // No need to parallelize
+        return R_NilValue;
+      }
+      if (get_num_tapes(f) > 1) {
+        // Already parallel (via parallel_accumulator or similar)
+        return R_NilValue;
+      }
+      adfun* pf = (ppf->vecpf)[0]; // One tape - get it
+      std::vector<adfun> vf = pf->parallel_accumulate(num_threads);
+      parallelADFun<double>* new_ppf = new parallelADFun<double>(vf);
+      delete ppf;
+      R_SetExternalPtrAddr(f, new_ppf);
+      return R_NilValue;
+    }
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for (int i=0; i<ppf->ntapes; i++) {
+      adfun* pf = (ppf->vecpf)[i];
+      TMBAD_TransformADFunObjectTemplate(pf, control);
+    }
+    // Some methods change Domain or Range of individual tapes. This
+    // is allowed when there is only one tape.
+    if (ppf->ntapes == 1) {
+      ppf->domain = (ppf->vecpf)[0]->Domain();
+      ppf->range  = (ppf->vecpf)[0]->Range();
+    }
+    // Now, check that it's ok. FIXME: Range() is not checked
+    for (int i=0; i<ppf->ntapes; i++) {
+      if (ppf->domain != (ppf->vecpf)[i]->Domain())
+        Rf_warning("Domain has changed in an invalid way");
+    }
+  } else {
+    Rf_error("Unknown function pointer");
+  }
+  return R_NilValue;
+}
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+/** \internal \brief Transform an existing ADFun object */
+SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
+{
+  int mustWork = getListInteger(control, "mustWork", 1);
+  if (mustWork)
+    Rf_error("Not supported for CPPAD_FRAMEWORK");
+  return R_NilValue;
+}
+#endif
+
+  /* --- InfoADFunObject ---------------------------------------------------- */
+
+#ifdef TMBAD_FRAMEWORK
+  SEXP InfoADFunObject(SEXP f) {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    if (Rf_isNull(f)) Rf_error("Expected external pointer - got NULL");
+    int num_tapes = get_num_tapes(f);
+    if (num_tapes >= 2)
+      Rf_error("'InfoADFunObject' is only available for tapes with one thread");
+    adfun* pf;
+    if (num_tapes == 0)
+      pf = (adfun*) R_ExternalPtrAddr(f);
+    else {
+      pf = ( (parallelADFun<double>*) R_ExternalPtrAddr(f) ) -> vecpf[0];
+    }
+    SEXP ans, names;
+    PROTECT(ans = Rf_allocVector(VECSXP, 6));
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    int i = 0;
+#define GET_INFO(EXPR)                          \
+    SET_VECTOR_ELT(ans, i, asSEXP(EXPR));       \
+    SET_STRING_ELT(names, i, Rf_mkChar(#EXPR)); \
+    i++;
+    // begin
+    std::vector<bool> a = pf -> activeDomain();
+    std::vector<int> ai(a.begin(), a.end());
+    vector<int> activeDomain(ai);
+    GET_INFO(activeDomain);
+    int opstack_size = pf->glob.opstack.size();
+    GET_INFO(opstack_size);
+    int values_size = pf->glob.values.size();
+    GET_INFO(values_size);
+    int inputs_size = pf->glob.inputs.size();
+    GET_INFO(inputs_size);
+    int Domain = pf->Domain();
+    GET_INFO(Domain);
+    int Range = pf->Range();
+    GET_INFO(Range);
+    // end
+#undef GET_INFO
+    Rf_setAttrib(ans,R_NamesSymbol,names);
+    UNPROTECT(2);
+    return ans;
+  }
+#endif
+
+#ifdef CPPAD_FRAMEWORK
   SEXP InfoADFunObject(SEXP f)
   {
     ADFun<double>* pf;
@@ -1272,7 +1743,9 @@ extern "C"
     UNPROTECT(2);
     return ans;
   }
+#endif
 
+#ifdef CPPAD_FRAMEWORK
   /** \internal \brief Call tape optimization function in CppAD */
   SEXP optimizeADFunObject(SEXP f)
   {
@@ -1289,13 +1762,35 @@ extern "C"
     }
     return R_NilValue;
   }
+#endif
 
   /** \internal \brief Get tag of external pointer */
   SEXP getTag(SEXP f){
     return R_ExternalPtrTag(f);
   }
 
-  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
+#ifdef TMBAD_FRAMEWORK
+  SEXP TMBAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
+  {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    TMB_TRY {
+      if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
+      SEXP tag=R_ExternalPtrTag(f);
+      if(tag == Rf_install("ADFun"))
+	return TMBAD_EvalADFunObjectTemplate< adfun >(f,theta,control);
+      if(tag == Rf_install("parallelADFun"))
+        return TMBAD_EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
+      Rf_error("NOT A KNOWN FUNCTION POINTER");
+    }
+    TMB_CATCH {
+      TMB_ERROR_BAD_ALLOC;
+    }
+  }
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+  SEXP CPPAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
       if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
@@ -1309,6 +1804,82 @@ extern "C"
     TMB_CATCH {
       TMB_ERROR_BAD_ALLOC;
     }
+  }
+#endif
+
+
+  SEXP tmbad_print(SEXP f, SEXP control) {
+#ifdef TMBAD_FRAMEWORK
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    int num_tapes = get_num_tapes(f);
+    adfun* pf;
+    if (num_tapes == 0)
+      pf = (adfun*) R_ExternalPtrAddr(f);
+    else {
+      int i = getListInteger(control, "i", 0);
+      pf = ( (parallelADFun<double>*) R_ExternalPtrAddr(f) ) -> vecpf[i];
+    }
+    std::string method =
+      CHAR(STRING_ELT(getListElement(control, "method"), 0));
+    if (method == "num_tapes") { // Get number of tapes
+      return ScalarInteger(num_tapes);
+    }
+    else if (method == "tape") { // Print tape
+      int depth = getListInteger(control, "depth", 1);
+      TMBad::global::print_config cfg;
+      cfg.depth = depth;
+      pf->glob.print(cfg);
+    }
+    else if (method == "dot") { // Print dot format
+      graph2dot(pf->glob, true, Rcout);
+    }
+    else if (method == "inv_index") { // Print member
+      using TMBad::operator<<;
+      Rcout << pf->glob.inv_index << "\n";
+    }
+    else if (method == "dep_index") { // Print member
+      using TMBad::operator<<;
+      Rcout << pf->glob.dep_index << "\n";
+    }
+    else if (method == "src") { // Print C src code
+      TMBad::code_config cfg;
+      cfg.gpu = false;
+      cfg.asm_comments = false;
+      cfg.cout = &Rcout;
+      *cfg.cout << "#include <cmath>" << std::endl;
+      *cfg.cout
+        << "template<class T>T sign(const T &x) { return (x > 0) - (x < 0); }"
+        << std::endl;
+      TMBad::global glob = pf->glob; // Invoke deep copy
+      TMBad::compress(glob);
+      write_forward(glob, cfg);
+      write_reverse(glob, cfg);
+    }
+    else if (method == "op") {
+      int name = getListInteger(control, "name", 0);
+      int address = getListInteger(control, "address", 0);
+      int input_size = getListInteger(control, "input_size", 0);
+      int output_size = getListInteger(control, "output_size", 0);
+      size_t n = pf->glob.opstack.size();
+      SEXP ans = PROTECT(allocVector(STRSXP, n));
+      for (size_t i=0; i<n; i++) {
+        std::stringstream strm;
+        if (address)     strm << (void*) pf->glob.opstack[i] << " ";
+        if (name)        strm << pf->glob.opstack[i]->op_name() << " ";
+        if (input_size)  strm << pf->glob.opstack[i]->input_size();
+        if (output_size) strm << pf->glob.opstack[i]->output_size();
+        const std::string& tmp = strm.str();
+        SET_STRING_ELT(ans, i, mkChar(tmp.c_str()));
+      }
+      UNPROTECT(1);
+      return ans;
+    }
+    else {
+      Rf_error("Unknown method: ", method.c_str());
+    }
+#endif
+    return R_NilValue;
   }
   
 }
@@ -1325,7 +1896,7 @@ extern "C"
     memory_manager.CallCFinalizer(x);
   }
   
-  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report)
+  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     /* Some type checking */
     if(!Rf_isNewList(data))Rf_error("'data' must be a list");
@@ -1395,7 +1966,7 @@ extern "C"
   /** \internal \brief Gets parameter order by running the user template
 
    We spend a function evaluation on getting the parameter order (!) */
-  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report)
+  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     TMB_TRY {
       /* Some type checking */
@@ -1414,7 +1985,39 @@ extern "C"
 } /* Double interface */
 
 
-ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int parallel_region=-1)
+#ifdef TMBAD_FRAMEWORK
+TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
+{
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  SEXP f = getListElement(control, "f");
+  adfun* pf;
+  bool allocate_new_pf = ( f == R_NilValue );
+  if ( ! allocate_new_pf ) {
+    if (parallel_region == -1)
+      pf = (adfun*) R_ExternalPtrAddr(f);
+    else
+      pf = ((parallelADFun<double>*) R_ExternalPtrAddr(f))->vecpf[parallel_region];
+  } else {
+    SEXP control_adfun = R_NilValue;
+    pf = TMBAD_MakeADFunObject_(data, parameters, report, control_adfun, parallel_region);
+  }
+  // Optionally skip gradient components (only need 'random' part of gradient)
+  SEXP random = getListElement(control, "random");
+  if (random != R_NilValue) {
+    int set_tail = INTEGER(random)[0] - 1;
+    std::vector<TMBad::Index> r(1, set_tail);
+    pf -> set_tail(r);
+  }
+  adfun* pgf = new adfun (pf->JacFun());
+  pf -> unset_tail(); // Not really needed
+  if (allocate_new_pf) delete pf;
+  return pgf;
+}
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   /* Create ADFun pointer */
   objective_function< AD<AD<double> > > F(data,parameters,report);
@@ -1433,12 +2036,89 @@ ADFun< double >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, int 
   ADFun< double >* pf = new ADFun< double >(x,yy);
   return pf;
 }
+#endif
 
 extern "C"
 {
-
+#ifdef TMBAD_FRAMEWORK
   /** \internal \brief Tape the gradient using nested AD types */
-  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report)
+  SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
+  {
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+
+    adfun* pf = NULL;
+    /* Some type checking */
+    if(!Rf_isNewList(data))Rf_error("'data' must be a list");
+    if(!Rf_isNewList(parameters))Rf_error("'parameters' must be a list");
+    if(!Rf_isEnvironment(report))Rf_error("'report' must be an environment");
+
+    /* Get the default parameter vector (tiny overhead) */
+    SEXP par,res=NULL;
+    objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
+    SEXP f = getListElement(control, "f");
+    int n = get_num_tapes(f);
+    if (n==0) // No tapes? Count!
+      n = F.count_parallel_regions(); // Evaluates user template
+#else
+    F.count_parallel_regions(); // Evaluates user template
+#endif
+    PROTECT(par=F.defaultpar());
+
+    if(_openmp){ // Parallel mode
+#ifdef _OPENMP
+      if(config.trace.parallel)
+	std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
+      start_parallel(); /* Start threads */
+      vector< adfun* > pfvec(n);
+      bool bad_thread_alloc = false;
+#pragma omp parallel for if (config.tape.parallel && n>1)
+      for(int i=0;i<n;i++){
+	TMB_TRY {
+	  pfvec[i] = NULL;
+	  pfvec[i] = TMBAD_MakeADGradObject_(data, parameters, report, control, i);
+	  if (config.optimize.instantly) pfvec[i]->optimize();
+	}
+	TMB_CATCH { bad_thread_alloc = true; }
+      }
+      if(bad_thread_alloc){
+	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
+	TMB_ERROR_BAD_ALLOC;
+      }
+      parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
+      /* Convert parallel ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
+      // R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+#endif
+    } else { // Serial mode
+      /* Actual work: tape creation */
+      TMB_TRY {
+        pf = NULL;
+        pf = TMBAD_MakeADGradObject_(data, parameters, report, control, -1);
+        if(config.optimize.instantly)pf->optimize();
+      }
+      TMB_CATCH {
+	if (pf != NULL) delete pf;
+	TMB_ERROR_BAD_ALLOC;
+      }
+      /* Convert ADFun pointer to R_ExternalPtr */
+      PROTECT(res=R_MakeExternalPtr((void*) pf,Rf_install("ADFun"),R_NilValue));
+    }
+
+    /* Return ptrList */
+    SEXP ans;
+    Rf_setAttrib(res,Rf_install("par"),par);
+    PROTECT(ans=ptrList(res));
+    UNPROTECT(3);
+    return ans;
+  } // TMBAD_MakeADGradObject
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+  /** \internal \brief Tape the gradient using nested AD types */
+  SEXP CPPAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     ADFun<double>* pf = NULL;
     /* Some type checking */
@@ -1460,14 +2140,15 @@ extern "C"
 #ifdef _OPENMP
       if(config.trace.parallel)
 	std::cout << n << " regions found.\n";
+      if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
       bool bad_thread_alloc = false;
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
-	  pfvec[i] = MakeADGradObject_(data, parameters, report, i);
+	  pfvec[i] = MakeADGradObject_(data, parameters, report, control, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
@@ -1484,7 +2165,7 @@ extern "C"
       /* Actual work: tape creation */
       TMB_TRY {
         pf = NULL;
-        pf = MakeADGradObject_(data, parameters, report, -1);
+        pf = MakeADGradObject_(data, parameters, report, control, -1);
         if(config.optimize.instantly)pf->optimize();
       }
       TMB_CATCH {
@@ -1502,6 +2183,7 @@ extern "C"
     UNPROTECT(3);
     return ans;
   } // MakeADGradObject
+#endif
 }
 
 
@@ -1511,7 +2193,59 @@ extern "C"
           change dimension - only treat h[:,skip] and h[skip,:] as
           zero). Negative subscripts are not allowed.
 */
-sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, int parallel_region=-1)
+#ifdef TMBAD_FRAMEWORK
+sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
+{
+  typedef TMBad::ad_aug ad;
+  typedef TMBad::ADFun<ad> adfun;
+  typedef sphess_t<adfun> sphess;
+  SEXP gf = getListElement(control, "gf");
+  adfun* pgf;
+  bool allocate_new_pgf = ( gf == R_NilValue );
+  if ( ! allocate_new_pgf ) {
+    if (parallel_region == -1)
+      pgf = (adfun*) R_ExternalPtrAddr(gf);
+    else
+      pgf = ((parallelADFun<double>*) R_ExternalPtrAddr(gf))->vecpf[parallel_region];
+  } else {
+    SEXP control_adgrad = R_NilValue;
+    pgf = TMBAD_MakeADGradObject_(data, parameters, report, control_adgrad, parallel_region);
+  }
+  if (config.optimize.instantly) pgf->optimize();
+  int n = pgf->Domain();
+  std::vector<bool> keepcol(n, true);
+  SEXP skip = getListElement(control, "skip");
+  for(int i=0; i<LENGTH(skip); i++) {
+    keepcol[ INTEGER(skip)[i] - 1 ] = false; // skip is R-index !
+  }
+  TMBad::SpJacFun_config spjacfun_cfg;
+  spjacfun_cfg.index_remap = false;
+  spjacfun_cfg.compress    = config.tmbad.sparse_hessian_compress;
+  TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol, spjacfun_cfg);
+  if (allocate_new_pgf) delete pgf;
+  // NB: Lower triangle, column major =
+  //     Transpose of upper triangle, row major
+  h.subset_inplace( h.row() <= h.col() ); // Upper triangle, row major
+  h.transpose_inplace();                  // Lower triangle, col major
+  if (config.optimize.instantly)          // Optimize now or later ?
+    h.optimize();
+  adfun* phf = new adfun( h );
+  // Convert h.i and h.j to vector<int>
+  vector<TMBad::Index> h_i(h.i);
+  vector<TMBad::Index> h_j(h.j);
+  sphess ans(phf, h_i.cast<int>(), h_j.cast<int>());
+  return ans;
+} // TMBAD_MakeADHessObject2
+#endif
+
+/** \internal \brief Tape the hessian[cbind(i,j)] using nested AD types.
+
+    skip: integer vector of columns to skip from the hessian (will not
+          change dimension - only treat h[:,skip] and h[skip,:] as
+          zero). Negative subscripts are not allowed.
+*/
+#ifdef CPPAD_FRAMEWORK
+sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   /* Some type checking */
   if(!Rf_isNewList(data))Rf_error("'data' must be a list");
@@ -1522,6 +2256,7 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
   objective_function< AD<AD<AD<double> > > > F(data,parameters,report);
   F.set_parallel_region(parallel_region);
   int n = F.theta.size();
+  SEXP skip = getListElement(control, "skip");
   vector<bool> keepcol(n); // Scatter for fast lookup 
   for(int i=0; i<n; i++){
     keepcol[i]=true;
@@ -1593,6 +2328,7 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP skip, in
   sphess ans(ptape3, rowindex, colindex);
   return ans;
 } // MakeADHessObject2
+#endif
 
 // kasper: Move to new file e.g. "convert.hpp"
 template <class ADFunType>
@@ -1621,25 +2357,94 @@ SEXP asSEXP(const sphess_t<ADFunType> &H, const char* tag)
 
 extern "C"
 {
+
+#ifdef TMBAD_FRAMEWORK
 #ifdef _OPENMP
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    typedef sphess_t<adfun> sphess;
+    if(config.trace.parallel)
+      std::cout << "Count num parallel regions\n";
+    objective_function< double > F(data,parameters,report);
+    SEXP gf = getListElement(control, "gf");
+    int n = get_num_tapes(gf);
+    if (n==0) // No tapes? Count!
+      n = F.count_parallel_regions(); // Evaluates user template
+    if(config.trace.parallel)
+      std::cout << n << " regions found.\n";
+    if (n==0) n++; // No explicit parallel accumulation
+    start_parallel(); /* FIXME: not needed */
+    /* parallel test */
+    bool bad_thread_alloc = false;
+    vector<sphess*> Hvec(n);
+#pragma omp parallel for if (config.tape.parallel && n>1)
+    for (int i=0; i<n; i++) {
+      TMB_TRY {
+	Hvec[i] = NULL;
+	Hvec[i] = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, control, i) );
+	//optimizeTape( Hvec[i]->pf );
+      }
+      TMB_CATCH { bad_thread_alloc = true; }
+    }
+    if (bad_thread_alloc) {
+      for(int i=0; i<n; i++) {
+	if (Hvec[i] != NULL) {
+	  delete Hvec[i]->pf;
+	  delete Hvec[i];
+	}
+      }
+      TMB_ERROR_BAD_ALLOC;
+    }
+    parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
+    return asSEXP(tmp->convert(),"parallelADFun");
+  } // MakeADHessObject2
+#else
+  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    typedef sphess_t<adfun> sphess;
+    sphess* pH = NULL;
+    SEXP ans;
+    TMB_TRY {
+      pH = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, control, -1) );
+      //optimizeTape( pH->pf );
+      ans = asSEXP(*pH, "ADFun");
+    }
+    TMB_CATCH {
+      if (pH != NULL) {
+	delete pH->pf;
+	delete pH;
+      }
+      TMB_ERROR_BAD_ALLOC;
+    }
+    delete pH;
+    return ans;
+  } // MakeADHessObject2
+#endif
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+#ifdef _OPENMP
+  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     if(config.trace.parallel)
       std::cout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
     int n=F.count_parallel_regions();
     if(config.trace.parallel)
       std::cout << n << " regions found.\n";
+    if (n==0) n++; // No explicit parallel accumulation
 
     start_parallel(); /* Start threads */
 
     /* parallel test */
     bool bad_thread_alloc = false;
     vector<sphess*> Hvec(n);
-#pragma omp parallel for if (config.tape.parallel)
+#pragma omp parallel for if (config.tape.parallel && n>1)
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
-	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, skip, i) );
+	Hvec[i] = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, control, i) );
 	optimizeTape( Hvec[i]->pf );
       }
       TMB_CATCH { bad_thread_alloc = true; }
@@ -1662,11 +2467,11 @@ extern "C"
     return ans;
   } // MakeADHessObject2
 #else
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip){
+  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     sphess* pH = NULL;
     SEXP ans;
     TMB_TRY {
-      pH = new sphess( MakeADHessObject2_(data, parameters, report, skip, -1) );
+      pH = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, control, -1) );
       optimizeTape( pH->pf );
       ans = asSEXP(*pH, "ADFun");
     }
@@ -1681,15 +2486,53 @@ extern "C"
     return ans;
   } // MakeADHessObject2
 #endif
+#endif
 }
 
 extern "C"
 {
-  SEXP usingAtomics(){
+
+#ifdef TMBAD_FRAMEWORK
+  SEXP TMBAD_usingAtomics(){
+    SEXP ans;
+    PROTECT(ans = Rf_allocVector(INTSXP,1));
+    INTEGER(ans)[0] = 1; // TMBAD doesn't benefit from knowing if 'false'
+    UNPROTECT(1);
+    return ans;
+  }
+#endif
+
+#ifdef CPPAD_FRAMEWORK
+  SEXP CPPAD_usingAtomics(){
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
     INTEGER(ans)[0] = atomic::atomicFunctionGenerated;
     UNPROTECT(1);
+    return ans;
+  }
+#endif
+
+  SEXP getFramework() {
+    SEXP ans;
+    PROTECT(ans = R_NilValue);
+#ifdef TMBAD_FRAMEWORK
+    ans = mkString("TMBad");
+#elif  CPPAD_FRAMEWORK
+    ans = mkString("CppAD");
+#else
+    ans = mkString("Unknown");
+#endif
+    SEXP openmp_sym, openmp_res;
+    PROTECT(openmp_sym = R_NilValue);
+    PROTECT(openmp_res = R_NilValue);
+    openmp_sym = Rf_install("openmp");
+#ifdef _OPENMP
+    openmp_res = ScalarLogical(1);
+#else
+    openmp_res = ScalarLogical(0);
+#endif
+    Rf_setAttrib(ans, openmp_sym, openmp_res);
+    UNPROTECT(3);
     return ans;
   }
 }
@@ -1697,6 +2540,7 @@ extern "C"
 extern "C"
 {
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y) {
+#ifdef CPPAD_FRAMEWORK
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
@@ -1709,8 +2553,25 @@ extern "C"
         y = pf->Forward(0, x);
       } else
         Rf_error("Unknown function pointer");
+#endif
+#ifdef TMBAD_FRAMEWORK
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    SEXP tag=R_ExternalPtrTag(f);
+    if(tag == Rf_install("ADFun")) {
+      adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+      y = pf->forward(x);
+    } else
+      if(tag == Rf_install("parallelADFun")) {
+        parallelADFun<double>* pf;
+        pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+        y = pf->forward(x);
+      } else
+        Rf_error("Unknown function pointer");
+#endif
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
+#ifdef CPPAD_FRAMEWORK
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
@@ -1723,30 +2584,75 @@ extern "C"
         y = pf->Reverse(1, v);
       } else
         Rf_error("Unknown function pointer");
+#endif
+#ifdef TMBAD_FRAMEWORK
+    typedef TMBad::ad_aug ad;
+    typedef TMBad::ADFun<ad> adfun;
+    SEXP tag=R_ExternalPtrTag(f);
+    if(tag == Rf_install("ADFun")) {
+      adfun* pf = (adfun*) R_ExternalPtrAddr(f);
+      y = pf->reverse(v);
+    } else
+      if(tag == Rf_install("parallelADFun")) {
+        parallelADFun<double>* pf;
+        pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
+        y = pf->reverse(v);
+      } else
+        Rf_error("Unknown function pointer");
+#endif
   }
 }
 
 #endif /* #ifndef WITH_LIBTMB */
 
 
+// Select AD framework
+#ifdef TMBAD_FRAMEWORK
+#define MakeADFunObject      TMBAD_MakeADFunObject
+#define EvalADFunObject      TMBAD_EvalADFunObject
+#define MakeADGradObject     TMBAD_MakeADGradObject
+#define MakeADHessObject2    TMBAD_MakeADHessObject2
+#define usingAtomics         TMBAD_usingAtomics
+#define TransformADFunObject TMBAD_TransformADFunObject
+#endif
+#ifdef CPPAD_FRAMEWORK
+#define MakeADFunObject      CPPAD_MakeADFunObject
+#define EvalADFunObject      CPPAD_EvalADFunObject
+#define MakeADGradObject     CPPAD_MakeADGradObject
+#define MakeADHessObject2    CPPAD_MakeADHessObject2
+#define usingAtomics         CPPAD_usingAtomics
+#define TransformADFunObject CPPAD_TransformADFunObject
+#endif
+
+
+
 #ifdef WITH_LIBTMB
 
 template class objective_function<double>;
+#ifdef CPPAD_FRAMEWORK
 template class objective_function<AD<double> >;
 template class objective_function<AD<AD<double> > >;
 template class objective_function<AD<AD<AD<double> > > >;
+#endif
+#ifdef TMBAD_FRAMEWORK
+template class objective_function<TMBad::ad_aug>;
+#endif
+
 extern "C"
 {
   SEXP MakeADFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP InfoADFunObject(SEXP f);
+  SEXP tmbad_print(SEXP f, SEXP control);
   SEXP optimizeADFunObject(SEXP f);
   SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control);
-  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report);
+  SEXP MakeDoubleFunObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP EvalDoubleFunObject(SEXP f, SEXP theta, SEXP control);
-  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report);
-  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report);
-  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP skip);
+  SEXP getParameterOrder(SEXP data, SEXP parameters, SEXP report, SEXP control);
+  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control);
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP usingAtomics();
+  SEXP getFramework();
+  SEXP TransformADFunObject(SEXP f, SEXP control);
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y);
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y);
 }
@@ -1765,13 +2671,16 @@ extern "C"{
   {"MakeADFunObject",     (DL_FUNC) &MakeADFunObject,     4},   \
   {"FreeADFunObject",     (DL_FUNC) &FreeADFunObject,     1},   \
   {"InfoADFunObject",     (DL_FUNC) &InfoADFunObject,     1},   \
+  {"tmbad_print",         (DL_FUNC) &tmbad_print,         2},   \
   {"EvalADFunObject",     (DL_FUNC) &EvalADFunObject,     3},   \
-  {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 3},   \
+  {"TransformADFunObject",(DL_FUNC) &TransformADFunObject,2},   \
+  {"MakeDoubleFunObject", (DL_FUNC) &MakeDoubleFunObject, 4},   \
   {"EvalDoubleFunObject", (DL_FUNC) &EvalDoubleFunObject, 3},   \
-  {"getParameterOrder",   (DL_FUNC) &getParameterOrder,   3},   \
-  {"MakeADGradObject",    (DL_FUNC) &MakeADGradObject,    3},   \
+  {"getParameterOrder",   (DL_FUNC) &getParameterOrder,   4},   \
+  {"MakeADGradObject",    (DL_FUNC) &MakeADGradObject,    4},   \
   {"MakeADHessObject2",   (DL_FUNC) &MakeADHessObject2,   4},   \
   {"usingAtomics",        (DL_FUNC) &usingAtomics,        0},   \
+  {"getFramework",        (DL_FUNC) &getFramework,        0},   \
   {"TMBconfig",           (DL_FUNC) &TMBconfig,           2}
   /* May be used as part of custom R_init function
      C-callable routines (PACKAGE is 'const char*') */
@@ -1799,6 +2708,9 @@ void TMB_LIB_INIT(DllInfo *dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, (Rboolean)FALSE);
   // Example: TMB_LIB_INIT = R_init_mypkg
+  //                                ^
+  //                                +-------+
+  //                                        ^
   TMB_CCALLABLES(&(xstringify(TMB_LIB_INIT)[7]));
 }
 #endif /* #ifdef TMB_LIB_INIT */

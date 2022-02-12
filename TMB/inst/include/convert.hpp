@@ -11,12 +11,18 @@ double asDouble(double x);
 double asDouble(AD<double> x);
 double asDouble(AD<AD<double> > x);
 double asDouble(AD<AD<AD<double> > > x);
+#ifdef TMBAD_FRAMEWORK
+double asDouble(TMBad::ad_aug x);
+#endif
 #else
 double asDouble(int x){return double(x);}
 double asDouble(double x){return x;}
 double asDouble(AD<double> x){return CppAD::Value(x);}
 double asDouble(AD<AD<double> > x){return CppAD::Value(CppAD::Value(x));}
 double asDouble(AD<AD<AD<double> > > x){return CppAD::Value(CppAD::Value(CppAD::Value(x)));}
+#ifdef TMBAD_FRAMEWORK
+double asDouble(TMBad::ad_aug x){return x.Value();}
+#endif
 #endif
 
 /** \brief Convert TMB matrix, vector, scalar or int to R style */
@@ -36,8 +42,8 @@ SEXP asSEXP(const matrix<Type> &a)
 }
 
 // Report vector of numeric types: Make R-vector
-#define asSEXP_VECTOR_OF_NUMERIC(Type)          \
-SEXP asSEXP(const vector<Type> &a) CSKIP(       \
+#define asSEXP_VECTOR_OF_NUMERIC(Type, ns)      \
+SEXP asSEXP(const ns::vector<Type> &a) CSKIP(   \
 {                                               \
   R_xlen_t size = a.size();                     \
   SEXP val;                                     \
@@ -48,10 +54,14 @@ SEXP asSEXP(const vector<Type> &a) CSKIP(       \
   UNPROTECT(1);                                 \
   return val;                                   \
 })
-asSEXP_VECTOR_OF_NUMERIC(int)
-asSEXP_VECTOR_OF_NUMERIC(double)
+asSEXP_VECTOR_OF_NUMERIC(int, tmbutils)
+asSEXP_VECTOR_OF_NUMERIC(double, tmbutils)
+asSEXP_VECTOR_OF_NUMERIC(double, std)
+#ifdef TMBAD_FRAMEWORK
+asSEXP_VECTOR_OF_NUMERIC(TMBad::ad_aug, tmbutils)
+#endif
 template<class Type>
-asSEXP_VECTOR_OF_NUMERIC(AD<Type>)
+asSEXP_VECTOR_OF_NUMERIC(AD<Type>, tmbutils)
 #undef asSEXP_VECTOR_OF_NUMERIC
 // Report vector of anything else: Make R-list
 template<class Type>
@@ -87,6 +97,11 @@ template<class Type>
 SEXP asSEXP(const AD<Type> &a){
   return asSEXP(CppAD::Value(a));
 }
+#ifdef TMBAD_FRAMEWORK
+SEXP asSEXP(const TMBad::ad_aug &a) CSKIP( {
+  return asSEXP(a.Value());
+} )
+#endif
 
 /** \brief Construct c++-vector from SEXP object */
 template <class Type>

@@ -32,6 +32,15 @@ checkMatrixPackageVersion <- function() {
 .onLoad <- function(lib, pkg) {
     library.dynam("TMB", pkg, lib)
     checkMatrixPackageVersion()
+    ## Select AD framework (CppAD or TMBad) used by TMB::compile
+    tmb.ad.framework <- getOption("tmb.ad.framework", NULL)
+    if (is.null(tmb.ad.framework))
+        tmb.ad.framework <- Sys.getenv("TMB_AD_FRAMEWORK", "CppAD")
+    options("tmb.ad.framework" = tmb.ad.framework)
+}
+
+.onUnload <- function(libpath) {
+    library.dynam.unload("TMB", libpath)
 }
 
 ## .LastLib <- function(libpath)

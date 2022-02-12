@@ -7,7 +7,6 @@
    ================================================ 
 */
 #ifdef _OPENMP
-#include <omp.h>
 #ifdef WITH_LIBTMB
 bool in_parallel();
 size_t thread_num();
@@ -20,15 +19,19 @@ size_t thread_num(){
   return static_cast<size_t>(omp_get_thread_num());
 }
 void start_parallel(){
+#ifdef CPPAD_FRAMEWORK
   CppAD::thread_alloc::free_all();
+#endif // CPPAD_FRAMEWORK
   int nthreads=omp_get_max_threads();
   if(config.trace.parallel)
     std::cout << "Using " << nthreads <<  " threads\n";
+#ifdef CPPAD_FRAMEWORK
   CppAD::thread_alloc::parallel_setup(nthreads,in_parallel,thread_num);
   CppAD::parallel_ad<AD<AD<AD<double> > > >();
   CppAD::parallel_ad<AD<AD<double> > >();
   CppAD::parallel_ad<AD<double> >();
   CppAD::parallel_ad<double >();
+#endif // CPPAD_FRAMEWORK
 }
 #endif
 #endif
@@ -47,9 +50,15 @@ struct sphess_t{
   vector<int> j;
 };
 
-/** \brief sphess_t<ADFun<double> > sphess */
-typedef sphess_t<ADFun<double> > sphess;
+#ifdef CPPAD_FRAMEWORK
+#define ADFUN ADFun<double>
+#endif // CPPAD_FRAMEWORK
+#ifdef TMBAD_FRAMEWORK
+#define ADFUN TMBad::ADFun<TMBad::ad_aug>
+#endif // TMBAD_FRAMEWORK
 
+/** \brief sphess_t<ADFun<double> > sphess */
+typedef sphess_t<ADFUN > sphess;
 
 /*
   Suppose we have a mapping F:R^n->R^m which may be written as F=F1+...+Fk.
@@ -60,8 +69,8 @@ typedef sphess_t<ADFun<double> > sphess;
   corresponding full taped version of F.
  */
 template <class Type>
-struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont complain about missing members */
-  typedef ADFun<Type> Base;
+struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complain about missing members */
+  typedef ADFUN Base;
   /* Following five members must be defined by constructor.
      Outer vectors are indexed by the chunk number.
      E.g. for tape number i vecind[i] is a vector of numbers in the 
@@ -82,7 +91,7 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
      In the case of a vector of ADFun pointers we assume that
      they all have equal domain and range dimensions.
    */
-  parallelADFun(vector<Base*> vecpf_){
+  void CTOR(vector<Base*> vecpf_) {
     size_t n=vecpf_.size();
     ntapes=n;
     vecpf.resize(n);
@@ -96,6 +105,19 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
 	vecind(i)[j]=j;
       }
     }
+  }
+  parallelADFun(vector<Base*> vecpf_) {
+    CTOR(vecpf_);
+  }
+  parallelADFun(const std::vector<Base> &vecf) {
+    vector<Base*> vecpf(vecf.size());
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for (int i=0; i<vecpf.size(); i++) {
+      vecpf[i] = new Base(vecf[i]);
+    }
+    CTOR(vecpf);
   }
   /* Constructor:
      In the case of a vector of sphess pointers the range dimensions are allowed
@@ -167,23 +189,24 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
   VectorBase subset(const VectorBase& x, size_t tapeid, int p=1){
     VectorBase y;
     y.resize(vecind(tapeid).size()*p);
-    for(int i=0;i<y.size()/p;i++)
+    for(int i=0;i<(int)y.size()/p;i++)
       for(int j=0;j<p;j++)
-	{y(i*p+j)=x(vecind(tapeid)[i]*p+j);}
+	{y[i*p+j]=x[vecind(tapeid)[i]*p+j];}
     return y;
   }
   /* Inverse operation of the subset above */
   template <typename VectorBase>
   void addinsert(VectorBase& x, const VectorBase& y, size_t tapeid, int p=1){
-    for(int i=0;i<y.size()/p;i++)
+    for(int i=0;i<(int)y.size()/p;i++)
       for(int j=0;j<p;j++)
-	{x(vecind(tapeid)[i]*p+j)+=y(i*p+j);}
+	{x[vecind(tapeid)[i]*p+j]+=y[i*p+j];}
   }
 
   /* Overload methods */
   size_t Domain(){return domain;}
   size_t Range(){return range;}
 
+#ifdef CPPAD_FRAMEWORK
   /* p=order, p+1 taylorcoefficients per variable, x=domain vector 
      x contains p'th order taylor coefficients of input (length n). 
      Output contains (p+1)'th order taylor coefficients (length m).
@@ -250,5 +273,120 @@ struct parallelADFun:ADFun<Type>{ /* Inheritance just so that compiler wont comp
     for(int i=0;i<ntapes;i++)vecpf(i)->optimize();
     if(config.trace.optimize)std::cout << "Done\n";
   }
+#endif // CPPAD_FRAMEWORK
+
+#ifdef TMBAD_FRAMEWORK
+  void unset_tail() {
+    for(int i=0; i<ntapes; i++) vecpf(i) -> unset_tail();
+  }
+  void set_tail(const std::vector<TMBad::Index> &r) {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> set_tail(r);
+  }
+  void force_update() {
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) vecpf(i) -> force_update();
+  }
+  vector<double> operator()(const std::vector<double> &x) {
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->operator()(x));
+    vector<double> out(range);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) addinsert(out, ans(i), i);
+    return out;
+  }
+  vector<double> Jacobian(const std::vector<double> &x) {
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->Jacobian(x));
+    vector<double> out( domain * range ); // domain fastest running
+    out.setZero();
+    for(int i=0; i<ntapes; i++) addinsert(out, ans(i), i, domain);
+    return out;
+  }
+  vector<double> Jacobian(const std::vector<double> &x,
+                          const std::vector<bool> &keep_x,
+                          const std::vector<bool> &keep_y ) {
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->Jacobian(x, keep_x, subset(keep_y, i)));
+    // Calculate indices into row space of resulting jacobian (subset)
+    vector<vector<size_t> > vecind2(vecind.size());
+    std::vector<size_t> remap = TMBad::cumsum0<size_t> (keep_y);
+    for(int i=0; i<ntapes; i++) {
+      std::vector<bool>
+        sub = subset(keep_y, i); // Bool mask into vecind(i)
+      std::vector<size_t>
+        vecind_i(vecind(i));
+      std::vector<size_t>
+        vecind_i_sub = TMBad::subset(vecind_i, sub); // remaining vecind(i)
+      std::vector<size_t>
+        vecind_i_sub_remap = TMBad::subset(remap, vecind_i_sub); // Remap
+      vecind2(i) = vector<size_t> (vecind_i_sub_remap);
+    }
+    // Fill into result matrix
+    int dim_x = std::count(keep_x.begin(), keep_x.end(), true);
+    int dim_y = std::count(keep_y.begin(), keep_y.end(), true);
+    vector<double> out( dim_x * dim_y );
+    out.setZero();
+    std::swap(vecind, vecind2);
+    for (int i=0; i<ntapes; i++) addinsert(out, ans(i), i, dim_x);
+    std::swap(vecind, vecind2);
+    return out;
+  }
+  vector<double> Jacobian(const std::vector<double> &x,
+                          const vector<double> &w) {
+    vector<vector<double> > ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++)
+      ans(i) = vector<double>(vecpf(i)->Jacobian(x, subset(w, i)));
+    vector<double> out(domain);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) out = out + ans(i);
+    return out;
+  }
+  // Used by tmbstan (tmb_forward and tmb_reverse)
+  // Assuming one-dimensional output.
+  template<class Vector>
+  Vector forward(const Vector &x) {
+    vector<Vector> ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) ans(i) = vecpf(i)->forward(x);
+    Vector out(1);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) out = out + ans(i);
+    return out;
+  }
+  template<class Vector>
+  Vector reverse(const Vector &w) {
+    vector<Vector> ans(ntapes);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+    for(int i=0; i<ntapes; i++) ans(i) = vecpf(i)->reverse(w);
+    Vector out(domain);
+    out.setZero();
+    for(int i=0; i<ntapes; i++) out = out + ans(i);
+    return out;
+  }
+#endif // TMBAD_FRAMEWORK
 };
 

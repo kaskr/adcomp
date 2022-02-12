@@ -6,7 +6,8 @@
 \usage{
 compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
   openmp = isParallelTemplate(file[1]), libtmb = TRUE, libinit = TRUE,
-  tracesweep = FALSE, ...)
+  tracesweep = FALSE, framework = getOption("tmb.ad.framework"),
+  supernodal = FALSE, longint = FALSE, eigen.disable.warnings = TRUE, ...)
 }
 \arguments{
 \item{file}{C++ file.}
@@ -25,6 +26,14 @@ compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
 
 \item{tracesweep}{Turn on preprocessor flag to trace AD sweeps? (Silently disables \code{libtmb})}
 
+\item{framework}{Which AD framework to use ('TMBad' or 'CppAD')}
+
+\item{supernodal}{Turn on preprocessor flag to use supernodal sparse Cholesky/Inverse from system wide suitesparse library}
+
+\item{longint}{Turn on preprocessor flag to use long integers for Eigen's SparseMatrix StorageIndex}
+
+\item{eigen.disable.warnings}{Turn on preprocessor flag to disable nuisance warnings. Note that this is not allowed for code to be compiled on CRAN.}
+
 \item{...}{Passed as Makeconf variables.}
 }
 \description{
@@ -39,6 +48,33 @@ the file pointed at by R_MAKEVARS_USER or the file ~/.R/Makevars if it exists.
 Additional configuration variables can be set with the \code{flags} and \code{...} arguments, which will override any
 previous selections.
 }
+\section{Using a custom SuiteSparse installation}{
+
+Sparse matrix calculations play an important role in TMB. By default TMB uses a small subset of \code{SuiteSparse} available through the R package \code{Matrix}. This is sufficient for most use cases, however for some very large models the following extra features are worth considering:
+
+\itemize{
+  \item Some large models benefit from an extended set of graph reordering algorithms (especially METIS) not part of \code{Matrix}. It is common that these orderings can provide quite big speedups.
+  \item Some large models need sparse matrices with number of nonzeros exceeding the current 32 bit limitation of \code{Matrix}. Normally such cases will result in the cholmod error 'problem too large'. \code{SuiteSparse} includes 64 bit integer routines to address this problem.
+}
+
+Experimental support for linking to a \emph{custom} \code{SuiteSparse} installation is available through two arguments to the \code{\link{compile}} function. The first argument \code{supernodal=TRUE} tells TMB to use the supernodal Cholesky factorization from the system wide \code{SuiteSparse} on the C++ side. This will affect the speed of the Laplace approximation when run internally (using arguments \code{intern} or \code{integrate} to \code{\link{MakeADFun}}).
+
+The second argument \code{longint=TRUE} tells TMB to use 64 bit integers for sparse matrices on the C++ side. This works in combination with \code{supernodal=TRUE} from Eigen version 3.4.
+
+On Windows a \code{SuiteSparse} installation can be obtained using the \code{Rtools} package manager. Start 'Rtools Bash' terminal and run:
+\preformatted{
+  pacman -Sy
+  pacman -S mingw-w64-{i686,x86_64}-suitesparse
+}
+
+On Linux one should look for the package \code{libsuitesparse-dev}.
+}
+
+\section{Selecting the AD framework}{
+
+TMB supports two different AD libraries 'CppAD' and 'TMBad' selected via the argument \code{framework} which works as a switch to set one of two C++ preprocessor flags: 'CPPAD_FRAMEWORK' or 'TMBAD_FRAMEWORK'. The default value of \code{framework} can be set from R by \code{options("tmb.ad.framework")} or alternatively from the shell via the environment variable 'TMB_AD_FRAMEWORK'. Packages linking to TMB should set one of the two C++ preprocessor flags in Makevars.
+}
+
 \seealso{
 \code{\link{precompile}}
 }

@@ -817,6 +817,7 @@ RECURSIVE              = YES
 EXCLUDE                = ../TMB/inst/include/Eigen \
                          ../TMB/inst/include/unsupported \
                          ../TMB/inst/include/cppad \
+                         ../TMB/inst/include/EigenWarnings \
                          layout README.md 00-BookConfig.md
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -2058,7 +2059,9 @@ PREDEFINED             =        VECTORIZE1_t(f)=       \
                                 VECTORIZE3_n(f)=       \
                                 CSKIP(body)=;          \
                                 "TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
-                                "TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);"
+                                "TMB_ATOMIC_STATIC_FUNCTION(name,arg2,arg3,arg4)=TMB_ATOMIC_VECTOR_FUNCTION(name,arg2,arg3,arg4)" \
+                                "TMB_BIND_ATOMIC(name,arg2,arg3)= template<class Type> CppAD::vector<Type> name(CppAD::vector<Type> x);" \
+                                TMBAD_FRAMEWORK=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

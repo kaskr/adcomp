@@ -150,7 +150,13 @@ namespace Rmath {
 
 }
 
+#ifdef CPPAD_FRAMEWORK
 #include "atomic_macro.hpp"
+#endif
+
+#ifdef TMBAD_FRAMEWORK
+#include "tmbad_atomic_macro.hpp"
+#endif
 
 template<class Type>
 struct TypeDefs{
@@ -200,11 +206,11 @@ Type dnorm1(Type x){
     \param x Input vector of length 1.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   pnorm1
 			   ,
-			   // OUTPUT_DIM
+			   // INPUT_DIM
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
@@ -219,11 +225,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 1.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   qnorm1
 			   ,
-			   // OUTPUT_DIM
+			   // INPUT_DIM
 			   1,
 			   // ATOMIC_DOUBLE
 			   ty[0] = Rmath::Rf_qnorm5(tx[0],0,1,1,0);
@@ -242,21 +248,24 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 4.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   D_incpl_gamma_shape
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   4
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0]=Rmath::D_incpl_gamma_shape(tx[0],tx[1],tx[2],tx[3]);
 			   ,
 			   // ATOMIC_REVERSE
 			   px[0] = exp( -tx[0] + (tx[1]-Type(1.0)) * log(tx[0]) + tx[3] ) * pow(log(tx[0]),tx[2]) * py[0];
-			   CppAD::vector<Type> tx_(tx);
-			   tx_[2] = tx_[2] + Type(1.0);  // Add one to get partial wrt. tx[1]
-			   px[1] = D_incpl_gamma_shape(tx_)[0] * py[0];
+                           Type tx_[4];
+                           tx_[0] = tx[0];
+                           tx_[1] = tx[1];
+                           tx_[2] = tx[2] + Type(1.0);  // Add one to get partial wrt. tx[1]
+                           tx_[3] = tx[3];
+                           px[1] = D_incpl_gamma_shape(tx_) * py[0];
 			   px[2] = Type(0);
 			   px[3] = ty[0] * py[0];
 			   )
@@ -272,12 +281,12 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 3.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   inv_incpl_gamma
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   3
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0]=Rmath::inv_incpl_gamma(tx[0],tx[1],tx[2]);
@@ -288,14 +297,14 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   Type logc = tx[2];
 			   Type tmp = exp(-value+logc)*pow(value,shape-Type(1));
 			   px[0] = 1.0 / tmp * py[0];
-			   CppAD::vector<Type> arg(4);
+			   Type arg[4];
 			   arg[0] = value;
 			   arg[1] = shape;
 			   arg[2] = Type(1); // 1st order partial wrt. shape
 			   arg[3] = logc;
-			   px[1] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
+			   px[1] = -D_incpl_gamma_shape(arg) / tmp * py[0];
 			   arg[2] = Type(0); // 0 order partial wrt. shape
-			   px[2] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
+			   px[2] = -D_incpl_gamma_shape(arg) / tmp * py[0];
 			   )
 
 /** \brief Atomic version of the n'th order derivative of the log gamma function.
@@ -305,21 +314,21 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   D_lgamma
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   2
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0]=Rmath::D_lgamma(tx[0],tx[1]);
 			   ,
 			   // ATOMIC_REVERSE
-			   CppAD::vector<Type> tx_(2);
+			   Type tx_[2];
 			   tx_[0]=tx[0];
 			   tx_[1]=tx[1]+Type(1.0);
-			   px[0] = D_lgamma(tx_)[0] * py[0];
+			   px[0] = D_lgamma(tx_) * py[0];
 			   px[1] = Type(0);
 			   )
 
@@ -329,12 +338,12 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   ppois
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   2
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0]=Rmath::Rf_ppois(tx[0],tx[1],1,0);
@@ -343,11 +352,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   Type value = ty[0];
 			   Type n = tx[0];
 			   Type lambda = tx[1];
-			   CppAD::vector<Type> arg(2);
+			   Type arg[2];
 			   arg[0] = n - Type(1);
 			   arg[1] = lambda;
 			   px[0] = Type(0);
-			   px[1] = (-value + ppois(arg)[0]) * py[0];
+			   px[1] = (-value + ppois(arg)) * py[0];
 			   )
 
 /** \brief Atomic version of \f$besselK(x,\nu)\f$.
@@ -356,12 +365,12 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   bessel_k_10
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   2
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0] = Rmath::Rf_bessel_k(tx[0], tx[1], 1.0 /* Not scaled */);
@@ -370,10 +379,10 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   Type value = ty[0];
 			   Type x = tx[0];
 			   Type nu = tx[1];
-			   CppAD::vector<Type> arg(2);
+			   Type arg[2];
 			   arg[0] = x;
 			   arg[1] = nu + Type(1);
-			   px[0] = ( -bessel_k_10(arg)[0] + value * (nu / x) ) * py[0];
+			   px[0] = ( -bessel_k_10(arg) + value * (nu / x) ) * py[0];
 			   px[1] = Type(0); /* Not implemented (!) */
 			   )
 
@@ -383,12 +392,12 @@ TMB_ATOMIC_VECTOR_FUNCTION(
     \param x Input vector of length 2.
     \return Vector of length 1.
 */
-TMB_ATOMIC_VECTOR_FUNCTION(
+TMB_ATOMIC_STATIC_FUNCTION(
 			   // ATOMIC_NAME
 			   bessel_i_10
 			   ,
-			   // OUTPUT_DIM
-			   1
+			   // INPUT_DIM
+			   2
 			   ,
 			   // ATOMIC_DOUBLE
 			   ty[0] = Rmath::Rf_bessel_i(tx[0], tx[1], 1.0 /* Not scaled */);
@@ -396,12 +405,12 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_REVERSE
 			   Type x =  tx[0];
 			   Type nu = tx[1];
-			   CppAD::vector<Type> arg(2);
+			   Type arg[2];
 			   arg[0] = x;
 			   arg[1] = nu + Type(1);
-			   Type B_right = bessel_i_10(arg)[0];
+			   Type B_right = bessel_i_10(arg);
 			   arg[1] = nu - Type(1);
-			   Type B_left  = bessel_i_10(arg)[0];
+			   Type B_left  = bessel_i_10(arg);
 			   px[0] = Type(0.5) * ( B_left + B_right ) * py[0];
 			   px[1] = Type(0); /* Not implemented (!) */
 )
@@ -435,7 +444,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   typedef TypeDefs<double>::ConstMapMatrix ConstMapMatrix_t;
 			   int n1 = CppAD::Integer(tx[0]);
 			   int n3 = CppAD::Integer(tx[1]);
-			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   int n2 = ( n1 + n3 > 0 ? (tx.size() - 2) / (n1 + n3) : 0 );
 			   ConstMapMatrix_t X(&tx[2      ], n1, n2);
 			   ConstMapMatrix_t Y(&tx[2+n1*n2], n2, n3);
 			   MapMatrix_t      Z(&ty[0      ], n1, n3);
@@ -445,7 +454,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   typedef typename TypeDefs<Type>::MapMatrix MapMatrix_t;
 			   int n1 = CppAD::Integer(tx[0]);
 			   int n3 = CppAD::Integer(tx[1]);
-			   int n2 = (tx.size() - 2) / (n1 + n3);
+			   int n2 = ( n1 + n3 > 0 ? (tx.size() - 2) / (n1 + n3) : 0 );
 			   matrix<Type> Xt = vec2mat(tx, n1, n2, 2).transpose();
 			   matrix<Type> Yt = vec2mat(tx, n2, n3, 2 + n1*n2).transpose();
 			   matrix<Type> W = vec2mat(py, n1, n3);
