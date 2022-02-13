@@ -140,6 +140,8 @@ namespace TMBad {
    macros can cause conflicts (as they do not respect the Eigen and
    CppAD namespace limits). E.g., the 'length' macro conflicts with
    CppAD when compiling with '-std=c++11'. */
+
+#define R_NO_REMAP  // avoid Eigen clashes with eval(), length(), 
 #include <R.h>
 #include <Rinternals.h>
 #include "toggle_thread_safe_R.hpp"

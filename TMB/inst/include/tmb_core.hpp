@@ -711,7 +711,7 @@ public:
   /** \brief Syncronize user's data object. It could be changed between calls to e.g. EvalDoubleFunObject */
   void sync_data() {
     SEXP env = ENCLOS(this->report);
-    this->data = findVar(install("data"), env);
+    this->data = Rf_findVar(Rf_install("data"), env);
   }
 
   /** \brief Extract theta vector from objetive function object */
@@ -1952,7 +1952,7 @@ extern "C"
       if(get_reportdims) {
         SEXP reportdims;
         PROTECT( reportdims = pf -> reportvector.reportdims() );
-        setAttrib( res, install("reportdims"), reportdims);
+        Rf_setAttrib( res, Rf_install("reportdims"), reportdims);
         UNPROTECT(1);
       }
       UNPROTECT(2);
@@ -2516,20 +2516,20 @@ extern "C"
     SEXP ans;
     PROTECT(ans = R_NilValue);
 #ifdef TMBAD_FRAMEWORK
-    ans = mkString("TMBad");
+    ans = Rf_mkString("TMBad");
 #elif  CPPAD_FRAMEWORK
-    ans = mkString("CppAD");
+    ans = Rf_mkString("CppAD");
 #else
-    ans = mkString("Unknown");
+    ans = Rf_mkString("Unknown");
 #endif
     SEXP openmp_sym, openmp_res;
     PROTECT(openmp_sym = R_NilValue);
     PROTECT(openmp_res = R_NilValue);
     openmp_sym = Rf_install("openmp");
 #ifdef _OPENMP
-    openmp_res = ScalarLogical(1);
+    openmp_res = Rf_ScalarLogical(1);
 #else
-    openmp_res = ScalarLogical(0);
+    openmp_res = Rf_ScalarLogical(0);
 #endif
     Rf_setAttrib(ans, openmp_sym, openmp_res);
     UNPROTECT(3);
