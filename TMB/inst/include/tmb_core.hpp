@@ -711,7 +711,7 @@ public:
   /** \brief Syncronize user's data object. It could be changed between calls to e.g. EvalDoubleFunObject */
   void sync_data() {
     SEXP env = ENCLOS(this->report);
-    this->data = findVar(install("data"), env);
+    this->data = Rf_findVar(Rf_install("data"), env);
   }
 
   /** \brief Extract theta vector from objetive function object */
@@ -1452,7 +1452,7 @@ extern "C"
 
 #ifdef TMBAD_FRAMEWORK
 inline int get_num_tapes(SEXP f) {
-  if (isNull(f))
+  if (Rf_isNull(f))
     return 0;
   SEXP tag = R_ExternalPtrTag(f);
   if (tag != Rf_install("parallelADFun"))
@@ -1488,7 +1488,7 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
     return R_NilValue;
   }
   SEXP random_order = getListElement(control, "random_order");
-  int nr = (isNull(random_order) ? 0 : LENGTH(random_order));
+  int nr = (Rf_isNull(random_order) ? 0 : LENGTH(random_order));
   std::vector<TMBad::Index> random;
   if (nr != 0) {
     random = std::vector<TMBad::Index>(INTEGER(random_order),
@@ -1823,7 +1823,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
     std::string method =
       CHAR(STRING_ELT(getListElement(control, "method"), 0));
     if (method == "num_tapes") { // Get number of tapes
-      return ScalarInteger(num_tapes);
+      return Rf_ScalarInteger(num_tapes);
     }
     else if (method == "tape") { // Print tape
       int depth = getListInteger(control, "depth", 1);
@@ -1862,7 +1862,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       int input_size = getListInteger(control, "input_size", 0);
       int output_size = getListInteger(control, "output_size", 0);
       size_t n = pf->glob.opstack.size();
-      SEXP ans = PROTECT(allocVector(STRSXP, n));
+      SEXP ans = PROTECT(Rf_allocVector(STRSXP, n));
       for (size_t i=0; i<n; i++) {
         std::stringstream strm;
         if (address)     strm << (void*) pf->glob.opstack[i] << " ";
@@ -1870,7 +1870,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
         if (input_size)  strm << pf->glob.opstack[i]->input_size();
         if (output_size) strm << pf->glob.opstack[i]->output_size();
         const std::string& tmp = strm.str();
-        SET_STRING_ELT(ans, i, mkChar(tmp.c_str()));
+        SET_STRING_ELT(ans, i, Rf_mkChar(tmp.c_str()));
       }
       UNPROTECT(1);
       return ans;
@@ -1952,7 +1952,7 @@ extern "C"
       if(get_reportdims) {
         SEXP reportdims;
         PROTECT( reportdims = pf -> reportvector.reportdims() );
-        setAttrib( res, install("reportdims"), reportdims);
+        Rf_setAttrib( res, Rf_install("reportdims"), reportdims);
         UNPROTECT(1);
       }
       UNPROTECT(2);
@@ -2516,20 +2516,20 @@ extern "C"
     SEXP ans;
     PROTECT(ans = R_NilValue);
 #ifdef TMBAD_FRAMEWORK
-    ans = mkString("TMBad");
+    ans = Rf_mkString("TMBad");
 #elif  CPPAD_FRAMEWORK
-    ans = mkString("CppAD");
+    ans = Rf_mkString("CppAD");
 #else
-    ans = mkString("Unknown");
+    ans = Rf_mkString("Unknown");
 #endif
     SEXP openmp_sym, openmp_res;
     PROTECT(openmp_sym = R_NilValue);
     PROTECT(openmp_res = R_NilValue);
     openmp_sym = Rf_install("openmp");
 #ifdef _OPENMP
-    openmp_res = ScalarLogical(1);
+    openmp_res = Rf_ScalarLogical(1);
 #else
-    openmp_res = ScalarLogical(0);
+    openmp_res = Rf_ScalarLogical(0);
 #endif
     Rf_setAttrib(ans, openmp_sym, openmp_res);
     UNPROTECT(3);

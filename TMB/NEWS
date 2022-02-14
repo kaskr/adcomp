@@ -1,4 +1,31 @@
 ------------------------------------------------------------------------
+TMB 1.7.22-2 (2022-02-13)
+*** FORKED PATCH VERSION ***
+------------------------------------------------------------------------
+
+o Explicitly reference tmbutils::array in tmbutils/density.hpp and
+  tmbutils/R_inla.hpp. This avoids a namespace clash between
+  Eigen:: and tmbutils:: when Eigen/Tensor headers are included:
+
+  > TMB/include/tmbutils/density.hpp:106:3: error: 
+  >    reference to 'array' is ambiguous
+
+o Add `#define R_NO_REMAP` before `#include <Rinternals.h>` in TMB.hpp. This
+  avoids a compiler error when including <TMB.hpp> is included before <Tensor>
+  (compiler Apple clang version 13.0.0):
+   
+   >  unsupported/Eigen/CXX11/src/Tensor/TensorTraits.h:122:8: error: 
+   >    explicit specialization of non-template struct 'Rf_eval'
+
+o Specify Rf_ prefix in a few locations in tmb_core.hpp and dynamic_data.hpp
+  where it was omitted (Rf_findVar, Rf_install, Rf_setAttrib, Rf_mkString,
+  Rf_ScalarLogical).
+
+o Update `inst/include/unsupported/` headers to Eigen 3.4.0 for consistency
+  with updated headers in `inst/include/Eigen`.
+
+   
+------------------------------------------------------------------------
 TMB 1.7.22 (2021-09-28)
 ------------------------------------------------------------------------
 

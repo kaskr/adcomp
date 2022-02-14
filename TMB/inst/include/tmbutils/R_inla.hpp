@@ -97,7 +97,7 @@ template<class Type>
   // Calculate new SPDE matrices
 
   // Calculate G1 - pt. 1
-  array<Type> Gtmp(n_tri,3,3);
+  tmbutils::array<Type> Gtmp(n_tri,3,3);
   for(i=0; i<n_tri; i++){    
     // 1st line: E0(i,) %*% adjH %*% t(E0(i,)), etc.    
     Gtmp(i,0,0) = (E0(i,0)*(E0(i,0)*adj_H(0,0)+E0(i,1)*adj_H(1,0)) + E0(i,1)*(E0(i,0)*adj_H(0,1)+E0(i,1)*adj_H(1,1))) / (4*Tri_Area(i));  
