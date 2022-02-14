@@ -160,6 +160,6 @@ Type objective_function<Type>::operator() ()
                                  density::GMRF(Q) ) )(x);
     }
   }
-  else error( ("Invalid distribution '" + distr + "'").c_str() );
+  else Rf_error( ("Invalid distribution '" + distr + "'").c_str() );
   return ans;
 }
