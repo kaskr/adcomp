@@ -2517,7 +2517,7 @@ extern "C"
     PROTECT(ans = R_NilValue);
 #ifdef TMBAD_FRAMEWORK
     ans = mkString("TMBad");
-#elif  CPPAD_FRAMEWORK
+#elif defined(CPPAD_FRAMEWORK)
     ans = mkString("CppAD");
 #else
     ans = mkString("Unknown");
