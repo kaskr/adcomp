@@ -59,6 +59,7 @@ void eigen_REprintf(const char* x);
    patched by RcppEigen to satisfy CRAN policy. This file may need
    regular updating. The renaming is to aviod a CRAN note. */
 #ifdef TMB_EIGEN_DISABLE_WARNINGS
+#define EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS 1
 #include "EigenWarnings/DisableStupidWarnings"
 #endif
 #include <Eigen/Dense>
