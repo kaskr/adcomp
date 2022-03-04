@@ -502,22 +502,13 @@ void Independent(vector<double> x)CSKIP({})
 /** \internal \brief Used by ADREPORT */
 template <class Type>
 struct report_stack{
-  vector<const char*> names;
-  vector<vector<int> > namedim;
-  vector<Type> result;
+  std::vector<const char*> names;
+  std::vector<vector<int> > namedim;
+  std::vector<Type> result;
   void clear(){
     names.resize(0);
     namedim.resize(0);
     result.resize(0);
-  }
-  /* Make space for 'prod(dim)' new items of given name */
-  void increase(vector<int> dim, const char* name){
-    int n = dim.prod();
-    names.conservativeResize(names.size() + 1);
-    names[names.size() - 1] = name;
-    namedim.conservativeResize(namedim.size() + 1);
-    namedim[namedim.size() - 1] = dim;
-    result.conservativeResize(result.size() + n);
   }
   // Get dimension of various object types
   vector<int> getDim(const matrix<Type> &x) {
@@ -537,13 +528,10 @@ struct report_stack{
   // push vector, matrix or array
   template<class Vector_Matrix_Or_Array>
   void push(Vector_Matrix_Or_Array x, const char* name) {
-    int n = x.size();
-    int oldsize = result.size();
-    vector<int> dim = getDim(x);
-    increase(dim, name);
-    Eigen::Array<Type, Eigen::Dynamic, Eigen::Dynamic> xvec = x;
-    xvec.resize(xvec.size(), 1);
-    result.segment(oldsize, n) = xvec;
+    names.push_back(name);
+    namedim.push_back(getDim(x));
+    Eigen::Array<Type, Eigen::Dynamic, Eigen::Dynamic> xa(x);
+    result.insert(result.end(), xa.data(), xa.data() + x.size());
   }
   // push scalar (convert to vector case)
   void push(Type x, const char* name){
@@ -551,8 +539,8 @@ struct report_stack{
     xvec[0] = x;
     push(xvec, name);
   }
-  // Cast to vector
-  operator vector<Type>(){
+  // Eval: cast to vector<Type>
+  vector<Type> operator()() {
     return result;
   }
   /* Get names (with replicates) to R */
@@ -562,8 +550,8 @@ struct report_stack{
     SEXP nam;
     PROTECT( nam = Rf_allocVector(STRSXP, n) );
     int k = 0;
-    for(int i = 0; i < names.size(); i++) {
-      int namelength = namedim(i).prod();
+    for(size_t i = 0; i < names.size(); i++) {
+      int namelength = namedim[i].prod();
       for(int j = 0; j < namelength; j++) {
         SET_STRING_ELT(nam, k, Rf_mkChar(names[i]) );
         k++;
@@ -575,9 +563,10 @@ struct report_stack{
   /* Get AD reported object dims */
   SEXP reportdims() {
     SEXP ans, nam;
-    PROTECT( ans = asSEXP(namedim) );
+    typedef vector<vector<int> > VVI;
+    PROTECT( ans = asSEXP(VVI(namedim)) );
     PROTECT( nam = Rf_allocVector(STRSXP, names.size()) );
-    for(int i = 0; i < names.size(); i++) {
+    for(size_t i = 0; i < names.size(); i++) {
       SET_STRING_ELT(nam, i, Rf_mkChar(names[i]));
     }
     Rf_setAttrib(ans, R_NamesSymbol, nam);
@@ -858,7 +847,7 @@ public:
        with the numbers reported via ADREPORT. */
     if(index != theta.size()){
       PARAMETER_VECTOR( TMB_epsilon_ );
-      ans += ( this->reportvector.result * TMB_epsilon_ ).sum();
+      ans += ( this->reportvector() * TMB_epsilon_ ).sum();
     }
     return ans;
   }
@@ -1217,7 +1206,7 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters
   } else { // ad report case
     F(); // Run through user template (modifies reportvector)
     //TMBad::Dependent(F.reportvector.result);
-    for (int i=0; i<F.reportvector.result.size(); i++) F.reportvector.result[i].Dependent();
+    for (int i=0; i<F.reportvector.size(); i++) F.reportvector.result[i].Dependent();
     info=F.reportvector.reportnames(); // parallel run *not* allowed
   }
   pf->glob.ad_stop();
@@ -1247,7 +1236,7 @@ ADFun<double>* MakeADFunObject_(SEXP data, SEXP parameters,
     pf = new ADFun< double >(F.theta,y);
   } else { // ad report case
     F(); // Run through user template (modifies reportvector)
-    pf = new ADFun< double >(F.theta,F.reportvector.result);
+    pf = new ADFun< double >(F.theta,F.reportvector());
     info=F.reportvector.reportnames(); // parallel run *not* allowed
   }
   return pf;
