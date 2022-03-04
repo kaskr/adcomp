@@ -11,6 +11,21 @@ make
 ```
 A file "REPORT.md" (see below) will be generated with test results and timings. 
 
+AD framework
+============
+Tests can by run using either `TMB_AD_FRAMEWORK=CppAD` or `TMB_AD_FRAMEWORK=TMBad`. For example:
+
+```shell
+make clean
+TMB_AD_FRAMEWORK=TMBad make spde
+```
+
+Note that examples in the folder 'TMBad' do not work with the CppAD framework:
+
+```shell
+TMB_AD_FRAMEWORK=TMBad make TMBad/thetalog
+```
+
 REPORT.md
 =========
 
