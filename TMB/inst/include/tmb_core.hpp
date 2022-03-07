@@ -910,7 +910,7 @@ struct parallel_accumulator{
 
 #ifdef TMBAD_FRAMEWORK
 template<class ADFunType>
-SEXP TMBAD_EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
+SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
 {
   if(!Rf_isNewList(control))Rf_error("'control' must be a list");
   ADFunType* pf;
@@ -1180,7 +1180,7 @@ void finalize(SEXP x)
 
 #ifdef TMBAD_FRAMEWORK
 /** \internal \brief Construct ADFun object */
-TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADFunObject_(SEXP data, SEXP parameters,
+TMBad::ADFun< TMBad::ad_aug >* MakeADFunObject_(SEXP data, SEXP parameters,
 			       SEXP report, SEXP control, int parallel_region=-1,
 			       SEXP &info=R_NilValue)
 {
@@ -1274,7 +1274,7 @@ extern "C"
 
 #ifdef TMBAD_FRAMEWORK
   /** \internal \brief Construct ADFun object */
-  SEXP TMBAD_MakeADFunObject(SEXP data, SEXP parameters,
+  SEXP MakeADFunObject(SEXP data, SEXP parameters,
 		       SEXP report, SEXP control)
   {
     typedef TMBad::ad_aug ad;
@@ -1315,7 +1315,7 @@ extern "C"
       for(int i = 0; i < n; i++) {
         TMB_TRY {
           pfvec[i] = NULL;
-          pfvec[i] = TMBAD_MakeADFunObject_(data, parameters, report, control, i, info);
+          pfvec[i] = MakeADFunObject_(data, parameters, report, control, i, info);
           if (config.optimize.instantly) pfvec[i]->optimize();
         }
         TMB_CATCH { bad_thread_alloc = true; }
@@ -1330,13 +1330,13 @@ extern "C"
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-      //R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+      //R_RegisterCFinalizer(res,finalizeparallelADFun);
 #endif
     } else { // Serial mode
       TMB_TRY{
 	/* Actual work: tape creation */
 	pf = NULL;
-	pf = TMBAD_MakeADFunObject_(data, parameters, report, control, -1, info);
+	pf = MakeADFunObject_(data, parameters, report, control, -1, info);
 	if (config.optimize.instantly) pf->optimize();
       }
       TMB_CATCH {
@@ -1355,12 +1355,12 @@ extern "C"
     UNPROTECT(4);
 
     return ans;
-  } // TMBAD_MakeADFunObject
+  } // MakeADFunObject
 #endif
 
 #ifdef CPPAD_FRAMEWORK
   /** \internal \brief Construct ADFun object */
-  SEXP CPPAD_MakeADFunObject(SEXP data, SEXP parameters,
+  SEXP MakeADFunObject(SEXP data, SEXP parameters,
                              SEXP report, SEXP control)
   {
     ADFun<double>* pf = NULL;
@@ -1449,7 +1449,7 @@ inline int get_num_tapes(SEXP f) {
   return
     ((parallelADFun<double>*) R_ExternalPtrAddr(f))->ntapes;
 }
-SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
+SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
 {
   if (pf == NULL)
     Rf_error("Cannot transform '<pointer: (nil)>' (unloaded/reloaded DLL?)");
@@ -1580,7 +1580,7 @@ SEXP TMBAD_TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP co
   return R_NilValue;
 }
 /** \internal \brief Transform an existing ADFun object */
-SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
+SEXP TransformADFunObject(SEXP f, SEXP control)
 {
   if (Rf_isNull(f))
     Rf_error("Expected external pointer - got NULL");
@@ -1592,7 +1592,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
   typedef TMBad::ADFun<ad> adfun;
   if(tag == Rf_install("ADFun")) {
     adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-    TMBAD_TransformADFunObjectTemplate(pf, control);
+    TransformADFunObjectTemplate(pf, control);
   } else if (tag == Rf_install("parallelADFun")) {
     // Warning: Most no meaningful for parallel models!:
     // OK      : reorder_random etc
@@ -1624,7 +1624,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
 #endif
     for (int i=0; i<ppf->ntapes; i++) {
       adfun* pf = (ppf->vecpf)[i];
-      TMBAD_TransformADFunObjectTemplate(pf, control);
+      TransformADFunObjectTemplate(pf, control);
     }
     // Some methods change Domain or Range of individual tapes. This
     // is allowed when there is only one tape.
@@ -1646,7 +1646,7 @@ SEXP TMBAD_TransformADFunObject(SEXP f, SEXP control)
 
 #ifdef CPPAD_FRAMEWORK
 /** \internal \brief Transform an existing ADFun object */
-SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
+SEXP TransformADFunObject(SEXP f, SEXP control)
 {
   int mustWork = getListInteger(control, "mustWork", 1);
   if (mustWork)
@@ -1759,7 +1759,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
   }
 
 #ifdef TMBAD_FRAMEWORK
-  SEXP TMBAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
+  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
@@ -1767,9 +1767,9 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
       if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
       SEXP tag=R_ExternalPtrTag(f);
       if(tag == Rf_install("ADFun"))
-	return TMBAD_EvalADFunObjectTemplate< adfun >(f,theta,control);
+	return EvalADFunObjectTemplate< adfun >(f,theta,control);
       if(tag == Rf_install("parallelADFun"))
-        return TMBAD_EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
+        return EvalADFunObjectTemplate<parallelADFun<double> >(f,theta,control);
       Rf_error("NOT A KNOWN FUNCTION POINTER");
     }
     TMB_CATCH {
@@ -1779,7 +1779,7 @@ SEXP CPPAD_TransformADFunObject(SEXP f, SEXP control)
 #endif
 
 #ifdef CPPAD_FRAMEWORK
-  SEXP CPPAD_EvalADFunObject(SEXP f, SEXP theta, SEXP control)
+  SEXP EvalADFunObject(SEXP f, SEXP theta, SEXP control)
   {
     TMB_TRY {
       if(Rf_isNull(f))Rf_error("Expected external pointer - got NULL");
@@ -1975,7 +1975,7 @@ extern "C"
 
 
 #ifdef TMBAD_FRAMEWORK
-TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
+TMBad::ADFun< TMBad::ad_aug >* MakeADGradObject_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
@@ -1989,7 +1989,7 @@ TMBad::ADFun< TMBad::ad_aug >* TMBAD_MakeADGradObject_(SEXP data, SEXP parameter
       pf = ((parallelADFun<double>*) R_ExternalPtrAddr(f))->vecpf[parallel_region];
   } else {
     SEXP control_adfun = R_NilValue;
-    pf = TMBAD_MakeADFunObject_(data, parameters, report, control_adfun, parallel_region);
+    pf = MakeADFunObject_(data, parameters, report, control_adfun, parallel_region);
   }
   // Optionally skip gradient components (only need 'random' part of gradient)
   SEXP random = getListElement(control, "random");
@@ -2031,7 +2031,7 @@ extern "C"
 {
 #ifdef TMBAD_FRAMEWORK
   /** \internal \brief Tape the gradient using nested AD types */
-  SEXP TMBAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
+  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
@@ -2067,7 +2067,7 @@ extern "C"
       for(int i=0;i<n;i++){
 	TMB_TRY {
 	  pfvec[i] = NULL;
-	  pfvec[i] = TMBAD_MakeADGradObject_(data, parameters, report, control, i);
+	  pfvec[i] = MakeADGradObject_(data, parameters, report, control, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
 	TMB_CATCH { bad_thread_alloc = true; }
@@ -2079,13 +2079,13 @@ extern "C"
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
       PROTECT(res=R_MakeExternalPtr((void*) ppf,Rf_install("parallelADFun"),R_NilValue));
-      // R_RegisterCFinalizer(res,TMBAD_finalizeparallelADFun);
+      // R_RegisterCFinalizer(res,finalizeparallelADFun);
 #endif
     } else { // Serial mode
       /* Actual work: tape creation */
       TMB_TRY {
         pf = NULL;
-        pf = TMBAD_MakeADGradObject_(data, parameters, report, control, -1);
+        pf = MakeADGradObject_(data, parameters, report, control, -1);
         if(config.optimize.instantly)pf->optimize();
       }
       TMB_CATCH {
@@ -2102,12 +2102,12 @@ extern "C"
     PROTECT(ans=ptrList(res));
     UNPROTECT(3);
     return ans;
-  } // TMBAD_MakeADGradObject
+  } // MakeADGradObject
 #endif
 
 #ifdef CPPAD_FRAMEWORK
   /** \internal \brief Tape the gradient using nested AD types */
-  SEXP CPPAD_MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
+  SEXP MakeADGradObject(SEXP data, SEXP parameters, SEXP report, SEXP control)
   {
     ADFun<double>* pf = NULL;
     /* Some type checking */
@@ -2183,7 +2183,7 @@ extern "C"
           zero). Negative subscripts are not allowed.
 */
 #ifdef TMBAD_FRAMEWORK
-sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
+sphess_t< TMBad::ADFun< TMBad::ad_aug > > MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
@@ -2198,7 +2198,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
       pgf = ((parallelADFun<double>*) R_ExternalPtrAddr(gf))->vecpf[parallel_region];
   } else {
     SEXP control_adgrad = R_NilValue;
-    pgf = TMBAD_MakeADGradObject_(data, parameters, report, control_adgrad, parallel_region);
+    pgf = MakeADGradObject_(data, parameters, report, control_adgrad, parallel_region);
   }
   if (config.optimize.instantly) pgf->optimize();
   int n = pgf->Domain();
@@ -2224,7 +2224,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
   vector<TMBad::Index> h_j(h.j);
   sphess ans(phf, h_i.cast<int>(), h_j.cast<int>());
   return ans;
-} // TMBAD_MakeADHessObject2
+} // MakeADHessObject2
 #endif
 
 /** \internal \brief Tape the hessian[cbind(i,j)] using nested AD types.
@@ -2234,7 +2234,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > TMBAD_MakeADHessObject2_(SEXP data, SE
           zero). Negative subscripts are not allowed.
 */
 #ifdef CPPAD_FRAMEWORK
-sphess CPPAD_MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
+sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
   /* Some type checking */
   if(!Rf_isNewList(data))Rf_error("'data' must be a list");
@@ -2349,7 +2349,7 @@ extern "C"
 
 #ifdef TMBAD_FRAMEWORK
 #ifdef _OPENMP
-  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     typedef sphess_t<adfun> sphess;
@@ -2371,7 +2371,7 @@ extern "C"
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
-	Hvec[i] = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, control, i) );
+	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, control, i) );
 	//optimizeTape( Hvec[i]->pf );
       }
       TMB_CATCH { bad_thread_alloc = true; }
@@ -2389,14 +2389,14 @@ extern "C"
     return asSEXP(tmp->convert(),"parallelADFun");
   } // MakeADHessObject2
 #else
-  SEXP TMBAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     typedef TMBad::ad_aug ad;
     typedef TMBad::ADFun<ad> adfun;
     typedef sphess_t<adfun> sphess;
     sphess* pH = NULL;
     SEXP ans;
     TMB_TRY {
-      pH = new sphess( TMBAD_MakeADHessObject2_(data, parameters, report, control, -1) );
+      pH = new sphess( MakeADHessObject2_(data, parameters, report, control, -1) );
       //optimizeTape( pH->pf );
       ans = asSEXP(*pH, "ADFun");
     }
@@ -2415,7 +2415,7 @@ extern "C"
 
 #ifdef CPPAD_FRAMEWORK
 #ifdef _OPENMP
-  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     if(config.trace.parallel)
       std::cout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
@@ -2433,7 +2433,7 @@ extern "C"
     for (int i=0; i<n; i++) {
       TMB_TRY {
 	Hvec[i] = NULL;
-	Hvec[i] = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, control, i) );
+	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, control, i) );
 	optimizeTape( Hvec[i]->pf );
       }
       TMB_CATCH { bad_thread_alloc = true; }
@@ -2456,11 +2456,11 @@ extern "C"
     return ans;
   } // MakeADHessObject2
 #else
-  SEXP CPPAD_MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
+  SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     sphess* pH = NULL;
     SEXP ans;
     TMB_TRY {
-      pH = new sphess( CPPAD_MakeADHessObject2_(data, parameters, report, control, -1) );
+      pH = new sphess( MakeADHessObject2_(data, parameters, report, control, -1) );
       optimizeTape( pH->pf );
       ans = asSEXP(*pH, "ADFun");
     }
@@ -2482,7 +2482,7 @@ extern "C"
 {
 
 #ifdef TMBAD_FRAMEWORK
-  SEXP TMBAD_usingAtomics(){
+  SEXP usingAtomics(){
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
     INTEGER(ans)[0] = 1; // TMBAD doesn't benefit from knowing if 'false'
@@ -2492,7 +2492,7 @@ extern "C"
 #endif
 
 #ifdef CPPAD_FRAMEWORK
-  SEXP CPPAD_usingAtomics(){
+  SEXP usingAtomics(){
     SEXP ans;
     PROTECT(ans = Rf_allocVector(INTSXP,1));
     INTEGER(ans)[0] = atomic::atomicFunctionGenerated;
@@ -2595,23 +2595,6 @@ extern "C"
 #endif /* #ifndef WITH_LIBTMB */
 
 
-// Select AD framework
-#ifdef TMBAD_FRAMEWORK
-#define MakeADFunObject      TMBAD_MakeADFunObject
-#define EvalADFunObject      TMBAD_EvalADFunObject
-#define MakeADGradObject     TMBAD_MakeADGradObject
-#define MakeADHessObject2    TMBAD_MakeADHessObject2
-#define usingAtomics         TMBAD_usingAtomics
-#define TransformADFunObject TMBAD_TransformADFunObject
-#endif
-#ifdef CPPAD_FRAMEWORK
-#define MakeADFunObject      CPPAD_MakeADFunObject
-#define EvalADFunObject      CPPAD_EvalADFunObject
-#define MakeADGradObject     CPPAD_MakeADGradObject
-#define MakeADHessObject2    CPPAD_MakeADHessObject2
-#define usingAtomics         CPPAD_usingAtomics
-#define TransformADFunObject CPPAD_TransformADFunObject
-#endif
 
 
 
