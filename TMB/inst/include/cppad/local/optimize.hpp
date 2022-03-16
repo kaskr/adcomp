@@ -2491,7 +2491,7 @@ void optimize_run(
 			// both operators are variables
 			case AddvvOp:
 			case SubvvOp:
-			if( (tape[arg[0]].connect_type == csum_connected) |
+			if( (tape[arg[0]].connect_type == csum_connected) ||
 			    (tape[arg[1]].connect_type == csum_connected)
 			)
 			{

@@ -96,7 +96,7 @@ CPPAD_INLINE_FRIEND_TEMPLATE_FUNCTION
 bool IdenticalEqualPar
 (const AD<Base> &x, const AD<Base> &y)
 {	bool parameter;
-	parameter = ( Parameter(x) & Parameter(y) );
+	parameter = ( Parameter(x) && Parameter(y) );
 	return parameter  && IdenticalEqualPar(x.value_, y.value_); 
 }
 // ==========================================================================
