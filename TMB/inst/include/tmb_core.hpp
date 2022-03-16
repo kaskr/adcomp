@@ -2254,7 +2254,7 @@ sphess MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control,
     keepcol[INTEGER(skip)[i]-1]=false; // skip is R-index !
   }
 #define KEEP_COL(col) (keepcol[col])
-#define KEEP_ROW(row,col) ( KEEP_COL(row) & (row>=col) )
+#define KEEP_ROW(row,col) ( KEEP_COL(row) && (row>=col) )
 
   /* Tape 1: Function R^n -> R */
   Independent(F.theta);
