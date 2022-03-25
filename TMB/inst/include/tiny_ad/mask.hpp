@@ -244,7 +244,7 @@ struct NAME ## Op<TMB_MAX_ORDER+1, ninput, noutput, mask> {             \
 };                                                                      \
 template<class dummy=void>                                              \
 CppAD::vector<TMBad::ad_aug>                                            \
-NAME (const CppAD::vector<TMBad::ad_aug> &x) {                          \
+NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP({                    \
   int n = x.size() - 1;                                                 \
   int order = CppAD::Integer(x[n]);                                     \
   std::vector<TMBad::ad_plain> x_(&(x[0]), &(x[0]) + n);                \
@@ -266,10 +266,10 @@ NAME (const CppAD::vector<TMBad::ad_aug> &x) {                          \
   CppAD::vector<TMBad::ad_aug> y(y_.size());                            \
   for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
   return y;                                                             \
-}                                                                       \
+})                                                                      \
 template<class dummy=void>                                              \
 CppAD::vector<double>                                                   \
-NAME (const CppAD::vector<double> &x) {                                 \
+NAME (const CppAD::vector<double> &x) CSKIP({                           \
   int n = x.size() - 1;                                                 \
   int order = CppAD::Integer(x[n]);                                     \
   typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
@@ -289,6 +289,14 @@ NAME (const CppAD::vector<double> &x) {                                 \
   else {                                                                \
     Rf_error("This interface is limited to 0th and 1st deriv order");   \
   }                                                                     \
-}
+})                                                                      \
+IF_TMB_PRECOMPILE(                                                      \
+template                                                                \
+CppAD::vector<TMBad::ad_aug>                                            \
+NAME<> (const CppAD::vector<TMBad::ad_aug> &x);                         \
+template                                                                \
+CppAD::vector<double>                                                   \
+NAME<> (const CppAD::vector<double> &x);                                \
+)
 
 #endif // TMBAD_FRAMEWORK
