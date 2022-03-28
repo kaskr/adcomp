@@ -251,6 +251,10 @@ MakeADFun <- function(data, parameters, map=list(),
                       integrate=NULL,
                       autopar=isParallelDLL(DLL),
                       ...){
+  ## Check that DLL is loaded
+  if ( ! DLL %in% names(getLoadedDLLs()) ) {
+    stop(sprintf("'%s' was not found in the list of loaded DLLs. Forgot to dyn.load(dynlib('%s')) ?", DLL, DLL))
+  }
   env <- environment() ## This environment
   if(!is.list(data))
     stop("'data' must be a list")
