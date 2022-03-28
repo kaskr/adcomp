@@ -450,6 +450,7 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
     det(H + G * H0 * G^T) = det(H) * det(H0M)
     ```
 */
+template<class dummy=void>
 struct jacobian_sparse_plus_lowrank_t {
   // The three tapes
   std::shared_ptr<jacobian_sparse_t<> > H;
@@ -565,7 +566,7 @@ struct jacobian_sparse_plus_lowrank_t {
     return y1 - y2;
   }
   template<class T>
-  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
+  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
                   const vector<T> &hvec,
                   const vector<T> &xvec) {
     using atomic::matmul;
@@ -607,7 +608,7 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   // Helper to get determinant: det(H)*det(H0)*det(M)
   template<class T>
-  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
+  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
                              const sparse_plus_lowrank<T> &h) {
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
@@ -1207,8 +1208,8 @@ Type log_determinant(const matrix<Type> &H, PTR ptr) {
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
 template<class Type>
-Type log_determinant(const jacobian_sparse_plus_lowrank_t::sparse_plus_lowrank<Type> &H,
-                     std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr) {
+Type log_determinant(const jacobian_sparse_plus_lowrank_t<>::sparse_plus_lowrank<Type> &H,
+                     std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr) {
   matrix<Type> H0M = (ptr -> getH0M(ptr, H)).array();
   return
     log_determinant(H.H, ptr->H) +
@@ -1304,11 +1305,11 @@ NewtonSolver<Functor,
 template<class Functor, class Type>
 NewtonSolver<Functor,
              Type,
-             jacobian_sparse_plus_lowrank_t> NewtonSparsePlusLowrank(
+             jacobian_sparse_plus_lowrank_t<> > NewtonSparsePlusLowrank(
                                                                      Functor &F,
                                                                      Eigen::Array<Type, Eigen::Dynamic, 1> start,
                                                                      newton_config cfg = newton_config() ) {
-  NewtonSolver<Functor, Type, jacobian_sparse_plus_lowrank_t > ans(F, start, cfg);
+  NewtonSolver<Functor, Type, jacobian_sparse_plus_lowrank_t<> > ans(F, start, cfg);
   return ans;
 }
 
