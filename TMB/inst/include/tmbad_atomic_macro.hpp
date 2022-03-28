@@ -7,13 +7,15 @@
   ATOMIC_REVERSE                                                        \
 )                                                                       \
 template<class dummy=void>                                              \
-CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x); \
+CppAD::vector<TMBad::ad_aug>                                            \
+ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x);                    \
 template<class dummy=void>                                              \
-CppAD::vector<double> ATOMIC_NAME (const CppAD::vector<double> &tx) {   \
+CppAD::vector<double>                                                   \
+ATOMIC_NAME (const CppAD::vector<double> &tx) CSKIP({                   \
   CppAD::vector<double> ty(OUTPUT_DIM);                                 \
   ATOMIC_DOUBLE;                                                        \
   return ty;                                                            \
-}                                                                       \
+})                                                                      \
 template<class dummy=void>                                              \
 struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
   typedef TMBad::global::DynamicInputOutputOperator Base;               \
@@ -49,16 +51,20 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
     ATOMIC_REVERSE;                                                     \
     for (size_t i=0; i<px.size(); i++) _args_.dx(i) += px[i];           \
   }                                                                     \
-  void forward(TMBad::ForwardArgs<TMBad::Writer> &args) { ASSERT(false); } \
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); } \
+  void forward                                                          \
+  (TMBad::ForwardArgs<TMBad::Writer> &args) { ASSERT(false); }          \
+  void reverse                                                          \
+  (TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }          \
 };                                                                      \
 template<class dummy>                                                   \
-CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) { \
+CppAD::vector<TMBad::ad_aug>                                            \
+ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) CSKIP({            \
   TMBad::Index n = tx.size();                                           \
   TMBad::Index m = OUTPUT_DIM;                                          \
   typedef ATOMIC_NAME ## Op <> OP;                                      \
   bool all_constant = true;                                             \
-  for (size_t i = 0; i<tx.size(); i++) all_constant &= tx[i].constant(); \
+  for (size_t i = 0; i<tx.size(); i++)                                  \
+    all_constant &= tx[i].constant();                                   \
   CppAD::vector<TMBad::ad_aug> ty(m);                                   \
   if (all_constant) {                                                   \
     CppAD::vector<double> xd(tx.size());                                \
@@ -66,19 +72,29 @@ CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx
     CppAD::vector<double> yd = ATOMIC_NAME(xd);                         \
     for (size_t i=0; i<yd.size(); i++) ty[i] = yd[i];                   \
   } else {                                                              \
-    TMBad::OperatorPure* pOp = TMBad::get_glob()->getOperator<OP>(n, m); \
-    std::vector<TMBad::ad_plain> x(&tx[0], &tx[0] + tx.size());         \
-    std::vector<TMBad::ad_plain> y = TMBad::get_glob()->add_to_stack<OP>(pOp, x); \
+    TMBad::OperatorPure*                                                \
+      pOp = TMBad::get_glob()->getOperator<OP>(n, m);                   \
+    std::vector<TMBad::ad_plain>                                        \
+      x(&tx[0], &tx[0] + tx.size());                                    \
+    std::vector<TMBad::ad_plain>                                        \
+      y = TMBad::get_glob()->add_to_stack<OP>(pOp, x);                  \
     for (size_t i=0; i<y.size(); i++) ty[i] = y[i];                     \
   }                                                                     \
   return ty;                                                            \
-}                                                                       \
+})                                                                      \
 template<class dummy=void>                                              \
 void ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx,               \
                   CppAD::vector<TMBad::ad_aug> &ty) {                   \
   ty = ATOMIC_NAME(tx);                                                 \
-}
-
+}                                                                       \
+IF_TMB_PRECOMPILE(                                                      \
+template                                                                \
+CppAD::vector<double>                                                   \
+ATOMIC_NAME<> (const CppAD::vector<double>& tx);                        \
+template                                                                \
+CppAD::vector<TMBad::ad_aug>                                            \
+ATOMIC_NAME<>(const CppAD::vector<TMBad::ad_aug>& tx);                  \
+)
 
 #define TMB_ATOMIC_STATIC_FUNCTION(                                     \
   ATOMIC_NAME,                                                          \
@@ -87,13 +103,15 @@ void ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx,               \
   ATOMIC_REVERSE                                                        \
 )                                                                       \
 template<class dummy=void>                                              \
-CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x); \
+CppAD::vector<TMBad::ad_aug> ATOMIC_NAME                                \
+(const CppAD::vector<TMBad::ad_aug> &x);                                \
 template<class dummy=void>                                              \
-CppAD::vector<double> ATOMIC_NAME (const CppAD::vector<double> &tx) {   \
+CppAD::vector<double> ATOMIC_NAME                                       \
+(const CppAD::vector<double> &tx) CSKIP({                               \
   CppAD::vector<double> ty(1);                                          \
   ATOMIC_DOUBLE;                                                        \
   return ty;                                                            \
-}                                                                       \
+})                                                                      \
 template<class dummy=void>                                              \
 double ATOMIC_NAME (const double *tx) {                                 \
   double ty[1];                                                         \
@@ -134,15 +152,19 @@ struct ATOMIC_NAME ## Op : TMBad::global::Operator<INPUT_SIZE, 1> {     \
     for (size_t i=0; i<INPUT_SIZE; i++) _args_.dx(i) += px[i];          \
   }                                                                     \
   template<class Type>                                                  \
-  void forward(TMBad::ForwardArgs<Type> &args) { ASSERT(false); }       \
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); } \
+  void forward                                                          \
+  (TMBad::ForwardArgs<Type> &args) { ASSERT(false); }                   \
+  void reverse                                                          \
+  (TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }          \
 };                                                                      \
 template<class dummy>                                                   \
-CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) { \
+CppAD::vector<TMBad::ad_aug> ATOMIC_NAME                                \
+(const CppAD::vector<TMBad::ad_aug> &tx) CSKIP({                        \
   TMBad::Index m = 1;                                                   \
   typedef ATOMIC_NAME ## Op <> OP;                                      \
   bool all_constant = true;                                             \
-  for (size_t i = 0; i<tx.size(); i++) all_constant &= tx[i].constant(); \
+  for (size_t i = 0; i<tx.size(); i++)                                  \
+    all_constant &= tx[i].constant();                                   \
   CppAD::vector<TMBad::ad_aug> ty(m);                                   \
   if (all_constant) {                                                   \
     CppAD::vector<double> xd(tx.size());                                \
@@ -150,15 +172,26 @@ CppAD::vector<TMBad::ad_aug> ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx
     CppAD::vector<double> yd = ATOMIC_NAME(xd);                         \
     for (size_t i=0; i<yd.size(); i++) ty[i] = yd[i];                   \
   } else {                                                              \
-    TMBad::OperatorPure* pOp = TMBad::get_glob()->getOperator<OP>();    \
-    std::vector<TMBad::ad_plain> x(&tx[0], &tx[0] + tx.size());         \
-    std::vector<TMBad::ad_plain> y = TMBad::get_glob()->add_to_stack<OP>(pOp, x); \
+    TMBad::OperatorPure*                                                \
+      pOp = TMBad::get_glob()->getOperator<OP>();                       \
+    std::vector<TMBad::ad_plain>                                        \
+      x(&tx[0], &tx[0] + tx.size());                                    \
+    std::vector<TMBad::ad_plain>                                        \
+      y = TMBad::get_glob()->add_to_stack<OP>(pOp, x);                  \
     for (size_t i=0; i<y.size(); i++) ty[i] = y[i];                     \
   }                                                                     \
   return ty;                                                            \
-}                                                                       \
+})                                                                      \
 template<class dummy=void>                                              \
 void ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx,               \
                   CppAD::vector<TMBad::ad_aug> &ty) {                   \
   ty = ATOMIC_NAME(tx);                                                 \
-}
+}                                                                       \
+IF_TMB_PRECOMPILE(                                                      \
+template                                                                \
+CppAD::vector<double>                                                   \
+ATOMIC_NAME<> (const CppAD::vector<double>& tx);                        \
+template                                                                \
+CppAD::vector<TMBad::ad_aug>                                            \
+ATOMIC_NAME<>(const CppAD::vector<TMBad::ad_aug>& tx);                  \
+)
