@@ -1400,6 +1400,7 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 ##' @param all Precompile all or just the core parts of TMB ?
 ##' @param clean Remove precompiled libraries ?
 ##' @param trace Trace precompilation process ?
+##' @param get.header Create files 'TMB.h' and 'TMB.cpp' in current working directory to be used as part of a project?
 ##' @param ... Not used.
 ##' @examples
 ##' \dontrun{
@@ -1408,36 +1409,64 @@ compile <- function(file,flags="",safebounds=TRUE,safeunload=TRUE,
 ##' ## Perform precompilation by running a model
 ##' runExample(all = TRUE)
 ##' }
-precompile <- function(all=TRUE, clean=FALSE, trace=TRUE,...){
+precompile <- function(all=TRUE, clean=FALSE, trace=TRUE, get.header=FALSE, ...){
   owdir <- getwd()
   on.exit(setwd(owdir))
-  folder <- system.file(paste0("libs", Sys.getenv("R_ARCH")), package="TMB")
-  setwd(folder)
-  if(clean){
-      f <- dir(pattern = "^libTMB")
-      if(length(f) && trace) cat("Removing:", f, "\n")
-      file.remove(f)
-      f <- system.file(paste0("include/precompile.hpp"), package="TMB")
-      file.create(f)
-      return(NULL)
-  }
-  ## Cleanup before applying changes:
-  precompile(clean = TRUE)
-  ## Precompile frequently used classes:
-  if(all) precompileSource()
-  code <- c(
-      "#undef  TMB_LIB_INIT",
-      "#undef  LIB_UNLOAD",
-      "#undef  WITH_LIBTMB",
-      "#undef  TMB_PRECOMPILE",
-      "#define TMB_PRECOMPILE 1",
-      "#pragma message \"Running TMB precompilation...\""[trace],
-      "#include <TMB.hpp>"
+  if (get.header) {
+      ## TMB.h
+      outfile <- paste(getwd(), "TMB.h", sep="/")
+      code <- c(
+          "#ifndef TMB_H",
+          "#define TMB_H",
+          "#ifdef TMB_PRECOMPILE",
+          readLines(system.file(paste0("include/tmb_enable_precompile.hpp"), package="TMB")),
+          "#else",
+          readLines(system.file(paste0("include/tmb_enable_header_only.hpp"), package="TMB")),
+          "#endif",
+          "#include <TMB.hpp>",
+          precompileSource()[all],
+          "#endif")
+      writeLines(code, outfile)
+      if(trace) message(outfile, " generated")
+      ## TMB.cpp
+      outfile <- paste(getwd(), "TMB.cpp", sep="/")
+      code <- c(
+          "#define TMB_PRECOMPILE",
+          '#include "TMB.h"'
       )
-  writeLines(code, "libTMB.cpp")
-  writeLines(code, "libTMBomp.cpp")
-  writeLines(code, "libTMBdbg.cpp")
-  if(trace) message("Precompilation sources generated")
+      writeLines(code, outfile)
+      if(trace) message(outfile, " generated")
+  } else {
+      folder <- system.file(paste0("libs", Sys.getenv("R_ARCH")), package="TMB")
+      setwd(folder)
+      if(clean){
+          f <- dir(pattern = "^libTMB")
+          if(length(f) && trace) cat("Removing:", f, "\n")
+          file.remove(f)
+          f <- system.file(paste0("include/precompile.hpp"), package="TMB")
+          file.create(f)
+          return(NULL)
+      }
+      ## Cleanup before applying changes:
+      precompile(clean = TRUE)
+      ## Precompile frequently used classes:
+      outfile <-
+          paste0(system.file("include", package="TMB"), "/precompile.hpp")
+      if(all) writeLines(precompileSource(), outfile)
+      code <- c(
+          "#undef  TMB_LIB_INIT",
+          "#undef  LIB_UNLOAD",
+          "#undef  WITH_LIBTMB",
+          "#undef  TMB_PRECOMPILE",
+          "#define TMB_PRECOMPILE 1",
+          "#pragma message \"Running TMB precompilation...\""[trace],
+          "#include <TMB.hpp>"
+      )
+      writeLines(code, "libTMB.cpp")
+      writeLines(code, "libTMBomp.cpp")
+      writeLines(code, "libTMBdbg.cpp")
+      if(trace) message("Precompilation sources generated")
+  }
 }
 
 ##' Add the platform dependent dynlib extension. In order for examples

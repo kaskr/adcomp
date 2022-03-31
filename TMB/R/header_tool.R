@@ -166,7 +166,5 @@ precompileSource <- function() {
         ),
         "#endif"
     )
-    outfile <-
-        paste0(system.file("include", package="TMB"), "/precompile.hpp")
-    writeLines(x, outfile)
+    x
 }
