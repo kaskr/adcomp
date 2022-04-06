@@ -46,11 +46,13 @@ struct config_struct{
     /** \brief Use atomic sparse log determinant (faster but limited order) ? */
     bool atomic_sparse_log_determinant;
   } tmbad;
+  int nthreads;
 
   int cmd;
   SEXP envir; /* PROTECTed because function argument - see
                  'TMBconfig' */
-  void set(const char* name, bool &var, bool default_value) CSKIP(
+  template<class T>
+  void set(const char* name, T &var, T default_value)
   {
     // cmd=0: set defaults in this struct.
     // cmd=1: copy from this struct to R.
@@ -59,7 +61,7 @@ struct config_struct{
     if (cmd==0) var = default_value;
     if (cmd==1) Rf_defineVar(name_symbol, asSEXP(var), envir);
     if (cmd==2) var = INTEGER(Rf_findVar(name_symbol, envir))[0];
-  })
+  }
 #define SET(name,value)set(#name,name,value);
   void set() CSKIP(
   {
@@ -72,6 +74,7 @@ struct config_struct{
     SET(tape.parallel,true);
     SET(tmbad.sparse_hessian_compress,false);
     SET(tmbad.atomic_sparse_log_determinant,true);
+    SET(nthreads,1);
   })
 #undef SET
   config_struct() CSKIP(

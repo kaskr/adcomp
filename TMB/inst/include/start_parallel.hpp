@@ -112,7 +112,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   parallelADFun(const std::vector<Base> &vecf) {
     vector<Base*> vecpf(vecf.size());
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for (int i=0; i<vecpf.size(); i++) {
       vecpf[i] = new Base(vecf[i]);
@@ -216,7 +216,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   VectorBase Forward(size_t p, const VectorBase& x, std::ostream& s = std::cout){
     vector<VectorBase> ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Forward(p,x);
     VectorBase out(range);
@@ -232,7 +232,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   VectorBase Reverse(size_t p, const VectorBase &v){
     vector<VectorBase> ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Reverse(p,subset(v,i));
     VectorBase out(p*domain); 
@@ -244,7 +244,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   VectorBase Jacobian(const VectorBase &x){
     vector<VectorBase> ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Jacobian(x);
     VectorBase out( domain * range ); // domain fastest running
@@ -256,7 +256,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   VectorBase Hessian(const VectorBase &x, size_t rangecomponent){
     vector<VectorBase> ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0;i<ntapes;i++)ans(i) = vecpf(i)->Hessian(x,rangecomponent);
     VectorBase out( domain * domain );
@@ -268,7 +268,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   void optimize(){
     if(config.trace.optimize)std::cout << "Optimizing parallel tape... ";
 #ifdef _OPENMP
-#pragma omp parallel for if (config.optimize.parallel)
+#pragma omp parallel for num_threads(config.nthreads) if (config.optimize.parallel)
 #endif
     for(int i=0;i<ntapes;i++)vecpf(i)->optimize();
     if(config.trace.optimize)std::cout << "Done\n";
@@ -281,20 +281,20 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   }
   void set_tail(const std::vector<TMBad::Index> &r) {
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++) vecpf(i) -> set_tail(r);
   }
   void force_update() {
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++) vecpf(i) -> force_update();
   }
   vector<double> operator()(const std::vector<double> &x) {
     vector<vector<double> > ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++)
       ans(i) = vector<double>(vecpf(i)->operator()(x));
@@ -306,7 +306,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   vector<double> Jacobian(const std::vector<double> &x) {
     vector<vector<double> > ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++)
       ans(i) = vector<double>(vecpf(i)->Jacobian(x));
@@ -320,7 +320,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
                           const std::vector<bool> &keep_y ) {
     vector<vector<double> > ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++)
       ans(i) = vector<double>(vecpf(i)->Jacobian(x, keep_x, subset(keep_y, i)));
@@ -352,7 +352,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
                           const vector<double> &w) {
     vector<vector<double> > ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++)
       ans(i) = vector<double>(vecpf(i)->Jacobian(x, subset(w, i)));
@@ -367,7 +367,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   Vector forward(const Vector &x) {
     vector<Vector> ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++) ans(i) = vecpf(i)->forward(x);
     Vector out(1);
@@ -379,7 +379,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   Vector reverse(const Vector &w) {
     vector<Vector> ans(ntapes);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(config.nthreads)
 #endif
     for(int i=0; i<ntapes; i++) ans(i) = vecpf(i)->reverse(w);
     Vector out(domain);
