@@ -207,9 +207,15 @@ oneStepPredict <- function(obj,
     ## Find randomeffects character
     args$random <- names.random
     args$regexp <- FALSE
-    ## Move data$name to parameter$name
-    args$parameters[observation.name] <- args$data[observation.name]
-    args$data[observation.name] <- NULL
+    ## Do we need to change, or take derivatives wrt., observations?
+    ## (search the code to see if a method uses "observation(k,y)" or
+    ## just "observation(k)").
+    obs.are.variables <- (method != "cdf")
+    ## Move data$name to parameter$name if necessary
+    if (obs.are.variables) {
+        args$parameters[observation.name] <- args$data[observation.name]
+        args$data[observation.name] <- NULL
+    }
     ## Make data.term.indicator in parameter list
     if(!is.null(data.term.indicator)){
         one <- rep(1, length(obs))
@@ -242,7 +248,8 @@ oneStepPredict <- function(obj,
         factor(fac)
     }
     map <- list()
-    map[[observation.name]] <- makeFac(obs)
+    if (obs.are.variables)
+        map[[observation.name]] <- makeFac(obs)
     if(!is.null(data.term.indicator)){
         map[[data.term.indicator]] <- makeFac(args$parameters[[data.term.indicator]])
     }
