@@ -228,7 +228,6 @@ parseIntegrate <- function(arg, name) {
 ##' @param silent Disable all tracing information?
 ##' @param intern Do Laplace approximation on C++ side ? See details (Experimental - may change without notice)
 ##' @param integrate Specify alternative integration method(s) for random effects (see details)
-##' @param autopar Enable automatic parallization? (Experimental)
 ##' @param ... Currently unused.
 ##' @return List with components (fn, gr, etc) suitable for calling an R optimizer, such as \code{nlminb} or \code{optim}.
 MakeADFun <- function(data, parameters, map=list(),
@@ -249,7 +248,6 @@ MakeADFun <- function(data, parameters, map=list(),
                       silent=FALSE,
                       intern=FALSE,
                       integrate=NULL,
-                      autopar=isParallelDLL(DLL),
                       ...){
   ## Check that DLL is loaded
   if ( ! DLL %in% names(getLoadedDLLs()) ) {
@@ -432,6 +430,7 @@ MakeADFun <- function(data, parameters, map=list(),
   ## set.defaults: reset internal parameters to their default values.
   .random <- random
   retape <- function(set.defaults = TRUE){
+    omp <- config(DLL=DLL) ## Get current OpenMP configuration
     random <<- .random ## Restore original 'random' argument
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
@@ -489,8 +488,14 @@ MakeADFun <- function(data, parameters, map=list(),
       }
     }
     if("ADFun"%in%type){
+      ## autopar? => Tape with single thread
+      if (omp$autopar)
+          openmp(1, DLL=DLL)
       ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
                      control=list(report=as.integer(ADreport)),PACKAGE=DLL)
+      ## autopar? => Restore OpenMP number of threads
+      if (omp$autopar)
+          openmp(omp$nthreads, DLL=DLL)
       if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
       ADFun <<- registerFinalizer(ADFun, DLL)
       if (!is.null(integrate)) {
@@ -599,11 +604,11 @@ MakeADFun <- function(data, parameters, map=list(),
           value.best <<- Inf
       }
     }
-    if (autopar) {
+    if (omp$autopar) {
         ## Experiment !
         TransformADFunObject(ADFun,
                              method = "parallel_accumulate",
-                             num_threads = as.integer(openmp()),
+                             num_threads = as.integer(openmp(DLL=DLL)),
                              mustWork = 0L)
     }
     if (length(random) > 0) {

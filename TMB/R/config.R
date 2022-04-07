@@ -37,5 +37,8 @@ config <- function(...,DLL=getUserDLL()){
   e <- new.env()
   .Call("TMBconfig",e,as.integer(1),PACKAGE=DLL)
   conf <- eapply(e,as.integer)
+  ## Backwards compatibility (don't break if members unavailable)
+  if (is.null(conf$autopar))  conf$autopar  <- FALSE
+  if (is.null(conf$nthreads)) conf$nthreads <- 1
   conf
 }
