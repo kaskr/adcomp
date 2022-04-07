@@ -1185,14 +1185,31 @@ isParallelDLL <- function(DLL) {
     attr( .Call("getFramework", PACKAGE = DLL), "openmp")
 }
 
-##' Control number of openmp threads.
+##' Control number of OpenMP threads used by a TMB model.
 ##'
-##' @title Control number of openmp threads.
+##' This function controls the number of parallel threads used by a TMB model compiled with OpenMP.
+##' The number of threads is part of the configuration list \code{config()} of the DLL.
+##' The value only affects parallization of the DLL. It does \emph{not} affect BLAS/LAPACK specific parallization which has to be specified elsewhere.
+##'
+##' When a DLL is loaded, the number of threads is set to 1 by default.
+##' To activate parallelization you have to explicitly call \code{openmp(nthreads)} after loading the DLL. Calling \code{openmp(max=TRUE)} should normally pick up the environment variable \code{OMP_NUM_THREADS}, but this may be platform dependent.
+##' @title Control number of OpenMP threads used by a TMB model.
 ##' @param n Requested number of threads, or \code{NULL} to just read the current value.
+##' @param max Logical; Set n to OpenMP runtime value 'omp_get_max_threads()' ?
+##' @param DLL DLL of a TMB model.
 ##' @return Number of threads.
-openmp <- function(n=NULL){
-  if(!is.null(n))n <- as.integer(n)
-  .Call("omp_num_threads",n,PACKAGE="TMB")
+openmp <- function(n=NULL, max=FALSE, DLL=getUserDLL()) {
+    ## Set n to max possible value?
+    if (max) {
+        n <- .Call("omp_num_threads", NULL, PACKAGE="TMB")
+    }
+    ## Set n ?
+    if (!is.null(n))
+        config(nthreads=n, DLL=DLL)
+    ## Return current value
+    ans <- config(DLL=DLL)$nthreads
+    names(ans) <- DLL
+    ans
 }
 
 ##' Compile a C++ template into a shared object file. OpenMP flag is set if the template is detected to be parallel.
