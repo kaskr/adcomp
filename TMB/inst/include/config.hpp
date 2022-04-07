@@ -46,7 +46,8 @@ struct config_struct{
     /** \brief Use atomic sparse log determinant (faster but limited order) ? */
     bool atomic_sparse_log_determinant;
   } tmbad;
-  int nthreads;
+  bool autopar; /**< \brief Enable automatic parallization (if OpenMP is enabled) ? */
+  int nthreads; /**< \brief Number of OpenMP threads to use (if OpenMP is enabled) */
 
   int cmd;
   SEXP envir; /* PROTECTed because function argument - see
@@ -74,6 +75,7 @@ struct config_struct{
     SET(tape.parallel,true);
     SET(tmbad.sparse_hessian_compress,false);
     SET(tmbad.atomic_sparse_log_determinant,true);
+    SET(autopar,false);
     SET(nthreads,1);
   })
 #undef SET
