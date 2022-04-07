@@ -22,7 +22,7 @@ void start_parallel(){
 #ifdef CPPAD_FRAMEWORK
   CppAD::thread_alloc::free_all();
 #endif // CPPAD_FRAMEWORK
-  int nthreads=omp_get_max_threads();
+  int nthreads=config.nthreads;
   if(config.trace.parallel)
     std::cout << "Using " << nthreads <<  " threads\n";
 #ifdef CPPAD_FRAMEWORK

@@ -623,7 +623,7 @@ public:
   int current_parallel_region;       /* Identifier of a code-fragment of user template */
   int selected_parallel_region;      /* Consider _this_ code-fragment */
   int max_parallel_regions;          /* Max number of parallel region identifiers,
-				        e.g. max_parallel_regions=omp_get_max_threads(); 
+				        e.g. max_parallel_regions=config.nthreads;
 				        probably best in most cases. */
   bool parallel_region(){            /* Is this the selected parallel region ? */
     bool ans;
@@ -891,7 +891,7 @@ struct parallel_accumulator{
     result=Type(0);
     obj=obj_;
 #ifdef _OPENMP
-    obj->max_parallel_regions=omp_get_max_threads();
+    obj->max_parallel_regions=config.nthreads;
 #endif
   }
   inline void operator+=(Type x){

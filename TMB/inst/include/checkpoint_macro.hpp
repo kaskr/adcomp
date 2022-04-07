@@ -112,7 +112,7 @@ namespace atomic{
     return fn;
   }
 #ifdef _OPENMP
-#define NTHREADS omp_get_max_threads()
+#define NTHREADS config.nthreads
 #define THREAD omp_get_thread_num()
 #else
 #define NTHREADS 1
@@ -291,7 +291,7 @@ struct AtomicLocal {
 template<class Functor>
 struct AtomicGlobal {
 #ifdef _OPENMP
-#define NTHREADS omp_get_max_threads()
+#define NTHREADS config.nthreads
 #define THREAD omp_get_thread_num()
 #else
 #define NTHREADS 1
