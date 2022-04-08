@@ -627,7 +627,7 @@ public:
 				        probably best in most cases. */
   bool parallel_region(){            /* Is this the selected parallel region ? */
     bool ans;
-    if(current_parallel_region<0 || selected_parallel_region<0)return true; /* Serial mode */
+    if(config.autopar || current_parallel_region<0 || selected_parallel_region<0)return true; /* Serial mode */
     ans = (selected_parallel_region==current_parallel_region) && (!parallel_ignore_statements);
     current_parallel_region++;
     if(max_parallel_regions>0)current_parallel_region=current_parallel_region % max_parallel_regions;
@@ -639,6 +639,7 @@ public:
     selected_parallel_region=0;
     parallel_ignore_statements=true; /* Do not evaluate stuff inside PARALLEL_REGION{...} */
     this->operator()();              /* Run through users code */
+    if (config.autopar) return 0;
     if(max_parallel_regions>0)return max_parallel_regions;
     else
     return current_parallel_region;
