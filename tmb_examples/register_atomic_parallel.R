@@ -1,6 +1,7 @@
 ## Run register_atomic.R with modified template
 tmpfile <- tempfile()
 newscript <- gsub("register_atomic","register_atomic_parallel",readLines("register_atomic.R"))
+newscript[4] <- "openmp(max=TRUE)"
 writeLines(newscript,tmpfile)
 source(tmpfile,echo=TRUE)
 
