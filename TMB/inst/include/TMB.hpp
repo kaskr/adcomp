@@ -51,9 +51,20 @@ void eigen_REprintf(const char* x);
                                   eigen_REprintf("\nPlease check your matrix-vector bounds etc., "); \
                                   eigen_REprintf("or run your program through a debugger.\n");       \
 				  abort();}
+#define TMBAD_ASSERT2(x,msg)                                            \
+if (!(x)) {                                                             \
+  Rcerr << "TMBad assertion failed.\n";                                 \
+  Rcerr << "The following condition was not met: " << #x << "\n";       \
+  Rcerr << "Possible reason: " msg << "\n";                             \
+  Rcerr << "For more info run your program through a debugger.\n";      \
+  abort();                                                              \
+}
+#define TMBAD_ASSERT(x) TMBAD_ASSERT2(x,"Unknown")
 #else
 #undef NDEBUG
 #define NDEBUG 1
+#define TMBAD_ASSERT2(x,msg) (void) (x);
+#define TMBAD_ASSERT(x) (void) (x);
 #endif
 /* Provide access to file 'DisableStupidWarnings.h' which has been
    patched by RcppEigen to satisfy CRAN policy. This file may need
