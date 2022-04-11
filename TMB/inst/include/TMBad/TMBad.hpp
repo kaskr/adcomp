@@ -166,7 +166,7 @@ struct ADFun {
     Dependent(y);
     this->glob.ad_stop();
     global *glob_end = get_glob();
-    ASSERT(glob_begin == glob_end);
+    TMBAD_ASSERT(glob_begin == glob_end);
   }
 
   /** \brief Constructor of 1 scalar input / 1 scalar output function
@@ -182,7 +182,7 @@ struct ADFun {
     y0.Dependent();
     this->glob.ad_stop();
     global *glob_end = get_glob();
-    ASSERT(glob_begin == glob_end);
+    TMBAD_ASSERT(glob_begin == glob_end);
   }
 
   /** \brief Constructor of 2 scalar input / 1 scalar output function
@@ -200,7 +200,7 @@ struct ADFun {
     y0.Dependent();
     this->glob.ad_stop();
     global *glob_end = get_glob();
-    ASSERT(glob_begin == glob_end);
+    TMBAD_ASSERT(glob_begin == glob_end);
   }
 
   ADFun() : force_update_flag(false) {}
@@ -227,9 +227,9 @@ struct ADFun {
       could be remapped.
   */
   void optimize() {
-    ASSERT2(inv_pos.size() == 0,
-            "Tape has 'cached independent variable positions' which would be "
-            "invalidated by the optimizer");
+    TMBAD_ASSERT2(inv_pos.size() == 0,
+                  "Tape has 'cached independent variable positions' which "
+                  "would be invalidated by the optimizer");
 
     std::vector<bool> outer_mask;
     if (inner_outer_in_use()) {
@@ -241,7 +241,7 @@ struct ADFun {
     glob.eliminate();
 
     if (inner_outer_in_use()) {
-      ASSERT(outer_mask.size() == Domain());
+      TMBAD_ASSERT(outer_mask.size() == Domain());
       set_inner_outer(*this, outer_mask);
     }
   }
@@ -258,7 +258,7 @@ struct ADFun {
     inv_pos = subset(pos, invperm(order(glob.inv_index)));
 
     if (inner_outer_in_use()) {
-      ASSERT(outer_mask.size() == Domain());
+      TMBAD_ASSERT(outer_mask.size() == Domain());
       set_inner_outer(*this, outer_mask);
     }
   }
@@ -300,8 +300,8 @@ struct ADFun {
     if (keep_x.size() > 0 || keep_y.size() > 0) {
       if (keep_x.size() == 0) keep_x.resize(glob.inv_index.size(), true);
       if (keep_y.size() == 0) keep_y.resize(glob.dep_index.size(), true);
-      ASSERT(keep_x.size() == glob.inv_index.size());
-      ASSERT(keep_y.size() == glob.dep_index.size());
+      TMBAD_ASSERT(keep_x.size() == glob.inv_index.size());
+      TMBAD_ASSERT(keep_y.size() == glob.dep_index.size());
 
       std::vector<bool> keep_var_init(keep_var.size(), false);
       for (size_t i = 0; i < glob.inv_index.size(); i++)
@@ -369,7 +369,7 @@ struct ADFun {
   bool force_update_flag;
   /** \brief Set the input parameter vector on the tape */
   Position DomainVecSet(const std::vector<Scalar> &x) {
-    ASSERT(x.size() == Domain());
+    TMBAD_ASSERT(x.size() == Domain());
     if (force_update_flag) {
       for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i];
       force_update_flag = false;
@@ -382,7 +382,7 @@ struct ADFun {
             *std::min_element(glob.inv_index.begin(), glob.inv_index.end());
         return find_pos(min_inv);
       }
-      ASSERT(inv_pos.size() == Domain());
+      TMBAD_ASSERT(inv_pos.size() == Domain());
       size_t min_var_changed = -1;
       size_t i_min = -1;
       for (size_t i = 0; i < x.size(); i++) {
@@ -422,7 +422,7 @@ struct ADFun {
   /** \brief Forward sweep any vector class */
   template <class Vector>
   Vector forward(const Vector &x) {
-    ASSERT((size_t)x.size() == Domain());
+    TMBAD_ASSERT((size_t)x.size() == Domain());
     for (size_t i = 0; i < (size_t)x.size(); i++) glob.value_inv(i) = x[i];
     glob.forward();
     Vector y(Range());
@@ -432,7 +432,7 @@ struct ADFun {
   /** \brief Reverse sweep any vector class */
   template <class Vector>
   Vector reverse(const Vector &w) {
-    ASSERT((size_t)w.size() == Range());
+    TMBAD_ASSERT((size_t)w.size() == Range());
     glob.clear_deriv();
     for (size_t i = 0; i < (size_t)w.size(); i++) glob.deriv_dep(i) = w[i];
     glob.reverse();
@@ -453,14 +453,14 @@ struct ADFun {
   */
   std::vector<ad> operator()(const std::vector<ad> &x_) const {
     std::vector<ad> x(x_.begin(), x_.end());
-    ASSERT(x.size() == Domain());
+    TMBAD_ASSERT(x.size() == Domain());
     for (size_t i = 0; i < x.size(); i++) {
       x[i].addToTape();
     }
     global *cur_glob = get_glob();
     for (size_t i = 0; i < x.size(); i++) {
-      ASSERT(x[i].ontape());
-      ASSERT(x[i].glob() == cur_glob);
+      TMBAD_ASSERT(x[i].ontape());
+      TMBAD_ASSERT(x[i].glob() == cur_glob);
     }
     global::replay replay(this->glob, *get_glob());
     replay.start();
@@ -478,8 +478,8 @@ struct ADFun {
   /** \brief Evaluate function scalar version \warning Experimental -
       may be removed */
   ad operator()(ad x0) {
-    ASSERT(Domain() == 1);
-    ASSERT(Range() == 1);
+    TMBAD_ASSERT(Domain() == 1);
+    TMBAD_ASSERT(Range() == 1);
     std::vector<ad> x(1);
     x[0] = x0;
     return (*this)(x)[0];
@@ -487,8 +487,8 @@ struct ADFun {
   /** \brief Evaluate function scalar version \warning Experimental -
       may be removed */
   ad operator()(ad x0, ad x1) {
-    ASSERT(Domain() == 2);
-    ASSERT(Range() == 1);
+    TMBAD_ASSERT(Domain() == 2);
+    TMBAD_ASSERT(Range() == 1);
     std::vector<ad> x(2);
     x[0] = x0;
     x[1] = x1;
@@ -558,8 +558,8 @@ struct ADFun {
   */
   std::vector<Scalar> Jacobian(const std::vector<Scalar> &x,
                                const std::vector<Scalar> &w) {
-    ASSERT(x.size() == Domain());
-    ASSERT(w.size() == Range());
+    TMBAD_ASSERT(x.size() == Domain());
+    TMBAD_ASSERT(w.size() == Range());
     Position start = DomainVecSet(x);
     glob.forward(start);
     glob.clear_deriv();
@@ -575,22 +575,22 @@ struct ADFun {
     std::vector<ad> w(w_.begin(), w_.end());
     global *cur_glob = get_glob();
 
-    ASSERT(x.size() == Domain());
+    TMBAD_ASSERT(x.size() == Domain());
     for (size_t i = 0; i < x.size(); i++) {
       x[i].addToTape();
     }
     for (size_t i = 0; i < x.size(); i++) {
-      ASSERT(x[i].ontape());
-      ASSERT(x[i].glob() == cur_glob);
+      TMBAD_ASSERT(x[i].ontape());
+      TMBAD_ASSERT(x[i].glob() == cur_glob);
     }
 
-    ASSERT(w.size() == Range());
+    TMBAD_ASSERT(w.size() == Range());
     for (size_t i = 0; i < w.size(); i++) {
       w[i].addToTape();
     }
     for (size_t i = 0; i < w.size(); i++) {
-      ASSERT(w[i].ontape());
-      ASSERT(w[i].glob() == cur_glob);
+      TMBAD_ASSERT(w[i].ontape());
+      TMBAD_ASSERT(w[i].glob() == cur_glob);
     }
 
     global::replay replay(this->glob, *get_glob());
@@ -729,7 +729,7 @@ struct ADFun {
       `f[i]:R^n->R` such that `f=sum_i f[i]`.
   */
   std::vector<ADFun> parallel_accumulate(size_t num_threads) {
-    ASSERT(Range() == 1);
+    TMBAD_ASSERT(Range() == 1);
     global glob_split = accumulation_tree_split(glob);
     autopar ap(glob_split, num_threads);
     ap.do_aggregate = true;
@@ -744,7 +744,7 @@ struct ADFun {
       \warning **Reverse** replay is not supported after parallelization.
   */
   ADFun parallelize(size_t num_threads) {
-    ASSERT(Range() == 1);
+    TMBAD_ASSERT(Range() == 1);
     global glob_split = accumulation_tree_split(glob);
     autopar ap(glob_split, num_threads);
     ap.do_aggregate = true;
@@ -880,8 +880,9 @@ struct ADFun {
           replay.clear_deriv_sub();
           Rcout << "done\n";
 
-          ASSERT(atomic_jac_row.Domain() == this->Domain() + this->Range());
-          ASSERT(atomic_jac_row.Range() == keep_x_count);
+          TMBAD_ASSERT(atomic_jac_row.Domain() ==
+                       this->Domain() + this->Range());
+          TMBAD_ASSERT(atomic_jac_row.Range() == keep_x_count);
         }
         std::vector<Replay> vec(atomic_jac_row.Domain(), Replay(0));
         for (size_t i = 0; i < this->Domain(); i++) {
@@ -1022,10 +1023,10 @@ struct ADFun {
 
     f.replay();
 
-    ASSERT(n_inner + n_outer == f.Domain());
-    ASSERT(find_op_by_name(f.glob, "RefOp").size() == 0);
-    ASSERT(find_op_by_name(f.glob, "InvOp").size() == f.Domain());
-    ASSERT(gx.size() == n_outer);
+    TMBAD_ASSERT(n_inner + n_outer == f.Domain());
+    TMBAD_ASSERT(find_op_by_name(f.glob, "RefOp").size() == 0);
+    TMBAD_ASSERT(find_op_by_name(f.glob, "InvOp").size() == f.Domain());
+    TMBAD_ASSERT(gx.size() == n_outer);
 
     for (size_t i = 0; i < n_outer; i++) {
       Index j = f.glob.inv_index[n_inner + i];
@@ -1051,15 +1052,18 @@ struct ADFun {
      relative to the current active context (glob).
   */
   std::vector<ad_aug> resolve_refs() {
-    ASSERT2(inner_inv_index.size() == 0 && outer_inv_index.size() == 0,
-            "'resolve_refs' can only be run once for a given function object");
+    TMBAD_ASSERT2(
+        inner_inv_index.size() == 0 && outer_inv_index.size() == 0,
+        "'resolve_refs' can only be run once for a given function object")
+
+        ;
     std::vector<Index> seq = find_op_by_name(glob, "RefOp");
     std::vector<Replay> values(seq.size());
     std::vector<Index> dummy_inputs;
     ForwardArgs<Replay> args(dummy_inputs, values);
     for (size_t i = 0; i < seq.size(); i++) {
-      ASSERT(glob.opstack[seq[i]]->input_size() == 0);
-      ASSERT(glob.opstack[seq[i]]->output_size() == 1);
+      TMBAD_ASSERT(glob.opstack[seq[i]]->input_size() == 0);
+      TMBAD_ASSERT(glob.opstack[seq[i]]->output_size() == 1);
       glob.opstack[seq[i]]->forward_incr(args);
       glob.opstack[seq[i]]->deallocate();
       glob.opstack[seq[i]] = get_glob()->getOperator<global::InvOp>();
@@ -1149,7 +1153,7 @@ struct ADFun<adaptive<ad> > : ADFun<ad> {
     Dependent(y);
     this->glob.ad_stop();
     global *glob_end = get_glob();
-    ASSERT(glob_begin == glob_end);
+    TMBAD_ASSERT(glob_begin == glob_end);
   }
 };
 
@@ -1234,7 +1238,7 @@ struct Decomp2 : std::pair<ADFun, ADFun> {
     ADFun &g = this->first;
     ADFun &f = this->second;
     Decomp3<ADFun> ans;
-    ASSERT(f.Range() == 1);
+    TMBAD_ASSERT(f.Range() == 1);
 
     std::vector<bool> keep_f = std::vector<bool>(f.Range(), true);
     std::vector<bool> keep_g = std::vector<bool>(g.Range(), true);
@@ -1262,7 +1266,7 @@ struct Decomp2 : std::pair<ADFun, ADFun> {
     std::vector<ad> xs0(x);
     xs0.insert(xs0.end(), s0.begin(), s0.end());
     if (false) {
-      ASSERT(keep_rc.size() == n || keep_rc.size() == 0);
+      TMBAD_ASSERT(keep_rc.size() == n || keep_rc.size() == 0);
       std::vector<bool> keep_xy(keep_rc);
       keep_xy.resize(f.Domain(), true);
       ADFun f_grad = f.JacFun(keep_xy, keep_f);

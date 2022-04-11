@@ -155,7 +155,7 @@ struct CallOp_ : global::SharedDynamicOperator {
       this->glob = new global(*other.glob);
     }
   }
-  CallOp_ &operator=(const CallOp_ &other) { ASSERT(false); }
+  CallOp_ &operator=(const CallOp_ &other) { TMBAD_ASSERT(false); }
   ~CallOp_() {
     if (glob != NULL) {
       delete glob;
@@ -184,7 +184,7 @@ struct CallOp_ : global::SharedDynamicOperator {
     typedef typename global::CPL<CallOp_>::type CPL_CallOp;
     bool any_marked_y = args.mark_dense<CPL_CallOp>(*this);
     if (any_marked_y) {
-      ASSERT(root_var != (Index)-1);
+      TMBAD_ASSERT(root_var != (Index)-1);
       if (root_var != (Index)-1) args.values[root_var] = true;
     }
   }
@@ -249,8 +249,8 @@ struct CallOp_ : global::SharedDynamicOperator {
     for (size_t i = 0; i < input_size(); i++) args.dx(i) += dx[i];
   }
 
-  void forward(ForwardArgs<Writer> &args) { ASSERT(false); }
-  void reverse(ReverseArgs<Writer> &args) { ASSERT(false); }
+  void forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
+  void reverse(ReverseArgs<Writer> &args) { TMBAD_ASSERT(false); }
 };
 
 struct CallOp {

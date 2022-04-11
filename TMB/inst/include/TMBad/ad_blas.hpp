@@ -96,7 +96,7 @@ typedef Matrix<global::Replay, Dynamic, Dynamic> vmatrix;
 
 template <class Target>
 void fill(Target &y, const global::ad_range x) {
-  ASSERT((size_t)y.size() == (size_t)x.size());
+  TMBAD_ASSERT((size_t)y.size() == (size_t)x.size());
   ad_plain xx = x;
   for (size_t i = 0; i < (size_t)y.size(); i++) {
     y(i) = xx;
@@ -222,8 +222,8 @@ struct MatMul : global::Operator<2, -1> {
   /** \brief It is **not* safe to remap the inputs of this operator */
   static const bool allow_remap = false;
 
-  void forward(ForwardArgs<Writer> &args) { ASSERT(false); }
-  void reverse(ReverseArgs<Writer> &args) { ASSERT(false); }
+  void forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
+  void reverse(ReverseArgs<Writer> &args) { TMBAD_ASSERT(false); }
   const char *op_name() { return "MatMul"; }
 };
 

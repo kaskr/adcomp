@@ -490,15 +490,7 @@ struct ForwardArgs<Writer> : ForwardArgs<Scalar> {
   Writer x(Index j) { return (indirect ? xi(j) : xd(j)); }
   Writer y(Index j) { return (indirect ? yi(j) : yd(j)); }
   Writer y_const(Index j) {
-    if (!(!indirect)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!indirect"
-            << "\n";
-      Rcerr << "POSSIBLE REASON: "
-            << "Attempt to write constants within loop?"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT2(!indirect, "Attempt to write constants within loop?");
     return tostr(Base::y(j));
   }
   ForwardArgs(IndexVector &inputs, ScalarVector &values)
@@ -1844,12 +1836,7 @@ struct global {
         `NULL`.
     */
     OperatorPure *compress() {
-      if (!(false)) {
-        Rcerr << "ASSERTION FAILED: "
-              << "false"
-              << "\n";
-        abort();
-      };
+      TMBAD_ASSERT(false);
       std::vector<Index> &inputs = get_glob()->inputs;
       size_t k = Op.input_size();
       size_t start = inputs.size() - k * n;
@@ -2116,25 +2103,10 @@ struct global {
        dynamic operators and therfore disallowed for static operators.
     */
     std::vector<ad_plain> operator()(const std::vector<ad_plain> &x) {
-      if (!(OperatorBase::dynamic)) {
-        Rcerr << "ASSERTION FAILED: "
-              << "OperatorBase::dynamic"
-              << "\n";
-        Rcerr << "POSSIBLE REASON: "
-              << "Stack to heap copy only allowed for dynamic operators"
-              << "\n";
-        abort();
-      };
+      TMBAD_ASSERT2(OperatorBase::dynamic,
+                    "Stack to heap copy only allowed for dynamic operators");
       Complete *pOp = new Complete(*this);
-      if (!(pOp->ref_count() == 0)) {
-        Rcerr << "ASSERTION FAILED: "
-              << "pOp->ref_count() == 0"
-              << "\n";
-        Rcerr << "POSSIBLE REASON: "
-              << "Operator already on the heap"
-              << "\n";
-        abort();
-      };
+      TMBAD_ASSERT2(pOp->ref_count() == 0, "Operator already on the heap");
       pOp->ref_count.increment();
       return get_glob()->add_to_stack<OperatorBase>(pOp, x);
     }
@@ -2332,16 +2304,9 @@ struct global {
      * resolved */
     template <class Type>
     void reverse(ReverseArgs<Type> &args) {
-      if (!(false)) {
-        Rcerr << "ASSERTION FAILED: "
-              << "false"
-              << "\n";
-        Rcerr << "POSSIBLE REASON: "
-              << "Reverse mode updates are forbidden until all references "
-                 "are resolved"
-              << "\n";
-        abort();
-      };
+      TMBAD_ASSERT2(false,
+                    "Reverse mode updates are forbidden until all references "
+                    "are resolved");
     }
     /** \brief Reverse mode updates are allowed in replay mode */
     void reverse(ReverseArgs<Replay> &args);
@@ -2390,13 +2355,8 @@ struct global {
     Complete<OperatorBase> *pOp = this->template getOperator<OperatorBase>();
     add_to_opstack<OperatorBase::dynamic>(pOp);
 
-    if (!(!((size_t)(values.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(values.size())"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(!((size_t)(values.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
     return ans;
   }
   /** \brief Add unary operator to the stack based on its **argument** */
@@ -2412,20 +2372,10 @@ struct global {
     Complete<OperatorBase> *pOp = this->template getOperator<OperatorBase>();
     add_to_opstack<OperatorBase::dynamic>(pOp);
 
-    if (!(!((size_t)(values.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(values.size())"
-            << "\n";
-      abort();
-    };
-    if (!(!((size_t)(inputs.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(inputs.size())"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(!((size_t)(values.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
+    TMBAD_ASSERT(!((size_t)(inputs.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
     return ans;
   }
   /** \brief Add binary operator to the stack based on its two **arguments** */
@@ -2442,20 +2392,10 @@ struct global {
     Complete<OperatorBase> *pOp = this->template getOperator<OperatorBase>();
     add_to_opstack<OperatorBase::dynamic>(pOp);
 
-    if (!(!((size_t)(values.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(values.size())"
-            << "\n";
-      abort();
-    };
-    if (!(!((size_t)(inputs.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(inputs.size())"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(!((size_t)(values.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
+    TMBAD_ASSERT(!((size_t)(inputs.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
     return ans;
   }
   template <class OperatorBase>
@@ -2473,20 +2413,10 @@ struct global {
     args.ptr = ptr;
     pOp->forward(args);
 
-    if (!(!((size_t)(values.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(values.size())"
-            << "\n";
-      abort();
-    };
-    if (!(!((size_t)(inputs.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(inputs.size())"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(!((size_t)(values.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
+    TMBAD_ASSERT(!((size_t)(inputs.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
     return ans;
   }
   /** \brief Add vector operator to the stack based on its **vector argument**
@@ -2505,20 +2435,10 @@ struct global {
     args.ptr = ptr;
     pOp->forward(args);
 
-    if (!(!((size_t)(values.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(values.size())"
-            << "\n";
-      abort();
-    };
-    if (!(!((size_t)(inputs.size()) >=
-            (size_t)std::numeric_limits<unsigned int>::max()))) {
-      Rcerr << "ASSERTION FAILED: "
-            << "!INDEX_OVERFLOW(inputs.size())"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(!((size_t)(values.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
+    TMBAD_ASSERT(!((size_t)(inputs.size()) >=
+                   (size_t)std::numeric_limits<unsigned int>::max()));
     std::vector<ad_plain> out(n);
     for (size_t i = 0; i < n; i++) out[i].index = ans.index + i;
     return out;
@@ -3069,6 +2989,7 @@ struct RoundOp : global::UnaryOperator {
 };
 ad_plain round(const ad_plain &x);
 ad_aug round(const ad_aug &x);
+
 double sign(const double &x);
 Writer sign(const Writer &x);
 struct SignOp : global::UnaryOperator {
@@ -3083,6 +3004,35 @@ struct SignOp : global::UnaryOperator {
 };
 ad_plain sign(const ad_plain &x);
 ad_aug sign(const ad_aug &x);
+
+double ge0(const double &x);
+double lt0(const double &x);
+Writer ge0(const Writer &x);
+struct Ge0Op : global::UnaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x) {
+    return ge0(x);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {}
+  const char *op_name();
+};
+ad_plain ge0(const ad_plain &x);
+ad_aug ge0(const ad_aug &x);
+Writer lt0(const Writer &x);
+struct Lt0Op : global::UnaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x) {
+    return lt0(x);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {}
+  const char *op_name();
+};
+ad_plain lt0(const ad_plain &x);
+ad_aug lt0(const ad_aug &x);
 using ::expm1;
 using ::fabs;
 using ::log1p;
@@ -3382,6 +3332,43 @@ struct PowOp : global::BinaryOperator {
 ad_plain pow(const ad_plain &x1, const ad_plain &x2);
 ad_aug pow(const ad_aug &x1, const ad_aug &x2);
 ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2);
+using std::max;
+Writer max(const Writer &x1, const Writer &x2);
+struct MaxOp : global::BinaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x1, Type x2) {
+    return max(x1, x2);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    args.dx(0) += args.dy(0) * ge0(args.x(0) - args.x(1));
+    args.dx(1) += args.dy(0) * lt0(args.x(0) - args.x(1));
+  }
+  const char *op_name();
+};
+ad_plain max(const ad_plain &x1, const ad_plain &x2);
+ad_aug max(const ad_aug &x1, const ad_aug &x2);
+ad_adapt max(const ad_adapt &x1, const ad_adapt &x2);
+
+using std::min;
+Writer min(const Writer &x1, const Writer &x2);
+struct MinOp : global::BinaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x1, Type x2) {
+    return min(x1, x2);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    args.dx(0) += args.dy(0) * ge0(args.x(1) - args.x(0));
+    args.dx(1) += args.dy(0) * lt0(args.x(1) - args.x(0));
+  }
+  const char *op_name();
+};
+ad_plain min(const ad_plain &x1, const ad_plain &x2);
+ad_aug min(const ad_aug &x1, const ad_aug &x2);
+ad_adapt min(const ad_adapt &x1, const ad_adapt &x2);
 Replay CondExpEq(const Replay &x0, const Replay &x1, const Replay &x2,
                  const Replay &x3);
 struct CondExpEqOp : global::Operator<4, 1> {
@@ -3393,21 +3380,11 @@ struct CondExpEqOp : global::Operator<4, 1> {
   void reverse(ReverseArgs<Writer> &args);
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   const char *op_name();
 };
@@ -3428,21 +3405,11 @@ struct CondExpNeOp : global::Operator<4, 1> {
   void reverse(ReverseArgs<Writer> &args);
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   const char *op_name();
 };
@@ -3463,21 +3430,11 @@ struct CondExpGtOp : global::Operator<4, 1> {
   void reverse(ReverseArgs<Writer> &args);
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   const char *op_name();
 };
@@ -3498,21 +3455,11 @@ struct CondExpLtOp : global::Operator<4, 1> {
   void reverse(ReverseArgs<Writer> &args);
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   const char *op_name();
 };
@@ -3533,21 +3480,11 @@ struct CondExpGeOp : global::Operator<4, 1> {
   void reverse(ReverseArgs<Writer> &args);
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   const char *op_name();
 };
@@ -3568,21 +3505,11 @@ struct CondExpLeOp : global::Operator<4, 1> {
   void reverse(ReverseArgs<Writer> &args);
   template <class Type>
   void forward(ForwardArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    if (!(false)) {
-      Rcerr << "ASSERTION FAILED: "
-            << "false"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(false);
   }
   const char *op_name();
 };

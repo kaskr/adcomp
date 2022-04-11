@@ -75,7 +75,7 @@ std::vector<size_t> which(const std::vector<bool> &x);
 /** \brief Vector subset by boolean mask */
 template <class T>
 std::vector<T> subset(const std::vector<T> &x, const std::vector<bool> &y) {
-  ASSERT(x.size() == y.size());
+  TMBAD_ASSERT(x.size() == y.size());
   std::vector<T> ans;
   for (size_t i = 0; i < x.size(); i++)
     if (y[i]) ans.push_back(x[i]);
@@ -105,7 +105,7 @@ template <class T, class I>
 void make_space_inplace(std::vector<T> &x, std::vector<I> &i, T space = T(0)) {
   std::vector<bool> mark(x.size(), false);
   for (size_t k = 0; k < i.size(); k++) {
-    ASSERT(!mark[i[k]]);
+    TMBAD_ASSERT(!mark[i[k]]);
     mark[i[k]] = true;
   }
   std::vector<T> x_new;
@@ -267,7 +267,7 @@ struct logIntegrate_t {
      \mu)-f(\mu))\:du\right) + \log(\sigma) + f(\mu) \f]
   */
   void rescale_integrand(const std::vector<ad_plain> &x) {
-    ASSERT(x.size() + 1 == glob.inv_index.size());
+    TMBAD_ASSERT(x.size() + 1 == glob.inv_index.size());
     if (cfg.debug) Rcout << "rescale integrand:\n";
     for (size_t i = 0; i < x.size(); i++) glob.value_inv(i) = x[i].Value();
     mu = glob.value_inv(x.size());
@@ -307,8 +307,8 @@ struct logIntegrate_t {
 
   logIntegrate_t(global &glob, gk_config cfg)
       : glob(glob), mu(0), sigma(1), f_mu(0), cfg(cfg) {
-    ASSERT(glob.inv_index.size() >= 1);
-    ASSERT(glob.dep_index.size() == 1);
+    TMBAD_ASSERT(glob.inv_index.size() >= 1);
+    TMBAD_ASSERT(glob.dep_index.size() == 1);
   }
   logIntegrate_t() {}
   global::replay *p_replay;
@@ -710,13 +710,13 @@ struct ParalOp : global::DynamicOperator<-1, -1> {
   template <class T>
   void reverse(ReverseArgs<T> &args) {
     bool parallel_operator_used_with_valid_type = false;
-    ASSERT(parallel_operator_used_with_valid_type);
+    TMBAD_ASSERT(parallel_operator_used_with_valid_type);
   }
   static const bool add_forward_replay_copy = true;
   template <class T>
   void forward(ForwardArgs<T> &args) {
     bool parallel_operator_used_with_valid_type = false;
-    ASSERT(parallel_operator_used_with_valid_type);
+    TMBAD_ASSERT(parallel_operator_used_with_valid_type);
   }
 
   void forward(ForwardArgs<Scalar> &args);

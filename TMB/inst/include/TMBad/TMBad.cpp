@@ -41,16 +41,16 @@ std::vector<ad_plain> CallOp::operator()(const std::vector<ad_plain> &x) {
 }
 
 ad_plain CallOp::operator()(ad_plain x0) {
-  ASSERT(pOp->input_size() == 1);
-  ASSERT(pOp->output_size() == 1);
+  TMBAD_ASSERT(pOp->input_size() == 1);
+  TMBAD_ASSERT(pOp->output_size() == 1);
   std::vector<ad_plain> tmp(1);
   tmp[0] = x0;
   return this->operator()(tmp)[0];
 }
 
 ad_plain CallOp::operator()(ad_plain x0, ad_plain x1) {
-  ASSERT(pOp->input_size() == 2);
-  ASSERT(pOp->output_size() == 1);
+  TMBAD_ASSERT(pOp->input_size() == 2);
+  TMBAD_ASSERT(pOp->output_size() == 1);
   std::vector<ad_plain> tmp(2);
   tmp[0] = x0;
   tmp[1] = x1;
@@ -58,8 +58,8 @@ ad_plain CallOp::operator()(ad_plain x0, ad_plain x1) {
 }
 
 ad_plain CallOp::operator()(ad_plain x0, ad_plain x1, ad_plain x2) {
-  ASSERT(pOp->input_size() == 3);
-  ASSERT(pOp->output_size() == 1);
+  TMBAD_ASSERT(pOp->input_size() == 3);
+  TMBAD_ASSERT(pOp->output_size() == 1);
   std::vector<ad_plain> tmp(3);
   tmp[0] = x0;
   tmp[1] = x1;
@@ -582,7 +582,7 @@ void reorder_sub_expressions(global &glob) {
   std::vector<hash_t> h = glob.hash_sweep(cfg);
   std::vector<Index> remap = radix::first_occurance<Index>(h);
 
-  ASSERT(all_allow_remap(glob));
+  TMBAD_ASSERT(all_allow_remap(glob));
 
   Args<> args(glob.inputs);
   for (size_t i = 0; i < glob.opstack.size(); i++) {
@@ -691,7 +691,7 @@ void compress(global &glob, size_t max_period_size) {
   Index k = 0;
   for (size_t i = 0; i < periods.size(); i++) {
     period p = periods[i];
-    ASSERT(p.rep >= 1);
+    TMBAD_ASSERT(p.rep >= 1);
     while (k < p.begin) {
       glob.opstack[k]->increment(ptr);
       k++;
@@ -1101,12 +1101,7 @@ Replay &global::replay::deriv_dep(Index i) { return derivs[orig.dep_index[i]]; }
 
 global::replay::replay(const global &orig, global &target)
     : orig(orig), target(target) {
-  if (!(&orig != &target)) {
-    Rcerr << "ASSERTION FAILED: "
-          << "&orig != &target"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(&orig != &target);
 }
 
 void global::replay::start() {
@@ -1117,12 +1112,7 @@ void global::replay::start() {
 
 void global::replay::stop() {
   if (&target != parent_glob) target.ad_stop();
-  if (!(parent_glob == get_glob())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "parent_glob == get_glob()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(parent_glob == get_glob());
 }
 
 void global::replay::clear_deriv() {
@@ -1132,24 +1122,14 @@ void global::replay::clear_deriv() {
 
 void global::replay::forward(bool inv_tags, bool dep_tags, Position start,
                              const std::vector<bool> &node_filter) {
-  if (!(&target == get_glob())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "&target == get_glob()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(&target == get_glob());
   if (inv_tags) {
     for (size_t i = 0; i < orig.inv_index.size(); i++)
       value_inv(i).Independent();
   }
   ForwardArgs<Replay> args(orig.inputs, values);
   if (node_filter.size() > 0) {
-    if (!(node_filter.size() == orig.opstack.size())) {
-      Rcerr << "ASSERTION FAILED: "
-            << "node_filter.size() == orig.opstack.size()"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(node_filter.size() == orig.opstack.size());
     orig.forward_loop(args, start.node, node_filter);
   } else {
     orig.forward_loop(args, start.node);
@@ -1161,24 +1141,14 @@ void global::replay::forward(bool inv_tags, bool dep_tags, Position start,
 
 void global::replay::reverse(bool dep_tags, bool inv_tags, Position start,
                              const std::vector<bool> &node_filter) {
-  if (!(&target == get_glob())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "&target == get_glob()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(&target == get_glob());
   if (inv_tags) {
     for (size_t i = 0; i < orig.dep_index.size(); i++)
       deriv_dep(i).Independent();
   }
   ReverseArgs<Replay> args(orig.inputs, values, derivs);
   if (node_filter.size() > 0) {
-    if (!(node_filter.size() == orig.opstack.size())) {
-      Rcerr << "ASSERTION FAILED: "
-            << "node_filter.size() == orig.opstack.size()"
-            << "\n";
-      abort();
-    };
+    TMBAD_ASSERT(node_filter.size() == orig.opstack.size());
     orig.reverse_loop(args, start.node, node_filter);
   } else {
     orig.reverse_loop(args, start.node);
@@ -1213,12 +1183,7 @@ void global::forward_replay(bool inv_tags, bool dep_tags) {
 
 void global::subgraph_cache_ptr() const {
   if (subgraph_ptr.size() == opstack.size()) return;
-  if (!(subgraph_ptr.size() < opstack.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "subgraph_ptr.size() < opstack.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(subgraph_ptr.size() < opstack.size());
   if (subgraph_ptr.size() == 0) subgraph_ptr.push_back(IndexPair(0, 0));
   for (size_t i = subgraph_ptr.size(); i < opstack.size(); i++) {
     IndexPair ptr = subgraph_ptr[i - 1];
@@ -1240,22 +1205,12 @@ void global::set_subgraph(const std::vector<bool> &marks, bool append) {
 }
 
 void global::mark_subgraph(std::vector<bool> &marks) {
-  if (!(marks.size() == values.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "marks.size() == values.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(marks.size() == values.size());
   clear_array_subgraph(marks, true);
 }
 
 void global::unmark_subgraph(std::vector<bool> &marks) {
-  if (!(marks.size() == values.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "marks.size() == values.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(marks.size() == values.size());
   clear_array_subgraph(marks, false);
 }
 
@@ -1269,12 +1224,7 @@ void global::clear_deriv_sub() { clear_array_subgraph(derivs); }
 
 global global::extract_sub(std::vector<Index> &var_remap, global new_glob) {
   subgraph_cache_ptr();
-  if (!(var_remap.size() == 0 || var_remap.size() == values.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "var_remap.size() == 0 || var_remap.size() == values.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(var_remap.size() == 0 || var_remap.size() == values.size());
   var_remap.resize(values.size(), 0);
   std::vector<bool> independent_variable = inv_marks();
   std::vector<bool> dependent_variable = dep_marks();
@@ -1325,12 +1275,7 @@ global global::extract_sub(std::vector<Index> &var_remap, global new_glob) {
 }
 
 void global::extract_sub_inplace(std::vector<bool> marks) {
-  if (!(marks.size() == values.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "marks.size() == values.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(marks.size() == values.size());
   std::vector<Index> var_remap(values.size(), 0);
   std::vector<bool> independent_variable = inv_marks();
   std::vector<bool> dependent_variable = dep_marks();
@@ -1528,12 +1473,7 @@ void global::append_edges::end_iteration() {
 }
 
 graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
-  if (!(keep_var.size() == values.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "keep_var.size() == values.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(keep_var.size() == values.size());
 
   std::vector<Index> var2op = this->var2op();
 
@@ -1569,12 +1509,7 @@ graph global::forward_graph(std::vector<bool> keep_var) {
   if (keep_var.size() == 0) {
     keep_var.resize(values.size(), true);
   }
-  if (!(values.size() == keep_var.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "values.size() == keep_var.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(values.size() == keep_var.size());
   return build_graph(false, keep_var);
 }
 
@@ -1582,12 +1517,7 @@ graph global::reverse_graph(std::vector<bool> keep_var) {
   if (keep_var.size() == 0) {
     keep_var.resize(values.size(), true);
   }
-  if (!(values.size() == keep_var.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "values.size() == keep_var.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(values.size() == keep_var.size());
   return build_graph(true, keep_var);
 }
 
@@ -1678,12 +1608,7 @@ std::vector<hash_t> global::hash_sweep(hash_config cfg) const {
   if (cfg.strong_inv) {
     bool have_inv_seed = (cfg.inv_seed.size() > 0);
     if (have_inv_seed) {
-      if (!(cfg.inv_seed.size() == inv_index.size())) {
-        Rcerr << "ASSERTION FAILED: "
-              << "cfg.inv_seed.size() == inv_index.size()"
-              << "\n";
-        abort();
-      };
+      TMBAD_ASSERT(cfg.inv_seed.size() == inv_index.size());
     }
     for (size_t i = 0; i < inv_index.size(); i++) {
       hash_vec[inv_index[i]] += (have_inv_seed ? cfg.inv_seed[i] + 1 : (i + 1));
@@ -1920,14 +1845,7 @@ bool global::ad_plain::initialized() const { return index != NA; }
 
 bool global::ad_plain::ontape() const { return initialized(); }
 
-void global::ad_plain::addToTape() const {
-  if (!(initialized())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "initialized()"
-          << "\n";
-    abort();
-  };
-}
+void global::ad_plain::addToTape() const { TMBAD_ASSERT(initialized()); }
 
 global *global::ad_plain::glob() const {
   return (ontape() ? get_glob() : NULL);
@@ -2044,36 +1962,15 @@ Scalar global::ad_plain::Value(global *glob) const {
 Scalar &global::ad_plain::Deriv() { return get_glob()->derivs[index]; }
 
 void global::ad_start() {
-  if (!(!in_use)) {
-    Rcerr << "ASSERTION FAILED: "
-          << "!in_use"
-          << "\n";
-    Rcerr << "POSSIBLE REASON: "
-          << "Tape already in use"
-          << "\n";
-    abort();
-  };
-  if (!(parent_glob == NULL)) {
-    Rcerr << "ASSERTION FAILED: "
-          << "parent_glob == NULL"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT2(!in_use, "Tape already in use");
+  TMBAD_ASSERT(parent_glob == NULL);
   parent_glob = global_ptr[OMP_THREAD_NUM];
   global_ptr[OMP_THREAD_NUM] = this;
   in_use = true;
 }
 
 void global::ad_stop() {
-  if (!(in_use)) {
-    Rcerr << "ASSERTION FAILED: "
-          << "in_use"
-          << "\n";
-    Rcerr << "POSSIBLE REASON: "
-          << "Tape not in use"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT2(in_use, "Tape not in use");
   global_ptr[OMP_THREAD_NUM] = parent_glob;
   parent_glob = NULL;
   in_use = false;
@@ -2122,15 +2019,7 @@ global::ad_aug::ad_aug(ad_plain x) : taped_value(x) { data.glob = get_glob(); }
 void global::ad_aug::addToTape() const {
   if (ontape()) {
     if (data.glob != get_glob()) {
-      if (!(in_context_stack(data.glob))) {
-        Rcerr << "ASSERTION FAILED: "
-              << "in_context_stack(data.glob)"
-              << "\n";
-        Rcerr << "POSSIBLE REASON: "
-              << "Variable not initialized?"
-              << "\n";
-        abort();
-      };
+      TMBAD_ASSERT2(in_context_stack(data.glob), "Variable not initialized?");
       global::OperatorPure *pOp =
           get_glob()->getOperator<RefOp>(data.glob, taped_value.index);
       this->taped_value =
@@ -2391,7 +2280,7 @@ ad_aug round(const ad_aug &x) {
     return round(ad_plain(x));
 }
 
-double sign(const double &x) { return (x > 0) - (x < 0); }
+double sign(const double &x) { return (x >= 0) - (x < 0); }
 
 Writer sign(const Writer &x) {
   return "sign"
@@ -2405,6 +2294,38 @@ ad_aug sign(const ad_aug &x) {
     return Scalar(sign(x.Value()));
   else
     return sign(ad_plain(x));
+}
+
+double ge0(const double &x) { return (x >= 0); }
+
+double lt0(const double &x) { return (x < 0); }
+
+Writer ge0(const Writer &x) {
+  return "ge0"
+         "(" +
+         x + ")";
+}
+const char *Ge0Op::op_name() { return "Ge0Op"; }
+ad_plain ge0(const ad_plain &x) { return get_glob()->add_to_stack<Ge0Op>(x); }
+ad_aug ge0(const ad_aug &x) {
+  if (x.constant())
+    return Scalar(ge0(x.Value()));
+  else
+    return ge0(ad_plain(x));
+}
+
+Writer lt0(const Writer &x) {
+  return "lt0"
+         "(" +
+         x + ")";
+}
+const char *Lt0Op::op_name() { return "Lt0Op"; }
+ad_plain lt0(const ad_plain &x) { return get_glob()->add_to_stack<Lt0Op>(x); }
+ad_aug lt0(const ad_aug &x) {
+  if (x.constant())
+    return Scalar(lt0(x.Value()));
+  else
+    return lt0(ad_plain(x));
 }
 
 Writer fabs(const Writer &x) {
@@ -2717,6 +2638,44 @@ ad_aug pow(const ad_aug &x1, const ad_aug &x2) {
 }
 ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2) {
   return ad_adapt(pow(ad_aug(x1), ad_aug(x2)));
+}
+
+Writer max(const Writer &x1, const Writer &x2) {
+  return "max"
+         "(" +
+         x1 + "," + x2 + ")";
+}
+const char *MaxOp::op_name() { return "MaxOp"; }
+ad_plain max(const ad_plain &x1, const ad_plain &x2) {
+  return get_glob()->add_to_stack<MaxOp>(x1, x2);
+}
+ad_aug max(const ad_aug &x1, const ad_aug &x2) {
+  if (x1.constant() && x2.constant())
+    return Scalar(max(x1.Value(), x2.Value()));
+  else
+    return max(ad_plain(x1), ad_plain(x2));
+}
+ad_adapt max(const ad_adapt &x1, const ad_adapt &x2) {
+  return ad_adapt(max(ad_aug(x1), ad_aug(x2)));
+}
+
+Writer min(const Writer &x1, const Writer &x2) {
+  return "min"
+         "(" +
+         x1 + "," + x2 + ")";
+}
+const char *MinOp::op_name() { return "MinOp"; }
+ad_plain min(const ad_plain &x1, const ad_plain &x2) {
+  return get_glob()->add_to_stack<MinOp>(x1, x2);
+}
+ad_aug min(const ad_aug &x1, const ad_aug &x2) {
+  if (x1.constant() && x2.constant())
+    return Scalar(min(x1.Value(), x2.Value()));
+  else
+    return min(ad_plain(x1), ad_plain(x2));
+}
+ad_adapt min(const ad_adapt &x1, const ad_adapt &x2) {
+  return ad_adapt(min(ad_aug(x1), ad_aug(x2)));
 }
 void CondExpEqOp::forward(ForwardArgs<Scalar> &args) {
   if (args.x(0) == args.x(1)) {
@@ -3220,31 +3179,16 @@ void LogSpaceSumStrideOp::dependencies(Args<> &args, Dependencies &dep) const {
 const char *LogSpaceSumStrideOp::op_name() { return "LSStride"; }
 
 void LogSpaceSumStrideOp::forward(ForwardArgs<Writer> &args) {
-  if (!(false)) {
-    Rcerr << "ASSERTION FAILED: "
-          << "false"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(false);
 }
 
 void LogSpaceSumStrideOp::reverse(ReverseArgs<Writer> &args) {
-  if (!(false)) {
-    Rcerr << "ASSERTION FAILED: "
-          << "false"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(false);
 }
 
 ad_plain logspace_sum_stride(const std::vector<ad_plain> &x,
                              const std::vector<Index> &stride, size_t n) {
-  if (!(x.size() == stride.size())) {
-    Rcerr << "ASSERTION FAILED: "
-          << "x.size() == stride.size()"
-          << "\n";
-    abort();
-  };
+  TMBAD_ASSERT(x.size() == stride.size());
   OperatorPure *pOp = get_glob()->getOperator<LogSpaceSumStrideOp>(stride, n);
   return get_glob()->add_to_stack<LogSpaceSumStrideOp>(pOp, x)[0];
 }
@@ -3374,7 +3318,7 @@ std::vector<Index> substitute(global &glob, const std::vector<Index> &seq,
   OperatorPure *invop = glob.getOperator<global::InvOp>();
   for (size_t i = 0; i < seq2.size(); i++) {
     OperatorPure *op = opstack[seq2[i]];
-    if (inv_tags) ASSERT(op != invop);
+    if (inv_tags) TMBAD_ASSERT(op != invop);
     size_t nin = op->input_size();
     size_t nou = op->output_size();
     opstack[seq2[i] - 1] = glob.getOperator<global::NullOp2>(nin, 0);
@@ -3434,7 +3378,7 @@ global accumulation_tree_split(global glob, bool sum_) {
 }
 
 void aggregate(global &glob, int sign) {
-  ASSERT((sign == 1) || (sign == -1));
+  TMBAD_ASSERT((sign == 1) || (sign == -1));
   glob.ad_start();
   std::vector<ad_aug_index> x(glob.dep_index.begin(), glob.dep_index.end());
   ad_aug y = 0;
@@ -3633,7 +3577,7 @@ std::vector<bool>::reference multivariate_index::mask(size_t i) {
 }
 
 void multivariate_index::set_mask(const std::vector<bool> &mask) {
-  ASSERT(mask.size() == mask_.size());
+  TMBAD_ASSERT(mask.size() == mask_.size());
   mask_ = mask;
 }
 
@@ -3673,11 +3617,11 @@ void clique::get_stride(const clique &super, Index ind,
   mv.flip();
   size_t xi_count = mv.count();
   mv.flip();
-  ASSERT(x.size() == xa_count * xi_count);
+  TMBAD_ASSERT(x.size() == xa_count * xi_count);
   for (size_t i = 0; i < xa_count; i++, ++mv) {
     mv.flip();
     for (size_t j = 0; j < xi_count; j++, ++mv) {
-      ASSERT(logsum[j].ontape());
+      TMBAD_ASSERT(logsum[j].ontape());
       x[mv] = logsum[j];
     }
     mv.flip();
@@ -3794,7 +3738,7 @@ void sequential_reduction::reorder_random() {
     subgraph.insert(subgraph.end(), sg.begin(), sg.end());
   }
   std::reverse(subgraph.begin(), subgraph.end());
-  ASSERT(random.size() == subgraph.size());
+  TMBAD_ASSERT(random.size() == subgraph.size());
   random = subgraph;
 }
 
@@ -3895,7 +3839,7 @@ void sequential_reduction::merge(Index i) {
     C.logsum[j] = logspace_sum_stride(x, stride, grid[inv2grid[i]].size());
   }
   size_t v_end = get_glob()->values.size();
-  ASSERT(v_end - v_begin == C.logsum.size());
+  TMBAD_ASSERT(v_end - v_begin == C.logsum.size());
 
   cliques.push_back(C);
 }
@@ -3960,8 +3904,8 @@ ad_aug sequential_reduction::get_result() {
   ad_aug ans = 0;
   std::list<clique>::iterator it;
   for (it = cliques.begin(); it != cliques.end(); ++it) {
-    ASSERT(it->clique_size() == 0);
-    ASSERT(it->logsum.size() == 1);
+    TMBAD_ASSERT(it->clique_size() == 0);
+    TMBAD_ASSERT(it->logsum.size() == 1);
     ans += it->logsum[0];
   }
 
@@ -4275,8 +4219,8 @@ std::vector<Index> remap_identical_sub_expressions(
   }
 
   for (size_t i = 0; i < remap.size(); i++) {
-    ASSERT(remap[i] <= i);
-    ASSERT(remap[remap[i]] == remap[i]);
+    TMBAD_ASSERT(remap[i] <= i);
+    TMBAD_ASSERT(remap[remap[i]] == remap[i]);
   }
 
   if (true) {
@@ -4334,7 +4278,7 @@ std::vector<Position> inv_positions(global &glob) {
 void reorder_graph(global &glob, std::vector<Index> inv_idx) {
   if (!all_allow_remap(glob)) return;
   for (size_t i = 1; i < inv_idx.size(); i++) {
-    ASSERT(inv_idx[i] > inv_idx[i - 1]);
+    TMBAD_ASSERT(inv_idx[i] > inv_idx[i - 1]);
   }
   std::vector<bool> marks(glob.values.size(), false);
   for (size_t i = 0; i < inv_idx.size(); i++)
