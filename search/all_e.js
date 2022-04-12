@@ -15,6 +15,7 @@ var searchData=
   ['node_5fsplit',['node_split',['../structTMBad_1_1autopar.html#aec13820c9cb5062da65438b2e5ee97f3',1,'TMBad::autopar']]],
   ['norm2shasho',['norm2SHASHo',['../group__R__style__distribution.html#gade4395b202724cba14e180062b749f0a',1,'distributions_R.hpp']]],
   ['noutput',['noutput',['../structTMBad_1_1global_1_1Operator.html#a7aa5a9105c7d6ade1404a762159314e6',1,'TMBad::global::Operator']]],
+  ['nthreads',['nthreads',['../structconfig__struct.html#acf2f810404993e7363c2abf4b994ba0f',1,'config_struct']]],
   ['nullop',['NullOp',['../structTMBad_1_1global_1_1NullOp.html',1,'TMBad::global']]],
   ['nullop2',['NullOp2',['../structTMBad_1_1global_1_1NullOp2.html',1,'TMBad::global']]],
   ['num_5fkeys',['num_keys',['../structradix_1_1radix.html#a8ad00d957ce8235baa8ff0d8ea6aa023',1,'radix::radix']]],
