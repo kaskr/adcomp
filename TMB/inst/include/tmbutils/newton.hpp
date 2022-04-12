@@ -166,8 +166,8 @@ struct HessianSolveVector : TMBad::global::DynamicOperator< -1, -1 > {
     }
   }
   template<class T>
-  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  void forward(TMBad::ForwardArgs<T> &args) { TMBAD_ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }
   const char* op_name() { return "JSolve"; }
 };
 
@@ -790,7 +790,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     }
     // The previous operation does not change the domain vector size.
     size_t n_inner = function.Domain();
-    ASSERT(n_inner == (size_t) start.size());
+    TMBAD_ASSERT(n_inner == (size_t) start.size());
     // Turn remaining references to parent contexts into outer
     // parameters. This operation increases function.Domain()
     par_outer = function.resolve_refs();
@@ -813,7 +813,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
 	gradient.DomainReduce(active);
 	std::vector<bool> active_outer(active.begin() + n_inner, active.end());
 	par_outer = TMBad::subset(par_outer, active_outer);
-	ASSERT(n_inner == (size_t) function.inner_inv_index.size());
+	TMBAD_ASSERT(n_inner == (size_t) function.inner_inv_index.size());
 	function.optimize();
       }
     }
@@ -1029,8 +1029,8 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
     args.dx_segment(0, n) += g.tail(n);
   }
   template<class T>
-  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  void forward(TMBad::ForwardArgs<T> &args) { TMBAD_ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }
   const char* op_name() { return "Newton"; }
   void print(TMBad::global::print_config cfg) {
     Rcout << cfg.prefix << "======== function:\n";
@@ -1102,8 +1102,8 @@ struct InvSubOperator : TMBad::global::SharedDynamicOperator {
     Rf_error("Inverse subset: order 2 not yet implemented (try changing config())");
   }
   template<class T>
-  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  void forward(TMBad::ForwardArgs<T> &args) { TMBAD_ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }
   const char* op_name() { return "InvSub"; }
 };
 template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
@@ -1154,8 +1154,8 @@ struct LogDetOperator : TMBad::global::SharedDynamicOperator {
     args.dx_segment(0, n) += ih.valuePtr();
   }
   template<class T>
-  void forward(TMBad::ForwardArgs<T> &args) { ASSERT(false); }
-  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
+  void forward(TMBad::ForwardArgs<T> &args) { TMBAD_ASSERT(false); }
+  void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }
   const char* op_name() { return "logDet"; }
 };
 template<class Type>
@@ -1233,7 +1233,7 @@ template<class Type>
 struct unsafe_cast : TMBad::ad_aug {
   unsafe_cast(TMBad::ad_aug x) : TMBad::ad_aug(x) {}
   operator Type() {
-    ASSERT2(this->constant(),
+    TMBAD_ASSERT2(this->constant(),
             "Invalid cast from ad_aug to double?");
     return this->Value();
   }
@@ -1382,7 +1382,7 @@ struct slice {
         //std::vector<TMBad::ad_aug> x,
         std::vector<TMBad::Index> random) :
     F(F), random(random) {
-    ASSERT2(F.Range() == 1,
+    TMBAD_ASSERT2(F.Range() == 1,
             "Laplace approximation is for scalar valued functions");
   }
   typedef TMBad::ad_aug T;
