@@ -52,9 +52,9 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
     for (size_t i=0; i<px.size(); i++) _args_.dx(i) += px[i];           \
   }                                                                     \
   void forward                                                          \
-  (TMBad::ForwardArgs<TMBad::Writer> &args) { ASSERT(false); }          \
+  (TMBad::ForwardArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }    \
   void reverse                                                          \
-  (TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }          \
+  (TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }    \
 };                                                                      \
 template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug>                                            \
@@ -153,9 +153,9 @@ struct ATOMIC_NAME ## Op : TMBad::global::Operator<INPUT_SIZE, 1> {     \
   }                                                                     \
   template<class Type>                                                  \
   void forward                                                          \
-  (TMBad::ForwardArgs<Type> &args) { ASSERT(false); }                   \
+  (TMBad::ForwardArgs<Type> &args) { TMBAD_ASSERT(false); }             \
   void reverse                                                          \
-  (TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }          \
+  (TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }    \
 };                                                                      \
 template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug> ATOMIC_NAME                                \
