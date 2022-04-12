@@ -1615,6 +1615,13 @@ SEXP TransformADFunObject(SEXP f, SEXP control)
       }
       adfun* pf = (ppf->vecpf)[0]; // One tape - get it
       std::vector<adfun> vf = pf->parallel_accumulate(num_threads);
+      if (config.trace.parallel) {
+        Rcout << "Autopar work split\n";
+        for (size_t i=0; i < vf.size(); i++) {
+          Rcout << "Chunk " << i << ": ";
+          Rcout << (double) vf[i].glob.opstack.size() / pf->glob.opstack.size() << "\n";
+        }
+      }
       parallelADFun<double>* new_ppf = new parallelADFun<double>(vf);
       delete ppf;
       R_SetExternalPtrAddr(f, new_ppf);
