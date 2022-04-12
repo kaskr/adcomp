@@ -12,8 +12,7 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
   1000), MCcontrol = list(doMC = FALSE, seed = 123, n = 100),
   ADreport = FALSE, atomic = TRUE, LaplaceNonZeroGradient = FALSE,
   DLL = getUserDLL(), checkParameterOrder = TRUE, regexp = FALSE,
-  silent = FALSE, intern = FALSE, integrate = NULL,
-  autopar = isParallelDLL(DLL), ...)
+  silent = FALSE, intern = FALSE, integrate = NULL, ...)
 }
 \arguments{
 \item{data}{List of data objects (vectors, matrices, arrays, factors, sparse matrices) required by the user template (order does not matter and un-used components are allowed).}
@@ -57,8 +56,6 @@ MakeADFun(data, parameters, map = list(), type = c("ADFun", "Fun",
 \item{intern}{Do Laplace approximation on C++ side ? See details (Experimental - may change without notice)}
 
 \item{integrate}{Specify alternative integration method(s) for random effects (see details)}
-
-\item{autopar}{Enable automatic parallization? (Experimental)}
 
 \item{...}{Currently unused.}
 }

@@ -2,16 +2,32 @@
 % Please edit documentation in R/TMB.R
 \name{openmp}
 \alias{openmp}
-\title{Control number of openmp threads.}
+\title{Control number of OpenMP threads used by a TMB model.}
 \usage{
-openmp(n = NULL)
+openmp(n = NULL, max = FALSE, autopar = NULL, DLL = getUserDLL())
 }
 \arguments{
 \item{n}{Requested number of threads, or \code{NULL} to just read the current value.}
+
+\item{max}{Logical; Set n to OpenMP runtime value 'omp_get_max_threads()' ?}
+
+\item{autopar}{Logical; use automatic parallelization - see details.}
+
+\item{DLL}{DLL of a TMB model.}
 }
 \value{
 Number of threads.
 }
 \description{
-Control number of openmp threads.
+Control number of OpenMP threads used by a TMB model.
+}
+\details{
+This function controls the number of parallel threads used by a TMB model compiled with OpenMP.
+The number of threads is part of the configuration list \code{config()} of the DLL.
+The value only affects parallization of the DLL. It does \emph{not} affect BLAS/LAPACK specific parallization which has to be specified elsewhere.
+
+When a DLL is loaded, the number of threads is set to 1 by default.
+To activate parallelization you have to explicitly call \code{openmp(nthreads)} after loading the DLL. Calling \code{openmp(max=TRUE)} should normally pick up the environment variable \code{OMP_NUM_THREADS}, but this may be platform dependent.
+
+An experimental option \code{autopar=TRUE} can be set to parallelize models automatically. This requires the model to be compiled with \code{framework="TMBad"} and \code{openmp=TRUE} without further requirements on the C++ code. If the C++ code already has explicit parallel constructs these will be ignored if automatic parallelization is enabled.
 }

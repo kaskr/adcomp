@@ -4,7 +4,8 @@
 \alias{precompile}
 \title{Precompile the TMB library in order to speed up compilation of templates.}
 \usage{
-precompile(all = TRUE, clean = FALSE, trace = TRUE, ...)
+precompile(all = TRUE, clean = FALSE, trace = TRUE, get.header = FALSE,
+  ...)
 }
 \arguments{
 \item{all}{Precompile all or just the core parts of TMB ?}
@@ -12,6 +13,8 @@ precompile(all = TRUE, clean = FALSE, trace = TRUE, ...)
 \item{clean}{Remove precompiled libraries ?}
 
 \item{trace}{Trace precompilation process ?}
+
+\item{get.header}{Create files 'TMB.h' and 'TMB.cpp' in current working directory to be used as part of a project?}
 
 \item{...}{Not used.}
 }
