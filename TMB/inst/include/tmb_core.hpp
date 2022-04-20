@@ -421,6 +421,8 @@ struct data_indicator : VT{
   VT cdf_lower;
   /** \brief **Logarithm** of upper CDF */
   VT cdf_upper;
+  /** \brief Subset argument (zero-based) passed from oneStepPredict. See `data_indicator::order()`. */
+  vector<int> ord;
   /** \brief Default CTOR */
   data_indicator() { }
   /** \brief Construct from observation vector
@@ -434,11 +436,14 @@ struct data_indicator : VT{
     cdf_upper = obs; cdf_upper.setZero();
   }
   /** \brief Fill with parameter vector */
-  void fill(vector<Type> p){
+  void fill(vector<Type> p, SEXP ord_){
     int n = (*this).size();
     if(p.size() >= n  ) VT::operator=(p.segment(0, n));
     if(p.size() >= 2*n) cdf_lower = p.segment(n, n);
     if(p.size() >= 3*n) cdf_upper = p.segment(2 * n, n);
+    if(!Rf_isNull(ord_)) {
+      this->ord = asVector<int>(ord_);
+    }
   }
   /** \brief Extract segment of indicator vector or array
       \note For this method the segment **is** applied to `cdf_lower` and `cdf_upper`. */
@@ -460,7 +465,10 @@ data_indicator<tmbutils::array<Type>, Type > name(obs, true);           \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
-                                           #name) );                    \
+                                           #name),                      \
+             Rf_getAttrib(                                              \
+                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric),    \
+                Rf_install("ord")) );                                   \
 }
 
 /** \brief Declare an indicator vector 'name' of same shape as 'obs'. By default, the indicator vector is filled with ones indicating that all observations are enabled.
@@ -473,7 +481,10 @@ data_indicator<tmbutils::vector<Type>, Type > name(obs, true);          \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
-                                           #name) );                    \
+                                           #name),                      \
+             Rf_getAttrib(                                              \
+                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric),    \
+                Rf_install("ord")) );                                   \
 }
 
 // kasper: Not sure used anywhere
