@@ -415,7 +415,7 @@ struct<Type> name(getListElement(TMB_OBJECTIVE_PTR -> data, #name));
     \tparam VT Can be **vector<Type>** or **array<Type>**
     \warning When extracting subsets of a `data_indicator` note that in general the subset is not applied to `cdf_lower` and `cdf_upper`.
 */
-template<class VT, class Type>
+template<class VT, class Type = typename VT::Scalar>
 struct data_indicator : VT{
   /** \brief **Logarithm** of lower CDF */
   VT cdf_lower;
@@ -494,7 +494,7 @@ struct data_indicator : VT{
     ?oneStepPredict
     \ingroup macros */
 #define DATA_ARRAY_INDICATOR(name, obs)                                 \
-data_indicator<tmbutils::array<Type>, Type > name(obs, true);           \
+data_indicator<tmbutils::array<Type> > name(obs, true);                 \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
@@ -510,7 +510,7 @@ if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
     ?oneStepPredict
     \ingroup macros */
 #define DATA_VECTOR_INDICATOR(name, obs)                                \
-data_indicator<tmbutils::vector<Type>, Type > name(obs, true);          \
+data_indicator<tmbutils::vector<Type> > name(obs, true);                \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
              TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
