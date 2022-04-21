@@ -423,8 +423,10 @@ struct data_indicator : VT{
   VT cdf_upper;
   /** \brief Subset argument (zero-based) passed from oneStepPredict. See `data_indicator::order()`. */
   vector<int> ord;
+  /** \brief Flag to tell if OSA calculation is active. See `data_indicator::osa_active()`. */
+  bool osa_flag;
   /** \brief Default CTOR */
-  data_indicator() { }
+  data_indicator() { osa_flag = false; }
   /** \brief Construct from observation vector
       \param obs Observation vector or array
       \param init_one If true the data_indicator will be filled with ones signifying that all observations should be enabled.
@@ -434,6 +436,7 @@ struct data_indicator : VT{
     if (init_one) VT::fill(Type(1.0));
     cdf_lower = obs; cdf_lower.setZero();
     cdf_upper = obs; cdf_upper.setZero();
+    osa_flag = false;
   }
   /** \brief Fill with parameter vector */
   void fill(vector<Type> p, SEXP ord_){
@@ -443,6 +446,9 @@ struct data_indicator : VT{
     if(p.size() >= 3*n) cdf_upper = p.segment(2 * n, n);
     if(!Rf_isNull(ord_)) {
       this->ord = asVector<int>(ord_);
+    }
+    for (int i=0; i<p.size(); i++) {
+      osa_flag |= CppAD::Variable(p[i]);
     }
   }
   /** \brief Extract segment of indicator vector or array
@@ -454,6 +460,7 @@ struct data_indicator : VT{
     if (ord.size() != 0) {
       ans.ord = ord.segment(pos, n);
     }
+    ans.osa_flag = osa_flag;
     return ans;
   }
   /** \brief Get order in which the one step conditionals will be requested by oneStepPredict */
@@ -477,6 +484,8 @@ struct data_indicator : VT{
     }
     return ans;
   }
+  /** \brief Are we inside a oneStepPredict calculation? */
+  bool osa_active() { return osa_flag; }
 };
 
 /** \brief Declare an indicator array 'name' of same shape as 'obs'. By default, the indicator array is filled with ones indicating that all observations are enabled.
