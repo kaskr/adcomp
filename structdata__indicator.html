@@ -88,10 +88,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1ae65647bfa39c414e677ad57bca6f0d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a1ae65647bfa39c414e677ad57bca6f0d">data_indicator</a> (VT obs, bool init_one=false)</td></tr>
 <tr class="memdesc:a1ae65647bfa39c414e677ad57bca6f0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from observation vector.  <a href="#a1ae65647bfa39c414e677ad57bca6f0d">More...</a><br /></td></tr>
 <tr class="separator:a1ae65647bfa39c414e677ad57bca6f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabea3718c778b6469ba72eac7811e565"><td class="memItemLeft" align="right" valign="top"><a id="aabea3718c778b6469ba72eac7811e565"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#aabea3718c778b6469ba72eac7811e565">fill</a> (<a class="el" href="structvector.html">vector</a>&lt; Type &gt; p)</td></tr>
-<tr class="memdesc:aabea3718c778b6469ba72eac7811e565"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill with parameter vector. <br /></td></tr>
-<tr class="separator:aabea3718c778b6469ba72eac7811e565"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58dba081c3cf4870fa92cfde3a373357"><td class="memItemLeft" align="right" valign="top"><a id="a58dba081c3cf4870fa92cfde3a373357"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a58dba081c3cf4870fa92cfde3a373357">fill</a> (<a class="el" href="structvector.html">vector</a>&lt; Type &gt; p, SEXP ord_)</td></tr>
+<tr class="memdesc:a58dba081c3cf4870fa92cfde3a373357"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill with parameter vector. <br /></td></tr>
+<tr class="separator:a58dba081c3cf4870fa92cfde3a373357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34c1c066185770defb71e8c32f89c8d9"><td class="memItemLeft" align="right" valign="top"><a id="a34c1c066185770defb71e8c32f89c8d9"></a>
+<a class="el" href="structvector.html">vector</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a34c1c066185770defb71e8c32f89c8d9">order</a> ()</td></tr>
+<tr class="memdesc:a34c1c066185770defb71e8c32f89c8d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get order in which the one step conditionals will be requested by oneStepPredict. <br /></td></tr>
+<tr class="separator:a34c1c066185770defb71e8c32f89c8d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6b04a9e1f157e8e4732cea7767e2208"><td class="memItemLeft" align="right" valign="top"><a id="aa6b04a9e1f157e8e4732cea7767e2208"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#aa6b04a9e1f157e8e4732cea7767e2208">osa_active</a> ()</td></tr>
+<tr class="memdesc:aa6b04a9e1f157e8e4732cea7767e2208"><td class="mdescLeft">&#160;</td><td class="mdescRight">Are we inside a oneStepPredict calculation? <br /></td></tr>
+<tr class="separator:aa6b04a9e1f157e8e4732cea7767e2208"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf31037a7d7e5b5c3427edb5472fa8ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdata__indicator.html">data_indicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#adf31037a7d7e5b5c3427edb5472fa8ad">segment</a> (int pos, int n)</td></tr>
 <tr class="memdesc:adf31037a7d7e5b5c3427edb5472fa8ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract segment of indicator vector or array.  <a href="#adf31037a7d7e5b5c3427edb5472fa8ad">More...</a><br /></td></tr>
 <tr class="separator:adf31037a7d7e5b5c3427edb5472fa8ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -106,9 +114,17 @@ VT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct
 VT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a4197613b975dbb510a79dd0aae34361b">cdf_upper</a></td></tr>
 <tr class="memdesc:a4197613b975dbb510a79dd0aae34361b"><td class="mdescLeft">&#160;</td><td class="mdescRight"><b>Logarithm</b> of upper CDF <br /></td></tr>
 <tr class="separator:a4197613b975dbb510a79dd0aae34361b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1560e55dc66f52a3af61032b563343f4"><td class="memItemLeft" align="right" valign="top"><a id="a1560e55dc66f52a3af61032b563343f4"></a>
+<a class="el" href="structvector.html">vector</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#a1560e55dc66f52a3af61032b563343f4">ord</a></td></tr>
+<tr class="memdesc:a1560e55dc66f52a3af61032b563343f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subset argument (zero-based) passed from oneStepPredict. See <code><a class="el" href="structdata__indicator.html#a34c1c066185770defb71e8c32f89c8d9" title="Get order in which the one step conditionals will be requested by oneStepPredict. ...">data_indicator::order()</a></code>. <br /></td></tr>
+<tr class="separator:a1560e55dc66f52a3af61032b563343f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8b36ad890613456cd8c75c4945d2ca6"><td class="memItemLeft" align="right" valign="top"><a id="af8b36ad890613456cd8c75c4945d2ca6"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdata__indicator.html#af8b36ad890613456cd8c75c4945d2ca6">osa_flag</a></td></tr>
+<tr class="memdesc:af8b36ad890613456cd8c75c4945d2ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag to tell if OSA calculation is active. See <code><a class="el" href="structdata__indicator.html#aa6b04a9e1f157e8e4732cea7767e2208" title="Are we inside a oneStepPredict calculation? ">data_indicator::osa_active()</a></code>. <br /></td></tr>
+<tr class="separator:af8b36ad890613456cd8c75c4945d2ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class VT, class Type&gt;<br />
+<div class="textblock"><h3>template&lt;class VT, class Type = typename VT::Scalar&gt;<br />
 struct data_indicator&lt; VT, Type &gt;</h3>
 
 <p>Utilities for OSA residuals. </p>
@@ -128,7 +144,7 @@ struct data_indicator&lt; VT, Type &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class VT, class Type&gt; </div>
+template&lt;class VT, class Type = typename VT::Scalar&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -167,7 +183,7 @@ template&lt;class VT, class Type&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00430">430</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00434">434</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
@@ -178,7 +194,7 @@ template&lt;class VT, class Type&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;class VT, class Type&gt; </div>
+template&lt;class VT, class Type = typename VT::Scalar&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -211,7 +227,7 @@ template&lt;class VT, class Type&gt; </div>
 <p>Extract segment of indicator vector or array. </p>
 <dl class="section note"><dt>Note</dt><dd>For this method the segment <b>is</b> applied to <code>cdf_lower</code> and <code>cdf_upper</code>. </dd></dl>
 
-<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00445">445</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+<p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00456">456</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
 </div>
 </div>
