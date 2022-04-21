@@ -225,6 +225,15 @@ oneStepPredict <- function(obj,
         } else {
             args$parameters[[data.term.indicator]] <- cbind(one)
         }
+        ## Set attribute to tell the order of observations
+        ord <- rep(NA, length(obs))
+        ord[conditional] <- 0 ## First (out of bounds)
+        ord[subset] <- seq_along(subset)
+        ord[unconditional] <- length(obs) + 1 ## Never (out of bounds)
+        if (any(is.na(ord))) {
+            stop("Failed to determine the order of obervations")
+        }
+        attr(args$parameters[[data.term.indicator]], "ord") <- as.double(ord - 1)
     }
     ## Pretend these are *not observed*:
     if(length(unconditional)>0){
