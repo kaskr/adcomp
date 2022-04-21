@@ -451,6 +451,30 @@ struct data_indicator : VT{
     data_indicator ans ( VT::segment(pos, n) );
     ans.cdf_lower = cdf_lower.segment(pos, n);
     ans.cdf_upper = cdf_upper.segment(pos, n);
+    if (ord.size() != 0) {
+      ans.ord = ord.segment(pos, n);
+    }
+    return ans;
+  }
+  /** \brief Get order in which the one step conditionals will be requested by oneStepPredict */
+  vector<int> order() {
+    int n = this->size();
+    vector<int> ans(n);
+    if (ord.size() == 0) {
+      for (int i=0; i<n; i++)
+        ans(i) = i;
+    } else {
+      if (ord.size() != n) Rf_error("Unexpected 'ord.size() != n'");
+      std::vector<std::pair<int, int> > y(n);
+      for (int i=0; i<n; i++) {
+        y[i].first = ord[i];
+        y[i].second = i;
+      }
+      std::sort(y.begin(), y.end()); // sort inplace
+      for (int i=0; i<n; i++) {
+        ans[i] = y[i].second;
+      }
+    }
     return ans;
   }
 };
