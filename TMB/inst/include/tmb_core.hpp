@@ -730,6 +730,10 @@ public:
     current_parallel_region=-1;
     selected_parallel_region=-1;
     max_parallel_regions=-1;
+#ifdef _OPENMP
+    if (config.nthreads > 1)
+      max_parallel_regions = config.nthreads;
+#endif
     reversefill=false;
     do_simulate = false;
     GetRNGstate(); /* Read random seed from R. Note: by default we do
