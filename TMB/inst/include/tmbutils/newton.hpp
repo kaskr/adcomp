@@ -1447,10 +1447,17 @@ struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
   }
   Type Laplace() {
     double sign = (Base::cfg.SPA ? -1 : 1);
+    hessian_t H = hessian();
+    Type logdetH = log_determinant(H, Base::hessian);
+    if (true) {
+      vector<Type> Hdiag = H.diagonal().array();
+      TMBad::addInfo(solution(), std::string("newton_solution"));
+      TMBad::addInfo(Hdiag, std::string("hessian_diagonal"));
+      TMBad::addInfo(std::vector<Type>(1,logdetH), std::string("hessian_log_determinant"));
+    }
     return
       sign * value() +
-      .5 * log_determinant( hessian(),
-                            Base::hessian) -
+      .5 * logdetH -
       sign * .5 * log(2. * M_PI) * n;
   }
 };
