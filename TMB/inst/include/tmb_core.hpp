@@ -1560,7 +1560,20 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
       random[i] -= 1 ; // R index -> C index
   }
   TMB_TRY {
-    if (method == "remove_random_parameters") {
+    if (method == "changeDomain" || method == "changeRange") {
+      pf->glob.subgraph_cache_ptr();
+      SEXP node_ = getListElement(control, "node");
+      TMBad::Index node = REAL(node_)[0];
+      TMBad::Index begin = pf->glob.subgraph_ptr[node].first;
+      TMBad::Index end   = begin + pf->glob.opstack[node]->input_size();
+      TMBad::Index* data = pf->glob.inputs.data();
+      std::vector<TMBad::Index> vars(data + begin, data + end);
+      if (method == "changeDomain")
+        pf->glob.inv_index = vars;
+      else
+        pf->glob.dep_index = vars;
+    }
+    else if (method == "remove_random_parameters") {
       std::vector<bool> mask(pf->Domain(), true);
       for (size_t i = 0; i<random.size(); i++)
         mask[random[i]] = false;
