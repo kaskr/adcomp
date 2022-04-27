@@ -1753,8 +1753,8 @@ SEXP TransformADFunObject(SEXP f, SEXP control)
       pf = ( (parallelADFun<double>*) R_ExternalPtrAddr(f) ) -> vecpf[0];
     }
     SEXP ans, names;
-    PROTECT(ans = Rf_allocVector(VECSXP, 6));
-    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    PROTECT(ans = Rf_allocVector(VECSXP, 7));
+    PROTECT(names = Rf_allocVector(STRSXP, 7));
     int i = 0;
 #define GET_INFO(EXPR)                          \
     SET_VECTOR_ELT(ans, i, asSEXP(EXPR));       \
@@ -1775,10 +1775,20 @@ SEXP TransformADFunObject(SEXP f, SEXP control)
     GET_INFO(Domain);
     int Range = pf->Range();
     GET_INFO(Range);
+    std::vector<TMBad::Index> nodes = find_op_by_name(pf->glob, "InfoOp");
+    std::vector<double> InfoNodes(nodes.begin(), nodes.end());
+    GET_INFO(InfoNodes);
+    SEXP nam;
+    PROTECT( nam = Rf_allocVector(STRSXP, nodes.size()) );
+    for(size_t k = 0; k < nodes.size(); k++) {
+      std::string* ptr = (std::string*) pf->glob.opstack[nodes[k]]->operator_data();
+      SET_STRING_ELT(nam, k, Rf_mkChar( ptr->c_str() ));
+    }
+    Rf_setAttrib(VECTOR_ELT(ans,i-1), R_NamesSymbol, nam);
     // end
 #undef GET_INFO
     Rf_setAttrib(ans,R_NamesSymbol,names);
-    UNPROTECT(2);
+    UNPROTECT(3);
     return ans;
   }
 #endif
