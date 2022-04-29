@@ -1451,14 +1451,15 @@ struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
   Type Laplace() {
     double sign = (Base::cfg.SPA ? -1 : 1);
     hessian_t H = hessian();
-    if (cfg.info_tags) {
+    if (Base::cfg.info_tags) {
       // Add placeholder for hessian diagonal *before* calculating log determinant
       vector<Type> Hdiag = H.diagonal().array();
       for (int i=0; i<Hdiag.size(); i++) Hdiag[i] = Hdiag[i].copy();
       H.diagonal() = Hdiag;
     }
     Type logdetH = log_determinant(H, Base::hessian);
-    if (cfg.info_tags) {
+    if (Base::cfg.info_tags) {
+      vector<Type> Hdiag = H.diagonal().array();
       TMBad::addInfo(solution(),
                      std::string("newton_solution"));
       TMBad::addInfo(Hdiag,
@@ -1614,8 +1615,20 @@ struct slice {
     x = std::vector<T> (xd.begin(), xd.end());
     ans.glob.ad_start();
     TMBad::Independent(x);
+    if (cfg.info_tags) {
+      std::vector<bool> not_random(x.size(), true);
+      for (size_t i=0; i<random.size(); i++) {
+        not_random[random[i]] = false;
+      }
+      TMBad::addInfo(subset(x, not_random),
+                     std::string("parameters"));
+    }
     vector<T> start = TMBad::subset(x, random);
     T y = Laplace(*this, start, cfg);
+    if (cfg.info_tags) {
+      TMBad::addInfo(std::vector<T>(1,y),
+                     std::string("laplace_approximation"));
+    }
     y.Dependent();
     ans.glob.ad_stop();
     return ans;
