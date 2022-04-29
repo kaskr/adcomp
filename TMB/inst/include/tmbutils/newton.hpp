@@ -821,6 +821,8 @@ struct newton_config {
       For this to work the inner objective function must return the
       negative log **MGF** rather than **density** */
   bool SPA;
+  /** \brief Add info tags? (Internal use only) */
+  bool info_tags;
   void set_defaults(SEXP x = R_NilValue) {
 #define SET_DEFAULT(name, value) set_from_real(x, name, #name, value)
     SET_DEFAULT(maxit, 1000);
@@ -844,6 +846,7 @@ struct newton_config {
     SET_DEFAULT(signif_abs_reduction, 1e-6);
     SET_DEFAULT(signif_rel_reduction, .5);
     SET_DEFAULT(SPA, false);
+    SET_DEFAULT(info_tags, false);
 #undef SET_DEFAULT
   }
   newton_config() {
@@ -1448,12 +1451,20 @@ struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
   Type Laplace() {
     double sign = (Base::cfg.SPA ? -1 : 1);
     hessian_t H = hessian();
-    Type logdetH = log_determinant(H, Base::hessian);
-    if (true) {
+    if (cfg.info_tags) {
+      // Add placeholder for hessian diagonal *before* calculating log determinant
       vector<Type> Hdiag = H.diagonal().array();
-      TMBad::addInfo(solution(), std::string("newton_solution"));
-      TMBad::addInfo(Hdiag, std::string("hessian_diagonal"));
-      TMBad::addInfo(std::vector<Type>(1,logdetH), std::string("hessian_log_determinant"));
+      for (int i=0; i<Hdiag.size(); i++) Hdiag[i] = Hdiag[i].copy();
+      H.diagonal() = Hdiag;
+    }
+    Type logdetH = log_determinant(H, Base::hessian);
+    if (cfg.info_tags) {
+      TMBad::addInfo(solution(),
+                     std::string("newton_solution"));
+      TMBad::addInfo(Hdiag,
+                     std::string("hessian_diagonal"));
+      TMBad::addInfo(std::vector<Type>(1,logdetH),
+                     std::string("hessian_log_determinant"));
     }
     return
       sign * value() +
