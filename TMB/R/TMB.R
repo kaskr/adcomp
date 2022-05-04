@@ -568,6 +568,7 @@ MakeADFun <- function(data, parameters, map=list(),
       if (intern) {
           cfg <- inner.control
           if (is.null(cfg$sparse)) cfg$sparse <- TRUE
+          if (is.null(cfg$info_tags)) cfg$info_tags <- TRUE
           cfg <- lapply(cfg, as.double)
           TransformADFunObject(ADFun,
                                method = "laplace",
