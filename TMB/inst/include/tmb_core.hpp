@@ -1532,11 +1532,6 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
   // FIXME: Must require non parallel object !!!
   std::string method =
     CHAR(STRING_ELT(getListElement(control, "method"), 0));
-  // Test adfun copy
-  if (method == "copy") {
-    *pf = adfun(*pf);
-    return R_NilValue;
-  }
   if (method == "set_compiled") {
     int i = 0;
 #ifdef _OPENMP
@@ -1560,7 +1555,15 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
       random[i] -= 1 ; // R index -> C index
   }
   TMB_TRY {
-    if (method == "changeDomain" || method == "changeRange") {
+    if (method == "copy") {
+      adfun* cpf = new adfun(*pf);
+      SEXP res, ans;
+      PROTECT(res = R_MakeExternalPtr((void*) cpf, Rf_install("ADFun"), R_NilValue));
+      PROTECT(ans = ptrList(res));
+      UNPROTECT(2);
+      return ans;
+    }
+    else if (method == "changeDomain" || method == "changeRange") {
       pf->glob.subgraph_cache_ptr();
       SEXP node_ = getListElement(control, "node");
       TMBad::Index node = REAL(node_)[0];
@@ -1691,7 +1694,7 @@ SEXP TransformADFunObject(SEXP f, SEXP control)
   typedef TMBad::ADFun<ad> adfun;
   if(tag == Rf_install("ADFun")) {
     adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-    TransformADFunObjectTemplate(pf, control);
+    return TransformADFunObjectTemplate(pf, control);
   } else if (tag == Rf_install("parallelADFun")) {
     // Warning: Most no meaningful for parallel models!:
     // OK      : reorder_random etc
@@ -1701,6 +1704,9 @@ SEXP TransformADFunObject(SEXP f, SEXP control)
     // 'Parallel accumulate'
     std::string method =
       CHAR(STRING_ELT(getListElement(control, "method"), 0));
+    if (method == "copy") {
+      Rf_error("'copy' not yet available for parallel tapes");
+    }
     if (method == "parallel_accumulate") {
       int num_threads = getListInteger(control, "num_threads", 2);
       if (num_threads == 1) {
