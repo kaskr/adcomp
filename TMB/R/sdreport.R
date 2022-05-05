@@ -124,6 +124,18 @@
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=NULL), ignore.parm.uncertainty = FALSE,
                      getReportCovariance=TRUE, skip.delta.method=FALSE){
+  ## Handle 'intern' integration LA/GK/SR
+  intern <- obj$env$intern || length(obj$env$integrate)
+  if (intern) {
+      if ( !is.null(obj$env$random) )
+          stop("Currently 'intern' sdreport only works when *all* random effects are intern")
+      ## last.par.best is 'short'
+      if(is.null(par.fixed))
+          par.fixed <- obj$env$last.par.best
+      ## AD Hessian is available (but don't use it by default)
+      ## if(is.null(hessian.fixed))
+      ##     hessian.fixed <- obj$he(par.fixed)
+  }
   if(is.null(obj$env$ADGrad) & (!is.null(obj$env$random)))
     stop("Cannot calculate sd's without type ADGrad available in object for random effect models.")
   ## Make object to calculate ADREPORT vector
@@ -381,15 +393,91 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
       warning("Could not report sd's of full randomeffect vector.")
     }
   }
+  ## Finally handle 'intern' case
+  if (intern) {
+      ## Random effects
+      tmp <- sdreport_intern(obj,
+                             par.fixed,
+                             hessian.fixed,
+                             Vtheta)
+      ans[names(tmp)] <- tmp
+      ## Something to report
+      ## if (length(obj2$env$ADreportDims) > 0) {
+      ## }
+      ## FIXME: Not accounting for mapped parameters
+      r <- which(rep( names(obj$env$parameters),
+                     sapply(obj$env$parameters, length) ) %in% obj$env$.random)
+  }
   ## Copy a few selected members of the environment 'env'. In
   ## particular we need the 'skeleton' objects that allow us to put
   ## results back in same shape as original parameter list.
   ans$env <- new.env(parent = emptyenv())
   ans$env$parameters <- obj$env$parameters
-  ans$env$random <- obj$env$random
+  ans$env$random <- r
   ans$env$ADreportDims <- obj2$env$ADreportDims
   class(ans) <- "sdreport"
   ans
+}
+
+## Helper: sdreport that works for intern Laplace approx
+sdreport_intern <- function(obj,
+                            par.fixed=NULL,
+                            hessian.fixed=NULL,
+                            Vtheta=NULL,
+                            ...
+                            ) {
+    ans <- list()
+    if(is.null(par.fixed))
+        par.fixed <- obj$env$last.par.best
+    if(is.null(hessian.fixed))
+        hessian.fixed <- obj$he(par.fixed)
+    if(is.null(Vtheta)) {
+        Vtheta <- try(solve(hessian.fixed), silent=TRUE)
+        if(is(Vtheta, "try-error")) Vtheta <- hessian.fixed * NaN
+    }
+    ## Copy ADFun and store original
+    ADFun.orig <- obj$env$ADFun
+    on.exit({obj$env$ADFun <- ADFun.orig})
+    obj$env$ADFun <- TransformADFunObject(obj$env$ADFun, "copy")
+    ## Get info_tags
+    tag <- info(obj$env$ADFun)$InfoNodes
+    ## Short hand
+    changeMapping <- function(from, to) {
+        stopifnot(from %in% names(tag))
+        stopifnot(to %in% names(tag))
+        TransformADFunObject(obj$env$ADFun, "changeDomain", node=tag[from])
+        TransformADFunObject(obj$env$ADFun, "changeRange",  node=tag[to])
+        NULL
+    }
+    ## Get random effect mode
+    changeMapping(from = "parameters", to = "newton_solution")
+    par.random <- obj$fn(par.fixed)
+    ## Get hessian diagonal
+    changeMapping(from = "parameters", to = "hessian_diagonal")
+    hd <- obj$fn(par.fixed)
+    ## Get d(logdet(H)) / d(diag(H)) = diag(H^-1)
+    changeMapping(from = "hessian_diagonal", to = "hessian_log_determinant")
+    diag.term1 = obj$gr(hd)
+    ## diag.term2 requires the 'adjoint trick' because n_fixed is much smaller than n_random
+    changeMapping(from = "parameters", to = "newton_solution")
+    ## Optional optimization
+    TransformADFunObject(obj$env$ADFun, "inactivate", nodes=tag)
+    TransformADFunObject(obj$env$ADFun, "eliminate")
+    ## Get weighted jacobian object
+    TransformADFunObject(obj$env$ADFun, "WgtJacFun")
+    p <- c(par.fixed, rep(0, length(par.random)))
+    keepx <- tail(1:length(p),-length(opt$par)) ## inputs = columns
+    keepy <- 1:length(opt$par) ## outputs = rows
+    At <- obj$env$f(p,
+                    order=1,
+                    keepx=keepx,
+                    keepy=keepy) [keepy, keepx, drop=FALSE]
+    A <- t(At)
+    diag.term2 <- rowSums((A %*% Vtheta)*A)
+    ## Assemble output
+    ans$par.random <- par.random
+    ans$diag.cov.random <- diag.term1 + diag.term2
+    ans
 }
 
 ##' Extract parameters, random effects and reported variables along
