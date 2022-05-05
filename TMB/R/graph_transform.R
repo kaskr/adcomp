@@ -2,10 +2,15 @@ TransformADFunObject <- function(ADFun,
                                  method,
                                  ...
                                  ) {
-    .Call("TransformADFunObject",
-          f = ADFun$ptr,
-          control = list(method = as.character(method), ...),
-          PACKAGE = ADFun$DLL)
+    method <- as.character(method)
+    ans <- .Call("TransformADFunObject",
+                 f = ADFun$ptr,
+                 control = list(method = method, ...),
+                 PACKAGE = ADFun$DLL)
+    if (method == "copy") {
+        ans <- registerFinalizer(ans, ADFun$DLL)
+    }
+    ans
 }
 
 ## Utility
