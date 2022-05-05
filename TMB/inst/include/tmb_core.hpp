@@ -1573,6 +1573,15 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
       else
         pf->glob.dep_index = vars;
     }
+    else if (method == "WgtJacFun") {
+      *pf = pf->WgtJacFun();
+    }
+    else if (method == "inactivate") {
+      SEXP nodes_ = getListElement(control, "nodes");
+      std::vector<TMBad::Index> nodes(REAL(nodes_),
+                                      REAL(nodes_) + LENGTH(nodes_));
+      pf->inactivate(nodes);
+    }
     else if (method == "remove_random_parameters") {
       std::vector<bool> mask(pf->Domain(), true);
       for (size_t i = 0; i<random.size(); i++)
@@ -1652,6 +1661,9 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
     }
     else if (method == "parallel_accumulate") {
       // Known method - done elsewhere
+    }
+    else if (method == "eliminate") {
+      pf->eliminate();
     }
     else if (method == "optimize") {
       pf->optimize();
