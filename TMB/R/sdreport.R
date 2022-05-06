@@ -457,7 +457,7 @@ sdreport_intern <- function(obj,
     hd <- obj$fn(par.fixed)
     ## Get d(logdet(H)) / d(diag(H)) = diag(H^-1)
     changeMapping(from = "hessian_diagonal", to = "hessian_log_determinant")
-    diag.term1 = obj$gr(hd)
+    diag.term1 <- as.vector(obj$gr(hd))
     ## diag.term2 requires the 'adjoint trick' because n_fixed is much smaller than n_random
     changeMapping(from = "parameters", to = "newton_solution")
     ## Optional optimization
