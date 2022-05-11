@@ -1563,6 +1563,11 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
       UNPROTECT(2);
       return ans;
     }
+    else if (method == "compose") {
+      SEXP other = getListElement(control, "other");
+      adfun* pg = (adfun*) R_ExternalPtrAddr(other);
+      *pf = (*pf).compose(*pg);
+    }
     else if (method == "changeDomain" || method == "changeRange") {
       pf->glob.subgraph_cache_ptr();
       SEXP node_ = getListElement(control, "node");
