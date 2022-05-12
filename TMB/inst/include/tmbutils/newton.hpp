@@ -1628,6 +1628,11 @@ struct slice {
     if (cfg.info_tags) {
       TMBad::addInfo(std::vector<T>(1,y),
                      std::string("laplace_approximation"));
+      for (size_t i=0; i<random.size(); i++) {
+        x[random[i]] = start[i];
+      }
+      TMBad::addInfo(x,
+                     std::string("par_full"));
     }
     y.Dependent();
     ans.glob.ad_stop();
