@@ -438,10 +438,7 @@ MakeADFun <- function(data, parameters, map=list(),
       ## Have to call "double-template" to trigger tape generation
       Fun <<- MakeDoubleFunObject(data, parameters, reportenv, DLL=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
-      out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
-                   control = list(do_simulate = as.integer(0),
-                                  get_reportdims = as.integer(1)),
-                   PACKAGE=DLL)
+      out <- EvalDoubleFunObject(Fun, unlist(parameters), get_reportdims = TRUE)
       ADreportDims <<- attr(out, "reportdims")
     }
     if(is.character(profile)){
@@ -682,8 +679,7 @@ MakeADFun <- function(data, parameters, map=list(),
         },
 
         "double" = {
-          res <- .Call("EvalDoubleFunObject", Fun$ptr, theta,
-                       control=list(do_simulate=as.integer(do_simulate),get_reportdims=as.integer(0)),PACKAGE=DLL)
+          res <- EvalDoubleFunObject(Fun, theta, do_simulate=do_simulate)
         },
 
         "ADGrad" = {

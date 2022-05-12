@@ -3,11 +3,8 @@ getParameterOrder <- function(data, parameters, DLL) {
     .Call("getParameterOrder", data, parameters, new.env(), NULL, PACKAGE=DLL)
 }
 
-## Constructor input:
-## - data
-## - parameters
-## - environment
-## - control
+## -----------------------------------------------------------------------------
+## Constructors:
 
 MakeDoubleFunObject <- function(data, parameters, reportenv, DLL) {
     control <- NULL
@@ -43,4 +40,14 @@ MakeADHessObject <- function(data, parameters, reportenv, gf=NULL, skip=integer(
                  data, parameters, reportenv, control, PACKAGE=DLL)
     ans <- registerFinalizer(ans, DLL)
     ans
+}
+
+## -----------------------------------------------------------------------------
+## Evaluators
+
+EvalDoubleFunObject <- function(Fun, theta, do_simulate=FALSE, get_reportdims=FALSE) {
+    theta <- as.double(theta)
+    control = list(do_simulate    = as.integer(do_simulate),
+                   get_reportdims = as.integer(get_reportdims) )
+    .Call("EvalDoubleFunObject", Fun$ptr, theta, control, PACKAGE=Fun$DLL)
 }
