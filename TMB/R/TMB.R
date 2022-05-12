@@ -491,8 +491,7 @@ MakeADFun <- function(data, parameters, map=list(),
       ## autopar? => Tape with single thread
       if (omp$autopar)
           openmp(1, DLL=DLL)
-      ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
-                     control=list(report=as.integer(ADreport)),PACKAGE=DLL)
+      ADFun <<- MakeADFunObject(data, parameters, reportenv, ADreport=ADreport, DLL=DLL)
       ## autopar? => Restore OpenMP number of threads
       if (omp$autopar)
           openmp(omp$nthreads, DLL=DLL)
