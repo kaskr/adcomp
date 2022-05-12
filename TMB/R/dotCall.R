@@ -34,3 +34,13 @@ MakeADGradObject <- function(data, parameters, reportenv, random=NULL, f=NULL, D
     ans <- registerFinalizer(ans, DLL)
     ans
 }
+
+## gf   (optional) = already calculated gradient object.
+## skip (optional) = index vector of parameters to skip.
+MakeADHessObject <- function(data, parameters, reportenv, gf=NULL, skip=integer(0), DLL) {
+    control <- list(gf=gf, skip=as.integer(skip))
+    ans <- .Call("MakeADHessObject2",
+                 data, parameters, reportenv, control, PACKAGE=DLL)
+    ans <- registerFinalizer(ans, DLL)
+    ans
+}

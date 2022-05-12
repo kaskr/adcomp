@@ -1830,11 +1830,12 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
       integer(0) ## <-- Empty integer vector
     }
   ## ptr.list
-  ADHess <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters,
-                  obj$env$reportenv,
-                  list(gf=obj$env$ADGrad$ptr, skip=skip), ## <-- Skip this index vector of parameters
-                  PACKAGE=obj$env$DLL)
-  ADHess <- registerFinalizer(ADHess, obj$env$DLL)
+  ADHess <- MakeADHessObject(obj$env$data,
+                             obj$env$parameters,
+                             obj$env$reportenv,
+                             gf=obj$env$ADGrad$ptr,
+                             skip=skip, ## <-- Skip this index vector of parameters
+                             DLL=obj$env$DLL)
   ## Experiment !
   TransformADFunObject(ADHess,
                        method = "reorder_random",
