@@ -631,13 +631,11 @@ MakeADFun <- function(data, parameters, map=list(),
   }## end{retape}
   ## Lazy / Full adgrad ?
   retape_adgrad <- function(lazy = TRUE) {
-      ## Use already taped function value
-      control <- list( f = ADFun$ptr )
-      ## In random effects case we only need the 'random' part of the gradient
-      if (lazy && !is.null(random))
-          control$random <- as.integer(random)
-      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,control,PACKAGE=DLL)
-      ADGrad <<- registerFinalizer(ADGrad, DLL)
+      ## * Use already taped function value f = ADFun$ptr
+      ## * In random effects case we only need the 'random' part of the gradient
+      if (!lazy) random <- NULL
+      ADGrad <<- MakeADGradObject(data, parameters, reportenv,
+                                  random=random, f=ADFun$ptr, DLL=DLL)
   }
   retape(set.defaults = TRUE)
   ## Has atomic functions been generated for the tapes ?
