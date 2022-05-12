@@ -617,8 +617,7 @@ MakeADFun <- function(data, parameters, map=list(),
                              mustWork = 0L)
     }
     if("Fun"%in%type) {
-        Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-        Fun <<- registerFinalizer(Fun, DLL)
+        Fun <<- MakeDoubleFunObject(data, parameters, reportenv, DLL=DLL)
     }
     if("ADGrad"%in%type) {
         retape_adgrad(lazy = TRUE)
