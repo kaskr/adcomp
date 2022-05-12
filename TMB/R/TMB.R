@@ -71,6 +71,7 @@ isNullPointer <- function(pointer) {
 
 ## Add external pointer finalizer
 registerFinalizer <- function(ADFun, DLL) {
+    if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
     ADFun$DLL <- DLL
     finalizer <- function(ptr) {
         if ( ! isNullPointer(ptr) ) {
@@ -435,8 +436,7 @@ MakeADFun <- function(data, parameters, map=list(),
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
-      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-      Fun <<- registerFinalizer(Fun, DLL)
+      Fun <<- MakeDoubleFunObject(data, parameters, reportenv, DLL=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
       out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
                    control = list(do_simulate = as.integer(0),
@@ -496,7 +496,6 @@ MakeADFun <- function(data, parameters, map=list(),
       ## autopar? => Restore OpenMP number of threads
       if (omp$autopar)
           openmp(omp$nthreads, DLL=DLL)
-      if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
       ADFun <<- registerFinalizer(ADFun, DLL)
       if (!is.null(integrate)) {
           nm <- sapply(parameters, length)
