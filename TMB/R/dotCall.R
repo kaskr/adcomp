@@ -1,4 +1,13 @@
+## -----------------------------------------------------------------------------
 ## Fixed R-API to .Call within MakeADFun
+## -----------------------------------------------------------------------------
+
+## General notes:
+## - Some TMB functionality (DATA_UPDATE) implicitly assumes that 'env'
+##   can be found as the enclosing environment (parent.env) of
+##   'reportenv' (!). It follows that reportenv must always be passed
+##   by the caller.
+
 getParameterOrder <- function(data, parameters, reportenv, DLL) {
     control <- NULL
     .Call("getParameterOrder", data, parameters, reportenv, control, PACKAGE=DLL)
