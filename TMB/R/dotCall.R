@@ -51,3 +51,31 @@ EvalDoubleFunObject <- function(Fun, theta, do_simulate=FALSE, get_reportdims=FA
                    get_reportdims = as.integer(get_reportdims) )
     .Call("EvalDoubleFunObject", Fun$ptr, theta, control, PACKAGE=Fun$DLL)
 }
+
+EvalADFunObject <- function(ADFun, theta,
+                            order=0,
+                            hessiancols=NULL,
+                            hessianrows=NULL,
+                            sparsitypattern=FALSE,
+                            rangecomponent=1,
+                            rangeweight=NULL,
+                            dumpstack=FALSE,
+                            doforward=TRUE,
+                            set_tail=FALSE,
+                            keepx=NULL,
+                            keepy=NULL,
+                            data_changed=FALSE) {
+    control <- list(order=as.integer(order),
+                    hessiancols=as.integer(hessiancols),
+                    hessianrows=as.integer(hessianrows),
+                    sparsitypattern=as.integer(sparsitypattern),
+                    rangecomponent=as.integer(rangecomponent),
+                    rangeweight=as.double(rangeweight),
+                    dumpstack=as.integer(dumpstack),
+                    doforward=as.integer(doforward),
+                    set_tail = as.integer(set_tail),
+                    keepx=as.integer(keepx),
+                    keepy=as.integer(keepy),
+                    data_changed = as.integer(data_changed) )
+    .Call("EvalADFunObject", ADFun$ptr, theta, control, PACKAGE=ADFun$DLL)
+}

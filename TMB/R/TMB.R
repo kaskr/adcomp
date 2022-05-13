@@ -657,22 +657,18 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     switch(type,
            "ADdouble" = {
-          res <- .Call("EvalADFunObject", ADFun$ptr, theta,
-                       control=list(
-                                 order=as.integer(order),
-                                 hessiancols=as.integer(cols),
-                                 hessianrows=as.integer(rows),
-                                 sparsitypattern=as.integer(sparsitypattern),
-                                 rangecomponent=as.integer(rangecomponent),
+          res <- EvalADFunObject(ADFun, theta,
+                                 order=order,
+                                 hessiancols=cols,
+                                 hessianrows=rows,
+                                 sparsitypattern=sparsitypattern,
+                                 rangecomponent=rangecomponent,
                                  rangeweight=rangeweight,
-                                 dumpstack=as.integer(dumpstack),
-                                 doforward=as.integer(doforward),
-                                 do_simulate=as.integer(do_simulate),
-                                 set_tail = as.integer(set_tail),
-                                 data_changed = as.integer(data_changed)
-                               ),
-                       PACKAGE=DLL
-                       )
+                                 dumpstack=dumpstack,
+                                 doforward=doforward,
+                                 do_simulate=do_simulate,
+                                 set_tail=set_tail,
+                                 data_changed=data_changed)
           last.par <<- theta
           if(order==1)last.par1 <<- theta
           if(order==2)last.par2 <<- theta
