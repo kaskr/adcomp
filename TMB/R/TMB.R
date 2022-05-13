@@ -774,20 +774,9 @@ MakeADFun <- function(data, parameters, map=list(),
       ## now gives .5*tr(Hdot*Hinv) !!
       ## return
       as.vector( f(theta,order=1) ) +
-        .Call("EvalADFunObject", e$ADHess$ptr, theta,
-              control=list(
-                        order=as.integer(1),
-                        hessiancols=as.integer(0),
-                        hessianrows=as.integer(0),
-                        sparsitypattern=as.integer(0),
-                        rangecomponent=as.integer(1),
-                        rangeweight=as.double(w),
-                        dumpstack=as.integer(0),
-                        doforward=as.integer(1),
-                        set_tail = as.integer(0),
-                        data_changed = as.integer(0)
-                      ),
-              PACKAGE=DLL)
+          EvalADFunObject(e$ADHess, theta,
+                          order=1,
+                          rangeweight=w)
     }## order == 1
     else stop(sprintf("'order'=%d not yet implemented", order))
   } ## end{ h }
