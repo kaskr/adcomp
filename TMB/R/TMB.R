@@ -71,6 +71,7 @@ isNullPointer <- function(pointer) {
 
 ## Add external pointer finalizer
 registerFinalizer <- function(ADFun, DLL) {
+    if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
     ADFun$DLL <- DLL
     finalizer <- function(ptr) {
         if ( ! isNullPointer(ptr) ) {
@@ -316,7 +317,7 @@ MakeADFun <- function(data, parameters, map=list(),
     ## For safety, check that parameter order match the parameter order in user template.
     ## If not, permute parameter list with a warning.
     ## Order in which parameters were requested:
-    parNameOrder <- .Call("getParameterOrder",data,parameters,new.env(),NULL,PACKAGE=DLL)
+    parNameOrder <- getParameterOrder(data, parameters, new.env(), DLL=DLL)
     if(!identical(names(parameters),parNameOrder)){
       if(!silent) cat("Order of parameters:\n")
       if(!silent) print(names(parameters))
@@ -435,13 +436,9 @@ MakeADFun <- function(data, parameters, map=list(),
     if(atomic){ ## FIXME: Then no reason to create ptrFun again later ?
       ## User template contains atomic functions ==>
       ## Have to call "double-template" to trigger tape generation
-      Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-      Fun <<- registerFinalizer(Fun, DLL)
+      Fun <<- MakeDoubleFunObject(data, parameters, reportenv, DLL=DLL)
       ## Hack: unlist(parameters) only guarantied to be a permutation of the parameter vecter.
-      out <- .Call("EvalDoubleFunObject", Fun$ptr, unlist(parameters),
-                   control = list(do_simulate = as.integer(0),
-                                  get_reportdims = as.integer(1)),
-                   PACKAGE=DLL)
+      out <- EvalDoubleFunObject(Fun, unlist(parameters), get_reportdims = TRUE)
       ADreportDims <<- attr(out, "reportdims")
     }
     if(is.character(profile)){
@@ -491,13 +488,10 @@ MakeADFun <- function(data, parameters, map=list(),
       ## autopar? => Tape with single thread
       if (omp$autopar)
           openmp(1, DLL=DLL)
-      ADFun <<- .Call("MakeADFunObject",data,parameters,reportenv,
-                     control=list(report=as.integer(ADreport)),PACKAGE=DLL)
+      ADFun <<- MakeADFunObject(data, parameters, reportenv, ADreport=ADreport, DLL=DLL)
       ## autopar? => Restore OpenMP number of threads
       if (omp$autopar)
           openmp(omp$nthreads, DLL=DLL)
-      if (is.null(ADFun)) return (NULL) ## ADFun=NULL used by sdreport
-      ADFun <<- registerFinalizer(ADFun, DLL)
       if (!is.null(integrate)) {
           nm <- sapply(parameters, length)
           nmpar <- rep(names(nm), nm)
@@ -619,8 +613,7 @@ MakeADFun <- function(data, parameters, map=list(),
                              mustWork = 0L)
     }
     if("Fun"%in%type) {
-        Fun <<- .Call("MakeDoubleFunObject",data,parameters,reportenv,NULL,PACKAGE=DLL)
-        Fun <<- registerFinalizer(Fun, DLL)
+        Fun <<- MakeDoubleFunObject(data, parameters, reportenv, DLL=DLL)
     }
     if("ADGrad"%in%type) {
         retape_adgrad(lazy = TRUE)
@@ -634,13 +627,11 @@ MakeADFun <- function(data, parameters, map=list(),
   }## end{retape}
   ## Lazy / Full adgrad ?
   retape_adgrad <- function(lazy = TRUE) {
-      ## Use already taped function value
-      control <- list( f = ADFun$ptr )
-      ## In random effects case we only need the 'random' part of the gradient
-      if (lazy && !is.null(random))
-          control$random <- as.integer(random)
-      ADGrad <<- .Call("MakeADGradObject",data,parameters,reportenv,control,PACKAGE=DLL)
-      ADGrad <<- registerFinalizer(ADGrad, DLL)
+      ## * Use already taped function value f = ADFun$ptr
+      ## * In random effects case we only need the 'random' part of the gradient
+      if (!lazy) random <- NULL
+      ADGrad <<- MakeADGradObject(data, parameters, reportenv,
+                                  random=random, f=ADFun$ptr, DLL=DLL)
   }
   retape(set.defaults = TRUE)
   ## Has atomic functions been generated for the tapes ?
@@ -665,48 +656,40 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     switch(type,
            "ADdouble" = {
-          res <- .Call("EvalADFunObject", ADFun$ptr, theta,
-                       control=list(
-                                 order=as.integer(order),
-                                 hessiancols=as.integer(cols),
-                                 hessianrows=as.integer(rows),
-                                 sparsitypattern=as.integer(sparsitypattern),
-                                 rangecomponent=as.integer(rangecomponent),
+          res <- EvalADFunObject(ADFun, theta,
+                                 order=order,
+                                 hessiancols=cols,
+                                 hessianrows=rows,
+                                 sparsitypattern=sparsitypattern,
+                                 rangecomponent=rangecomponent,
                                  rangeweight=rangeweight,
-                                 dumpstack=as.integer(dumpstack),
-                                 doforward=as.integer(doforward),
-                                 do_simulate=as.integer(do_simulate),
-                                 set_tail = as.integer(set_tail),
-                                 data_changed = as.integer(data_changed)
-                               ),
-                       PACKAGE=DLL
-                       )
+                                 dumpstack=dumpstack,
+                                 doforward=doforward,
+                                 set_tail=set_tail,
+                                 data_changed=data_changed)
           last.par <<- theta
           if(order==1)last.par1 <<- theta
           if(order==2)last.par2 <<- theta
         },
 
         "double" = {
-          res <- .Call("EvalDoubleFunObject", Fun$ptr, theta,
-                       control=list(do_simulate=as.integer(do_simulate),get_reportdims=as.integer(0)),PACKAGE=DLL)
+          res <- EvalDoubleFunObject(Fun, theta, do_simulate=do_simulate)
         },
 
         "ADGrad" = {
-          res <- .Call("EvalADFunObject", ADGrad$ptr, theta,
-                       control=list(order=as.integer(order),
-                                    hessiancols=as.integer(cols),
-                                    hessianrows=as.integer(rows),
-                                    sparsitypattern=as.integer(sparsitypattern),
-                                    rangecomponent=as.integer(rangecomponent),
-                                    rangeweight=rangeweight,
-                                    dumpstack=as.integer(dumpstack),
-                                    doforward=as.integer(doforward),
-                                    set_tail = as.integer(set_tail),
-                                    keepx=as.integer(keepx),
-                                    keepy=as.integer(keepy),
-                                    data_changed = as.integer(data_changed)
-                                    ),
-                       PACKAGE=DLL)
+            res <- EvalADFunObject(ADGrad, theta,
+                                   order=order,
+                                   hessiancols=cols,
+                                   hessianrows=rows,
+                                   sparsitypattern=sparsitypattern,
+                                   rangecomponent=rangecomponent,
+                                   rangeweight=rangeweight,
+                                   dumpstack=dumpstack,
+                                   doforward=doforward,
+                                   set_tail=set_tail,
+                                   keepx=keepx,
+                                   keepy=keepy,
+                                   data_changed=data_changed)
         },
         stop("invalid 'type'")) # end{ switch() }
     res
@@ -790,20 +773,9 @@ MakeADFun <- function(data, parameters, map=list(),
       ## now gives .5*tr(Hdot*Hinv) !!
       ## return
       as.vector( f(theta,order=1) ) +
-        .Call("EvalADFunObject", e$ADHess$ptr, theta,
-              control=list(
-                        order=as.integer(1),
-                        hessiancols=as.integer(0),
-                        hessianrows=as.integer(0),
-                        sparsitypattern=as.integer(0),
-                        rangecomponent=as.integer(1),
-                        rangeweight=as.double(w),
-                        dumpstack=as.integer(0),
-                        doforward=as.integer(1),
-                        set_tail = as.integer(0),
-                        data_changed = as.integer(0)
-                      ),
-              PACKAGE=DLL)
+          EvalADFunObject(e$ADHess, theta,
+                          order=1,
+                          rangeweight=w)
     }## order == 1
     else stop(sprintf("'order'=%d not yet implemented", order))
   } ## end{ h }
@@ -1835,29 +1807,20 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
       integer(0) ## <-- Empty integer vector
     }
   ## ptr.list
-  ADHess <- .Call("MakeADHessObject2", obj$env$data, obj$env$parameters,
-                  obj$env$reportenv,
-                  list(gf=obj$env$ADGrad$ptr, skip=skip), ## <-- Skip this index vector of parameters
-                  PACKAGE=obj$env$DLL)
-  ADHess <- registerFinalizer(ADHess, obj$env$DLL)
+  ADHess <- MakeADHessObject(obj$env$data,
+                             obj$env$parameters,
+                             obj$env$reportenv,
+                             gf=obj$env$ADGrad$ptr,
+                             skip=skip, ## <-- Skip this index vector of parameters
+                             DLL=obj$env$DLL)
   ## Experiment !
   TransformADFunObject(ADHess,
                        method = "reorder_random",
                        random_order = r,
                        mustWork = 0L)
-  ev <- function(par, set_tail=0)
-          .Call("EvalADFunObject", ADHess$ptr, par,
-                control = list(
-                            order = as.integer(0),
-                            hessiancols = integer(0),
-                            hessianrows = integer(0),
-                            sparsitypattern = as.integer(0),
-                            rangecomponent = as.integer(1),
-                            dumpstack=as.integer(0),
-                            doforward=as.integer(1),
-                            set_tail = as.integer(set_tail),
-                            data_changed = as.integer(0)
-                ), PACKAGE=obj$env$DLL)
+  ev <- function(par, set_tail=0) {
+      EvalADFunObject(ADHess, par, set_tail = set_tail)
+  }
   n <- as.integer(length(obj$env$par))
   M <- new("dsTMatrix",
            i = as.integer(attr(ADHess$ptr,"i")),
