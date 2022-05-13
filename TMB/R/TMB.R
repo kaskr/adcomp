@@ -492,7 +492,6 @@ MakeADFun <- function(data, parameters, map=list(),
       ## autopar? => Restore OpenMP number of threads
       if (omp$autopar)
           openmp(omp$nthreads, DLL=DLL)
-      ADFun <<- registerFinalizer(ADFun, DLL)
       if (!is.null(integrate)) {
           nm <- sapply(parameters, length)
           nmpar <- rep(names(nm), nm)
