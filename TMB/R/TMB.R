@@ -678,21 +678,19 @@ MakeADFun <- function(data, parameters, map=list(),
         },
 
         "ADGrad" = {
-          res <- .Call("EvalADFunObject", ADGrad$ptr, theta,
-                       control=list(order=as.integer(order),
-                                    hessiancols=as.integer(cols),
-                                    hessianrows=as.integer(rows),
-                                    sparsitypattern=as.integer(sparsitypattern),
-                                    rangecomponent=as.integer(rangecomponent),
-                                    rangeweight=rangeweight,
-                                    dumpstack=as.integer(dumpstack),
-                                    doforward=as.integer(doforward),
-                                    set_tail = as.integer(set_tail),
-                                    keepx=as.integer(keepx),
-                                    keepy=as.integer(keepy),
-                                    data_changed = as.integer(data_changed)
-                                    ),
-                       PACKAGE=DLL)
+            res <- EvalADFunObject(ADGrad, theta,
+                                   order=order,
+                                   hessiancols=cols,
+                                   hessianrows=rows,
+                                   sparsitypattern=sparsitypattern,
+                                   rangecomponent=rangecomponent,
+                                   rangeweight=rangeweight,
+                                   dumpstack=dumpstack,
+                                   doforward=doforward,
+                                   set_tail=set_tail,
+                                   keepx=keepx,
+                                   keepy=keepy,
+                                   data_changed=data_changed)
         },
         stop("invalid 'type'")) # end{ switch() }
     res
