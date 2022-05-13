@@ -317,7 +317,7 @@ MakeADFun <- function(data, parameters, map=list(),
     ## For safety, check that parameter order match the parameter order in user template.
     ## If not, permute parameter list with a warning.
     ## Order in which parameters were requested:
-    parNameOrder <- getParameterOrder(data, parameters, DLL=DLL)
+    parNameOrder <- getParameterOrder(data, parameters, new.env(), DLL=DLL)
     if(!identical(names(parameters),parNameOrder)){
       if(!silent) cat("Order of parameters:\n")
       if(!silent) print(names(parameters))

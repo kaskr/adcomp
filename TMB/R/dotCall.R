@@ -1,6 +1,7 @@
 ## Fixed R-API to .Call within MakeADFun
-getParameterOrder <- function(data, parameters, DLL) {
-    .Call("getParameterOrder", data, parameters, new.env(), NULL, PACKAGE=DLL)
+getParameterOrder <- function(data, parameters, reportenv, DLL) {
+    control <- NULL
+    .Call("getParameterOrder", data, parameters, reportenv, control, PACKAGE=DLL)
 }
 
 ## -----------------------------------------------------------------------------
