@@ -26,7 +26,7 @@ MakeADGradObject <- function(data, parameters, reportenv, random=NULL, f=NULL, D
     control <- list( f=f )
     if (!is.null(random))
         control$random <- as.integer(random)
-    ans <- .Call("MakeADFunObject",
+    ans <- .Call("MakeADGradObject",
                  data, parameters, reportenv, control, PACKAGE=DLL)
     ans <- registerFinalizer(ans, DLL)
     ans
