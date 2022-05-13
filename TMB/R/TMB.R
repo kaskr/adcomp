@@ -1830,19 +1830,9 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
                        method = "reorder_random",
                        random_order = r,
                        mustWork = 0L)
-  ev <- function(par, set_tail=0)
-          .Call("EvalADFunObject", ADHess$ptr, par,
-                control = list(
-                            order = as.integer(0),
-                            hessiancols = integer(0),
-                            hessianrows = integer(0),
-                            sparsitypattern = as.integer(0),
-                            rangecomponent = as.integer(1),
-                            dumpstack=as.integer(0),
-                            doforward=as.integer(1),
-                            set_tail = as.integer(set_tail),
-                            data_changed = as.integer(0)
-                ), PACKAGE=obj$env$DLL)
+  ev <- function(par, set_tail=0) {
+      EvalADFunObject(ADHess, par, set_tail = set_tail)
+  }
   n <- as.integer(length(obj$env$par))
   M <- new("dsTMatrix",
            i = as.integer(attr(ADHess$ptr,"i")),
