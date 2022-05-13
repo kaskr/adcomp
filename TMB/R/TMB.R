@@ -666,7 +666,6 @@ MakeADFun <- function(data, parameters, map=list(),
                                  rangeweight=rangeweight,
                                  dumpstack=dumpstack,
                                  doforward=doforward,
-                                 do_simulate=do_simulate,
                                  set_tail=set_tail,
                                  data_changed=data_changed)
           last.par <<- theta

@@ -65,12 +65,14 @@ EvalADFunObject <- function(ADFun, theta,
                             keepx=NULL,
                             keepy=NULL,
                             data_changed=FALSE) {
+    if (!is.null(rangeweight))
+        rangeweight <- as.double(rangeweight)
     control <- list(order=as.integer(order),
                     hessiancols=as.integer(hessiancols),
                     hessianrows=as.integer(hessianrows),
                     sparsitypattern=as.integer(sparsitypattern),
                     rangecomponent=as.integer(rangecomponent),
-                    rangeweight=as.double(rangeweight),
+                    rangeweight=rangeweight,
                     dumpstack=as.integer(dumpstack),
                     doforward=as.integer(doforward),
                     set_tail = as.integer(set_tail),
