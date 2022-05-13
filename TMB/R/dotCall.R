@@ -23,7 +23,7 @@ MakeADFunObject <- function(data, parameters, reportenv, ADreport=FALSE, DLL) {
 }
 
 MakeADGradObject <- function(data, parameters, reportenv, random=NULL, f=NULL, DLL) {
-    control <- list( report = as.integer(ADreport), f=f )
+    control <- list( f=f )
     if (!is.null(random))
         control$random <- as.integer(random)
     ans <- .Call("MakeADFunObject",
