@@ -435,43 +435,41 @@ sdreport_intern <- function(obj,
         Vtheta <- try(solve(hessian.fixed), silent=TRUE)
         if(is(Vtheta, "try-error")) Vtheta <- hessian.fixed * NaN
     }
-    ## Copy ADFun and store original
-    ADFun.orig <- obj$env$ADFun
-    on.exit({obj$env$ADFun <- ADFun.orig})
-    obj$env$ADFun <- TransformADFunObject(obj$env$ADFun, "copy")
+    ## Copy ADFun
+    ADFun <- TransformADFunObject(obj$env$ADFun, "copy")
     ## Get info_tags
-    tag <- info(obj$env$ADFun)$InfoNodes
+    tag <- info(ADFun)$InfoNodes
     ## Short hand
-    changeMapping <- function(from, to) {
+    changeMapping <- function(ADFun, from, to) {
         stopifnot(from %in% names(tag))
         stopifnot(to %in% names(tag))
-        TransformADFunObject(obj$env$ADFun, "changeDomain", node=tag[from])
-        TransformADFunObject(obj$env$ADFun, "changeRange",  node=tag[to])
+        TransformADFunObject(ADFun, "changeDomain", node=tag[from])
+        TransformADFunObject(ADFun, "changeRange",  node=tag[to])
         NULL
     }
     ## Get random effect mode
-    changeMapping(from = "parameters", to = "newton_solution")
-    par.random <- obj$fn(par.fixed)
+    changeMapping(ADFun, from = "parameters", to = "newton_solution")
+    par.random <- EvalADFunObject(ADFun, par.fixed)
     ## Get hessian diagonal
-    changeMapping(from = "parameters", to = "hessian_diagonal")
-    hd <- obj$fn(par.fixed)
+    changeMapping(ADFun, from = "parameters", to = "hessian_diagonal")
+    hd <- EvalADFunObject(ADFun, par.fixed)
     ## Get d(logdet(H)) / d(diag(H)) = diag(H^-1)
-    changeMapping(from = "hessian_diagonal", to = "hessian_log_determinant")
-    diag.term1 <- as.vector(obj$gr(hd))
+    changeMapping(ADFun, from = "hessian_diagonal", to = "hessian_log_determinant")
+    diag.term1 <- as.vector( EvalADFunObject(ADFun, hd, order=1) )
     ## diag.term2 requires the 'adjoint trick' because n_fixed is much smaller than n_random
-    changeMapping(from = "parameters", to = "newton_solution")
+    changeMapping(ADFun, from = "parameters", to = "newton_solution")
     ## Optional optimization
-    TransformADFunObject(obj$env$ADFun, "inactivate", nodes=tag)
-    TransformADFunObject(obj$env$ADFun, "eliminate")
+    TransformADFunObject(ADFun, "inactivate", nodes=tag)
+    TransformADFunObject(ADFun, "eliminate")
     ## Get weighted jacobian object
-    TransformADFunObject(obj$env$ADFun, "WgtJacFun")
+    TransformADFunObject(ADFun, "WgtJacFun")
     p <- c(par.fixed, rep(0, length(par.random)))
     keepx <- tail(1:length(p),-length(opt$par)) ## inputs = columns
     keepy <- 1:length(opt$par) ## outputs = rows
-    At <- obj$env$f(p,
-                    order=1,
-                    keepx=keepx,
-                    keepy=keepy) [keepy, keepx, drop=FALSE]
+    At <- EvalADFunObject(ADFun, p,
+                          order=1,
+                          keepx=keepx,
+                          keepy=keepy)
     A <- t(At)
     diag.term2 <- rowSums((A %*% Vtheta)*A)
     ## Assemble output
