@@ -439,12 +439,12 @@ sdreport_intern <- function(obj,
         Vtheta <- try(solve(hessian.fixed), silent=TRUE)
         if(is(Vtheta, "try-error")) Vtheta <- hessian.fixed * NaN
     }
-    ## Copy ADFun
+    ## Copy ADFun + add info tags
     ADFun <- TransformADFunObject(obj$env$ADFun, "copy")
-    ## Get info_tags
-    tag <- info(ADFun)$InfoNodes
+    ADFun <- c(ADFun, info(ADFun))
     ## Short hand
     changeMapping <- function(ADFun, from, to) {
+        tag <- ADFun$InfoNodes
         stopifnot(from %in% names(tag))
         stopifnot(to %in% names(tag))
         TransformADFunObject(ADFun, "changeDomain", node=tag[from])
@@ -466,7 +466,7 @@ sdreport_intern <- function(obj,
     ## diag.term2 requires the 'adjoint trick' because n_fixed is much smaller than n_random
     changeMapping(ADFun, from = "parameters", to = "newton_solution")
     ## Optional optimization
-    TransformADFunObject(ADFun, "inactivate", nodes=tag)
+    TransformADFunObject(ADFun, "inactivate", nodes=ADFun$InfoNodes)
     TransformADFunObject(ADFun, "eliminate")
     ## Get weighted jacobian object
     TransformADFunObject(ADFun, "WgtJacFun")
@@ -490,12 +490,13 @@ sdreport_intern <- function(obj,
     if (infoPhi$Range == 0)
         return (ans)
     ## Any random effects in the active domain ?
-    ## activeDomain <- as.logical(infoPhi$activeDomain)
-    ## simpleCase <- !any(activeDomain[random])
+    activeDomain <- as.logical(infoPhi$activeDomain)
+    simpleCase <- !any(activeDomain[random])
     ADParAug <- TransformADFunObject(obj$env$ADFun, "copy") ## Copy ADFun (again)
+    ADParAug <- c(ADParAug, info(ADParAug))
     changeMapping(ADParAug, from = "parameters", to = "par_full") ## Parameter augmentation
     ## Optional optimization
-    TransformADFunObject(ADParAug, "inactivate", nodes=tag)
+    TransformADFunObject(ADParAug, "inactivate", nodes=ADFun$InfoNodes)
     TransformADFunObject(ADParAug, "eliminate")
     ## -------------------------------------------------------------------------
     ## Generalized delta method
@@ -503,7 +504,45 @@ sdreport_intern <- function(obj,
     ## Term 1: Generate 'epsilon tape' T1(eps) = phi(u_hat(eps)) and note that
     ##         d/deps T1(eps) = - grad(phi_u) H^-1 grad(phi_u)^T
     ##         which is essentially term 1.
-    term1 <- 0
+    term1 <- 0 ## Simple case
+    if (!simpleCase) {
+        ## Construct 'epsilon tape'
+        ## FIXME: partial copy-paste from 'sdreport'
+        epsilon <- rep(0, infoPhi$Range)
+        par.full <- EvalADFunObject(ADParAug, par.fixed)
+        parameters <- obj$env$parList(par = par.full)
+        ## FIXME: partial copy-paste from validation.R
+        names.random <- obj$env$.random
+        names.all <- names(parameters)
+        fix <- setdiff(names.all, names.random)
+        map <- lapply(parameters[fix], function(x)factor(x*NA))
+        ## FIXME: Handle mapped random effects too?
+        parameters$TMB_epsilon_ <- epsilon
+        ## FIXME: In theory this epsilon tape can have a much bigger
+        ## sparsity pattern than necessary.
+        obj3 <- MakeADFun(obj$env$data,
+                          parameters,
+                          random = obj$env$.random,
+                          map=map,
+                          checkParameterOrder = FALSE,
+                          DLL = obj$env$DLL,
+                          silent = obj$env$silent,
+                          intern = obj$env$intern)
+        ADeps <- obj3$env$ADFun ## Epsilon tape
+        ADeps <- c(ADeps, info(ADeps))
+        changeMapping(ADeps, from = "parameters", to = "newton_solution")
+        ## Compose
+        ADPhi1 <- TransformADFunObject(ADPhi, "copy")
+        ## Update internal parameters
+        EvalADFunObject(ADPhi1, par.full)
+        ## Remove fixed effects
+        fixed <- setdiff(1:length(par.full), random)
+        ## FIXME: Change stupid method and argument name
+        TransformADFunObject(ADPhi1, "remove_random_parameters", random_order=as.integer(fixed))
+        ## Compose
+        TransformADFunObject(ADPhi1, "compose", other=ADeps$ptr)
+        term1 <- - EvalADFunObject(ADPhi1, obj3$par, order=1)
+    }
     ## Term 2: Generate tape T2(theta) = phi(theta, u_hat(theta)) and note that
     ##         term 2 is A * V(theta) * A^T where A = grad(T2).
     TransformADFunObject(ADPhi, "compose", other=ADParAug$ptr)
