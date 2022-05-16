@@ -403,7 +403,8 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
                              par.fixed,
                              hessian.fixed,
                              Vtheta,
-                             r)
+                             obj2=obj2,
+                             random=r)
       ans[names(tmp)] <- tmp
       ## Something to report
       ## if (length(obj2$env$ADreportDims) > 0) {
@@ -425,6 +426,7 @@ sdreport_intern <- function(obj,
                             par.fixed=NULL,
                             hessian.fixed=NULL,
                             Vtheta=NULL,
+                            obj2=NULL,
                             random,
                             ...
                             ) {
@@ -483,19 +485,36 @@ sdreport_intern <- function(obj,
     ## -------------------------------------------------------------------------
     ## Prepare for delta method
     ## -------------------------------------------------------------------------
-    if (FALSE) {
-        ADFun <- TransformADFunObject(obj$env$ADFun, "copy") ## Copy ADFun (again)
-        changeMapping(ADFun, from = "parameters", to = "par_full")
-        ADPhi <- obj2$env$ADFun
-    }
+    ADPhi <- obj2$env$ADFun
+    infoPhi <- info(ADPhi)
+    if (infoPhi$Range == 0)
+        return (ans)
+    ## Any random effects in the active domain ?
+    ## activeDomain <- as.logical(infoPhi$activeDomain)
+    ## simpleCase <- !any(activeDomain[random])
+    ADParAug <- TransformADFunObject(obj$env$ADFun, "copy") ## Copy ADFun (again)
+    changeMapping(ADParAug, from = "parameters", to = "par_full") ## Parameter augmentation
+    ## Optional optimization
+    TransformADFunObject(ADParAug, "inactivate", nodes=tag)
+    TransformADFunObject(ADParAug, "eliminate")
     ## -------------------------------------------------------------------------
     ## Generalized delta method
     ## -------------------------------------------------------------------------
     ## Term 1: Generate 'epsilon tape' T1(eps) = phi(u_hat(eps)) and note that
     ##         d/deps T1(eps) = - grad(phi_u) H^-1 grad(phi_u)^T
     ##         which is essentially term 1.
+    term1 <- 0
     ## Term 2: Generate tape T2(theta) = phi(theta, u_hat(theta)) and note that
     ##         term 2 is A * V(theta) * A^T where A = grad(T2).
+    TransformADFunObject(ADPhi, "compose", other=ADParAug$ptr)
+    phi <- EvalADFunObject(ADPhi, par.fixed)
+    A <- EvalADFunObject(ADPhi, par.fixed, order=1)
+    term2 <- A %*% Vtheta %*% t(A)
+    ## Assemble output
+    ans$value <- phi
+    ans$cov <- term1 + term2
+    ans$sd <- sqrt(diag(ans$cov))
+    ## return
     ans
 }
 
