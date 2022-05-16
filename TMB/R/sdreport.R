@@ -395,18 +395,19 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
   }
   ## Finally handle 'intern' case
   if (intern) {
+      ## FIXME: Not accounting for mapped parameters
+      r <- which(rep( names(obj$env$parameters),
+                     sapply(obj$env$parameters, length) ) %in% obj$env$.random)
       ## Random effects
       tmp <- sdreport_intern(obj,
                              par.fixed,
                              hessian.fixed,
-                             Vtheta)
+                             Vtheta,
+                             r)
       ans[names(tmp)] <- tmp
       ## Something to report
       ## if (length(obj2$env$ADreportDims) > 0) {
       ## }
-      ## FIXME: Not accounting for mapped parameters
-      r <- which(rep( names(obj$env$parameters),
-                     sapply(obj$env$parameters, length) ) %in% obj$env$.random)
   }
   ## Copy a few selected members of the environment 'env'. In
   ## particular we need the 'skeleton' objects that allow us to put
@@ -424,6 +425,7 @@ sdreport_intern <- function(obj,
                             par.fixed=NULL,
                             hessian.fixed=NULL,
                             Vtheta=NULL,
+                            random,
                             ...
                             ) {
     ans <- list()
@@ -447,6 +449,9 @@ sdreport_intern <- function(obj,
         TransformADFunObject(ADFun, "changeRange",  node=tag[to])
         NULL
     }
+    ## -------------------------------------------------------------------------
+    ## random effects + standard dev
+    ## -------------------------------------------------------------------------
     ## Get random effect mode
     changeMapping(ADFun, from = "parameters", to = "newton_solution")
     par.random <- EvalADFunObject(ADFun, par.fixed)
@@ -464,8 +469,8 @@ sdreport_intern <- function(obj,
     ## Get weighted jacobian object
     TransformADFunObject(ADFun, "WgtJacFun")
     p <- c(par.fixed, rep(0, length(par.random)))
-    keepx <- tail(1:length(p),-length(opt$par)) ## inputs = columns
-    keepy <- 1:length(opt$par) ## outputs = rows
+    keepx <- tail(1:length(p),-length(par.fixed)) ## inputs = columns
+    keepy <- 1:length(par.fixed) ## outputs = rows
     At <- EvalADFunObject(ADFun, p,
                           order=1,
                           keepx=keepx,
@@ -475,6 +480,22 @@ sdreport_intern <- function(obj,
     ## Assemble output
     ans$par.random <- par.random
     ans$diag.cov.random <- diag.term1 + diag.term2
+    ## -------------------------------------------------------------------------
+    ## Prepare for delta method
+    ## -------------------------------------------------------------------------
+    if (FALSE) {
+        ADFun <- TransformADFunObject(obj$env$ADFun, "copy") ## Copy ADFun (again)
+        changeMapping(ADFun, from = "parameters", to = "par_full")
+        ADPhi <- obj2$env$ADFun
+    }
+    ## -------------------------------------------------------------------------
+    ## Generalized delta method
+    ## -------------------------------------------------------------------------
+    ## Term 1: Generate 'epsilon tape' T1(eps) = phi(u_hat(eps)) and note that
+    ##         d/deps T1(eps) = - grad(phi_u) H^-1 grad(phi_u)^T
+    ##         which is essentially term 1.
+    ## Term 2: Generate tape T2(theta) = phi(theta, u_hat(theta)) and note that
+    ##         term 2 is A * V(theta) * A^T where A = grad(T2).
     ans
 }
 
