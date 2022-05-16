@@ -486,11 +486,11 @@ sdreport_intern <- function(obj,
     ## Prepare for delta method
     ## -------------------------------------------------------------------------
     ADPhi <- obj2$env$ADFun
-    infoPhi <- info(ADPhi)
-    if (infoPhi$Range == 0)
+    ADPhi <- c(ADPhi, info(ADPhi))
+    if (ADPhi$Range == 0)
         return (ans)
     ## Any random effects in the active domain ?
-    activeDomain <- as.logical(infoPhi$activeDomain)
+    activeDomain <- as.logical(ADPhi$activeDomain)
     simpleCase <- !any(activeDomain[random])
     ADParAug <- TransformADFunObject(obj$env$ADFun, "copy") ## Copy ADFun (again)
     ADParAug <- c(ADParAug, info(ADParAug))
@@ -508,7 +508,7 @@ sdreport_intern <- function(obj,
     if (!simpleCase) {
         ## Construct 'epsilon tape'
         ## FIXME: partial copy-paste from 'sdreport'
-        epsilon <- rep(0, infoPhi$Range)
+        epsilon <- rep(0, ADPhi$Range)
         par.full <- EvalADFunObject(ADParAug, par.fixed)
         parameters <- obj$env$parList(par = par.full)
         ## FIXME: partial copy-paste from validation.R
