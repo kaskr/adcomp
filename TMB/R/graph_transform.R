@@ -13,6 +13,12 @@ TransformADFunObject <- function(ADFun,
     ans
 }
 
+## Not really a transform but didn't know where else to put it...
+readNodeInputs <- function(ADFun, node) {
+    node <- as.double(node)
+    TransformADFunObject(ADFun, "readNodeInputs", node=node)
+}
+
 ## Utility
 tape_print <- function(x, depth=0, method="tape", DLL=getUserDLL(), ...) {
     if (is.list(x)) x <- x$ptr
