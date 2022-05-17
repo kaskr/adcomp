@@ -1568,7 +1568,7 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
       adfun* pg = (adfun*) R_ExternalPtrAddr(other);
       *pf = (*pf).compose(*pg);
     }
-    else if (method == "changeDomain" || method == "changeRange") {
+    else if (method == "changeDomain" || method == "changeRange" || method == "readNodeInputs") {
       pf->glob.subgraph_cache_ptr();
       SEXP node_ = getListElement(control, "node");
       TMBad::Index node = REAL(node_)[0];
@@ -1578,8 +1578,16 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
       std::vector<TMBad::Index> vars(data + begin, data + end);
       if (method == "changeDomain")
         pf->glob.inv_index = vars;
-      else
+      else if (method == "changeRange")
         pf->glob.dep_index = vars;
+      else {
+        // readNodeInputs
+        std::swap(pf->glob.dep_index, vars);
+        std::vector<TMBad::Scalar> out = pf->RangeVec();
+        std::swap(pf->glob.dep_index, vars); // restore
+        SEXP ans = asSEXP(out);
+        return ans;
+      }
     }
     else if (method == "WgtJacFun") {
       *pf = pf->WgtJacFun();
