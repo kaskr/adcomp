@@ -675,6 +675,17 @@ MakeADFun <- function(data, parameters, map=list(),
         },
 
         "double" = {
+          if (intern) {
+              ## Expand theta to include random effects
+              ## Make sure ADFun is up-to-date
+              EvalADFunObject(ADFun, theta)
+              ## Make sure InfoNodes are available
+              if (is.null(ADFun$InfoNodes)) {
+                  ADFun <- c(ADFun, info(ADFun))
+              }
+              ## Get full parameter vecter
+              theta <- readNodeInputs(ADFun, ADFun$InfoNodes["par_full"])
+          }
           res <- EvalDoubleFunObject(Fun, theta, do_simulate=do_simulate)
         },
 
