@@ -486,6 +486,8 @@ sdreport_intern <- function(obj,
     ## Prepare for delta method
     ## -------------------------------------------------------------------------
     ADPhi <- obj2$env$ADFun
+    if (is.null(ADPhi))
+        return (ans)
     ADPhi <- c(ADPhi, info(ADPhi))
     if (ADPhi$Range == 0)
         return (ans)
