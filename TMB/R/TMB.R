@@ -357,6 +357,19 @@ MakeADFun <- function(data, parameters, map=list(),
   lfixed <- function() {
       !lrandom()
   }
+  ## helper for intern=TRUE
+  get.par.full <- function(theta) {
+      if (!intern) return(theta)
+      ## Expand theta to include random effects
+      ## Make sure ADFun is up-to-date
+      EvalADFunObject(ADFun, theta)
+      ## Make sure InfoNodes are available
+      if (is.null(ADFun$InfoNodes)) {
+          ADFun <- c(ADFun, info(ADFun))
+      }
+      ## Get full parameter vecter
+      readNodeInputs(ADFun, ADFun$InfoNodes["par_full"])
+  }
   ## Utility to get back parameter list in original shape
   parList <- function(x=par[lfixed()],par=last.par){
     ans <- parameters
@@ -675,17 +688,7 @@ MakeADFun <- function(data, parameters, map=list(),
         },
 
         "double" = {
-          if (intern) {
-              ## Expand theta to include random effects
-              ## Make sure ADFun is up-to-date
-              EvalADFunObject(ADFun, theta)
-              ## Make sure InfoNodes are available
-              if (is.null(ADFun$InfoNodes)) {
-                  ADFun <- c(ADFun, info(ADFun))
-              }
-              ## Get full parameter vecter
-              theta <- readNodeInputs(ADFun, ADFun$InfoNodes["par_full"])
-          }
+          theta <- get.full.par(theta) ## intern=TRUE
           res <- EvalDoubleFunObject(Fun, theta, do_simulate=do_simulate)
         },
 
