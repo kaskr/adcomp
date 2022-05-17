@@ -377,6 +377,7 @@ MakeADFun <- function(data, parameters, map=list(),
     nonempindex <- which(nonemp)
     skeleton <- as.relistable(ans[nonemp])
     par[lfixed()] <- x
+    par <- get.par.full(par) ## intern=TRUE
     li <- relist(par,skeleton)
     reshape <- function(x){
       if(is.null(attr(x,"map")))return(x)
