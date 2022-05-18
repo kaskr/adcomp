@@ -689,7 +689,7 @@ MakeADFun <- function(data, parameters, map=list(),
         },
 
         "double" = {
-          theta <- get.full.par(theta) ## intern=TRUE
+          theta <- get.par.full(theta) ## intern=TRUE
           res <- EvalDoubleFunObject(Fun, theta, do_simulate=do_simulate)
         },
 
