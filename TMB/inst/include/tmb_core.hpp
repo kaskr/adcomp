@@ -2558,8 +2558,8 @@ extern "C"
 #endif
 
   SEXP getFramework() {
+    // ans
     SEXP ans;
-    PROTECT(ans = R_NilValue);
 #ifdef TMBAD_FRAMEWORK
     ans = mkString("TMBad");
 #elif defined(CPPAD_FRAMEWORK)
@@ -2567,15 +2567,19 @@ extern "C"
 #else
     ans = mkString("Unknown");
 #endif
-    SEXP openmp_sym, openmp_res;
-    PROTECT(openmp_sym = R_NilValue);
-    PROTECT(openmp_res = R_NilValue);
-    openmp_sym = Rf_install("openmp");
+    PROTECT(ans);
+    // openmp_sym (Not strictly necessary to PROTECT)
+    SEXP openmp_sym = Rf_install("openmp");
+    PROTECT(openmp_sym);
+    // openmp_res
+    SEXP openmp_res;
 #ifdef _OPENMP
     openmp_res = ScalarLogical(1);
 #else
     openmp_res = ScalarLogical(0);
 #endif
+    PROTECT(openmp_res);
+    // Assemble
     Rf_setAttrib(ans, openmp_sym, openmp_res);
     UNPROTECT(3);
     return ans;
