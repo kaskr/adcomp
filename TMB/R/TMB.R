@@ -598,7 +598,7 @@ MakeADFun <- function(data, parameters, map=list(),
           value.best <<- Inf
       }
     }
-    if (omp$autopar) {
+    if (omp$autopar && !ADreport) {
         ## Experiment !
         TransformADFunObject(ADFun,
                              method = "parallel_accumulate",

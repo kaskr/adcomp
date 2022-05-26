@@ -731,7 +731,6 @@ public:
     selected_parallel_region=-1;
     max_parallel_regions=-1;
 #ifdef _OPENMP
-    if (config.nthreads > 1)
       max_parallel_regions = config.nthreads;
 #endif
     reversefill=false;
