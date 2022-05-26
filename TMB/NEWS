@@ -1,4 +1,19 @@
 ------------------------------------------------------------------------
+TMB 1.9.0 (2022-05-26)
+------------------------------------------------------------------------
+
+o Fix PROTECT bugs (thanks to Tomas Kalibera)
+
+o Behavior if TMB parallization has been changed:
+  - Setting the number of threads of a TMB model using TMB::openmp() is now portable across platforms.
+  - Number of TMB threads no longer interferes with number of threads used by other packages or BLAS/LAPACK.
+  - By default, unless explicitly requested, models run with a single thread.
+
+o precompile() can now auto generate 'TMB.h' and 'TMB.cpp' that may be used by R packages to split in several compilation units.
+
+o MakeADFun() now checks that the DLL is loaded.
+
+------------------------------------------------------------------------
 TMB 1.8.1 (2022-03-23)
 ------------------------------------------------------------------------
 
