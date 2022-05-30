@@ -1,0 +1,22 @@
+# -*- Makefile -*-
+
+## R wants a first target
+all: $(SHLIB)
+
+## Auto generate TMB.h and (implicitly) TMB.cpp
+## NOTE: Pass 'all=TRUE' to precompile a bigger portion of TMB
+TMB.h:
+	"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "TMB::precompile(all=FALSE, get.header=TRUE)"
+TMB.cpp : TMB.h
+
+## TMB.cpp is not *initially* part of this folder and thus the
+## existence of 'TMB.o' is unknown to make.  We have to manually tell
+## that TMB.o affects the main target:
+$(SHLIB) : TMB.o
+
+## The default Makerules do not account for changes in header files.
+## We have to tell which targets (*.o) must be rebuilt if a header is
+## updated:
+adaptive_integration.o: distrib.h TMB.h
+distrib.o : distrib.h
+TMB.o : TMB.h
