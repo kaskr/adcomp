@@ -8,6 +8,7 @@ namespace tmbutils{
 #include "matexp.hpp"
 #include "splines.hpp"
 #include "order.hpp"
+#include "interpol.hpp"
 
 template<class Type, class T1, class T2>
 vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
