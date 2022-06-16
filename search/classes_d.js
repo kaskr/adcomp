@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['scale_5ft',['SCALE_t',['../classSCALE__t.html',1,'']]],
   ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
+  ['scale_5ft',['SCALE_t',['../classSCALE__t.html',1,'']]],
   ['segment_5fref',['segment_ref',['../structTMBad_1_1segment__ref.html',1,'TMBad']]],
   ['separable_5ft',['SEPARABLE_t',['../classSEPARABLE__t.html',1,'']]],
   ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],

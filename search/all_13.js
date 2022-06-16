@@ -1,8 +1,9 @@
 var searchData=
 [
   ['special_20matrix_20functions',['Special matrix functions',['../group__matrix__functions.html',1,'']]],
-  ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
+  ['safe_5fcheck',['safe_check',['../structinterpol2D__config.html#a22e92b06bafe1db56cb1ed904658aff8',1,'interpol2D_config::safe_check()'],['../structtmbutils_1_1interpol2D__config.html#aa12469ffe1625f090f9a4a69c97f7b46',1,'tmbutils::interpol2D_config::safe_check()']]],
   ['scale_5ft',['SCALE_t',['../classSCALE__t.html',1,'']]],
+  ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
   ['search',['search',['../structTMBad_1_1graph.html#a6c6ad714443e1dee5db27db7a40523d5',1,'TMBad::graph::search(std::vector&lt; Index &gt; &amp;start, bool sort_input=true, bool sort_output=true)'],['../structTMBad_1_1graph.html#acb3f095fb932b2257911c650f0eeb43c',1,'TMBad::graph::search(std::vector&lt; Index &gt; &amp;start, std::vector&lt; bool &gt; &amp;visited, bool sort_input=true, bool sort_output=true)']]],
   ['segment',['segment',['../structdata__indicator.html#adf31037a7d7e5b5c3427edb5472fa8ad',1,'data_indicator']]],
   ['segment_5fref',['segment_ref',['../structTMBad_1_1segment__ref.html',1,'TMBad']]],

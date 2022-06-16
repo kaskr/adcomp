@@ -314,7 +314,7 @@ Aborted (core dumped)</p>
 </blockquote>
 <p>So, you must restart R and give the commands</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="Errors.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TMB)</span>
-<span id="cb22-2"><a href="Errors.html#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;my_project.R&quot;</span>)</span></code></pre></div>
+<span id="cb22-2"><a href="Errors.html#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;my_project.<a class="code" href="../structinterpol2D__config.html#a8e8fccc28eb97428896340a222d199d5">R</a>&quot;</span>)</span></code></pre></div>
 <blockquote>
 <p>#5 objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:11</p>
 </blockquote>
@@ -354,7 +354,7 @@ compilers, but can otherwise be downloaded from
 can be picked up by the debugger. There are only two extra lines that
 need to be included (“//Extra line needed” in the above example).</p>
 <p>When we try to run this program in the usual way, the program crashes:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="Errors.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;nan_error_ex.R&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="Errors.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;nan_error_ex.<a class="code" href="../structinterpol2D__config.html#a8e8fccc28eb97428896340a222d199d5">R</a>&quot;</span>)</span></code></pre></div>
 <blockquote>
 <p>Floating point exception (core dumped)
 tmp3&gt;</p>
@@ -362,7 +362,7 @@ tmp3&gt;</p>
 <p>At this stage you should run the debugger to find out that the
 floating point exception occurs at line number 14:</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="Errors.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TMB)</span>
-<span id="cb26-2"><a href="Errors.html#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;nan_error_ex.R&quot;</span>)</span></code></pre></div>
+<span id="cb26-2"><a href="Errors.html#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;nan_error_ex.<a class="code" href="../structinterpol2D__config.html#a8e8fccc28eb97428896340a222d199d5">R</a>&quot;</span>)</span></code></pre></div>
 <blockquote>
 <p>#1 0x00007ffff0e7eb09 in objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:14</p>
 </blockquote>

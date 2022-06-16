@@ -342,7 +342,7 @@ value of the correlation matrix, but not the full covariance matrix,
 can easily be assessed using the <code>.<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>()</code> operator</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="Densities.html#cb12-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);</span>
 <span id="cb12-2"><a href="Densities.html#cb12-2" aria-hidden="true" tabindex="-1"></a>Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();</span>
-<span id="cb12-3"><a href="Densities.html#cb12-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to R session</span></span></code></pre></div>
+<span id="cb12-3"><a href="Densities.html#cb12-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to <a class="code" href="../structinterpol2D__config.html#a8e8fccc28eb97428896340a222d199d5">R</a> session</span></span></code></pre></div>
 </div>
 <div id="autoregressive-processes" class="section level2" number="6.2">
 <h2><span class="header-section-number">6.2</span> Autoregressive processes</h2>

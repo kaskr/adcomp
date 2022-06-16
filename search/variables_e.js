@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['safe_5fcheck',['safe_check',['../structinterpol2D__config.html#a22e92b06bafe1db56cb1ed904658aff8',1,'interpol2D_config::safe_check()'],['../structtmbutils_1_1interpol2D__config.html#aa12469ffe1625f090f9a4a69c97f7b46',1,'tmbutils::interpol2D_config::safe_check()']]],
   ['self',['self',['../structTMBad_1_1CallOp__.html#a6909a4cc620504a34d8abdb1071f2f4a',1,'TMBad::CallOp_']]],
   ['self_5freplay',['self_replay',['../structTMBad_1_1CallOp__.html#a17d77a3f7c5a3f9dad7c6523e2ad3f94',1,'TMBad::CallOp_']]],
   ['signif_5fabs_5freduction',['signif_abs_reduction',['../structnewton_1_1newton__config.html#a4fb35bc77af136e1d3bc81d908f4180b',1,'newton::newton_config']]],
