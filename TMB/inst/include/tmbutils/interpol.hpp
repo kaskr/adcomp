@@ -1,6 +1,13 @@
+/** \file
+    \brief Atomic interpolation operator.
+    \note Available for TMBad framework only.
+*/
+
 #ifdef TMBAD_FRAMEWORK
 
 #include <memory>
+
+namespace tmbutils {
 
 /** \brief Configuration for `Interpol2D` */
 template<class Type>
@@ -188,7 +195,6 @@ struct interpol2D : TMBad::global::DynamicOperator<2, 1> {
     std::vector<ad> z = TMBad::global::Complete<interpol2D>(cpy)(xy);
     return z[0];
   }
-  /** \brief Vectorized evaluation */
 #define Type T
   VECTORIZE2_tt(operator());
 #undef Type
@@ -209,5 +215,7 @@ struct interpol2D : TMBad::global::DynamicOperator<2, 1> {
   void reverse(TMBad::ReverseArgs<TMBad::Writer> &args) { ASSERT(false); }
   const char* op_name() { return "IP2D"; }
 };
+
+}
 
 #endif

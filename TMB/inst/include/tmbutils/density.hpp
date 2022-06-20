@@ -6,6 +6,13 @@
    \note These density classes return the **negative log likelihood**.
 */
 
+/**
+   \brief Collection of multivariate Gaussian distributions (members listed in \ref density.hpp)
+   \ingroup Densities
+   \details For use of the namespace see \ref Densities
+*/
+namespace density {
+using namespace tmbutils;
 
 #define TYPEDEFS(scalartype_)			\
 public:						\
@@ -1406,3 +1413,5 @@ PROJ_t<distribution> PROJ(distribution f_, vector<int> i){
 
 
 #undef TYPEDEFS
+
+} // End namespace

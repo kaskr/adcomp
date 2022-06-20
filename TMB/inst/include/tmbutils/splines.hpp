@@ -1,5 +1,9 @@
-// R's spline function wrapped into template class that can be used
-// with TMB.
+/** \file
+    \brief R's spline function wrapped into template class that can be used with TMB.
+*/
+
+namespace tmbutils {
+
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
 
@@ -523,3 +527,5 @@ public:
   }
   
 };
+
+}

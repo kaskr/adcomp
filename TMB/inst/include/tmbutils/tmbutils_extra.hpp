@@ -6,9 +6,7 @@ namespace tmbutils{
 #include "spmat.hpp"
 #include "kronecker.hpp"
 #include "matexp.hpp"
-#include "splines.hpp"
 #include "order.hpp"
-#include "interpol.hpp"
 
 template<class Type, class T1, class T2>
 vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
@@ -21,17 +19,9 @@ vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
 
 } // End namespace
 
-/** 
-   \brief Collection of multivariate Gaussian distributions (members listed in \ref density.hpp)
-
-   \ingroup Densities
-   
-   For use of the namespace see \ref Densities   
-*/
-namespace density{
-  using namespace tmbutils;
+#include "splines.hpp"
+#include "interpol.hpp"
 #include "density.hpp"
-} // End namespace
 
 #include "romberg.hpp"
 #include "autodiff.hpp"
