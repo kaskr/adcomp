@@ -176,7 +176,7 @@ template&lt;class scalartype &gt; </div>
 </div><div class="memdoc">
 
 <p>Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q. </p>
-<p>For detailed explanation of GMRFs see the class definition <a class="el" href="classGMRF__t.html">GMRF_t</a> </p><dl class="params"><dt>Parameters</dt><dd>
+<p>For detailed explanation of GMRFs see the class definition <a class="el" href="classdensity_1_1GMRF__t.html">GMRF_t</a> </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Q</td><td>precision matrix </td></tr>
     <tr><td class="paramname">order</td><td>Convolution order, i.e. the precision matrix is Q^order (matrix product) </td></tr>
@@ -184,8 +184,9 @@ template&lt;class scalartype &gt; </div>
   </table>
   </dd>
 </dl>
-
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00928">928</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="spde_8cpp-example.html#a8">spde.cpp</a>, <a class="el" href="spde_aniso_8cpp-example.html#a10">spde_aniso.cpp</a>, <a class="el" href="spde_aniso_speedup_8cpp-example.html#a11">spde_aniso_speedup.cpp</a>, and <a class="el" href="TMBad_2spde_epsilon_8cpp-example.html#a8">TMBad/spde_epsilon.cpp</a>.</dd>
+</dl>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00934">934</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -225,10 +226,10 @@ template&lt;class scalartype &gt; </div>
   </table>
   </dd>
 </dl>
-<p>Shortform version for working with the density of the <a class="el" href="classMVNORM__t.html">MVNORM_t</a> distribution (C++ class). Typical use: </p><div class="fragment"><div class="line"><a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)(x);</div></div><!-- fragment --><p> where <code>Sigma</code> is a covariance matrix. The part <code>MVNORM(Sigma)</code> creates an object of <a class="el" href="classdensity_1_1MVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a>, which is then evaluated by the part <code></code>(x). </p>
+<p>Shortform version for working with the density of the <a class="el" href="classdensity_1_1MVNORM__t.html">MVNORM_t</a> distribution (C++ class). Typical use: </p><div class="fragment"><div class="line"><a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)(x);</div></div><!-- fragment --><p> where <code>Sigma</code> is a covariance matrix. The part <code>MVNORM(Sigma)</code> creates an object of <a class="el" href="classdensity_1_1MVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a>, which is then evaluated by the part <code></code>(x). </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="multivariate_distributions_8cpp-example.html#a3">multivariate_distributions.cpp</a>, and <a class="el" href="sdv_multi_8cpp-example.html#a8">sdv_multi.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00202">202</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00208">208</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -268,9 +269,9 @@ template&lt;class distribution1 , class distribution2 &gt; </div>
   </table>
   </dd>
 </dl>
-<p>Shortform version to combine two densities using the class <a class="el" href="classSEPARABLE__t.html">SEPARABLE_t</a> . Typical use: </p><div class="fragment"><div class="line"><a class="code" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(x); <span class="comment">// 2D array</span></div><div class="line"><a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(phi), <a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma))(x);</div></div><!-- fragment --><p> where <code>MVNORM(Sigma)</code> acts in the first dimension of x and <code>AR1(phi)</code> acts in the second dimension of x. </p><dl class="section note"><dt>Note</dt><dd>The order of array dimensions is reversed in the sense that f_ acts in the <em>second</em> dimension and g_ acts in the <em>first</em> dimension (This order is consistent with how Kronecker products work in R). </dd></dl>
+<p>Shortform version to combine two densities using the class <a class="el" href="classdensity_1_1SEPARABLE__t.html">SEPARABLE_t</a> . Typical use: </p><div class="fragment"><div class="line"><a class="code" href="group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(x); <span class="comment">// 2D array</span></div><div class="line"><a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(phi), <a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma))(x);</div></div><!-- fragment --><p> where <code>MVNORM(Sigma)</code> acts in the first dimension of x and <code>AR1(phi)</code> acts in the second dimension of x. </p><dl class="section note"><dt>Note</dt><dd>The order of array dimensions is reversed in the sense that f_ acts in the <em>second</em> dimension and g_ acts in the <em>first</em> dimension (This order is consistent with how Kronecker products work in R). </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01241">1241</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l01247">1247</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>

@@ -5,6 +5,5 @@ var searchData=
   ['period',['period',['../structTMBad_1_1period.html',1,'TMBad']]],
   ['periodic',['periodic',['../structTMBad_1_1periodic.html',1,'TMBad']]],
   ['print_5fconfig',['print_config',['../structTMBad_1_1global_1_1print__config.html',1,'TMBad::global']]],
-  ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]],
-  ['proj_5ft',['PROJ_t',['../classPROJ__t.html',1,'']]]
+  ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]]
 ];

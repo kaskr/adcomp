@@ -80,7 +80,7 @@ $(function() {
 <p>Stationary AR1 process.  
  <a href="classdensity_1_1AR1__t.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="density_8hpp_source.html">density.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -120,12 +120,12 @@ class density::AR1_t&lt; distribution &gt;</h3>
 \[x_i = \phi x_{i-1} + \sigma\varepsilon_i\:,\:\:\: \varepsilon_i \sim N(0,\Sigma)\]
 </p>
 <p> where \(\sigma=\sqrt{1-\phi^2}\). Then \(E(x_i)=0\), \(V(x_i)=\Sigma\) and the covariance is \(E(x_ix_j&#39;)=\phi^{|i-j|}\Sigma\). We refer to this process as a stationary 1st order autoregressive process with multivariate increments with parameter phi and marginal distribution f. Compactly denoted AR1(phi,f).</p>
-<p>Note that the construction can be carried out recursively, as "AR1(phi,f)" is itself a distribution that can be used as input to AR1(). See example below: </p><div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi1=0.8;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;N01&lt;Type&gt;</a> &gt; f1(phi1);</div><div class="line">\\ Can be evaluated on a <a class="code" href="structvector.html">vector</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10);</div><div class="line">Type ans=f1(x);</div></div><!-- fragment --><p>Now use f1 as marginal in a new AR1 process with parameter phi2:</p>
-<div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi2=0.5;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;AR1_t&lt;N01&lt;Type&gt;</a> &gt; &gt; f2(phi1,f1);</div><div class="line">\\ Can be evaluated on a 2-dimensional <a class="code" href="structarray.html">array</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10,20);</div><div class="line">Type ans=f2(x);</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="multivariate_distributions_8cpp-example.html#_a9">multivariate_distributions.cpp</a>.</dd>
+<p>Note that the construction can be carried out recursively, as "AR1(phi,f)" is itself a distribution that can be used as input to AR1(). See example below: </p><div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi1=0.8;</div><div class="line">AR1_t&lt;N01&lt;Type&gt; &gt; f1(phi1);</div><div class="line">\\ Can be evaluated on a <a class="code" href="structvector.html">vector</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10);</div><div class="line">Type ans=f1(x);</div></div><!-- fragment --><p>Now use f1 as marginal in a new AR1 process with parameter phi2:</p>
+<div class="fragment"><div class="line">\\ Construct negative log <a class="code" href="namespacedensity.html">density</a> of standard AR1 process on a line:</div><div class="line">Type phi2=0.5;</div><div class="line">AR1_t&lt;AR1_t&lt;N01&lt;Type&gt; &gt; &gt; f2(phi1,f1);</div><div class="line">\\ Can be evaluated on a 2-dimensional <a class="code" href="structarray.html">array</a>:</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(10,20);</div><div class="line">Type ans=f2(x);</div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="multivariate_distributions_8cpp-example.html#_a9">multivariate_distributions.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00369">369</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00375">375</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a></li>
+<li><a class="el" href="density_8hpp_source.html">density.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

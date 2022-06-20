@@ -308,18 +308,18 @@ longest input (no re-cycling) hence is consistent with <code><a class="code" hre
 </div>
 <div id="generators-for-density-objects" class="section level3" number="13.1.2">
 <h3><span class="header-section-number">13.1.2</span> Generators for density objects</h3>
-<p>Objects from the density namespace have their own <code><a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>()</code>
+<p>Objects from the density namespace have their own <code><a class="code" href="../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca">simulate</a>()</code>
 method. Taking the multivariate normal distribution as example we have
 the following ways to draw a simulation:</p>
 <ol style="list-style-type: decimal">
-<li><code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>()</code> returns a vector with a simulation from
+<li><code><a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma).<a class="code" href="../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca">simulate</a>()</code> returns a vector with a simulation from
 the multivariate normal distribution. The void argument version is
 only available when there is no ambiguity in the dimension of the
 output. In the <code>MVNORM</code> case the dimension of the output is known
 from the dimension of <code>Sigma</code>. In other cases e.g. <code>AR1(phi)</code> the
 dimension of the output is not known hence the void argument
 version is not available.</li>
-<li><code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>)</code> pass <code>x</code> by reference and writes the
+<li><code><a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma).<a class="code" href="../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca">simulate</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>)</code> pass <code>x</code> by reference and writes the
 simulation directly to <code>x</code> without returning anything. This version
 is available for <em>all</em> the classes because the dimension of the
 simulation can always be deduced from <code>x</code>.</li>
@@ -442,7 +442,7 @@ simulate from the density objects:</p>
 <span id="cb45-23"><a href="Simulation.html#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>;i&lt;N.<a class="code" href="../structTMBad_1_1period.html#ad870a607cdf6f2f10c423df5d101a158">size</a>();i++)res-=N[i]*eta[i]-exp(eta[i]);</span>
 <span id="cb45-24"><a href="Simulation.html#cb45-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-25"><a href="Simulation.html#cb45-25" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {</span>
-<span id="cb45-26"><a href="Simulation.html#cb45-26" aria-hidden="true" tabindex="-1"></a>    AR1(phi,AR1(phi,AR1(phi,AR1(phi)))).<a class="code" href="../classAR1__t.html#ab50537f15c92d25cc378863c41b63367">simulate</a>(eta);</span>
+<span id="cb45-26"><a href="Simulation.html#cb45-26" aria-hidden="true" tabindex="-1"></a>    AR1(phi,AR1(phi,AR1(phi,AR1(phi)))).<a class="code" href="../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca">simulate</a>(eta);</span>
 <span id="cb45-27"><a href="Simulation.html#cb45-27" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; lam = exp(eta);</span>
 <span id="cb45-28"><a href="Simulation.html#cb45-28" aria-hidden="true" tabindex="-1"></a>    N = <a class="code" href="../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e">rpois</a>(lam);</span>
 <span id="cb45-29"><a href="Simulation.html#cb45-29" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(eta);</span>

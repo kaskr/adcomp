@@ -31,13 +31,12 @@ var searchData=
   ['min',['min',['../convenience_8hpp.html#a6ced780585902c59301c9e0e80044dd2',1,'convenience.hpp']]],
   ['min_5fperiod_5frep',['min_period_rep',['../structTMBad_1_1periodic.html#a41224e1d13159485498eee55b853cb55',1,'TMBad::periodic']]],
   ['model_20object',['Model object',['../ModelObject.html',1,'']]],
-  ['multivariate_5findex',['multivariate_index',['../structTMBad_1_1multivariate__index.html',1,'TMBad']]],
   ['multivariate_5findex',['multivariate_index',['../structTMBad_1_1multivariate__index.html#ab2d6e323b83a17ffc8de2820556784dd',1,'TMBad::multivariate_index::multivariate_index(size_t bound_, size_t dim, bool flag=true)'],['../structTMBad_1_1multivariate__index.html#ad5e30f23949d0f61aa08333a595cd256',1,'TMBad::multivariate_index::multivariate_index(std::vector&lt; size_t &gt; bound, bool flag=true)']]],
+  ['multivariate_5findex',['multivariate_index',['../structTMBad_1_1multivariate__index.html',1,'TMBad']]],
   ['mvintegral',['mvIntegral',['../structgauss__kronrod_1_1mvIntegral.html',1,'gauss_kronrod']]],
   ['mvintegral',['mvIntegral',['../structTMBad_1_1mvIntegral.html',1,'TMBad']]],
   ['mvintegrate',['mvIntegrate',['../namespacegauss__kronrod.html#a4d70d01b00bd9d461e54f17766187a3c',1,'gauss_kronrod::mvIntegrate()'],['../namespaceTMBad.html#a1f0cef3ccb08fc4b9a36d893beed3eff',1,'TMBad::mvIntegrate()']]],
-  ['mvnorm',['MVNORM',['../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07',1,'MVNORM():&#160;density.hpp'],['../namespacedensity.html#a0721aacc998f4cbd0290626073c19763',1,'density::MVNORM()']]],
-  ['mvnorm_5ft',['MVNORM_t',['../classMVNORM__t.html',1,'']]],
+  ['mvnorm',['MVNORM',['../namespacedensity.html#a0721aacc998f4cbd0290626073c19763',1,'density']]],
   ['mvnorm_5ft',['MVNORM_t',['../classdensity_1_1MVNORM__t.html',1,'density']]],
   ['mvnorm_5ft_3c_20scalartype_20_3e',['MVNORM_t&lt; scalartype &gt;',['../classdensity_1_1MVNORM__t.html',1,'density']]]
 ];

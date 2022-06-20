@@ -10,6 +10,6 @@ var searchData=
   ['copy',['copy',['../structTMBad_1_1global_1_1OperatorPure.html#a9a1ba345e1da9bd94ebacf8c6228175c',1,'TMBad::global::OperatorPure::copy()'],['../structTMBad_1_1global_1_1Complete.html#a7f3bef91176e6d4d953731151bc28875',1,'TMBad::global::Complete::copy()'],['../structTMBad_1_1global_1_1ad__aug.html#a2b2cecc8cd3e3a41200534584373663a',1,'TMBad::global::ad_aug::copy()']]],
   ['copy0',['copy0',['../structTMBad_1_1global_1_1ad__aug.html#a553f6ad29c674c0ee02401bc1386060b',1,'TMBad::global::ad_aug']]],
   ['count',['count',['../structTMBad_1_1multivariate__index.html#a0e0963ab1bc981cdf5ad5dc6628ef417',1,'TMBad::multivariate_index']]],
-  ['cov',['cov',['../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc',1,'MVNORM_t::cov()'],['../classARk__t.html#ac2ec7808cbff3f5a0b554c1fa9daf2e6',1,'ARk_t::cov()'],['../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202',1,'density::MVNORM_t::cov()'],['../classdensity_1_1ARk__t.html#aaebe57b632f9f457ebff2e3a7f159292',1,'density::ARk_t::cov()']]],
+  ['cov',['cov',['../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202',1,'density::MVNORM_t::cov()'],['../classdensity_1_1ARk__t.html#aaebe57b632f9f457ebff2e3a7f159292',1,'density::ARk_t::cov()']]],
   ['crossprod',['crossprod',['../structnewton_1_1jacobian__dense__t.html#aee31aba509038390ca02ca26dfdafaa0',1,'newton::jacobian_dense_t']]]
 ];

@@ -4,8 +4,8 @@ var searchData=
   ['accumulation_5ftree_5fsplit',['accumulation_tree_split',['../namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342',1,'TMBad']]],
   ['activedomain',['activeDomain',['../structTMBad_1_1ADFun.html#a167b014b2dd4b054479793a34ec8f15a',1,'TMBad::ADFun']]],
   ['activerange',['activeRange',['../structTMBad_1_1ADFun.html#a05bb7fc1f61fedeb107ac8d34196d336',1,'TMBad::ADFun']]],
-  ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html',1,'TMBad::global']]],
   ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html#a5a51cdf510b60d836a643e55cddccf28',1,'TMBad::global::ad_aug::ad_aug()'],['../structTMBad_1_1global_1_1ad__aug.html#a62ad80b496690f07f498202af3a3d95e',1,'TMBad::global::ad_aug::ad_aug(Scalar x)'],['../structTMBad_1_1global_1_1ad__aug.html#a818efd5406dcb1874a052c14d10ededa',1,'TMBad::global::ad_aug::ad_aug(ad_plain x)']]],
+  ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html',1,'TMBad::global']]],
   ['ad_5fplain_5findex',['ad_plain_index',['../structTMBad_1_1ad__plain__index.html',1,'TMBad']]],
   ['ad_5frange',['ad_range',['../structTMBad_1_1global_1_1ad__range.html',1,'TMBad::global']]],
   ['adapop_5f',['AdapOp_',['../structTMBad_1_1AdapOp__.html',1,'TMBad']]],
@@ -32,13 +32,11 @@ var searchData=
   ['appendix',['Appendix',['../Appendix.html',1,'']]],
   ['apply',['apply',['../structTMBad_1_1intervals.html#aacc3716e44e5196f251f8c45771b251c',1,'TMBad::intervals']]],
   ['ar1_5ft',['AR1_t',['../classdensity_1_1AR1__t.html',1,'density']]],
-  ['ar1_5ft',['AR1_t',['../classAR1__t.html',1,'']]],
   ['args',['Args',['../structTMBad_1_1Args.html',1,'TMBad']]],
   ['args_3c_3e',['Args&lt;&gt;',['../structTMBad_1_1Args.html',1,'TMBad']]],
   ['ark_5ft',['ARk_t',['../classdensity_1_1ARk__t.html',1,'density']]],
-  ['ark_5ft',['ARk_t',['../classARk__t.html',1,'']]],
-  ['array',['array',['../structtmbutils_1_1array.html',1,'tmbutils']]],
   ['array',['array',['../structarray.html',1,'array&lt; Type &gt;'],['../structarray.html#a9d8b76f300cf492b63651d68cfdf07a1',1,'array::array()'],['../structtmbutils_1_1array.html#a9f39c9bdac23bba3ee423a78e9c12f7a',1,'tmbutils::array::array()']]],
+  ['array',['array',['../structtmbutils_1_1array.html',1,'tmbutils']]],
   ['arrayaccess',['ArrayAccess',['../namespaceTMBad.html#ac58fdbf4882a18362578c1727898df5c',1,'TMBad']]],
   ['asmatrix',['asMatrix',['../convert_8hpp.html#a80696d978edf95ca73237181dbadb356',1,'asMatrix(const vector&lt; Type &gt; &amp;x, int nr, int nc):&#160;convert.hpp'],['../convert_8hpp.html#a5365728c1cfe93bc2e66da0afa22ccc7',1,'asMatrix(SEXP x):&#160;convert.hpp']]],
   ['assexp',['asSEXP',['../convert_8hpp.html#a6f1c440f99cb8ec0ea3a65dfe5778a70',1,'asSEXP(const matrix&lt; Type &gt; &amp;a):&#160;convert.hpp'],['../convert_8hpp.html#a807aa91b8ef91565dc11d797dda50f53',1,'asSEXP(Eigen::SparseMatrix&lt; Type &gt; x):&#160;convert.hpp']]],
@@ -52,6 +50,6 @@ var searchData=
   ['atomicglobal',['AtomicGlobal',['../structatomic_1_1AtomicGlobal.html',1,'atomic']]],
   ['atomiclocal',['AtomicLocal',['../structatomic_1_1AtomicLocal.html',1,'atomic']]],
   ['autodiff',['autodiff',['../namespaceautodiff.html',1,'']]],
-  ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]],
-  ['autopar',['autopar',['../structconfig__struct.html#ac49b8edc2dac73ce4b47b589e9eb0dd0',1,'config_struct']]]
+  ['autopar',['autopar',['../structconfig__struct.html#ac49b8edc2dac73ce4b47b589e9eb0dd0',1,'config_struct']]],
+  ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]]
 ];

@@ -79,7 +79,7 @@ $(function() {
 <p>Separable extension of two densitites.  
  <a href="classdensity_1_1SEPARABLE__t.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="density_8hpp_source.html">density.hpp</a>&gt;</code></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class distribution1, class distribution2&gt;<br />
 class density::SEPARABLE_t&lt; distribution1, distribution2 &gt;</h3>
@@ -102,10 +102,10 @@ using rules of the kronecker product we have that
 ... something that can be expressed through the normalizing
 constants f(0) and g(0) ...
 f(0)^nr * g(0)^nq * sqrt(2*pi)^(nq*nr)
-</pre><p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Separable extension of two AR1 processes</span></div><div class="line">Type phi1=0.8;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;N01&lt;Type&gt;</a> &gt; f(phi1);</div><div class="line">Type phi2=0.8;</div><div class="line"><a class="code" href="classAR1__t.html">AR1_t&lt;N01&lt;Type&gt;</a> &gt; g(phi2);</div><div class="line"><a class="code" href="classSEPARABLE__t.html">SEPARABLE_t&lt;AR1_t&lt;N01&lt;Type&gt;</a> &gt; , <a class="code" href="classAR1__t.html">AR1_t&lt;N01&lt;Type&gt;</a> &gt; &gt; h(f,g);</div><div class="line"><span class="comment">// Can be evaluated on an array:</span></div><div class="line"><a class="code" href="structarray.html">array&lt;Type&gt;</a> x(10,20);</div><div class="line">Type ans=h(x);</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01100">1100</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+</pre><p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Separable extension of two AR1 processes</span></div><div class="line">Type phi1=0.8;</div><div class="line">AR1_t&lt;N01&lt;Type&gt; &gt; f(phi1);</div><div class="line">Type phi2=0.8;</div><div class="line">AR1_t&lt;N01&lt;Type&gt; &gt; g(phi2);</div><div class="line">SEPARABLE_t&lt;AR1_t&lt;N01&lt;Type&gt; &gt; , AR1_t&lt;N01&lt;Type&gt; &gt; &gt; h(f,g);</div><div class="line"><span class="comment">// Can be evaluated on an array:</span></div><div class="line"><a class="code" href="structarray.html">array&lt;Type&gt;</a> x(10,20);</div><div class="line">Type ans=h(x);</div></div><!-- fragment --> 
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l01106">1106</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a></li>
+<li><a class="el" href="density_8hpp_source.html">density.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

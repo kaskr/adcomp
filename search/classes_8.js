@@ -12,6 +12,5 @@ var searchData=
   ['mvintegral',['mvIntegral',['../structgauss__kronrod_1_1mvIntegral.html',1,'gauss_kronrod']]],
   ['mvintegral',['mvIntegral',['../structTMBad_1_1mvIntegral.html',1,'TMBad']]],
   ['mvnorm_5ft',['MVNORM_t',['../classdensity_1_1MVNORM__t.html',1,'density']]],
-  ['mvnorm_5ft',['MVNORM_t',['../classMVNORM__t.html',1,'']]],
   ['mvnorm_5ft_3c_20scalartype_20_3e',['MVNORM_t&lt; scalartype &gt;',['../classdensity_1_1MVNORM__t.html',1,'density']]]
 ];

@@ -1,11 +1,10 @@
 var searchData=
 [
   ['n01',['N01',['../classdensity_1_1N01.html',1,'density']]],
-  ['n01',['N01',['../classN01.html',1,'']]],
   ['newton',['newton',['../namespacenewton.html',1,'newton'],['../namespacenewton.html#ace0d0afa0de08ecca62779979470290b',1,'newton::Newton()']]],
   ['newton_5fconfig',['newton_config',['../structnewton_1_1newton__config.html',1,'newton']]],
-  ['newtonoperator',['NewtonOperator',['../structnewton_1_1NewtonOperator.html',1,'newton']]],
   ['newtonoperator',['NewtonOperator',['../structnewton_1_1NewtonOperator.html#ab160781dc5fa76fc4151b4777d1fcab0',1,'newton::NewtonOperator']]],
+  ['newtonoperator',['NewtonOperator',['../structnewton_1_1NewtonOperator.html',1,'newton']]],
   ['next_5fcallop',['next_CallOp',['../structTMBad_1_1CallOp__.html#afc4dfb756832a70fe5c428d433ded360',1,'TMBad::CallOp_']]],
   ['next_5fdglob',['next_Dglob',['../structTMBad_1_1CallOp__.html#a09f4313e95a881306f1e528a9ced5a0e',1,'TMBad::CallOp_']]],
   ['next_5fglob',['next_glob',['../structTMBad_1_1CallOp__.html#a0356ec2d9628acc786f4d1153588499f',1,'TMBad::CallOp_']]],

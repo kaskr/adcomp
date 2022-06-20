@@ -2,7 +2,7 @@ var searchData=
 [
   ['unprotect_5fchild',['unprotect_child',['../structTMBad_1_1CallOp__.html#ada419c024ced65ea2b03f597d4bca6a8',1,'TMBad::CallOp_']]],
   ['unset_5ftail',['unset_tail',['../structTMBad_1_1ADFun.html#aeb4174f46532ec9bf1a83604df30eec6',1,'TMBad::ADFun']]],
-  ['unstructured_5fcorr',['UNSTRUCTURED_CORR',['../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5',1,'UNSTRUCTURED_CORR():&#160;density.hpp'],['../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4',1,'density::UNSTRUCTURED_CORR()']]],
+  ['unstructured_5fcorr',['UNSTRUCTURED_CORR',['../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4',1,'density']]],
   ['update',['update',['../structTMBad_1_1sequential__reduction.html#a891f93e1abb8011af47a24e2dc84b63d',1,'TMBad::sequential_reduction']]],
   ['update_5fderiv',['update_deriv',['../structTMBad_1_1CallOp__.html#ad9fc43f097a4b98f787a94774c17dbd6',1,'TMBad::CallOp_']]]
 ];

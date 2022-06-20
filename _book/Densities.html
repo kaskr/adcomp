@@ -313,8 +313,8 @@ that we want to evaluate at <em>x</em>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="Densities.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span>
 <span id="cb9-2"><a href="Densities.html#cb9-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);     <span class="co">// Covariance matrix</span></span>
 <span id="cb9-3"><a href="Densities.html#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// ..... User must assign <a class="code" href="../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02">value</a> to Sigma here</span></span>
-<span id="cb9-4"><a href="Densities.html#cb9-4" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);      <span class="co">// Evaluate negative log likelihod</span></span></code></pre></div>
-<p>In the last line <code><a class="code" href="../density_8hpp.html#a0ab00cdcb2757d23910a6d54523eec07">MVNORM</a>(Sigma)</code> should be interpreted as a
+<span id="cb9-4"><a href="Densities.html#cb9-4" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);      <span class="co">// Evaluate negative log likelihod</span></span></code></pre></div>
+<p>In the last line <code><a class="code" href="../namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)</code> should be interpreted as a
 multivariate density, which via the last parenthesis <code>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>)</code> is
 evaluated at <code>x</code>. A less compact way of expressing this is</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="Densities.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dt">MVNORM_t</span>&lt;Type&gt; your_dmnorm(Sigma);</span>
@@ -326,23 +326,23 @@ when you need to evaluate the density more than once, i.e. for different values
 <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances
 and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of
 these freely (modulo the positive definite constraint) you can use
-<code><a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>()</code> to specify the correlation matrix, and
-<code><a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>()</code> to specify variances. <code><a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>()</code> takes as
+<code><a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>()</code> to specify the correlation matrix, and
+<code><a class="code" href="../namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>()</code> to specify variances. <code><a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>()</code> takes as
 input a vector a dummy parameters that internally is used to build the
 correlation matrix via its cholesky factor.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="Densities.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span>
 <span id="cb11-2"><a href="Densities.html#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = <span class="dv">10</span>;</span>
 <span id="cb11-3"><a href="Densities.html#cb11-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; unconstrained_params(n*(n-<span class="dv">1</span>)/<span class="dv">2</span>);  <span class="co">// Dummy parameterization of correlation matrix</span></span>
 <span id="cb11-4"><a href="Densities.html#cb11-4" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; sds(n);                           <span class="co">// Standard deviations</span></span>
-<span id="cb11-5"><a href="Densities.html#cb11-5" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e">VECSCALE</a>(<a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span></code></pre></div>
+<span id="cb11-5"><a href="Densities.html#cb11-5" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>(<a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span></code></pre></div>
 <p>If all elements of <code>dummy_params</code> are estimated we are in effect
 estimating a full correlation matrix without any constraints on its
 elements (except for the mandatory positive definiteness). The actual
 value of the correlation matrix, but not the full covariance matrix,
-can easily be assessed using the <code>.<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>()</code> operator</p>
+can easily be assessed using the <code>.<a class="code" href="../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202">cov</a>()</code> operator</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="Densities.html#cb12-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html#accfc8dbb05153041d1d72dbbec388130">matrix</a>&lt;Type&gt; Sigma(n,n);</span>
-<span id="cb12-2"><a href="Densities.html#cb12-2" aria-hidden="true" tabindex="-1"></a>Sigma = <a class="code" href="../density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classMVNORM__t.html#a7bd0bc2ecad6f323974b247b81220acc">cov</a>();</span>
-<span id="cb12-3"><a href="Densities.html#cb12-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to <a class="code" href="../structinterpol2D__config.html#a8e8fccc28eb97428896340a222d199d5">R</a> session</span></span></code></pre></div>
+<span id="cb12-2"><a href="Densities.html#cb12-2" aria-hidden="true" tabindex="-1"></a>Sigma = <a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202">cov</a>();</span>
+<span id="cb12-3"><a href="Densities.html#cb12-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to <a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a> session</span></span></code></pre></div>
 </div>
 <div id="autoregressive-processes" class="section level2" number="6.2">
 <h2><span class="header-section-number">6.2</span> Autoregressive processes</h2>
@@ -433,8 +433,8 @@ correlation given by</p>
 <span id="cb17-7"><a href="Densities.html#cb17-7" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structarray.html">array</a>&lt;Type&gt; <a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>(n_s,<span class="dt">n_t</span>);</span>
 <span id="cb17-8"><a href="Densities.html#cb17-8" aria-hidden="true" tabindex="-1"></a>x.setZero();                    <span class="co">// <a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a> = 0</span></span>
 <span id="cb17-9"><a href="Densities.html#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="Densities.html#cb17-10" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>(AR1(<span class="dt">rho_t</span>),AR1(rho_s))(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span></code></pre></div>
-<p>Note that the arguments to <code><a class="code" href="../density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57">SEPARABLE</a>()</code> are given in the opposite order
+<span id="cb17-10"><a href="Densities.html#cb17-10" aria-hidden="true" tabindex="-1"></a>res = <a class="code" href="../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(<span class="dt">rho_t</span>),AR1(rho_s))(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span></code></pre></div>
+<p>Note that the arguments to <code><a class="code" href="../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>()</code> are given in the opposite order
 to the dimensions of <code>x</code>.</p>
 </div>
 </div>

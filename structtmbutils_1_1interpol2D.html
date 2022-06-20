@@ -80,20 +80,18 @@ $(function() {
 <p>Get a smooth representation of a <b>data</b> matrix.  
  <a href="structtmbutils_1_1interpol2D.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="interpol_8hpp_source.html">interpol.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:adad8980f72d664ad1653875ed7aca788"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1interpol2D.html#adad8980f72d664ad1653875ed7aca788">interpol2D</a> (<a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt; data, <a class="el" href="structtmbutils_1_1vector.html">vector</a>&lt; Type &gt; x_range, <a class="el" href="structtmbutils_1_1vector.html">vector</a>&lt; Type &gt; y_range, <a class="el" href="structtmbutils_1_1interpol2D__config.html">interpol2D_config</a>&lt; Type &gt; cfg=<a class="el" href="structtmbutils_1_1interpol2D__config.html">interpol2D_config</a>&lt; Type &gt;())</td></tr>
 <tr class="memdesc:adad8980f72d664ad1653875ed7aca788"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct interpolation object.  <a href="#adad8980f72d664ad1653875ed7aca788">More...</a><br /></td></tr>
 <tr class="separator:adad8980f72d664ad1653875ed7aca788"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21df8f91346fd9d1f284155e9e53eaa4"><td class="memItemLeft" align="right" valign="top"><a id="a21df8f91346fd9d1f284155e9e53eaa4"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1interpol2D.html#a21df8f91346fd9d1f284155e9e53eaa4">operator()</a> (double x, double y, int nx=0, int ny=0)</td></tr>
-<tr class="memdesc:a21df8f91346fd9d1f284155e9e53eaa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar evaluation with double types. <br /></td></tr>
+<tr class="memitem:a21df8f91346fd9d1f284155e9e53eaa4"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1interpol2D.html#a21df8f91346fd9d1f284155e9e53eaa4">operator()</a> (double x, double y, int nx=0, int ny=0)</td></tr>
+<tr class="memdesc:a21df8f91346fd9d1f284155e9e53eaa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar evaluation with double types.  <a href="#a21df8f91346fd9d1f284155e9e53eaa4">More...</a><br /></td></tr>
 <tr class="separator:a21df8f91346fd9d1f284155e9e53eaa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac70de67ddb5c906665b62bd33528859e"><td class="memItemLeft" align="right" valign="top"><a id="ac70de67ddb5c906665b62bd33528859e"></a>
-<a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1interpol2D.html#ac70de67ddb5c906665b62bd33528859e">operator()</a> (<a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a> x, <a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a> y, int nx=0, int ny=0)</td></tr>
-<tr class="memdesc:ac70de67ddb5c906665b62bd33528859e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar evaluation with ad types. <br /></td></tr>
+<tr class="memitem:ac70de67ddb5c906665b62bd33528859e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1interpol2D.html#ac70de67ddb5c906665b62bd33528859e">operator()</a> (<a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a> x, <a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a> y, int nx=0, int ny=0)</td></tr>
+<tr class="memdesc:ac70de67ddb5c906665b62bd33528859e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar evaluation with ad types.  <a href="#ac70de67ddb5c906665b62bd33528859e">More...</a><br /></td></tr>
 <tr class="separator:ac70de67ddb5c906665b62bd33528859e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structTMBad_1_1global_1_1Operator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structTMBad_1_1global_1_1Operator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structTMBad_1_1global_1_1Operator.html">TMBad::global::Operator&lt; ninput, noutput &gt;</a></td></tr>
 <tr class="memitem:ab69366c03963e826043947e83d392909 inherit pub_methods_structTMBad_1_1global_1_1Operator"><td class="memItemLeft" align="right" valign="top"><a id="ab69366c03963e826043947e83d392909"></a>
@@ -199,12 +197,12 @@ struct tmbutils::interpol2D&lt; Type &gt;</h3>
 <p>Get a smooth representation of a <b>data</b> matrix. </p>
 <p>This 2D interpolation can be put on the AD tape. Interpolation data is shared among instances so you can do interpolation many times without duplicating the data.</p>
 <p>In addition the operator is thread safe, whether used with manual parallelization (<code><a class="el" href="structparallel__accumulator.html" title="Helper to manage parallel accumulation. ">parallel_accumulator</a></code> etc) or automatic parallization (<code><a class="el" href="structTMBad_1_1autopar.html" title="Split a computational graph using a simple heuristic. ">TMBad::autopar</a></code>).</p>
-<p>The actual interpolation is based on a kernel smoothing approach: To obtain the interpolated value at coordinate (x,y), the coordinate is first transformed to continous matrix index coordinates. The distance to each matrix entry <code>d(i,j)</code> is calculated and a corresponding 'weight' is given as a function (kernel) of the distance divided by the 'interpolation radius' (R), i.e. <code>W(i,j)=kernel(d(i,j)/R)</code>. The final interpolated value becomes <code>sum(W*F)/sum(W)</code> where <code>F</code> is the data matrix.</p>
-<p>We note that the interpolation radius (<a class="el" href="structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb" title="Interpolation radius relative to integer lattice. ">interpol2D_config::R</a>) is relative to matrix index coordinates (and is thus unaffected by the <code>x_range</code> and <code>y_range</code>).</p>
+<p>The actual interpolation is based on a kernel smoothing approach: To obtain the interpolated value at coordinate (x,y), the coordinate is first transformed to continous matrix index coordinates using the supplied <code>x_range</code> and <code>y_range</code>. The distance to each matrix entry <code>d(i,j)</code> is then calculated, and a corresponding 'weight' is given as a function (kernel) of the distance divided by the 'interpolation radius' (R), i.e. <code>W(i,j)=kernel(d(i,j)/R)</code>. The final interpolated value becomes <code>sum(W*F)/sum(W)</code> where <code>F</code> is the data matrix.</p>
+<p>We note that the interpolation radius (<a class="el" href="structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb" title="Interpolation radius relative to integer lattice. ">interpol2D_config::R</a>) is relative to matrix index coordinates (and is thus not related to the <code>x_range</code> and <code>y_range</code>).</p>
 <dl class="section note"><dt>Note</dt><dd>An error is triggered if some data are not constant </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="TMBad_2interpol_8cpp-example.html#_a0">TMBad/interpol.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00138">138</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="interpol_8hpp_source.html#l00145">145</a> of file <a class="el" href="interpol_8hpp_source.html">interpol.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="adad8980f72d664ad1653875ed7aca788"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adad8980f72d664ad1653875ed7aca788">&sect;&nbsp;</a></span>interpol2D()</h2>
@@ -265,12 +263,139 @@ template&lt;class Type &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00158">158</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="interpol_8hpp_source.html#l00165">165</a> of file <a class="el" href="interpol_8hpp_source.html">interpol.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a21df8f91346fd9d1f284155e9e53eaa4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21df8f91346fd9d1f284155e9e53eaa4">&sect;&nbsp;</a></span>operator()() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="structtmbutils_1_1interpol2D.html">tmbutils::interpol2D</a>&lt; Type &gt;::operator() </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Scalar evaluation with double types. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>x-coordinate </td></tr>
+    <tr><td class="paramname">y</td><td>y-coordinate </td></tr>
+    <tr><td class="paramname">nx</td><td>x-derivative order </td></tr>
+    <tr><td class="paramname">ny</td><td>y-derivative order </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="interpol_8hpp_source.html#l00193">193</a> of file <a class="el" href="interpol_8hpp_source.html">interpol.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac70de67ddb5c906665b62bd33528859e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac70de67ddb5c906665b62bd33528859e">&sect;&nbsp;</a></span>operator()() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a> <a class="el" href="structtmbutils_1_1interpol2D.html">tmbutils::interpol2D</a>&lt; Type &gt;::operator() </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a>&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad</a>&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nx</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ny</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Scalar evaluation with ad types. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>x-coordinate </td></tr>
+    <tr><td class="paramname">y</td><td>y-coordinate </td></tr>
+    <tr><td class="paramname">nx</td><td>x-derivative order </td></tr>
+    <tr><td class="paramname">ny</td><td>y-derivative order </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="interpol_8hpp_source.html#l00202">202</a> of file <a class="el" href="interpol_8hpp_source.html">interpol.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a></li>
+<li><a class="el" href="interpol_8hpp_source.html">interpol.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

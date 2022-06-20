@@ -80,7 +80,7 @@ $(function() {
 <p>Multivariate normal distribution with user supplied covariance matrix.  
  <a href="classdensity_1_1MVNORM__t.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="density_8hpp_source.html">density.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -100,9 +100,9 @@ scalartype&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 class density::MVNORM_t&lt; scalartype_ &gt;</h3>
 
 <p>Multivariate normal distribution with user supplied covariance matrix. </p>
-<p>Class to evaluate the negative log density of a mean zero multivariate Gaussian variable with general covariance matrix Sigma. Intended for small dense covariance matrices. </p><div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(3,3);</div><div class="line">Sigma.fill(0.1);             <span class="comment">// Fill the whole matrix</span></div><div class="line">Sigma.diagonal() *= 10.0;    <span class="comment">// Multiply diagonal by 10 to positive definite Sigma</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x0(3);          <span class="comment">// Point of evaluation</span></div><div class="line">x0.fill(0.0);                <span class="comment">// Initialize x0 to be zero</span></div><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> N_0_Sigma(Sigma);   <span class="comment">// N_0_Sigma is now a Distribution  </span></div><div class="line">res = N_0_Sigma(x0);         <span class="comment">// Evaluates (neg. log) density at x</span></div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="laplace_8cpp-example.html#_a6">laplace.cpp</a>, <a class="el" href="matern_8cpp-example.html#_a5">matern.cpp</a>, <a class="el" href="multivariate_distributions_8cpp-example.html#_a2">multivariate_distributions.cpp</a>, <a class="el" href="mvrw_8cpp-example.html#_a6">mvrw.cpp</a>, <a class="el" href="sam_8cpp-example.html#_a10">sam.cpp</a>, <a class="el" href="spatial_8cpp-example.html#_a6">spatial.cpp</a>, <a class="el" href="TMBad_2sam_8cpp-example.html#_a10">TMBad/sam.cpp</a>, <a class="el" href="TMBad_2spatial_8cpp-example.html#_a6">TMBad/spatial.cpp</a>, and <a class="el" href="validation_2MVRandomWalkValidation_8cpp-example.html#_a7">validation/MVRandomWalkValidation.cpp</a>.</dd>
+<p>Class to evaluate the negative log density of a mean zero multivariate Gaussian variable with general covariance matrix Sigma. Intended for small dense covariance matrices. </p><div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(3,3);</div><div class="line">Sigma.fill(0.1);             <span class="comment">// Fill the whole matrix</span></div><div class="line">Sigma.diagonal() *= 10.0;    <span class="comment">// Multiply diagonal by 10 to positive definite Sigma</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x0(3);          <span class="comment">// Point of evaluation</span></div><div class="line">x0.fill(0.0);                <span class="comment">// Initialize x0 to be zero</span></div><div class="line">MVNORM_t&lt;Type&gt; N_0_Sigma(Sigma);   <span class="comment">// N_0_Sigma is now a Distribution  </span></div><div class="line">res = N_0_Sigma(x0);         <span class="comment">// Evaluates (neg. log) density at x</span></div></div><!-- fragment --> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="laplace_8cpp-example.html#_a6">laplace.cpp</a>, <a class="el" href="matern_8cpp-example.html#_a5">matern.cpp</a>, <a class="el" href="multivariate_distributions_8cpp-example.html#_a2">multivariate_distributions.cpp</a>, <a class="el" href="mvrw_8cpp-example.html#_a6">mvrw.cpp</a>, <a class="el" href="sam_8cpp-example.html#_a10">sam.cpp</a>, <a class="el" href="spatial_8cpp-example.html#_a6">spatial.cpp</a>, <a class="el" href="TMBad_2sam_8cpp-example.html#_a10">TMBad/sam.cpp</a>, <a class="el" href="TMBad_2spatial_8cpp-example.html#_a6">TMBad/spatial.cpp</a>, and <a class="el" href="validation_2MVRandomWalkValidation_8cpp-example.html#_a7">validation/MVRandomWalkValidation.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00106">106</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00112">112</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a1d284b3f3adac475399ae1e5428cb202"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1d284b3f3adac475399ae1e5428cb202">&sect;&nbsp;</a></span>cov()</h2>
@@ -130,9 +130,9 @@ template&lt;class scalartype_&gt; </div>
 </div><div class="memdoc">
 
 <p>Covariance matrix extractor. </p>
-<p>Typical use: </p><div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(3,3);</div><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> N_0_Sigma(Sigma);   <span class="comment">// N_0_Sigma is now a Distribution  </span></div><div class="line">N_0_Sigma.cov();                   <span class="comment">// Returns covariance matrix (Sigma in this case)</span></div></div><!-- fragment --><p> Useful for classes such as <a class="el" href="classUNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t</a> that inherits from <a class="el" href="classdensity_1_1MVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a>. </p>
+<p>Typical use: </p><div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(3,3);</div><div class="line">MVNORM_t&lt;Type&gt; N_0_Sigma(Sigma);   <span class="comment">// N_0_Sigma is now a Distribution  </span></div><div class="line">N_0_Sigma.cov();                   <span class="comment">// Returns covariance matrix (Sigma in this case)</span></div></div><!-- fragment --><p> Useful for classes such as <a class="el" href="classdensity_1_1UNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t</a> that inherits from <a class="el" href="classdensity_1_1MVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a>. </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00128">128</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00134">134</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
@@ -180,12 +180,12 @@ template&lt;class scalartype_&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00156">156</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l00162">162</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a></li>
+<li><a class="el" href="density_8hpp_source.html">density.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

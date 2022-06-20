@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lgamma_2ehpp',['lgamma.hpp',['../lgamma_8hpp.html',1,'']]]
+  ['kronecker_2ehpp',['kronecker.hpp',['../kronecker_8hpp.html',1,'']]]
 ];

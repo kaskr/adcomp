@@ -80,7 +80,7 @@ $(function() {
 <p>Apply a vector scale transformation on a density.  
  <a href="classdensity_1_1VECSCALE__t.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="density_8hpp_source.html">density.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -102,14 +102,14 @@ class density::VECSCALE_t&lt; distribution &gt;</h3>
   </table>
   </dd>
 </dl>
-<dl class="section remark"><dt>Remarks</dt><dd>To scale the standard deviations of a unit-variance multivariate normal distribution of class <a class="el" href="classdensity_1_1UNSTRUCTURED__CORR__t.html" title="Multivariate normal distribution with unstructered correlation matrix. ">UNSTRUCTURED_CORR_t</a>: <div class="fragment"><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> Lx(6);                                  </div><div class="line"><a class="code" href="classUNSTRUCTURED__CORR__t.html">UNSTRUCTURED_CORR_t&lt;Type&gt;</a> nll(Lx);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> sds(4);</div><div class="line">sds.fill(2.0);                            <span class="comment">// Set all standard deviations to 2.0</span></div><div class="line">res = <a class="code" href="classVECSCALE__t.html">VECSCALE_t</a>(nll,sds)(x);</div></div><!-- fragment --></dd>
+<dl class="section remark"><dt>Remarks</dt><dd>To scale the standard deviations of a unit-variance multivariate normal distribution of class <a class="el" href="classdensity_1_1UNSTRUCTURED__CORR__t.html" title="Multivariate normal distribution with unstructered correlation matrix. ">UNSTRUCTURED_CORR_t</a>: <div class="fragment"><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> Lx(6);                                  </div><div class="line">UNSTRUCTURED_CORR_t&lt;Type&gt; nll(Lx);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> sds(4);</div><div class="line">sds.fill(2.0);                            <span class="comment">// Set all standard deviations to 2.0</span></div><div class="line">res = VECSCALE_t(nll,sds)(x);</div></div><!-- fragment --></dd>
 <dd>
-Another application is to scale the variance of a unit-variance AR(1) process; see <a class="el" href="classAR1__t.html">AR1_t</a> . </dd></dl>
+Another application is to scale the variance of a unit-variance AR(1) process; see <a class="el" href="classdensity_1_1AR1__t.html">AR1_t</a> . </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="mvrw_sparse_8cpp-example.html#_a5">mvrw_sparse.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l01013">1013</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="density_8hpp_source.html#l01019">1019</a> of file <a class="el" href="density_8hpp_source.html">density.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a></li>
+<li><a class="el" href="density_8hpp_source.html">density.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

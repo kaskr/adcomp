@@ -24,7 +24,6 @@ var searchData=
   ['print_5fconfig',['print_config',['../structTMBad_1_1global_1_1print__config.html',1,'TMBad::global']]],
   ['prod_5fint',['prod_int',['../namespaceTMBad.html#ad2bc1b8c42b0b04c39a847649707f86c',1,'TMBad']]],
   ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]],
-  ['proj_5ft',['PROJ_t',['../classPROJ__t.html',1,'']]],
   ['protect_5fchild',['protect_child',['../structTMBad_1_1CallOp__.html#a29f35910987bd7a5c3c5537a7b3d53e9',1,'TMBad::CallOp_']]],
   ['pshasho',['pSHASHo',['../group__R__style__distribution.html#gaf8d16a1e0e699a2b6975b9ce219ea51a',1,'distributions_R.hpp']]],
   ['ptr',['ptr',['../structTMBad_1_1Args.html#aa9514d46195bc915e622947734866d46',1,'TMBad::Args']]],

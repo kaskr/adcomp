@@ -6,7 +6,6 @@ var searchData=
   ['complete',['Complete',['../structTMBad_1_1global_1_1Complete.html',1,'TMBad::global']]],
   ['complete_3c_20tmbad_3a_3acallop_5f_20_3e',['Complete&lt; TMBad::CallOp_ &gt;',['../structTMBad_1_1global_1_1Complete.html',1,'TMBad::global']]],
   ['config_5fstruct',['config_struct',['../structconfig__struct.html',1,'']]],
-  ['contar2_5ft',['contAR2_t',['../classcontAR2__t.html',1,'']]],
   ['contar2_5ft',['contAR2_t',['../classdensity_1_1contAR2__t.html',1,'density']]],
   ['control',['control',['../structTMBad_1_1control.html',1,'TMBad']]],
   ['control',['control',['../structgauss__kronrod_1_1control.html',1,'gauss_kronrod']]],

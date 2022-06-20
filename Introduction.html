@@ -175,11 +175,11 @@ Multivariate distributions </h1>
 <p>Consider a zero-mean multivariate normal distribution with covariance matrix <em>Sigma</em> (symmetric positive definite), that we want to evaluate at <em>x</em>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> n = 10;</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> x(n);           <span class="comment">// Evaluation point           </span></div><div class="line">x.fill(0.0);                 <span class="comment">// Point of evaluation: x = (0,0,...,0)</span></div></div><!-- fragment --><p>The negative log-normal density is evaluated as follows:</p>
 <div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacedensity.html">density</a>;</div><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(n,n);     <span class="comment">// Covariance matrix</span></div><div class="line"><span class="comment">// ..... User must assign value to Sigma here</span></div><div class="line">res = <a class="code" href="namespacedensity.html#a0721aacc998f4cbd0290626073c19763">MVNORM</a>(Sigma)(x);      <span class="comment">// Evaluate negative log likelihod</span></div></div><!-- fragment --><p>In the last line <code>MVNORM(Sigma)</code> should be interpreted as a multivariate density, which via the last parenthesis <code>(x)</code> is evaluated at <code>x</code>. A less compact way of expressing this is</p>
-<div class="fragment"><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> your_dmnorm(Sigma);</div><div class="line">res = your_dmnorm(x);</div></div><!-- fragment --><p>in which <code>your_dmnorm</code> is a variable that holds the "density".</p>
-<p>Note, that the latter way (using the <code><a class="el" href="classMVNORM__t.html" title="Multivariate normal distribution with user supplied covariance matrix. ">MVNORM_t</a></code>) is <em>more efficient</em> when you need to evaluate the density more than once, i.e. for different values of <code>x</code>.</p>
-<p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of these freely (modulo the positive definite constraint) you can use <code><a class="el" href="density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5" title="Construct object to evaluate the density with unstructured correlation matrix. See UNSTRUCTURED_CORR_...">UNSTRUCTURED_CORR()</a></code> to specify the correlation matrix, and <code><a class="el" href="density_8hpp.html#aae30a0275dafde20092e4c12c6bda61e" title="Construct object to evaluate a scaled density. See VECSCALE_t for details. ">VECSCALE()</a></code> to specify variances. <code><a class="el" href="density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5" title="Construct object to evaluate the density with unstructured correlation matrix. See UNSTRUCTURED_CORR_...">UNSTRUCTURED_CORR()</a></code> takes as input a vector a dummy parameters that internally is used to build the correlation matrix via its cholesky factor.</p>
+<div class="fragment"><div class="line">MVNORM_t&lt;Type&gt; your_dmnorm(Sigma);</div><div class="line">res = your_dmnorm(x);</div></div><!-- fragment --><p>in which <code>your_dmnorm</code> is a variable that holds the "density".</p>
+<p>Note, that the latter way (using the <code>MVNORM_t</code>) is <em>more efficient</em> when you need to evaluate the density more than once, i.e. for different values of <code>x</code>.</p>
+<p><em>Sigma</em> can be parameterized in different ways. Due to the symmetry of <em>Sigma</em> there are at most <em>n(n+1)/2</em> free parameters (<em>n</em> variances and <em>n(n-1)/2</em> correlation parameters). If you want to estimate all of these freely (modulo the positive definite constraint) you can use <code><a class="el" href="namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4" title="Construct object to evaluate the density with unstructured correlation matrix. See UNSTRUCTURED_CORR_...">UNSTRUCTURED_CORR()</a></code> to specify the correlation matrix, and <code><a class="el" href="namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680" title="Construct object to evaluate a scaled density. See VECSCALE_t for details. ">VECSCALE()</a></code> to specify variances. <code><a class="el" href="namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4" title="Construct object to evaluate the density with unstructured correlation matrix. See UNSTRUCTURED_CORR_...">UNSTRUCTURED_CORR()</a></code> takes as input a vector a dummy parameters that internally is used to build the correlation matrix via its cholesky factor.</p>
 <div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacedensity.html">density</a>;</div><div class="line"><span class="keywordtype">int</span> n = 10;</div><div class="line">vector&lt;Type&gt; unconstrained_params(n*(n-1)/2);  <span class="comment">// Dummy parameterization of correlation matrix</span></div><div class="line">vector&lt;Type&gt; sds(n);                           <span class="comment">// Standard deviations</span></div><div class="line">res = <a class="code" href="namespacedensity.html#ad4883b13b683e6b9e1e27846b74e4680">VECSCALE</a>(<a class="code" href="namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params),sds)(x);</div></div><!-- fragment --><p>If all elements of <code>dummy_params</code> are estimated we are in effect estimating a full correlation matrix without any constraints on its elements (except for the mandatory positive definiteness). The actual value of the correlation matrix, but not the full covariance matrix, can easily be assessed using the <code>.cov()</code> operator</p>
-<div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(n,n);</div><div class="line">Sigma = <a class="code" href="density_8hpp.html#ac4f63b9a5cd5b2eff0871db3fd889fd5">UNSTRUCTURED_CORR</a>(unconstrained_params).cov();</div><div class="line"><a class="code" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="comment">// Report back to R session</span></div></div><!-- fragment --><h2>Autoregressive processes</h2>
+<div class="fragment"><div class="line"><a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> Sigma(n,n);</div><div class="line">Sigma = <a class="code" href="namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params).cov();</div><div class="line"><a class="code" href="group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="comment">// Report back to R session</span></div></div><!-- fragment --><h2>Autoregressive processes</h2>
 <p>Consider a stationary univariate Gaussian AR1 process <em>x(t),t=0,...,n-1</em>. The stationary distribution is choosen so that:</p>
 <ul>
 <li><em>x(t)</em> has mean 0 and variance 1 (for all <em>t</em>).</li>
@@ -195,27 +195,27 @@ Multivariate distributions </h1>
 <h4>Multivariate AR1 processes</h4>
 <p>This is the first real illustration of how distributions can be used as building blocks to obtain more complex distributions. Consider the <em>p</em> dimensional AR1 process</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> n = 10;                   <span class="comment">// Number of time steps</span></div><div class="line"><span class="keywordtype">int</span> p=3;                      <span class="comment">// dim(x)</span></div><div class="line"><a class="code" href="structarray.html">array&lt;Type&gt;</a> x(p,n);           <span class="comment">// Evaluation point</span></div></div><!-- fragment --><p>The columns in <code>x</code> refer to the different time points. We then evaluate the (negative log) joint density of the time series.</p>
-<div class="fragment"><div class="line"><a class="code" href="classMVNORM__t.html">MVNORM_t&lt;Type&gt;</a> your_dmnorm(Sigma);  <span class="comment">// Density of x(t) </span></div><div class="line">Type phi;                           <span class="comment">// Correlation parameter</span></div><div class="line">res = AR1(phi,your_dmnorm)(x);</div></div><!-- fragment --><p>Note the following:</p>
+<div class="fragment"><div class="line">MVNORM_t&lt;Type&gt; your_dmnorm(Sigma);  <span class="comment">// Density of x(t) </span></div><div class="line">Type phi;                           <span class="comment">// Correlation parameter</span></div><div class="line">res = AR1(phi,your_dmnorm)(x);</div></div><!-- fragment --><p>Note the following:</p>
 <ul>
 <li>We have introduced an intermediate variable <code>your_dmnorm</code>, which holds the p-dim density marginal density of <em>x(t)</em>. This is a zero-mean normal density with covariance matrix <code>Sigma</code>.</li>
 <li>All <em>p</em> univarite time series have the same serial correlation <em>phi</em>.</li>
 <li>The multivariate process <em>x(t)</em> is stationary in the same sense as the univariate AR1 process described above.</li>
 </ul>
 <h4>Higher order AR processes</h4>
-<p>There also exists <a class="el" href="classARk__t.html">ARk_t</a> of arbitrary autoregressive order.</p>
+<p>There also exists ARk_t of arbitrary autoregressive order.</p>
 <h2>Gaussian Markov random fields (GMRF)</h2>
 <p>GMRF may be defined in two ways:</p>
 <ol type="1">
 <li>Via a (sparse) precision matrix Q.</li>
 <li>Via a d-dimensional lattice.</li>
 </ol>
-<p>For further details please see <a class="el" href="classGMRF__t.html">GMRF_t</a>. Under 1) a sparse Q corresponding to a Matern covariance function can be obtained via the <a class="el" href="namespaceR__inla.html">R_inla</a> namespace.</p>
+<p>For further details please see GMRF_t. Under 1) a sparse Q corresponding to a Matern covariance function can be obtained via the <a class="el" href="namespaceR__inla.html">R_inla</a> namespace.</p>
 <h2>Separable construction of covariance (precision) matrices</h2>
-<p>A typical use of separability is to create space-time models with a sparse precision matrix. Details are given in <a class="el" href="classSEPARABLE__t.html">SEPARABLE_t</a>. Here we give a simple example.</p>
+<p>A typical use of separability is to create space-time models with a sparse precision matrix. Details are given in SEPARABLE_t. Here we give a simple example.</p>
 <p>Assume that we study a quantity <code>x</code> that changes both in space and time. For simplicity we consider only a one-dimensional space. We discretize space and time using equidistant grids, and assume that the distance between grid points is 1 in both dimensions. We then define an <code>AR1(rho_s)</code> process in space and one in time <code>AR1(rho_t)</code>. The separable assumption is that two points <code>x1</code> and <code>x2</code>, separated in space by a distance <code>ds</code> and in time by a distance <code>dt</code>, have correlation given by</p>
 <p><code>rho_s^ds*rho_t^dt</code></p>
 <p>This is implemented as</p>
-<div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacedensity.html">density</a>;</div><div class="line"><span class="keywordtype">int</span> n_s = 10;                   <span class="comment">// Number of grid points in space</span></div><div class="line"><span class="keywordtype">int</span> n_t = 10;                   <span class="comment">// Number of grid points in time</span></div><div class="line">Type rho_s = 0.2;               <span class="comment">// Correlation in space</span></div><div class="line">Type rho_t = 0.4;               <span class="comment">// Correlation in time</span></div><div class="line"></div><div class="line"><a class="code" href="structarray.html">array&lt;Type&gt;</a> x(n_s,n_t);</div><div class="line">x.setZero();                    <span class="comment">// x = 0</span></div><div class="line"></div><div class="line">res = <a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(rho_t),AR1(rho_s))(x);</div></div><!-- fragment --><p>Note that the arguments to <code><a class="el" href="density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57" title="Construct object to evaluate the separable extension of two multivariate zero-mean normal densities...">SEPARABLE()</a></code> are given in the opposite order to the dimensions of <code>x</code>.</p>
+<div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacedensity.html">density</a>;</div><div class="line"><span class="keywordtype">int</span> n_s = 10;                   <span class="comment">// Number of grid points in space</span></div><div class="line"><span class="keywordtype">int</span> n_t = 10;                   <span class="comment">// Number of grid points in time</span></div><div class="line">Type rho_s = 0.2;               <span class="comment">// Correlation in space</span></div><div class="line">Type rho_t = 0.4;               <span class="comment">// Correlation in time</span></div><div class="line"></div><div class="line"><a class="code" href="structarray.html">array&lt;Type&gt;</a> x(n_s,n_t);</div><div class="line">x.setZero();                    <span class="comment">// x = 0</span></div><div class="line"></div><div class="line">res = <a class="code" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>(AR1(rho_t),AR1(rho_s))(x);</div></div><!-- fragment --><p>Note that the arguments to <code><a class="el" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5" title="Construct object to evaluate the separable extension of two multivariate zero-mean normal densities...">SEPARABLE()</a></code> are given in the opposite order to the dimensions of <code>x</code>.</p>
 <h1><a class="anchor" id="Examples"></a>
 Example collection </h1>
 <ul>
@@ -235,85 +235,85 @@ Example collection </h1>
 <tr>
 <th align="left">Example </th><th align="left">Description  </th></tr>
 <tr>
-<td align="left"><a class="el" href="adaptive_integration_8cpp-example.html">adaptive_integration.cpp</a> </td><td align="left">Adaptive integration using 'tiny_ad' </td></tr>
+<td align="left">../tmb_examples/adaptive_integration.cpp </td><td align="left">Adaptive integration using 'tiny_ad' </td></tr>
 <tr>
-<td align="left"><a class="el" href="ar1_4D_8cpp-example.html">ar1_4D.cpp</a> </td><td align="left">Separable covariance on 4D lattice with AR1 structure in each direction. </td></tr>
+<td align="left">../tmb_examples/ar1_4D.cpp </td><td align="left">Separable covariance on 4D lattice with AR1 structure in each direction. </td></tr>
 <tr>
-<td align="left"><a class="el" href="compois_8cpp-example.html">compois.cpp</a> </td><td align="left">Conway-Maxwell-Poisson distribution </td></tr>
+<td align="left">../tmb_examples/compois.cpp </td><td align="left">Conway-Maxwell-Poisson distribution </td></tr>
 <tr>
-<td align="left"><a class="el" href="hmm_8cpp-example.html">hmm.cpp</a> </td><td align="left">Inference in a 'double-well' stochastic differential equation using HMM filter. </td></tr>
+<td align="left">../tmb_examples/hmm.cpp </td><td align="left">Inference in a 'double-well' stochastic differential equation using HMM filter. </td></tr>
 <tr>
-<td align="left">interpol.cpp </td><td align="left">Demonstrate 2D interpolation operator </td></tr>
+<td align="left">../tmb_examples/TMBad/interpol.cpp </td><td align="left">Demonstrate 2D interpolation operator </td></tr>
 <tr>
-<td align="left"><a class="el" href="laplace_8cpp-example.html">laplace.cpp</a> </td><td align="left">Laplace approximation from scratch demonstrated on 'spatial' example. </td></tr>
+<td align="left">../tmb_examples/laplace.cpp </td><td align="left">Laplace approximation from scratch demonstrated on 'spatial' example. </td></tr>
 <tr>
-<td align="left"><a class="el" href="linreg_8cpp-example.html">linreg.cpp</a> </td><td align="left">Simple linear regression. </td></tr>
+<td align="left">../tmb_examples/linreg.cpp </td><td align="left">Simple linear regression. </td></tr>
 <tr>
-<td align="left"><a class="el" href="linreg_parallel_8cpp-example.html">linreg_parallel.cpp</a> </td><td align="left">Parallel linear regression. </td></tr>
+<td align="left">../tmb_examples/linreg_parallel.cpp </td><td align="left">Parallel linear regression. </td></tr>
 <tr>
-<td align="left"><a class="el" href="longlinreg_8cpp-example.html">longlinreg.cpp</a> </td><td align="left">Linear regression - 10^6 observations. </td></tr>
+<td align="left">../tmb_examples/longlinreg.cpp </td><td align="left">Linear regression - 10^6 observations. </td></tr>
 <tr>
-<td align="left"><a class="el" href="lr_test_8cpp-example.html">lr_test.cpp</a> </td><td align="left">Illustrate map feature of TMB to perform likelihood ratio tests on a ragged array dataset. </td></tr>
+<td align="left">../tmb_examples/lr_test.cpp </td><td align="left">Illustrate map feature of TMB to perform likelihood ratio tests on a ragged array dataset. </td></tr>
 <tr>
-<td align="left"><a class="el" href="matern_8cpp-example.html">matern.cpp</a> </td><td align="left">Gaussian process with Matern covariance. </td></tr>
+<td align="left">../tmb_examples/matern.cpp </td><td align="left">Gaussian process with Matern covariance. </td></tr>
 <tr>
-<td align="left">MVRandomWalkValidation.cpp </td><td align="left">Estimate and validate a multivariate random walk model with correlated increments and correlated observations. </td></tr>
+<td align="left">../tmb_examples/validation/MVRandomWalkValidation.cpp </td><td align="left">Estimate and validate a multivariate random walk model with correlated increments and correlated observations. </td></tr>
 <tr>
-<td align="left"><a class="el" href="mvrw_8cpp-example.html">mvrw.cpp</a> </td><td align="left">Random walk with multivariate correlated increments and measurement noise. </td></tr>
+<td align="left">../tmb_examples/mvrw.cpp </td><td align="left">Random walk with multivariate correlated increments and measurement noise. </td></tr>
 <tr>
-<td align="left"><a class="el" href="mvrw_sparse_8cpp-example.html">mvrw_sparse.cpp</a> </td><td align="left">Identical with random walk example. Utilizing sparse block structure so efficient when the number of states is high. </td></tr>
+<td align="left">../tmb_examples/mvrw_sparse.cpp </td><td align="left">Identical with random walk example. Utilizing sparse block structure so efficient when the number of states is high. </td></tr>
 <tr>
-<td align="left"><a class="el" href="nmix_8cpp-example.html">nmix.cpp</a> </td><td align="left">nmix example from <a href="https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix">https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix</a> </td></tr>
+<td align="left">../tmb_examples/nmix.cpp </td><td align="left">nmix example from <a href="https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix">https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix</a> </td></tr>
 <tr>
-<td align="left"><a class="el" href="orange_big_8cpp-example.html">orange_big.cpp</a> </td><td align="left">Scaled up version of the Orange Tree example (5000 latent random variables) </td></tr>
+<td align="left">../tmb_examples/orange_big.cpp </td><td align="left">Scaled up version of the Orange Tree example (5000 latent random variables) </td></tr>
 <tr>
-<td align="left">randomwalkvalidation.cpp </td><td align="left">Estimate and validate a random walk model with and without drift </td></tr>
+<td align="left">../tmb_examples/validation/randomwalkvalidation.cpp </td><td align="left">Estimate and validate a random walk model with and without drift </td></tr>
 <tr>
-<td align="left"><a class="el" href="register_atomic_8cpp-example.html">register_atomic.cpp</a> </td><td align="left">Similar to example 'adaptive_integration' using CppAD Romberg integration. REGISTER_ATOMIC is used to reduce tape size. </td></tr>
+<td align="left">../tmb_examples/register_atomic.cpp </td><td align="left">Similar to example 'adaptive_integration' using CppAD Romberg integration. REGISTER_ATOMIC is used to reduce tape size. </td></tr>
 <tr>
-<td align="left"><a class="el" href="register_atomic_parallel_8cpp-example.html">register_atomic_parallel.cpp</a> </td><td align="left">Parallel version of 'register_atomic' </td></tr>
+<td align="left">../tmb_examples/register_atomic_parallel.cpp </td><td align="left">Parallel version of 'register_atomic' </td></tr>
 <tr>
-<td align="left">rickervalidation.cpp </td><td align="left">Estimate and validate a Ricker model based on data simulated from the logistic map </td></tr>
+<td align="left">../tmb_examples/validation/rickervalidation.cpp </td><td align="left">Estimate and validate a Ricker model based on data simulated from the logistic map </td></tr>
 <tr>
-<td align="left"><a class="el" href="sam_8cpp-example.html">sam.cpp</a> </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
+<td align="left">../tmb_examples/sam.cpp </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
 <tr>
-<td align="left"><a class="el" href="sam_8cpp-example.html">sam.cpp</a> </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
+<td align="left">../tmb_examples/TMBad/sam.cpp </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
 <tr>
-<td align="left"><a class="el" href="sde_linear_8cpp-example.html">sde_linear.cpp</a> </td><td align="left">Inference in a linear scalar stochastic differential equation. </td></tr>
+<td align="left">../tmb_examples/sde_linear.cpp </td><td align="left">Inference in a linear scalar stochastic differential equation. </td></tr>
 <tr>
-<td align="left"><a class="el" href="sdv_multi_8cpp-example.html">sdv_multi.cpp</a> </td><td align="left">Multivatiate SV model from Skaug and Yu 2013, Comp. Stat &amp; data Analysis (to appear) </td></tr>
+<td align="left">../tmb_examples/sdv_multi.cpp </td><td align="left">Multivatiate SV model from Skaug and Yu 2013, Comp. Stat &amp; data Analysis (to appear) </td></tr>
 <tr>
-<td align="left"><a class="el" href="sdv_multi_compact_8cpp-example.html">sdv_multi_compact.cpp</a> </td><td align="left">Compact version of sdv_multi </td></tr>
+<td align="left">../tmb_examples/sdv_multi_compact.cpp </td><td align="left">Compact version of sdv_multi </td></tr>
 <tr>
-<td align="left"><a class="el" href="socatt_8cpp-example.html">socatt.cpp</a> </td><td align="left">socatt from ADMB example collection. </td></tr>
+<td align="left">../tmb_examples/socatt.cpp </td><td align="left">socatt from ADMB example collection. </td></tr>
 <tr>
-<td align="left">solver.cpp </td><td align="left">Demonstrate adaptive solver of <a class="el" href="namespaceTMBad.html" title="Automatic differentiation library designed for TMB. ">TMBad</a> </td></tr>
+<td align="left">../tmb_examples/TMBad/solver.cpp </td><td align="left">Demonstrate adaptive solver of <a class="el" href="namespaceTMBad.html" title="Automatic differentiation library designed for TMB. ">TMBad</a> </td></tr>
 <tr>
-<td align="left">spa_gauss.cpp </td><td align="left">Demonstrate saddlepoint approximation (SPA) </td></tr>
+<td align="left">../tmb_examples/TMBad/spa_gauss.cpp </td><td align="left">Demonstrate saddlepoint approximation (SPA) </td></tr>
 <tr>
-<td align="left"><a class="el" href="spatial_8cpp-example.html">spatial.cpp</a> </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
+<td align="left">../tmb_examples/spatial.cpp </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
 <tr>
-<td align="left"><a class="el" href="spatial_8cpp-example.html">spatial.cpp</a> </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
+<td align="left">../tmb_examples/TMBad/spatial.cpp </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
 <tr>
-<td align="left"><a class="el" href="spde_8cpp-example.html">spde.cpp</a> </td><td align="left">Illustration SPDE/INLA approach to spatial modelling via Matern correlation function </td></tr>
+<td align="left">../tmb_examples/spde.cpp </td><td align="left">Illustration SPDE/INLA approach to spatial modelling via Matern correlation function </td></tr>
 <tr>
-<td align="left"><a class="el" href="spde_aniso_8cpp-example.html">spde_aniso.cpp</a> </td><td align="left">Anisotropic version of "spde.cpp". </td></tr>
+<td align="left">../tmb_examples/spde_aniso.cpp </td><td align="left">Anisotropic version of "spde.cpp". </td></tr>
 <tr>
-<td align="left"><a class="el" href="spde_aniso_speedup_8cpp-example.html">spde_aniso_speedup.cpp</a> </td><td align="left">Speedup "spde_aniso.cpp" by moving normalization out of the template. </td></tr>
+<td align="left">../tmb_examples/spde_aniso_speedup.cpp </td><td align="left">Speedup "spde_aniso.cpp" by moving normalization out of the template. </td></tr>
 <tr>
-<td align="left">spde_epsilon.cpp </td><td align="left">Low-level demonstration of fast epsilon bias correction using 'sparse plus lowrank' hessian </td></tr>
+<td align="left">../tmb_examples/TMBad/spde_epsilon.cpp </td><td align="left">Low-level demonstration of fast epsilon bias correction using 'sparse plus lowrank' hessian </td></tr>
 <tr>
-<td align="left"><a class="el" href="thetalog_8cpp-example.html">thetalog.cpp</a> </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
+<td align="left">../tmb_examples/thetalog.cpp </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
 <tr>
-<td align="left"><a class="el" href="thetalog_8cpp-example.html">thetalog.cpp</a> </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
+<td align="left">../tmb_examples/TMBad/thetalog.cpp </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
 <tr>
-<td align="left"><a class="el" href="transform_8cpp-example.html">transform.cpp</a> </td><td align="left">Gamma distributed random effects using copulas. </td></tr>
+<td align="left">../tmb_examples/transform.cpp </td><td align="left">Gamma distributed random effects using copulas. </td></tr>
 <tr>
-<td align="left"><a class="el" href="transform_parallel_8cpp-example.html">transform_parallel.cpp</a> </td><td align="left">Parallel version of transform </td></tr>
+<td align="left">../tmb_examples/transform_parallel.cpp </td><td align="left">Parallel version of transform </td></tr>
 <tr>
-<td align="left"><a class="el" href="transform2_8cpp-example.html">transform2.cpp</a> </td><td align="left">Beta distributed random effects using copulas. </td></tr>
+<td align="left">../tmb_examples/transform2.cpp </td><td align="left">Beta distributed random effects using copulas. </td></tr>
 <tr>
-<td align="left"><a class="el" href="tweedie_8cpp-example.html">tweedie.cpp</a> </td><td align="left">Estimating parameters in a Tweedie distribution. </td></tr>
+<td align="left">../tmb_examples/tweedie.cpp </td><td align="left">Estimating parameters in a Tweedie distribution. </td></tr>
 </table>
 <h1><a class="anchor" id="Errors"></a>
 Compilation and run time errors </h1>
@@ -376,7 +376,7 @@ Toolbox </h1>
 <p>Autoregressive (AR) processes may be implemented using the compact notation of section <a href="#Densities">Densities</a>. The resulting AR process may be applied both in the observational part and in the distribution of a latent variable.</p>
 <p>Nonlinear time must be implemented from scratch, as in the example <a class="el" href="thetalog_8cpp-example.html">thetalog.cpp</a></p>
 <h3>Spatial models</h3>
-<p>TMB has strong support for spatial model and space-time models via the <code><a class="el" href="density_8hpp.html#a29cd93eb507f2c6ef581b645ec91e3b7" title="Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q...">GMRF()</a></code> and <code><a class="el" href="density_8hpp.html#afd76474bb73fa9af11b9dfb6c11f0c57" title="Construct object to evaluate the separable extension of two multivariate zero-mean normal densities...">SEPARABLE()</a></code> functions, and the notion of a <code>distribution</code>. The reader is referred to section <a href="#Densities">Densities</a> for details and examples.</p>
+<p>TMB has strong support for spatial model and space-time models via the <code><a class="el" href="namespacedensity.html#a3aee006c3c4f4ef0b0c3d4628ead67d0" title="Construct object to evaluate density of Gaussian Markov Random Field (GMRF) for sparse Q...">GMRF()</a></code> and <code><a class="el" href="namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5" title="Construct object to evaluate the separable extension of two multivariate zero-mean normal densities...">SEPARABLE()</a></code> functions, and the notion of a <code>distribution</code>. The reader is referred to section <a href="#Densities">Densities</a> for details and examples.</p>
 <h1><a class="anchor" id="CppTutorial"></a>
 C++ tutorial </h1>
 <h3>I know R but not C++</h3>

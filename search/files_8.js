@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['spmat_2ehpp',['spmat.hpp',['../spmat_8hpp.html',1,'']]]
+  ['r_5finla_2ehpp',['R_inla.hpp',['../R__inla_8hpp.html',1,'']]]
 ];

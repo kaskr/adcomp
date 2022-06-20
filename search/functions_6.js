@@ -5,7 +5,7 @@ var searchData=
   ['get_5fstride',['get_stride',['../structTMBad_1_1clique.html#a229ca475b3c7a7b16845506de762ce46',1,'TMBad::clique']]],
   ['getcontiguous',['getContiguous',['../namespaceTMBad.html#a7fdcccf3e65418e10c47540c5e665240',1,'TMBad']]],
   ['glob',['glob',['../structTMBad_1_1global_1_1ad__aug.html#a1996f62cee48ce0d35a0488c4903f83d',1,'TMBad::global::ad_aug']]],
-  ['gmrf',['GMRF',['../density_8hpp.html#a29cd93eb507f2c6ef581b645ec91e3b7',1,'GMRF():&#160;density.hpp'],['../namespacedensity.html#a3aee006c3c4f4ef0b0c3d4628ead67d0',1,'density::GMRF()']]],
+  ['gmrf',['GMRF',['../namespacedensity.html#a3aee006c3c4f4ef0b0c3d4628ead67d0',1,'density']]],
   ['gradient',['gradient',['../namespaceautodiff.html#a9726ba5efee905cf45ff8a16ed2ce35d',1,'autodiff']]],
   ['graph',['graph',['../structTMBad_1_1graph.html#aa8f1559029e90c6cb3a0706fd36bebd9',1,'TMBad::graph']]]
 ];
