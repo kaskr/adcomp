@@ -11,7 +11,7 @@ parameters <- list(mu=0, logSigma = log(1))
 
 ## Compile C++ code and load into R
 library(TMB)
-compile("spa_gauss.cpp")
+compile("spa_gauss.cpp", framework="TMBad")
 dyn.load(dynlib("spa_gauss"))
 
 ## create adfun (SPA inner problem option set in C++ template)

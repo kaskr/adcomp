@@ -1,5 +1,5 @@
 library(TMB)
-compile("spatial.cpp")
+compile("spatial.cpp", framework="TMBad")
 dyn.load(dynlib("spatial"))
 
 ## Read data

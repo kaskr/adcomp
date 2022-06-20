@@ -1,7 +1,7 @@
 ## Demonstrate automatic HMM filter (sequential reduction) on 'thetalog'
 
 library(TMB)
-compile("thetalog.cpp")
+compile("thetalog.cpp", framework="TMBad")
 dyn.load(dynlib("thetalog"))
 ## Read data
 Y <- scan("thetalog.dat", skip=3, quiet=TRUE)

@@ -1,7 +1,7 @@
 source("sam_data.R")
 
 library(TMB)
-compile("sam.cpp")
+compile("sam.cpp", framework="TMBad")
 dyn.load(dynlib("sam"))
 
 parameters <- list(

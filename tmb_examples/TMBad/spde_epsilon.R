@@ -1,5 +1,5 @@
 library(TMB)
-compile("spde_epsilon.cpp", supernodal=FALSE) ## IMPORTANT: use 'supernodal=TRUE' if possible!
+compile("spde_epsilon.cpp", supernodal=FALSE, framework="TMBad") ## IMPORTANT: use 'supernodal=TRUE' if possible!
 dyn.load(dynlib("spde_epsilon"))
 
 ## get cached objects - See 'spde_mesh.R'

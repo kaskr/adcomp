@@ -1,7 +1,7 @@
 library(TMB)
 
 ## Compile and load the model
-compile("solver.cpp")
+compile("solver.cpp", framework="TMBad")
 dyn.load(dynlib("solver"))
 
 ## Data and parameters
