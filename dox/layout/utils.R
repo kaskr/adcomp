@@ -28,11 +28,14 @@ doxylink <- function(x) {
         ans <- paste("\\ref", x)
     } else { ## HTML
         is_file <- (x != sub(".cpp$", "", x))
+        x <- ifelse(is_file, sub(".*tmb_examples/", "", x), x)
         ans <- ifelse(is_file,
                       paste0(
                           "[", x, "]",
                           "(", .doxygen_relpath, "/",
-                          sub(".cpp$", "_8cpp-example.html", x),
+                          sub("/", "_2",
+                              sub(".cpp$", "_8cpp-example.html", x)
+                              ),
                           ")" ),
                       paste0("`",x,"`") )
     }

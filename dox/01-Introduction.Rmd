@@ -491,7 +491,7 @@ Example collection {#Examples}
 ```{R results='asis', echo=FALSE}
 examples <- dir("../tmb_examples", pattern=".cpp$", recursive=TRUE, full.names=TRUE)
 description <- sub("^//[ ]*", "", sapply(paste0(examples), function(x)readLines(x)[1]))
-tab <- cbind(Example=doxylink(basename(examples)), Description=description)
+tab <- cbind(Example=doxylink(examples), Description=description)
 rownames(tab) <- NULL
 ord <- order(sub(".cpp","",basename(examples)))
 knitr::kable(tab[ord, ])
