@@ -243,13 +243,11 @@ Example collection </h1>
 <tr>
 <td align="left">../tmb_examples/hmm.cpp </td><td align="left">Inference in a 'double-well' stochastic differential equation using HMM filter. </td></tr>
 <tr>
-<td align="left">../tmb_examples/TMBad/interpol.cpp </td><td align="left">Demonstrate 2D interpolation operator </td></tr>
-<tr>
 <td align="left">../tmb_examples/laplace.cpp </td><td align="left">Laplace approximation from scratch demonstrated on 'spatial' example. </td></tr>
 <tr>
-<td align="left">../tmb_examples/linreg.cpp </td><td align="left">Simple linear regression. </td></tr>
-<tr>
 <td align="left">../tmb_examples/linreg_parallel.cpp </td><td align="left">Parallel linear regression. </td></tr>
+<tr>
+<td align="left">../tmb_examples/linreg.cpp </td><td align="left">Simple linear regression. </td></tr>
 <tr>
 <td align="left">../tmb_examples/longlinreg.cpp </td><td align="left">Linear regression - 10^6 observations. </td></tr>
 <tr>
@@ -257,63 +255,65 @@ Example collection </h1>
 <tr>
 <td align="left">../tmb_examples/matern.cpp </td><td align="left">Gaussian process with Matern covariance. </td></tr>
 <tr>
-<td align="left">../tmb_examples/validation/MVRandomWalkValidation.cpp </td><td align="left">Estimate and validate a multivariate random walk model with correlated increments and correlated observations. </td></tr>
+<td align="left">../tmb_examples/mvrw_sparse.cpp </td><td align="left">Identical with random walk example. Utilizing sparse block structure so efficient when the number of states is high. </td></tr>
 <tr>
 <td align="left">../tmb_examples/mvrw.cpp </td><td align="left">Random walk with multivariate correlated increments and measurement noise. </td></tr>
-<tr>
-<td align="left">../tmb_examples/mvrw_sparse.cpp </td><td align="left">Identical with random walk example. Utilizing sparse block structure so efficient when the number of states is high. </td></tr>
 <tr>
 <td align="left">../tmb_examples/nmix.cpp </td><td align="left">nmix example from <a href="https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix">https://groups.nceas.ucsb.edu/non-linear-modeling/projects/nmix</a> </td></tr>
 <tr>
 <td align="left">../tmb_examples/orange_big.cpp </td><td align="left">Scaled up version of the Orange Tree example (5000 latent random variables) </td></tr>
 <tr>
-<td align="left">../tmb_examples/validation/randomwalkvalidation.cpp </td><td align="left">Estimate and validate a random walk model with and without drift </td></tr>
+<td align="left">../tmb_examples/register_atomic_parallel.cpp </td><td align="left">Parallel version of 'register_atomic' </td></tr>
 <tr>
 <td align="left">../tmb_examples/register_atomic.cpp </td><td align="left">Similar to example 'adaptive_integration' using CppAD Romberg integration. REGISTER_ATOMIC is used to reduce tape size. </td></tr>
 <tr>
-<td align="left">../tmb_examples/register_atomic_parallel.cpp </td><td align="left">Parallel version of 'register_atomic' </td></tr>
-<tr>
-<td align="left">../tmb_examples/validation/rickervalidation.cpp </td><td align="left">Estimate and validate a Ricker model based on data simulated from the logistic map </td></tr>
-<tr>
 <td align="left">../tmb_examples/sam.cpp </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
-<tr>
-<td align="left">../tmb_examples/TMBad/sam.cpp </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
 <tr>
 <td align="left">../tmb_examples/sde_linear.cpp </td><td align="left">Inference in a linear scalar stochastic differential equation. </td></tr>
 <tr>
-<td align="left">../tmb_examples/sdv_multi.cpp </td><td align="left">Multivatiate SV model from Skaug and Yu 2013, Comp. Stat &amp; data Analysis (to appear) </td></tr>
-<tr>
 <td align="left">../tmb_examples/sdv_multi_compact.cpp </td><td align="left">Compact version of sdv_multi </td></tr>
 <tr>
+<td align="left">../tmb_examples/sdv_multi.cpp </td><td align="left">Multivatiate SV model from Skaug and Yu 2013, Comp. Stat &amp; data Analysis (to appear) </td></tr>
+<tr>
 <td align="left">../tmb_examples/socatt.cpp </td><td align="left">socatt from ADMB example collection. </td></tr>
+<tr>
+<td align="left">../tmb_examples/spatial.cpp </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
+<tr>
+<td align="left">../tmb_examples/spde_aniso_speedup.cpp </td><td align="left">Speedup "spde_aniso.cpp" by moving normalization out of the template. </td></tr>
+<tr>
+<td align="left">../tmb_examples/spde_aniso.cpp </td><td align="left">Anisotropic version of "spde.cpp". </td></tr>
+<tr>
+<td align="left">../tmb_examples/spde.cpp </td><td align="left">Illustration SPDE/INLA approach to spatial modelling via Matern correlation function </td></tr>
+<tr>
+<td align="left">../tmb_examples/thetalog.cpp </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
+<tr>
+<td align="left">../tmb_examples/TMBad/interpol.cpp </td><td align="left">Demonstrate 2D interpolation operator </td></tr>
+<tr>
+<td align="left">../tmb_examples/TMBad/sam.cpp </td><td align="left">State space assessment model from Nielsen and Berg 2014, Fisheries Research. </td></tr>
 <tr>
 <td align="left">../tmb_examples/TMBad/solver.cpp </td><td align="left">Demonstrate adaptive solver of <a class="el" href="namespaceTMBad.html" title="Automatic differentiation library designed for TMB. ">TMBad</a> </td></tr>
 <tr>
 <td align="left">../tmb_examples/TMBad/spa_gauss.cpp </td><td align="left">Demonstrate saddlepoint approximation (SPA) </td></tr>
 <tr>
-<td align="left">../tmb_examples/spatial.cpp </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
-<tr>
 <td align="left">../tmb_examples/TMBad/spatial.cpp </td><td align="left">Spatial poisson GLMM on a grid, with exponentially decaying correlation function </td></tr>
-<tr>
-<td align="left">../tmb_examples/spde.cpp </td><td align="left">Illustration SPDE/INLA approach to spatial modelling via Matern correlation function </td></tr>
-<tr>
-<td align="left">../tmb_examples/spde_aniso.cpp </td><td align="left">Anisotropic version of "spde.cpp". </td></tr>
-<tr>
-<td align="left">../tmb_examples/spde_aniso_speedup.cpp </td><td align="left">Speedup "spde_aniso.cpp" by moving normalization out of the template. </td></tr>
 <tr>
 <td align="left">../tmb_examples/TMBad/spde_epsilon.cpp </td><td align="left">Low-level demonstration of fast epsilon bias correction using 'sparse plus lowrank' hessian </td></tr>
 <tr>
-<td align="left">../tmb_examples/thetalog.cpp </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
-<tr>
 <td align="left">../tmb_examples/TMBad/thetalog.cpp </td><td align="left">Theta logistic population model from Pedersen et al 2012, Ecol. Modelling. </td></tr>
 <tr>
-<td align="left">../tmb_examples/transform.cpp </td><td align="left">Gamma distributed random effects using copulas. </td></tr>
-<tr>
 <td align="left">../tmb_examples/transform_parallel.cpp </td><td align="left">Parallel version of transform </td></tr>
+<tr>
+<td align="left">../tmb_examples/transform.cpp </td><td align="left">Gamma distributed random effects using copulas. </td></tr>
 <tr>
 <td align="left">../tmb_examples/transform2.cpp </td><td align="left">Beta distributed random effects using copulas. </td></tr>
 <tr>
 <td align="left">../tmb_examples/tweedie.cpp </td><td align="left">Estimating parameters in a Tweedie distribution. </td></tr>
+<tr>
+<td align="left">../tmb_examples/validation/MVRandomWalkValidation.cpp </td><td align="left">Estimate and validate a multivariate random walk model with correlated increments and correlated observations. </td></tr>
+<tr>
+<td align="left">../tmb_examples/validation/randomwalkvalidation.cpp </td><td align="left">Estimate and validate a random walk model with and without drift </td></tr>
+<tr>
+<td align="left">../tmb_examples/validation/rickervalidation.cpp </td><td align="left">Estimate and validate a Ricker model based on data simulated from the logistic map </td></tr>
 </table>
 <h1><a class="anchor" id="Errors"></a>
 Compilation and run time errors </h1>
