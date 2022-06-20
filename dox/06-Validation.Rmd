@@ -98,8 +98,7 @@ examples <- dir("../tmb_examples/validation", pattern=".cpp$", recursive=TRUE, f
 description <- sub("^//[ ]*", "", sapply(paste0(examples), function(x)readLines(x)[1]))
 tab <- cbind(Example=doxylink(examples), Description=description)
 rownames(tab) <- NULL
-ord <- order(sub(".cpp","",basename(examples)))
-knitr::kable(tab[ord, ])
+knitr::kable(tab)
 ```
 
 #### One sample from the posterior

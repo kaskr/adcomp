@@ -493,8 +493,7 @@ examples <- dir("../tmb_examples", pattern=".cpp$", recursive=TRUE, full.names=T
 description <- sub("^//[ ]*", "", sapply(paste0(examples), function(x)readLines(x)[1]))
 tab <- cbind(Example=doxylink(examples), Description=description)
 rownames(tab) <- NULL
-ord <- order(sub(".cpp","",basename(examples)))
-knitr::kable(tab[ord, ])
+knitr::kable(tab)
 ```
 
 Compilation and run time errors {#Errors}
