@@ -207,7 +207,7 @@ struct interpol2D : TMBad::global::DynamicOperator<2, 1> {
     return z[0];
   }
 #define Type T
-  VECTORIZE2_tt(operator());
+  VECTORIZE2_tt(operator())
 #undef Type
   // Forward pass
   template<class T>
