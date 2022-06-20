@@ -128,15 +128,16 @@ struct interpol2Dtab {
     The actual interpolation is based on a kernel smoothing approach:
     To obtain the interpolated value at coordinate (x,y), the
     coordinate is first transformed to continous matrix index
-    coordinates.  The distance to each matrix entry `d(i,j)` is
-    calculated and a corresponding 'weight' is given as a function
-    (kernel) of the distance divided by the 'interpolation radius'
-    (R), i.e. `W(i,j)=kernel(d(i,j)/R)`.  The final interpolated
-    value becomes `sum(W*F)/sum(W)` where `F` is the data matrix.
+    coordinates using the supplied `x_range` and `y_range`.  The
+    distance to each matrix entry `d(i,j)` is then calculated, and a
+    corresponding 'weight' is given as a function (kernel) of the
+    distance divided by the 'interpolation radius' (R),
+    i.e. `W(i,j)=kernel(d(i,j)/R)`.  The final interpolated value
+    becomes `sum(W*F)/sum(W)` where `F` is the data matrix.
 
-    We note that the interpolation radius (interpol2D_config::R) is relative to matrix
-    index coordinates (and is thus unaffected by the `x_range` and
-    `y_range`).
+    We note that the interpolation radius (interpol2D_config::R) is
+    relative to matrix index coordinates (and is thus not related to
+    the `x_range` and `y_range`).
 
     \note An error is triggered if some data are not constant
 */
@@ -183,11 +184,21 @@ struct interpol2D : TMBad::global::DynamicOperator<2, 1> {
     return 1;
   }
   typedef TMBad::ad_aug ad;
-  /** \brief Scalar evaluation with double types */
+  /** \brief Scalar evaluation with double types
+      \param x x-coordinate
+      \param y y-coordinate
+      \param nx x-derivative order
+      \param ny y-derivative order
+  */
   double operator()(double x, double y, int nx=0, int ny=0) {
     return (*dtab)(x, y, nx, ny);
   }
-  /** \brief Scalar evaluation with ad types */
+  /** \brief Scalar evaluation with ad types
+      \param x x-coordinate
+      \param y y-coordinate
+      \param nx x-derivative order
+      \param ny y-derivative order
+  */
   ad operator()(ad x, ad y, int nx=0, int ny=0) {
     std::vector<ad> xy(2); xy[0]=x; xy[1]=y;
     interpol2D cpy(*this);
