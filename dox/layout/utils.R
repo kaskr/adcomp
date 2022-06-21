@@ -21,14 +21,22 @@ if(!exists(".doxygen")) {
 ## Doxyfile->GENERATE_TAGFILE=tagfile.xml and use the links in this
 ## xml file.
 doxylink <- function(x) {
-    if(.latex) { ## Latex
-        ans <- x
+    if(.latex) {
+        ## Latex
+        return (x)
     }
-    else if(.doxygen) { ## Doxygen
+    ## Strip paths known to doxygen (Doxyfile->EXAMPLE_PATH)
+    strip_path <- function(x) {
+        x <- sub(".*tmb_examples/", "", x)
+        x
+    }
+    is_file <- (x != sub(".cpp$", "", x))
+    x <- ifelse(is_file, strip_path(x), x)
+    if(.doxygen) {
+        ## Doxygen pages (e.g. 'Related Pages')
         ans <- paste("\\ref", x)
-    } else { ## HTML
-        is_file <- (x != sub(".cpp$", "", x))
-        x <- ifelse(is_file, sub(".*tmb_examples/", "", x), x)
+    } else {
+        ## Rmarkdown (HTML links)
         ans <- ifelse(is_file,
                       paste0(
                           "[", x, "]",
