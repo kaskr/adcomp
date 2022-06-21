@@ -25,7 +25,13 @@ struct vector : Array<Type,Dynamic,1>
 
   template<class T1, class T2>
   vector(T1 x, T2 y):Base(x,y) {}
-  
+
+  void print(){
+    std::cout << "Vector dim: " << this->size() << "\n";
+    std::cout << "Vector val: ";
+    for(int i=0; i<this->size(); i++) std::cout << this->operator[](i) << " ";
+    std::cout << "\n";
+  };
   
   template<class T1>
   vector & operator= (const T1 & other)
