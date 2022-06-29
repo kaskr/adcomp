@@ -1,8 +1,16 @@
 var searchData=
 [
-  ['tail_5fstart',['tail_start',['../structTMBad_1_1ADFun.html#aefa0288feb02f73ce9394107f06af2cb',1,'TMBad::ADFun']]],
-  ['taped_5fvalue',['taped_value',['../structTMBad_1_1global_1_1ad__aug.html#a41973f663d582180aef5503aad3fcb5b',1,'TMBad::global::ad_aug']]],
-  ['tol10',['tol10',['../structnewton_1_1newton__config.html#adae003b54ccbecc979649501887fc354',1,'newton::newton_config']]],
-  ['total_5fwidth',['total_width',['../structradix_1_1radix.html#a5d697ce11a06517ff3c98365cda84d04',1,'radix::radix']]],
-  ['trace',['trace',['../structnewton_1_1newton__config.html#aa1a4c9d68eb293c08748acf0d6f93273',1,'newton::newton_config']]]
+  ['safe_5fcheck',['safe_check',['../structtmbutils_1_1interpol2D__config.html#aa12469ffe1625f090f9a4a69c97f7b46',1,'tmbutils::interpol2D_config']]],
+  ['signif_5fabs_5freduction',['signif_abs_reduction',['../structnewton_1_1newton__config.html#a4fb35bc77af136e1d3bc81d908f4180b',1,'newton::newton_config']]],
+  ['signif_5frel_5freduction',['signif_rel_reduction',['../structnewton_1_1newton__config.html#a56bd69f6ee4aef99ba79885aa6a046d3',1,'newton::newton_config']]],
+  ['simplify',['simplify',['../structnewton_1_1newton__config.html#adf3b5d55989f2207e1e42aa507002589',1,'newton::newton_config']]],
+  ['size',['size',['../structTMBad_1_1period.html#ad870a607cdf6f2f10c423df5d101a158',1,'TMBad::period']]],
+  ['smart_5fpointer',['smart_pointer',['../structTMBad_1_1global_1_1Operator.html#aac3686d68e0e7ad3eb95183b47d54542',1,'TMBad::global::Operator']]],
+  ['spa',['SPA',['../structnewton_1_1newton__config.html#a2f1ff47b0d0ef6787d423e7868afdcbd',1,'newton::newton_config']]],
+  ['sparse',['sparse',['../structnewton_1_1newton__config.html#ae2fbfb1d427f38b82534bcb831c0a352',1,'newton::newton_config']]],
+  ['sparse_5fhessian_5fcompress',['sparse_hessian_compress',['../structconfig__struct.html#a1e2f729cd2a179fddeafb86c2f4f73e0',1,'config_struct']]],
+  ['step_5ftol',['step_tol',['../structnewton_1_1newton__config.html#ac65d0922b71fa75b73e62805cc216f6c',1,'newton::newton_config']]],
+  ['strong_5fconst',['strong_const',['../structTMBad_1_1global_1_1hash__config.html#a6a6476f74cd0d7fbee43258c8843cd73',1,'TMBad::global::hash_config']]],
+  ['strong_5finv',['strong_inv',['../structTMBad_1_1global_1_1hash__config.html#a3cde64462f3c376913503856ccb140b1',1,'TMBad::global::hash_config']]],
+  ['strong_5foutput',['strong_output',['../structTMBad_1_1global_1_1hash__config.html#a2f25c0a38dec050d9f74e99e4958caf6',1,'TMBad::global::hash_config']]]
 ];

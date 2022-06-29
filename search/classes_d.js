@@ -9,5 +9,6 @@ var searchData=
   ['spjacfun_5fconfig',['SpJacFun_config',['../structTMBad_1_1SpJacFun__config.html',1,'TMBad']]],
   ['splinefun',['splinefun',['../classtmbutils_1_1splinefun.html',1,'tmbutils']]],
   ['sr_5fgrid',['sr_grid',['../structTMBad_1_1sr__grid.html',1,'TMBad']]],
+  ['standard_5fderivative_5ftable',['standard_derivative_table',['../structTMBad_1_1standard__derivative__table.html',1,'TMBad']]],
   ['stdwrap',['StdWrap',['../structTMBad_1_1StdWrap.html',1,'TMBad']]]
 ];

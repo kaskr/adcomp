@@ -12,7 +12,6 @@ var searchData=
   ['ppois',['ppois',['../namespaceatomic.html#a29ad7d7fdc9702c597b6d76d3ef281e3',1,'atomic::ppois()'],['../group__R__style__distribution.html#ga21965e84a53d083256382b7eeb0383e7',1,'ppois():&#160;distributions_R.hpp']]],
   ['print',['print',['../structTMBad_1_1global_1_1OperatorPure.html#a5466d15800ff5168642d249d314a0ff7',1,'TMBad::global::OperatorPure::print()'],['../structTMBad_1_1global_1_1Operator.html#a3afe4dc75b38f8a8d2b98ab1eea478ed',1,'TMBad::global::Operator::print()'],['../structTMBad_1_1global_1_1Complete.html#a4f39f5bacdf723c2178d1c1066790d0f',1,'TMBad::global::Complete::print()'],['../structTMBad_1_1ADFun.html#aeab6809f1e07bfdab172b293fa45d40e',1,'TMBad::ADFun::print()']]],
   ['prod_5fint',['prod_int',['../namespaceTMBad.html#ad2bc1b8c42b0b04c39a847649707f86c',1,'TMBad']]],
-  ['protect_5fchild',['protect_child',['../structTMBad_1_1CallOp__.html#a29f35910987bd7a5c3c5537a7b3d53e9',1,'TMBad::CallOp_']]],
   ['pshasho',['pSHASHo',['../group__R__style__distribution.html#gaf8d16a1e0e699a2b6975b9ce219ea51a',1,'distributions_R.hpp']]],
   ['pweibull',['pweibull',['../group__R__style__distribution.html#gac33d133f2004957d705de28a4729b0e8',1,'distributions_R.hpp']]]
 ];

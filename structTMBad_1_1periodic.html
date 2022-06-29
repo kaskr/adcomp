@@ -115,7 +115,7 @@ struct TMBad::periodic&lt; T &gt;</h3>
 <h2>Example 1:</h2>
 <p>Periods with high degree of compression are selected. In the example below the period <code>1 2 1 2 3</code> with replicator 3 is preferred over <code>1 2</code> with replicator 2.</p>
 <div class="fragment"><div class="line">{1, 2, 1, 2, 3, 1, 2, 1, 2, 3, 1, 2, 1, 2, 3, 1, 1, 1}</div><div class="line">begin: 0 size: 5 rep: 3</div><div class="line">begin: 15 size: 1 rep: 3</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00078">78</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
+<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00041">41</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a712569133a91fd9cce7ca044ef3b0827"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a712569133a91fd9cce7ca044ef3b0827">&sect;&nbsp;</a></span>find_best_period()</h2>
@@ -146,7 +146,7 @@ template&lt;class T&gt; </div>
 <p>Find the best period (highest compression degree) starting from a given index. </p>
 <p>A period of size <code>p</code> with replicator <code>r</code> reduces the full vector representation <code>p*r</code> to just <code>p</code>, i.e. relative degree of compression is <code>r</code>. Starting form <code>start</code> we thus seek the period with highest replicator. The function tests all periods up to a specified <code>max_period_size</code>. Note that, once a period <code>p</code> with replicator <code>r</code> has been found, it is redundant to test periods shorter than <code>p*r+1</code>. </p>
 
-<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00124">124</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
+<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00087">87</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
 
 </div>
 </div>
@@ -189,7 +189,7 @@ template&lt;class T&gt; </div>
 <p>Find number period replicates. </p>
 <p>Find number of consecutive period replicates starting from a given index <code>start</code>. </p>
 
-<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00105">105</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
+<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00068">68</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ template&lt;class T&gt; </div>
 <p>Test period one step ahead. </p>
 <p>Tests if <code>all(x[i]==x[i+p])</code> where <code>i = start + 0:(p-1)</code>. </p>
 
-<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00093">93</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
+<p>Definition at line <a class="el" href="compression_8hpp_source.html#l00056">56</a> of file <a class="el" href="compression_8hpp_source.html">compression.hpp</a>.</p>
 
 </div>
 </div>

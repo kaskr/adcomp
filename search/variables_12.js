@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['x',['x',['../structradix_1_1radix.html#a386883ec22bc6f6d43b5633dd2bdab3f',1,'radix::radix']]],
-  ['x_5forder',['x_order',['../structradix_1_1radix.html#a638636e8da26557624230f08ee2f6c23',1,'radix::radix']]],
-  ['x_5fsort',['x_sort',['../structradix_1_1radix.html#aecef0a084dd491b2f0f3464bac9e4d7b',1,'radix::radix']]]
+  ['vglob',['vglob',['../structTMBad_1_1autopar.html#a4c029a4873dc12389211b6e99f8c0ffe',1,'TMBad::autopar::vglob()'],['../structTMBad_1_1ParalOp.html#af0f5b3c48c513146eb61363f35a59a41',1,'TMBad::ParalOp::vglob()']]]
 ];

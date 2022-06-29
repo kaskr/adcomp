@@ -12,6 +12,7 @@ var searchData=
   ['tmb_5fenable_5fprecompile_2ehpp',['tmb_enable_precompile.hpp',['../tmb__enable__precompile_8hpp.html',1,'']]],
   ['tmb_5fobjective_5fptr',['TMB_OBJECTIVE_PTR',['../group__macros.html#ga50653183cdc71e3cb81b410768f23efb',1,'tmb_core.hpp']]],
   ['tmbad',['TMBad',['../namespaceTMBad.html',1,'']]],
+  ['tmbad_5funion_5for_5fstruct',['TMBAD_UNION_OR_STRUCT',['../structTMBad_1_1global_1_1ad__aug.html#a1f4986dec3f7d246b5e69d2e9363c86a',1,'TMBad::global::ad_aug']]],
   ['tmbutils',['tmbutils',['../namespacetmbutils.html',1,'']]],
   ['tmbutils_2ehpp',['tmbutils.hpp',['../tmbutils_8hpp.html',1,'']]],
   ['toggle_5fthread_5fsafe_5fr_2ehpp',['toggle_thread_safe_R.hpp',['../toggle__thread__safe__R_8hpp.html',1,'']]],

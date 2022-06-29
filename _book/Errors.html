@@ -342,7 +342,7 @@ compilers, but can otherwise be downloaded from
 <span id="cb24-8"><a href="Errors.html#cb24-8" aria-hidden="true" tabindex="-1"></a>  feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW); <span class="co">// Extra line needed</span></span>
 <span id="cb24-9"><a href="Errors.html#cb24-9" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb24-10"><a href="Errors.html#cb24-10" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);</span>
-<span id="cb24-11"><a href="Errors.html#cb24-11" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span>
+<span id="cb24-11"><a href="Errors.html#cb24-11" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
 <span id="cb24-12"><a href="Errors.html#cb24-12" aria-hidden="true" tabindex="-1"></a>  Type f;</span>
 <span id="cb24-13"><a href="Errors.html#cb24-13" aria-hidden="true" tabindex="-1"></a>  f = sqrt(-<span class="fl">1.</span>);        <span class="co">// FE_INVALID   ( sqrt(-1.) returns NaN )</span></span>
 <span id="cb24-14"><a href="Errors.html#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">//f = 1./0.;          // FE_DIVBYZERO ( division by zero )</span></span>
@@ -376,17 +376,17 @@ then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, typ
 <div id="missing-casts-for-vectorized-functions" class="section level3" number="8.2.3">
 <h3><span class="header-section-number">8.2.3</span> Missing casts for vectorized functions</h3>
 <p>TMB vectorized functions cannot be called directly with expressions, for example the following will fail to compile:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="Errors.html#cb27-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="Errors.html#cb27-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
 <span id="cb27-2"><a href="Errors.html#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t do this! Doesn&#39;t compile</span></span>
-<span id="cb27-3"><a href="Errors.html#cb27-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a> + <span class="dv">1</span>);</span></code></pre></div>
+<span id="cb27-3"><a href="Errors.html#cb27-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a> + <span class="dv">1</span>);</span></code></pre></div>
 <blockquote>
 <p>error: could not convert ‘atomic::D_lgamma(const CppAD::vector<Type>&amp;) …
 from ‘double’ to ‘Eigen::CwiseBinaryOp&lt;Eigen::internal::scalar_sum_op&lt;double, double&gt;, … &gt;’</p>
 </blockquote>
 <p>Eigen lazy-evaluates expressions, and the templating of lgamma means we expect to return a “x + y”-typed object, which it obviously can’t do.</p>
 <p>To work around this, cast the input:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="Errors.html#cb28-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a>);</span>
-<span id="cb28-2"><a href="Errors.html#cb28-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structvector.html">vector</a>&lt;Type&gt;(<a class="code" href="../structTMBad_1_1ForwardArgs.html#acd57f895cadf784409ff7843d369ed2d">x</a> + <span class="dv">1</span>));</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="Errors.html#cb28-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
+<span id="cb28-2"><a href="Errors.html#cb28-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structvector.html">vector</a>&lt;Type&gt;(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a> + <span class="dv">1</span>));</span></code></pre></div>
 </div>
 </div>
 </div>

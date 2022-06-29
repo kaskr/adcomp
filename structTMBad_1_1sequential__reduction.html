@@ -121,7 +121,7 @@ Public Member Functions</h2></td></tr>
 <li>Therefore x6 is summed out of the two cliques. The updated cliques are {4} and {2}. </li>
 </ul>
 
-<p>Definition at line <a class="el" href="graph__transform_8hpp_source.html#l00520">520</a> of file <a class="el" href="graph__transform_8hpp_source.html">graph_transform.hpp</a>.</p>
+<p>Definition at line <a class="el" href="graph__transform_8hpp_source.html#l00581">581</a> of file <a class="el" href="graph__transform_8hpp_source.html">graph_transform.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="af1e29eb57afd6a9280e5269cbbde12e1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af1e29eb57afd6a9280e5269cbbde12e1">&sect;&nbsp;</a></span>sequential_reduction()</h2>
@@ -179,7 +179,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03672">3672</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03525">3525</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,7 +208,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Example: </p><div class="fragment"><div class="line"> Assume i=2 and the current state contains cliques</div><div class="line"> (1) (1 2 3) (2 4) (1 3)</div><div class="line"> We start by finding all cliques that contain 2, in <span class="keyword">this</span> <span class="keywordflow">case</span>:</div><div class="line"> (1 2 3) (2 4)</div><div class="line"> The <span class="stringliteral">&#39;super&#39;</span> clique becomes</div><div class="line"> (1 2 3 4)</div><div class="line"> Rather than expanding <span class="keyword">this</span> as a 4D <a class="code" href="structarray.html">array</a> we figure out how to</div><div class="line"> access the 4D information from the existing lower dimensional</div><div class="line"> arrays (1 2 3) and (2 4), i.e. &#39;offsets&#39; and &#39;strides&#39;.</div><div class="line"> We <a class="code" href="namespaceTMBad.html#ac1c73a21ac1632b2dfaff8a3e0aa405a">integrate</a> &#39;i&#39; out of the 4D <a class="code" href="structarray.html">array</a> without constructing the 4D</div><div class="line"> <a class="code" href="structarray.html">array</a>. The resulting clique is</div><div class="line"> (1 3 4)</div><div class="line"> This new (merged) clique is added to the list and the updated list now</div><div class="line">looks like: (1) (1 3 4) (1 3)</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03795">3795</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03648">3648</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +230,7 @@ Public Member Functions</h2></td></tr>
 <p>Re-order random effects. </p>
 <p>Two random effects are <em>connected</em> if they both affect the same term. This function finds a fill-reducing permutation of the corresponding un-directed graph. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03714">3714</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03567">3567</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1sequential__reduction.html#af1e29eb57afd6a9280e5269cbbde12e1">sequential_reduction()</a>.</p>
 
@@ -265,7 +265,7 @@ Public Member Functions</h2></td></tr>
 <p>tabulate each combination of variables of a subgraph </p>
 <p>It is assumed that a subgraph has been made. The subgraph has a certain number of inputs and outputs. This function tabulates <em>a given output</em> <code>dep_index</code> for <em>all combinations of inputs</em> <code>inv_index</code>. To avoid tabulating identical functions many times, we a use caching based on term hash codes. </p><dl class="section note"><dt>Note</dt><dd>If multiple grids are in play we have to include the grid ids in the hash codes! (although it is hard to imagine a case where one would wish to tabulate identical functions using different grids). </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03765">3765</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03618">3618</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -294,7 +294,7 @@ Public Member Functions</h2></td></tr>
 <li>Integrate variable i out of C and add C to S. </li>
 </ol>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03849">3849</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03702">3702</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>

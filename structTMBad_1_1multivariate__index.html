@@ -126,7 +126,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <div class="textblock"><p>Utilility class for <code><a class="el" href="structTMBad_1_1sequential__reduction.html" title="Sequential reduction algorithm. ">sequential_reduction</a></code>. </p>
 <p>Helps looping through a multivariate index along any possible sub slice.</p>
 <p>Example: Loop through <code>{0,1}^5</code> with middle index (2) slowest running and remaining indices (0,1,3,4) fastest running.</p><div class="fragment"><div class="line"><span class="preprocessor"> #include &lt;TMBad.hpp&gt;</span> <span class="keyword">using</span></div><div class="line"><span class="keyword">namespace </span><a class="code" href="namespaceTMBad.html">TMBad</a>; <span class="keywordtype">int</span> main() { <a class="code" href="structTMBad_1_1multivariate__index.html">multivariate_index</a> x(2, 5, <span class="keyword">false</span>); x.mask(2) =</div><div class="line"><span class="keyword">true</span>; <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j=0; j&lt;x.count(); ++j, ++x) { x.flip(); <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;</div><div class="line">i&lt;x.count(); ++i, ++x) { Rcout &lt;&lt; x.index() &lt;&lt; <span class="stringliteral">&quot; pointer=&quot;</span> &lt;&lt; x &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div><div class="line">     }</div><div class="line">     x.flip();</div><div class="line">   }</div><div class="line"> }</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="graph__transform_8hpp_source.html#l00374">374</a> of file <a class="el" href="graph__transform_8hpp_source.html">graph_transform.hpp</a>.</p>
+<p>Definition at line <a class="el" href="graph__transform_8hpp_source.html#l00435">435</a> of file <a class="el" href="graph__transform_8hpp_source.html">graph_transform.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab2d6e323b83a17ffc8de2820556784dd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab2d6e323b83a17ffc8de2820556784dd">&sect;&nbsp;</a></span>multivariate_index() <span class="overload">[1/2]</span></h2>
@@ -170,7 +170,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03538">3538</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03391">3391</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -209,7 +209,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03545">3545</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03398">3398</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <p>Number of elements indexed by this <code><a class="el" href="structTMBad_1_1multivariate__index.html" title="Utilility class for sequential_reduction. ">multivariate_index</a></code> </p>
 <dl class="section note"><dt>Note</dt><dd>It is generally recommended to avoid re-calculating the <code>count</code> inside a loop such as <code>for(i=0; i&lt;x.count(); i++, ++x)</code>. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03531">3531</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03384">3384</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1clique.html#a229ca475b3c7a7b16845506de762ce46">TMBad::clique::get_stride()</a>, and <a class="el" href="structTMBad_1_1sequential__reduction.html#ab7f1dcb61e1e5fca346d0c1059b9d8da">TMBad::sequential_reduction::tabulate()</a>.</p>
 

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['old_5fstate',['old_state',['../structTMBad_1_1old__state.html',1,'TMBad']]],
+  ['omp_5fshared_5fptr',['omp_shared_ptr',['../structTMBad_1_1omp__shared__ptr.html',1,'TMBad']]],
   ['op_5finfo',['op_info',['../structTMBad_1_1global_1_1OperatorPure_1_1op__info.html',1,'TMBad::global::OperatorPure']]],
   ['operation_5fstack',['operation_stack',['../structTMBad_1_1global_1_1operation__stack.html',1,'TMBad::global']]],
   ['operator',['Operator',['../structTMBad_1_1global_1_1Operator.html',1,'TMBad::global']]],

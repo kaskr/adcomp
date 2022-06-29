@@ -8,7 +8,6 @@ var searchData=
   ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html',1,'TMBad::global']]],
   ['ad_5fplain_5findex',['ad_plain_index',['../structTMBad_1_1ad__plain__index.html',1,'TMBad']]],
   ['ad_5frange',['ad_range',['../structTMBad_1_1global_1_1ad__range.html',1,'TMBad::global']]],
-  ['adapop_5f',['AdapOp_',['../structTMBad_1_1AdapOp__.html',1,'TMBad']]],
   ['adaptive',['adaptive',['../structTMBad_1_1adaptive.html',1,'TMBad']]],
   ['add_5fforward_5freplay_5fcopy',['add_forward_replay_copy',['../structTMBad_1_1global_1_1Operator.html#ade724d95fe23bab98d1e643e98694d8f',1,'TMBad::global::Operator']]],
   ['add_5fstatic_5fidentifier',['add_static_identifier',['../structTMBad_1_1global_1_1Operator.html#afe8ae701c2bf31311cee3ea27cd918e6',1,'TMBad::global::Operator']]],
@@ -22,8 +21,8 @@ var searchData=
   ['addincrementdecrement',['AddIncrementDecrement',['../structTMBad_1_1global_1_1AddIncrementDecrement.html',1,'TMBad::global']]],
   ['addinputsizeoutputsize',['AddInputSizeOutputSize',['../structTMBad_1_1global_1_1AddInputSizeOutputSize.html',1,'TMBad::global']]],
   ['addtotape',['addToTape',['../structTMBad_1_1global_1_1ad__aug.html#ad34517e8142446f641953d43f50055fd',1,'TMBad::global::ad_aug']]],
-  ['adfun',['ADFun',['../structTMBad_1_1ADFun.html',1,'TMBad']]],
   ['adfun',['ADFun',['../structTMBad_1_1ADFun.html#a7f57af25a9111396b79937cccc113710',1,'TMBad::ADFun::ADFun(Functor F, const ScalarVector &amp;x_)'],['../structTMBad_1_1ADFun.html#a65bf7a1740d1dff08ad92df8336c512f',1,'TMBad::ADFun::ADFun(Functor F, Scalar x0_)'],['../structTMBad_1_1ADFun.html#aab2aee8d7452e1a9f901d13aa2d6f375',1,'TMBad::ADFun::ADFun(Functor F, Scalar x0_, Scalar x1_)']]],
+  ['adfun',['ADFun',['../structTMBad_1_1ADFun.html',1,'TMBad']]],
   ['adfun_3c_3e',['ADFun&lt;&gt;',['../structTMBad_1_1ADFun.html',1,'TMBad']]],
   ['adreport',['ADREPORT',['../group__macros.html#ga43a13c435127491364e4a167478f4992',1,'tmb_core.hpp']]],
   ['aggregate',['aggregate',['../namespaceTMBad.html#a9da8f10d11a2ebeb90e146372c438714',1,'TMBad']]],
@@ -49,7 +48,8 @@ var searchData=
   ['atomic_20functions',['Atomic functions',['../AtomicFunctions.html',1,'']]],
   ['atomicglobal',['AtomicGlobal',['../structatomic_1_1AtomicGlobal.html',1,'atomic']]],
   ['atomiclocal',['AtomicLocal',['../structatomic_1_1AtomicLocal.html',1,'atomic']]],
+  ['atomop',['AtomOp',['../structTMBad_1_1AtomOp.html',1,'TMBad']]],
   ['autodiff',['autodiff',['../namespaceautodiff.html',1,'']]],
-  ['autopar',['autopar',['../structconfig__struct.html#ac49b8edc2dac73ce4b47b589e9eb0dd0',1,'config_struct']]],
-  ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]]
+  ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]],
+  ['autopar',['autopar',['../structconfig__struct.html#ac49b8edc2dac73ce4b47b589e9eb0dd0',1,'config_struct']]]
 ];

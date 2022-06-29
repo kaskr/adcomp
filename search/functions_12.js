@@ -17,6 +17,7 @@ var searchData=
   ['split',['split',['../convenience_8hpp.html#a6f8b0640162d24d598e3f137ce43e2e8',1,'convenience.hpp']]],
   ['split_5fperiod',['split_period',['../namespaceTMBad.html#a7f273488d2199251bb0ffd0bc51e770c',1,'TMBad']]],
   ['squeeze',['squeeze',['../convenience_8hpp.html#a60881c3c25c4c417f502545879c32d5e',1,'convenience.hpp']]],
+  ['standard_5fderivative_5ftable',['standard_derivative_table',['../structTMBad_1_1standard__derivative__table.html#a81d91c86694864075abee84ef64d7205',1,'TMBad::standard_derivative_table']]],
   ['subset',['subset',['../namespaceTMBad.html#a0f15d841b8532f7292b15482ecf95f7f',1,'TMBad::subset(const std::vector&lt; T &gt; &amp;x, const std::vector&lt; bool &gt; &amp;y)'],['../namespaceTMBad.html#a680370b2d84fcf15bcf5dd158cf99684',1,'TMBad::subset(const std::vector&lt; T &gt; &amp;x, const std::vector&lt; I &gt; &amp;ind)']]],
   ['substitute',['substitute',['../namespaceTMBad.html#ac10a11cbcba1ba6abef860177a21bd59',1,'TMBad::substitute(global &amp;glob, const std::vector&lt; Index &gt; &amp;seq, bool inv_tags=true, bool dep_tags=true)'],['../namespaceTMBad.html#a61a789d6a042c96e48fedfa05f868f6a',1,'TMBad::substitute(global &amp;glob, const char *name, bool inv_tags=true, bool dep_tags=true)']]],
   ['sum',['sum',['../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3',1,'convenience.hpp']]],

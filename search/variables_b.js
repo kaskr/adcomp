@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['ok_5fexit_5fif_5fpdhess',['ok_exit_if_pdhess',['../structnewton_1_1newton__config.html#a83fb37d93a904f9468a01bd91a93deba',1,'newton::newton_config']]],
-  ['on_5ffailure_5fgive_5fwarning',['on_failure_give_warning',['../structnewton_1_1newton__config.html#a68e21a86d229db3e49a8634b60c12457',1,'newton::newton_config']]],
-  ['on_5ffailure_5freturn_5fnan',['on_failure_return_nan',['../structnewton_1_1newton__config.html#a77fcac432ec7c99e8d69b61898eb878c',1,'newton::newton_config']]],
-  ['optimize',['optimize',['../structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c',1,'config_struct']]],
-  ['ord',['ord',['../structdata__indicator.html#a1560e55dc66f52a3af61032b563343f4',1,'data_indicator']]],
-  ['osa_5fflag',['osa_flag',['../structdata__indicator.html#af8b36ad890613456cd8c75c4945d2ca6',1,'data_indicator']]]
+  ['ninput',['ninput',['../structTMBad_1_1global_1_1Operator.html#a80fca2ec1b06e53ff3e49fa1f223e9d6',1,'TMBad::global::Operator']]],
+  ['node_5fsplit',['node_split',['../structTMBad_1_1autopar.html#aec13820c9cb5062da65438b2e5ee97f3',1,'TMBad::autopar']]],
+  ['noutput',['noutput',['../structTMBad_1_1global_1_1Operator.html#a7aa5a9105c7d6ade1404a762159314e6',1,'TMBad::global::Operator']]],
+  ['nthreads',['nthreads',['../structconfig__struct.html#acf2f810404993e7363c2abf4b994ba0f',1,'config_struct']]],
+  ['num_5fkeys',['num_keys',['../structradix_1_1radix.html#a8ad00d957ce8235baa8ff0d8ea6aa023',1,'radix::radix']]]
 ];

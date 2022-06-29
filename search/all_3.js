@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['callop_5f',['CallOp_',['../structTMBad_1_1CallOp__.html',1,'TMBad']]],
-  ['callop_5f_3c_20true_20_3e',['CallOp_&lt; true &gt;',['../structTMBad_1_1CallOp__.html',1,'TMBad']]],
   ['cdf_5flower',['cdf_lower',['../structdata__indicator.html#af47c87a6a8ac5c010da838d508c7c3f6',1,'data_indicator']]],
   ['cdf_5fupper',['cdf_upper',['../structdata__indicator.html#a4197613b975dbb510a79dd0aae34361b',1,'data_indicator']]],
   ['clique',['clique',['../structTMBad_1_1clique.html',1,'TMBad']]],
@@ -9,9 +7,9 @@ var searchData=
   ['colcounts',['colcounts',['../structTMBad_1_1graph.html#a04d7eff1990f0e9d64f7e4ae15b5cb2f',1,'TMBad::graph']]],
   ['cols',['cols',['../structarray.html#af29c9b168b60fe0b0de91073875d7300',1,'array::cols()'],['../structtmbutils_1_1array.html#ab8995d3f6459685cfddd466420865946',1,'tmbutils::array::cols()']]],
   ['complete',['Complete',['../structTMBad_1_1global_1_1Complete.html',1,'TMBad::global']]],
-  ['complete_3c_20tmbad_3a_3acallop_5f_20_3e',['Complete&lt; TMBad::CallOp_ &gt;',['../structTMBad_1_1global_1_1Complete.html',1,'TMBad::global']]],
   ['compois_5fcalc_5floglambda',['compois_calc_loglambda',['../distributions__R_8hpp.html#a96f96e2fb32bac3add5b7770d5948cb8',1,'distributions_R.hpp']]],
   ['compois_5fcalc_5flogz',['compois_calc_logZ',['../distributions__R_8hpp.html#a8535c4db7ec1932a50fc6fc8b47af871',1,'distributions_R.hpp']]],
+  ['compose',['compose',['../structTMBad_1_1ADFun.html#ae62f5ccb12d043cd5584ad8914dd7e2a',1,'TMBad::ADFun']]],
   ['compress',['compress',['../structTMBad_1_1global_1_1Rep.html#ae7238e694aa7111403ebb9e0bf14fb98',1,'TMBad::global::Rep']]],
   ['config_2ehpp',['config.hpp',['../config_8hpp.html',1,'']]],
   ['config_5fstruct',['config_struct',['../structconfig__struct.html',1,'']]],
@@ -29,7 +27,6 @@ var searchData=
   ['cpl',['CPL',['../structTMBad_1_1global_1_1CPL.html',1,'TMBad::global']]],
   ['cpl_3c_20operator1_20_3e',['CPL&lt; Operator1 &gt;',['../structTMBad_1_1global_1_1CPL.html',1,'TMBad::global']]],
   ['cpl_3c_20operator2_20_3e',['CPL&lt; Operator2 &gt;',['../structTMBad_1_1global_1_1CPL.html',1,'TMBad::global']]],
-  ['cpl_3c_20tmbad_3a_3acallop_5f_20_3e',['CPL&lt; TMBad::CallOp_ &gt;',['../structTMBad_1_1global_1_1CPL.html',1,'TMBad::global']]],
   ['crossprod',['crossprod',['../structnewton_1_1jacobian__dense__t.html#aee31aba509038390ca02ca26dfdafaa0',1,'newton::jacobian_dense_t']]],
   ['comprehensive_20documentation_20of_20c_2b_2b_20functions_20and_20classes_20_28api_29',['Comprehensive Documentation of C++ Functions and Classes (API)',['../index.html',1,'']]],
   ['c_2b_2b_20macros',['C++ Macros',['../group__macros.html',1,'']]]

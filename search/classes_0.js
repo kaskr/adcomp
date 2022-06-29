@@ -4,7 +4,6 @@ var searchData=
   ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html',1,'TMBad::global']]],
   ['ad_5fplain_5findex',['ad_plain_index',['../structTMBad_1_1ad__plain__index.html',1,'TMBad']]],
   ['ad_5frange',['ad_range',['../structTMBad_1_1global_1_1ad__range.html',1,'TMBad::global']]],
-  ['adapop_5f',['AdapOp_',['../structTMBad_1_1AdapOp__.html',1,'TMBad']]],
   ['adaptive',['adaptive',['../structTMBad_1_1adaptive.html',1,'TMBad']]],
   ['adddependencies',['AddDependencies',['../structTMBad_1_1global_1_1AddDependencies.html',1,'TMBad::global']]],
   ['addforwardfromeval',['AddForwardFromEval',['../structTMBad_1_1global_1_1AddForwardFromEval.html',1,'TMBad::global']]],
@@ -25,5 +24,6 @@ var searchData=
   ['array',['array',['../structtmbutils_1_1array.html',1,'tmbutils']]],
   ['atomicglobal',['AtomicGlobal',['../structatomic_1_1AtomicGlobal.html',1,'atomic']]],
   ['atomiclocal',['AtomicLocal',['../structatomic_1_1AtomicLocal.html',1,'atomic']]],
+  ['atomop',['AtomOp',['../structTMBad_1_1AtomOp.html',1,'TMBad']]],
   ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]]
 ];

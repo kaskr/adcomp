@@ -5,6 +5,7 @@ var searchData=
   ['cols',['cols',['../structarray.html#af29c9b168b60fe0b0de91073875d7300',1,'array::cols()'],['../structtmbutils_1_1array.html#ab8995d3f6459685cfddd466420865946',1,'tmbutils::array::cols()']]],
   ['compois_5fcalc_5floglambda',['compois_calc_loglambda',['../distributions__R_8hpp.html#a96f96e2fb32bac3add5b7770d5948cb8',1,'distributions_R.hpp']]],
   ['compois_5fcalc_5flogz',['compois_calc_logZ',['../distributions__R_8hpp.html#a8535c4db7ec1932a50fc6fc8b47af871',1,'distributions_R.hpp']]],
+  ['compose',['compose',['../structTMBad_1_1ADFun.html#ae62f5ccb12d043cd5584ad8914dd7e2a',1,'TMBad::ADFun']]],
   ['compress',['compress',['../structTMBad_1_1global_1_1Rep.html#ae7238e694aa7111403ebb9e0bf14fb98',1,'TMBad::global::Rep']]],
   ['contiguousblock',['contiguousBlock',['../namespaceTMBad.html#add945a5791aa9c39a76bf4474591062a',1,'TMBad']]],
   ['copy',['copy',['../structTMBad_1_1global_1_1OperatorPure.html#a9a1ba345e1da9bd94ebacf8c6228175c',1,'TMBad::global::OperatorPure::copy()'],['../structTMBad_1_1global_1_1Complete.html#a7f3bef91176e6d4d953731151bc28875',1,'TMBad::global::Complete::copy()'],['../structTMBad_1_1global_1_1ad__aug.html#a2b2cecc8cd3e3a41200534584373663a',1,'TMBad::global::ad_aug::copy()']]],

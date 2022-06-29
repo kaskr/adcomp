@@ -178,22 +178,21 @@ Scalar&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a26012ad50da1dd0dd54de571036949f9"><td class="memItemLeft" ><a id="a26012ad50da1dd0dd54de571036949f9"></a>
-union {</td></tr>
-<tr class="memitem:a26012ad50da1dd0dd54de571036949f9"><td class="memItemLeft" valign="top">}&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html#a26012ad50da1dd0dd54de571036949f9">data</a></td></tr>
-<tr class="memdesc:a26012ad50da1dd0dd54de571036949f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <code>taped_value</code> is <b>not</b> initialized then this is the value of <code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code>. Otherwise, <code>value</code> is un-defined, and <code>glob</code> is the tape on which this <code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code> resides. <br /></td></tr>
-<tr class="separator:a26012ad50da1dd0dd54de571036949f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41973f663d582180aef5503aad3fcb5b"><td class="memItemLeft" align="right" valign="top"><a id="a41973f663d582180aef5503aad3fcb5b"></a>
 ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html#a41973f663d582180aef5503aad3fcb5b">taped_value</a></td></tr>
 <tr class="memdesc:a41973f663d582180aef5503aad3fcb5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <code>taped_value</code> <b>is</b> initialized (see <code>ad_plain::initialize</code>) this is the value of <code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code>. <br /></td></tr>
 <tr class="separator:a41973f663d582180aef5503aad3fcb5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f4986dec3f7d246b5e69d2e9363c86a"><td class="memItemLeft" align="right" valign="top"><a id="a1f4986dec3f7d246b5e69d2e9363c86a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1ad__aug.html#a1f4986dec3f7d246b5e69d2e9363c86a">TMBAD_UNION_OR_STRUCT</a></td></tr>
+<tr class="memdesc:a1f4986dec3f7d246b5e69d2e9363c86a"><td class="mdescLeft">&#160;</td><td class="mdescRight">If <code>taped_value</code> is <b>not</b> initialized then this is the value of <code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code>. Otherwise, <code>value</code> is un-defined, and <code>glob</code> is the tape on which this <code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code> resides. <br /></td></tr>
+<tr class="separator:a1f4986dec3f7d246b5e69d2e9363c86a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Augmented AD type. </p>
 <p><code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code> is an augmentation of the simple type <code>ad_plain</code>. It tries hard to keep tapes small by only adding operations when strictly necessary. For instance, it detects whether a variable is constant or identical zero to see if a reduction is possible to avoid adding the variable to the tape. The downside is that <code><a class="el" href="structTMBad_1_1global_1_1ad__aug.html" title="Augmented AD type. ">ad_aug</a></code> takes up slightly more memory. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="TMBad_2spa_gauss_8cpp-example.html#_a0">TMBad/spa_gauss.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02671">2671</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l02594">2594</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5a51cdf510b60d836a643e55cddccf28"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5a51cdf510b60d836a643e55cddccf28">&sect;&nbsp;</a></span>ad_aug() <span class="overload">[1/3]</span></h2>
@@ -213,7 +212,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>Default CTOR. </p>
 <p>Leaves <code>taped_value</code> in uninitialized state to signify that this variable is constant. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02013">2013</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01966">1966</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -236,7 +235,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>CTOR from scalar. </p>
 <p>Leaves <code>taped_value</code> in uninitialized state to signify that this variable is constant. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02015">2015</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01968">1968</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +258,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>CTOR from <code>ad_plain</code> </p>
 <p>Leaves <code>value</code> uninitialized. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02017">2017</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01970">1970</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -282,7 +281,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>Force this variable to be put on the tape. </p>
 <p>If variable already is on the tape nothing happens. In particular the variable cannot be assumed to be the most recently added. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02019">2019</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01972">1972</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1global_1_1ad__aug.html#a2b2cecc8cd3e3a41200534584373663a">copy()</a>, <a class="el" href="structTMBad_1_1global_1_1ad__aug.html#a553f6ad29c674c0ee02401bc1386060b">copy0()</a>, and <a class="el" href="structTMBad_1_1global_1_1ad__aug.html#a97c04f578ec919d51684cbb335a9e15d">Dependent()</a>.</p>
 
@@ -334,7 +333,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <li>x * 1 = x </li>
 </ul>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02106">2106</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02059">2059</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +359,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <li>x + 0 = x </li>
 </ul>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02086">2086</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02039">2039</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -387,7 +386,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <li>x - x = 0 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02093">2093</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02046">2046</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -413,7 +412,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <li>x / 1 = x </li>
 </ul>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02117">2117</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02070">2070</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -436,7 +435,7 @@ ad_plain&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>Override this ad_plain and set glob to <code>get_glob()</code> </p>
 <dl class="section warning"><dt>Warning</dt><dd>Internal use only </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l02036">2036</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01989">1989</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
