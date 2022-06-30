@@ -1,6 +1,10 @@
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
 
+/** \file
+    \brief Easy access to AD library.
+*/
+
 /**
    \brief Automatic differentiation (gradient, hessian, jacobian)
 

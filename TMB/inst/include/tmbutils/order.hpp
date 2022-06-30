@@ -1,7 +1,13 @@
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
 
-/** \file 
+/**
+    \file Taped sorting.
+*/
+
+namespace tmbutils {
+
+/**
    \brief Taped sorting of a vector.
 
    Example:
@@ -9,8 +15,7 @@
    order<Type> perm(x);
    vector<Type> xsort=perm(x);
    \endcode
-
- */
+*/
 template <class Type>
 class order{
 public:
@@ -60,3 +65,5 @@ public:
   }  
 
 };
+
+}

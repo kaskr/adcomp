@@ -5,6 +5,8 @@
   \brief Extends Eigen::SparseMatrix class
 */
 
+namespace tmbutils {
+
 /** Create sparse matrix from R-triplet sparse matrix */
 template<class Type>
 Eigen::SparseMatrix<Type> asSparseMatrix(SEXP M){
@@ -141,4 +143,6 @@ matrix<Type> invertSparseMatrix(Eigen::SparseMatrix<Type> A){
   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldlt(A);
   matrix<Type> ans = ldlt.solve(I);
   return ans;
+}
+
 }

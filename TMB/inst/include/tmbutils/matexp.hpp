@@ -6,6 +6,8 @@
 
 */
 
+namespace tmbutils {
+
 /** \brief Matrix exponential: matrix of arbitrary dimension. */
 template <class scalartype, int dim>
 struct matexp{
@@ -76,3 +78,5 @@ struct matexp<scalartype,2>{
     return ans;
   }
 };
+
+}

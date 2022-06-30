@@ -5,6 +5,8 @@
     \brief Kronecker product of two matrices
 */
 
+namespace tmbutils {
+
 /** \brief Kronecker product of two matrices */
 template <class scalartype, int n1, int n2, int n3, int n4>
 Matrix<scalartype,n1*n3,n2*n4> kronecker(Matrix<scalartype,n1,n2> x, Matrix<scalartype,n3,n4> y){
@@ -28,4 +30,6 @@ matrix<scalartype> kronecker(matrix<scalartype> x, matrix<scalartype> y){
 	for(int l=0;l<n4;l++)
 	  ans(i*n3+k,j*n4+l)=x(i,j)*y(k,l);
   return ans;
+}
+
 }

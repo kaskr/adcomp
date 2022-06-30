@@ -1,6 +1,10 @@
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
 
+/** \file
+    \brief Romberg integration.
+*/
+
 /**
    \brief Univariate and multivariate numerical integration
 

@@ -1,12 +1,7 @@
 // Copyright (C) 2013-2015 Kasper Kristensen
 // License: GPL-2
 
-namespace tmbutils{
-// Convenience utilites
-#include "spmat.hpp"
-#include "kronecker.hpp"
-#include "matexp.hpp"
-#include "order.hpp"
+namespace tmbutils {
 
 template<class Type, class T1, class T2>
 vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
@@ -19,9 +14,13 @@ vector<Type> dnorm(vector<Type> x, T1 mean, T2 sd, int give_log=0)
 
 } // End namespace
 
+// Convenience utilites
+#include "spmat.hpp"
+#include "kronecker.hpp"
+#include "matexp.hpp"
+#include "order.hpp"
 #include "splines.hpp"
 #include "interpol.hpp"
 #include "density.hpp"
-
 #include "romberg.hpp"
 #include "autodiff.hpp"
