@@ -43,7 +43,7 @@ var searchData=
   ['dgamma',['dgamma',['../group__R__style__distribution.html#gab0e2205710a698ad6a0ed39e0652c9a3',1,'lgamma.hpp']]],
   ['diff',['diff',['../convenience_8hpp.html#a52655410b55f07d20cac2b9c04fd7e4b',1,'convenience.hpp']]],
   ['dim',['dim',['../structTMBad_1_1clique.html#aa20a8e53a8dfbc21d44eb1539f622f55',1,'TMBad::clique']]],
-  ['discrlyap',['discrLyap',['../spmat_8hpp.html#a6a009c282b3344fdf5e03a09d22e6673',1,'discrLyap():&#160;spmat.hpp'],['../namespacetmbutils.html#a7a15c4d4e4e0ef8faaa0d2c9c07a908a',1,'tmbutils::discrLyap()']]],
+  ['discrlyap',['discrLyap',['../namespacetmbutils.html#a7a15c4d4e4e0ef8faaa0d2c9c07a908a',1,'tmbutils']]],
   ['distributions_5fr_2ehpp',['distributions_R.hpp',['../distributions__R_8hpp.html',1,'']]],
   ['dlgamma',['dlgamma',['../group__R__style__distribution.html#gab866b2d110b42f28e56f1ede83ddad28',1,'lgamma.hpp']]],
   ['dlogis',['dlogis',['../group__R__style__distribution.html#ga66d02b20cbc8c317dcad0130d2c96a4c',1,'distributions_R.hpp']]],

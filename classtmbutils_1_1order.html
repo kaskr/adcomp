@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.12"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TMB Documentation: matexp&lt; scalartype, 2 &gt; Struct Template Reference</title>
+<title>TMB Documentation: tmbutils::order&lt; Type &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,28 +63,32 @@ $(function() {
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="namespacetmbutils.html">tmbutils</a></li><li class="navelem"><a class="el" href="classtmbutils_1_1order.html">order</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="structmatexp_3_01scalartype_00_012_01_4-members.html">List of all members</a>  </div>
+<a href="classtmbutils_1_1order-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">matexp&lt; scalartype, 2 &gt; Struct Template Reference</div>  </div>
+<div class="title">tmbutils::order&lt; Type &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Matrix exponential: 2x2 case which can be handled efficiently.  
- <a href="structmatexp_3_01scalartype_00_012_01_4.html#details">More...</a></p>
+<p>Taped sorting of a vector.  
+ <a href="classtmbutils_1_1order.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="matexp_8hpp_source.html">matexp.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="order_8hpp_source.html">order.hpp</a>&gt;</code></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class scalartype&gt;<br />
-struct matexp&lt; scalartype, 2 &gt;</h3>
+<div class="textblock"><h3>template&lt;class Type&gt;<br />
+class tmbutils::order&lt; Type &gt;</h3>
 
-<p>Matrix exponential: 2x2 case which can be handled efficiently. </p>
-
-<p>Definition at line <a class="el" href="matexp_8hpp_source.html#l00044">44</a> of file <a class="el" href="matexp_8hpp_source.html">matexp.hpp</a>.</p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="matexp_8hpp_source.html">matexp.hpp</a></li>
+<p>Taped sorting of a vector. </p>
+<p>Example: </p><div class="fragment"><div class="line">order&lt;Type&gt; perm(x);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> xsort=perm(x);</div></div><!-- fragment --> 
+<p>Definition at line <a class="el" href="order_8hpp_source.html#l00020">20</a> of file <a class="el" href="order_8hpp_source.html">order.hpp</a>.</p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li><a class="el" href="order_8hpp_source.html">order.hpp</a></li>
 </ul>
 </div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

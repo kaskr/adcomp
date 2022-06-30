@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.12"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TMB Documentation: order.hpp File Reference</title>
+<title>TMB Documentation: romberg.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,18 +69,39 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">order.hpp File Reference</div>  </div>
+<div class="title">romberg.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Taped sorting of a vector.  
+<p>Romberg integration.  
 <a href="#details">More...</a></p>
 
-<p><a href="order_8hpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="romberg_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceromberg"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceromberg.html">romberg</a></td></tr>
+<tr class="memdesc:namespaceromberg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Univariate and multivariate numerical integration. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a980bb141c963b1cf20da450063c5c7d1"><td class="memTemplParams" colspan="2">template&lt;class Type , class F &gt; </td></tr>
+<tr class="memitem:a980bb141c963b1cf20da450063c5c7d1"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceromberg.html#a980bb141c963b1cf20da450063c5c7d1">romberg::integrate</a> (F f, Type a, Type b, int n=7, int p=2)</td></tr>
+<tr class="memdesc:a980bb141c963b1cf20da450063c5c7d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">1D numerical integration using Romberg's method.  <a href="namespaceromberg.html#a980bb141c963b1cf20da450063c5c7d1">More...</a><br /></td></tr>
+<tr class="separator:a980bb141c963b1cf20da450063c5c7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71c323cd2dce5c8915428493518820f0"><td class="memTemplParams" colspan="2">template&lt;class Type , class F &gt; </td></tr>
+<tr class="memitem:a71c323cd2dce5c8915428493518820f0"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceromberg.html#a71c323cd2dce5c8915428493518820f0">romberg::integrate</a> (F f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; a, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; b, int n=7, int p=2)</td></tr>
+<tr class="memdesc:a71c323cd2dce5c8915428493518820f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multi-dimensional numerical integration using Romberg's method. Dimension need not be known at compile time.  <a href="namespaceromberg.html#a71c323cd2dce5c8915428493518820f0">More...</a><br /></td></tr>
+<tr class="separator:a71c323cd2dce5c8915428493518820f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Taped sorting of a vector. </p>
-<p>Example: </p><div class="fragment"><div class="line">order&lt;Type&gt; perm(x);</div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> xsort=perm(x);</div></div><!-- fragment --> 
-<p>Definition in file <a class="el" href="order_8hpp_source.html">order.hpp</a>.</p>
+<div class="textblock"><p>Romberg integration. </p>
+
+<p>Definition in file <a class="el" href="romberg_8hpp_source.html">romberg.hpp</a>.</p>
 </div></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>

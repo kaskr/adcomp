@@ -96,6 +96,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1matrix.html">matrix</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix class used by TMB.  <a href="structtmbutils_1_1matrix.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtmbutils_1_1order.html">order</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Taped sorting of a vector.  <a href="classtmbutils_1_1order.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtmbutils_1_1splinefun.html">splinefun</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spline Interpolation.  <a href="classtmbutils_1_1splinefun.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,7 +165,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Create sparse matrix from R-triplet sparse matrix </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00011">11</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00012">12</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -188,7 +191,7 @@ template&lt;class Type &gt; </div>
 <p>This function converts a dense matrix to a sparse matrix based on its numerical values.</p>
 <dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00052">52</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00053">53</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -214,7 +217,7 @@ template&lt;class Type &gt; </div>
 <p>This function converts a dense vector to a sparse vector based on its numerical values.</p>
 <dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00075">75</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00076">76</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -237,7 +240,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Solve discrete Lyapunov equation V=AVA'+I </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00114">114</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00115">115</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +263,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Inverse of PD sparse matrix </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00139">139</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00140">140</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>
@@ -286,7 +289,9 @@ template&lt;class Type &gt; </div>
 <p>A <b>structural zero</b> is a scalar taking the value zero for all configurations of the model parameters. If the return value is <code>true</code> the input is guarantied to be a structural zero.</p>
 <dl class="section note"><dt>Note</dt><dd>Nothing can be deduced if the return value is <code>false</code>. For instance complex structural zeros such as \(1-sin(x)^2-cos(x)^2\) won't be detected. </dd></dl>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00038">38</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00039">39</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+
+<p>Referenced by <a class="el" href="namespacetmbutils.html#a6c030f6f404a962e0bfe7efb62cea107">asSparseMatrix()</a>, and <a class="el" href="namespacetmbutils.html#a4e791ce6c973be4a3acf8400e842b9c4">asSparseVector()</a>.</p>
 
 </div>
 </div>
@@ -319,7 +324,7 @@ template&lt;class Type &gt; </div>
 </div><div class="memdoc">
 <p>Kronecker product of two sparse matrices </p>
 
-<p>Definition at line <a class="el" href="tmbutils__extra_8hpp_source.html#l00087">87</a> of file <a class="el" href="tmbutils__extra_8hpp_source.html">tmbutils_extra.hpp</a>.</p>
+<p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00088">88</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
 
 </div>
 </div>

@@ -37,7 +37,7 @@ var searchData=
   ['optimize',['optimize',['../structconfig__struct.html#a35675ba68c65dcae5a993b9f9d7fb22c',1,'config_struct::optimize()'],['../structTMBad_1_1ADFun.html#a3c98ef8af51b88b1eff590d1c51174da',1,'TMBad::ADFun::optimize()']]],
   ['ord',['ord',['../structdata__indicator.html#a1560e55dc66f52a3af61032b563343f4',1,'data_indicator']]],
   ['order',['order',['../structdata__indicator.html#a34c1c066185770defb71e8c32f89c8d9',1,'data_indicator::order()'],['../namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a',1,'TMBad::order()']]],
-  ['order_2ehpp',['order.hpp',['../order_8hpp.html',1,'']]],
+  ['order',['order',['../classtmbutils_1_1order.html',1,'tmbutils']]],
   ['osa_5factive',['osa_active',['../structdata__indicator.html#aa6b04a9e1f157e8e4732cea7767e2208',1,'data_indicator']]],
   ['osa_5fflag',['osa_flag',['../structdata__indicator.html#af8b36ad890613456cd8c75c4945d2ca6',1,'data_indicator']]],
   ['other_5ffuse',['other_fuse',['../structTMBad_1_1global_1_1OperatorPure.html#af1909d3da095674e961fb1245a21fa2d',1,'TMBad::global::OperatorPure::other_fuse()'],['../structTMBad_1_1global_1_1Operator.html#a44de8681624f3c5180fef7e0f32c1f55',1,'TMBad::global::Operator::other_fuse()'],['../structTMBad_1_1global_1_1Complete.html#a8c43e34ccf1683c56df2cb67b5001e97',1,'TMBad::global::Complete::other_fuse()']]],

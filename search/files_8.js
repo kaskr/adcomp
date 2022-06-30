@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['r_5finla_2ehpp',['R_inla.hpp',['../R__inla_8hpp.html',1,'']]]
+  ['splines_2ehpp',['splines.hpp',['../splines_8hpp.html',1,'']]],
+  ['spmat_2ehpp',['spmat.hpp',['../spmat_8hpp.html',1,'']]]
 ];

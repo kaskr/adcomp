@@ -41,11 +41,11 @@ var searchData=
   ['inv_5findex_5fis_5fconsecutive',['inv_index_is_consecutive',['../structTMBad_1_1ADFun.html#a8ab042323c2a3fe3ec58d1cff47a38df',1,'TMBad::ADFun']]],
   ['inv_5fpos',['inv_pos',['../structTMBad_1_1ADFun.html#a705447d5939318791890cfae1dec2714',1,'TMBad::ADFun']]],
   ['inv_5fseed',['inv_seed',['../structTMBad_1_1global_1_1hash__config.html#a2af4600dc0577f10e4f5917aa82705ea',1,'TMBad::global::hash_config']]],
-  ['invertsparsematrix',['invertSparseMatrix',['../spmat_8hpp.html#a2c0d7d14234bc82952b502b16e7b0d2c',1,'invertSparseMatrix():&#160;spmat.hpp'],['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils::invertSparseMatrix()']]],
+  ['invertsparsematrix',['invertSparseMatrix',['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils']]],
   ['invlogit',['invlogit',['../convenience_8hpp.html#a2dc0f0009cd46180a4d5ae56a6a45cfa',1,'convenience.hpp']]],
   ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]],
   ['invperm',['invperm',['../namespaceTMBad.html#ad00aca64104fb2a72dcf504491f883cd',1,'TMBad']]],
   ['is_5flinear',['is_linear',['../structTMBad_1_1global_1_1Operator.html#aa04ac97e7c374bfa9e9fda7a5f40de5d',1,'TMBad::global::Operator::is_linear()'],['../structTMBad_1_1global_1_1Fused.html#a08f0e92f584cc7a5cf5ab4a4779b84e4',1,'TMBad::global::Fused::is_linear()'],['../structTMBad_1_1global_1_1Rep.html#a3a9f7c5517c744800d058ac3380345da',1,'TMBad::global::Rep::is_linear()'],['../structTMBad_1_1global_1_1RepCompress.html#a61289352180dae19ded143be4ea1903d',1,'TMBad::global::RepCompress::is_linear()']]],
   ['iscontiguous',['isContiguous',['../namespaceTMBad.html#abde1aeefff323308fc25cc8a7fb1d9fd',1,'TMBad']]],
-  ['isstructuralzero',['isStructuralZero',['../spmat_8hpp.html#a0ac2b338c4f7f3880b603f5263652a44',1,'isStructuralZero():&#160;spmat.hpp'],['../namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6',1,'tmbutils::isStructuralZero()']]]
+  ['isstructuralzero',['isStructuralZero',['../namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6',1,'tmbutils']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.12"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TMB Documentation: kronecker.hpp File Reference</title>
+<title>TMB Documentation: autodiff.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,37 +73,39 @@ $(function() {
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">kronecker.hpp File Reference</div>  </div>
+<div class="title">autodiff.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Kronecker product of two matrices.  
+<p>Easy access to AD library.  
 <a href="#details">More...</a></p>
 
-<p><a href="kronecker_8hpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="autodiff_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:namespacetmbutils"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html">tmbutils</a></td></tr>
-<tr class="memdesc:namespacetmbutils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility functions for TMB (automatically included) <br /></td></tr>
+<tr class="memitem:namespaceautodiff"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html">autodiff</a></td></tr>
+<tr class="memdesc:namespaceautodiff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Automatic differentiation (gradient, hessian, jacobian) <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a8c968627c02f3bc076ae767e726d2221"><td class="memTemplParams" colspan="2"><a id="a8c968627c02f3bc076ae767e726d2221"></a>
-template&lt;class scalartype , int n1, int n2, int n3, int n4&gt; </td></tr>
-<tr class="memitem:a8c968627c02f3bc076ae767e726d2221"><td class="memTemplItemLeft" align="right" valign="top">Matrix&lt; scalartype, n1 *n3, n2 *n4 &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a8c968627c02f3bc076ae767e726d2221">tmbutils::kronecker</a> (Matrix&lt; scalartype, n1, n2 &gt; x, Matrix&lt; scalartype, n3, n4 &gt; y)</td></tr>
-<tr class="memdesc:a8c968627c02f3bc076ae767e726d2221"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kronecker product of two matrices. <br /></td></tr>
-<tr class="separator:a8c968627c02f3bc076ae767e726d2221"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90d6a17fcd11a84e2eb361b3f64001c8"><td class="memTemplParams" colspan="2"><a id="a90d6a17fcd11a84e2eb361b3f64001c8"></a>
-template&lt;class scalartype &gt; </td></tr>
-<tr class="memitem:a90d6a17fcd11a84e2eb361b3f64001c8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a90d6a17fcd11a84e2eb361b3f64001c8">tmbutils::kronecker</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt; x, <a class="el" href="structmatrix.html">matrix</a>&lt; scalartype &gt; y)</td></tr>
-<tr class="memdesc:a90d6a17fcd11a84e2eb361b3f64001c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kronecker product of two matrices. <br /></td></tr>
-<tr class="separator:a90d6a17fcd11a84e2eb361b3f64001c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Type &gt; </td></tr>
+<tr class="memitem:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structvector.html">vector</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html#a9726ba5efee905cf45ff8a16ed2ce35d">autodiff::gradient</a> (Functor F, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate gradient of vector function with scalar values.  <a href="namespaceautodiff.html#a9726ba5efee905cf45ff8a16ed2ce35d">More...</a><br /></td></tr>
+<tr class="separator:a9726ba5efee905cf45ff8a16ed2ce35d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aece87159d1d7bc9099eff6b751143db4"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Type &gt; </td></tr>
+<tr class="memitem:aece87159d1d7bc9099eff6b751143db4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">autodiff::hessian</a> (Functor f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:aece87159d1d7bc9099eff6b751143db4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate hessian of vector function with scalar values.  <a href="namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">More...</a><br /></td></tr>
+<tr class="separator:aece87159d1d7bc9099eff6b751143db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafec6d83cf272ad8af0c578e9bb91091"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Type &gt; </td></tr>
+<tr class="memitem:aafec6d83cf272ad8af0c578e9bb91091"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceautodiff.html#aafec6d83cf272ad8af0c578e9bb91091">autodiff::jacobian</a> (Functor f, <a class="el" href="structvector.html">vector</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:aafec6d83cf272ad8af0c578e9bb91091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate jacobian of vector function with vector values.  <a href="namespaceautodiff.html#aafec6d83cf272ad8af0c578e9bb91091">More...</a><br /></td></tr>
+<tr class="separator:aafec6d83cf272ad8af0c578e9bb91091"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Kronecker product of two matrices. </p>
+<div class="textblock"><p>Easy access to AD library. </p>
 
-<p>Definition in file <a class="el" href="kronecker_8hpp_source.html">kronecker.hpp</a>.</p>
+<p>Definition in file <a class="el" href="autodiff_8hpp_source.html">autodiff.hpp</a>.</p>
 </div></div><!-- contents -->
 License: <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL v2</a>
