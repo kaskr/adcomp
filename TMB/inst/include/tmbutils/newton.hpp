@@ -760,7 +760,7 @@ struct newton_config_t : newton_config {
     \tparam Hessian_Type Class of the hessian structure (sparse, dense or sparse_plus_lowrank).
 */
 template<class Functor, class Hessian_Type=jacobian_dense_t<> >
-struct NewtonOperator : TMBad::global::SharedDynamicOperator {
+struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   typedef TMBad::Scalar Scalar;
@@ -1045,7 +1045,7 @@ struct NewtonOperator : TMBad::global::SharedDynamicOperator {
 typedef jacobian_sparse_t< DEFAULT_SPARSE_FACTORIZATION > jacobian_sparse_default_t;
 
 template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
-struct InvSubOperator : TMBad::global::SharedDynamicOperator {
+struct InvSubOperator : TMBad::global::DynamicOperator< -1, -1> {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   typedef TMBad::Scalar Scalar;
@@ -1107,7 +1107,7 @@ struct InvSubOperator : TMBad::global::SharedDynamicOperator {
   const char* op_name() { return "InvSub"; }
 };
 template<class Factorization=DEFAULT_SPARSE_FACTORIZATION >
-struct LogDetOperator : TMBad::global::SharedDynamicOperator {
+struct LogDetOperator : TMBad::global::DynamicOperator< -1, -1> {
   static const bool have_input_size_output_size = true;
   static const bool add_forward_replay_copy = true;
   typedef TMBad::Scalar Scalar;
