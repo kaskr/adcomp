@@ -6,6 +6,7 @@ var searchData=
   ['separable',['SEPARABLE',['../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5',1,'density']]],
   ['sequential_5freduction',['sequential_reduction',['../structTMBad_1_1sequential__reduction.html#af1e29eb57afd6a9280e5269cbbde12e1',1,'TMBad::sequential_reduction']]],
   ['set_5finner_5fouter',['set_inner_outer',['../structTMBad_1_1ADFun.html#a7c7bdec0af160c47dd876b465b5f50e0',1,'TMBad::ADFun']]],
+  ['set_5finv_5fpositions',['set_inv_positions',['../structTMBad_1_1ADFun.html#ac9925689705ff5761502b2675fe78934',1,'TMBad::ADFun']]],
   ['set_5fmask',['set_mask',['../structTMBad_1_1multivariate__index.html#af781385c0333f1b367cf5e05bf66bd2e',1,'TMBad::multivariate_index']]],
   ['set_5ftail',['set_tail',['../structTMBad_1_1ADFun.html#a17ee3314ad4cf50eb8e936d20104c256',1,'TMBad::ADFun']]],
   ['setdim',['setdim',['../structarray.html#a8a41ec12f07808c62e5b9848cebe9a63',1,'array::setdim()'],['../structtmbutils_1_1array.html#a1800f7ced31e5deb6f8864bc9369f5d1',1,'tmbutils::array::setdim()']]],

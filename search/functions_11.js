@@ -6,7 +6,7 @@ var searchData=
   ['rcompois',['rcompois',['../distributions__R_8hpp.html#a6b70740b28883180856ab723d264c12a',1,'distributions_R.hpp']]],
   ['rcompois2',['rcompois2',['../distributions__R_8hpp.html#ae0cee337bb07ffb8593d9fb3fb18b245',1,'distributions_R.hpp']]],
   ['remap_5fidentical_5fsub_5fexpressions',['remap_identical_sub_expressions',['../namespaceTMBad.html#af1eaffa26abd798259f48bd225838090',1,'TMBad']]],
-  ['reorder',['reorder',['../structTMBad_1_1ADFun.html#a22e7746356de4cf93b804a5bda10010a',1,'TMBad::ADFun']]],
+  ['reorder',['reorder',['../structTMBad_1_1ADFun.html#a91d9e0e63497857f84456660c8188b96',1,'TMBad::ADFun']]],
   ['reorder_5fdepth_5ffirst',['reorder_depth_first',['../namespaceTMBad.html#a26f93ff241852d703fec8ca9c6e32a76',1,'TMBad']]],
   ['reorder_5fgraph',['reorder_graph',['../namespaceTMBad.html#ae59304fbd753dbe20f62eb5c83ab1bfe',1,'TMBad']]],
   ['reorder_5frandom',['reorder_random',['../structTMBad_1_1sequential__reduction.html#a6f117eea7c4de9ed2e2261e61d590e2f',1,'TMBad::sequential_reduction']]],

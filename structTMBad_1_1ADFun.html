@@ -228,10 +228,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <a class="el" href="structTMBad_1_1IndirectAccessor.html">IndirectAccessor</a>&lt; Scalar &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#aa0aaf8f6d423d1987fa55ab92a5bf5ad">RangeVec</a> ()</td></tr>
 <tr class="memdesc:aa0aaf8f6d423d1987fa55ab92a5bf5ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get most recent result vector from the tape. <br /></td></tr>
 <tr class="separator:aa0aaf8f6d423d1987fa55ab92a5bf5ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22e7746356de4cf93b804a5bda10010a"><td class="memItemLeft" align="right" valign="top"><a id="a22e7746356de4cf93b804a5bda10010a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#a22e7746356de4cf93b804a5bda10010a">reorder</a> (std::vector&lt; Index &gt; random)</td></tr>
-<tr class="memdesc:a22e7746356de4cf93b804a5bda10010a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reorder computational graph Let random effects come last. <br /></td></tr>
-<tr class="separator:a22e7746356de4cf93b804a5bda10010a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91d9e0e63497857f84456660c8188b96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#a91d9e0e63497857f84456660c8188b96">reorder</a> (std::vector&lt; Index &gt; last)</td></tr>
+<tr class="memdesc:a91d9e0e63497857f84456660c8188b96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reorder computational graph to allow quick updates of selected inputs.  <a href="#a91d9e0e63497857f84456660c8188b96">More...</a><br /></td></tr>
+<tr class="separator:a91d9e0e63497857f84456660c8188b96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9136db7013fac131a8b3c07255315f6a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#a9136db7013fac131a8b3c07255315f6a">replay</a> ()</td></tr>
 <tr class="memdesc:a9136db7013fac131a8b3c07255315f6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replay this operation sequence to a new sequence.  <a href="#a9136db7013fac131a8b3c07255315f6a">More...</a><br /></td></tr>
 <tr class="separator:a9136db7013fac131a8b3c07255315f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -247,6 +246,9 @@ template&lt;class Vector &gt; </td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#a7c7bdec0af160c47dd876b465b5f50e0">set_inner_outer</a> (<a class="el" href="structTMBad_1_1ADFun.html">ADFun</a> &amp;ans, const std::vector&lt; bool &gt; &amp;outer_mask)</td></tr>
 <tr class="memdesc:a7c7bdec0af160c47dd876b465b5f50e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper: Pass on inner/outer information to a new tape. Some parameters are marked as 'outer parameters'. All other prameters are 'inner'. This function passes on inner/outer information to a new tape assuming that the new tape <b>preserves parameter ordering</b> but <b>may increase or reduce the parameter list</b>. <br /></td></tr>
 <tr class="separator:a7c7bdec0af160c47dd876b465b5f50e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9925689705ff5761502b2675fe78934"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#ac9925689705ff5761502b2675fe78934">set_inv_positions</a> ()</td></tr>
+<tr class="memdesc:ac9925689705ff5761502b2675fe78934"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache tape positions of independent variables.  <a href="#ac9925689705ff5761502b2675fe78934">More...</a><br /></td></tr>
+<tr class="separator:ac9925689705ff5761502b2675fe78934"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17ee3314ad4cf50eb8e936d20104c256"><td class="memItemLeft" align="right" valign="top"><a id="a17ee3314ad4cf50eb8e936d20104c256"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html#a17ee3314ad4cf50eb8e936d20104c256">set_tail</a> (const std::vector&lt; Index &gt; &amp;random)</td></tr>
 <tr class="memdesc:a17ee3314ad4cf50eb8e936d20104c256"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set start position needed to get selected independent variable derivatives. <br /></td></tr>
@@ -440,7 +442,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Construct function composition. </p>
 <p>Given this function (f) and another function (g) construct the composition f(g(x)). </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00924">924</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00942">942</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -473,7 +475,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Decompose this computational graph. </p>
 <dl class="section note"><dt>Note</dt><dd>This function preserves the inner/outer parameter categories if in use. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00940">940</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00958">958</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -506,7 +508,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Decompose this computational graph by operator name. </p>
 <dl class="section note"><dt>Note</dt><dd>This function preserves the inner/outer parameter categories if in use. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00976">976</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00994">994</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -538,7 +540,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Optional optimization step before resolving references. </p>
 <p>Replay all RefOp-only dependent sub-expression to active glob. Expand this <a class="el" href="structTMBad_1_1ADFun.html" title="Automatic differentiation function object. ">ADFun</a> with boundary variables. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00984">984</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01002">1002</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -577,7 +579,7 @@ template&lt;class ad = ad_aug&gt; </div>
 </dl>
 <p>This function was added as a way to get rid of protected operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01126">1126</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01144">1144</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -609,7 +611,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Are the independent variable indices consecutive? </p>
 <p>Cheep test to guarantee that independent variable indicies are consecutive. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00311">311</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00330">330</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -666,7 +668,7 @@ template&lt;class ad = ad_aug&gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function preserves the inner/outer parameter categories if in use. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00661">661</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00680">680</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceautodiff.html#a9726ba5efee905cf45ff8a16ed2ce35d">autodiff::gradient()</a>, <a class="el" href="namespaceautodiff.html#aece87159d1d7bc9099eff6b751143db4">autodiff::hessian()</a>, and <a class="el" href="namespaceautodiff.html#aafec6d83cf272ad8af0c578e9bb91091">autodiff::jacobian()</a>.</p>
 
@@ -701,7 +703,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Evaluate the Jacobian matrix. </p>
 <p>Denote by f:R^n-&gt;R^m this function object. The Jacobian matrix is the m-by-n derivative matrix stored <b>row-major</b>. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00465">465</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00484">484</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -750,7 +752,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Evaluate the Jacobian matrix <b>subset</b> </p>
 <p>Denote by f:R^n-&gt;R^m this function object. The Jacobian matrix is the m-by-n derivative matrix stored <b>row-major</b>. This function evaluates <code>J[keep_y, keep_x]</code> (<code>keep_x</code> / <code>keep_y</code> cooresponds to input / output respectively) </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00484">484</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00503">503</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -793,7 +795,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Evaluate the Jacobian matrix multiplied by a vector. </p>
 <p>Denote by f:R^n-&gt;R^m this function object. The Jacobian matrix is the m-by-n derivative matrix stored <b>row-major</b>. This function calculates the derivative d/dx(sum(f(x)*w)) </p>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00523">523</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00542">542</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -836,7 +838,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Integrate as many univariate variables as possible. </p>
 <dl class="section note"><dt>Note</dt><dd>Use <code><a class="el" href="structTMBad_1_1ADFun.html#a167b014b2dd4b054479793a34ec8f15a" title="Which inputs are affecting some outputs. ">activeDomain()</a></code> to identify which variables have been integrated (integrated variables are no longer active). </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00889">889</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00907">907</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -869,7 +871,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Evaluate function for ad vector input. </p>
 <p>Runs a forward replay to current active tape <code>get_glob()</code>. </p><dl class="section warning"><dt>Warning</dt><dd>There must be an active tape and the ad inputs must correspond to the active tape (FIXME: This comment is outdated I think). </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00418">418</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00437">437</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -902,7 +904,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Evaluate function scalar version. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Experimental - may be removed </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00444">444</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00463">463</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -945,7 +947,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Evaluate function scalar version. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Experimental - may be removed </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00453">453</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00472">472</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1018,7 +1020,46 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Parallelize this operation sequence. </p>
 <dl class="section warning"><dt>Warning</dt><dd><b>Reverse</b> replay is not supported after parallelization. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00713">713</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00732">732</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a91d9e0e63497857f84456660c8188b96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91d9e0e63497857f84456660c8188b96">&sect;&nbsp;</a></span>reorder()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class ad = ad_aug&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="structTMBad_1_1ADFun.html">TMBad::ADFun</a>&lt; ad &gt;::reorder </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; Index &gt;&#160;</td>
+          <td class="paramname"><em>last</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reorder computational graph to allow quick updates of selected inputs. </p>
+<p>Permute the computational graph such that the selected independent variables <code>last</code> come as late as possible. Then cache the independent variable positions to allow fast updates of the <code>last</code> subset.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">last</td><td><em>Sorted</em> index vector of selected independent variables satisfying <code>0 &lt;= last[i] &lt; Domain()</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00237">237</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1050,7 +1091,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Replay this operation sequence to a new sequence. </p>
 <p>Under rare circumstances this may reduce the tape size, e.g. by removing constant operations. </p><dl class="section warning"><dt>Warning</dt><dd>This is an experimental feature that may be removed. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00731">731</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00750">750</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#a35c4a932098d7dcf09166961971a9777">TMBad::ADFun&lt;&gt;::decompose_refs()</a>.</p>
 
@@ -1088,7 +1129,39 @@ template&lt;class ad = ad_aug&gt; </div>
 </li>
 </ol>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01037">1037</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01055">1055</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac9925689705ff5761502b2675fe78934"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9925689705ff5761502b2675fe78934">&sect;&nbsp;</a></span>set_inv_positions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class ad = ad_aug&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="structTMBad_1_1ADFun.html">TMBad::ADFun</a>&lt; ad &gt;::set_inv_positions </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cache tape positions of independent variables. </p>
+<p>An operation sequence may be ordered such that independent variables that are <em>updated frequently</em> come as <em>late as possible</em>. By caching the independent variable positions, the forward pass can jump directly to the first position that must be updated. </p>
+
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00222">222</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1149,7 +1222,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd><code>Sparse&lt;<a class="el" href="structTMBad_1_1ADFun.html" title="Automatic differentiation function object. ">ADFun</a>&gt;</code> containing function and sparsity pattern.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function preserves the inner/outer parameter categories if in use. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00757">757</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00776">776</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1181,7 +1254,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Temporarily regard this object as function of inner parameters. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Don't forget to swap back when done! </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01070">1070</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01088">1088</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1213,7 +1286,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Temporarily regard this object as function of outer parameters. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Don't forget to swap back when done! </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01077">1077</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01095">1095</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1263,7 +1336,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>New function object \(F&#39;:R^{n+m} \rightarrow R^{n\_} ((x,w)\rightarrow w^T*F&#39;) \) representing the Jacobian (subset) multiplied by a weight vector.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function preserves the inner/outer parameter categories if in use. </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00683">683</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00702">702</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -1285,7 +1358,7 @@ template&lt;class ad = ad_aug&gt; </div>
 <p>Vector of positions by independent variables. </p>
 <p>If in use, i.e. <code>inv_pos.size()&gt;0</code>, it means that tail sweeping is enabled. The vector allows to lookup tape postions for any given independent variable. In particular it holds that <code>inv_index[i] == start[i].ptr.second</code>. </p><dl class="section note"><dt>Note</dt><dd><code>inv_index</code> need not be sorted ! </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00294">294</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00313">313</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
