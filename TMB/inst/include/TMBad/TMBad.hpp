@@ -211,22 +211,41 @@ struct ADFun {
       set_inner_outer(*this, outer_mask);
     }
   }
-  /** \brief Reorder computational graph
-      Let random effects come last
+  /** \brief Cache tape positions of independent variables.
+
+      An operation sequence may be ordered such that independent
+      variables that are *updated frequently* come as *late as
+      possible*. By caching the independent variable positions, the
+      forward pass can jump directly to the first position that must
+      be updated.
   */
-  void reorder(std::vector<Index> random) {
+  void set_inv_positions() {
+    std::vector<Position> pos = inv_positions(glob);
+    inv_pos = subset(pos, invperm(order(glob.inv_index)));
+  }
+  /** \brief Reorder computational graph to allow quick updates of
+      selected inputs.
+
+      Permute the computational graph such that the selected
+      independent variables `last` come as late as possible. Then
+      cache the independent variable positions to allow fast updates
+      of the `last` subset.
+
+      \param last *Sorted* index vector of selected independent
+      variables satisfying `0 <= last[i] < Domain()`.
+  */
+  void reorder(std::vector<Index> last) {
     std::vector<bool> outer_mask;
     if (inner_outer_in_use()) {
       outer_mask = DomainOuterMask();
     }
-    reorder_graph(glob, random);
-    std::vector<Position> pos = inv_positions(glob);
-    inv_pos = subset(pos, invperm(order(glob.inv_index)));
+    reorder_graph(glob, last);
 
     if (inner_outer_in_use()) {
       TMBAD_ASSERT(outer_mask.size() == Domain());
       set_inner_outer(*this, outer_mask);
     }
+    set_inv_positions();
   }
 
   size_t Domain() const { return glob.inv_index.size(); }
@@ -838,9 +857,8 @@ struct ADFun {
           Rcout << "Disable: 'config(tmbad.sparse_hessian_compress=0)'\n";
           atomic_jac_row = this->WgtJacFun(keep_x, keep_y);
           atomic_jac_row.optimize();
-          atomic_jac_row.glob.set_fuse(true);
-          atomic_jac_row.replay();
-          atomic_jac_row.glob.set_fuse(false);
+
+          atomic_jac_row.set_inv_positions();
 
           atomic_jac_row = atomic_jac_row.atomic();
 

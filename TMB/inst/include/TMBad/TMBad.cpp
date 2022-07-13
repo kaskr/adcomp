@@ -3821,6 +3821,12 @@ void autopar::run() {
     start[0] = reverse_graph.dep2op[ord[i]];
     reverse_graph.search(start, visited, false, false);
     dWork[i] = start.size();
+    if (false) {
+      for (size_t k = 0; k < start.size(); k++) {
+        Rcout << glob.opstack[start[k]]->op_name() << " ";
+      }
+      Rcout << "\n";
+    }
   }
 
   std::vector<size_t> thread_assign(ord.size(), 0);
@@ -3839,7 +3845,7 @@ void autopar::run() {
 
   node_split.resize(num_threads);
   for (size_t i = 0; i < ord.size(); i++) {
-    node_split[thread_assign[ord[i]]].push_back(reverse_graph.dep2op[i]);
+    node_split[thread_assign[i]].push_back(reverse_graph.dep2op[ord[i]]);
   }
 
   for (size_t i = 0; i < num_threads; i++) {

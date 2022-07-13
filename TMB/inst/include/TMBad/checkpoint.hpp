@@ -94,8 +94,10 @@ struct omp_shared_ptr {
       sp = (*weak_refs)[TMBAD_THREAD_NUM].lock();
     }
   }
+  omp_shared_ptr() {}
   T &operator*() const { return *sp; }
-  T *operator->() const { return sp->get(); }
+  T *operator->() const { return sp.get(); }
+  explicit operator bool() const { return (bool)sp; }
 };
 
 /** \brief Generic checkpoint operator
