@@ -542,11 +542,15 @@ oneStepPredict <- function(obj,
     if(method == "cdf"){
         p <- newobj$par
         newobj$fn(p) ## Test eval
+        newobj$env$random.start <- expression(last.par[random])
         cdf <- function(k){
             tracefun(k)
             nll <- newobj$fn(observation(k))
+            lp <- newobj$env$last.par
             nlcdf.lower <- newobj$fn(observation(k, lower.cdf = TRUE))
+            newobj$env$last.par <- lp ## restore
             nlcdf.upper <- newobj$fn(observation(k, upper.cdf = TRUE))
+            newobj$env$last.par <- lp ## restore
             c(nll=nll, nlcdf.lower=nlcdf.lower, nlcdf.upper=nlcdf.upper)
         }
         pred <- applyMethod(cdf)
