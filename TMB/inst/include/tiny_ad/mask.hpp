@@ -243,31 +243,6 @@ struct NAME ## Op<TMB_MAX_ORDER+1, ninput, noutput, mask> {             \
   }                                                                     \
 };                                                                      \
 template<class dummy=void>                                              \
-CppAD::vector<TMBad::ad_aug>                                            \
-NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP({                    \
-  int n = x.size() - 1;                                                 \
-  int order = CppAD::Integer(x[n]);                                     \
-  std::vector<TMBad::ad_plain> x_(&(x[0]), &(x[0]) + n);                \
-  std::vector<TMBad::ad_plain> y_;                                      \
-  typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
-  static const int nvar = Foo0::nvar;                                   \
-  typedef NAME ## Op<1, NCHAR(MASK), nvar, OCTAL(MASK)> Foo1;           \
-  if (order==0) {                                                       \
-    Foo0 foo0;                                                          \
-    y_ = foo0(x_);                                                      \
-  }                                                                     \
-  else if (order==1) {                                                  \
-    Foo1 foo1;                                                          \
-    y_ = foo1(x_);                                                      \
-  }                                                                     \
-  else {                                                                \
-    Rf_error("This interface is limited to 0th and 1st deriv order");   \
-  }                                                                     \
-  CppAD::vector<TMBad::ad_aug> y(y_.size());                            \
-  for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
-  return y;                                                             \
-})                                                                      \
-template<class dummy=void>                                              \
 CppAD::vector<double>                                                   \
 NAME (const CppAD::vector<double> &x) CSKIP({                           \
   int n = x.size() - 1;                                                 \
@@ -289,6 +264,42 @@ NAME (const CppAD::vector<double> &x) CSKIP({                           \
   else {                                                                \
     Rf_error("This interface is limited to 0th and 1st deriv order");   \
   }                                                                     \
+})                                                                      \
+template<class dummy=void>                                              \
+CppAD::vector<TMBad::ad_aug>                                            \
+NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP({                    \
+  bool all_constant = true;                                             \
+  for (size_t i = 0; i<x.size(); i++)                                   \
+    all_constant &= x[i].constant();                                    \
+  if (all_constant) {                                                   \
+    CppAD::vector<double> xd(x.size());                                 \
+    for (size_t i=0; i<xd.size(); i++) xd[i] = x[i].Value();            \
+    CppAD::vector<double> yd = NAME(xd);                                \
+    CppAD::vector<TMBad::ad_aug> y(yd.size());                          \
+    for (size_t i=0; i<yd.size(); i++) y[i] = yd[i];                    \
+    return y;                                                           \
+  }                                                                     \
+  int n = x.size() - 1;                                                 \
+  int order = CppAD::Integer(x[n]);                                     \
+  std::vector<TMBad::ad_plain> x_(&(x[0]), &(x[0]) + n);                \
+  std::vector<TMBad::ad_plain> y_;                                      \
+  typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
+  static const int nvar = Foo0::nvar;                                   \
+  typedef NAME ## Op<1, NCHAR(MASK), nvar, OCTAL(MASK)> Foo1;           \
+  if (order==0) {                                                       \
+    Foo0 foo0;                                                          \
+    y_ = foo0(x_);                                                      \
+  }                                                                     \
+  else if (order==1) {                                                  \
+    Foo1 foo1;                                                          \
+    y_ = foo1(x_);                                                      \
+  }                                                                     \
+  else {                                                                \
+    Rf_error("This interface is limited to 0th and 1st deriv order");   \
+  }                                                                     \
+  CppAD::vector<TMBad::ad_aug> y(y_.size());                            \
+  for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
+  return y;                                                             \
 })                                                                      \
 IF_TMB_PRECOMPILE(                                                      \
 template                                                                \
