@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['safe_5feval',['safe_eval',['../structnewton_1_1safe__eval.html',1,'newton']]],
   ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
   ['segment_5fref',['segment_ref',['../structTMBad_1_1segment__ref.html',1,'TMBad']]],
   ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],
