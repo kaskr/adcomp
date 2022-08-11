@@ -1228,20 +1228,33 @@ void Newton_CTOR_Hook(Newton &F, const vector<TMBad::ad_aug> &start) {
   F.sol = F.add_to_tape();
 }
 
-// Helper to simplify user interface of Functor by making ad_aug version work for doubles as well 
-template<class Type>
-struct unsafe_cast : TMBad::ad_aug {
-  unsafe_cast(TMBad::ad_aug x) : TMBad::ad_aug(x) {}
-  operator Type() {
-    TMBAD_ASSERT2(this->constant(),
-            "Invalid cast from ad_aug to double?");
-    return this->Value();
+/** Helper to simplify user interface of Functor by making `ad_aug` version work for `double` as well
+
+    In principle, the double case should be trivial, as it evaluates
+    the functor using AD types that are constants. However, some
+    operators might add to tape for constant inputs (by mistake). To
+    guard aginst such mistakes, we wrap the double evaluation inside a
+    dummy AD context.
+*/
+template<class Functor, class Type>
+struct safe_eval {
+  Type operator()(Functor &F, vector<Type> x) {
+    return F(x);
   }
 };
-template<>
-struct unsafe_cast<TMBad::ad_aug> : TMBad::ad_aug {
-  unsafe_cast(TMBad::ad_aug x) : TMBad::ad_aug(x) {}
+template<class Functor>
+struct safe_eval<Functor, double> {
+  double operator()(Functor &F, vector<double> x) {
+    /* double case: Wrap evaluation inside an AD context, just in case
+       some operations in F adds to tape. */
+    TMBad::global dummy;
+    dummy.ad_start();
+    double ans = asDouble(F(x));
+    dummy.ad_stop();
+    return ans;
+  }
 };
+
 template<class Functor, class Type, class Hessian_Type=jacobian_dense_t<> >
 struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
   typedef NewtonOperator<Functor, Hessian_Type > Base;
@@ -1262,7 +1275,7 @@ struct NewtonSolver : NewtonOperator<Functor, Hessian_Type > {
   }
   Type value() {
     if (Base::cfg.simplify) {
-      return unsafe_cast<Type> ( F(solution()) );
+      return safe_eval<Functor, Type>()(F, solution());
     } else {
       return Base::function(std::vector<Type>(sol))[0];
     }
