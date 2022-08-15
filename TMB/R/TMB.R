@@ -284,7 +284,7 @@ MakeADFun <- function(data, parameters, map=list(),
     dataSanitize <- function(x){
       if(is.list(x)) return( lapply(x, dataSanitize) )
       if(is(x,"sparseMatrix")){
-        x <- as(x,"dgTMatrix")
+        x <- as(x,"TsparseMatrix")
       }
       else if (is.character(x))
       {
@@ -1835,7 +1835,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
            i = as.integer(attr(ADHess$ptr,"i")),
            j = as.integer(attr(ADHess$ptr,"j")),
            x = ev(obj$env$par), Dim = c(n,n), uplo = "L")
-  Hfull <- as(M,"dsCMatrix")
+  Hfull <- .T2Cmat(M) ## WAS: as(M,"dsCMatrix")
   Hrandom <- Hfull[r,r,drop=FALSE]
   ## before returning the function, remove unneeded variables from the environment:
   rm(skip, n, M)

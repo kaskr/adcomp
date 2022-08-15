@@ -50,7 +50,7 @@ data$spde <- list(
     "E2"       = E2,
     "TV"       = TV - 1,
     "G0"       = inla_spde$param.inla$M0,
-    "G0_inv"   = as(diag(1/diag(inla_spde$param.inla$M0)), "dgTMatrix"))
+    "G0_inv"   = as(diag(1/diag(inla_spde$param.inla$M0)), "TsparseMatrix"))
 
 parameters <- list(beta       = c(-5.0,0,0,0,0),
                    log_tau    = -2.0,
