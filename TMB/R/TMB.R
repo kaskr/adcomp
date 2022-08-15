@@ -284,7 +284,7 @@ MakeADFun <- function(data, parameters, map=list(),
     dataSanitize <- function(x){
       if(is.list(x)) return( lapply(x, dataSanitize) )
       if(is(x,"sparseMatrix")){
-        x <- as(x,"dgTMatrix")
+        x <- as(x,"TsparseMatrix")
       }
       else if (is.character(x))
       {
