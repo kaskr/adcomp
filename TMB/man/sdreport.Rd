@@ -63,13 +63,13 @@ the delta method using \code{skip.delta.method=TRUE}.
 For random effect models a generalized delta-method is used. First
 the joint covariance of random effect and parameter estimation error is approximated
 by
-\deqn{V \pmatrix{ \hat u - u \cr \hat\theta - \theta } \approx
-\pmatrix{ H_{uu}^{-1} & 0 \cr 0 & 0 } +
+\deqn{V \left( \begin{array}{cc} \hat u - u \cr \hat\theta - \theta \end{array} \right) \approx
+\left( \begin{array}{cc} H_{uu}^{-1} & 0 \cr 0 & 0 \end{array} \right) +
 J V(\hat\theta) J'
 }
 where \eqn{H_{uu}} denotes random effect block of the full joint
 Hessian of \code{obj$env$f} and \eqn{J} denotes the Jacobian of
-\eqn{\pmatrix{\hat u(\theta) \cr \theta}} wrt. \eqn{\theta}.
+\eqn{\left( \begin{array}{cc}\hat u(\theta) \cr \theta \end{array} \right)} wrt. \eqn{\theta}.
 Here, the first term represents the expected conditional variance
 of the estimation error given the data and the second term represents the variance
 of the conditional mean of the estimation error given the data.
@@ -77,13 +77,13 @@ of the conditional mean of the estimation error given the data.
 Now the delta method can be applied on a general non-linear
 function \eqn{\phi(u,\theta)} of random effects \eqn{u} and
 parameters \eqn{\theta}:
-\deqn{V\left(\phi(\hat u,\hat\theta) - \phi(u,\theta) \right)\approx \nabla\phi V \pmatrix{
-\hat u - u \cr \hat\theta - \theta }\nabla\phi'}
+\deqn{V\left(\phi(\hat u,\hat\theta) - \phi(u,\theta) \right)\approx \nabla\phi V \left( \begin{array}{cc}
+\hat u - u \cr \hat\theta - \theta \end{array} \right) \nabla\phi'}
 
 The full joint covariance is not returned by default, because it
 may require large amounts of memory.  It may be obtained by
 specifying \code{getJointPrecision=TRUE}, in which case \eqn{V
-\pmatrix{ \hat u - u \cr \hat\theta - \theta } ^{-1} } will be part of the
+\left( \begin{array}{cc} \hat u - u \cr \hat\theta - \theta \end{array} \right) ^{-1} } will be part of the
 output. This matrix must be manually inverted using
 \code{solve(jointPrecision)} in order to get the joint covariance
 matrix. Note, that the parameter order will follow the original

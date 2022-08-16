@@ -28,22 +28,32 @@ oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
 
 \item{discreteSupport}{Possible outcomes of discrete distribution (\code{method="oneStepGeneric"} only).}
 
-\item{range}{Possible range of the observations.}
+\item{range}{Possible range of the observations. (\code{method="oneStepGeneric"} only).}
 
-\item{seed}{Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine.}
+\item{seed}{Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine (recommended for simulation studies).}
 
 \item{parallel}{Run in parallel using the \code{parallel} package?}
 
-\item{trace}{Trace progress?}
+\item{trace}{Logical; Trace progress? More options available for \code{method="oneStepGeneric"} - see details.}
 
-\item{reverse}{Do calculations in opposite order to improve stability ? (currently enabled by default for \code{oneStepGaussianOffMode} method only)}
+\item{reverse}{Do calculations in opposite order to improve stability? (currently enabled by default for \code{oneStepGaussianOffMode} method only)}
 
 \item{...}{Control parameters for OSA method}
 }
 \value{
 \code{data.frame} with OSA \emph{standardized} residuals
-in column \code{residual}. Depending on the method the output may
-also include OSA expected observation in column \code{mean}.
+in column \code{residual}. In addition, depending on the method, the output
+includes selected characteristics of the predictive distribution (current row) given past observations (past rows), notably the \emph{conditional}
+\describe{
+\item{mean}{Expectation of the current observation}
+\item{sd}{Standard deviation of the current observation}
+\item{Fx}{CDF at current observation}
+\item{px}{Density at current observation}
+\item{nll}{Negative log density at current observation}
+\item{nlcdf.lower}{Negative log of the lower CDF at current observation}
+\item{nlcdf.upper}{Negative log of the upper CDF at current observation}
+}
+\emph{given past observations}.
 }
 \description{
 Calculate one-step-ahead (OSA) residuals for a latent variable
@@ -67,9 +77,12 @@ In case of discrete observations draw (unit) uniform variables
 \eqn{U_1,...,U_n} and construct the randomized OSA residuals
 \deqn{\Phi^{-1}(F_1(X_1)-U_1 p_1(X_1))\:,...,\:\Phi^{-1}(F_n(X_n)-U_n p_n(X_n))}
 These are also iid standard normal.
+}
+\section{Choosing the method}{
 
-The user must specify one of the following methods to calculate
-the residuals:
+The user must specify the method used to calculate the residuals - see detailed list of method descriptions below.
+We note that all the methods are based on approximations. While the default 'oneStepGaussianoffMode' often represents a good compromise between accuracy and speed, it cannot be assumed to work well for all model classes.
+As a rule of thumb, if in doubt whether a method is accurate enough, you should always compare with the 'oneStepGeneric' which is considered the most accurate of the available methods.
 \describe{
 \item{method="fullGaussian"}{
 This method assumes that the joint distribution of data \emph{and}
@@ -109,6 +122,10 @@ Then this template can be augmented with a
 
 The new data vector (\code{keep}) need not be passed from \R. It
 automatically becomes a copy of \code{x} filled with ones.
+
+Some extra parameters are essential for the method.
+Pay special attention to the integration domain which must be specified either via \code{range} (continuous case) or \code{discreteSupport} (discrete case).
+It may be useful to look at the one step predictive distributions on either log scale (\code{trace=2}) or natural scale (\code{trace=3}) to determine which alternative methods might be appropriate.
 }
 \item{method="oneStepGaussian"}{
 This is a special case of the generic method where the one step
@@ -130,9 +147,9 @@ negative log of the lower and upper CDF:
     DATA_VECTOR(x);
     DATA_VECTOR_INDICATOR(keep, x);
     ...
-    nll -= keep(i) * dnorm(x(i), u(i), 0.0, true);
-    nll -= keep.cdf_lower(i) * log( pnorm(x(i), u(i), 0.0) );
-    nll -= keep.cdf_upper(i) * log( 1.0 - pnorm(x(i), u(i), 0.0) );
+    nll -= keep(i) * dnorm(x(i), u(i), sd(i), true);
+    nll -= keep.cdf_lower(i) * log( pnorm(x(i), u(i), sd(i)) );
+    nll -= keep.cdf_upper(i) * log( 1.0 - pnorm(x(i), u(i), sd(i)) );
     ...
 }
 
@@ -142,6 +159,7 @@ filled with zeros.
 }
 }
 }
+
 \examples{
 ######################## Gaussian case
 runExample("simple")

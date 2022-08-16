@@ -16,7 +16,7 @@ Free memory allocated on the C++ side by \code{MakeADFun}.
 An object returned by \code{MakeADFun} contains pointers to
 structures allocated on the C++ side. These are managed by R's
 garbage collector which for the most cases is sufficient. However,
-because the garbage collector is unware of the C++ object sizes,
+because the garbage collector is unaware of the C++ object sizes,
 it may fail to release memory to the system as frequently as
 necessary. In such cases one can manually call
 \code{FreeADFun(obj)} to release the resources.

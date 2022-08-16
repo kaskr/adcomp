@@ -9,7 +9,7 @@ openmp(n = NULL, max = FALSE, autopar = NULL, DLL = getUserDLL())
 \arguments{
 \item{n}{Requested number of threads, or \code{NULL} to just read the current value.}
 
-\item{max}{Logical; Set n to OpenMP runtime value 'omp_get_max_threads()' ?}
+\item{max}{Logical; Set n to OpenMP runtime value 'omp_get_max_threads()'?}
 
 \item{autopar}{Logical; use automatic parallelization - see details.}
 
@@ -24,7 +24,7 @@ Control number of OpenMP threads used by a TMB model.
 \details{
 This function controls the number of parallel threads used by a TMB model compiled with OpenMP.
 The number of threads is part of the configuration list \code{config()} of the DLL.
-The value only affects parallization of the DLL. It does \emph{not} affect BLAS/LAPACK specific parallization which has to be specified elsewhere.
+The value only affects parallelization of the DLL. It does \emph{not} affect BLAS/LAPACK specific parallelization which has to be specified elsewhere.
 
 When a DLL is loaded, the number of threads is set to 1 by default.
 To activate parallelization you have to explicitly call \code{openmp(nthreads)} after loading the DLL. Calling \code{openmp(max=TRUE)} should normally pick up the environment variable \code{OMP_NUM_THREADS}, but this may be platform dependent.
