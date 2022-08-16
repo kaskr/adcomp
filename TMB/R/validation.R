@@ -23,9 +23,9 @@
 ##' These are also iid standard normal.
 ##'
 ##' @section Choosing the method:
-##' The user must specify the method used to calculate the residuals - see detailed list of method desciptions below.
+##' The user must specify the method used to calculate the residuals - see detailed list of method descriptions below.
 ##' We note that all the methods are based on approximations. While the default 'oneStepGaussianoffMode' often represents a good compromise between accuracy and speed, it cannot be assumed to work well for all model classes.
-##' As a rule of thumb, if in doubt whether a method is accuate enough, you should always compare with the 'oneStepGeneric' which is considered the most accurate of the available methods.
+##' As a rule of thumb, if in doubt whether a method is accurate enough, you should always compare with the 'oneStepGeneric' which is considered the most accurate of the available methods.
 ##' \describe{
 ##' \item{method="fullGaussian"}{
 ##' This method assumes that the joint distribution of data \emph{and}
