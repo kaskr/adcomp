@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+TMB 1.9.1 (2022-08-16)
+------------------------------------------------------------------------
+
+o Prepare for Matrix 1.4-2 deprecations.
+
+o Fix html version of sdreport docs (thanks to Kurt Hornik).
+
+o Constant input test was missing for some special functions.
+
+o Added argument 'max.order' to compile().
+
+o oneStepPredict() CDF method was stabilized.
+
+o 2D interpolation operator was added on C++ side.
+
+------------------------------------------------------------------------
 TMB 1.9.0 (2022-05-26)
 ------------------------------------------------------------------------
 
