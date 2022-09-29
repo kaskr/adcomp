@@ -73,8 +73,8 @@ if(example!=""){
           ## have 'env' as part of sdreport output):
           keep <- function(x)
               !is.environment(x)
-          keepx <- sapply(x,keep)
-          keepy <- sapply(y,keep)
+          keepx <- unlist(lapply(x,keep))
+          keepy <- unlist(lapply(y,keep))
           Map(diff, x[keepx], y[keepy])
       }
       else if((!is.integer(x))&(is.numeric(x)|is.matrix(y))&length(x)>0)max(abs(x-y))
