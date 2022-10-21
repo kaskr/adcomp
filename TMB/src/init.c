@@ -14,7 +14,7 @@ SEXP tmb_invQ_tril_halfdiag(SEXP Lfac);
 SEXP match_pattern(SEXP A_, SEXP B_);
 SEXP tmb_sparse_izamd(SEXP A_, SEXP mark_, SEXP diag_);
 SEXP tmb_half_diag(SEXP A_);
-SEXP have_tmb_symbolic();
+SEXP have_tmb_symbolic(void);
 SEXP tmb_symbolic(SEXP Qp);
 SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult);
 SEXP tmb_CHMfactor_solve(SEXP L_, SEXP y_);
