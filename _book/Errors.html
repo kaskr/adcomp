@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8 Compilation and run time errors | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8 Compilation and run time errors | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="Examples.html"/>
 <link rel="next" href="Toolbox.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,13 +275,13 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Errors" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Compilation and run time errors</h1>
+<div id="Errors" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">8</span> Compilation and run time errors<a href="Errors.html#Errors" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>The R interface to the debugger (gdb) is documented as part of the R
 help system, i.e. you can type <code>?gdbsource</code> in R to get info. The
 current document only adresses isses that the relate to C++.</p>
-<div id="compilation-errors" class="section level2" number="8.1">
-<h2><span class="header-section-number">8.1</span> Compilation errors</h2>
+<div id="compilation-errors" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> Compilation errors<a href="Errors.html#compilation-errors" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>It may be hard to understand the compilation errors for the following
 reasons</p>
 <ul>
@@ -290,8 +289,8 @@ reasons</p>
 error messages.</li>
 </ul>
 </div>
-<div id="run-time-errors" class="section level2" number="8.2">
-<h2><span class="header-section-number">8.2</span> Run time errors</h2>
+<div id="run-time-errors" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> Run time errors<a href="Errors.html#run-time-errors" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Run time errors are broadly speaking of two types:</p>
 <ul>
 <li>Out-of-bounds (you are “walking out of an array”)</li>
@@ -300,8 +299,8 @@ error messages.</li>
 <p>You can use the debugger to locate both types of errors, but the
 procedure is a little bit different in the two cases. The following
 assumes that you have the GNU debugger <code>gdb</code> installed.</p>
-<div id="out-of-bounds-error" class="section level3" number="8.2.1">
-<h3><span class="header-section-number">8.2.1</span> Out-of-bounds error</h3>
+<div id="out-of-bounds-error" class="section level3 hasAnchor" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Out-of-bounds error<a href="Errors.html#out-of-bounds-error" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An example is:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb21-1"><a href="Errors.html#cb21-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; <a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>(<span class="dv">4</span>);</span>
 <span id="cb21-2"><a href="Errors.html#cb21-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>(<span class="dv">5</span>);                <span class="co">// 5 is not a valid <a class="code" href="../structTMBad_1_1multivariate__index.html#a4ad25168bc543d8738cf3a36fe7d30e4">index</a> <a class="code" href="../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02">value</a> here</span></span></code></pre></div>
@@ -321,8 +320,8 @@ Aborted (core dumped)</p>
 <p>and you can see that the debugger points to line number 11 in the .cpp
 file. <code>gdbsource()</code> is an R function that is part of TMB.</p>
 </div>
-<div id="floating-point-exception" class="section level3" number="8.2.2">
-<h3><span class="header-section-number">8.2.2</span> Floating point exception</h3>
+<div id="floating-point-exception" class="section level3 hasAnchor" number="8.2.2">
+<h3><span class="header-section-number">8.2.2</span> Floating point exception<a href="Errors.html#floating-point-exception" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>If you on the other hand perform an illegal mathematical operation,
 such as</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="Errors.html#cb23-1" aria-hidden="true" tabindex="-1"></a>Type f = sqrt(-<span class="fl">1.</span>);</span></code></pre></div>
@@ -373,8 +372,8 @@ To circumvent this problem one can run without NaN debugging enabled and
 save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation),
 then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type="double")</code>.</p>
 </div>
-<div id="missing-casts-for-vectorized-functions" class="section level3" number="8.2.3">
-<h3><span class="header-section-number">8.2.3</span> Missing casts for vectorized functions</h3>
+<div id="missing-casts-for-vectorized-functions" class="section level3 hasAnchor" number="8.2.3">
+<h3><span class="header-section-number">8.2.3</span> Missing casts for vectorized functions<a href="Errors.html#missing-casts-for-vectorized-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>TMB vectorized functions cannot be called directly with expressions, for example the following will fail to compile:</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="Errors.html#cb27-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
 <span id="cb27-2"><a href="Errors.html#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t do this! Doesn&#39;t compile</span></span>
@@ -456,7 +455,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

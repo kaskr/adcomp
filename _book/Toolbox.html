@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>9 Toolbox | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="9 Toolbox | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="Errors.html"/>
 <link rel="next" href="CppTutorial.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,11 +275,11 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Toolbox" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Toolbox</h1>
+<div id="Toolbox" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">9</span> Toolbox<a href="Toolbox.html#Toolbox" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>First read the <em>Statistical Modelling</em> section of <a href="Tutorial.html#Tutorial">Tutorial</a>.</p>
-<div id="non-normal-latent-variables-random-effects" class="section level3" number="9.0.1">
-<h3><span class="header-section-number">9.0.1</span> Non-normal latent variables (random effects)</h3>
+<div id="non-normal-latent-variables-random-effects" class="section level3 hasAnchor" number="9.0.1">
+<h3><span class="header-section-number">9.0.1</span> Non-normal latent variables (random effects)<a href="Toolbox.html#non-normal-latent-variables-random-effects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The underlying latent random variables in TMB must be Gaussian for the
 Laplace approximation to be accurate. To obtain other distributions,
 say a gamma distribution, the “transformation trick” can be used. We
@@ -294,16 +293,16 @@ follows:</p>
 <span id="cb29-5"><a href="Toolbox.html#cb29-5" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; w = <a class="code" href="../group__R__style__distribution.html#ga0e4b623b592b42651357611532e2b912">qgamma</a>(v,shape,scale);</span></code></pre></div>
 <p><code>w</code> now has a gamma distribution.</p>
 </div>
-<div id="discrete-latent-variables" class="section level3" number="9.0.2">
-<h3><span class="header-section-number">9.0.2</span> Discrete latent variables</h3>
+<div id="discrete-latent-variables" class="section level3 hasAnchor" number="9.0.2">
+<h3><span class="header-section-number">9.0.2</span> Discrete latent variables<a href="Toolbox.html#discrete-latent-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The Laplace approximation can not be applied to discrete latent
 variables that occur in mixture models and HMMs (Hidden Markov
 models). However, such likelihoods have analytic expressions, and may
 be coded up in TMB. TMB would still calculate the exact gradient of
 the HMM likelihood.</p>
 </div>
-<div id="mixture-models" class="section level3" number="9.0.3">
-<h3><span class="header-section-number">9.0.3</span> Mixture models</h3>
+<div id="mixture-models" class="section level3 hasAnchor" number="9.0.3">
+<h3><span class="header-section-number">9.0.3</span> Mixture models<a href="Toolbox.html#mixture-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Although mixture models are a special case of discrete latent variable
 models, they do deserve special attention. Consider the case that we
 want a mixture of two zero-mean normal distributions (with different
@@ -315,8 +314,8 @@ standard deviations). This can be implemented as:</p>
 <span id="cb30-5"><a href="Toolbox.html#cb30-5" aria-hidden="true" tabindex="-1"></a>nll -= <a class="code" href="../convenience_8hpp.html#a1fe3cb777e8fd8080385579ab87600e3">sum</a>( log(      p  * <a class="code" href="../group__R__style__distribution.html#ga5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>, Type(<span class="dv">0</span>), sigma(<span class="dv">0</span>), <span class="kw">false</span>)</span>
 <span id="cb30-6"><a href="Toolbox.html#cb30-6" aria-hidden="true" tabindex="-1"></a>               + (<span class="fl">1.0</span>-p) * <a class="code" href="../group__R__style__distribution.html#ga5eb914782c488bd3ec4a50d4e4a73394">dnorm</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>, Type(<span class="dv">0</span>), sigma(<span class="dv">1</span>), <span class="kw">false</span>) ) );</span></code></pre></div>
 </div>
-<div id="time-series" class="section level3" number="9.0.4">
-<h3><span class="header-section-number">9.0.4</span> Time series</h3>
+<div id="time-series" class="section level3 hasAnchor" number="9.0.4">
+<h3><span class="header-section-number">9.0.4</span> Time series<a href="Toolbox.html#time-series" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Autoregressive (AR) processes may be implemented using the compact
 notation of section <a href="Densities.html#Densities">Densities</a>. The resulting AR process may be
 applied both in the observational part and in the distribution of a
@@ -324,8 +323,8 @@ latent variable.</p>
 <p>Nonlinear time must be implemented from scratch, as in the example
 <a href="../thetalog_8cpp-example.html">thetalog.cpp</a></p>
 </div>
-<div id="spatial-models" class="section level3" number="9.0.5">
-<h3><span class="header-section-number">9.0.5</span> Spatial models</h3>
+<div id="spatial-models" class="section level3 hasAnchor" number="9.0.5">
+<h3><span class="header-section-number">9.0.5</span> Spatial models<a href="Toolbox.html#spatial-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>TMB has strong support for spatial model and space-time models via the
 <code><a class="code" href="../namespacedensity.html#a3aee006c3c4f4ef0b0c3d4628ead67d0">GMRF</a>()</code> and <code><a class="code" href="../namespacedensity.html#a7163798c4b0467ac2e570b034d7ca4c5">SEPARABLE</a>()</code> functions, and the notion of a
 <code>distribution</code>. The reader is referred to section <a href="Densities.html#Densities">Densities</a> for
@@ -398,7 +397,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

@@ -107,7 +107,7 @@ $(function() {
 <p>Simulating datasets from known parameters and re-estimationg those parameters can be done generically by:</p>
 <div class="fragment"><div class="line">sim &lt;- replicate(50, {</div><div class="line">  simdata &lt;- obj$simulate(par=obj$par, complete=TRUE)</div><div class="line">  obj2 &lt;- MakeADFun(simdata, parameters, DLL=&quot;linreg&quot;, silent=TRUE)</div><div class="line">  nlminb(obj2$par, obj2$fn, obj2$gr)$par</div><div class="line">})</div></div><!-- fragment --><p>We reshape and plot the result:</p>
 <div class="fragment"><div class="line">library(lattice)</div><div class="line">df &lt;- data.frame(estimate=as.vector(sim), parameter=names(obj$par)[row(sim)])</div><div class="line">densityplot( ~ estimate | parameter, data=df, layout=c(3,1))</div></div><!-- fragment --><div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-9-1.svg" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-9-1.svg" alt="plot of chunk unnamed-chunk-9" style="display: block; margin: auto;"></object>
 </div>
 <p>Compare with the true parameter values of the simulation:</p>
 <div class="fragment"><div class="line">obj$par</div></div><!-- fragment --><div class="fragment"><div class="line">##  a  b sd </div><div class="line">##  0  0  1</div></div><!-- fragment --><h3>Advanced examples</h3>

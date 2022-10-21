@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>14 Validation | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="14 Validation | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="Simulation.html"/>
 <link rel="next" href="AtomicFunctions.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,17 +275,17 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Validation" class="section level1" number="14">
-<h1><span class="header-section-number">14</span> Validation</h1>
-<div id="residuals" class="section level2" number="14.1">
-<h2><span class="header-section-number">14.1</span> Residuals</h2>
+<div id="Validation" class="section level1 hasAnchor" number="14">
+<h1><span class="header-section-number">14</span> Validation<a href="Validation.html#Validation" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="residuals" class="section level2 hasAnchor" number="14.1">
+<h2><span class="header-section-number">14.1</span> Residuals<a href="Validation.html#residuals" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The underlying framework is the same for all cases listed in this section.
 [ Description of general framework FIXME ]</p>
 <p>For models that does not include random effects the calculations can be simplified greatly.</p>
-<div id="models-without-random-effects" class="section level3" number="14.1.1">
-<h3><span class="header-section-number">14.1.1</span> Models without random effects</h3>
-<div id="normal-distribution-pearson-residuals-." class="section level4" number="14.1.1.1">
-<h4><span class="header-section-number">14.1.1.1</span> Normal distribution (Pearson residuals) .</h4>
+<div id="models-without-random-effects" class="section level3 hasAnchor" number="14.1.1">
+<h3><span class="header-section-number">14.1.1</span> Models without random effects<a href="Validation.html#models-without-random-effects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="normal-distribution-pearson-residuals-." class="section level4 hasAnchor" number="14.1.1.1">
+<h4><span class="header-section-number">14.1.1.1</span> Normal distribution (Pearson residuals) .<a href="Validation.html#normal-distribution-pearson-residuals-." class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>This example shows how standardized residuals can be calculated within the template code and reported back to R using the <code>REPORT</code> function in TMB.</p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb46-1"><a href="Validation.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">// linear regression with reporting of residuals</span></span>
 <span id="cb46-2"><a href="Validation.html#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></span>
@@ -311,10 +310,10 @@ div.csl-indent {
 <span id="cb47-3"><a href="Validation.html#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(rep<span class="sc">$</span>residuals)</span>
 <span id="cb47-4"><a href="Validation.html#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span></code></pre></div>
 </div>
-<div id="non-normal-distributions" class="section level4" number="14.1.1.2">
-<h4><span class="header-section-number">14.1.1.2</span> Non-normal distributions</h4>
-<div id="continuous" class="section level5" number="14.1.1.2.1">
-<h5><span class="header-section-number">14.1.1.2.1</span> Continuous</h5>
+<div id="non-normal-distributions" class="section level4 hasAnchor" number="14.1.1.2">
+<h4><span class="header-section-number">14.1.1.2</span> Non-normal distributions<a href="Validation.html#non-normal-distributions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="continuous" class="section level5 hasAnchor" number="14.1.1.2.1">
+<h5><span class="header-section-number">14.1.1.2.1</span> Continuous<a href="Validation.html#continuous" class="anchor-section" aria-label="Anchor link to header"></a></h5>
 <p>We now consider situations where the error distribution is continuous but not Gaussian.<br />
 Residuals that are standard normal distributed given that the model is correct, can be obtained be using the “transformation trick,” here illustrated using a model that fits a gamma distribution.</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb48-1"><a href="Validation.html#cb48-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -332,8 +331,8 @@ Residuals that are standard normal distributed given that the model is correct, 
 <span id="cb48-13"><a href="Validation.html#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> nll;</span>
 <span id="cb48-14"><a href="Validation.html#cb48-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
-<div id="discrete" class="section level5" number="14.1.1.2.2">
-<h5><span class="header-section-number">14.1.1.2.2</span> Discrete</h5>
+<div id="discrete" class="section level5 hasAnchor" number="14.1.1.2.2">
+<h5><span class="header-section-number">14.1.1.2.2</span> Discrete<a href="Validation.html#discrete" class="anchor-section" aria-label="Anchor link to header"></a></h5>
 <p>For discrete probability distributions the transformation trick can also be used, but an element of randomization must be added in order to obtain residuals that are truly Gaussian.</p>
 <p>Assume that you have a series of observed counts <code>y</code> and you have fitted some TMB model using a Poisson likelihood, and the predicted values from that model have been reported and saved in a vector called <code>mu</code>.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="Validation.html#cb49-1" aria-hidden="true" tabindex="-1"></a>... </span>
@@ -344,20 +343,20 @@ Residuals that are standard normal distributed given that the model is correct, 
 </div>
 </div>
 </div>
-<div id="models-with-random-effects" class="section level3" number="14.1.2">
-<h3><span class="header-section-number">14.1.2</span> Models with random effects</h3>
+<div id="models-with-random-effects" class="section level3 hasAnchor" number="14.1.2">
+<h3><span class="header-section-number">14.1.2</span> Models with random effects<a href="Validation.html#models-with-random-effects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Model validation using residuals is considerably more complicated for random effect models.
 Further information can be found in <span class="citation">(<a href="#ref-thygesen2017validation" role="doc-biblioref">Thygesen et al. 2017</a>)</span> FIXME: not generating reference.</p>
-<div id="one-step-ahead-residuals" class="section level4" number="14.1.2.1">
-<h4><span class="header-section-number">14.1.2.1</span> One-step-ahead residuals</h4>
+<div id="one-step-ahead-residuals" class="section level4 hasAnchor" number="14.1.2.1">
+<h4><span class="header-section-number">14.1.2.1</span> One-step-ahead residuals<a href="Validation.html#one-step-ahead-residuals" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Other names are one step prediction errors, forecast pseudo-residuals, and recursive residuals.
 These residuals can be computed using the <code>oneStepPredict</code> function.
 There are several methods available within this function, and it is the responsibility of the user to ensure that an appropriate method is chosen for a given model.</p>
 <p>The following examples of its use are availabe in the <code>tmb_examples/validation</code> folder.</p>
 <table>
 <colgroup>
-<col width="47%" />
-<col width="52%" />
+<col width="25%" />
+<col width="74%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -381,16 +380,16 @@ There are several methods available within this function, and it is the responsi
 </tbody>
 </table>
 </div>
-<div id="one-sample-from-the-posterior" class="section level4" number="14.1.2.2">
-<h4><span class="header-section-number">14.1.2.2</span> One sample from the posterior</h4>
+<div id="one-sample-from-the-posterior" class="section level4 hasAnchor" number="14.1.2.2">
+<h4><span class="header-section-number">14.1.2.2</span> One sample from the posterior<a href="Validation.html#one-sample-from-the-posterior" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>An alternative (and faster) method is based on a single sample of the random effects from the their posterior distribution given the data.
 For state space models we can derive both process- and observation errors from the single sample and the observations, and compare these with the assumptions in the model.</p>
 <p>An example can be found at the end of the <code>randomwalkvalidation.R</code> file in the <code>tmb_examples/validation</code> folder</p>
 </div>
 </div>
 </div>
-<div id="checking-the-laplace-approximation" class="section level2" number="14.2">
-<h2><span class="header-section-number">14.2</span> Checking the Laplace approximation</h2>
+<div id="checking-the-laplace-approximation" class="section level2 hasAnchor" number="14.2">
+<h2><span class="header-section-number">14.2</span> Checking the Laplace approximation<a href="Validation.html#checking-the-laplace-approximation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>FIXME:</p>
 
 </div>
@@ -467,7 +466,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

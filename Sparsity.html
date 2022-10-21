@@ -85,11 +85,11 @@ $(function() {
 </p>
 <p>The separability of factors on the right hand side implies some conditional independence properties. For instance if \(x_1\) and \(x_3\) are held constant then \(x_2\) and \(x_4\) varies independently. We say that \(x_2\) and \(x_4\) are conditionally independent given \(x_1\) and \(x_3\). The conditional independence graph is defined by drawing <em>undirected</em> edges between variables occurring in the same factor \(f_i\):</p>
 <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-2-1.svg" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-2-1.svg" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;"></object>
 </div>
 <p>Equivalently the graph may be visualized via its adjacency matrix:</p>
 <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-3-1.svg" title="plot of chunk unnamed-chunk-3" alt="plot of chunk unnamed-chunk-3" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-3-1.svg" alt="plot of chunk unnamed-chunk-3" style="display: block; margin: auto;"></object>
 </div>
 <p>This is the <b>sparsity pattern</b> of the model.</p>
 <blockquote class="doxtable">
@@ -99,11 +99,11 @@ $(function() {
 <p>Important probabilistic properties can be deduced directly from the graph. This is due to the following <em>node removal</em> properties.</p>
 <ol type="1">
 <li>The conditional distribution given node \(X_i\) is found by removing \(X_i\) and its edges from the graph. For instance conditional on \(X_4\) we get the following graph: <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-4-1.svg" title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-4-1.svg" alt="plot of chunk unnamed-chunk-4" style="display: block; margin: auto;"></object>
 </div>
 </li>
 <li>The marginal distribution wrt. a node \(X_i\) is found by removing \(X_i\) from the graph and connecting <em>all</em> \(X_i\)'s neighbors. For instance when integrating \(X_4\) out of the joint density we get the following graph for the remaining nodes: <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-5-1.svg" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-5-1.svg" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;"></object>
 </div>
 </li>
 </ol>
@@ -113,7 +113,7 @@ $(function() {
 <h3>Directed acyclic graph</h3>
 <p>When building models in TMB it is often more natural to specify processes in incremental steps - i.e. through the successive conditional distributions. The previous example could be simulated by drawing the variables \(X_1,X_2,X_3,X_4\) one by one in the given order as illustrated by the following <em>directed</em> graph:</p>
 <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-6-1.svg" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-6-1.svg" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;"></object>
 </div>
 <p>The graph shows dependencies of any specific node <em>given past nodes</em>. The edge from \(X_1\) to \(X_3\) was not in the original (undirected) graph. This is a so-called <b>fill-in</b>.</p>
 <blockquote class="doxtable">
@@ -122,11 +122,11 @@ $(function() {
 <h3>The effect of adding data</h3>
 <p>It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that \(X_4\) is a data point we would illustrate it by:</p>
 <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-7-1.svg" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-7-1.svg" alt="plot of chunk unnamed-chunk-7" style="display: block; margin: auto;"></object>
 </div>
 <p>Here there are only three variables left. The conditional independence structure of the variables is:</p>
 <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-8-1.svg" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-8-1.svg" alt="plot of chunk unnamed-chunk-8" style="display: block; margin: auto;"></object>
 </div>
 <p>which is the same graph as was previously found by integrating \(X_4\) out of the joint distribution.</p>
 <blockquote class="doxtable">
@@ -145,12 +145,12 @@ $(function() {
 <p>The joint negative log-likelihood of state vector \(u\) and measurements \(y\) is implemented in the C++ template <a class="el" href="thetalog_8cpp-example.html">thetalog.cpp</a>. The example can be run by:</p>
 <div class="fragment"><div class="line">runExample(&quot;thetalog&quot;, exfolder=&quot;adcomp/tmb_examples&quot;)</div></div><!-- fragment --><p>We demonstrate it in the case \(n=5\). Here is the DAG</p>
 <div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-10-1.svg" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-10-1.svg" alt="plot of chunk unnamed-chunk-10" style="display: block; margin: auto;"></object>
 </div>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
 <p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
 <div class="fragment"><div class="line">library(Matrix)</div><div class="line">obj &lt;- MakeADFun(data, parameters, random=c(&quot;X&quot;), DLL=&quot;thetalog&quot;)</div><div class="line">image(obj$env$spHess(random=TRUE))</div></div><!-- fragment --><div class="image">
-<object type="image/svg+xml" data="figure/unnamed-chunk-11-1.svg" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" style="display: block; margin: auto;"></object>
+<object type="image/svg+xml" data="figure/unnamed-chunk-11-1.svg" alt="plot of chunk unnamed-chunk-11" style="display: block; margin: auto;"></object>
 </div>
 <blockquote class="doxtable">
 <p>FIXME: NOT DONE YET !</p>

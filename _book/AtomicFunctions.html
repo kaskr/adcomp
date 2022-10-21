@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>15 Atomic functions | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="15 Atomic functions | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="Validation.html"/>
 <link rel="next" href="Appendix.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,23 +275,23 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="AtomicFunctions" class="section level1" number="15">
-<h1><span class="header-section-number">15</span> Atomic functions</h1>
+<div id="AtomicFunctions" class="section level1 hasAnchor" number="15">
+<h1><span class="header-section-number">15</span> Atomic functions<a href="AtomicFunctions.html#AtomicFunctions" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Custom functions and derivatives can be added to the TMB library. This may be necessary for the following reasons:</p>
 <ul>
 <li>Adaptive (e.g. iterative) algorithms cannot be represented by a fixed computational graph and thus cannot be directly differentiated using TMB. Algorithms that use parameter dependent if-else branching are examples of such functions.</li>
 <li>Some functions have so many floating point operations that it is infeasible to expand the computational graph. Memory usage may be greatly reduced in such cases by collapsing the computational graph to a singe node with multiple inputs and outputs.</li>
 </ul>
-<div id="reverse-mode-differentiation" class="section level2" number="15.1">
-<h2><span class="header-section-number">15.1</span> Reverse mode differentiation</h2>
+<div id="reverse-mode-differentiation" class="section level2 hasAnchor" number="15.1">
+<h2><span class="header-section-number">15.1</span> Reverse mode differentiation<a href="AtomicFunctions.html#reverse-mode-differentiation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>TMB uses CppAD as its engine for reverse mode derivatives. In order to add a new primitive function</p>
 <p><span class="math display">\[f: R^n \rightarrow R^m\]</span></p>
 <p>we must inform CppAD how to calculate derivatives of this function in reverse mode. That is, for any range space vector <span class="math inline">\(w \in R^m\)</span> we must calculate the gradient of the function <span class="math inline">\(R^n \rightarrow R\)</span> given by</p>
 <p><span class="math display">\[ x \rightarrow \text{sum}( f(x) \odot w ) \]</span></p>
 <p>where ‘<span class="math inline">\(\odot\)</span>’ is pointwise multiplication.</p>
 </div>
-<div id="example-adding-new-primitive-function-with-known-derivatives" class="section level2" number="15.2">
-<h2><span class="header-section-number">15.2</span> Example: Adding new primitive function with known derivatives</h2>
+<div id="example-adding-new-primitive-function-with-known-derivatives" class="section level2 hasAnchor" number="15.2">
+<h2><span class="header-section-number">15.2</span> Example: Adding new primitive function with known derivatives<a href="AtomicFunctions.html#example-adding-new-primitive-function-with-known-derivatives" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>As an example consider the <a href="https://en.wikipedia.org/wiki/Lambert_W_function">Lambert W function</a> defined implicitly by</p>
 <p><span class="math display">\[y = W(y e^y)\]</span></p>
 <p>Here, we only consider <span class="math inline">\(W\)</span> as defined on the positive reals. It follows, by differentiating the above identity, that</p>
@@ -333,8 +332,8 @@ div.csl-indent {
 <span id="cb52-8"><a href="AtomicFunctions.html#cb52-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb52-9"><a href="AtomicFunctions.html#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Vectorized version</span></span>
 <span id="cb52-10"><a href="AtomicFunctions.html#cb52-10" aria-hidden="true" tabindex="-1"></a>VECTORIZE_1t(LambertW)</span></code></pre></div>
-<div id="testing-the-primitive-function" class="section level3" number="15.2.1">
-<h3><span class="header-section-number">15.2.1</span> Testing the primitive function</h3>
+<div id="testing-the-primitive-function" class="section level3 hasAnchor" number="15.2.1">
+<h3><span class="header-section-number">15.2.1</span> Testing the primitive function<a href="AtomicFunctions.html#testing-the-primitive-function" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here is a complete example using Newton’s method to calculate the Lambert <span class="math inline">\(W\)</span> function
 (there are more sophisticated algorithms such as the one by <a href="https://doi.org/10.1016/j.cam.2012.11.021">Fukushima (2013)</a>,
 but that doesn’t matter for this example):</p>
@@ -390,8 +389,8 @@ but that doesn’t matter for this example):</p>
 <p>And from R</p>
 <div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="AtomicFunctions.html#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compile</span>(<span class="st">&quot;lambert.cpp&quot;</span>)</span>
 <span id="cb54-2"><a href="AtomicFunctions.html#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dyn.load</span>(<span class="fu">dynlib</span>(<span class="st">&quot;lambert&quot;</span>))</span></code></pre></div>
-<div id="checking-function-value-and-derivatives" class="section level4" number="15.2.1.1">
-<h4><span class="header-section-number">15.2.1.1</span> Checking function value and derivatives</h4>
+<div id="checking-function-value-and-derivatives" class="section level4 hasAnchor" number="15.2.1.1">
+<h4><span class="header-section-number">15.2.1.1</span> Checking function value and derivatives<a href="AtomicFunctions.html#checking-function-value-and-derivatives" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Check definition of the function:</p>
 <div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="AtomicFunctions.html#cb55-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">MakeADFun</span>(<span class="at">data=</span><span class="fu">list</span>(), <span class="at">parameters=</span><span class="fu">list</span>(<span class="at"><a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>=</span><span class="dv">1</span>), <span class="at">DLL=</span><span class="st">&quot;lambert&quot;</span>)</span>
 <span id="cb55-2"><a href="AtomicFunctions.html#cb55-2" aria-hidden="true" tabindex="-1"></a>obj<span class="sc">$</span><span class="fu">fn</span>(<span class="dv">7</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="dv">7</span>))</span></code></pre></div>
@@ -412,8 +411,8 @@ but that doesn’t matter for this example):</p>
 </div>
 </div>
 </div>
-<div id="other-approaches" class="section level2" number="15.3">
-<h2><span class="header-section-number">15.3</span> Other approaches</h2>
+<div id="other-approaches" class="section level2 hasAnchor" number="15.3">
+<h2><span class="header-section-number">15.3</span> Other approaches<a href="AtomicFunctions.html#other-approaches" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>For the Lambert <span class="math inline">\(W\)</span> function we know how to calculate the derivatives. There are cases for which the derivatives are impossible (or difficult) to write down. If you’re in this situation you may want to try using forward mode AD to help in defining an atomic function. A full worked out example is available here: <a href="../adaptive_integration_8cpp-example.html">adaptive_integration.cpp</a>. Derivatives are calculated automatically and if-else branching is allowed. The main downside with this approach is that it is limited to functions with very few inputs.</p>
 <p>Checkpointing is another useful technique. It is demonstrated in the example <a href="../register_atomic_8cpp-example.html">register_atomic.cpp</a>. It does not work for adaptive algorithms but is otherwise automatic. It is useful to reduce AD memory usage in cases where the same sequence of operations is being applied many times.</p>
 
@@ -486,7 +485,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

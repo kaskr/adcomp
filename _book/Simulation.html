@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>13 Simulation | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="13 Simulation | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="Sparsity.html"/>
 <link rel="next" href="Validation.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,8 +275,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Simulation" class="section level1" number="13">
-<h1><span class="header-section-number">13</span> Simulation</h1>
+<div id="Simulation" class="section level1 hasAnchor" number="13">
+<h1><span class="header-section-number">13</span> Simulation<a href="Simulation.html#Simulation" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>When building models in TMB it is generally recommended to test the
 implementation on simulated data. Obviously, data can be simulated
 from R and passed to the C++ template. In practice this amounts to
@@ -286,10 +285,10 @@ implementation of the model. However, with increased model complexity
 it becomes inconvenient to maintain two separate
 implementations. Therefore, TMB allows the the user to write the
 simulation code as an integrated part of the C++ model template.</p>
-<div id="overview-of-simulation-methods-in-tmb" class="section level2" number="13.1">
-<h2><span class="header-section-number">13.1</span> Overview of simulation methods in TMB</h2>
-<div id="standard-generators" class="section level3" number="13.1.1">
-<h3><span class="header-section-number">13.1.1</span> Standard generators</h3>
+<div id="overview-of-simulation-methods-in-tmb" class="section level2 hasAnchor" number="13.1">
+<h2><span class="header-section-number">13.1</span> Overview of simulation methods in TMB<a href="Simulation.html#overview-of-simulation-methods-in-tmb" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="standard-generators" class="section level3 hasAnchor" number="13.1.1">
+<h3><span class="header-section-number">13.1.1</span> Standard generators<a href="Simulation.html#standard-generators" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The TMB simulation routines use the same naming convention as the R
 simulators. For instance <code><a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>()</code> is used to simulate from a normal
 distribution. However, the argument convention is slightly
@@ -306,8 +305,8 @@ longest input (no re-cycling) hence is consistent with <code><a class="code" hre
 <p><code><a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e">rpois</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a6bba21a2132e3504e183cdcd3e3e30cd">runif</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a29a4e821ec4b62567f8b40ab6ae78187">rbinom</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a74162523131288cf49a0d5d2e7c55253">rgamma</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#ae83ce74738a3b97e3432225a9036c99a">rexp</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#ae5f4590feabf617af4f525518b5802b8">rbeta</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#afc356ef7a9514c2629dd14de76e7e265">rf</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a266f56242a3cae0326439727b9f20b47">rlogis</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#af610012a7bedea646cc43a7dff276639">rt</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a2f3b0e14bca65b9153d89e797bdc37dd">rweibull</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#a6b70740b28883180856ab723d264c12a">rcompois</a>()</code>, <code><a class="code" href="../distributions__R_8hpp.html#ada07d8e0e57f901b42640684c3b3d2c3">rtweedie</a>()</code>, <code><a class="code" href="../lgamma_8hpp.html#a37ea00b66863cc66e267cfc5ced6c9ee">rnbinom</a>()</code>, <code><a class="code" href="../lgamma_8hpp.html#abbdff2745abaa2784b9350f1db929c3e">rnbinom2</a>()</code></p>
 </blockquote>
 </div>
-<div id="generators-for-density-objects" class="section level3" number="13.1.2">
-<h3><span class="header-section-number">13.1.2</span> Generators for density objects</h3>
+<div id="generators-for-density-objects" class="section level3 hasAnchor" number="13.1.2">
+<h3><span class="header-section-number">13.1.2</span> Generators for density objects<a href="Simulation.html#generators-for-density-objects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Objects from the density namespace have their own <code><a class="code" href="../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca">simulate</a>()</code>
 method. Taking the multivariate normal distribution as example we have
 the following ways to draw a simulation:</p>
@@ -325,22 +324,22 @@ is available for <em>all</em> the classes because the dimension of the
 simulation can always be deduced from <code>x</code>.</li>
 </ol>
 </div>
-<div id="controlling-the-random-seed" class="section level3" number="13.1.3">
-<h3><span class="header-section-number">13.1.3</span> Controlling the random seed</h3>
+<div id="controlling-the-random-seed" class="section level3 hasAnchor" number="13.1.3">
+<h3><span class="header-section-number">13.1.3</span> Controlling the random seed<a href="Simulation.html#controlling-the-random-seed" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>All TMB simulation methods are based on R’s random number
 generator. It follows that the random seed can be controlled from R
 the usual way using <code>set.seed</code> even though the simulation is performed
 on the C++ side.</p>
 </div>
 </div>
-<div id="simulation-blocks" class="section level2" number="13.2">
-<h2><span class="header-section-number">13.2</span> Simulation blocks</h2>
+<div id="simulation-blocks" class="section level2 hasAnchor" number="13.2">
+<h2><span class="header-section-number">13.2</span> Simulation blocks<a href="Simulation.html#simulation-blocks" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Simulation functions can be called from anywhere in the C++
 program. However, usually one should put the simulation code inside
 specialized <em>simulation blocks</em> that allows the code to only be
 executed when requested from R.</p>
-<div id="a-linear-regression-example" class="section level3" number="13.2.1">
-<h3><span class="header-section-number">13.2.1</span> A linear regression example</h3>
+<div id="a-linear-regression-example" class="section level3 hasAnchor" number="13.2.1">
+<h3><span class="header-section-number">13.2.1</span> A linear regression example<a href="Simulation.html#a-linear-regression-example" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A complete example extending the example <a href="../linreg_8cpp-example.html">linreg.cpp</a>
 with simulation code is:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb35-1"><a href="Simulation.html#cb35-1" aria-hidden="true" tabindex="-1"></a></span>
@@ -393,8 +392,8 @@ that can be used for this.</p>
 <code>obj$env$last.par</code>.</p>
 </blockquote>
 </div>
-<div id="a-simulation-study" class="section level3" number="13.2.2">
-<h3><span class="header-section-number">13.2.2</span> A simulation study</h3>
+<div id="a-simulation-study" class="section level3 hasAnchor" number="13.2.2">
+<h3><span class="header-section-number">13.2.2</span> A simulation study<a href="Simulation.html#a-simulation-study" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Simulating datasets from known parameters and re-estimationg those
 parameters can be done generically by:</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="Simulation.html#cb41-1" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">50</span>, {</span>
@@ -412,8 +411,8 @@ parameters can be done generically by:</p>
 <pre><code>##  a  b sd 
 ##  0  0  1</code></pre>
 </div>
-<div id="advanced-examples" class="section level3" number="13.2.3">
-<h3><span class="header-section-number">13.2.3</span> Advanced examples</h3>
+<div id="advanced-examples" class="section level3 hasAnchor" number="13.2.3">
+<h3><span class="header-section-number">13.2.3</span> Advanced examples<a href="Simulation.html#advanced-examples" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The examples <a href="../sam_8cpp-example.html">sam.cpp</a> and <a href="../ar1_4D_8cpp-example.html">ar1_4D.cpp</a>
 includes more advanced simulation code. The latter demonstrates how to
 simulate from the density objects:</p>
@@ -456,8 +455,8 @@ simulate from the density objects:</p>
 reference. Thereby the simulator knows the dimension of <code>eta</code> and can
 fill <code>eta</code> with a simulation.</p>
 </div>
-<div id="further-notes" class="section level3" number="13.2.4">
-<h3><span class="header-section-number">13.2.4</span> Further notes</h3>
+<div id="further-notes" class="section level3 hasAnchor" number="13.2.4">
+<h3><span class="header-section-number">13.2.4</span> Further notes<a href="Simulation.html#further-notes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The above example only used one simulation block. In general there is
 no limitation on the number of simulation blocks that can be used in a
 model and simulation blocks can use temporaries calculated outside the
@@ -537,7 +536,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

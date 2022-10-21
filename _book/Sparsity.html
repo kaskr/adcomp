@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>12 Sparsity | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="12 Sparsity | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="ModelObject.html"/>
 <link rel="next" href="Simulation.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,8 +275,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Sparsity" class="section level1" number="12">
-<h1><span class="header-section-number">12</span> Sparsity</h1>
+<div id="Sparsity" class="section level1 hasAnchor" number="12">
+<h1><span class="header-section-number">12</span> Sparsity<a href="Sparsity.html#Sparsity" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Large random effect models require sparsity in order to work in TMB.
 In this section we will discuss:</p>
 <ul>
@@ -287,10 +286,10 @@ In this section we will discuss:</p>
 <li>How to visualize sparsity either as a matrix or a graph.</li>
 <li>How to use sparsity for general optimization problems (not just random effects).</li>
 </ul>
-<div id="conditional-independence-graphs-and-dags" class="section level2" number="12.1">
-<h2><span class="header-section-number">12.1</span> Conditional independence graphs and DAGs</h2>
-<div id="conditional-independence" class="section level3" number="12.1.1">
-<h3><span class="header-section-number">12.1.1</span> Conditional independence</h3>
+<div id="conditional-independence-graphs-and-dags" class="section level2 hasAnchor" number="12.1">
+<h2><span class="header-section-number">12.1</span> Conditional independence graphs and DAGs<a href="Sparsity.html#conditional-independence-graphs-and-dags" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="conditional-independence" class="section level3 hasAnchor" number="12.1.1">
+<h3><span class="header-section-number">12.1.1</span> Conditional independence<a href="Sparsity.html#conditional-independence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>There are various graph representations that are commonly used to
 visualize probabilistic structure. One such is the <em>conditional
 independence graph</em>. Say we have a model of four random variables <span class="math inline">\(X_1,...,X_4\)</span> for which the joint density is:</p>
@@ -305,8 +304,8 @@ The conditional independence graph is defined by drawing <em>undirected</em> edg
 <p>The sparsity pattern visualizes the conditional independence structure of the random effects in the model.</p>
 </blockquote>
 </div>
-<div id="node-removal-properties" class="section level3" number="12.1.2">
-<h3><span class="header-section-number">12.1.2</span> Node removal properties</h3>
+<div id="node-removal-properties" class="section level3 hasAnchor" number="12.1.2">
+<h3><span class="header-section-number">12.1.2</span> Node removal properties<a href="Sparsity.html#node-removal-properties" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Important probabilistic properties can be deduced directly from the graph. This is due to the following <em>node removal</em> properties.</p>
 <ol style="list-style-type: decimal">
 <li><p>The conditional distribution given node <span class="math inline">\(X_i\)</span> is found by removing <span class="math inline">\(X_i\)</span> and its edges from the graph. For instance conditional on <span class="math inline">\(X_4\)</span> we get the following graph:
@@ -318,8 +317,8 @@ The conditional independence graph is defined by drawing <em>undirected</em> edg
 <p>Conditioning preserves sparseness. Marginalizing tend to destroy sparseness by adding more edges to the graph.</p>
 </blockquote>
 </div>
-<div id="directed-acyclic-graph" class="section level3" number="12.1.3">
-<h3><span class="header-section-number">12.1.3</span> Directed acyclic graph</h3>
+<div id="directed-acyclic-graph" class="section level3 hasAnchor" number="12.1.3">
+<h3><span class="header-section-number">12.1.3</span> Directed acyclic graph<a href="Sparsity.html#directed-acyclic-graph" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>When building models in TMB it is often more natural to specify processes in incremental steps - i.e. through the successive conditional distributions. The previous example could be simulated by drawing the variables <span class="math inline">\(X_1,X_2,X_3,X_4\)</span> one by one in the given order as illustrated by the following <em>directed</em> graph:</p>
 <p><img src="_main_files/figure-html/unnamed-chunk-15-1.svg" style="display: block; margin: auto;" /></p>
 <p>The graph shows dependencies of any specific node <em>given past nodes</em>. The edge from <span class="math inline">\(X_1\)</span> to <span class="math inline">\(X_3\)</span> was not in the original (undirected) graph. This is a so-called <strong>fill-in</strong>.</p>
@@ -327,8 +326,8 @@ The conditional independence graph is defined by drawing <em>undirected</em> edg
 <p>Order matters. The DAG is different from the conditional independence graph.</p>
 </blockquote>
 </div>
-<div id="the-effect-of-adding-data" class="section level3" number="12.1.4">
-<h3><span class="header-section-number">12.1.4</span> The effect of adding data</h3>
+<div id="the-effect-of-adding-data" class="section level3 hasAnchor" number="12.1.4">
+<h3><span class="header-section-number">12.1.4</span> The effect of adding data<a href="Sparsity.html#the-effect-of-adding-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>It is convenient to use a box-shape for nodes that represent data. For instance if we pretend that <span class="math inline">\(X_4\)</span> is a data point we would illustrate it by:</p>
 <p><img src="_main_files/figure-html/unnamed-chunk-16-1.svg" style="display: block; margin: auto;" /></p>
 <p>Here there are only three variables left. The conditional independence structure of the variables is:</p>
@@ -339,8 +338,8 @@ The conditional independence graph is defined by drawing <em>undirected</em> edg
 </blockquote>
 </div>
 </div>
-<div id="the-theta-logistic-example" class="section level2" number="12.2">
-<h2><span class="header-section-number">12.2</span> The theta logistic example</h2>
+<div id="the-theta-logistic-example" class="section level2 hasAnchor" number="12.2">
+<h2><span class="header-section-number">12.2</span> The theta logistic example<a href="Sparsity.html#the-theta-logistic-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Consider the ``theta logistic’’ population model <span class="citation">(<a href="#ref-pedersen2011estimation" role="doc-biblioref">Pedersen et al. 2011</a>)</span>. This is a
 state-space model with state equation</p>
 <p><span class="math display">\[u_t = u_{t-1} + r_0\left(1-\left(\frac{\exp(u_{t-1})}{K}\right)^\psi\right) + e_t\]</span></p>
@@ -439,7 +438,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

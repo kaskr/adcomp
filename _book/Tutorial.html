@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2 Tutorial | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2 Tutorial | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="Introduction.html"/>
 <link rel="next" href="Structure_TMB.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,8 +275,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Tutorial" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Tutorial</h1>
+<div id="Tutorial" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">2</span> Tutorial<a href="Tutorial.html#Tutorial" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>A TMB project consists of an R file (<em>.R) and a C++ file (</em>.cpp). The
 R file does pre- and post processing of data in addition to maximizing
 the log-likelihood contained in *.cpp. See <a href="Examples.html#Examples">Examples</a> for more
@@ -309,19 +308,19 @@ is used in a calculation that affects the return value it must be
 “cast” to Type:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="Tutorial.html#cb2-1" aria-hidden="true" tabindex="-1"></a>Type nll;           <span class="co">// Define variable that holds the return <a class="code" href="../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02">value</a> (neg. log. lik)</span></span>
 <span id="cb2-2"><a href="Tutorial.html#cb2-2" aria-hidden="true" tabindex="-1"></a>nll = Type(<span class="fl">1.2</span>);    <span class="co">// Assign <a class="code" href="../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02">value</a> 1.2; a cast is needed.</span></span></code></pre></div>
-<div id="obtaining-data-and-parameter-values-from-r" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> Obtaining data and parameter values from R</h2>
+<div id="obtaining-data-and-parameter-values-from-r" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Obtaining data and parameter values from R<a href="Tutorial.html#obtaining-data-and-parameter-values-from-r" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Obviously, we will need to pass both data and parameter values to the
 objective function. This is done through a set of macros that TMB
 defines for us.</p>
-<div id="list-of-data-macros" class="section level3" number="2.1.1">
-<h3><span class="header-section-number">2.1.1</span> List of data macros</h3>
+<div id="list-of-data-macros" class="section level3 hasAnchor" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> List of data macros<a href="Tutorial.html#list-of-data-macros" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <blockquote>
 <p><code><a class="code" href="../group__macros.html#ga97c14a26ca75571090d332f15130ae4b">DATA_ARRAY</a>()</code>, <code><a class="code" href="../group__macros.html#gace5461529127e9c6f01c0b76b4fda2e6">DATA_FACTOR</a>()</code>, <code><a class="code" href="../group__macros.html#gaf5fe8a4b8a5134f341fa63844abb6fdc">DATA_IARRAY</a>()</code>, <code>DATA_IMATRIX()</code>, <code><a class="code" href="../group__macros.html#gae361b76344dbd1c7cbf5073949211641">DATA_INTEGER</a>()</code>, <code><a class="code" href="../group__macros.html#ga7889208e14a95d21cf630157cf0e2c80">DATA_IVECTOR</a>()</code>, <code><a class="code" href="../group__macros.html#gada5d1729c6988c1060cfa456b56c8d8c">DATA_MATRIX</a>()</code>, <code><a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>()</code>, <code>DATA_SPARSE_MATRIX()</code>, <code><a class="code" href="../group__macros.html#gaba52ba9bd5c88f42a0ce96432aa6e688">DATA_STRING</a>()</code>, <code><a class="code" href="../group__macros.html#gaf9885566da0d248c1a4b4d7a0eeafcd2">DATA_STRUCT</a>()</code>, <code>DATA_UPDATE()</code>, <code><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>()</code></p>
 </blockquote>
 </div>
-<div id="list-of-parameter-macros" class="section level3" number="2.1.2">
-<h3><span class="header-section-number">2.1.2</span> List of parameter macros</h3>
+<div id="list-of-parameter-macros" class="section level3 hasAnchor" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> List of parameter macros<a href="Tutorial.html#list-of-parameter-macros" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <blockquote>
 <p><code><a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>()</code>, <code><a class="code" href="../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>()</code>, <code>PARAMETER_MATRIX()</code>, <code><a class="code" href="../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a">PARAMETER_VECTOR</a>()</code></p>
 </blockquote>
@@ -337,8 +336,8 @@ of <code>x</code>, as it can be retrieved inside the C++ program:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="Tutorial.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> n = x.<a class="code" href="../structTMBad_1_1period.html#ad870a607cdf6f2f10c423df5d101a158">size</a>();</span></code></pre></div>
 </div>
 </div>
-<div id="an-extended-c-language" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> An extended C++ language</h2>
+<div id="an-extended-c-language" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> An extended C++ language<a href="Tutorial.html#an-extended-c-language" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>TMB extends C++ with functionality that is important for formulating
 likelihood functions. You have different toolboxes available:</p>
 <ul>
@@ -356,8 +355,8 @@ holds the return value (neg. log. likelihood).</p>
 <p>As in ordinary C++ local variable tmp must be assigned a value before
 it can enter into a calculation.</p>
 </div>
-<div id="statistical-modelling" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Statistical modelling</h2>
+<div id="statistical-modelling" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Statistical modelling<a href="Tutorial.html#statistical-modelling" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>TMB can handle complex statistical problems with hierarchical
 structure (latent random variables) and multiple data sources. Latent
 random variables must be continuous (discrete distributions are not
@@ -470,7 +469,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6 Multivariate distributions | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6 Multivariate distributions | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="R_style_distribution.html"/>
 <link rel="next" href="Examples.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,8 +275,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Densities" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Multivariate distributions</h1>
+<div id="Densities" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">6</span> Multivariate distributions<a href="Densities.html#Densities" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>The namespace</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="Densities.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> <a class="code" href="../namespacedensity.html">density</a>;</span></code></pre></div>
 <p>gives access to a variety of multivariate normal distributions:</p>
@@ -301,8 +300,8 @@ distributions we note the following which is of practical importance:</p>
 <li>All members in the <code>density</code> namespace return the <strong>negative</strong> log
 density, opposed to the univariate densities in <a href="R_style_distribution.html#R_style_distribution">R style distributions</a>.</li>
 </ul>
-<div id="multivariate-normal-distributions" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Multivariate normal distributions</h2>
+<div id="multivariate-normal-distributions" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Multivariate normal distributions<a href="Densities.html#multivariate-normal-distributions" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Consider a zero-mean multivariate normal distribution
 with covariance matrix <em>Sigma</em> (symmetric positive definite),
 that we want to evaluate at <em>x</em>:</p>
@@ -344,8 +343,8 @@ can easily be assessed using the <code>.<a class="code" href="../classdensity_1_
 <span id="cb12-2"><a href="Densities.html#cb12-2" aria-hidden="true" tabindex="-1"></a>Sigma = <a class="code" href="../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4">UNSTRUCTURED_CORR</a>(unconstrained_params).<a class="code" href="../classdensity_1_1MVNORM__t.html#a1d284b3f3adac475399ae1e5428cb202">cov</a>();</span>
 <span id="cb12-3"><a href="Densities.html#cb12-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(Sigma);                                         <span class="co">// Report back to <a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a> session</span></span></code></pre></div>
 </div>
-<div id="autoregressive-processes" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> Autoregressive processes</h2>
+<div id="autoregressive-processes" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Autoregressive processes<a href="Densities.html#autoregressive-processes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Consider a stationary univariate Gaussian AR1 process
 <em>x(t),t=0,…,n-1</em>. The stationary distribution is choosen so that:</p>
 <ul>
@@ -370,8 +369,8 @@ satisfy:</p>
 <span id="cb14-2"><a href="Densities.html#cb14-2" aria-hidden="true" tabindex="-1"></a>res = SCALE(AR1(rho),sigma)(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span></code></pre></div>
 <p>Now, <em>var[x(t)] = sigma^2</em>. Because all elements of <code>x</code> are scaled by
 the same constant we use SCALE rather than VECSCALE.</p>
-<div id="multivariate-ar1-processes" class="section level4" number="6.2.0.1">
-<h4><span class="header-section-number">6.2.0.1</span> Multivariate AR1 processes</h4>
+<div id="multivariate-ar1-processes" class="section level4 hasAnchor" number="6.2.0.1">
+<h4><span class="header-section-number">6.2.0.1</span> Multivariate AR1 processes<a href="Densities.html#multivariate-ar1-processes" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>This is the first real illustration of how distributions can be used
 as building blocks to obtain more complex distributions. Consider the
 <em>p</em> dimensional AR1 process</p>
@@ -393,13 +392,13 @@ zero-mean normal density with covariance matrix <code>Sigma</code>.</li>
 the univariate AR1 process described above.</li>
 </ul>
 </div>
-<div id="higher-order-ar-processes" class="section level4" number="6.2.0.2">
-<h4><span class="header-section-number">6.2.0.2</span> Higher order AR processes</h4>
+<div id="higher-order-ar-processes" class="section level4 hasAnchor" number="6.2.0.2">
+<h4><span class="header-section-number">6.2.0.2</span> Higher order AR processes<a href="Densities.html#higher-order-ar-processes" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>There also exists <code>ARk_t</code> of arbitrary autoregressive order.</p>
 </div>
 </div>
-<div id="gaussian-markov-random-fields-gmrf" class="section level2" number="6.3">
-<h2><span class="header-section-number">6.3</span> Gaussian Markov random fields (GMRF)</h2>
+<div id="gaussian-markov-random-fields-gmrf" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Gaussian Markov random fields (GMRF)<a href="Densities.html#gaussian-markov-random-fields-gmrf" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>GMRF may be defined in two ways:</p>
 <ol style="list-style-type: decimal">
 <li>Via a (sparse) precision matrix Q.</li>
@@ -409,8 +408,8 @@ the univariate AR1 process described above.</li>
 corresponding to a Matern covariance function can be obtained via the
 <code>R_inla</code> namespace.</p>
 </div>
-<div id="separable-construction-of-covariance-precision-matrices" class="section level2" number="6.4">
-<h2><span class="header-section-number">6.4</span> Separable construction of covariance (precision) matrices</h2>
+<div id="separable-construction-of-covariance-precision-matrices" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Separable construction of covariance (precision) matrices<a href="Densities.html#separable-construction-of-covariance-precision-matrices" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A typical use of separability is to create space-time models with a
 sparse precision matrix. Details are given in <code>SEPARABLE_t</code>. Here
 we give a simple example.</p>
@@ -504,7 +503,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

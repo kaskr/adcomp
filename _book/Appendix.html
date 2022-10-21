@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>16 Appendix | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.29 and GitBook 2.6.7" />
 
   <meta property="og:title" content="16 Appendix | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://kaskr.github.io/adcomp/" />
   <meta property="og:image" content="https://kaskr.github.io/adcomp//images/cover.png" />
   <meta property="og:description" content="Comprehensive documentation of TMB - theory and examples." />
   <meta name="github-repo" content="kaskr/adcomp" />
@@ -31,7 +30,6 @@
   
 <link rel="prev" href="AtomicFunctions.html"/>
 
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,8 +47,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
@@ -276,10 +275,10 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="Appendix" class="section level1" number="16">
-<h1><span class="header-section-number">16</span> Appendix</h1>
-<div id="notation" class="section level2" number="16.1">
-<h2><span class="header-section-number">16.1</span> Notation</h2>
+<div id="Appendix" class="section level1 hasAnchor" number="16">
+<h1><span class="header-section-number">16</span> Appendix<a href="Appendix.html#Appendix" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="notation" class="section level2 hasAnchor" number="16.1">
+<h2><span class="header-section-number">16.1</span> Notation<a href="Appendix.html#notation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We use the following notation</p>
 <table>
 <thead>
@@ -320,8 +319,8 @@ div.csl-indent {
 </tbody>
 </table>
 </div>
-<div id="profiling-the-inner-problem" class="section level2" number="16.2">
-<h2><span class="header-section-number">16.2</span> Profiling the inner problem</h2>
+<div id="profiling-the-inner-problem" class="section level2 hasAnchor" number="16.2">
+<h2><span class="header-section-number">16.2</span> Profiling the inner problem<a href="Appendix.html#profiling-the-inner-problem" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This section describes the underlying theory of the argument <code>profile</code>
 to <code>MakeADFun</code> intended to speedup and robustify linear mixed effect
 models with a large number of fixed effects. With a few common model
@@ -354,8 +353,8 @@ Assume that for any <span class="math inline">\(\beta\)</span> and <span class="
 \]</span></p>
 <p>where the first equality holds in general and the second equality follows from assumptions (1) and (2).</p>
 <p><span class="math inline">\(\square\)</span></p>
-<div id="example" class="section level3" number="16.2.1">
-<h3><span class="header-section-number">16.2.1</span> Example</h3>
+<div id="example" class="section level3 hasAnchor" number="16.2.1">
+<h3><span class="header-section-number">16.2.1</span> Example<a href="Appendix.html#example" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The standard situation for which <strong>assumption 1</strong> holds is when the
 <span class="math inline">\(\beta\)</span>s are the linear fixed effects of a mixed model. In this case
 the joint negative log density takes the form
@@ -368,8 +367,8 @@ is thus a linear function of the random effect <span class="math inline">\(u\)</
 (e.g. Gaussian) posterior distribution.</p>
 </div>
 </div>
-<div id="theory-underlying-sdreport" class="section level2" number="16.3">
-<h2><span class="header-section-number">16.3</span> Theory underlying sdreport</h2>
+<div id="theory-underlying-sdreport" class="section level2 hasAnchor" number="16.3">
+<h2><span class="header-section-number">16.3</span> Theory underlying sdreport<a href="Appendix.html#theory-underlying-sdreport" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This section supplements the documentation of <code>?sdreport</code> by adding
 some missing details.</p>
 <p>As previously, we consider a general latent variable model with
@@ -491,7 +490,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');
