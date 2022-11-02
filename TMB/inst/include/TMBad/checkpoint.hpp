@@ -21,16 +21,26 @@ struct standard_derivative_table : std::vector<ADFun> {
   standard_derivative_table(const ADFun &F) : std::vector<ADFun>(1, F) {}
 };
 
+/** \brief Default tester for `retaping_derivative_table`.
+    \param x Previous parameter vector
+    \param y Current parameter vector
+    \return `true` if retaping is required. `false` otherwise.
+*/
+struct ParametersChanged {
+  bool operator()(const std::vector<Scalar> &x, const std::vector<Scalar> &y);
+};
+
 /** \brief Adaptive derivative table used by `AtomOp` */
-template <class Functor, class ADFun>
+template <class Functor, class ADFun, class Test = ParametersChanged>
 struct retaping_derivative_table : standard_derivative_table<ADFun> {
   Functor F;
+  Test test;
   /** \brief Retape the zero derivative and remove all higher orders
       from the table. */
   void retape(ForwardArgs<Scalar> &args) {
     size_t n = (*this)[0].Domain();
     std::vector<Scalar> x = args.x_segment(0, n);
-    bool change = ((*this)[0].DomainVec() != x);
+    bool change = test((*this)[0].DomainVec(), x);
     if (change) {
       (*this).resize(1);
       (*this)[0] = ADFun(F, x);
@@ -39,8 +49,8 @@ struct retaping_derivative_table : standard_derivative_table<ADFun> {
   /** \brief Set zero order *functor* used to retape this derivative
       table. */
   template <class V>
-  retaping_derivative_table(const Functor &F, const V &x)
-      : standard_derivative_table<ADFun>(ADFun(F, x)), F(F) {}
+  retaping_derivative_table(const Functor &F, const V &x, Test test = Test())
+      : standard_derivative_table<ADFun>(ADFun(F, x)), F(F), test(test) {}
 };
 
 /** \brief Manage shared operator data across multiple threads.
@@ -160,6 +170,9 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
   template <class T1, class T2>
   AtomOp(const T1 &F, const T2 &x)
       : dtab(std::make_shared<DerivativeTable>(F, x)), order(0) {}
+  template <class T1, class T2, class T3>
+  AtomOp(const T1 &F, const T2 &x, const T3 &t)
+      : dtab(std::make_shared<DerivativeTable>(F, x, t)), order(0) {}
 
   Index input_size() const { return (*dtab)[order].Domain(); }
   Index output_size() const { return (*dtab)[order].Range(); }

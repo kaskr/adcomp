@@ -4,6 +4,7 @@
 #include "checkpoint.hpp"
 #include "global.hpp"
 #include "graph_transform.hpp"
+#include "vectorize.hpp"
 
 namespace TMBad {
 
@@ -1150,6 +1151,25 @@ struct ADFun {
     }
   }
 };
+/** \brief Construct ADFun that automatically retapes
+
+    By default, retaping takes place whenever the parameter vector
+    changes compared to previous evaluation. However, this can be
+    controlled in more detail by passing a custom tester object - see
+    the prototype `ParametersChanged`.
+
+    \param F Functor to be taped
+    \param x Evaluation point
+    \tparam Test Class to test if parameters have changed
+*/
+template <class Functor, class Test = ParametersChanged>
+ADFun<> ADFun_retaping(Functor &F, const std::vector<ad_aug> &x,
+                       Test test = Test()) {
+  typedef retaping_derivative_table<Functor, ADFun<>, Test> DTab;
+  global::Complete<AtomOp<DTab> > Op(F, x, test);
+  return ADFun<>(Op, x);
+}
+
 template <class ADFun>
 struct Sparse : ADFun {
   std::vector<Index> i;

@@ -20,7 +20,7 @@ namespace TMBad {
     than once.
 */
 template <class Matrix>
-global::ad_range contiguousBlock(const Matrix &x) {
+global::ad_segment contiguousBlock(const Matrix &x) {
   bool yes = true;
   Index j_previous = -1;
   for (size_t i = 0; i < (size_t)x.size(); i++) {
@@ -38,7 +38,7 @@ global::ad_range contiguousBlock(const Matrix &x) {
     j_previous = j;
   }
   if (yes) {
-    return global::ad_range(ad_plain(x(0)), x.rows(), x.cols());
+    return global::ad_segment(ad_plain(x(0)), x.rows(), x.cols());
   }
 
   ad_plain ans;
@@ -48,7 +48,7 @@ global::ad_range contiguousBlock(const Matrix &x) {
     x(i).override_by(xi_cpy);
     if (i == 0) ans = xi_cpy;
   }
-  return global::ad_range(ans, x.rows(), x.cols());
+  return global::ad_segment(ans, x.rows(), x.cols());
 }
 
 using Eigen::Dynamic;
@@ -58,12 +58,10 @@ typedef Matrix<double, Dynamic, Dynamic> dmatrix;
 typedef Matrix<global::Replay, Dynamic, Dynamic> vmatrix;
 
 template <class Target>
-void fill(Target &y, const global::ad_range x) {
+void fill(Target &y, const global::ad_segment x) {
   TMBAD_ASSERT((size_t)y.size() == (size_t)x.size());
-  ad_plain xx = x;
   for (size_t i = 0; i < (size_t)y.size(); i++) {
-    y(i) = xx;
-    xx.index++;
+    y(i) = x[i];
   }
 }
 
@@ -71,9 +69,10 @@ template <bool XT, bool YT, bool ZT>
 struct MatMul;
 template <bool XT, bool YT, bool ZT>
 void matmul(const vmatrix &x, const vmatrix &y, Map<vmatrix> z) {
-  global::ad_range xc = contiguousBlock(x);
-  global::ad_range yc = contiguousBlock(y);
-  global::ad_range out = get_glob()->add_to_stack<MatMul<XT, YT, ZT> >(xc, yc);
+  global::ad_segment xc = contiguousBlock(x);
+  global::ad_segment yc = contiguousBlock(y);
+  global::ad_segment out =
+      get_glob()->add_to_stack<MatMul<XT, YT, ZT> >(xc, yc);
   fill(z, out);
 }
 
@@ -102,7 +101,7 @@ struct MatMul : global::Operator<2, -1> {
   static const int max_fuse_depth = 0;
   int n1, n2, n3;
   static const int ninput = 2;
-  MatMul(global::ad_range X, global::ad_range Y) {
+  MatMul(global::ad_segment X, global::ad_segment Y) {
     set_dim(X.rows(), X.cols(), Y.rows(), Y.cols());
   }
   MatMul(int n1, int n2, int n3) : n1(n1), n2(n2), n3(n3) {}

@@ -43,7 +43,7 @@
 #ifdef _OPENMP
 #include <omp.h>
 #define TMBAD_THREAD_NUM omp_get_thread_num()
-#define TMBAD_SHARED_PTR omp_shared_ptr
+#define TMBAD_SHARED_PTR TMBad::omp_shared_ptr
 #else
 #define TMBAD_SHARED_PTR std::shared_ptr
 #define TMBAD_THREAD_NUM 0
