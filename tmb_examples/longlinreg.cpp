@@ -3,6 +3,10 @@
 template<class Type>
 Type objective_function<Type>::operator() ()
 {
+  // Optional: demonstrate some TMBad specific optimizations
+#ifdef TMBAD_FRAMEWORK
+  using vectorize::vector;
+#endif
   DATA_VECTOR(Y);
   DATA_VECTOR(x);
   PARAMETER(a);

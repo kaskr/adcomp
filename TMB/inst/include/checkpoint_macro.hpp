@@ -279,6 +279,9 @@ struct AtomicLocal {
     vector<Type> y(y_);
     return y;
   }
+  vector<double> operator()(const vector<double> &x) {
+    return F(x);
+  }
 };
 
 /**
@@ -322,7 +325,7 @@ struct AtomicGlobal {
   };                                                                    \
   }                                                                     \
   vector<double> USERFUNCTION(const vector<double> &x) {                \
-    typedef USERFUNCTION##NAMESPACE::UserFunctor<TMBad::ad_aug> Functor; \
+    typedef USERFUNCTION##NAMESPACE::UserFunctor<double> Functor;       \
     return atomic::AtomicGlobal<Functor>()(x);                          \
   }                                                                     \
   vector<TMBad::ad_aug> USERFUNCTION(const vector<TMBad::ad_aug> &x) {  \
