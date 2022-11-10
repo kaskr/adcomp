@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['tmbad',['TMBad',['../namespaceTMBad.html',1,'']]],
-  ['tmbutils',['tmbutils',['../namespacetmbutils.html',1,'']]]
+  ['sparse_5fmatrix_5fexponential',['sparse_matrix_exponential',['../namespacesparse__matrix__exponential.html',1,'']]]
 ];

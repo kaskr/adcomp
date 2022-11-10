@@ -90,7 +90,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6f117eea7c4de9ed2e2261e61d590e2f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1sequential__reduction.html#a6f117eea7c4de9ed2e2261e61d590e2f">reorder_random</a> ()</td></tr>
 <tr class="memdesc:a6f117eea7c4de9ed2e2261e61d590e2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Re-order random effects.  <a href="#a6f117eea7c4de9ed2e2261e61d590e2f">More...</a><br /></td></tr>
 <tr class="separator:a6f117eea7c4de9ed2e2261e61d590e2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1e29eb57afd6a9280e5269cbbde12e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1sequential__reduction.html#af1e29eb57afd6a9280e5269cbbde12e1">sequential_reduction</a> (global &amp;glob, std::vector&lt; Index &gt; random, std::vector&lt; <a class="el" href="structTMBad_1_1sr__grid.html">sr_grid</a> &gt; grid=std::vector&lt; <a class="el" href="structTMBad_1_1sr__grid.html">sr_grid</a> &gt;(1, <a class="el" href="structTMBad_1_1sr__grid.html">sr_grid</a>(-20, 20, 200)), std::vector&lt; Index &gt; random2grid=std::vector&lt; Index &gt;(0), bool perm=true)</td></tr>
+<tr class="memitem:af1e29eb57afd6a9280e5269cbbde12e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1sequential__reduction.html#af1e29eb57afd6a9280e5269cbbde12e1">sequential_reduction</a> (<a class="el" href="structTMBad_1_1global.html">global</a> &amp;glob, std::vector&lt; Index &gt; random, std::vector&lt; <a class="el" href="structTMBad_1_1sr__grid.html">sr_grid</a> &gt; grid=std::vector&lt; <a class="el" href="structTMBad_1_1sr__grid.html">sr_grid</a> &gt;(1, <a class="el" href="structTMBad_1_1sr__grid.html">sr_grid</a>(-20, 20, 200)), std::vector&lt; Index &gt; random2grid=std::vector&lt; Index &gt;(0), bool perm=true)</td></tr>
 <tr class="memdesc:af1e29eb57afd6a9280e5269cbbde12e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">CTOR of sequential reduction object.  <a href="#af1e29eb57afd6a9280e5269cbbde12e1">More...</a><br /></td></tr>
 <tr class="separator:af1e29eb57afd6a9280e5269cbbde12e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7f1dcb61e1e5fca346d0c1059b9d8da"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad_aug</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1sequential__reduction.html#ab7f1dcb61e1e5fca346d0c1059b9d8da">tabulate</a> (std::vector&lt; Index &gt; inv_index, Index dep_index)</td></tr>
@@ -132,7 +132,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">TMBad::sequential_reduction::sequential_reduction </td>
           <td>(</td>
-          <td class="paramtype">global &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="structTMBad_1_1global.html">global</a> &amp;&#160;</td>
           <td class="paramname"><em>glob</em>, </td>
         </tr>
         <tr>
@@ -179,7 +179,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03525">3525</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03595">3595</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,7 +208,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Example: </p><div class="fragment"><div class="line"> Assume i=2 and the current state contains cliques</div><div class="line"> (1) (1 2 3) (2 4) (1 3)</div><div class="line"> We start by finding all cliques that contain 2, in <span class="keyword">this</span> <span class="keywordflow">case</span>:</div><div class="line"> (1 2 3) (2 4)</div><div class="line"> The <span class="stringliteral">&#39;super&#39;</span> clique becomes</div><div class="line"> (1 2 3 4)</div><div class="line"> Rather than expanding <span class="keyword">this</span> as a 4D <a class="code" href="structarray.html">array</a> we figure out how to</div><div class="line"> access the 4D information from the existing lower dimensional</div><div class="line"> arrays (1 2 3) and (2 4), i.e. &#39;offsets&#39; and &#39;strides&#39;.</div><div class="line"> We <a class="code" href="namespaceTMBad.html#ac1c73a21ac1632b2dfaff8a3e0aa405a">integrate</a> &#39;i&#39; out of the 4D <a class="code" href="structarray.html">array</a> without constructing the 4D</div><div class="line"> <a class="code" href="structarray.html">array</a>. The resulting clique is</div><div class="line"> (1 3 4)</div><div class="line"> This new (merged) clique is added to the list and the updated list now</div><div class="line">looks like: (1) (1 3 4) (1 3)</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03648">3648</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03718">3718</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +230,7 @@ Public Member Functions</h2></td></tr>
 <p>Re-order random effects. </p>
 <p>Two random effects are <em>connected</em> if they both affect the same term. This function finds a fill-reducing permutation of the corresponding un-directed graph. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03567">3567</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03637">3637</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1sequential__reduction.html#af1e29eb57afd6a9280e5269cbbde12e1">sequential_reduction()</a>.</p>
 
@@ -265,7 +265,7 @@ Public Member Functions</h2></td></tr>
 <p>tabulate each combination of variables of a subgraph </p>
 <p>It is assumed that a subgraph has been made. The subgraph has a certain number of inputs and outputs. This function tabulates <em>a given output</em> <code>dep_index</code> for <em>all combinations of inputs</em> <code>inv_index</code>. To avoid tabulating identical functions many times, we a use caching based on term hash codes. </p><dl class="section note"><dt>Note</dt><dd>If multiple grids are in play we have to include the grid ids in the hash codes! (although it is hard to imagine a case where one would wish to tabulate identical functions using different grids). </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03618">3618</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03688">3688</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -294,7 +294,7 @@ Public Member Functions</h2></td></tr>
 <li>Integrate variable i out of C and add C to S. </li>
 </ol>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03702">3702</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03772">3772</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['a_5fvalues',['A_values',['../structsparse__matrix__exponential_1_1expm__series.html#a74413a543ff57cb9837592750ee0b401',1,'sparse_matrix_exponential::expm_series']]],
   ['accessible_5fcholmodsupernodalllt',['Accessible_CholmodSupernodalLLT',['../structEigen_1_1Accessible__CholmodSupernodalLLT.html',1,'Eigen']]],
   ['accumulation_5ftree_5fsplit',['accumulation_tree_split',['../namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342',1,'TMBad']]],
   ['activedomain',['activeDomain',['../structTMBad_1_1ADFun.html#a167b014b2dd4b054479793a34ec8f15a',1,'TMBad::ADFun']]],
@@ -7,10 +8,15 @@ var searchData=
   ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html',1,'TMBad::global']]],
   ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html#a5a51cdf510b60d836a643e55cddccf28',1,'TMBad::global::ad_aug::ad_aug()'],['../structTMBad_1_1global_1_1ad__aug.html#a62ad80b496690f07f498202af3a3d95e',1,'TMBad::global::ad_aug::ad_aug(Scalar x)'],['../structTMBad_1_1global_1_1ad__aug.html#a818efd5406dcb1874a052c14d10ededa',1,'TMBad::global::ad_aug::ad_aug(ad_plain x)']]],
   ['ad_5fplain_5findex',['ad_plain_index',['../structTMBad_1_1ad__plain__index.html',1,'TMBad']]],
-  ['ad_5frange',['ad_range',['../structTMBad_1_1global_1_1ad__range.html',1,'TMBad::global']]],
+  ['ad_5fsegment',['ad_segment',['../structTMBad_1_1global_1_1ad__segment.html',1,'TMBad::global']]],
+  ['ad_5fsegment',['ad_segment',['../structTMBad_1_1global_1_1ad__segment.html#a9e4e8a52aa08037e6af4164e97da8645',1,'TMBad::global::ad_segment::ad_segment()'],['../structTMBad_1_1global_1_1ad__segment.html#adf5984eb176b8319b6c47ae3eb1e0888',1,'TMBad::global::ad_segment::ad_segment(ad_plain x, size_t n)'],['../structTMBad_1_1global_1_1ad__segment.html#a47895567c6b6660bd1ac83a5ddfe2178',1,'TMBad::global::ad_segment::ad_segment(ad_aug x)'],['../structTMBad_1_1global_1_1ad__segment.html#a1544155238f82a2d725e680f7b6a67ae',1,'TMBad::global::ad_segment::ad_segment(Scalar x)'],['../structTMBad_1_1global_1_1ad__segment.html#aa65899108e88b3c86698179dc9c598f5',1,'TMBad::global::ad_segment::ad_segment(Index idx, size_t n)'],['../structTMBad_1_1global_1_1ad__segment.html#a12e42316245c84681fd5e19c2fcdb64f',1,'TMBad::global::ad_segment::ad_segment(ad_plain x, size_t r, size_t c)'],['../structTMBad_1_1global_1_1ad__segment.html#ad4c82f2d9303bf46cd10cd890b1439d8',1,'TMBad::global::ad_segment::ad_segment(Replay *x, size_t n, bool zero_check=false)']]],
+  ['ad_5fstart',['ad_start',['../structTMBad_1_1global.html#a4a2d146e97f051dc2a4ae2de004d64e7',1,'TMBad::global']]],
+  ['ad_5fstop',['ad_stop',['../structTMBad_1_1global.html#a576ac1ed235900325b0b6d216973397b',1,'TMBad::global']]],
   ['adaptive',['adaptive',['../structTMBad_1_1adaptive.html',1,'TMBad']]],
   ['add_5fforward_5freplay_5fcopy',['add_forward_replay_copy',['../structTMBad_1_1global_1_1Operator.html#ade724d95fe23bab98d1e643e98694d8f',1,'TMBad::global::Operator']]],
   ['add_5fstatic_5fidentifier',['add_static_identifier',['../structTMBad_1_1global_1_1Operator.html#afe8ae701c2bf31311cee3ea27cd918e6',1,'TMBad::global::Operator']]],
+  ['add_5fto_5fopstack',['add_to_opstack',['../structTMBad_1_1global.html#a8c9eb7c07c5f9fb62e3b77f7e24b4b86',1,'TMBad::global']]],
+  ['add_5fto_5fstack',['add_to_stack',['../structTMBad_1_1global.html#ac5185a4a7bdcebc6a5610493a07e751f',1,'TMBad::global::add_to_stack(Scalar result=0)'],['../structTMBad_1_1global.html#aab0338dab4425fae61859215d21d47b8',1,'TMBad::global::add_to_stack(const ad_plain &amp;x)'],['../structTMBad_1_1global.html#a9f22e479ca8c0f2d155c0188abad28a2',1,'TMBad::global::add_to_stack(const ad_plain &amp;x, const ad_plain &amp;y)'],['../structTMBad_1_1global.html#a9e7a671bde2d50af51c70d3b744fac21',1,'TMBad::global::add_to_stack(OperatorPure *pOp, const std::vector&lt; ad_plain &gt; &amp;x)']]],
   ['adddependencies',['AddDependencies',['../structTMBad_1_1global_1_1AddDependencies.html',1,'TMBad::global']]],
   ['addforwardfromeval',['AddForwardFromEval',['../structTMBad_1_1global_1_1AddForwardFromEval.html',1,'TMBad::global']]],
   ['addforwardfromeval_3c_20operatorbase_2c_201_20_3e',['AddForwardFromEval&lt; OperatorBase, 1 &gt;',['../structTMBad_1_1global_1_1AddForwardFromEval_3_01OperatorBase_00_011_01_4.html',1,'TMBad::global']]],
@@ -24,6 +30,7 @@ var searchData=
   ['adfun',['ADFun',['../structTMBad_1_1ADFun.html#a7f57af25a9111396b79937cccc113710',1,'TMBad::ADFun::ADFun(Functor F, const ScalarVector &amp;x_)'],['../structTMBad_1_1ADFun.html#a65bf7a1740d1dff08ad92df8336c512f',1,'TMBad::ADFun::ADFun(Functor F, Scalar x0_)'],['../structTMBad_1_1ADFun.html#aab2aee8d7452e1a9f901d13aa2d6f375',1,'TMBad::ADFun::ADFun(Functor F, Scalar x0_, Scalar x1_)']]],
   ['adfun',['ADFun',['../structTMBad_1_1ADFun.html',1,'TMBad']]],
   ['adfun_3c_3e',['ADFun&lt;&gt;',['../structTMBad_1_1ADFun.html',1,'TMBad']]],
+  ['adfun_5fretaping',['ADFun_retaping',['../namespaceTMBad.html#a8942995be599665e0914b3367c75e3cd',1,'TMBad']]],
   ['adreport',['ADREPORT',['../group__macros.html#ga43a13c435127491364e4a167478f4992',1,'tmb_core.hpp']]],
   ['aggregate',['aggregate',['../namespaceTMBad.html#a9da8f10d11a2ebeb90e146372c438714',1,'TMBad']]],
   ['all_5fallow_5fremap',['all_allow_remap',['../namespaceTMBad.html#a7d5dbfbcb2e6c7ca956e9032175ffc69',1,'TMBad']]],
@@ -51,6 +58,6 @@ var searchData=
   ['atomop',['AtomOp',['../structTMBad_1_1AtomOp.html',1,'TMBad']]],
   ['autodiff',['autodiff',['../namespaceautodiff.html',1,'']]],
   ['autodiff_2ehpp',['autodiff.hpp',['../autodiff_8hpp.html',1,'']]],
-  ['autopar',['autopar',['../structconfig__struct.html#ac49b8edc2dac73ce4b47b589e9eb0dd0',1,'config_struct']]],
-  ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]]
+  ['autopar',['autopar',['../structTMBad_1_1autopar.html',1,'TMBad']]],
+  ['autopar',['autopar',['../structconfig__struct.html#ac49b8edc2dac73ce4b47b589e9eb0dd0',1,'config_struct']]]
 ];

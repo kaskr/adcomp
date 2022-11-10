@@ -18,6 +18,7 @@ var searchData=
   ['toggle_5fthread_5fsafe_5fr_2ehpp',['toggle_thread_safe_R.hpp',['../toggle__thread__safe__R_8hpp.html',1,'']]],
   ['tol10',['tol10',['../structnewton_1_1newton__config.html#adae003b54ccbecc979649501887fc354',1,'newton::newton_config']]],
   ['total_5fwidth',['total_width',['../structradix_1_1radix.html#a5d697ce11a06517ff3c98365cda84d04',1,'radix::radix']]],
-  ['trace',['trace',['../structnewton_1_1newton__config.html#aa1a4c9d68eb293c08748acf0d6f93273',1,'newton::newton_config']]],
-  ['transpose',['transpose',['../structarray.html#a9f0df57cc5403f71194f2159ec80bd66',1,'array::transpose()'],['../structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050',1,'tmbutils::array::transpose()']]]
+  ['trace',['trace',['../structnewton_1_1newton__config.html#aa1a4c9d68eb293c08748acf0d6f93273',1,'newton::newton_config::trace()'],['../structsparse__matrix__exponential_1_1config.html#a808f66cc75314f815749df1f3441c2ea',1,'sparse_matrix_exponential::config::trace()']]],
+  ['transpose',['transpose',['../structarray.html#a9f0df57cc5403f71194f2159ec80bd66',1,'array::transpose()'],['../structtmbutils_1_1array.html#a25f546d435692cbc7da96d568e51d050',1,'tmbutils::array::transpose()']]],
+  ['vectorize_2ehpp',['vectorize.hpp',['../tmbutils_2vectorize_8hpp.html',1,'']]]
 ];

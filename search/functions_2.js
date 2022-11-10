@@ -1,5 +1,9 @@
 var searchData=
 [
+  ['clear',['clear',['../structTMBad_1_1global.html#a29518fc35dd8f9c733a51739aac7786c',1,'TMBad::global']]],
+  ['clear_5farray_5fsubgraph',['clear_array_subgraph',['../structTMBad_1_1global.html#ad0d7d23b96392bb9f92a0799a26a874f',1,'TMBad::global']]],
+  ['clear_5fderiv',['clear_deriv',['../structTMBad_1_1global.html#a90fbfe5560ea16ec5102823153517a50',1,'TMBad::global']]],
+  ['clear_5fderiv_5fsub',['clear_deriv_sub',['../structTMBad_1_1global.html#a9c75e4a0c3c3b2cfab165b03881ef5d7',1,'TMBad::global']]],
   ['col',['col',['../structarray.html#a4fd607c3b000df567725bbf4a846139e',1,'array::col()'],['../structtmbutils_1_1array.html#a4b09b981825d16f0b6254e53ae18f15d',1,'tmbutils::array::col()']]],
   ['colcounts',['colcounts',['../structTMBad_1_1graph.html#a04d7eff1990f0e9d64f7e4ae15b5cb2f',1,'TMBad::graph']]],
   ['cols',['cols',['../structarray.html#af29c9b168b60fe0b0de91073875d7300',1,'array::cols()'],['../structtmbutils_1_1array.html#ab8995d3f6459685cfddd466420865946',1,'tmbutils::array::cols()']]],
@@ -7,7 +11,8 @@ var searchData=
   ['compois_5fcalc_5flogz',['compois_calc_logZ',['../distributions__R_8hpp.html#a8535c4db7ec1932a50fc6fc8b47af871',1,'distributions_R.hpp']]],
   ['compose',['compose',['../structTMBad_1_1ADFun.html#ae62f5ccb12d043cd5584ad8914dd7e2a',1,'TMBad::ADFun']]],
   ['compress',['compress',['../structTMBad_1_1global_1_1Rep.html#ae7238e694aa7111403ebb9e0bf14fb98',1,'TMBad::global::Rep']]],
-  ['contiguousblock',['contiguousBlock',['../namespaceTMBad.html#add945a5791aa9c39a76bf4474591062a',1,'TMBad']]],
+  ['concat',['concat',['../namespacetmbutils.html#aaf07f283042e355ceeb654eb27cd1e5d',1,'tmbutils']]],
+  ['contiguousblock',['contiguousBlock',['../namespaceTMBad.html#a02c930c5983988be2a3c57322b23ebde',1,'TMBad']]],
   ['copy',['copy',['../structTMBad_1_1global_1_1OperatorPure.html#a9a1ba345e1da9bd94ebacf8c6228175c',1,'TMBad::global::OperatorPure::copy()'],['../structTMBad_1_1global_1_1Complete.html#a7f3bef91176e6d4d953731151bc28875',1,'TMBad::global::Complete::copy()'],['../structTMBad_1_1global_1_1ad__aug.html#a2b2cecc8cd3e3a41200534584373663a',1,'TMBad::global::ad_aug::copy()']]],
   ['copy0',['copy0',['../structTMBad_1_1global_1_1ad__aug.html#a553f6ad29c674c0ee02401bc1386060b',1,'TMBad::global::ad_aug']]],
   ['count',['count',['../structTMBad_1_1multivariate__index.html#a0e0963ab1bc981cdf5ad5dc6628ef417',1,'TMBad::multivariate_index']]],

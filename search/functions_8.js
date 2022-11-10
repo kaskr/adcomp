@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['identical',['identical',['../structTMBad_1_1global_1_1ad__aug.html#ab4735f03a51cd88cad90b179207bff76',1,'TMBad::global::ad_aug']]],
+  ['identical',['identical',['../structTMBad_1_1global.html#a7257275d5fbfbc0f6a8ef8bc1227cbb9',1,'TMBad::global::identical()'],['../structTMBad_1_1global_1_1ad__aug.html#ab4735f03a51cd88cad90b179207bff76',1,'TMBad::global::ad_aug::identical()']]],
   ['identicalone',['identicalOne',['../structTMBad_1_1global_1_1ad__aug.html#aada84172bae6d07dbccf690ef8360345',1,'TMBad::global::ad_aug']]],
   ['identicalzero',['identicalZero',['../structTMBad_1_1global_1_1ad__aug.html#a8a080813846b41b8f075f7a5ff2e2e43',1,'TMBad::global::ad_aug']]],
   ['identifier',['identifier',['../structTMBad_1_1global_1_1OperatorPure.html#a112474b01b04462a0819883905824932',1,'TMBad::global::OperatorPure::identifier()'],['../structTMBad_1_1global_1_1Complete.html#a44f2761667e03f2b50f8f69182e2d6dc',1,'TMBad::global::Complete::identifier()']]],
@@ -21,10 +21,11 @@ var searchData=
   ['interpol2d',['interpol2D',['../structtmbutils_1_1interpol2D.html#adad8980f72d664ad1653875ed7aca788',1,'tmbutils::interpol2D']]],
   ['inv_5fincpl_5fgamma',['inv_incpl_gamma',['../namespaceatomic.html#aca6bfb1722819752d1ad1084a6de6f27',1,'atomic']]],
   ['inv_5findex_5fis_5fconsecutive',['inv_index_is_consecutive',['../structTMBad_1_1ADFun.html#a8ab042323c2a3fe3ec58d1cff47a38df',1,'TMBad::ADFun']]],
+  ['inv_5fmarks',['inv_marks',['../structTMBad_1_1global.html#a4874d26ba228701e0b724664d7cf302c',1,'TMBad::global']]],
   ['invertsparsematrix',['invertSparseMatrix',['../namespacetmbutils.html#adfaef43957936d4f60977d12ae69be82',1,'tmbutils']]],
   ['invlogit',['invlogit',['../convenience_8hpp.html#a2dc0f0009cd46180a4d5ae56a6a45cfa',1,'convenience.hpp']]],
   ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]],
   ['invperm',['invperm',['../namespaceTMBad.html#ad00aca64104fb2a72dcf504491f883cd',1,'TMBad']]],
-  ['iscontiguous',['isContiguous',['../namespaceTMBad.html#abde1aeefff323308fc25cc8a7fb1d9fd',1,'TMBad']]],
+  ['iscontiguous',['isContiguous',['../namespaceTMBad.html#a7adc1233300ab60b78c4e365565e0839',1,'TMBad']]],
   ['isstructuralzero',['isStructuralZero',['../namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6',1,'tmbutils']]]
 ];

@@ -81,6 +81,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1array.html">array</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array class used by TMB.  <a href="structtmbutils_1_1array.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1Concat.html">Concat</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialized representation of objects of different types.  <a href="structtmbutils_1_1Concat.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtmbutils_1_1interpol2D.html">interpol2D</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a smooth representation of a <b>data</b> matrix.  <a href="structtmbutils_1_1interpol2D.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -119,6 +122,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a4e791ce6c973be4a3acf8400e842b9c4"><td class="memTemplItemLeft" align="right" valign="top">Eigen::SparseVector&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a4e791ce6c973be4a3acf8400e842b9c4">asSparseVector</a> (<a class="el" href="structtmbutils_1_1vector.html">vector</a>&lt; Type &gt; x)</td></tr>
 <tr class="memdesc:a4e791ce6c973be4a3acf8400e842b9c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create sparse vector from dense vector.  <a href="#a4e791ce6c973be4a3acf8400e842b9c4">More...</a><br /></td></tr>
 <tr class="separator:a4e791ce6c973be4a3acf8400e842b9c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf07f283042e355ceeb654eb27cd1e5d"><td class="memTemplParams" colspan="2">template&lt;class... Ts&gt; </td></tr>
+<tr class="memitem:aaf07f283042e355ceeb654eb27cd1e5d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structtmbutils_1_1Concat.html">Concat</a>&lt; Ts... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#aaf07f283042e355ceeb654eb27cd1e5d">concat</a> (Ts &amp;... args)</td></tr>
+<tr class="memdesc:aaf07f283042e355ceeb654eb27cd1e5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialized representation of objects of different types.  <a href="#aaf07f283042e355ceeb654eb27cd1e5d">More...</a><br /></td></tr>
+<tr class="separator:aaf07f283042e355ceeb654eb27cd1e5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a15c4d4e4e0ef8faaa0d2c9c07a908a"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:a7a15c4d4e4e0ef8faaa0d2c9c07a908a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacetmbutils.html#a7a15c4d4e4e0ef8faaa0d2c9c07a908a">discrLyap</a> (<a class="el" href="structtmbutils_1_1matrix.html">matrix</a>&lt; Type &gt; A_)</td></tr>
 <tr class="separator:a7a15c4d4e4e0ef8faaa0d2c9c07a908a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -218,6 +225,32 @@ template&lt;class Type &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Zeros are detected using <code><a class="el" href="namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6" title="Test if a scalar is a structural zero. ">isStructuralZero()</a></code> ensuring that entries which might become non-zero for certain parameter settings will not be regarded as zeros. </dd></dl>
 
 <p>Definition at line <a class="el" href="spmat_8hpp_source.html#l00076">76</a> of file <a class="el" href="spmat_8hpp_source.html">spmat.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aaf07f283042e355ceeb654eb27cd1e5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf07f283042e355ceeb654eb27cd1e5d">&sect;&nbsp;</a></span>concat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class... Ts&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structtmbutils_1_1Concat.html">Concat</a>&lt;Ts...&gt; tmbutils::concat </td>
+          <td>(</td>
+          <td class="paramtype">Ts &amp;...&#160;</td>
+          <td class="paramname"><em>args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Serialized representation of objects of different types. </p>
+<p>This function provides an interface between a parameter list and its serialized (vector) representation. In R, this would correspond to 'unlist()/relist()'.</p>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Custom parameter list</span></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Type&gt;</div><div class="line"><span class="keyword">struct </span>parameter_list {</div><div class="line">  <a class="code" href="structvector.html">vector&lt;Type&gt;</a> v;</div><div class="line">  <a class="code" href="structmatrix.html">matrix&lt;Type&gt;</a> m;</div><div class="line">  <a class="code" href="structarray.html">array&lt;Type&gt;</a> a;</div><div class="line">  Type s;</div><div class="line">  <span class="comment">// To enable unlist/relist functionality, we must specify which members to include in representation:</span></div><div class="line">  <span class="keyword">auto</span> unlist() { <span class="keywordflow">return</span> <a class="code" href="namespacetmbutils.html#aaf07f283042e355ceeb654eb27cd1e5d">concat</a>(v, m, a, s); }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// Declare a parameter list</span></div><div class="line">parameter_list&lt;Type&gt; pl;</div><div class="line"></div><div class="line"><span class="comment">// To &#39;unlist&#39; it do</span></div><div class="line"><a class="code" href="structvector.html">vector&lt;Type&gt;</a> parms = pl.unlist();</div><div class="line"></div><div class="line"><span class="comment">// To &#39;relist&#39; it do</span></div><div class="line">pl.unlist() = parms;</div></div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>Return type 'auto' requires C++14. </dd></dl>
+
+<p>Definition at line <a class="el" href="concat_8hpp_source.html#l00095">95</a> of file <a class="el" href="concat_8hpp_source.html">concat.hpp</a>.</p>
 
 </div>
 </div>

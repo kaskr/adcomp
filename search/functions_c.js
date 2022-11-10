@@ -3,6 +3,8 @@ var searchData=
   ['make_5fspace_5finplace',['make_space_inplace',['../namespaceTMBad.html#a77ae670bec3cb65efe603575738c6b36',1,'TMBad']]],
   ['marginal_5fgk',['marginal_gk',['../structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451',1,'TMBad::ADFun']]],
   ['marginal_5fsr',['marginal_sr',['../structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9',1,'TMBad::ADFun::marginal_sr(const std::vector&lt; Index &gt; &amp;random, std::vector&lt; sr_grid &gt; grid, const std::vector&lt; Index &gt; &amp;random2grid, bool perm=true)'],['../structTMBad_1_1ADFun.html#a06cb3c9a658ebfab1fec4d057464a68b',1,'TMBad::ADFun::marginal_sr(const std::vector&lt; Index &gt; &amp;random, sr_grid grid=sr_grid())']]],
+  ['mark_5fspace',['mark_space',['../structTMBad_1_1global.html#ab0b0a15a25ce60054e0fe3206c2abaa3',1,'TMBad::global']]],
+  ['mark_5fsubgraph',['mark_subgraph',['../structTMBad_1_1global.html#a6173ce2afde74ac1280802a5ba644266',1,'TMBad::global']]],
   ['mask',['mask',['../structTMBad_1_1multivariate__index.html#a2569c5512781cf1c1ef70838214818bd',1,'TMBad::multivariate_index']]],
   ['match',['match',['../namespaceTMBad.html#a8ce30625513d5dd19ff0fd3d81d68b4f',1,'TMBad']]],
   ['matern',['matern',['../group__special__functions.html#ga4bdabb9b3e59feb7c552b30c46c8959c',1,'convenience.hpp']]],

@@ -110,13 +110,13 @@ struct TMBad::Args&lt; dummy &gt;</h3>
 
 <p>Argument class to handle array access of operator inputs and outputs. </p>
 <ul>
-<li>Values (<code>global::values</code>) and derivatives (<code>global::derivs</code>) are stored as two contiguous arrays of the same size.</li>
+<li>Values (<code><a class="el" href="structTMBad_1_1global.html#ab0e103e381a0ac01787adda6ff0e12d1" title="Contiguous workspace for taped variables (same length as global::derivs) ">global::values</a></code>) and derivatives (<code><a class="el" href="structTMBad_1_1global.html#ad18a96dd9424824d1469a1f2df118a39" title="Contiguous workspace for derivatives (same length as global::values) ">global::derivs</a></code>) are stored as two contiguous arrays of the same size.</li>
 <li>Operator inputs can be scattered and thus require indirect lookup.</li>
-<li>Operator outputs are always contiguous and thus do not require any indirect lookup. <dl class="section warning"><dt>Warning</dt><dd>An <code><a class="el" href="structTMBad_1_1Args.html" title="Argument class to handle array access of operator inputs and outputs. ">Args</a></code> class instance becomes invalid if <code>global::inputs</code> is modified. </dd></dl>
+<li>Operator outputs are always contiguous and thus do not require any indirect lookup. <dl class="section warning"><dt>Warning</dt><dd>An <code><a class="el" href="structTMBad_1_1Args.html" title="Argument class to handle array access of operator inputs and outputs. ">Args</a></code> class instance becomes invalid if <code><a class="el" href="structTMBad_1_1global.html#ab65f7bbdc201397934917936b67d407a" title="Pointers into global::values determining operator inputs. ">global::inputs</a></code> is modified. </dd></dl>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l00251">251</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l00256">256</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="aa9514d46195bc915e622947734866d46"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa9514d46195bc915e622947734866d46">&sect;&nbsp;</a></span>ptr</h2>
@@ -138,9 +138,9 @@ template&lt;class dummy = void&gt; </div>
 <li><code>ptr.second</code> points into the actual value/derivative array </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l00258">258</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l00263">263</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="namespaceTMBad.html#a7d5dbfbcb2e6c7ca956e9032175ffc69">TMBad::all_allow_remap()</a>, <a class="el" href="structTMBad_1_1graph.html#aa8f1559029e90c6cb3a0706fd36bebd9">TMBad::graph::graph()</a>, <a class="el" href="structTMBad_1_1autopar.html#aabf9829b1406e5bdfa6066da9c28cb2d">TMBad::autopar::max_tree_depth()</a>, <a class="el" href="namespaceTMBad.html#af1eaffa26abd798259f48bd225838090">TMBad::remap_identical_sub_expressions()</a>, <a class="el" href="namespaceTMBad.html#a26f93ff241852d703fec8ca9c6e32a76">TMBad::reorder_depth_first()</a>, and <a class="el" href="namespaceTMBad.html#a7f273488d2199251bb0ffd0bc51e770c">TMBad::split_period()</a>.</p>
+<p>Referenced by <a class="el" href="structTMBad_1_1global.html#a9e7a671bde2d50af51c70d3b744fac21">TMBad::global::add_to_stack()</a>, <a class="el" href="namespaceTMBad.html#a7d5dbfbcb2e6c7ca956e9032175ffc69">TMBad::all_allow_remap()</a>, <a class="el" href="structTMBad_1_1global.html#aef2700550d94c96c7a2b437354fac8d7">TMBad::global::forward()</a>, <a class="el" href="structTMBad_1_1global.html#a97b377010b34268039733176938d51c0">TMBad::global::forward_loop()</a>, <a class="el" href="structTMBad_1_1global.html#a6ac217c1fc6e6773ea41c0e413a3944f">TMBad::global::forward_loop_subgraph()</a>, <a class="el" href="structTMBad_1_1autopar.html#aabf9829b1406e5bdfa6066da9c28cb2d">TMBad::autopar::max_tree_depth()</a>, <a class="el" href="structTMBad_1_1global.html#a6ef36053bc61dce1beb5e02ef0a41538">TMBad::global::op2var()</a>, <a class="el" href="namespaceTMBad.html#af1eaffa26abd798259f48bd225838090">TMBad::remap_identical_sub_expressions()</a>, <a class="el" href="namespaceTMBad.html#a26f93ff241852d703fec8ca9c6e32a76">TMBad::reorder_depth_first()</a>, <a class="el" href="structTMBad_1_1global.html#a5773910a9aa186762830a4d8a63a827f">TMBad::global::reverse_loop()</a>, <a class="el" href="structTMBad_1_1global.html#a9bf470755a22832f49cf7ce071392962">TMBad::global::reverse_loop_subgraph()</a>, and <a class="el" href="namespaceTMBad.html#a7f273488d2199251bb0ffd0bc51e770c">TMBad::split_period()</a>.</p>
 
 </div>
 </div>

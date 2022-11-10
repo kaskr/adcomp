@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['pack',['pack',['../namespaceTMBad.html#ac0d3d7acc2d3a02068309892f38d1b83',1,'TMBad']]],
+  ['packop',['PackOp',['../structTMBad_1_1PackOp.html',1,'TMBad']]],
   ['parallel',['parallel',['../structconfig__struct.html#aee7fd765ea620feb3abe94f02a8ffe48',1,'config_struct::parallel()'],['../group__parallel.html',1,'(Global Namespace)']]],
   ['parallel_5faccumulate',['parallel_accumulate',['../structTMBad_1_1ADFun.html#a0376ff79dffee9a009b4ed2e5ac384cf',1,'TMBad::ADFun']]],
   ['parallel_5faccumulator',['parallel_accumulator',['../structparallel__accumulator.html',1,'']]],
@@ -9,6 +11,8 @@ var searchData=
   ['parameter_5farray',['PARAMETER_ARRAY',['../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e',1,'tmb_core.hpp']]],
   ['parameter_5fmatrix',['PARAMETER_MATRIX',['../group__macros.html#gabcad2a3c2d238178707c6c45de2d3bec',1,'tmb_core.hpp']]],
   ['parameter_5fvector',['PARAMETER_VECTOR',['../group__macros.html#ga6b8a70eeee38fe896e89e0a9c6bef84a',1,'tmb_core.hpp']]],
+  ['parameterschanged',['ParametersChanged',['../structTMBad_1_1ParametersChanged.html',1,'TMBad']]],
+  ['parent_5fglob',['parent_glob',['../structTMBad_1_1global.html#a967af82378829c553645c98e038cd222',1,'TMBad::global']]],
   ['pbeta',['pbeta',['../group__R__style__distribution.html#ga1a2f7c79b991f6e572c367437744483e',1,'distributions_R.hpp']]],
   ['period',['period',['../structTMBad_1_1period.html',1,'TMBad']]],
   ['periodic',['periodic',['../structTMBad_1_1periodic.html',1,'TMBad']]],
@@ -20,7 +24,7 @@ var searchData=
   ['pnorm_5fapprox',['pnorm_approx',['../convenience_8hpp.html#ac425fd96f63e819ea8f12f30058d41b0',1,'convenience.hpp']]],
   ['power',['power',['../structnewton_1_1newton__config.html#a2566d8743675a711d8e36c4b8efca886',1,'newton::newton_config']]],
   ['ppois',['ppois',['../namespaceatomic.html#a29ad7d7fdc9702c597b6d76d3ef281e3',1,'atomic::ppois()'],['../group__R__style__distribution.html#ga21965e84a53d083256382b7eeb0383e7',1,'ppois():&#160;distributions_R.hpp']]],
-  ['print',['print',['../structTMBad_1_1global_1_1OperatorPure.html#a5466d15800ff5168642d249d314a0ff7',1,'TMBad::global::OperatorPure::print()'],['../structTMBad_1_1global_1_1Operator.html#a3afe4dc75b38f8a8d2b98ab1eea478ed',1,'TMBad::global::Operator::print()'],['../structTMBad_1_1global_1_1Complete.html#a4f39f5bacdf723c2178d1c1066790d0f',1,'TMBad::global::Complete::print()'],['../structTMBad_1_1ADFun.html#aeab6809f1e07bfdab172b293fa45d40e',1,'TMBad::ADFun::print()']]],
+  ['print',['print',['../structTMBad_1_1global_1_1OperatorPure.html#a5466d15800ff5168642d249d314a0ff7',1,'TMBad::global::OperatorPure::print()'],['../structTMBad_1_1global.html#a18fcf1d965e321077c54e0dafc066746',1,'TMBad::global::print(print_config cfg)'],['../structTMBad_1_1global.html#aef6f66b7b08ec0bb5da1ed01d327dd02',1,'TMBad::global::print()'],['../structTMBad_1_1global_1_1Operator.html#a3afe4dc75b38f8a8d2b98ab1eea478ed',1,'TMBad::global::Operator::print()'],['../structTMBad_1_1global_1_1Complete.html#a4f39f5bacdf723c2178d1c1066790d0f',1,'TMBad::global::Complete::print()'],['../structTMBad_1_1ADFun.html#aeab6809f1e07bfdab172b293fa45d40e',1,'TMBad::ADFun::print()']]],
   ['print_5fconfig',['print_config',['../structTMBad_1_1global_1_1print__config.html',1,'TMBad::global']]],
   ['prod_5fint',['prod_int',['../namespaceTMBad.html#ad2bc1b8c42b0b04c39a847649707f86c',1,'TMBad']]],
   ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]],

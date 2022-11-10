@@ -1,15 +1,12 @@
 var searchData=
 [
-  ['safe_5feval',['safe_eval',['../structnewton_1_1safe__eval.html',1,'newton']]],
-  ['scale_5ft',['SCALE_t',['../classdensity_1_1SCALE__t.html',1,'density']]],
-  ['segment_5fref',['segment_ref',['../structTMBad_1_1segment__ref.html',1,'TMBad']]],
-  ['separable_5ft',['SEPARABLE_t',['../classdensity_1_1SEPARABLE__t.html',1,'density']]],
-  ['sequential_5freduction',['sequential_reduction',['../structTMBad_1_1sequential__reduction.html',1,'TMBad']]],
-  ['spde_5faniso_5ft',['spde_aniso_t',['../structR__inla_1_1spde__aniso__t.html',1,'R_inla']]],
-  ['spde_5ft',['spde_t',['../structR__inla_1_1spde__t.html',1,'R_inla']]],
-  ['spjacfun_5fconfig',['SpJacFun_config',['../structTMBad_1_1SpJacFun__config.html',1,'TMBad']]],
-  ['splinefun',['splinefun',['../classtmbutils_1_1splinefun.html',1,'tmbutils']]],
-  ['sr_5fgrid',['sr_grid',['../structTMBad_1_1sr__grid.html',1,'TMBad']]],
-  ['standard_5fderivative_5ftable',['standard_derivative_table',['../structTMBad_1_1standard__derivative__table.html',1,'TMBad']]],
-  ['stdwrap',['StdWrap',['../structTMBad_1_1StdWrap.html',1,'TMBad']]]
+  ['radix',['radix',['../structradix_1_1radix.html',1,'radix']]],
+  ['referencecounter',['ReferenceCounter',['../structTMBad_1_1global_1_1ReferenceCounter.html',1,'TMBad::global']]],
+  ['referencecounter_3c_20operatorbase_3a_3asmart_5fpointer_2c_20void_20_3e',['ReferenceCounter&lt; OperatorBase::smart_pointer, void &gt;',['../structTMBad_1_1global_1_1ReferenceCounter.html',1,'TMBad::global']]],
+  ['referencecounter_3c_20spaxop_3c_20t_20_3e_20_3a_3asmart_5fpointer_2c_20void_20_3e',['ReferenceCounter&lt; SpAxOp&lt; T &gt; ::smart_pointer, void &gt;',['../structTMBad_1_1global_1_1ReferenceCounter.html',1,'TMBad::global']]],
+  ['refop',['RefOp',['../structTMBad_1_1global_1_1RefOp.html',1,'TMBad::global']]],
+  ['rep',['Rep',['../structTMBad_1_1global_1_1Rep.html',1,'TMBad::global']]],
+  ['repcompress',['RepCompress',['../structTMBad_1_1global_1_1RepCompress.html',1,'TMBad::global']]],
+  ['retaping_5fderivative_5ftable',['retaping_derivative_table',['../structTMBad_1_1retaping__derivative__table.html',1,'TMBad']]],
+  ['reverseargs',['ReverseArgs',['../structTMBad_1_1ReverseArgs.html',1,'TMBad']]]
 ];

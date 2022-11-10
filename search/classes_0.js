@@ -3,7 +3,7 @@ var searchData=
   ['accessible_5fcholmodsupernodalllt',['Accessible_CholmodSupernodalLLT',['../structEigen_1_1Accessible__CholmodSupernodalLLT.html',1,'Eigen']]],
   ['ad_5faug',['ad_aug',['../structTMBad_1_1global_1_1ad__aug.html',1,'TMBad::global']]],
   ['ad_5fplain_5findex',['ad_plain_index',['../structTMBad_1_1ad__plain__index.html',1,'TMBad']]],
-  ['ad_5frange',['ad_range',['../structTMBad_1_1global_1_1ad__range.html',1,'TMBad::global']]],
+  ['ad_5fsegment',['ad_segment',['../structTMBad_1_1global_1_1ad__segment.html',1,'TMBad::global']]],
   ['adaptive',['adaptive',['../structTMBad_1_1adaptive.html',1,'TMBad']]],
   ['adddependencies',['AddDependencies',['../structTMBad_1_1global_1_1AddDependencies.html',1,'TMBad::global']]],
   ['addforwardfromeval',['AddForwardFromEval',['../structTMBad_1_1global_1_1AddForwardFromEval.html',1,'TMBad::global']]],

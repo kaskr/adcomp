@@ -294,7 +294,7 @@ simulators. For instance <code><a class="code" href="../distributions__R_8hpp.ht
 distribution. However, the argument convention is slightly
 different:</p>
 <ol style="list-style-type: decimal">
-<li><code><a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(n, mu, sd)</code> draws <code>n</code> simulations from a normal
+<li><code><a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(<a class="code" href="../structTMBad_1_1PackOp.html#a0abca4747af9e597e4c44570727b9f4c">n</a>, mu, sd)</code> draws <code>n</code> simulations from a normal
 distribution. Unlike R this works for <strong>scalar parameters only</strong>.</li>
 <li><code><a class="code" href="../distributions__R_8hpp.html#a6827b210cb379b7d9a8c23eafdf7e64c">rnorm</a>(mu, sd)</code> is a TMB specific variant that works for
 <strong>mixed scalar and vector input</strong>. Output length follows the length of the
@@ -426,7 +426,7 @@ simulate from the density objects:</p>
 <span id="cb45-8"><a href="Simulation.html#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</span>
 <span id="cb45-9"><a href="Simulation.html#cb45-9" aria-hidden="true" tabindex="-1"></a>Type objective_function&lt;Type&gt;::<span class="kw">operator</span>() ()</span>
 <span id="cb45-10"><a href="Simulation.html#cb45-10" aria-hidden="true" tabindex="-1"></a>{</span>
-<span id="cb45-11"><a href="Simulation.html#cb45-11" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(N)</span>
+<span id="cb45-11"><a href="Simulation.html#cb45-11" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structsparse__matrix__exponential_1_1expm__series.html#a1879c6c58576ae16d3172fc53de3badf">N</a>)</span>
 <span id="cb45-12"><a href="Simulation.html#cb45-12" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga6ac3eddb1dd503ceaf4c6ac91546b23e">PARAMETER_ARRAY</a>(eta);</span>
 <span id="cb45-13"><a href="Simulation.html#cb45-13" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(transf_phi); <span class="co">/* fastest running <a class="code" href="../structTMBad_1_1clique.html#aa20a8e53a8dfbc21d44eb1539f622f55">dim</a> */</span></span>
 <span id="cb45-14"><a href="Simulation.html#cb45-14" aria-hidden="true" tabindex="-1"></a>  Type phi=f(transf_phi);</span>
@@ -437,15 +437,15 @@ simulate from the density objects:</p>
 <span id="cb45-19"><a href="Simulation.html#cb45-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-20"><a href="Simulation.html#cb45-20" aria-hidden="true" tabindex="-1"></a>  res+=AR1(phi,AR1(phi,AR1(phi,AR1(phi))))(eta);</span>
 <span id="cb45-21"><a href="Simulation.html#cb45-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-22"><a href="Simulation.html#cb45-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">// logdpois = N log lam - lam</span></span>
-<span id="cb45-23"><a href="Simulation.html#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>;i&lt;N.<a class="code" href="../structTMBad_1_1period.html#ad870a607cdf6f2f10c423df5d101a158">size</a>();i++)res-=N[i]*eta[i]-exp(eta[i]);</span>
+<span id="cb45-22"><a href="Simulation.html#cb45-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">// logdpois = <a class="code" href="../structsparse__matrix__exponential_1_1expm__series.html#a1879c6c58576ae16d3172fc53de3badf">N</a> log lam - lam</span></span>
+<span id="cb45-23"><a href="Simulation.html#cb45-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>;i&lt;N.<a class="code" href="../structTMBad_1_1period.html#ad870a607cdf6f2f10c423df5d101a158">size</a>();i++)res-=<a class="code" href="../structsparse__matrix__exponential_1_1expm__series.html#a1879c6c58576ae16d3172fc53de3badf">N</a>[i]*eta[i]-exp(eta[i]);</span>
 <span id="cb45-24"><a href="Simulation.html#cb45-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-25"><a href="Simulation.html#cb45-25" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a> {</span>
 <span id="cb45-26"><a href="Simulation.html#cb45-26" aria-hidden="true" tabindex="-1"></a>    AR1(phi,AR1(phi,AR1(phi,AR1(phi)))).<a class="code" href="../classdensity_1_1AR1__t.html#aa23a34e54a3cf7543208a2ad30f9f1ca">simulate</a>(eta);</span>
 <span id="cb45-27"><a href="Simulation.html#cb45-27" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../structvector.html">vector</a>&lt;Type&gt; lam = exp(eta);</span>
-<span id="cb45-28"><a href="Simulation.html#cb45-28" aria-hidden="true" tabindex="-1"></a>    N = <a class="code" href="../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e">rpois</a>(lam);</span>
+<span id="cb45-28"><a href="Simulation.html#cb45-28" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../structsparse__matrix__exponential_1_1expm__series.html#a1879c6c58576ae16d3172fc53de3badf">N</a> = <a class="code" href="../distributions__R_8hpp.html#a9483de78a77e19b579580f0e23f4bb0e">rpois</a>(lam);</span>
 <span id="cb45-29"><a href="Simulation.html#cb45-29" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(eta);</span>
-<span id="cb45-30"><a href="Simulation.html#cb45-30" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(N);</span>
+<span id="cb45-30"><a href="Simulation.html#cb45-30" aria-hidden="true" tabindex="-1"></a>    <a class="code" href="../group__macros.html#gac2d7888f4e0385930448f992de53079b">REPORT</a>(<a class="code" href="../structsparse__matrix__exponential_1_1expm__series.html#a1879c6c58576ae16d3172fc53de3badf">N</a>);</span>
 <span id="cb45-31"><a href="Simulation.html#cb45-31" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb45-32"><a href="Simulation.html#cb45-32" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-33"><a href="Simulation.html#cb45-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> res;</span>

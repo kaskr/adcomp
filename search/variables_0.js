@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['a_5fvalues',['A_values',['../structsparse__matrix__exponential_1_1expm__series.html#a74413a543ff57cb9837592750ee0b401',1,'sparse_matrix_exponential::expm_series']]],
   ['add_5fforward_5freplay_5fcopy',['add_forward_replay_copy',['../structTMBad_1_1global_1_1Operator.html#ade724d95fe23bab98d1e643e98694d8f',1,'TMBad::global::Operator']]],
   ['add_5fstatic_5fidentifier',['add_static_identifier',['../structTMBad_1_1global_1_1Operator.html#afe8ae701c2bf31311cee3ea27cd918e6',1,'TMBad::global::Operator']]],
   ['allow_5fremap',['allow_remap',['../structTMBad_1_1global_1_1Operator.html#a805360f5e00d94f915a7b28e4a6a68a7',1,'TMBad::global::Operator']]],
