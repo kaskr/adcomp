@@ -5,15 +5,15 @@
    \brief Namespace with special functions and derivatives
 
    This namespace extends the 'derivatives table' of CppAD.
-   - R's special math library is extended with derivatives in cases 
+   - R's special math library is extended with derivatives in cases
    where symbolic derivatives are available. These special functions
    are often iterative and therefore difficult to implement with AD
-   types. Instead, we code the derivatives based on the double versions 
+   types. Instead, we code the derivatives based on the double versions
    available from R. This approach requires fewer code lines, and has the
    benefit of obtaining the same high accuracy as R's math functions.
-   - Some matrix operations are extended with derivatives. This greatly 
+   - Some matrix operations are extended with derivatives. This greatly
    reduces the AD memory usage. Furthermore, these atomic operations
-   can be linked to a performance library by setting preprocesor flag 
+   can be linked to a performance library by setting preprocesor flag
    EIGEN_USE_BLAS.
    - New symbols can be added by advanced users. First option is to
    code the reverse mode derivatives by hand using the
@@ -201,7 +201,7 @@ Type dnorm1(Type x){
   return Type(1.0/sqrt(2.0*M_PI)) * exp(-Type(.5)*x*x);
 }
 
-/** \brief Atomic version of standard normal distribution function. 
+/** \brief Atomic version of standard normal distribution function.
     Derivative is known to be 'dnorm1'.
     \param x Input vector of length 1.
     \return Vector of length 1.
@@ -220,7 +220,7 @@ TMB_ATOMIC_STATIC_FUNCTION(
 			   px[0] = dnorm1(tx[0]) * py[0];
 			   )
 
-/** \brief Atomic version of standard normal quantile function. 
+/** \brief Atomic version of standard normal quantile function.
     Derivative is expressed through 'dnorm1'.
     \param x Input vector of length 1.
     \return Vector of length 1.
@@ -241,7 +241,7 @@ TMB_ATOMIC_STATIC_FUNCTION(
 /** \brief Atomic version of scaled incomplete gamma function differentiated to any order wrt. shape parameter
     \f[ \exp(c) \int_0^{y} \exp(-t) t^{\lambda-1} \log(t)^n \:dt \f]
     where the 4 input parameters are passed as a vector \f$x=(y,\lambda,n,c)\f$.
-    Note that the normalized incomplete gamma function is obtained as the special case 
+    Note that the normalized incomplete gamma function is obtained as the special case
     \f$n=0\f$ and \f$c=-\log \Gamma(\lambda)\f$.
     Valid parameter range: \f$x \in \mathbb{R}_+\times\mathbb{R}_+\times\mathbb{N}_0\times\mathbb{R}\f$.
     \warning No check is performed on parameters
@@ -558,6 +558,38 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px=mat2vec(res);
 			   )
 
+/** \brief Atomic version of matrix square root of positive semi-definite n-by-n matrix A.
+    Finds the unique positive semidefinite matrix B such that B * B = A.
+    \param x Input vector of length n*n.
+    \return Vector of length n*n.
+*/
+TMB_ATOMIC_VECTOR_FUNCTION(
+         // ATOMIC_NAME
+         sqrtm
+         ,
+         // OUTPUT_DIM
+         tx.size()
+         ,
+         // ATOMIC_DOUBLE
+         typedef Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > SAES_t;
+         int n=sqrt((double)tx.size());
+         matrix<double> X=vec2mat(tx,n,n);
+         SAES_t saes(X);
+         matrix<double> sqrtX = saes.operatorSqrt();
+         for(int i=0;i<n*n;i++)ty[i]=sqrtX(i);
+         ,
+         // ATOMIC_REVERSE ( vec(f'(X)) =  (f(X)^T %kronecker sum% f(X))^-1 * vec(X') )
+         int n = sqrt((double)ty.size());
+         matrix<Type> Y = vec2mat(ty, n, n); // f(X)
+         matrix<Type> Yt = Y.transpose(); // f(x)^T
+         matrix<Type> I(Y.rows(),Y.cols());
+         I.setIdentity();
+         matrix<Type> kronSum = kronecker(Yt,I)+kronecker(I,Y);
+         matrix<Type> kronSumInv = matinv(kronSum);
+         px = kronSumInv*vector<Type>(py);
+         )
+
+
 /* ================================== INTERFACES
 */
 
@@ -626,6 +658,19 @@ matrix<Type> matinvpd(matrix<Type> x, Type &logdet){
   CppAD::vector<Type> res = invpd(mat2vec(x));
   logdet = res[0];
   return vec2mat(res,n,n,1);
+}
+
+/** \brief
+
+    Calculate matrix square root of a positive semi-definite n-by-n matrix A.
+    Finds the unique positive semidefinite matrix B such that B * B = A.
+
+    \ingroup matrix_functions
+*/
+template<class Type>
+matrix<Type> sqrtm(matrix<Type> x){
+  int n=x.rows();
+  return vec2mat(sqrtm(atomic::mat2vec(x)),n,n);
 }
 
 /** \brief Log-determinant of positive definite matrix
