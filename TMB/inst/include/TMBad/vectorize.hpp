@@ -404,7 +404,7 @@ struct SegmentRef {
   Scalar *value_ptr();
   Scalar *deriv_ptr();
   SegmentRef();
-  SegmentRef(Scalar *x);
+  SegmentRef(const Scalar *x);
   SegmentRef(global *g, Index o, Index s);
   SegmentRef(const ad_segment &x);
   bool isNull();
@@ -498,6 +498,24 @@ ad_segment unpack(const std::vector<T> &x, Index j) {
   ad_segment x_(x[j * K], K);
   return unpack(x_);
 }
+Scalar *unpack(const std::vector<Scalar> &x, Index j);
+
+template <class T>
+std::vector<T> repack(const std::vector<T> &x) {
+  Index K = ScalarPack<SegmentRef>::size;
+  size_t n = x.size() / K;
+  std::vector<T> y;
+  for (size_t j = 0; j < n; j++) {
+    ad_segment x_(x[j * K], K);
+    SegmentRef sr(x_);
+    ad_segment orig(sr.offset, sr.size);
+    ad_segment yj = pack(orig);
+    for (size_t i = 0; i < K; i++) y.push_back(yj[i]);
+  }
+  return y;
+}
+
+std::vector<ad_aug> concat(const std::vector<ad_segment> &x);
 
 }  // namespace TMBad
 #endif  // HAVE_VECTORIZE_HPP
