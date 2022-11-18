@@ -141,7 +141,7 @@ struct expm_series {
   /** Operator that multiplies sparse matrix with vector */
   TMBad::global::Complete<SpAxOp<T> > multiply;
   /** ADFun object that holds the entire matexp tape */
-  TMBad::ADFun<> F;
+  TMBad::ADFun_packed<> F;
   /** Configuration */
   config<T> cfg;
   /** Helper to update generator */
@@ -155,19 +155,15 @@ struct expm_series {
   { }
   /** \brief Evaluate `x^T*exp(A)` */
   vec operator()(vec x) {
-    vec pA = TMBad::pack(A_values);
-    vec px = TMBad::pack(x);
     N = min(N, T(cfg.Nmax));
-    // Concatenate. FIXME: don't make assumptions on packed length
-    std::vector<TMBad::ad_aug> ax = {pA[0], pA[1], px[0], px[1], N};
-    if (F.Domain() == 0) {
+    std::vector<TMBad::ad_segment> args = {A_values, x, vec(N, 1)};
+    if (! F.initialized() ) {
       struct Test {
         config<T> cfg;
-        bool operator() (const std::vector<TMBad::Scalar> &x,
-                         const std::vector<TMBad::Scalar> &y) {
+        TMBad::Scalar Nold;
+        bool operator() (const std::vector<TMBad::Scalar*> &x) {
           using TMBad::operator<<;
-          TMBad::Scalar N = y[4];
-          TMBad::Scalar Nold = x[4];
+          TMBad::Scalar N = x[2][0];
           if ( (int) N == cfg.Nmax) {
             if (cfg.warn)
               Rf_warning("expm: N terms reduced to Nmax (%i)", (int) cfg.Nmax);
@@ -175,34 +171,31 @@ struct expm_series {
           bool change = (Nold != N);
           if (cfg.trace && change) {
             Rcout << "Retaping:" << " Nold=" << Nold << " Nnew=" << N << "\n";
+            Nold = N;
           }
           return change;
         }
       };
-      Test N_changed = {cfg};
-      F = TMBad::ADFun_retaping(*this, ax, N_changed);
+      Test N_changed = {cfg, N.Value()};
+      F = TMBad::ADFun_retaping(*this, args, N_changed);
     }
-    std::vector<TMBad::ad_aug> y = F(ax);
-    // Again assuming length=2. use y.size() instead?
-    vec y2(y[0], 2);
-    return TMBad::unpack(y2);
+    return F(args);
   }
 private:
-  friend class TMBad::ADFun<>;
+  friend class TMBad::PackWrap<expm_series>;
   // Packed: (A, x) -> exp(A) * x
-  std::vector<TMBad::ad_aug> operator() (const std::vector<TMBad::ad_aug> &Ax) {
+  TMBad::ad_segment operator() (const std::vector<TMBad::ad_segment> &args) {
     // Unpack input
-    vec A = TMBad::unpack(Ax, 0);
-    vec x = TMBad::unpack(Ax, 1);
-    int N = (int) Ax[4].Value();
+    vec A = args[0];
+    vec x = args[1];
+    vec N_= args[2];
+    int N = (int) N_[0].Value();
     // Evaluate series
     vec term(x), y(x);
     for (int n=1; n<N; n++) {
       term = multiply(A, term) / n;
       y += term;
     }
-    // Pack result
-    y = TMBad::pack(y);
     return y;
   }
 };
