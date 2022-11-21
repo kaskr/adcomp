@@ -88,6 +88,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun.html">ADFun</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Automatic differentiation function object.  <a href="structTMBad_1_1ADFun.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ADFun__packed.html">ADFun_packed</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Container of <a class="el" href="structTMBad_1_1ADFun.html" title="Automatic differentiation function object. ">ADFun</a> object with packed input and output.  <a href="structTMBad_1_1ADFun__packed.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1Args.html">Args</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Argument class to handle array access of operator inputs and outputs.  <a href="structTMBad_1_1Args.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,6 +147,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1PackOp.html">PackOp</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack (<code><a class="el" href="structTMBad_1_1PackOp.html" title="Pack (PackOp) or unpack (UnpkOp) n consecutive values on the tape. ">PackOp</a></code>) or unpack (<code><a class="el" href="structTMBad_1_1UnpkOp.html" title="Pack (PackOp) or unpack (UnpkOp) n consecutive values on the tape. ">UnpkOp</a></code>) <code>n</code> consecutive values on the tape.  <a href="structTMBad_1_1PackOp.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1PackWrap.html">PackWrap</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a functor to have packed input/output.  <a href="structTMBad_1_1PackWrap.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1ParalOp.html">ParalOp</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parallel operator.  <a href="structTMBad_1_1ParalOp.html#details">More...</a><br /></td></tr>
@@ -203,6 +209,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a8942995be599665e0914b3367c75e3cd"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structTMBad_1_1ADFun.html">ADFun</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#a8942995be599665e0914b3367c75e3cd">ADFun_retaping</a> (Functor &amp;F, const std::vector&lt; <a class="el" href="structTMBad_1_1global_1_1ad__aug.html">ad_aug</a> &gt; &amp;x, Test test=Test())</td></tr>
 <tr class="memdesc:a8942995be599665e0914b3367c75e3cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct <a class="el" href="structTMBad_1_1ADFun.html" title="Automatic differentiation function object. ">ADFun</a> that automatically retapes.  <a href="#a8942995be599665e0914b3367c75e3cd">More...</a><br /></td></tr>
 <tr class="separator:a8942995be599665e0914b3367c75e3cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a378f5a84861c70994f30a12b9e2b7f47"><td class="memTemplParams" colspan="2">template&lt;class Functor , class Test &gt; </td></tr>
+<tr class="memitem:a378f5a84861c70994f30a12b9e2b7f47"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structTMBad_1_1ADFun__packed.html">ADFun_packed</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#a378f5a84861c70994f30a12b9e2b7f47">ADFun_retaping</a> (Functor &amp;F, const std::vector&lt; <a class="el" href="structTMBad_1_1global_1_1ad__segment.html">ad_segment</a> &gt; &amp;x, Test test)</td></tr>
+<tr class="memdesc:a378f5a84861c70994f30a12b9e2b7f47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct <a class="el" href="structTMBad_1_1ADFun.html" title="Automatic differentiation function object. ">ADFun</a> that automatically retapes.  <a href="#a378f5a84861c70994f30a12b9e2b7f47">More...</a><br /></td></tr>
+<tr class="separator:a378f5a84861c70994f30a12b9e2b7f47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9da8f10d11a2ebeb90e146372c438714"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#a9da8f10d11a2ebeb90e146372c438714">aggregate</a> (<a class="el" href="structTMBad_1_1global.html">global</a> &amp;glob, int sign=1)</td></tr>
 <tr class="memdesc:a9da8f10d11a2ebeb90e146372c438714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduce a multivariate output function by summing its range components.  <a href="#a9da8f10d11a2ebeb90e146372c438714">More...</a><br /></td></tr>
 <tr class="separator:a9da8f10d11a2ebeb90e146372c438714"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -389,14 +399,14 @@ template&lt;class I &gt; </td></tr>
 <p>Split a computational graph by it's accumulation tree. </p>
 <p>This routine transforms a function object with univariate output into a function object with multiple outputs. Each new output represents a term of the original function, i.e. by summing all the terms one can recover the original function. </p><dl class="section note"><dt>Note</dt><dd>FIXME: Handle the case Range() &gt; 1. Select which component ? </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03365">3365</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03368">3368</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451">TMBad::ADFun&lt;&gt;::marginal_gk()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9">TMBad::ADFun&lt;&gt;::marginal_sr()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
 </div>
 </div>
 <a id="a8942995be599665e0914b3367c75e3cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8942995be599665e0914b3367c75e3cd">&sect;&nbsp;</a></span>ADFun_retaping()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8942995be599665e0914b3367c75e3cd">&sect;&nbsp;</a></span>ADFun_retaping() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,9 +455,64 @@ template&lt;class Functor , class Test  = ParametersChanged&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01166">1166</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01165">1165</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structsparse__matrix__exponential_1_1expm__series.html#af0859a73859eab43475362e478b628da">sparse_matrix_exponential::expm_series&lt; T &gt;::operator()()</a>.</p>
+
+</div>
+</div>
+<a id="a378f5a84861c70994f30a12b9e2b7f47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a378f5a84861c70994f30a12b9e2b7f47">&sect;&nbsp;</a></span>ADFun_retaping() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Functor , class Test &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structTMBad_1_1ADFun__packed.html">ADFun_packed</a> TMBad::ADFun_retaping </td>
+          <td>(</td>
+          <td class="paramtype">Functor &amp;&#160;</td>
+          <td class="paramname"><em>F</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structTMBad_1_1global_1_1ad__segment.html">ad_segment</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Test&#160;</td>
+          <td class="paramname"><em>test</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct <a class="el" href="structTMBad_1_1ADFun.html" title="Automatic differentiation function object. ">ADFun</a> that automatically retapes. </p>
+<p>By default, retaping takes place whenever the parameter vector changes compared to previous evaluation. However, this can be controlled in more detail by passing a custom tester object - see the prototype <code><a class="el" href="structTMBad_1_1ParametersChanged.html" title="Default tester for retaping_derivative_table. ">ParametersChanged</a></code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">F</td><td>Functor to be taped </td></tr>
+    <tr><td class="paramname">x</td><td>Evaluation point </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Test</td><td>Class to test if parameters have changed</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The resulting object is <code><a class="el" href="structTMBad_1_1ADFun__packed.html" title="Container of ADFun object with packed input and output. ">ADFun_packed</a></code>, i.e. it has <em>packed</em> inputs <b>and</b> outputs. Such packed I/O can compactly represent e.g. matrices, vectors or other large objects with a consequtive memory layout. </p>
+
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l01194">1194</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 
 </div>
 </div>
@@ -485,7 +550,7 @@ template&lt;class Functor , class Test  = ParametersChanged&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03405">3405</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03408">3408</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1autopar.html#ac5cb220e781af8a02e6a43ea0fd7a3b6">TMBad::autopar::extract()</a>, <a class="el" href="structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451">TMBad::ADFun&lt;&gt;::marginal_gk()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9">TMBad::ADFun&lt;&gt;::marginal_sr()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -510,7 +575,7 @@ template&lt;class Functor , class Test  = ParametersChanged&gt; </div>
 <p>Test if all operators in the stack allow input remapping. </p>
 <p>I.e. test if <code>op_info.allow_remap = true</code> for all operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04043">4043</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04046">4046</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ae59304fbd753dbe20f62eb5c83ab1bfe">reorder_graph()</a>.</p>
 
@@ -606,7 +671,7 @@ template&lt;class V &gt; </div>
 <p>Get node indices of the accumulation tree or its boundary. </p>
 <p>The tree is defined as the maximal <b>topologically closed</b> sub graph T, containing only linear operators. In other words, the nodes in the tree are not allowed to produce variables that are inputs to any non linear operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03302">3302</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03305">3305</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342">accumulation_tree_split()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -924,7 +989,7 @@ template&lt;class Integrand &gt; </div>
 <p>Allow / disallow comparison operators for <code>ad_aug</code> </p>
 <p>It is recommended to disable comparison for the non-retaping type <code>ad_aug</code>, i.e. not including this file! </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04243">4243</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04246">4246</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -1006,7 +1071,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04055">4055</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04058">4058</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -1029,7 +1094,7 @@ template&lt;class T &gt; </div>
 <p>Depth-first reordering of computational graph. </p>
 <p>Application: Register optimization for GPU </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00592">592</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00595">595</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1periodic.html#a712569133a91fd9cce7ca044ef3b0827">TMBad::periodic&lt; T &gt;::find_best_period()</a>, and <a class="el" href="namespaceTMBad.html#a26f93ff241852d703fec8ca9c6e32a76">reorder_depth_first()</a>.</p>
 
@@ -1070,7 +1135,7 @@ template&lt;class T &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Nothing is done if <b>any operators with pointer inputs are detected on the tape</b>. (FIXME: Not optimal) </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04206">4206</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04209">4209</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#a91d9e0e63497857f84456660c8188b96">TMBad::ADFun&lt;&gt;::reorder()</a>.</p>
 
@@ -1100,7 +1165,7 @@ template&lt;class T &gt; </div>
 <li>Now <code>remap</code> provides a valid ordering of the graph using the permutation <code>radix::order(remap)</code> </li>
 </ol>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00534">534</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00537">537</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1periodic.html#a712569133a91fd9cce7ca044ef3b0827">TMBad::periodic&lt; T &gt;::find_best_period()</a>, and <a class="el" href="namespaceTMBad.html#a1b45e31a4e1f8a7839d2540965259543">reorder_sub_expressions()</a>.</p>
 
@@ -1125,7 +1190,7 @@ template&lt;class T &gt; </div>
 <p>Re-order computational graph to make it more compressible. </p>
 <p>Potential re-ordering to be applied <b>after</b> <code>reorder_sub_expressions</code>. Pushes all temporaries forward. Here a temporary* is defined as a variable which is only used once as input to an operator. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00564">564</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00567">567</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1periodic.html#a712569133a91fd9cce7ca044ef3b0827">TMBad::periodic&lt; T &gt;::find_best_period()</a>, and <a class="el" href="namespaceTMBad.html#aeadfc2a73d19ae22613af3cd3ed203f6">reorder_temporaries()</a>.</p>
 
@@ -1175,7 +1240,7 @@ template&lt;class T &gt; </div>
 </ol>
 <p>FIXME: This function implementation is still a bit unclear </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00187">187</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l00190">190</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1periodic.html#a712569133a91fd9cce7ca044ef3b0827">TMBad::periodic&lt; T &gt;::find_best_period()</a>, <a class="el" href="namespaceTMBad.html#a26f93ff241852d703fec8ca9c6e32a76">reorder_depth_first()</a>, and <a class="el" href="namespaceTMBad.html#a7f273488d2199251bb0ffd0bc51e770c">split_period()</a>.</p>
 
@@ -1222,7 +1287,7 @@ template&lt;class T &gt; </div>
 <p>substitute node index sequence by independent variables </p>
 <dl class="section note"><dt>Note</dt><dd>Currently all operators in sequence must be different from InvOp </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03336">3336</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03339">3339</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342">accumulation_tree_split()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a7eaf97afbbf35a63d2895b12a18391ce">TMBad::ADFun&lt;&gt;::decompose()</a>, <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>, and <a class="el" href="namespaceTMBad.html#a61a789d6a042c96e48fedfa05f868f6a">substitute()</a>.</p>
 

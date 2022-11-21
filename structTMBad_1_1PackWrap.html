@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.12"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TMB Documentation: TMBad::standard_derivative_table&lt; ADFun, packed_ &gt; Struct Template Reference</title>
+<title>TMB Documentation: TMBad::PackWrap&lt; Functor &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -65,45 +65,47 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceTMBad.html">TMBad</a></li><li class="navelem"><a class="el" href="structTMBad_1_1standard__derivative__table.html">standard_derivative_table</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespaceTMBad.html">TMBad</a></li><li class="navelem"><a class="el" href="structTMBad_1_1PackWrap.html">PackWrap</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="structTMBad_1_1standard__derivative__table-members.html">List of all members</a>  </div>
+<a href="structTMBad_1_1PackWrap-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">TMBad::standard_derivative_table&lt; ADFun, packed_ &gt; Struct Template Reference</div>  </div>
+<div class="title">TMBad::PackWrap&lt; Functor &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Fixed derivative table used by <code><a class="el" href="structTMBad_1_1AtomOp.html" title="Generic checkpoint operator. ">AtomOp</a></code>  
- <a href="structTMBad_1_1standard__derivative__table.html#details">More...</a></p>
+<p>Transform a functor to have packed input/output.  
+ <a href="structTMBad_1_1PackWrap.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="checkpoint_8hpp_source.html">checkpoint.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a304e3756453a7a14ad6a527420ac3c66"><td class="memItemLeft" align="right" valign="top"><a id="a304e3756453a7a14ad6a527420ac3c66"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1standard__derivative__table.html#a304e3756453a7a14ad6a527420ac3c66">requireOrder</a> (size_t n)</td></tr>
-<tr class="memdesc:a304e3756453a7a14ad6a527420ac3c66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add derivatives up to this order. <br /></td></tr>
-<tr class="separator:a304e3756453a7a14ad6a527420ac3c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab17eb94d18f0bf84e246e3296ebfd506"><td class="memItemLeft" align="right" valign="top"><a id="ab17eb94d18f0bf84e246e3296ebfd506"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1standard__derivative__table.html#ab17eb94d18f0bf84e246e3296ebfd506">retape</a> (<a class="el" href="structTMBad_1_1ForwardArgs.html">ForwardArgs</a>&lt; Scalar &gt; &amp;args)</td></tr>
-<tr class="memdesc:ab17eb94d18f0bf84e246e3296ebfd506"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retaping this derivative table has no effect. <br /></td></tr>
-<tr class="separator:ab17eb94d18f0bf84e246e3296ebfd506"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36475037d06cbc5f453a9fbfea15c050"><td class="memItemLeft" align="right" valign="top"><a id="a36475037d06cbc5f453a9fbfea15c050"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1standard__derivative__table.html#a36475037d06cbc5f453a9fbfea15c050">standard_derivative_table</a> (const <a class="el" href="structTMBad_1_1ADFun.html">ADFun</a> &amp;F)</td></tr>
-<tr class="memdesc:a36475037d06cbc5f453a9fbfea15c050"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set zero order function of this derivative table. <br /></td></tr>
-<tr class="separator:a36475037d06cbc5f453a9fbfea15c050"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7700e48e2f47766c3054c3a0c5749f66"><td class="memTemplParams" colspan="2"><a id="a7700e48e2f47766c3054c3a0c5749f66"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a7700e48e2f47766c3054c3a0c5749f66"><td class="memTemplItemLeft" align="right" valign="top">std::vector&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structTMBad_1_1PackWrap.html#a7700e48e2f47766c3054c3a0c5749f66">operator()</a> (const std::vector&lt; T &gt; &amp;xp)</td></tr>
+<tr class="memdesc:a7700e48e2f47766c3054c3a0c5749f66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transformed functor assuming original maps <code>std::vector&lt;ad_segment&gt;</code> to <code>ad_segment</code> <br /></td></tr>
+<tr class="separator:a7700e48e2f47766c3054c3a0c5749f66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39f62468f8514fa7a41219919df46431"><td class="memItemLeft" align="right" valign="top"><a id="a39f62468f8514fa7a41219919df46431"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1PackWrap.html#a39f62468f8514fa7a41219919df46431">operator()</a> (const std::vector&lt; Scalar &gt; &amp;xp)</td></tr>
+<tr class="memdesc:a39f62468f8514fa7a41219919df46431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transformed 'tester' assuming original maps <code>std::vector&lt;Scalar*&gt;</code> to <code>bool</code> <br /></td></tr>
+<tr class="separator:a39f62468f8514fa7a41219919df46431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class ADFun, bool packed_ = false&gt;<br />
-struct TMBad::standard_derivative_table&lt; ADFun, packed_ &gt;</h3>
+<div class="textblock"><h3>template&lt;class Functor&gt;<br />
+struct TMBad::PackWrap&lt; Functor &gt;</h3>
 
-<p>Fixed derivative table used by <code><a class="el" href="structTMBad_1_1AtomOp.html" title="Generic checkpoint operator. ">AtomOp</a></code> </p>
+<p>Transform a functor to have packed input/output. </p>
+<p>A functor operating on <code>ad_segment</code>s must be transformed to 'packed' format in order to be used by <code><a class="el" href="structTMBad_1_1AtomOp.html" title="Generic checkpoint operator. ">AtomOp</a></code> with <code>packed=true</code>.</p>
+<ul>
+<li>Evaluation functor is constructed using <code><a class="el" href="structTMBad_1_1PackWrap.html" title="Transform a functor to have packed input/output. ">PackWrap</a>&lt;Functor&gt;</code>.</li>
+<li>The tester object is constructed using <code><a class="el" href="structTMBad_1_1PackWrap.html" title="Transform a functor to have packed input/output. ">PackWrap</a>&lt;Tester&gt;</code>. </li>
+</ul>
 
-<p>Definition at line <a class="el" href="checkpoint_8hpp_source.html#l00012">12</a> of file <a class="el" href="checkpoint_8hpp_source.html">checkpoint.hpp</a>.</p>
+<p>Definition at line <a class="el" href="checkpoint_8hpp_source.html#l00252">252</a> of file <a class="el" href="checkpoint_8hpp_source.html">checkpoint.hpp</a>.</p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="checkpoint_8hpp_source.html">checkpoint.hpp</a></li>
 </ul>

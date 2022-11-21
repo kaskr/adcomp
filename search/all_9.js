@@ -26,7 +26,7 @@ var searchData=
   ['integral',['Integral',['../structgauss__kronrod_1_1Integral.html#a2e3f56d0b0b497cdeb319f6c28f57bf3',1,'gauss_kronrod::Integral::Integral()'],['../structTMBad_1_1Integral.html#aa71f8b0e3a12c1613cbbcad7a49cd2c5',1,'TMBad::Integral::Integral()']]],
   ['integral',['Integral',['../structgauss__kronrod_1_1Integral.html',1,'gauss_kronrod']]],
   ['integral',['Integral',['../structTMBad_1_1Integral.html',1,'TMBad']]],
-  ['integral_3c_20evaluator_20_3e',['Integral&lt; evaluator &gt;',['../structTMBad_1_1Integral.html',1,'TMBad::Integral&lt; evaluator &gt;'],['../structgauss__kronrod_1_1Integral.html',1,'gauss_kronrod::Integral&lt; evaluator &gt;']]],
+  ['integral_3c_20evaluator_20_3e',['Integral&lt; evaluator &gt;',['../structgauss__kronrod_1_1Integral.html',1,'gauss_kronrod::Integral&lt; evaluator &gt;'],['../structTMBad_1_1Integral.html',1,'TMBad::Integral&lt; evaluator &gt;']]],
   ['integrand',['integrand',['../structgauss__kronrod_1_1Integral.html#a7d1902f18dfd593f3f1cada18c9056cb',1,'gauss_kronrod::Integral::integrand()'],['../structTMBad_1_1Integral.html#a2770e1e0cf8afd4ae46d00d4f3839022',1,'TMBad::Integral::integrand()']]],
   ['integrate',['integrate',['../namespacegauss__kronrod.html#ad2a3bebe64e675f09612aa6211ef1998',1,'gauss_kronrod::integrate()'],['../namespaceTMBad.html#ac1c73a21ac1632b2dfaff8a3e0aa405a',1,'TMBad::integrate()'],['../namespaceromberg.html#a980bb141c963b1cf20da450063c5c7d1',1,'romberg::integrate(F f, Type a, Type b, int n=7, int p=2)'],['../namespaceromberg.html#a71c323cd2dce5c8915428493518820f0',1,'romberg::integrate(F f, vector&lt; Type &gt; a, vector&lt; Type &gt; b, int n=7, int p=2)']]],
   ['interpol_2ehpp',['interpol.hpp',['../interpol_8hpp.html',1,'']]],

@@ -89,7 +89,7 @@ struct TMBad::StdWrap&lt; Functor, InterfaceVector &gt;</h3>
 <p>However, it may be that our functor is implemeted using an <code>other</code> vector class. In this case the <code><a class="el" href="structTMBad_1_1StdWrap.html" title="Interoperability with other vector classes. ">StdWrap</a></code> can help by automatically adding the <code>std::vector</code> evaluation operator. To make it work one must make sure that conversion operators exist for <code>other</code>, i.e. CTOR and conversion methods must be implemented for the vector class:</p>
 <div class="fragment"><div class="line">other(<span class="keyword">const</span> std::vector&lt;T&gt; &amp;x);</div><div class="line">other::operator std::vector&lt;T&gt;();</div></div><!-- fragment --><p>Then one can proceed by</p>
 <div class="fragment"><div class="line">Functor F;</div><div class="line">StdWrap&lt;Functor, other&gt; Fnew(F);</div><div class="line">other x;</div><div class="line"><a class="code" href="structTMBad_1_1ADFun.html">ADFun&lt;&gt;</a> (Fnew, x);</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00058">58</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8hpp_source.html#l00057">57</a> of file <a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a>.</p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="TMBad_8hpp_source.html">TMBad.hpp</a></li>
 </ul>

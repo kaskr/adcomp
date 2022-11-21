@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['f',['F',['../structsparse__matrix__exponential_1_1expm__series.html#a1b1dff093ef87b9282bceb021dc46e96',1,'sparse_matrix_exponential::expm_series']]],
+  ['f',['F',['../structsparse__matrix__exponential_1_1expm__series.html#af55e58c872a170449caf61e4ae58d8a9',1,'sparse_matrix_exponential::expm_series']]],
   ['factor',['factor',['../namespaceradix.html#a4c066628e3dc89be1fd84d2dd5da9d2b',1,'radix']]],
   ['fill',['fill',['../structdata__indicator.html#a58dba081c3cf4870fa92cfde3a373357',1,'data_indicator']]],
   ['find_5fbest_5fperiod',['find_best_period',['../structTMBad_1_1periodic.html#a712569133a91fd9cce7ca044ef3b0827',1,'TMBad::periodic']]],
