@@ -11,7 +11,7 @@ namespace TMBad {
 vmatrix matmul(const vmatrix &x, const vmatrix &y) {
   vmatrix z(x.rows(), y.cols());
   Map<vmatrix> zm(&z(0), z.rows(), z.cols());
-  matmul<false, false, false>(x, y, zm);
+  matmul<false, false, false, false>(x, y, zm);
   return z;
 }
 
@@ -894,23 +894,42 @@ graph::graph(size_t num_nodes, const std::vector<IndexPair> &edges) {
   }
 }
 
-global::operation_stack::operation_stack() : any_dynamic(false) {}
-
-global::operation_stack::operation_stack(const operation_stack &x) {
-  (*this).copy_from(x);
+op_info::op_info() : code(0) {
+  static_assert(sizeof(IntRep) * 8 >= op_flag_count,
+                "'IntRep' not wide enough!");
 }
 
-void global::operation_stack::push_back(OperatorPure *x, bool dynamic) {
-  if (dynamic)
-    push_back<true>(x);
-  else
-    push_back<false>(x);
+op_info::op_info(op_flag f) : code(1 << f) {}
+
+bool op_info::test(op_flag f) const { return code & 1 << f; }
+
+op_info &op_info::operator|=(const op_info &other) {
+  code |= other.code;
+  return *this;
 }
 
-operation_stack &global::operation_stack::operator=(const operation_stack &x) {
-  if (this != &x) {
+op_info &op_info::operator&=(const op_info &other) {
+  code &= other.code;
+  return *this;
+}
+
+global::operation_stack::operation_stack() {}
+
+global::operation_stack::operation_stack(const operation_stack &other) {
+  (*this).copy_from(other);
+}
+
+void global::operation_stack::push_back(OperatorPure *x) {
+  Base::push_back(x);
+
+  any |= x->info();
+}
+
+operation_stack &global::operation_stack::operator=(
+    const operation_stack &other) {
+  if (this != &other) {
     (*this).clear();
-    (*this).copy_from(x);
+    (*this).copy_from(other);
   }
   return *this;
 }
@@ -918,21 +937,19 @@ operation_stack &global::operation_stack::operator=(const operation_stack &x) {
 global::operation_stack::~operation_stack() { (*this).clear(); }
 
 void global::operation_stack::clear() {
-  if (any_dynamic) {
+  if (any.test(op_info::dynamic)) {
     for (size_t i = 0; i < (*this).size(); i++) (*this)[i]->deallocate();
   }
   (*this).resize(0);
 }
 
-void global::operation_stack::copy_from(const operation_stack &x) {
-  if (x.any_dynamic) {
-    this->any_dynamic = true;
-    for (size_t i = 0; i < x.size(); i++)
-      (*this).push_back(x[i]->copy(), false);
+void global::operation_stack::copy_from(const operation_stack &other) {
+  if (other.any.test(op_info::dynamic)) {
+    for (size_t i = 0; i < other.size(); i++) Base::push_back(other[i]->copy());
   } else {
-    this->any_dynamic = false;
-    std::vector<OperatorPure *>::operator=(x);
+    Base::operator=(other);
   }
+  this->any = other.any;
 }
 
 global::global()
@@ -1053,6 +1070,48 @@ void global::forward_dense(std::vector<bool> &marks) {
   }
 }
 
+intervals<Index> global::updating_intervals() const {
+  Dependencies dep;
+  intervals<Index> marked_intervals;
+  Args<> args(inputs);
+  for (size_t i = 0; i < opstack.size(); i++) {
+    if (opstack[i]->info().test(op_info::updating)) {
+      dep.clear();
+      opstack[i]->dependencies(args, dep);
+
+      for (size_t i = 0; i < dep.I.size(); i++) {
+        Index a = dep.I[i].first;
+        Index b = dep.I[i].second;
+        marked_intervals.insert(a, b);
+      }
+    }
+    opstack[i]->increment(args.ptr);
+  }
+  return marked_intervals;
+}
+
+intervals<Index> global::updating_intervals_sub() const {
+  Dependencies dep;
+  intervals<Index> marked_intervals;
+  Args<> args(inputs);
+  subgraph_cache_ptr();
+  for (size_t j = 0; j < subgraph_seq.size(); j++) {
+    Index i = subgraph_seq[j];
+    args.ptr = subgraph_ptr[i];
+    if (opstack[i]->info().test(op_info::updating)) {
+      dep.clear();
+      opstack[i]->dependencies(args, dep);
+
+      for (size_t i = 0; i < dep.I.size(); i++) {
+        Index a = dep.I[i].first;
+        Index b = dep.I[i].second;
+        marked_intervals.insert(a, b);
+      }
+    }
+  }
+  return marked_intervals;
+}
+
 Replay &global::replay::value_inv(Index i) { return values[orig.inv_index[i]]; }
 
 Replay &global::replay::deriv_inv(Index i) { return derivs[orig.inv_index[i]]; }
@@ -1077,9 +1136,26 @@ void global::replay::stop() {
   TMBAD_ASSERT(parent_glob == get_glob());
 }
 
+void global::replay::add_updatable_derivs(const intervals<Index> &I) {
+  struct {
+    Replay *p;
+    void operator()(Index a, Index b) {
+      Index n = b - a + 1;
+      global::ZeroOp Z(n);
+      Z(p + a, n);
+    }
+  } F = {derivs.data()};
+  I.apply(F);
+}
+
 void global::replay::clear_deriv() {
   derivs.resize(values.size());
   std::fill(derivs.begin(), derivs.end(), Replay(0));
+
+  if (orig.opstack.any.test(op_info::updating)) {
+    intervals<Index> I = orig.updating_intervals();
+    add_updatable_derivs(I);
+  }
 }
 
 void global::replay::forward(bool inv_tags, bool dep_tags, Position start,
@@ -1132,7 +1208,14 @@ void global::replay::reverse_sub() {
   orig.reverse_loop_subgraph(args);
 }
 
-void global::replay::clear_deriv_sub() { orig.clear_array_subgraph(derivs); }
+void global::replay::clear_deriv_sub() {
+  orig.clear_array_subgraph(derivs);
+
+  if (orig.opstack.any.test(op_info::updating)) {
+    intervals<Index> I = orig.updating_intervals_sub();
+    add_updatable_derivs(I);
+  }
+}
 
 void global::forward_replay(bool inv_tags, bool dep_tags) {
   global new_glob;
@@ -1194,7 +1277,6 @@ global global::extract_sub(std::vector<Index> &var_remap, global new_glob) {
   for (size_t j = 0; j < subgraph_seq.size(); j++) {
     Index i = subgraph_seq[j];
     args.ptr = subgraph_ptr[i];
-    OperatorPure::op_info info = opstack[i]->info();
 
     size_t nout = opstack[i]->output_size();
     for (size_t k = 0; k < nout; k++) {
@@ -1215,7 +1297,7 @@ global global::extract_sub(std::vector<Index> &var_remap, global new_glob) {
       new_glob.inputs.push_back(var_remap[args.input(k)]);
     }
 
-    new_glob.opstack.push_back(opstack[i]->copy(), info.dynamic);
+    new_glob.opstack.push_back(opstack[i]->copy());
   }
 
   independent_variable.flip();
@@ -1245,12 +1327,17 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
   std::vector<bool> opstack_deallocate(opstack.size(), false);
 
   for (size_t i = 0; i < opstack.size(); i++) {
-    OperatorPure::op_info info = opstack[i]->info();
+    op_info info = opstack[i]->info();
 
     size_t nout = opstack[i]->output_size();
-    bool any_marked_output = info.elimination_protected;
+    bool any_marked_output = info.test(op_info::elimination_protected);
     for (size_t j = 0; j < nout; j++) {
       any_marked_output |= args.y(j);
+    }
+    if (info.test(op_info::updating) && nout == 0) {
+      Dependencies dep;
+      opstack[i]->dependencies_updating(args, dep);
+      any_marked_output |= dep.any(args.values);
     }
 
     if (any_marked_output) {
@@ -1310,7 +1397,7 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
   }
   opstack.resize(k);
 
-  if (opstack.any_dynamic) this->forward();
+  if (opstack.any.test(op_info::dynamic)) this->forward();
 }
 
 global global::extract_sub() {
@@ -1439,18 +1526,36 @@ graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
 
   std::vector<Index> var2op = this->var2op();
 
+  bool any_updating = false;
+
   Args<> args(inputs);
   std::vector<IndexPair> edges;
   Dependencies dep;
   size_t i = 0;
   append_edges F(i, opstack.size(), keep_var, var2op, edges);
   for (; i < opstack.size(); i++) {
+    any_updating |= opstack[i]->info().test(op_info::updating);
     dep.clear();
     opstack[i]->dependencies(args, dep);
     F.start_iteration();
     dep.apply(F);
     F.end_iteration();
     opstack[i]->increment(args.ptr);
+  }
+  if (any_updating) {
+    size_t begin = edges.size();
+    i = 0;
+    args = Args<>(inputs);
+    for (; i < opstack.size(); i++) {
+      dep.clear();
+      opstack[i]->dependencies_updating(args, dep);
+      F.start_iteration();
+      dep.apply(F);
+      F.end_iteration();
+      opstack[i]->increment(args.ptr);
+    }
+    for (size_t j = begin; j < edges.size(); j++)
+      std::swap(edges[j].first, edges[j].second);
   }
 
   if (transpose) {
@@ -1764,6 +1869,18 @@ const char *global::DataOp::op_name() { return "DataOp"; }
 
 void global::DataOp::forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
 
+global::ZeroOp::ZeroOp(Index n) { Base::noutput = n; }
+
+const char *global::ZeroOp::op_name() { return "ZeroOp"; }
+
+void global::ZeroOp::forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
+
+void global::ZeroOp::operator()(Replay *x, Index n) {
+  Complete<ZeroOp> Z(n);
+  ad_segment y = Z(ad_segment());
+  for (size_t i = 0; i < n; i++) x[i] = y[i];
+}
+
 global::NullOp::NullOp() {}
 
 const char *global::NullOp::op_name() { return "NullOp"; }
@@ -1808,6 +1925,20 @@ OperatorPure *global::Fuse(OperatorPure *Op1, OperatorPure *Op2) {
 }
 
 void global::set_fuse(bool flag) { fuse = flag; }
+
+void global::add_to_opstack(OperatorPure *pOp) {
+  if (fuse) {
+    while (this->opstack.size() > 0) {
+      OperatorPure *OpTry = this->Fuse(this->opstack.back(), pOp);
+      if (OpTry == NULL) break;
+
+      this->opstack.pop_back();
+      pOp = OpTry;
+    }
+  }
+
+  this->opstack.push_back(pOp);
+}
 
 bool global::ad_plain::initialized() const { return index != NA; }
 
@@ -3351,7 +3482,7 @@ std::vector<Index> substitute(global &glob, const std::vector<Index> &seq,
     opstack[seq2[i]] = glob.getOperator<global::NullOp2>(0, nou);
     op->deallocate();
   }
-  glob.opstack.any_dynamic = true;
+  glob.opstack.any |= op_info(op_info::dynamic);
   std::vector<Index> new_inv = glob.op2var(seq2);
   if (!inv_tags) glob.inv_index.resize(0);
   if (!dep_tags) glob.dep_index.resize(0);
@@ -4046,8 +4177,8 @@ std::vector<Index> get_likely_expression_duplicates(
 bool all_allow_remap(const global &glob) {
   Args<> args(glob.inputs);
   for (size_t i = 0; i < glob.opstack.size(); i++) {
-    OperatorPure::op_info info = glob.opstack[i]->info();
-    if (!info.allow_remap) {
+    op_info info = glob.opstack[i]->info();
+    if (!info.test(op_info::allow_remap)) {
       return false;
     }
     glob.opstack[i]->increment(args.ptr);
@@ -4158,8 +4289,8 @@ std::vector<Index> remap_identical_sub_expressions(
     Args<> args(glob.inputs);
     intervals<Index> visited;
     for (size_t i = 0; i < glob.opstack.size(); i++) {
-      OperatorPure::op_info info = glob.opstack[i]->info();
-      if (!info.allow_remap) {
+      op_info info = glob.opstack[i]->info();
+      if (!info.test(op_info::allow_remap)) {
         Dependencies dep;
         glob.opstack[i]->dependencies(args, dep);
         for (size_t j = 0; j < dep.I.size(); j++) {

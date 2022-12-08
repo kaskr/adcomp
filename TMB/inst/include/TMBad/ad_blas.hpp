@@ -65,15 +65,20 @@ void fill(Target &y, const global::ad_segment x) {
   }
 }
 
-template <bool XT, bool YT, bool ZT>
+template <bool XT, bool YT, bool ZT, bool UP>
 struct MatMul;
-template <bool XT, bool YT, bool ZT>
+template <bool XT, bool YT, bool ZT, bool UP>
 void matmul(const vmatrix &x, const vmatrix &y, Map<vmatrix> z) {
   global::ad_segment xc = contiguousBlock(x);
   global::ad_segment yc = contiguousBlock(y);
-  global::ad_segment out =
-      get_glob()->add_to_stack<MatMul<XT, YT, ZT> >(xc, yc);
-  fill(z, out);
+  if (!UP) {
+    global::ad_segment out =
+        get_glob()->add_to_stack<MatMul<XT, YT, ZT, UP> >(xc, yc);
+    fill(z, out);
+  } else {
+    global::ad_segment zc = contiguousBlock(z);
+    get_glob()->add_to_stack<MatMul<XT, YT, ZT, UP> >(xc, yc, zc);
+  }
 }
 
 /** \brief Multiply two matrices of ad variables */
@@ -82,31 +87,44 @@ vmatrix matmul(const vmatrix &x, const vmatrix &y);
 /** \brief Multiply two matrices of scalar types */
 dmatrix matmul(const dmatrix &x, const dmatrix &y);
 
-/** Expand all 8 combinations */
-template <bool XT, bool YT, bool ZT>
+/** Expand all 16 combinations */
+template <bool XT, bool YT, bool ZT, bool UP>
 void matmul(Map<const dmatrix> x, Map<const dmatrix> y, Map<dmatrix> z) {
-  if (XT && YT && ZT) z.transpose() = x.transpose() * y.transpose();
-  if (!XT && YT && ZT) z.transpose() = x * y.transpose();
-  if (XT && !YT && ZT) z.transpose() = x.transpose() * y;
-  if (XT && YT && !ZT) z = x.transpose() * y.transpose();
-  if (!XT && !YT && ZT) z.transpose() = x * y;
-  if (XT && !YT && !ZT) z = x.transpose() * y;
-  if (!XT && YT && !ZT) z = x * y.transpose();
-  if (!XT && !YT && !ZT) z = x * y;
+  if (!UP) {
+    if (XT && YT && ZT) z.transpose() = x.transpose() * y.transpose();
+    if (!XT && YT && ZT) z.transpose() = x * y.transpose();
+    if (XT && !YT && ZT) z.transpose() = x.transpose() * y;
+    if (XT && YT && !ZT) z = x.transpose() * y.transpose();
+    if (!XT && !YT && ZT) z.transpose() = x * y;
+    if (XT && !YT && !ZT) z = x.transpose() * y;
+    if (!XT && YT && !ZT) z = x * y.transpose();
+    if (!XT && !YT && !ZT) z = x * y;
+  }
+  if (UP) {
+    if (XT && YT && ZT) z.transpose() += x.transpose() * y.transpose();
+    if (!XT && YT && ZT) z.transpose() += x * y.transpose();
+    if (XT && !YT && ZT) z.transpose() += x.transpose() * y;
+    if (XT && YT && !ZT) z += x.transpose() * y.transpose();
+    if (!XT && !YT && ZT) z.transpose() += x * y;
+    if (XT && !YT && !ZT) z += x.transpose() * y;
+    if (!XT && YT && !ZT) z += x * y.transpose();
+    if (!XT && !YT && !ZT) z += x * y;
+  }
 }
 
-template <bool XT, bool YT, bool ZT>
-struct MatMul : global::Operator<2, -1> {
+template <bool XT, bool YT, bool ZT, bool UP>
+struct MatMul : global::Operator<2 + UP, -1> {
   static const bool dynamic = true;
   static const int max_fuse_depth = 0;
   int n1, n2, n3;
-  static const int ninput = 2;
+  static const int ninput = 2 + UP;
   MatMul(global::ad_segment X, global::ad_segment Y) {
     set_dim(X.rows(), X.cols(), Y.rows(), Y.cols());
   }
   MatMul(int n1, int n2, int n3) : n1(n1), n2(n2), n3(n3) {}
-  Index input_size() const { return 2; }
+  Index input_size() const { return 2 + UP; }
   Index output_size() const {
+    if (UP) return 0;
     int Xrows, Xcols, Yrows, Ycols, Zrows, Zcols;
     get_dim(Xrows, Xcols, Yrows, Ycols, Zrows, Zcols);
     return Zrows * Zcols;
@@ -143,10 +161,11 @@ struct MatMul : global::Operator<2, -1> {
     get_dim(Xrows, Xcols, Yrows, Ycols, Zrows, Zcols);
     typedef Map<Matrix<Type, Dynamic, Dynamic> > MapMatrix;
     typedef Map<const Matrix<Type, Dynamic, Dynamic> > ConstMapMatrix;
+    Type *zp = (UP ? args.x_ptr(2) : args.y_ptr(0));
     ConstMapMatrix X(args.x_ptr(0), Xrows, Xcols);
     ConstMapMatrix Y(args.x_ptr(1), Yrows, Ycols);
-    MapMatrix Z(args.y_ptr(0), Zrows, Zcols);
-    matmul<XT, YT, ZT>(X, Y, Z);
+    MapMatrix Z(zp, Zrows, Zcols);
+    matmul<XT, YT, ZT, UP>(X, Y, Z);
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
@@ -154,22 +173,15 @@ struct MatMul : global::Operator<2, -1> {
     get_dim(Xrows, Xcols, Yrows, Ycols, Zrows, Zcols);
     typedef Map<Matrix<Type, Dynamic, Dynamic> > MapMatrix;
     typedef Map<const Matrix<Type, Dynamic, Dynamic> > ConstMapMatrix;
+    Type *dzp = (UP ? args.dx_ptr(2) : args.dy_ptr(0));
     ConstMapMatrix X(args.x_ptr(0), Xrows, Xcols);
     ConstMapMatrix Y(args.x_ptr(1), Yrows, Ycols);
-    ConstMapMatrix W(args.dy_ptr(0), Zrows, Zcols);
+    ConstMapMatrix W(dzp, Zrows, Zcols);
     MapMatrix DX(args.dx_ptr(0), Xrows, Xcols);
     MapMatrix DY(args.dx_ptr(1), Yrows, Ycols);
 
-    Matrix<Type, Dynamic, Dynamic> DX0_tmp(DX.rows(), DX.cols());
-    Matrix<Type, Dynamic, Dynamic> DY0_tmp(DY.rows(), DY.cols());
-    MapMatrix DX0(&DX0_tmp(0), DX.rows(), DX.cols());
-    MapMatrix DY0(&DY0_tmp(0), DY.rows(), DY.cols());
-
-    matmul<ZT, !YT, XT>(W, Y, DX0);
-    matmul<!XT, ZT, YT>(X, W, DY0);
-
-    DX += DX0;
-    DY += DY0;
+    matmul<ZT, !YT, XT, true>(W, Y, DX);
+    matmul<!XT, ZT, YT, true>(X, W, DY);
   }
 
   void dependencies(Args<> &args, Dependencies &dep) const {
@@ -178,11 +190,21 @@ struct MatMul : global::Operator<2, -1> {
     dep.add_segment(args.input(0), Xrows * Xcols);
     dep.add_segment(args.input(1), Yrows * Ycols);
   }
+
+  void dependencies_updating(Args<> &args, Dependencies &dep) const {
+    int Xrows, Xcols, Yrows, Ycols, Zrows, Zcols;
+    get_dim(Xrows, Xcols, Yrows, Ycols, Zrows, Zcols);
+    if (UP) {
+      dep.add_segment(args.input(2), Zrows * Zcols);
+    }
+  }
   static const bool have_dependencies = true;
   /** \brief This operator **has** implicit dependencies */
   static const bool implicit_dependencies = true;
   /** \brief It is **not* safe to remap the inputs of this operator */
   static const bool allow_remap = false;
+  /** \brief This operator may update existing variables on the tape */
+  static const bool updating = true;
 
   void forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
   void reverse(ReverseArgs<Writer> &args) { TMBAD_ASSERT(false); }

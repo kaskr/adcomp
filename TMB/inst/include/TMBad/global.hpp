@@ -386,8 +386,26 @@ struct ForwardArgs<bool> : Args<> {
   /** \brief Helper */
   template <class Operator>
   void mark_all_output(const Operator &op) {
-    Index noutput = op.output_size();
-    for (Index j = 0; j < noutput; j++) y(j) = true;
+    if (Operator::updating && op.output_size() == 0) {
+      Dependencies dep;
+      op.dependencies_updating(*this, dep);
+
+      for (size_t i = 0; i < dep.size(); i++) values[dep[i]] = true;
+
+      for (size_t i = 0; i < dep.I.size(); i++) {
+        Index a = dep.I[i].first;
+        Index b = dep.I[i].second;
+        bool insert = marked_intervals.insert(a, b);
+        if (insert) {
+          for (Index j = a; j <= b; j++) {
+            values[j] = true;
+          }
+        }
+      }
+    } else {
+      Index noutput = op.output_size();
+      for (Index j = 0; j < noutput; j++) y(j) = true;
+    }
   }
   /** \brief Dense sparsity pattern */
   template <class Operator>
@@ -417,9 +435,15 @@ struct ReverseArgs<bool> : Args<> {
   template <class Operator>
   bool any_marked_output(const Operator &op) {
     if (Operator::elimination_protected) return true;
-    Index noutput = op.output_size();
-    for (Index j = 0; j < noutput; j++)
-      if (y(j)) return true;
+    if (Operator::updating && op.output_size() == 0) {
+      Dependencies dep;
+      op.dependencies_updating(*this, dep);
+      return dep.any(values);
+    } else {
+      Index noutput = op.output_size();
+      for (Index j = 0; j < noutput; j++)
+        if (y(j)) return true;
+    }
     return false;
   }
   /** \brief Helper */
@@ -701,6 +725,60 @@ struct constructOperator<CompleteOperator, true> {
 };
 }  // namespace
 
+/** \brief Bitwise collection of selected operator flags
+    \details These flags are available for any operator in the
+   `operation_stack`.
+*/
+struct op_info {
+  /** \brief Type used for internal integer representation */
+  typedef int IntRep;
+  /** \brief Internal integer representation */
+  IntRep code;
+  /** \brief Enumeration of selected boolean flags in `global::Operator` */
+  enum op_flag {
+    /** \copydoc global::Operator::dynamic */
+    dynamic,
+    /** \copydoc global::Operator::smart_pointer */
+    smart_pointer,
+    /** \copydoc global::Operator::is_linear */
+    is_linear,
+    /** \copydoc global::Operator::independent_variable */
+    independent_variable,
+    /** \copydoc global::Operator::dependent_variable */
+    dependent_variable,
+    /** \copydoc global::Operator::allow_remap */
+    allow_remap,
+    /** \copydoc global::Operator::elimination_protected */
+    elimination_protected,
+    /** \copydoc global::Operator::updating */
+    updating,
+    /** \brief Mark end of enum */
+    op_flag_count
+  };
+  template <class T>
+  IntRep get_flags(T op) {
+    return
+
+        (op.dynamic * (1 << dynamic)) |
+        (op.smart_pointer * (1 << smart_pointer)) |
+        (op.is_linear * (1 << is_linear)) |
+        (op.independent_variable * (1 << independent_variable)) |
+        (op.dependent_variable * (1 << dependent_variable)) |
+        (op.allow_remap * (1 << allow_remap)) |
+        (op.elimination_protected * (1 << elimination_protected)) |
+        (op.updating * (1 << updating));
+  }
+  op_info();
+  op_info(op_flag f);
+
+  template <class T>
+  op_info(T op) : code(get_flags(op)) {}
+  /** \brief Test if a given flag is set */
+  bool test(op_flag f) const;
+  op_info &operator|=(const op_info &other);
+  op_info &operator&=(const op_info &other);
+};
+
 /** \brief Struct defining the main AD context.
 
     - An AD context holds the three data arrays defining the tape: `opstack`,
@@ -776,6 +854,10 @@ struct global {
         `reverse(ReverseArgs<Replay>& args)`.
     */
     virtual void dependencies(Args<> &args, Dependencies &dep) = 0;
+    /** \brief Get the indices of variables updated by this operator.
+        \details Used only when `Operator::updating` flag is set.
+    */
+    virtual void dependencies_updating(Args<> &args, Dependencies &dep) = 0;
     /** \brief Replay operation sequence. \copydoc forward */
     virtual void forward(ForwardArgs<Replay> &args) = 0;
     /** \brief Replay operation sequence. \copydoc reverse */
@@ -806,17 +888,6 @@ struct global {
     virtual OperatorPure *copy() = 0;
     /** \brief Deallocate this OperatorPure. */
     virtual void deallocate() = 0;
-    /** \brief Operator info that is constant for this operator */
-    struct op_info {
-      bool dynamic;
-      bool smart_pointer;
-      bool dense;
-      bool is_linear;
-      bool independent_variable;
-      bool dependent_variable;
-      bool allow_remap;
-      bool elimination_protected;
-    };
     /** \brief Get operator info. */
     virtual op_info info() = 0;
     /** \brief Optional operator_data */
@@ -841,19 +912,22 @@ struct global {
       wouldn't do the expected. Use `clear()` instead.
   */
   struct operation_stack : std::vector<OperatorPure *> {
-    bool any_dynamic;
+    typedef std::vector<OperatorPure *> Base;
+    /** \brief Bitwise max of operator flags in this stack */
+    op_info any;
+    /** \brief Default CTOR */
     operation_stack();
-    operation_stack(const operation_stack &x);
-    template <bool dynamic>
-    void push_back(OperatorPure *x) {
-      std::vector<OperatorPure *>::push_back(x);
-      if (dynamic) any_dynamic = true;
-    }
-    void push_back(OperatorPure *x, bool dynamic);
-    operation_stack &operator=(const operation_stack &x);
+    /** \brief Copy CTOR */
+    operation_stack(const operation_stack &other);
+    /** \brief Add new operator to this stack and update bitwise operator
+     * information */
+    void push_back(OperatorPure *x);
+    /** \brief Copy assignment */
+    operation_stack &operator=(const operation_stack &other);
     ~operation_stack();
+    /** \brief Clear the operation stack without freeing the container */
     void clear();
-    void copy_from(const operation_stack &x);
+    void copy_from(const operation_stack &other);
   };
 
   /** \brief Operation stack */
@@ -1057,6 +1131,10 @@ struct global {
  */
   void forward_dense(std::vector<bool> &marks);
 
+  intervals<Index> updating_intervals() const;
+
+  intervals<Index> updating_intervals_sub() const;
+
   struct replay {
     /** \brief Mimic `orig` operation sequence value array `global::values` */
     std::vector<Replay> values;
@@ -1095,6 +1173,8 @@ struct global {
         Restore the previous active operation sequence
     */
     void stop();
+    /** \brief Add 'updatable' derivatives to the tape */
+    void add_updatable_derivs(const intervals<Index> &I);
     /** \brief Initialize derivative array used by this replay */
     void clear_deriv();
     /** \brief Forward replay of `replay::orig` operation sequence.
@@ -1461,6 +1541,35 @@ struct global {
     static const bool smart_pointer = false;
     /** \brief Protect this operator from elimination by the tape optimizer ? */
     static const bool elimination_protected = false;
+    /** \brief This operator **may** update existing variables ?
+
+        \details An 'updating' operator is allowed to update
+        (increment/decrement) *certain* ('updatable') variables
+        already on the tape.  In general this property breaks basic
+        principles of reverse mode AD unless the following extra
+        requirement is satisfied:
+
+        - Once an updatable variable have been *read* it may no longer be
+       updated.
+
+        This requrement always holds for the derivative variables during reverse
+       replay. We note that 'updating' operators are considered an extension to
+       the standard AD framework. In particular, a more complex dependency
+       anlysis is required:
+
+        - Updating operators **must** have `implicit_dependencies=true`.
+        - The `updating` flag **must** be inherited by derivatives.
+        - The `updating` flag signifies that necessary derivative
+          workspaces are added to the tape prior to any reverse
+          replay.
+        - An `updating` operator **must** implement the member
+          `dependencies_updating()` defining which variables are
+          updated.
+    */
+    static const bool updating = false;
+    /** \brief Default implementation of `OperatorPure::dependencies_updating()`
+     */
+    void dependencies_updating(Args<> &args, Dependencies &dep) const {}
     /** \brief How to fuse this operator (self) with another (other) */
     OperatorPure *other_fuse(OperatorPure *self, OperatorPure *other) {
       return NULL;
@@ -2095,6 +2204,9 @@ struct global {
     void dependencies(Args<> &args, Dependencies &dep) {
       Op.dependencies(args, dep);
     }
+    void dependencies_updating(Args<> &args, Dependencies &dep) {
+      Op.dependencies_updating(args, dep);
+    }
     void increment(IndexPair &ptr) { Op.increment(ptr); }
     void decrement(IndexPair &ptr) { Op.decrement(ptr); }
     Index input_size() { return Op.input_size(); }
@@ -2139,16 +2251,8 @@ struct global {
       }
       delete this;
     }
-    OperatorPure::op_info info() {
-      OperatorPure::op_info info;
-      info.dynamic = Op.dynamic;
-      info.smart_pointer = Op.smart_pointer;
-      info.independent_variable = Op.independent_variable;
-      info.dependent_variable = Op.dependent_variable;
-      info.allow_remap = Op.allow_remap;
-      info.is_linear = Op.is_linear;
-      info.elimination_protected = Op.elimination_protected;
-
+    op_info info() {
+      op_info info(Op);
       return info;
     }
     void *identifier() {
@@ -2233,6 +2337,30 @@ struct global {
     const char *op_name();
     void forward(ForwardArgs<Writer> &args);
   };
+  /** \brief Add zero allocated workspace to the tape
+
+      Serves as a pre-allocated workspace for `Operator::updating`
+      operators. In particular
+
+      - Operator outputs are not allowed to be remapped (ensured by 'dynamic')
+      - Operator persists during forward replay
+  */
+  struct ZeroOp : DynamicOutputOperator<0> {
+    typedef DynamicOutputOperator<0> Base;
+    static const bool add_forward_replay_copy = true;
+    ZeroOp(Index n);
+    template <class Type>
+    void forward(ForwardArgs<Type> &args) {
+      for (Index i = 0; i < Base::noutput; i++) args.y(i) = Type(0);
+    }
+    template <class Type>
+    void reverse(ReverseArgs<Type> &args) {}
+    const char *op_name();
+    void forward(ForwardArgs<Writer> &args);
+    /** \brief Override a consequtive set of variables by a zero allocated
+     * workspace */
+    void operator()(Replay *x, Index n);
+  };
   /** \brief Empty operator **without** inputs or outputs */
   struct NullOp : Operator<0, 0> {
     NullOp();
@@ -2308,22 +2436,7 @@ struct global {
 
   /** \brief Add `OperatorPure` to stack and trigger operator fusion
       if enabled */
-  template <bool dynamic>
-  void add_to_opstack(OperatorPure *pOp) {
-    if (fuse) {
-      while (this->opstack.size() > 0) {
-        OperatorPure *OpTry = this->Fuse(this->opstack.back(), pOp);
-        if (OpTry == NULL) break;
-
-        this->opstack.pop_back();
-        pOp = OpTry;
-
-        this->opstack.any_dynamic = true;
-      }
-    }
-
-    this->opstack.push_back<dynamic>(pOp);
-  }
+  void add_to_opstack(OperatorPure *pOp);
   /** \brief Add nullary operator to the stack based on its **result**  */
   template <class OperatorBase>
   ad_plain add_to_stack(Scalar result = 0) {
@@ -2333,7 +2446,7 @@ struct global {
     this->values.push_back(result);
 
     Complete<OperatorBase> *pOp = this->template getOperator<OperatorBase>();
-    add_to_opstack<OperatorBase::dynamic>(pOp);
+    add_to_opstack(pOp);
 
     TMBAD_ASSERT(!TMBAD_INDEX_OVERFLOW(values.size()));
     return ans;
@@ -2349,7 +2462,7 @@ struct global {
     this->inputs.push_back(x.index);
 
     Complete<OperatorBase> *pOp = this->template getOperator<OperatorBase>();
-    add_to_opstack<OperatorBase::dynamic>(pOp);
+    add_to_opstack(pOp);
 
     TMBAD_ASSERT(!TMBAD_INDEX_OVERFLOW(values.size()));
     TMBAD_ASSERT(!TMBAD_INDEX_OVERFLOW(inputs.size()));
@@ -2367,14 +2480,15 @@ struct global {
     this->inputs.push_back(y.index);
 
     Complete<OperatorBase> *pOp = this->template getOperator<OperatorBase>();
-    add_to_opstack<OperatorBase::dynamic>(pOp);
+    add_to_opstack(pOp);
 
     TMBAD_ASSERT(!TMBAD_INDEX_OVERFLOW(values.size()));
     TMBAD_ASSERT(!TMBAD_INDEX_OVERFLOW(inputs.size()));
     return ans;
   }
   template <class OperatorBase>
-  ad_segment add_to_stack(ad_segment lhs, ad_segment rhs) {
+  ad_segment add_to_stack(ad_segment lhs, ad_segment rhs,
+                          ad_segment more = ad_segment()) {
     IndexPair ptr((Index)inputs.size(), (Index)values.size());
     Complete<OperatorBase> *pOp =
         this->template getOperator<OperatorBase>(lhs, rhs);
@@ -2382,7 +2496,8 @@ struct global {
     ad_segment ans(values.size(), n);
     inputs.push_back(lhs.index());
     inputs.push_back(rhs.index());
-    opstack.push_back<OperatorBase::dynamic>(pOp);
+    if (more.size() > 0) inputs.push_back(more.index());
+    opstack.push_back(pOp);
     values.resize(values.size() + n);
     ForwardArgs<Scalar> args(inputs, values, this);
     args.ptr = ptr;
@@ -2411,7 +2526,7 @@ struct global {
                  pOp->input_size());
     if (lhs.size() > 0) inputs.push_back(lhs.index());
     if (rhs.size() > 0) inputs.push_back(rhs.index());
-    opstack.push_back<OperatorBase::dynamic>(pOp);
+    opstack.push_back(pOp);
     values.resize(values.size() + n);
     ForwardArgs<Scalar> args(inputs, values, this);
     args.ptr = ptr;
@@ -2431,7 +2546,7 @@ struct global {
     size_t n = pOp->output_size();
     ad_segment ans(values.size(), n);
     for (size_t i = 0; i < m; i++) inputs.push_back(x[i].index);
-    opstack.push_back<OperatorBase::dynamic>(pOp);
+    opstack.push_back(pOp);
     values.resize(values.size() + n);
     ForwardArgs<Scalar> args(inputs, values, this);
     args.ptr = ptr;
