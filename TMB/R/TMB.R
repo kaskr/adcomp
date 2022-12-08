@@ -648,8 +648,7 @@ MakeADFun <- function(data, parameters, map=list(),
         if(silent)beSilent()
         ## Loaded or deep copied object: Only restore external
         ## pointers. Don't touch last.par/last.par.best etc:
-        if (type != "double")
-            retape(set.defaults = FALSE)
+        retape(set.defaults = FALSE)
     }
     ## User has changed the data => Next forward pass must traverse whole graph !
     data_changed <- !identical(.data, data) ## Fast to check if identical (i.e. most of the time)
