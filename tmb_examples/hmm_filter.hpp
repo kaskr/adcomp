@@ -87,7 +87,15 @@ struct hmm_filter{
   }
   /* Update step */
   vector<Type> multiply(matrix<Type> x, vector<Type> y){
-    return atomic::matmul(x, matrix<Type>(y.matrix())).vec();
+    /* Select which matrix multiply implementation to use:
+       - Fast version is available only for TMBad
+       - Standard version is available for both TMBad and CppAD */
+#ifdef TMBAD_FRAMEWORK
+    using TMBad::matmul;
+#else
+    using atomic::matmul;
+#endif
+    return matmul(x, matrix<Type>(y.matrix())).array();
   }
   void update(vector<Type> &px, Type &nll, int yobs){
     // Update joint distribution (J) of state and measurement, and
