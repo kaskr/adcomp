@@ -113,6 +113,7 @@ using SparseMatrix = SparseMatrix_rename<T, Flags, StorageIndex>;
 #include "TMBad/compile.hpp"
 #include "TMBad/graph2dot.hpp"
 #include "TMBad/compression.hpp"
+#include "TMBad/ad_blas.hpp"
 #ifndef WITH_LIBTMB
 #include "TMBad/TMBad.cpp"
 #endif
