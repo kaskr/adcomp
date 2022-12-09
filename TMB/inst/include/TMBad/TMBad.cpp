@@ -3438,7 +3438,7 @@ std::vector<Index> get_accumulation_tree(global &glob, bool boundary) {
 
   std::vector<bool> node_subset(opstack.size(), false);
   for (size_t i = 0; i < opstack.size(); i++) {
-    node_subset[i] = opstack[i]->info().is_linear;
+    node_subset[i] = opstack[i]->info().test(op_info::is_linear);
   }
 
   node_subset.flip();
