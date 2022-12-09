@@ -5,6 +5,7 @@ var searchData=
   ['tagop',['TagOp',['../structnewton_1_1TagOp.html',1,'newton']]],
   ['tail_5fstart',['tail_start',['../structTMBad_1_1ADFun.html#aefa0288feb02f73ce9394107f06af2cb',1,'TMBad::ADFun']]],
   ['taped_5fvalue',['taped_value',['../structTMBad_1_1global_1_1ad__aug.html#a41973f663d582180aef5503aad3fcb5b',1,'TMBad::global::ad_aug']]],
+  ['test',['test',['../structTMBad_1_1op__info.html#a00bfa294ef0a62a3ff18cdb576b5fad9',1,'TMBad::op_info']]],
   ['test_5fperiod',['test_period',['../structTMBad_1_1periodic.html#ae70d3e174b4f0909820d7a95e901aa20',1,'TMBad::periodic']]],
   ['tmb_2ehpp',['TMB.hpp',['../TMB_8hpp.html',1,'']]],
   ['tmb_5fcore_2ehpp',['tmb_core.hpp',['../tmb__core_8hpp.html',1,'']]],

@@ -31,5 +31,6 @@ var searchData=
   ['proj_5ft',['PROJ_t',['../classdensity_1_1PROJ__t.html',1,'density']]],
   ['pshasho',['pSHASHo',['../group__R__style__distribution.html#gaf8d16a1e0e699a2b6975b9ce219ea51a',1,'distributions_R.hpp']]],
   ['ptr',['ptr',['../structTMBad_1_1Args.html#aa9514d46195bc915e622947734866d46',1,'TMBad::Args']]],
+  ['push_5fback',['push_back',['../structTMBad_1_1global_1_1operation__stack.html#a5dc900b93788faa4b8996dffdfcd1860',1,'TMBad::global::operation_stack']]],
   ['pweibull',['pweibull',['../group__R__style__distribution.html#gac33d133f2004957d705de28a4729b0e8',1,'distributions_R.hpp']]]
 ];

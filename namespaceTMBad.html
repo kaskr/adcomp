@@ -145,6 +145,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1omp__shared__ptr.html">omp_shared_ptr</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Manage shared operator data across multiple threads.  <a href="structTMBad_1_1omp__shared__ptr.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1op__info.html">op_info</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise collection of selected operator flags.  <a href="structTMBad_1_1op__info.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1PackOp.html">PackOp</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pack (<code><a class="el" href="structTMBad_1_1PackOp.html" title="Pack (PackOp) or unpack (UnpkOp) n consecutive values on the tape. ">PackOp</a></code>) or unpack (<code><a class="el" href="structTMBad_1_1UnpkOp.html" title="Pack (PackOp) or unpack (UnpkOp) n consecutive values on the tape. ">UnpkOp</a></code>) <code>n</code> consecutive values on the tape.  <a href="structTMBad_1_1PackOp.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -276,9 +279,9 @@ vmatrix&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n
 dmatrix&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#ae632849ca0d53ae5d7e4ae2a42492c25">matmul</a> (const dmatrix &amp;x, const dmatrix &amp;y)</td></tr>
 <tr class="memdesc:ae632849ca0d53ae5d7e4ae2a42492c25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply two matrices of scalar types. <br /></td></tr>
 <tr class="separator:ae632849ca0d53ae5d7e4ae2a42492c25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11f9fb5e0c81bbf03ac3770512b00d11"><td class="memTemplParams" colspan="2">template&lt;bool XT, bool YT, bool ZT&gt; </td></tr>
-<tr class="memitem:a11f9fb5e0c81bbf03ac3770512b00d11"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#a11f9fb5e0c81bbf03ac3770512b00d11">matmul</a> (Map&lt; const dmatrix &gt; x, Map&lt; const dmatrix &gt; y, Map&lt; dmatrix &gt; z)</td></tr>
-<tr class="separator:a11f9fb5e0c81bbf03ac3770512b00d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95e83f54802c7f23f4f8b763e6930a5a"><td class="memTemplParams" colspan="2">template&lt;bool XT, bool YT, bool ZT, bool UP&gt; </td></tr>
+<tr class="memitem:a95e83f54802c7f23f4f8b763e6930a5a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#a95e83f54802c7f23f4f8b763e6930a5a">matmul</a> (Map&lt; const dmatrix &gt; x, Map&lt; const dmatrix &gt; y, Map&lt; dmatrix &gt; z)</td></tr>
+<tr class="separator:a95e83f54802c7f23f4f8b763e6930a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f0cef3ccb08fc4b9a36d893beed3eff"><td class="memTemplParams" colspan="2">template&lt;class Integrand &gt; </td></tr>
 <tr class="memitem:a1f0cef3ccb08fc4b9a36d893beed3eff"><td class="memTemplItemLeft" align="right" valign="top">mvIntegral0&lt; Integrand &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceTMBad.html#a1f0cef3ccb08fc4b9a36d893beed3eff">mvIntegrate</a> (Integrand &amp;f, <a class="el" href="structTMBad_1_1control.html">control</a> c=<a class="el" href="structTMBad_1_1control.html">control</a>())</td></tr>
 <tr class="memdesc:a1f0cef3ccb08fc4b9a36d893beed3eff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multivariate integration.  <a href="#a1f0cef3ccb08fc4b9a36d893beed3eff">More...</a><br /></td></tr>
@@ -399,7 +402,7 @@ template&lt;class I &gt; </td></tr>
 <p>Split a computational graph by it's accumulation tree. </p>
 <p>This routine transforms a function object with univariate output into a function object with multiple outputs. Each new output represents a term of the original function, i.e. by summing all the terms one can recover the original function. </p><dl class="section note"><dt>Note</dt><dd>FIXME: Handle the case Range() &gt; 1. Select which component ? </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03368">3368</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03499">3499</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451">TMBad::ADFun&lt;&gt;::marginal_gk()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9">TMBad::ADFun&lt;&gt;::marginal_sr()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -550,7 +553,7 @@ template&lt;class Functor , class Test &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03408">3408</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03539">3539</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1autopar.html#ac5cb220e781af8a02e6a43ea0fd7a3b6">TMBad::autopar::extract()</a>, <a class="el" href="structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451">TMBad::ADFun&lt;&gt;::marginal_gk()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9">TMBad::ADFun&lt;&gt;::marginal_sr()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -573,9 +576,9 @@ template&lt;class Functor , class Test &gt; </div>
 </div><div class="memdoc">
 
 <p>Test if all operators in the stack allow input remapping. </p>
-<p>I.e. test if <code>op_info.allow_remap = true</code> for all operators. </p>
+<p>I.e. test if <code><a class="el" href="structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a93b52f3b482f43a7ec7b7db4cffc2066" title="Is it safe to remap the inputs of this operator? ">op_info.allow_remap</a> = true</code> for all operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04046">4046</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04177">4177</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ae59304fbd753dbe20f62eb5c83ab1bfe">reorder_graph()</a>.</p>
 
@@ -636,7 +639,7 @@ template&lt;class V &gt; </div>
 <li>ad_adapt </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02953">2953</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l03068">3068</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1sequential__reduction.html#ab7f1dcb61e1e5fca346d0c1059b9d8da">TMBad::sequential_reduction::tabulate()</a>.</p>
 
@@ -671,7 +674,7 @@ template&lt;class V &gt; </div>
 <p>Get node indices of the accumulation tree or its boundary. </p>
 <p>The tree is defined as the maximal <b>topologically closed</b> sub graph T, containing only linear operators. In other words, the nodes in the tree are not allowed to produce variables that are inputs to any non linear operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03305">3305</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03436">3436</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342">accumulation_tree_split()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -702,7 +705,7 @@ template&lt;class V &gt; </div>
 <li>ad_adapt </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02941">2941</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l03056">3056</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#adfc2a635fea773aff598ccbeaaacd074">forceContiguous()</a>.</p>
 
@@ -788,7 +791,7 @@ template&lt;class V &gt; </div>
 <li>ad_adapt </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02915">2915</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l03030">3030</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#adfc2a635fea773aff598ccbeaaacd074">forceContiguous()</a>.</p>
 
@@ -880,13 +883,13 @@ template&lt;class T , class I &gt; </div>
 
 </div>
 </div>
-<a id="a11f9fb5e0c81bbf03ac3770512b00d11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11f9fb5e0c81bbf03ac3770512b00d11">&sect;&nbsp;</a></span>matmul()</h2>
+<a id="a95e83f54802c7f23f4f8b763e6930a5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95e83f54802c7f23f4f8b763e6930a5a">&sect;&nbsp;</a></span>matmul()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;bool XT, bool YT, bool ZT&gt; </div>
+template&lt;bool XT, bool YT, bool ZT, bool UP&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void TMBad::matmul </td>
@@ -913,9 +916,9 @@ template&lt;bool XT, bool YT, bool ZT&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Expand all 8 combinations </p>
+<p>Expand all 16 combinations </p>
 
-<p>Definition at line <a class="el" href="ad__blas_8hpp_source.html#l00087">87</a> of file <a class="el" href="ad__blas_8hpp_source.html">ad_blas.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ad__blas_8hpp_source.html#l00092">92</a> of file <a class="el" href="ad__blas_8hpp_source.html">ad_blas.hpp</a>.</p>
 
 </div>
 </div>
@@ -989,7 +992,7 @@ template&lt;class Integrand &gt; </div>
 <p>Allow / disallow comparison operators for <code>ad_aug</code> </p>
 <p>It is recommended to disable comparison for the non-retaping type <code>ad_aug</code>, i.e. not including this file! </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04246">4246</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04377">4377</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -1071,7 +1074,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04058">4058</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04189">4189</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -1135,7 +1138,7 @@ template&lt;class T &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Nothing is done if <b>any operators with pointer inputs are detected on the tape</b>. (FIXME: Not optimal) </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04209">4209</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04340">4340</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#a91d9e0e63497857f84456660c8188b96">TMBad::ADFun&lt;&gt;::reorder()</a>.</p>
 
@@ -1287,7 +1290,7 @@ template&lt;class T &gt; </div>
 <p>substitute node index sequence by independent variables </p>
 <dl class="section note"><dt>Note</dt><dd>Currently all operators in sequence must be different from InvOp </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03339">3339</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03470">3470</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342">accumulation_tree_split()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a7eaf97afbbf35a63d2895b12a18391ce">TMBad::ADFun&lt;&gt;::decompose()</a>, <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>, and <a class="el" href="namespaceTMBad.html#a61a789d6a042c96e48fedfa05f868f6a">substitute()</a>.</p>
 

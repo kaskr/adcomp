@@ -98,6 +98,10 @@ template&lt;class Type &gt; </td></tr>
 <tr class="memdesc:a53aa7e72f18dbeddb233e421988c2a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derivatives in the dense case are zero. <br /></td></tr>
 <tr class="separator:a53aa7e72f18dbeddb233e421988c2a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structTMBad_1_1global_1_1Operator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structTMBad_1_1global_1_1Operator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structTMBad_1_1global_1_1Operator.html">TMBad::global::Operator&lt; 1 &gt;</a></td></tr>
+<tr class="memitem:a40adcfb6719f3e08b308a976083ccd02 inherit pub_methods_structTMBad_1_1global_1_1Operator"><td class="memItemLeft" align="right" valign="top"><a id="a40adcfb6719f3e08b308a976083ccd02"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a40adcfb6719f3e08b308a976083ccd02">dependencies_updating</a> (<a class="el" href="structTMBad_1_1Args.html">Args</a>&lt;&gt; &amp;args, Dependencies &amp;dep) const</td></tr>
+<tr class="memdesc:a40adcfb6719f3e08b308a976083ccd02 inherit pub_methods_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <code>OperatorPure::dependencies_updating()</code> <br /></td></tr>
+<tr class="separator:a40adcfb6719f3e08b308a976083ccd02 inherit pub_methods_structTMBad_1_1global_1_1Operator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab69366c03963e826043947e83d392909 inherit pub_methods_structTMBad_1_1global_1_1Operator"><td class="memItemLeft" align="right" valign="top"><a id="ab69366c03963e826043947e83d392909"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#ab69366c03963e826043947e83d392909">operator_data</a> ()</td></tr>
 <tr class="memdesc:ab69366c03963e826043947e83d392909 inherit pub_methods_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return operator specific dynamic information (optional) <br /></td></tr>
@@ -192,6 +196,9 @@ static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#aac3686d68e0e7ad3eb95183b47d54542">smart_pointer</a></td></tr>
 <tr class="memdesc:aac3686d68e0e7ad3eb95183b47d54542 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this operator a 'smart pointer' (with reference counting) ? <br /></td></tr>
 <tr class="separator:aac3686d68e0e7ad3eb95183b47d54542 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a543345b436f11969c493a8cf4b034463 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memItemLeft" align="right" valign="top">static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a543345b436f11969c493a8cf4b034463">updating</a></td></tr>
+<tr class="memdesc:a543345b436f11969c493a8cf4b034463 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">This operator <b>may</b> update existing variables ?  <a href="structTMBad_1_1global_1_1Operator.html#a543345b436f11969c493a8cf4b034463">More...</a><br /></td></tr>
+<tr class="separator:a543345b436f11969c493a8cf4b034463 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Copy value and set derivative to zero. </p>
@@ -201,7 +208,7 @@ static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 <li>Otherwise, it behaves like the copy operator <code><a class="el" href="structTMBad_1_1global_1_1ad__plain_1_1CopyOp.html" title="Copy operation. ">CopyOp</a></code>. </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02504">2504</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l02619">2619</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a4c85872204b433e241364a15992ccb14"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4c85872204b433e241364a15992ccb14">&sect;&nbsp;</a></span>dependencies()</h2>
@@ -232,7 +239,7 @@ static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 <p>Derivatives in the sparse case are untracked, i.e. zero. </p>
 <dl class="section note"><dt>Note</dt><dd>Inputs to <code><a class="el" href="structTMBad_1_1global_1_1ad__plain_1_1ValOp.html" title="Copy value and set derivative to zero. ">ValOp</a></code> are <b>not</b> marked for removal by the tape optimizer despite the empty <code>dependencies</code> (because the tape optimizer uses the boolean pattern which has the default <code>mark_dense</code> implementation). </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01846">1846</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l01977">1977</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>

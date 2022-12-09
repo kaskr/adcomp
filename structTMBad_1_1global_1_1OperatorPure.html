@@ -70,7 +70,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structTMBad_1_1global_1_1OperatorPure-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -83,12 +82,6 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="global_8hpp_source.html">global.hpp</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1OperatorPure_1_1op__info.html">op_info</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structTMBad_1_1global_1_1Operator.html" title="Operator with input/output dimension known at compile time. ">Operator</a> info that is constant for this operator.  <a href="structTMBad_1_1global_1_1OperatorPure_1_1op__info.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9a1ba345e1da9bd94ebacf8c6228175c"><td class="memItemLeft" align="right" valign="top"><a id="a9a1ba345e1da9bd94ebacf8c6228175c"></a>
@@ -106,6 +99,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a2ebeb799cadd483b2305b0bec3b7c810"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1OperatorPure.html#a2ebeb799cadd483b2305b0bec3b7c810">dependencies</a> (<a class="el" href="structTMBad_1_1Args.html">Args</a>&lt;&gt; &amp;args, Dependencies &amp;dep)=0</td></tr>
 <tr class="memdesc:a2ebeb799cadd483b2305b0bec3b7c810"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the indices of variables required by this operator.  <a href="#a2ebeb799cadd483b2305b0bec3b7c810">More...</a><br /></td></tr>
 <tr class="separator:a2ebeb799cadd483b2305b0bec3b7c810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d52c4ff3af471f601fc9d82591a3f68"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1OperatorPure.html#a2d52c4ff3af471f601fc9d82591a3f68">dependencies_updating</a> (<a class="el" href="structTMBad_1_1Args.html">Args</a>&lt;&gt; &amp;args, Dependencies &amp;dep)=0</td></tr>
+<tr class="memdesc:a2d52c4ff3af471f601fc9d82591a3f68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the indices of variables updated by this operator.  <a href="#a2d52c4ff3af471f601fc9d82591a3f68">More...</a><br /></td></tr>
+<tr class="separator:a2d52c4ff3af471f601fc9d82591a3f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe5f99dd4f7776763c45ca590719197b"><td class="memItemLeft" align="right" valign="top"><a id="afe5f99dd4f7776763c45ca590719197b"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1OperatorPure.html#afe5f99dd4f7776763c45ca590719197b">forward</a> (<a class="el" href="structTMBad_1_1ForwardArgs.html">ForwardArgs</a>&lt; Scalar &gt; &amp;args)=0</td></tr>
 <tr class="memdesc:afe5f99dd4f7776763c45ca590719197b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update output values of this <a class="el" href="structTMBad_1_1global_1_1OperatorPure.html" title="The abstract operator for the operation stack global::opstack ">OperatorPure</a>. <br /></td></tr>
@@ -147,7 +143,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memdesc:a843683185bebb0e7abfb6fe39d82f737"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment input/output pointers to prepare for the next <a class="el" href="structTMBad_1_1global_1_1OperatorPure.html" title="The abstract operator for the operation stack global::opstack ">OperatorPure</a> in the stack. <br /></td></tr>
 <tr class="separator:a843683185bebb0e7abfb6fe39d82f737"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4daa17e4ebeb64403865a4320cf4bb91"><td class="memItemLeft" align="right" valign="top"><a id="a4daa17e4ebeb64403865a4320cf4bb91"></a>
-virtual <a class="el" href="structTMBad_1_1global_1_1OperatorPure_1_1op__info.html">op_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1OperatorPure.html#a4daa17e4ebeb64403865a4320cf4bb91">info</a> ()=0</td></tr>
+virtual <a class="el" href="structTMBad_1_1op__info.html">op_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1OperatorPure.html#a4daa17e4ebeb64403865a4320cf4bb91">info</a> ()=0</td></tr>
 <tr class="memdesc:a4daa17e4ebeb64403865a4320cf4bb91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get operator info. <br /></td></tr>
 <tr class="separator:a4daa17e4ebeb64403865a4320cf4bb91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e96537422a8f7a6fd69ba3d8a926a1d"><td class="memItemLeft" align="right" valign="top"><a id="a2e96537422a8f7a6fd69ba3d8a926a1d"></a>
@@ -212,7 +208,7 @@ virtual <a class="el" href="structTMBad_1_1global_1_1OperatorPure.html">Operator
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l00730">730</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l00808">808</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a2ebeb799cadd483b2305b0bec3b7c810"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2ebeb799cadd483b2305b0bec3b7c810">&sect;&nbsp;</a></span>dependencies()</h2>
@@ -252,6 +248,47 @@ virtual <a class="el" href="structTMBad_1_1global_1_1OperatorPure.html">Operator
 <p>Result of this operation (the indices) are <em>appended</em> to the <code>dep</code> argument. Its main purpose is to build the computational graph. Under normal circumstances the information can be autogenerated from the operator inputs. However there is a subtle exception: Operators are allowed to take reference inputs. For instance a matrix multiply only requires addresses of the first element of the two input matrices. Such cases must have special code to provide <b>all</b> input addresses. </p><dl class="section note"><dt>Note</dt><dd>This information is somewhat overlapping with that of <code>reverse(<a class="el" href="structTMBad_1_1ReverseArgs.html" title="Access input/output values and derivatives during a reverse pass. Write access granted for the input ...">ReverseArgs</a>&lt;Replay&gt;&amp; args)</code>. </dd></dl>
 
 <p>Implemented in <a class="el" href="structTMBad_1_1global_1_1Complete.html#a32848b186f77afb69214d202cde051f3">TMBad::global::Complete&lt; OperatorBase &gt;</a>, and <a class="el" href="structTMBad_1_1global_1_1Complete.html#a32848b186f77afb69214d202cde051f3">TMBad::global::Complete&lt; SpAxOp&lt; T &gt; &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a2d52c4ff3af471f601fc9d82591a3f68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d52c4ff3af471f601fc9d82591a3f68">&sect;&nbsp;</a></span>dependencies_updating()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void TMBad::global::OperatorPure::dependencies_updating </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTMBad_1_1Args.html">Args</a>&lt;&gt; &amp;&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Dependencies &amp;&#160;</td>
+          <td class="paramname"><em>dep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the indices of variables updated by this operator. </p>
+<p>Used only when <code><a class="el" href="structTMBad_1_1global_1_1Operator.html#a543345b436f11969c493a8cf4b034463" title="This operator may update existing variables ? ">Operator::updating</a></code> flag is set. </p>
+
+<p>Implemented in <a class="el" href="structTMBad_1_1global_1_1Complete.html#a106400a83f6387c1650ccbd35c6b9b5b">TMBad::global::Complete&lt; OperatorBase &gt;</a>, and <a class="el" href="structTMBad_1_1global_1_1Complete.html#a106400a83f6387c1650ccbd35c6b9b5b">TMBad::global::Complete&lt; SpAxOp&lt; T &gt; &gt;</a>.</p>
 
 </div>
 </div>

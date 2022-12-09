@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['clear',['clear',['../structTMBad_1_1global.html#a29518fc35dd8f9c733a51739aac7786c',1,'TMBad::global']]],
+  ['clear',['clear',['../structTMBad_1_1global_1_1operation__stack.html#aa0d8c540a4b55ddb37bf9a3c69d2a77a',1,'TMBad::global::operation_stack::clear()'],['../structTMBad_1_1global.html#a29518fc35dd8f9c733a51739aac7786c',1,'TMBad::global::clear()']]],
   ['clear_5farray_5fsubgraph',['clear_array_subgraph',['../structTMBad_1_1global.html#ad0d7d23b96392bb9f92a0799a26a874f',1,'TMBad::global']]],
   ['clear_5fderiv',['clear_deriv',['../structTMBad_1_1global.html#a90fbfe5560ea16ec5102823153517a50',1,'TMBad::global']]],
   ['clear_5fderiv_5fsub',['clear_deriv_sub',['../structTMBad_1_1global.html#a9c75e4a0c3c3b2cfab165b03881ef5d7',1,'TMBad::global']]],

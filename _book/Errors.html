@@ -278,7 +278,7 @@ div.csl-indent {
 <div id="Errors" class="section level1 hasAnchor" number="8">
 <h1><span class="header-section-number">8</span> Compilation and run time errors<a href="Errors.html#Errors" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>The R interface to the debugger (gdb) is documented as part of the R
-help system, i.e. you can type <code>?gdbsource</code> in R to get info. The
+help system, i.e. you can type <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>?gdbsource</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> in R to get info. The
 current document only adresses isses that the relate to C++.</p>
 <div id="compilation-errors" class="section level2 hasAnchor" number="8.1">
 <h2><span class="header-section-number">8.1</span> Compilation errors<a href="Errors.html#compilation-errors" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -298,12 +298,12 @@ error messages.</li>
 </ul>
 <p>You can use the debugger to locate both types of errors, but the
 procedure is a little bit different in the two cases. The following
-assumes that you have the GNU debugger <code>gdb</code> installed.</p>
+assumes that you have the GNU debugger <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>gdb</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> installed.</p>
 <div id="out-of-bounds-error" class="section level3 hasAnchor" number="8.2.1">
 <h3><span class="header-section-number">8.2.1</span> Out-of-bounds error<a href="Errors.html#out-of-bounds-error" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An example is:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb21-1"><a href="Errors.html#cb21-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; <a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>(<span class="dv">4</span>);</span>
-<span id="cb21-2"><a href="Errors.html#cb21-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>(<span class="dv">5</span>);                <span class="co">// 5 is not a valid <a class="code" href="../structTMBad_1_1multivariate__index.html#a4ad25168bc543d8738cf3a36fe7d30e4">index</a> <a class="code" href="../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02">value</a> here</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode cpp"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode cpp"><span id="cb21-1"><a href="Errors.html#cb21-1" aria-hidden="true" tabindex="-1"></a><a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../structvector.html">vector</a>&lt;Type&gt; <a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>(<span class="dv">4</span>);</span>
+<span id="cb21-2"><a href="Errors.html#cb21-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structTMBad_1_1ForwardArgs.html#a962686eac8b51f2b207c5bf666b1e360">y</a>(<span class="dv">5</span>);                <span class="co">// 5 is not a valid <a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../structTMBad_1_1multivariate__index.html#a4ad25168bc543d8738cf3a36fe7d30e4">index</a> <a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../namespaceTMBad.html#ae0f11020200051df812c0540a9cf7d02">value</a> here</span></span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <p>This will cause TMB and R to crash with the following error message:</p>
 <blockquote>
 <p>TMB has received an error from Eigen. The following condition was not met:
@@ -312,27 +312,27 @@ Please check your matrix-vector bounds etc., or run your program through a debug
 Aborted (core dumped)</p>
 </blockquote>
 <p>So, you must restart R and give the commands</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="Errors.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TMB)</span>
-<span id="cb22-2"><a href="Errors.html#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;my_project.<a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a>&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode r"><span id="cb22-1"><a href="Errors.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TMB)</span>
+<span id="cb22-2"><a href="Errors.html#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;my_project.<a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a>&quot;</span>)</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <blockquote>
 <p>#5 objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:11</p>
 </blockquote>
 <p>and you can see that the debugger points to line number 11 in the .cpp
-file. <code>gdbsource()</code> is an R function that is part of TMB.</p>
+file. <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>gdbsource()</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> is an R function that is part of TMB.</p>
 </div>
 <div id="floating-point-exception" class="section level3 hasAnchor" number="8.2.2">
 <h3><span class="header-section-number">8.2.2</span> Floating point exception<a href="Errors.html#floating-point-exception" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>If you on the other hand perform an illegal mathematical operation,
 such as</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="Errors.html#cb23-1" aria-hidden="true" tabindex="-1"></a>Type f = sqrt(-<span class="fl">1.</span>);</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode cpp"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode cpp"><span id="cb23-1"><a href="Errors.html#cb23-1" aria-hidden="true" tabindex="-1"></a>Type f = sqrt(-<span class="fl">1.</span>);</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <p>R will not crash, but the objective function will return a NaN value.
 However, you will not know in which part of your C++ code the error
-occured. By including the <code>fenv.h</code> library (part of many C++
+occured. By including the <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>fenv.h</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> library (part of many C++
 compilers, but can otherwise be downloaded from
 <a href="http://www.scs.stanford.edu/histar/src/uinc/fenv.h" class="uri">http://www.scs.stanford.edu/histar/src/uinc/fenv.h</a>)</p>
-<p><code>nan_error_ex.cpp</code>:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb24-1"><a href="Errors.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Illustrates how to make the debugger catch a floating point error.</span></span>
-<span id="cb24-2"><a href="Errors.html#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;<a class="code" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></span>
+<p><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>nan_error_ex.cpp</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode cpp"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode cpp"><span id="cb24-1"><a href="Errors.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Illustrates how to make the debugger catch a floating point error.</span></span>
+<span id="cb24-2"><a href="Errors.html#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;<a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../TMB_8hpp.html">TMB.hpp</a>&gt;</span></span>
 <span id="cb24-3"><a href="Errors.html#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fenv.h&gt;</span><span class="pp"> </span><span class="co">// Extra line needed</span></span>
 <span id="cb24-4"><a href="Errors.html#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-5"><a href="Errors.html#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</span>
@@ -340,28 +340,28 @@ compilers, but can otherwise be downloaded from
 <span id="cb24-7"><a href="Errors.html#cb24-7" aria-hidden="true" tabindex="-1"></a>{</span>
 <span id="cb24-8"><a href="Errors.html#cb24-8" aria-hidden="true" tabindex="-1"></a>  feenableexcept(FE_INVALID | FE_OVERFLOW | FE_DIVBYZERO | FE_UNDERFLOW); <span class="co">// Extra line needed</span></span>
 <span id="cb24-9"><a href="Errors.html#cb24-9" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb24-10"><a href="Errors.html#cb24-10" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);</span>
-<span id="cb24-11"><a href="Errors.html#cb24-11" aria-hidden="true" tabindex="-1"></a>  <a class="code" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
+<span id="cb24-10"><a href="Errors.html#cb24-10" aria-hidden="true" tabindex="-1"></a>  <a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../group__macros.html#ga5a9120a7b504f9502b5d1ce9d0c078ec">DATA_SCALAR</a>(lambda);</span>
+<span id="cb24-11"><a href="Errors.html#cb24-11" aria-hidden="true" tabindex="-1"></a>  <a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../group__macros.html#ga70b2d449f7c53e87abee7d5fb71dc4c0">PARAMETER</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
 <span id="cb24-12"><a href="Errors.html#cb24-12" aria-hidden="true" tabindex="-1"></a>  Type f;</span>
 <span id="cb24-13"><a href="Errors.html#cb24-13" aria-hidden="true" tabindex="-1"></a>  f = sqrt(-<span class="fl">1.</span>);        <span class="co">// FE_INVALID   ( sqrt(-1.) returns NaN )</span></span>
 <span id="cb24-14"><a href="Errors.html#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">//f = 1./0.;          // FE_DIVBYZERO ( division by zero )</span></span>
 <span id="cb24-15"><a href="Errors.html#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">//f = exp(100000.);   // FE_OVERFLOW  ( exp(100000.) returns Inf )   [Does not work on all platforms]</span></span>
 <span id="cb24-16"><a href="Errors.html#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">//f = exp(-100000.);  // FE_UNDERFLOW ( exp(-100000.) returns 0 )</span></span>
 <span id="cb24-17"><a href="Errors.html#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> f;</span>
-<span id="cb24-18"><a href="Errors.html#cb24-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb24-18"><a href="Errors.html#cb24-18" aria-hidden="true" tabindex="-1"></a>}</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <p>a floating point exception will be turned into an actual error that
 can be picked up by the debugger. There are only two extra lines that
 need to be included (“//Extra line needed” in the above example).</p>
 <p>When we try to run this program in the usual way, the program crashes:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="Errors.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;nan_error_ex.<a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a>&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode r"><span id="cb25-1"><a href="Errors.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;nan_error_ex.<a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a>&quot;</span>)</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <blockquote>
 <p>Floating point exception (core dumped)
 tmp3&gt;</p>
 </blockquote>
 <p>At this stage you should run the debugger to find out that the
 floating point exception occurs at line number 14:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="Errors.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TMB)</span>
-<span id="cb26-2"><a href="Errors.html#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;nan_error_ex.<a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a>&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode r"><span id="cb26-1"><a href="Errors.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TMB)</span>
+<span id="cb26-2"><a href="Errors.html#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gdbsource</span>(<span class="st">&quot;nan_error_ex.<a class="code" href="../structtmbutils_1_1interpol2D__config.html#adf0e8ad690081888eb4923a57db8f3fb">R</a>&quot;</span>)</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <blockquote>
 <p>#1 0x00007ffff0e7eb09 in objective_function<double>::operator() (this=<optimized out>) at nan_error_ex.cpp:14</p>
 </blockquote>
@@ -369,23 +369,23 @@ floating point exception occurs at line number 14:</p>
 For more elaborate R-scripts it may therefore happen that a NaN occurs in the R-script
 before the floating point exception in the TMB program (i.e. the problem of interest) happens.
 To circumvent this problem one can run without NaN debugging enabled and
-save the parameter vector that gave the floating point exception (e.g. <code>badpar &lt;- obj$env$last.par</code> after the NaN evaluation),
-then enable NaN debugging, re-compile, and evaluate <code>obj$env$f( badpar, type="double")</code>.</p>
+save the parameter vector that gave the floating point exception (e.g. <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>badpar &lt;- obj$env$last.par</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> after the NaN evaluation),
+then enable NaN debugging, re-compile, and evaluate <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>obj$env$f( badpar, type="double")</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>.</p>
 </div>
 <div id="missing-casts-for-vectorized-functions" class="section level3 hasAnchor" number="8.2.3">
 <h3><span class="header-section-number">8.2.3</span> Missing casts for vectorized functions<a href="Errors.html#missing-casts-for-vectorized-functions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>TMB vectorized functions cannot be called directly with expressions, for example the following will fail to compile:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="Errors.html#cb27-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
+<div class="sourceCode" id="cb27"><pre class="sourceCode cpp"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode cpp"><span id="cb27-1"><a href="Errors.html#cb27-1" aria-hidden="true" tabindex="-1"></a><a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
 <span id="cb27-2"><a href="Errors.html#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Don&#39;t do this! Doesn&#39;t compile</span></span>
-<span id="cb27-3"><a href="Errors.html#cb27-3" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a> + <span class="dv">1</span>);</span></code></pre></div>
+<span id="cb27-3"><a href="Errors.html#cb27-3" aria-hidden="true" tabindex="-1"></a><a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a> + <span class="dv">1</span>);</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 <blockquote>
 <p>error: could not convert ‘atomic::D_lgamma(const CppAD::vector<Type>&amp;) …
 from ‘double’ to ‘Eigen::CwiseBinaryOp&lt;Eigen::internal::scalar_sum_op&lt;double, double&gt;, … &gt;’</p>
 </blockquote>
 <p>Eigen lazy-evaluates expressions, and the templating of lgamma means we expect to return a “x + y”-typed object, which it obviously can’t do.</p>
 <p>To work around this, cast the input:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="Errors.html#cb28-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
-<span id="cb28-2"><a href="Errors.html#cb28-2" aria-hidden="true" tabindex="-1"></a><a class="code" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="code" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="code" href="../structvector.html">vector</a>&lt;Type&gt;(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a> + <span class="dv">1</span>));</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode cpp"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode cpp"><span id="cb28-1"><a href="Errors.html#cb28-1" aria-hidden="true" tabindex="-1"></a><a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../group__macros.html#gad334262a7679f343bdc919ae35810161">DATA_VECTOR</a>(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a>);</span>
+<span id="cb28-2"><a href="Errors.html#cb28-2" aria-hidden="true" tabindex="-1"></a><a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../structvector.html">vector</a>&lt;Type&gt; out = <a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../group__special__functions.html#ga177b023eb871927fcfc90259e9f00382">lgamma</a>(<a class="<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>" href="../structvector.html">vector</a>&lt;Type&gt;(<a class="code" href="../structTMBad_1_1ForwardArgs.html#ac77836e3d42c395e3bc4d54037d66056">x</a> + <span class="dv">1</span>));</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
 </div>
 </div>
 </div>

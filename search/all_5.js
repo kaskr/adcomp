@@ -1,7 +1,7 @@
 var searchData=
 [
   ['eliminate',['eliminate',['../structTMBad_1_1global.html#aec6a949ba45e07c3011c0452693fc054',1,'TMBad::global::eliminate()'],['../structTMBad_1_1ADFun.html#a782cbf6958519f6ceb33816c02631c97',1,'TMBad::ADFun::eliminate()']]],
-  ['elimination_5fprotected',['elimination_protected',['../structTMBad_1_1global_1_1Operator.html#abb3d6eb6dad87b1870e4da089ca00f65',1,'TMBad::global::Operator']]],
+  ['elimination_5fprotected',['elimination_protected',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7abdbd3a05ce9ea0743a4740f6551968bf',1,'TMBad::op_info::elimination_protected()'],['../structTMBad_1_1global_1_1Operator.html#abb3d6eb6dad87b1870e4da089ca00f65',1,'TMBad::global::Operator::elimination_protected()']]],
   ['end',['end',['../structTMBad_1_1global.html#a69025186f8340ae2047612fb72ebc062',1,'TMBad::global']]],
   ['eval',['eval',['../structTMBad_1_1global_1_1ad__plain_1_1ValOp.html#a565812b6fbece3283435b2716d166345',1,'TMBad::global::ad_plain::ValOp']]],
   ['expm',['expm',['../group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae',1,'atomic']]],

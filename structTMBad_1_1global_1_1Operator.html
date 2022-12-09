@@ -85,6 +85,10 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a40adcfb6719f3e08b308a976083ccd02"><td class="memItemLeft" align="right" valign="top"><a id="a40adcfb6719f3e08b308a976083ccd02"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a40adcfb6719f3e08b308a976083ccd02">dependencies_updating</a> (<a class="el" href="structTMBad_1_1Args.html">Args</a>&lt;&gt; &amp;args, Dependencies &amp;dep) const</td></tr>
+<tr class="memdesc:a40adcfb6719f3e08b308a976083ccd02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <code><a class="el" href="structTMBad_1_1global_1_1OperatorPure.html#a2d52c4ff3af471f601fc9d82591a3f68" title="Get the indices of variables updated by this operator. ">OperatorPure::dependencies_updating()</a></code> <br /></td></tr>
+<tr class="separator:a40adcfb6719f3e08b308a976083ccd02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab69366c03963e826043947e83d392909"><td class="memItemLeft" align="right" valign="top"><a id="ab69366c03963e826043947e83d392909"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#ab69366c03963e826043947e83d392909">operator_data</a> ()</td></tr>
 <tr class="memdesc:ab69366c03963e826043947e83d392909"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return operator specific dynamic information (optional) <br /></td></tr>
@@ -178,6 +182,9 @@ static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#aac3686d68e0e7ad3eb95183b47d54542">smart_pointer</a> = false</td></tr>
 <tr class="memdesc:aac3686d68e0e7ad3eb95183b47d54542"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this operator a 'smart pointer' (with reference counting) ? <br /></td></tr>
 <tr class="separator:aac3686d68e0e7ad3eb95183b47d54542"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a543345b436f11969c493a8cf4b034463"><td class="memItemLeft" align="right" valign="top">static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a543345b436f11969c493a8cf4b034463">updating</a> = false</td></tr>
+<tr class="memdesc:a543345b436f11969c493a8cf4b034463"><td class="mdescLeft">&#160;</td><td class="mdescRight">This operator <b>may</b> update existing variables ?  <a href="#a543345b436f11969c493a8cf4b034463">More...</a><br /></td></tr>
+<tr class="separator:a543345b436f11969c493a8cf4b034463"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;int ninput_, int noutput_ = 1&gt;<br />
@@ -185,7 +192,7 @@ struct TMBad::global::Operator&lt; ninput_, noutput_ &gt;</h3>
 
 <p><a class="el" href="structTMBad_1_1global_1_1Operator.html" title="Operator with input/output dimension known at compile time. ">Operator</a> with input/output dimension known at compile time. </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01408">1408</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01488">1488</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a805360f5e00d94f915a7b28e4a6a68a7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a805360f5e00d94f915a7b28e4a6a68a7">&sect;&nbsp;</a></span>allow_remap</h2>
@@ -212,7 +219,7 @@ template&lt;int ninput_, int noutput_ = 1&gt; </div>
 <p>Is it safe to remap the inputs of this operator? </p>
 <p>In general it is illegal to remap operators that assume a certain memory layout of its inputs, e.g. BLAS routines. Make sure to set to <code>false</code> for those cases. </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01436">1436</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01516">1516</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +252,46 @@ template&lt;int ninput_, int noutput_ = 1&gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01447">1447</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01527">1527</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a543345b436f11969c493a8cf4b034463"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a543345b436f11969c493a8cf4b034463">&sect;&nbsp;</a></span>updating</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int ninput_, int noutput_ = 1&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const bool <a class="el" href="structTMBad_1_1global_1_1Operator.html">TMBad::global::Operator</a>&lt; ninput_, noutput_ &gt;::updating = false</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This operator <b>may</b> update existing variables ? </p>
+<p>An 'updating' operator is allowed to update (increment/decrement) <em>certain</em> ('updatable') variables already on the tape. In general this property breaks basic principles of reverse mode AD unless the following extra requirement is satisfied:</p>
+<ul>
+<li>Once an updatable variable have been <em>read</em> it may no longer be updated.</li>
+</ul>
+<p>This requrement always holds for the derivative variables during reverse replay. We note that 'updating' operators are considered an extension to the standard AD framework. In particular, a more complex dependency anlysis is required:</p>
+<ul>
+<li>Updating operators <b>must</b> have <code>implicit_dependencies=true</code>.</li>
+<li>The <code>updating</code> flag <b>must</b> be inherited by derivatives.</li>
+<li>The <code>updating</code> flag signifies that necessary derivative workspaces are added to the tape prior to any reverse replay.</li>
+<li>An <code>updating</code> operator <b>must</b> implement the member <code><a class="el" href="structTMBad_1_1global_1_1Operator.html#a40adcfb6719f3e08b308a976083ccd02" title="Default implementation of OperatorPure::dependencies_updating() ">dependencies_updating()</a></code> defining which variables are updated. </li>
+</ul>
+
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01569">1569</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>

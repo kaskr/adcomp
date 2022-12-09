@@ -8,5 +8,6 @@ var searchData=
   ['unstructured_5fcorr',['UNSTRUCTURED_CORR',['../namespacedensity.html#aec3874ac89bc3a5d5d4d245db46b09e4',1,'density']]],
   ['unstructured_5fcorr_5ft',['UNSTRUCTURED_CORR_t',['../classdensity_1_1UNSTRUCTURED__CORR__t.html',1,'density']]],
   ['update',['update',['../structTMBad_1_1sequential__reduction.html#a891f93e1abb8011af47a24e2dc84b63d',1,'TMBad::sequential_reduction::update()'],['../structsparse__matrix__exponential_1_1expm__series.html#a4315ff7dedbc27ecd422b983a23a518a',1,'sparse_matrix_exponential::expm_series::update()']]],
+  ['updating',['updating',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7aafa2720cbc7acdfef4371e5f669e3d24',1,'TMBad::op_info::updating()'],['../structTMBad_1_1global_1_1Operator.html#a543345b436f11969c493a8cf4b034463',1,'TMBad::global::Operator::updating()']]],
   ['ustep',['ustep',['../structnewton_1_1newton__config.html#a27148aa6a59f021ca253530a8de11939',1,'newton::newton_config']]]
 ];

@@ -28,7 +28,7 @@ var searchData=
   ['simulate_5fnot_5fyet_5fimplemented',['SIMULATE_NOT_YET_IMPLEMENTED',['../density_8hpp.html#a55f3dd2dbccf00be303b1d76567d2f22',1,'density.hpp']]],
   ['simulation',['Simulation',['../Simulation.html',1,'']]],
   ['size',['size',['../structTMBad_1_1period.html#ad870a607cdf6f2f10c423df5d101a158',1,'TMBad::period']]],
-  ['smart_5fpointer',['smart_pointer',['../structTMBad_1_1global_1_1Operator.html#aac3686d68e0e7ad3eb95183b47d54542',1,'TMBad::global::Operator']]],
+  ['smart_5fpointer',['smart_pointer',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a8751da64048623d69bdc5d3478c2101c',1,'TMBad::op_info::smart_pointer()'],['../structTMBad_1_1global_1_1Operator.html#aac3686d68e0e7ad3eb95183b47d54542',1,'TMBad::global::Operator::smart_pointer()']]],
   ['sort_5finplace',['sort_inplace',['../namespaceTMBad.html#a38d8df92c0a05d0d448e1eae4a841cd1',1,'TMBad']]],
   ['sort_5funique_5finplace',['sort_unique_inplace',['../namespaceTMBad.html#a60b8a480a2ea6ffca01aec59882b2d57',1,'TMBad']]],
   ['spa',['SPA',['../structnewton_1_1newton__config.html#a2f1ff47b0d0ef6787d423e7868afdcbd',1,'newton::newton_config']]],
