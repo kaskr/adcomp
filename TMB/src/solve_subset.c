@@ -51,6 +51,7 @@
 # define FCONE
 #endif
 #include "Matrix.h"
+#include <Rdefines.h>
 
 /* Copy-pasted from "Writing R Extensions". A similar spell is present
    in Matrix.h so might not be needed anymore ? */

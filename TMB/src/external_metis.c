@@ -5,6 +5,7 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 #include "Matrix.h"
+#include <Rdefines.h>
 
 #ifdef _USE_EXTERNAL_CHOLMOD_LIB_
 /* ========================================================================== */
