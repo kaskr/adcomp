@@ -1,6 +1,7 @@
 #ifndef TINY_AD_BESSEL_H
 #define TINY_AD_BESSEL_H
 
+#include "undefs.h" // Rcpp
 /* Standalone ? */
 #ifndef R_RCONFIG_H
 #include <cmath>
