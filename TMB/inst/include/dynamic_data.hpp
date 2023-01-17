@@ -87,7 +87,7 @@ namespace dynamic_data {
                              // forward double
                              SEXP envir = double_to_sexp( tx[0] );
                              const char* nam = double_to_charptr( tx[1] );
-                             SEXP res = findVar(install(nam), envir);
+                             SEXP res = Rf_findVar(Rf_install(nam), envir);
                              ty[0] = sexp_to_double( res );
                              ,
                              // reverse
