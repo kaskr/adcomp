@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+TMB 1.9.2 (2023-01-23)
+------------------------------------------------------------------------
+
+o Improved interoperability with Rcpp (conflicts resolved).
+
+o Fix some broken sparse matrix coercions that used to work.
+
+o New features on C++ side:
+  - Atomic sparse matrix exponential.
+  - Atomic vectorized operations mainly for internal use.
+  - Faster matrix multiply for higher order AD (see example 'hmm_filter').
+  - Utility for parameter object concatenation.
+
+o Fix warnings from CRAN check page.
+
+------------------------------------------------------------------------
 TMB 1.9.1 (2022-08-16)
 ------------------------------------------------------------------------
 
