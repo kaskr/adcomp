@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>12 Sparsity | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
   <meta property="og:title" content="12 Sparsity | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -350,14 +350,14 @@ uniform prior is implicitly assigned to <span class="math inline">\(u_0\)</span>
 <p>The joint negative log-likelihood of state vector <span class="math inline">\(u\)</span> and measurements
 <span class="math inline">\(y\)</span> is implemented in the C++ template <a href="../thetalog_8cpp-example.html">thetalog.cpp</a>.
 The example can be run by:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode r"><span id="cb33-1"><a href="Sparsity.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="at">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="Sparsity.html#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">runExample</span>(<span class="st">&quot;thetalog&quot;</span>, <span class="at">exfolder=</span><span class="st">&quot;adcomp/tmb_examples&quot;</span>)</span></code></pre></div>
 <p>We demonstrate it in the case <span class="math inline">\(n=5\)</span>. Here is the DAG</p>
 <p><img src="_main_files/figure-html/unnamed-chunk-19-1.svg" style="display: block; margin: auto;" /></p>
 <p>This is a standard hidden Markov structure. Each data node is bound to a <em>single</em> random effect - hence the data does not introduce additional edges in the random effect structure.</p>
-<p>We can use the <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>image</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> function from the <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>Matrix</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> package to plot the random effect structure (we must first load the Matrix package):</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a> class="sourceCode r"><span id="cb34-1"><a href="Sparsity.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
-<span id="cb34-2"><a href="Sparsity.html#cb34-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">MakeADFun</span>(data, parameters, <span class="at">random=</span><span class="fu">c</span>(<span class="st">&quot;X&quot;</span>), <span class="at">DLL=</span><span class="st">&quot;thetalog&quot;</span>)</span>
-<span id="cb34-3"><a href="Sparsity.html#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(obj<span class="sc">$</span>env<span class="sc">$</span><span class="fu">spHess</span>(<span class="at">random=</span><span class="cn">TRUE</span>))</span></<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>></pre></div>
+<p>We can use the <code>image</code> function from the <code>Matrix</code> package to plot the random effect structure (we must first load the Matrix package):</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="Sparsity.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
+<span id="cb37-2"><a href="Sparsity.html#cb37-2" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">MakeADFun</span>(data, parameters, <span class="at">random=</span><span class="fu">c</span>(<span class="st">&quot;X&quot;</span>), <span class="at">DLL=</span><span class="st">&quot;thetalog&quot;</span>)</span>
+<span id="cb37-3"><a href="Sparsity.html#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(obj<span class="sc">$</span>env<span class="sc">$</span><span class="fu">spHess</span>(<span class="at">random=</span><span class="cn">TRUE</span>))</span></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-20-1.svg" width="336" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>FIXME: NOT DONE YET !</p>

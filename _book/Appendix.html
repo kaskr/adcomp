@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>16 Appendix | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
   <meta property="og:title" content="16 Appendix | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -321,11 +321,11 @@ div.csl-indent {
 </div>
 <div id="profiling-the-inner-problem" class="section level2 hasAnchor" number="16.2">
 <h2><span class="header-section-number">16.2</span> Profiling the inner problem<a href="Appendix.html#profiling-the-inner-problem" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This section describes the underlying theory of the argument <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>profile</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>
-to <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>MakeADFun</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> intended to speedup and robustify linear mixed effect
+<p>This section describes the underlying theory of the argument <code>profile</code>
+to <code>MakeADFun</code> intended to speedup and robustify linear mixed effect
 models with a large number of fixed effects. With a few common model
 properties (Assumption 1 and 2 below), which must be checked by the
-user, one can apply the <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>profile</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> argument to move outer parameters to
+user, one can apply the <code>profile</code> argument to move outer parameters to
 the inner problem without affecting the model result.</p>
 <p><strong>Theorem 1 (Profiling inner problem)</strong>
 Assume that for any <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\theta\)</span></p>
@@ -369,7 +369,7 @@ is thus a linear function of the random effect <span class="math inline">\(u\)</
 </div>
 <div id="theory-underlying-sdreport" class="section level2 hasAnchor" number="16.3">
 <h2><span class="header-section-number">16.3</span> Theory underlying sdreport<a href="Appendix.html#theory-underlying-sdreport" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>This section supplements the documentation of <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>?sdreport</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> by adding
+<p>This section supplements the documentation of <code>?sdreport</code> by adding
 some missing details.</p>
 <p>As previously, we consider a general latent variable model with
 parameter vector <span class="math inline">\(\theta\)</span>, random effect vector <span class="math inline">\(u\)</span> and observation
@@ -401,7 +401,7 @@ depend on <span class="math inline">\(u\)</span> and <span class="math inline">\
 approximated by the inverse random effect Hessian <span class="math inline">\(H_{uu}^{-1}\)</span> based
 on the assumption that <span class="math inline">\(u|x\)</span> is well approximated by a Gaussian
 distribution (a reasonable assumption given that we are using the
-Laplace approximation). This explains the first term of variance formula in <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>?sdreport</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>:</p>
+Laplace approximation). This explains the first term of variance formula in <code>?sdreport</code>:</p>
 <p><span class="math display">\[E(V[D|x]) \approx \begin{pmatrix} H_{uu}^{-1} &amp; 0 \\ 0 &amp; 0 \end{pmatrix}\]</span></p>
 <p>Likewise,</p>
 <p><span class="math display">\[E[D|x]=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - E(u|x)\\ \hat\theta(x) - \theta\end{pmatrix}\]</span></p>
@@ -409,7 +409,7 @@ Laplace approximation). This explains the first term of variance formula in <<a 
 <p><span class="math display">\[E[D|x]=\begin{pmatrix}\hat u\left(\hat\theta(x),x\right) - \hat u(\theta,x)\\ \hat\theta(x) - \theta\end{pmatrix}\]</span></p>
 <p>We approximate the expectation using linerization of <span class="math inline">\(\theta \rightarrow \hat u(\theta,x)\)</span> around <span class="math inline">\(\hat\theta(x)\)</span></p>
 <p><span class="math display">\[E[D|x]=J_x \cdot (\hat\theta(x) - \theta)\]</span></p>
-<p>We now have the second term of the variance formula in <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>?sdreport</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>:</p>
+<p>We now have the second term of the variance formula in <code>?sdreport</code>:</p>
 <p><span class="math display">\[V(E[D|x]) \approx J_x V(\hat\theta(x)) J_x&#39;\]</span></p>
 <p>This term becomes negligible if the amount of data is high because of
 the assumed asymptotic consistency of <span class="math inline">\(\hat\theta\)</span>.</p>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
   <meta property="og:title" content="The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -283,7 +283,7 @@ div.csl-indent {
 <p>TMB (Template Model Builder) is an R package for fitting statistical latent variable models to data. It is strongly inspired by <a href="http://www.admb-project.org">ADMB</a>. Unlike most other R packages the model is formulated in C++. This provides great flexibility, but requires some familiarity with the C/C++ programming language.</p>
 <ul>
 <li>TMB can calculate first and second order derivatives of the likelihood function by <a href="http://en.wikipedia.org/wiki/Automatic_differentiation">AD</a>, or any objective function written in C++.</li>
-<li>The objective function (and its derivatives) can be called from R. Hence, parameter estimation via e.g. <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>nlminb()</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> is easy.</li>
+<li>The objective function (and its derivatives) can be called from R. Hence, parameter estimation via e.g. <code>nlminb()</code> is easy.</li>
 <li>The user can specify that the <a href="http://en.wikipedia.org/wiki/Laplace_approximation">Laplace approximation</a> should be applied to any subset of the function arguments.
 <ul>
 <li>Yields marginal likelihood in latent variable model.</li>

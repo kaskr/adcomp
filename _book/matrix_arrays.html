@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4 Matrices and arrays | The comprehensive TMB documentation</title>
   <meta name="description" content="Comprehensive documentation of TMB - theory and examples." />
-  <meta name="generator" content="bookdown 0.30 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4 Matrices and arrays | The comprehensive TMB documentation" />
   <meta property="og:type" content="book" />
@@ -279,22 +279,22 @@ div.csl-indent {
 <h1><span class="header-section-number">4</span> Matrices and arrays<a href="matrix_arrays.html#matrix_arrays" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <div id="relationship-to-r" class="section level2 hasAnchor" number="4.1">
 <h2><span class="header-section-number">4.1</span> Relationship to R<a href="matrix_arrays.html#relationship-to-r" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In R you can apply both matrix multiplication (<<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>%*%</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>) and elementwise
-multiplication (<<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>*</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>) to objects of type “matrix,” i.e. it is the
+<p>In R you can apply both matrix multiplication (<code>%*%</code>) and elementwise
+multiplication (<code>*</code>) to objects of type “matrix,” i.e. it is the
 operator that determines the operation. In TMB we instead have two
-different types of objects, while the multiplication operator (<<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>*</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>) is
+different types of objects, while the multiplication operator (<code>*</code>) is
 the same:</p>
 <ul>
-<li><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>matrix</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>: linear algebra</li>
-<li><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>array</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>: elementwise operations; () and [] style indexing.</li>
-<li><<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>vector</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>: can be used in linear algebra with <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>matrix</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>, but at the
+<li><code>matrix</code>: linear algebra</li>
+<li><code>array</code>: elementwise operations; () and [] style indexing.</li>
+<li><code>vector</code>: can be used in linear algebra with <code>matrix</code>, but at the
 same time admits R style element-wise operations.</li>
 </ul>
 <p>See the file <a href="../matrix_arrays_8cpp-example.html">matrix_arrays.cpp</a> for examples of use.</p>
 </div>
 <div id="relationship-to-eigen" class="section level2 hasAnchor" number="4.2">
 <h2><span class="header-section-number">4.2</span> Relationship to Eigen<a href="matrix_arrays.html#relationship-to-eigen" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The TMB types <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>matrix</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> and <<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>>array</<a class="code" href="../structTMBad_1_1op__info.html#abf0a1eac216e5f53dd67f695b381b296">code</a>> (in dimension 2) inherits
+<p>The TMB types <code>matrix</code> and <code>array</code> (in dimension 2) inherits
 directly from the the Eigen types Matrix and Array. The advanced user
 of TMB will benefit from familiarity with the
 <a href="http://eigen.tuxfamily.org/dox/group__TutorialMatrixClass.html">Eigen documentation</a>.
