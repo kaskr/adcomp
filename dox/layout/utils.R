@@ -116,7 +116,7 @@ plotGraph <- function(h, DAG=TRUE, fill_in=DAG, group = function(x)(x-1)%%nrow,
     labels <- sapply(labels, sub)
     ## Draw nodes one-by-one in natural order
     fill_in_edges <- function(h) {
-        h <- as(h, "dsCMatrix")
+        h <- as(h, "CsparseMatrix")
         h@x[] <- 0
         diag(h) <- 1
         p <- nrow(h):1
@@ -132,7 +132,7 @@ plotGraph <- function(h, DAG=TRUE, fill_in=DAG, group = function(x)(x-1)%%nrow,
     }
     ## Undirected case
     edges <- function(h) {
-        h <- as(h, "dsCMatrix")
+        h <- as(h, "CsparseMatrix")
         h@x[] <- 1
         diag(h) <- 0
         e <- which(triu(h)>0, arr=TRUE)

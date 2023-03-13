@@ -12,7 +12,8 @@ dictionary <- function(folder = "html", what="code") {
     tag <- unique(tag)
     keyword <- gsub( ".*>", "", gsub("</a>", "", tag) )
     ## 2. Keep only useful ones
-    discard <- keyword == "\\" | grepl("operator", keyword) | keyword=="dt"
+    discard <- keyword == "\\" | grepl("operator", keyword) | keyword=="dt" | keyword=="code"
+    discard <- discard | grepl("TMBad", tag)
     tag <- tag[!discard]
     keyword <- keyword[!discard]
     ## 3. Keep only unique

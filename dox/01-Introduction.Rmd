@@ -179,6 +179,7 @@ The following rules apply:
   many probability distributions, including multivariate normal
   distributions. For probability distributions not available from
   these libraries, the user can use raw C++ code:
+
     ```{.cpp}
     DATA_VECTOR(y);                   // Data vector
     Type nll = Type(0);               // Return value
@@ -250,6 +251,7 @@ arguments) as close as possible to that of R.
   probability distributions, except possibly for the last (log)
   argument.
 - An example:
+
     ```{.cpp}
     DATA_SCALAR(y);
     DATA_VECTOR(x);
@@ -260,6 +262,7 @@ arguments) as close as possible to that of R.
     dexp(x, rate_matrix, true);             // Error, matrix arguments not allowed
     ```
 - To sum over elements in the vector returned use
+
     ```{.cpp}
     sum(dexp(x,rate));
     ```

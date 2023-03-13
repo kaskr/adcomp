@@ -43,7 +43,7 @@ plotGraph(h, DAG=FALSE, group=function(x)x==2|x==3)
 Equivalently the graph may be visualized via its adjacency matrix:
 
 ```{r, echo=FALSE, eval=TRUE, fig=TRUE}
-hh <- as(forceSymmetric(h),"dsCMatrix")
+hh <- as(h, "CsparseMatrix")
 hh@x[] <- 1
 image(hh)
 ```
