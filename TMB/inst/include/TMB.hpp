@@ -40,6 +40,11 @@ struct isDouble<double>{
 #include <R_ext/Print.h>
 #include "Rstream.hpp"
 
+/* Flag to bypass abort() */
+#ifndef TMB_ABORT
+#define TMB_ABORT abort()
+#endif
+
 /* Include the Eigen library. */
 #ifdef TMB_SAFEBOUNDS
 #undef NDEBUG
@@ -50,14 +55,14 @@ void eigen_REprintf(const char* x);
                                   eigen_REprintf(#x);                                                \
                                   eigen_REprintf("\nPlease check your matrix-vector bounds etc., "); \
                                   eigen_REprintf("or run your program through a debugger.\n");       \
-				  abort();}
+				  TMB_ABORT;}
 #define TMBAD_ASSERT2(x,msg)                                            \
 if (!(x)) {                                                             \
   Rcerr << "TMBad assertion failed.\n";                                 \
   Rcerr << "The following condition was not met: " << #x << "\n";       \
   Rcerr << "Possible reason: " msg << "\n";                             \
   Rcerr << "For more info run your program through a debugger.\n";      \
-  abort();                                                              \
+  TMB_ABORT;                                                            \
 }
 #define TMBAD_ASSERT(x) TMBAD_ASSERT2(x,"Unknown")
 #else
