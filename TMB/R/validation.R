@@ -458,7 +458,7 @@ oneStepPredict <- function(obj,
                 newobj$env$last.par.best <- newobj$env$last.par ## <-- used by tmbprofile
                 slice <- tmbprofile(newobj, k, slice=TRUE,
                                     parm.range = range,...)
-                spline <- splinefun(slice[[1]], slice[[2]])
+                spline <- splinefun(slice[[1]], slice[[2]], ties=mean)
                 spline.range <- range(slice[[1]])
                 if(trace >= 2){
                     plotfun <- function(slice, spline){
