@@ -281,41 +281,44 @@ oneStepPredict <- function(obj,
     args$map <- c(args$map, map)
     ## New object be silent
     args$silent <- TRUE
-    ## Create new object
-    newobj <- do.call("MakeADFun", args)
 
-    ## Helper function to loop through observations:
-    nm <- names(newobj$par)
-    obs.pointer <- which(nm == observation.name)
+    ## 'fullGaussian' does *not* use any of the following objects
+    if (method != "fullGaussian") {
+        ## Create new object
+        newobj <- do.call("MakeADFun", args)
 
-    if(method=="cdf"){
-        tmp <- matrix(which(nm == data.term.indicator), ncol=3)
-        data.term.pointer <- tmp[,1]
-        lower.cdf.pointer <- tmp[,2]
-        upper.cdf.pointer <- tmp[,3]
-    } else {
-        data.term.pointer <- which(nm == data.term.indicator)
-        lower.cdf.pointer <- NULL
-        upper.cdf.pointer <- NULL
-    }
-    observation <- local({
-        obs.local <- newobj$par
-        i <- 1:length(subset)
-        function(k, y=NULL, lower.cdf=FALSE, upper.cdf=FALSE){
-            ## Disable all observations later than k:
-            obs.local[data.term.pointer[k<i]] <- 0
-            ## On request, overwrite k'th observation:
-            if(!is.null(y)) obs.local[obs.pointer[k]] <- y
-            ## On request, get tail probs rather than point probs:
-            if(lower.cdf | upper.cdf){
-                obs.local[data.term.pointer[k]] <- 0
-                if(lower.cdf) obs.local[lower.cdf.pointer[k]] <- 1
-                if(upper.cdf) obs.local[upper.cdf.pointer[k]] <- 1
-            }
-            obs.local
+        ## Helper function to loop through observations:
+        nm <- names(newobj$par)
+        obs.pointer <- which(nm == observation.name)
+
+        if(method=="cdf"){
+            tmp <- matrix(which(nm == data.term.indicator), ncol=3)
+            data.term.pointer <- tmp[,1]
+            lower.cdf.pointer <- tmp[,2]
+            upper.cdf.pointer <- tmp[,3]
+        } else {
+            data.term.pointer <- which(nm == data.term.indicator)
+            lower.cdf.pointer <- NULL
+            upper.cdf.pointer <- NULL
         }
-    })
-
+        observation <- local({
+            obs.local <- newobj$par
+            i <- 1:length(subset)
+            function(k, y=NULL, lower.cdf=FALSE, upper.cdf=FALSE){
+                ## Disable all observations later than k:
+                obs.local[data.term.pointer[k<i]] <- 0
+                ## On request, overwrite k'th observation:
+                if(!is.null(y)) obs.local[obs.pointer[k]] <- y
+                ## On request, get tail probs rather than point probs:
+                if(lower.cdf | upper.cdf){
+                    obs.local[data.term.pointer[k]] <- 0
+                    if(lower.cdf) obs.local[lower.cdf.pointer[k]] <- 1
+                    if(upper.cdf) obs.local[upper.cdf.pointer[k]] <- 1
+                }
+                obs.local
+            }
+        })
+    }
     ## Parallel case: overload lapply
     if(parallel){
         ## mclapply uses fork => must set nthreads=1
