@@ -479,7 +479,7 @@ template&lt;class T1 , class T2 , class T3 &gt; </div>
 </dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="compois_8cpp-example.html#a4">compois.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00619">619</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
+<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00627">627</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
 
 </div>
 </div>
@@ -538,7 +538,7 @@ template&lt;class T1 , class T2 , class T3 &gt; </div>
 </dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="compois_8cpp-example.html#a5">compois.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00639">639</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
+<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00647">647</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
 
 </div>
 </div>
@@ -1075,11 +1075,12 @@ template&lt;class Type &gt; </div>
 \[ (0 \leq y) \land (0 &lt; \mu) \land (0 &lt; \phi) \land (1 &lt; p) \land (p &lt; 2) \]
 </p>
 <p> .</p>
+<p>This implementation can be used for both constant and variable y. However, note that the derivative wrt. y is hardcoded to return zero (!).</p>
 <dl class="section note"><dt>Note</dt><dd>Parameter order differs from the R version.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>The derivative wrt. the y argument is disabled (zero). Hence the tweedie distribution can only be used for <em>data</em> (not random effects). </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="tweedie_8cpp-example.html#a2">tweedie.cpp</a>.</dd>
 </dl>
-<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00551">551</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
+<p>Definition at line <a class="el" href="distributions__R_8hpp_source.html#l00554">554</a> of file <a class="el" href="distributions__R_8hpp_source.html">distributions_R.hpp</a>.</p>
 
 </div>
 </div>
