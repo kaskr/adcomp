@@ -539,6 +539,9 @@ VECTORIZE2_tt(besselY)
     Silently returns NaN if not within the valid parameter range:
     \f[ (0 \leq y) \land (0 < \mu) \land (0 < \phi) \land (1 < p) \land (p < 2) \f] .
 
+    This implementation can be used for both constant and variable y. However, note
+    that the derivative wrt. y is hardcoded to return zero (!).
+
     \note Parameter order differs from the R version.
 
     \warning The derivative wrt. the y argument is disabled
@@ -551,14 +554,19 @@ template<class Type>
 Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
   Type p1 = p - 1.0, p2 = 2.0 - p;
   Type ans = -pow(mu, p2) / (phi * p2); // log(prob(y=0))
-  if (y > 0) {
+  if (y > 0 || CppAD::Variable(y)) {
     CppAD::vector<Type> tx(4);
     tx[0] = y;
     tx[1] = phi;
     tx[2] = p;
     tx[3] = 0;
-    ans += atomic::tweedie_logW(tx)[0];
-    ans += -y / (phi * p1 * pow(mu, p1)) - log(y);
+    Type ans2 = atomic::tweedie_logW(tx)[0];
+    ans2 += -y / (phi * p1 * pow(mu, p1)) - log(y);
+    if (CppAD::Variable(y)) {
+      ans += CppAD::CondExpGt(y, Type(0), ans2, Type(0));
+    } else {
+      ans += ans2;
+    }
   }
   return ( give_log ? ans : exp(ans) );
 }
