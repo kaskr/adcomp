@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+TMB 1.9.3 (2023-03-27)
+------------------------------------------------------------------------
+
+o Prepare for Matrix 1.5-4 deprecations.
+
+o checkConsistency(): New argument 'estimate' enables full simulation
+  study and another argument 'observation.name' can be used to not
+  retape between simulation replicates.
+
+o oneStepPredict(): Eliminate nuisance warnings from generic method.
+
+o C++ side: Added preprocessor flag 'TMB_ABORT' to better control
+  behaviour in 'TMB_SAFEBOUNDS' mode (e.g. signal normal R error
+  rather than abort).
+
+------------------------------------------------------------------------
 TMB 1.9.2 (2023-01-23)
 ------------------------------------------------------------------------
 
