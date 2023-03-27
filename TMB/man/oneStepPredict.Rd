@@ -4,12 +4,23 @@
 \alias{oneStepPredict}
 \title{Calculate one-step-ahead (OSA) residuals for a latent variable model.}
 \usage{
-oneStepPredict(obj, observation.name = NULL, data.term.indicator = NULL,
+oneStepPredict(
+  obj,
+  observation.name = NULL,
+  data.term.indicator = NULL,
   method = c("oneStepGaussianOffMode", "fullGaussian", "oneStepGeneric",
-  "oneStepGaussian", "cdf"), subset = NULL, conditional = NULL,
-  discrete = NULL, discreteSupport = NULL, range = c(-Inf, Inf),
-  seed = 123, parallel = FALSE, trace = TRUE, reverse = (method ==
-  "oneStepGaussianOffMode"), ...)
+    "oneStepGaussian", "cdf"),
+  subset = NULL,
+  conditional = NULL,
+  discrete = NULL,
+  discreteSupport = NULL,
+  range = c(-Inf, Inf),
+  seed = 123,
+  parallel = FALSE,
+  trace = TRUE,
+  reverse = (method == "oneStepGaussianOffMode"),
+  ...
+)
 }
 \arguments{
 \item{obj}{Output from \code{MakeADFun}.}

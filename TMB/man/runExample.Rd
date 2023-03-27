@@ -4,8 +4,16 @@
 \alias{runExample}
 \title{Run one of the test examples.}
 \usage{
-runExample(name = NULL, all = FALSE, thisR = TRUE, clean = FALSE,
-  exfolder = NULL, dontrun = FALSE, subarch = TRUE, ...)
+runExample(
+  name = NULL,
+  all = FALSE,
+  thisR = TRUE,
+  clean = FALSE,
+  exfolder = NULL,
+  dontrun = FALSE,
+  subarch = TRUE,
+  ...
+)
 }
 \arguments{
 \item{name}{Character name of example.}

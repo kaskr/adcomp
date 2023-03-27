@@ -4,9 +4,19 @@
 \alias{tmbprofile}
 \title{Adaptive likelihood profiling.}
 \usage{
-tmbprofile(obj, name, lincomb, h = 1e-04, ytol = 2, ystep = 0.1,
-  maxit = ceiling(5 * ytol/ystep), parm.range = c(-Inf, Inf),
-  slice = FALSE, trace = TRUE, ...)
+tmbprofile(
+  obj,
+  name,
+  lincomb,
+  h = 1e-04,
+  ytol = 2,
+  ystep = 0.1,
+  maxit = ceiling(5 * ytol/ystep),
+  parm.range = c(-Inf, Inf),
+  slice = FALSE,
+  trace = TRUE,
+  ...
+)
 }
 \arguments{
 \item{obj}{Object from \code{MakeADFun} that has been optimized.}

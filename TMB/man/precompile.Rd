@@ -4,8 +4,7 @@
 \alias{precompile}
 \title{Precompile the TMB library in order to speed up compilation of templates.}
 \usage{
-precompile(all = TRUE, clean = FALSE, trace = TRUE, get.header = FALSE,
-  ...)
+precompile(all = TRUE, clean = FALSE, trace = TRUE, get.header = FALSE, ...)
 }
 \arguments{
 \item{all}{Precompile all or just the core parts of TMB ?}

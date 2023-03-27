@@ -4,11 +4,17 @@
 \alias{sdreport}
 \title{General sdreport function.}
 \usage{
-sdreport(obj, par.fixed = NULL, hessian.fixed = NULL,
-  getJointPrecision = FALSE, bias.correct = FALSE,
+sdreport(
+  obj,
+  par.fixed = NULL,
+  hessian.fixed = NULL,
+  getJointPrecision = FALSE,
+  bias.correct = FALSE,
   bias.correct.control = list(sd = FALSE, split = NULL, nsplit = NULL),
-  ignore.parm.uncertainty = FALSE, getReportCovariance = TRUE,
-  skip.delta.method = FALSE)
+  ignore.parm.uncertainty = FALSE,
+  getReportCovariance = TRUE,
+  skip.delta.method = FALSE
+)
 }
 \arguments{
 \item{obj}{Object returned by \code{MakeADFun}}

@@ -4,10 +4,28 @@
 \alias{newton}
 \title{Generalized newton optimizer.}
 \usage{
-newton(par, fn, gr, he, trace = 1, maxit = 100, tol = 1e-08, alpha = 1,
-  smartsearch = TRUE, mgcmax = 1e+60, super = TRUE, silent = TRUE,
-  ustep = 1, power = 0.5, u0 = 1e-04, grad.tol = tol, step.tol = tol,
-  tol10 = 0.001, env = environment(), ...)
+newton(
+  par,
+  fn,
+  gr,
+  he,
+  trace = 1,
+  maxit = 100,
+  tol = 1e-08,
+  alpha = 1,
+  smartsearch = TRUE,
+  mgcmax = 1e+60,
+  super = TRUE,
+  silent = TRUE,
+  ustep = 1,
+  power = 0.5,
+  u0 = 1e-04,
+  grad.tol = tol,
+  step.tol = tol,
+  tol10 = 0.001,
+  env = environment(),
+  ...
+)
 }
 \arguments{
 \item{par}{Initial parameter.}

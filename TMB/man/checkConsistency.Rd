@@ -4,7 +4,14 @@
 \alias{checkConsistency}
 \title{Check consistency and Laplace accuracy}
 \usage{
-checkConsistency(obj, par = NULL, hessian = FALSE, n = 100)
+checkConsistency(
+  obj,
+  par = NULL,
+  hessian = FALSE,
+  estimate = FALSE,
+  n = 100,
+  observation.name = NULL
+)
 }
 \arguments{
 \item{obj}{Object from \code{MakeADFun}}
@@ -14,7 +21,11 @@ unspecified use the best encountered parameter of the object.}
 
 \item{hessian}{Calculate the hessian matrix for each replicate ?}
 
+\item{estimate}{Estimate parameters for each replicate ?}
+
 \item{n}{Number of simulations}
+
+\item{observation.name}{Optional; Name of simulated observation}
 }
 \value{
 List with gradient simulations (joint and marginal)
@@ -54,6 +65,15 @@ bias is transformed to parameter scale (using the estimated
 information matrix) to provide an estimate of parameter bias caused
 by the Laplace approximation.
 }
+\section{Simulation/re-estimation}{
+
+A full simulation/re-estimation study is performed when \code{estimate=TRUE}.
+By default \link[stats]{nlminb} will be used to perform the minimization, and output is stored in a separate list component 'estimate' for each replicate.
+Should a custom optimizer be needed, it can be passed as a user function via the same argument (\code{estimate}).
+The function (\code{estimate}) will be called for each simulation as \code{estimate(obj)} where \code{obj} is the simulated model object.
+Current default corresponds to \code{estimate = function(obj) nlminb(obj$par,obj$fn,obj$gr)}.
+}
+
 \examples{
 \dontrun{
 runExample("simple")

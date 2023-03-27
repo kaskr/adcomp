@@ -4,11 +4,22 @@
 \alias{compile}
 \title{Compile a C++ template to DLL suitable for MakeADFun.}
 \usage{
-compile(file, flags = "", safebounds = TRUE, safeunload = TRUE,
-  openmp = isParallelTemplate(file[1]), libtmb = TRUE, libinit = TRUE,
-  tracesweep = FALSE, framework = getOption("tmb.ad.framework"),
-  supernodal = FALSE, longint = FALSE, eigen.disable.warnings = TRUE,
-  max.order = NULL, ...)
+compile(
+  file,
+  flags = "",
+  safebounds = TRUE,
+  safeunload = TRUE,
+  openmp = isParallelTemplate(file[1]),
+  libtmb = TRUE,
+  libinit = TRUE,
+  tracesweep = FALSE,
+  framework = getOption("tmb.ad.framework"),
+  supernodal = FALSE,
+  longint = FALSE,
+  eigen.disable.warnings = TRUE,
+  max.order = NULL,
+  ...
+)
 }
 \arguments{
 \item{file}{C++ file.}

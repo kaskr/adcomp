@@ -4,8 +4,12 @@
 \alias{summary.sdreport}
 \title{summary tables of model parameters}
 \usage{
-\method{summary}{sdreport}(object, select = c("all", "fixed", "random",
-  "report"), p.value = FALSE, ...)
+\method{summary}{sdreport}(
+  object,
+  select = c("all", "fixed", "random", "report"),
+  p.value = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{Output from \code{\link{sdreport}}}

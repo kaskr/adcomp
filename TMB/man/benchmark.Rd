@@ -7,8 +7,7 @@
 \usage{
 benchmark(obj, n = 10, expr = NULL, cores = NULL)
 
-\method{plot}{parallelBenchmark}(x, type = "b", ..., show = c("speedup",
-  "time"), legendpos = "topleft")
+\method{plot}{parallelBenchmark}(x, type = "b", ..., show = c("speedup", "time"), legendpos = "topleft")
 }
 \arguments{
 \item{obj}{Object from \code{MakeADFun}}

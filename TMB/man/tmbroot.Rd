@@ -4,9 +4,16 @@
 \alias{tmbroot}
 \title{Compute likelihood profile confidence intervals of a TMB object by root-finding}
 \usage{
-tmbroot(obj, name, target = 0.5 * qchisq(0.95, df = 1), lincomb,
-  parm.range = c(NA, NA), sd.range = 7, trace = FALSE,
-  continuation = FALSE)
+tmbroot(
+  obj,
+  name,
+  target = 0.5 * qchisq(0.95, df = 1),
+  lincomb,
+  parm.range = c(NA, NA),
+  sd.range = 7,
+  trace = FALSE,
+  continuation = FALSE
+)
 }
 \arguments{
 \item{obj}{Object from \code{MakeADFun} that has been optimized.}
