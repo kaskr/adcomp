@@ -1836,7 +1836,7 @@ sparseHessianFun <- function(obj, skipFixedEffects=FALSE) {
            i = as.integer(attr(ADHess$ptr,"i")),
            j = as.integer(attr(ADHess$ptr,"j")),
            x = ev(obj$env$par), Dim = c(n,n), uplo = "L")
-  Hfull <- .T2Cmat(M) ## WAS: as(M,"dsCMatrix")
+  Hfull <- as(M, "CsparseMatrix") ## WAS: as(M,"dsCMatrix")
   Hrandom <- Hfull[r,r,drop=FALSE]
   ## before returning the function, remove unneeded variables from the environment:
   rm(skip, n, M)
