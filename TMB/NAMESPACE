@@ -7,7 +7,7 @@ importFrom("methods", as, is, new,
 	   cbind2, rbind2)
 importFrom("stats", approx, confint, integrate, median, nlminb,
 	   optim, optimHess, pchisq, qchisq, qnorm, rnorm,
-	   runif, sd, splinefun, uniroot, var)
+	   runif, sd, splinefun, uniroot, var, ks.test)
 importFrom("utils", as.relistable, relist,
 	   head, tail)
 ## Windows specific imports

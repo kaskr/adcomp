@@ -31,11 +31,18 @@
 ##' information matrix) to provide an estimate of parameter bias caused
 ##' by the Laplace approximation.
 ##'
+##' @section Simulation/re-estimation:
+##' A full simulation/re-estimation study is performed when \code{estimate=TRUE}.
+##' By default \link[stats]{nlminb} will be used to perform the minimization, and output is stored in a separate list component 'estimate' for each replicate.
+##' Should a custom optimizer be needed, it can be passed as a user function via the same argument (\code{estimate}).
+##' The function (\code{estimate}) will be called for each simulation as \code{estimate(obj)} where \code{obj} is the simulated model object.
+##' Current default corresponds to \code{estimate = function(obj) nlminb(obj$par,obj$fn,obj$gr)}.
 ##' @title Check consistency and Laplace accuracy
 ##' @param obj Object from \code{MakeADFun}
 ##' @param par Parameter vector (\eqn{\theta}) for simulation. If
 ##'     unspecified use the best encountered parameter of the object.
 ##' @param hessian Calculate the hessian matrix for each replicate ?
+##' @param estimate Estimate parameters for each replicate ?
 ##' @param n Number of simulations
 ##' @param observation.name Optional; Name of simulated observation
 ##' @return List with gradient simulations (joint and marginal)
@@ -51,9 +58,17 @@
 checkConsistency <- function(obj,
                              par = NULL,
                              hessian = FALSE,
+                             estimate = FALSE,
                              n = 100,
                              observation.name = NULL
                              ) {
+    ## Optimizer
+    if (!is.logical(estimate)) {
+        Optimizer <- match.fun(estimate)
+        estimate <- TRUE
+    } else {
+        Optimizer <- function(obj) nlminb(obj$par, obj$fn, obj$gr)
+    }
     ## Args to construct copy of 'obj'
     args <- as.list(obj$env)[intersect(names(formals(MakeADFun)), ls(obj$env))]
     ## Determine parameter and full parameter to use
@@ -165,6 +180,11 @@ checkConsistency <- function(obj,
         }
         ans$gradient <- newobj$gr(par)
         if (hessian) ans$hessian <- optimHess(par, newobj$fn, newobj$gr)
+        if (estimate) {
+            newobj$par <- par ## just in case...
+            ans$objective.true <- newobj$fn(par)
+            ans$estimate <- try(Optimizer(newobj))
+        }
         ans
     }
     ans <- lapply(seq_len(n), doSim)
@@ -226,6 +246,27 @@ summary.checkConsistency <- function(object, na.rm=FALSE, ...) {
     }
     ans$joint <- check( ans$gradientJoint )
     ans$marginal <- check( ans$gradient )
+    ## Simulation study
+    have.estimate <- !is.null(object[[1]]$estimate)
+    if (have.estimate) {
+        getEstMat <- function(name) {
+            do.call("cbind",
+                    lapply(object,
+                           function(x)
+                               as.vector(x$estimate[[name]])))
+        }
+        est <- list()
+        est$par <- t(getEstMat("par"))
+        colnames(est$par) <- names(ans$par)
+        est$par <- as.data.frame(est$par)
+        est$objective <- drop(getEstMat("objective"))
+        est$deviance <- 2 * ( drop(getMat("objective.true")) - est$objective )
+        est$deviance.p.value <-
+            ks.test(est$deviance, "pchisq", df = length(ans$par))$p.value
+        ans$convergence <- drop(getEstMat("convergence"))
+        ## Set it
+        ans$estimate <- est
+    }
     ans
 }
 
@@ -256,6 +297,12 @@ print.checkConsistency <- function(x, ...) {
     cat("\n")
     cat("Estimated parameter bias:\n")
     print(s$marginal$bias)
+    ## Estimate info:
+    if (!is.null(s$estimate)) {
+        cat("\n")
+        cat("summary(.)$estimate contains:\n")
+        print(names(s$estimate))
+    }
     invisible(x)
 }
 
