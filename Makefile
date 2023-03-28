@@ -14,7 +14,7 @@ all:
 	make pdf
 
 doc-update:
-	echo "library(roxygen2);roxygenize(\"$(PACKAGE)\",roclets = c(\"collate\", \"rd\"))" | $(R) --slave
+	echo "library(roxygen2);roxygenize(\"$(PACKAGE)\",roclets = c(\"collate\", \"rd\"), load_code=load_source)" | $(R) --slave
 
 build-package:
 	$(R) CMD build --resave-data=no $(PACKAGE)
