@@ -24,7 +24,7 @@ importClassesFrom("Matrix")# all currently (FIXME) , corMatrix, dgCMatrix, dgTMa
 importMethodsFrom("Matrix", coerce, cov2cor, determinant, drop,
                   "%*%", crossprod,tcrossprod,
 		  t, diag, chol2inv, solve, colSums,rowSums)
-importFrom("Matrix", .T2Cmat,
+importFrom("Matrix",
 	   Cholesky, forceSymmetric, invPerm,
 	   tril, triu, Diagonal)
 
