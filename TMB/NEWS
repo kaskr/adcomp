@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
-TMB 1.9.3 (2023-03-27)
+TMB 1.9.3 (2023-03-28)
 ------------------------------------------------------------------------
 
 o Prepare for Matrix 1.5-4 deprecations.
@@ -12,7 +12,8 @@ o oneStepPredict(): Eliminate nuisance warnings from generic method.
 
 o C++ side: Added preprocessor flag 'TMB_ABORT' to better control
   behaviour in 'TMB_SAFEBOUNDS' mode (e.g. signal normal R error
-  rather than abort).
+  rather than abort). In addition, 'TMB_CATCH' can now be configured
+  to catch more than just std::bad_alloc.
 
 ------------------------------------------------------------------------
 TMB 1.9.2 (2023-01-23)
