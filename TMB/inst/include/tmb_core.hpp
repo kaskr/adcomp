@@ -17,10 +17,32 @@
     is responsible for catching its own exceptions.
 */
 
+#ifndef TMB_TRY
 #define TMB_TRY try
-#define TMB_CATCH catch(std::bad_alloc& ba)
-#define TMB_ERROR_BAD_ALLOC Rf_error("Memory allocation fail in function '%s'\n", \
-				  __FUNCTION__)
+#endif
+// By default we only accept 'bad_alloc' as a valid exception. Everything else => debugger !
+// Behaviour can be changed by re-defining this macro.
+#ifndef TMB_CATCH
+#define TMB_CATCH catch(std::bad_alloc& excpt)
+#endif
+// Inside the TMB_CATCH comes 'cleanup code' followed by this error
+// call (allowed to depend on the exception 'excpt')
+// Error message can be changed by re-defining this macro.
+#ifndef TMB_ERROR_BAD_ALLOC
+#define TMB_ERROR_BAD_ALLOC                             \
+Rf_error("Caught exception '%s' in function '%s'\n",    \
+         excpt.what(),                                  \
+         __FUNCTION__)
+#endif
+// Error call comes outside TMB_CATCH in OpenMP case (so *cannot*
+// depend on exception e.g. 'excpt')
+// Error message can be changed by re-defining this macro.
+#ifndef TMB_ERROR_BAD_THREAD_ALLOC
+#define TMB_ERROR_BAD_THREAD_ALLOC                      \
+Rf_error("Caught exception '%s' in function '%s'\n",    \
+         bad_thread_alloc,                              \
+         __FUNCTION__)
+#endif
 
 /* Memory manager:
    Count the number of external pointers alive.
@@ -1358,7 +1380,7 @@ extern "C"
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* FIXME: NOT NEEDED */
       vector< adfun* > pfvec(n);
-      bool bad_thread_alloc = false;
+      const char* bad_thread_alloc = NULL;
 #pragma omp parallel for num_threads(config.nthreads) if (config.tape.parallel && n>1)
       for(int i = 0; i < n; i++) {
         TMB_TRY {
@@ -1366,11 +1388,13 @@ extern "C"
           pfvec[i] = MakeADFunObject_(data, parameters, report, control, i, info);
           if (config.optimize.instantly) pfvec[i]->optimize();
         }
-        TMB_CATCH { bad_thread_alloc = true; }
+        TMB_CATCH {
+          if (pfvec[i] != NULL) delete pfvec[i];
+          bad_thread_alloc = excpt.what();
+        }
       }
       if (bad_thread_alloc) {
-        for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-        TMB_ERROR_BAD_ALLOC;
+        TMB_ERROR_BAD_THREAD_ALLOC;
       }
 
       // FIXME: NOT DONE YET
@@ -1441,7 +1465,7 @@ extern "C"
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
-      bool bad_thread_alloc = false;
+      const char* bad_thread_alloc = NULL;
 #pragma omp parallel for num_threads(config.nthreads) if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
@@ -1449,11 +1473,13 @@ extern "C"
 	  pfvec[i] = MakeADFunObject_(data, parameters, report, control, i, info);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
-	TMB_CATCH { bad_thread_alloc = true; }
+	TMB_CATCH {
+          if (pfvec[i] != NULL) delete pfvec[i];
+          bad_thread_alloc = excpt.what();
+        }
       }
-      if(bad_thread_alloc){
-	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-	TMB_ERROR_BAD_ALLOC;
+      if (bad_thread_alloc) {
+	TMB_ERROR_BAD_THREAD_ALLOC;
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
@@ -2117,7 +2143,7 @@ extern "C"
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< adfun* > pfvec(n);
-      bool bad_thread_alloc = false;
+      const char* bad_thread_alloc = NULL;
 #pragma omp parallel for num_threads(config.nthreads) if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
@@ -2125,11 +2151,13 @@ extern "C"
 	  pfvec[i] = MakeADGradObject_(data, parameters, report, control, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
-	TMB_CATCH { bad_thread_alloc = true; }
+	TMB_CATCH {
+          if (pfvec[i] != NULL) delete pfvec[i];
+          bad_thread_alloc = excpt.what();
+        }
       }
-      if(bad_thread_alloc){
-	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-	TMB_ERROR_BAD_ALLOC;
+      if (bad_thread_alloc) {
+	TMB_ERROR_BAD_THREAD_ALLOC;
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
@@ -2187,7 +2215,7 @@ extern "C"
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
-      bool bad_thread_alloc = false;
+      const char* bad_thread_alloc = NULL;
 #pragma omp parallel for num_threads(config.nthreads) if (config.tape.parallel && n>1)
       for(int i=0;i<n;i++){
 	TMB_TRY {
@@ -2195,11 +2223,13 @@ extern "C"
 	  pfvec[i] = MakeADGradObject_(data, parameters, report, control, i);
 	  if (config.optimize.instantly) pfvec[i]->optimize();
 	}
-	TMB_CATCH { bad_thread_alloc = true; }
+	TMB_CATCH {
+          if (pfvec[i] != NULL) delete pfvec[i];
+          bad_thread_alloc = excpt.what();
+        }
       }
-      if(bad_thread_alloc){
-	for(int i=0; i<n; i++) if (pfvec[i] != NULL) delete pfvec[i];
-	TMB_ERROR_BAD_ALLOC;
+      if (bad_thread_alloc) {
+	TMB_ERROR_BAD_THREAD_ALLOC;
       }
       parallelADFun<double>* ppf=new parallelADFun<double>(pfvec);
       /* Convert parallel ADFun pointer to R_ExternalPtr */
@@ -2420,7 +2450,7 @@ extern "C"
     if (n==0) n++; // No explicit parallel accumulation
     start_parallel(); /* FIXME: not needed */
     /* parallel test */
-    bool bad_thread_alloc = false;
+    const char* bad_thread_alloc = NULL;
     vector<sphess*> Hvec(n);
 #pragma omp parallel for num_threads(config.nthreads) if (config.tape.parallel && n>1)
     for (int i=0; i<n; i++) {
@@ -2429,16 +2459,16 @@ extern "C"
 	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, control, i) );
 	//optimizeTape( Hvec[i]->pf );
       }
-      TMB_CATCH { bad_thread_alloc = true; }
+      TMB_CATCH {
+        if (Hvec[i] != NULL) {
+          delete Hvec[i]->pf;
+          delete Hvec[i];
+        }
+        bad_thread_alloc = excpt.what();
+      }
     }
     if (bad_thread_alloc) {
-      for(int i=0; i<n; i++) {
-	if (Hvec[i] != NULL) {
-	  delete Hvec[i]->pf;
-	  delete Hvec[i];
-	}
-      }
-      TMB_ERROR_BAD_ALLOC;
+      TMB_ERROR_BAD_THREAD_ALLOC;
     }
     parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
     return asSEXP(tmp->convert(),"parallelADFun");
@@ -2482,7 +2512,7 @@ extern "C"
     start_parallel(); /* Start threads */
 
     /* parallel test */
-    bool bad_thread_alloc = false;
+    const char* bad_thread_alloc = NULL;
     vector<sphess*> Hvec(n);
 #pragma omp parallel for num_threads(config.nthreads) if (config.tape.parallel && n>1)
     for (int i=0; i<n; i++) {
@@ -2491,16 +2521,16 @@ extern "C"
 	Hvec[i] = new sphess( MakeADHessObject2_(data, parameters, report, control, i) );
 	optimizeTape( Hvec[i]->pf );
       }
-      TMB_CATCH { bad_thread_alloc = true; }
-    }
-    if (bad_thread_alloc) {
-      for(int i=0; i<n; i++) {
+      TMB_CATCH {
 	if (Hvec[i] != NULL) {
 	  delete Hvec[i]->pf;
 	  delete Hvec[i];
 	}
+        bad_thread_alloc = excpt.what();
       }
-      TMB_ERROR_BAD_ALLOC;
+    }
+    if (bad_thread_alloc) {
+      TMB_ERROR_BAD_THREAD_ALLOC;
     }
     parallelADFun<double>* tmp=new parallelADFun<double>(Hvec);
     for(int i=0; i<n; i++) {
