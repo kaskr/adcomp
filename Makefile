@@ -115,7 +115,6 @@ cran-version:
 	echo "  if(!file.exists(dll)) runExample(\"simple\", dontrun=TRUE, eigen.disable.warnings=FALSE)" >> TMB/R/zzz.R
 	echo "}"                                                                                          >> TMB/R/zzz.R
 	make eliminate-cout
-	make doc-update
 	make build-package
 
 ##########################################################
