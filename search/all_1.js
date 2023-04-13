@@ -35,7 +35,7 @@ var searchData=
   ['adreport',['ADREPORT',['../group__macros.html#ga43a13c435127491364e4a167478f4992',1,'tmb_core.hpp']]],
   ['aggregate',['aggregate',['../namespaceTMBad.html#a9da8f10d11a2ebeb90e146372c438714',1,'TMBad']]],
   ['all_5fallow_5fremap',['all_allow_remap',['../namespaceTMBad.html#a7d5dbfbcb2e6c7ca956e9032175ffc69',1,'TMBad']]],
-  ['allow_5fremap',['allow_remap',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a93b52f3b482f43a7ec7b7db4cffc2066',1,'TMBad::op_info::allow_remap()'],['../structTMBad_1_1global_1_1Operator.html#a805360f5e00d94f915a7b28e4a6a68a7',1,'TMBad::global::Operator::allow_remap()']]],
+  ['allow_5fremap',['allow_remap',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a93b52f3b482f43a7ec7b7db4cffc2066',1,'TMBad::op_info::allow_remap()'],['../structTMBad_1_1global_1_1Operator.html#a805360f5e00d94f915a7b28e4a6a68a7',1,'TMBad::global::Operator::allow_remap()'],['../structTMBad_1_1PackOp.html#a9e67552769056db975541896305c2f15',1,'TMBad::PackOp::allow_remap()'],['../structTMBad_1_1UnpkOp.html#aa90cc9a7dc9d2946e121813909a7b04c',1,'TMBad::UnpkOp::allow_remap()']]],
   ['any',['any',['../structTMBad_1_1global_1_1operation__stack.html#afa6dcf03bfba3b29e4519c4d5dd5605e',1,'TMBad::global::operation_stack']]],
   ['appendix',['Appendix',['../Appendix.html',1,'']]],
   ['apply',['apply',['../structTMBad_1_1intervals.html#aacc3716e44e5196f251f8c45771b251c',1,'TMBad::intervals']]],

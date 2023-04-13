@@ -125,6 +125,10 @@ Index&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
+<tr class="memitem:aa90cc9a7dc9d2946e121813909a7b04c"><td class="memItemLeft" align="right" valign="top"><a id="aa90cc9a7dc9d2946e121813909a7b04c"></a>
+static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1UnpkOp.html#aa90cc9a7dc9d2946e121813909a7b04c">allow_remap</a> = false</td></tr>
+<tr class="memdesc:aa90cc9a7dc9d2946e121813909a7b04c"><td class="mdescLeft">&#160;</td><td class="mdescRight">It is **not* safe to remap the inputs of this operator. <br /></td></tr>
+<tr class="separator:aa90cc9a7dc9d2946e121813909a7b04c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21f88dec52472b8df22632f4044136c1"><td class="memItemLeft" align="right" valign="top"><a id="a21f88dec52472b8df22632f4044136c1"></a>
 static const Index&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1UnpkOp.html#a21f88dec52472b8df22632f4044136c1">K</a> = ScalarPack&lt;<a class="el" href="structTMBad_1_1SegmentRef.html">SegmentRef</a>&gt;::size</td></tr>
 <tr class="memdesc:a21f88dec52472b8df22632f4044136c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Packed size (~2) <br /></td></tr>
@@ -222,7 +226,7 @@ static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 <p>The purpose of these operators is to provide an analogue of 'pass by reference' between AD tapes.</p>
 <p>An 'outer' tape which repeatedly (<code>N</code> times) calls an 'inner' tape (<code>R^n-&gt;R</code>) would normally require <code>O(N*n)</code> memory units because each of the <code>n</code> inputs must be referenced each time the inner tape is called. By packing the input array, the memory usage can be reduced to <code>O(N+n)</code>. </p>
 
-<p>Definition at line <a class="el" href="TMBad_2vectorize_8hpp_source.html#l00459">459</a> of file <a class="el" href="TMBad_2vectorize_8hpp_source.html">TMBad/vectorize.hpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_2vectorize_8hpp_source.html#l00461">461</a> of file <a class="el" href="TMBad_2vectorize_8hpp_source.html">TMBad/vectorize.hpp</a>.</p>
 </div><hr/>The documentation for this struct was generated from the following files:<ul>
 <li><a class="el" href="TMBad_2vectorize_8hpp_source.html">TMBad/vectorize.hpp</a></li>
 <li><a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a></li>
