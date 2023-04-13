@@ -411,8 +411,9 @@ struct SegmentRef {
   void resize(ad_segment &pack, Index n);
 };
 
-ad_segment pack(const ad_segment &x);
+ad_segment pack(const ad_segment &x, bool up = false);
 ad_segment unpack(const ad_segment &x);
+void unpack(const ad_segment &x, ad_segment &y);
 
 /** \brief Pack (`PackOp`) or unpack (`UnpkOp`) `n` consecutive values
     on the tape.
@@ -426,26 +427,66 @@ ad_segment unpack(const ad_segment &x);
     is called. By packing the input array, the memory usage can be
     reduced to `O(N+n)`.
 */
+template <bool UP>
 struct PackOp : global::DynamicOperator<1, ScalarPack<SegmentRef>::size> {
+  static const bool forward_updating = false;
+  static const bool reverse_updating = UP;
   /** \brief Packed size (~2) */
   static const Index K = ScalarPack<SegmentRef>::size;
   /** \brief Unpacked size */
   Index n;
-  PackOp(const Index n);
+  PackOp(const Index n) : n(n) {}
   /** \brief Pack values */
-  void forward(ForwardArgs<Scalar> &args);
+  void forward(ForwardArgs<Scalar> &args) {
+    SegmentRef *y = (SegmentRef *)args.y_ptr(0);
+    y[0] = SegmentRef(args.glob_ptr, args.input(0), n);
+  }
   /** \brief Pack values (replay) */
-  void forward(ForwardArgs<Replay> &args);
+  void forward(ForwardArgs<Replay> &args) {
+    ad_segment x(args.x_ptr(0), n);
+    args.y_segment(0, K) = pack(x, UP);
+  }
   /** \brief Unpack derivatives */
-  void reverse(ReverseArgs<Scalar> &args);
+  void reverse(ReverseArgs<Scalar> &args) {
+    SegmentRef tmp(args.dy_ptr(0));
+    if (tmp.glob_ptr != NULL) {
+      Scalar *dx = SegmentRef(args.y_ptr(0)).deriv_ptr();
+      Scalar *dy = SegmentRef(args.dy_ptr(0)).deriv_ptr();
+      for (Index i = 0; i < n; i++) dx[i] += dy[i];
+    }
+  }
   /** \brief Unpack derivatives (replay) */
-  void reverse(ReverseArgs<Replay> &args);
-  const char *op_name();
+  void reverse(ReverseArgs<Replay> &args) {
+    ad_segment dy_packed(args.dy_ptr(0), K);
+
+    if (SegmentRef(dy_packed).isNull()) {
+      SegmentRef().resize(dy_packed, n);
+    }
+    if (UP) {
+      TMBAD_ASSERT2(
+          TMBad::global::ad_segment().is_contiguous(args.dx_ptr(0), n),
+          "Internal inconsistency: "
+          "Updatable derivative workspace *must* be 'on tape' and 'contiguous'")
+
+          ;
+      ad_segment dx(args.dx_ptr(0), n);
+      unpack(dy_packed, dx);
+    } else {
+      ad_segment dy = unpack(dy_packed);
+      ad_segment dx(args.dx_ptr(0), n, true);
+      dx += dy;
+      Replay *pdx = args.dx_ptr(0);
+      for (Index i = 0; i < n; i++) pdx[i] = dx[i];
+    }
+  }
+  const char *op_name() { return "PackOp"; }
   /** \brief It is **not* safe to remap the inputs of this operator */
   static const bool allow_remap = false;
   static const bool have_dependencies = true;
   static const bool implicit_dependencies = true;
-  void dependencies(Args<> &args, Dependencies &dep) const;
+  void dependencies(Args<> &args, Dependencies &dep) const {
+    dep.add_segment(args.input(0), n);
+  }
 
   template <class T>
   void forward(ForwardArgs<T> &args) {
@@ -458,26 +499,61 @@ struct PackOp : global::DynamicOperator<1, ScalarPack<SegmentRef>::size> {
 };
 
 /** \copydoc PackOp */
-struct UnpkOp : global::DynamicOperator<1, -1> {
+template <bool UP>
+struct UnpkOp : global::DynamicOperator<1 + UP, -1> {
+  static const bool forward_updating = UP;
+  static const bool reverse_updating = false;
   /** \brief Packed size (~2) */
   static const Index K = ScalarPack<SegmentRef>::size;
   /** \brief Unpacked size */
   Index noutput;
-  UnpkOp(const Index n);
+  static const bool have_input_size_output_size = true;
+  Index input_size() const { return 1 + UP; }
+  Index output_size() const { return UP ? 0 : noutput; }
+  UnpkOp(const Index n) : noutput(n) {}
   /** \brief Unpack values */
-  void forward(ForwardArgs<Scalar> &args);
+  void forward(ForwardArgs<Scalar> &args) {
+    Scalar *y = (UP ? args.x_ptr(1) : args.y_ptr(0));
+    SegmentRef srx(args.x_ptr(0));
+    if (srx.isNull()) {
+      if (!UP)
+        for (Index i = 0; i < noutput; i++) y[i] = 0;
+      return;
+    }
+    Scalar *x = srx.value_ptr();
+    if (UP)
+      for (Index i = 0; i < noutput; i++) y[i] += x[i];
+    else
+      for (Index i = 0; i < noutput; i++) y[i] = x[i];
+
+    ((SegmentRef *)args.x_ptr(0))->glob_ptr = NULL;
+  }
   static const bool add_forward_replay_copy = true;
   /** \brief Pack derivatives */
-  void reverse(ReverseArgs<Scalar> &args);
+  void reverse(ReverseArgs<Scalar> &args) {
+    SegmentRef *dx = (SegmentRef *)args.dx_ptr(0);
+    dx[0] =
+        SegmentRef(args.glob_ptr, UP ? args.input(1) : args.output(0), noutput);
+  }
   /** \brief Pack derivatives (replay) */
-  void reverse(ReverseArgs<Replay> &args);
-  const char *op_name();
+  void reverse(ReverseArgs<Replay> &args) {
+    ad_segment dy(UP ? args.dx_ptr(1) : args.dy_ptr(0), noutput);
+    ad_segment dy_packed = pack(dy, UP);
+    Replay *pdx = args.dx_ptr(0);
+    for (Index i = 0; i < dy_packed.size(); i++) pdx[i] = dy_packed[i];
+  }
+  const char *op_name() { return "UnpkOp"; }
 
   /** \brief It is **not* safe to remap the inputs of this operator */
   static const bool allow_remap = false;
   static const bool have_dependencies = true;
   static const bool implicit_dependencies = true;
-  void dependencies(Args<> &args, Dependencies &dep) const;
+  void dependencies(Args<> &args, Dependencies &dep) const {
+    dep.add_segment(args.input(0), K);
+  }
+  void dependencies_updating(Args<> &args, Dependencies &dep) const {
+    if (UP) dep.add_segment(args.input(1), noutput);
+  }
 
   template <class T>
   void forward(ForwardArgs<T> &args) {
@@ -490,10 +566,12 @@ struct UnpkOp : global::DynamicOperator<1, -1> {
 };
 
 /** \brief Pack consecutive values on the tape */
-ad_segment pack(const ad_segment &x);
+ad_segment pack(const ad_segment &x, bool up);
 
 /** \brief Unpack consecutive values on the tape */
 ad_segment unpack(const ad_segment &x);
+/** \brief Fused unpack and destination increment */
+void unpack(const ad_segment &x, ad_segment &y);
 
 /** \brief Unpack consecutive values on the tape */
 template <class T>
@@ -513,7 +591,7 @@ std::vector<T> repack(const std::vector<T> &x) {
     ad_segment x_(x[j * K], K);
     SegmentRef sr(x_);
     ad_segment orig(sr.offset, sr.size);
-    ad_segment yj = pack(orig);
+    ad_segment yj = pack(orig, true);
     for (size_t i = 0; i < K; i++) y.push_back(yj[i]);
   }
   return y;

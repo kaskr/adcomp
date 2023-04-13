@@ -1075,7 +1075,7 @@ intervals<Index> global::updating_intervals() const {
   intervals<Index> marked_intervals;
   Args<> args(inputs);
   for (size_t i = 0; i < opstack.size(); i++) {
-    if (opstack[i]->info().test(op_info::updating)) {
+    if (opstack[i]->info().test(op_info::reverse_updating)) {
       dep.clear();
       opstack[i]->dependencies(args, dep);
 
@@ -1098,7 +1098,7 @@ intervals<Index> global::updating_intervals_sub() const {
   for (size_t j = 0; j < subgraph_seq.size(); j++) {
     Index i = subgraph_seq[j];
     args.ptr = subgraph_ptr[i];
-    if (opstack[i]->info().test(op_info::updating)) {
+    if (opstack[i]->info().test(op_info::reverse_updating)) {
       dep.clear();
       opstack[i]->dependencies(args, dep);
 
@@ -1152,7 +1152,7 @@ void global::replay::clear_deriv() {
   derivs.resize(values.size());
   std::fill(derivs.begin(), derivs.end(), Replay(0));
 
-  if (orig.opstack.any.test(op_info::updating)) {
+  if (orig.opstack.any.test(op_info::reverse_updating)) {
     intervals<Index> I = orig.updating_intervals();
     add_updatable_derivs(I);
   }
@@ -1211,7 +1211,7 @@ void global::replay::reverse_sub() {
 void global::replay::clear_deriv_sub() {
   orig.clear_array_subgraph(derivs);
 
-  if (orig.opstack.any.test(op_info::updating)) {
+  if (orig.opstack.any.test(op_info::reverse_updating)) {
     intervals<Index> I = orig.updating_intervals_sub();
     add_updatable_derivs(I);
   }
@@ -1334,7 +1334,7 @@ void global::extract_sub_inplace(std::vector<bool> marks) {
     for (size_t j = 0; j < nout; j++) {
       any_marked_output |= args.y(j);
     }
-    if (info.test(op_info::updating) && nout == 0) {
+    if (info.test(op_info::forward_updating)) {
       Dependencies dep;
       opstack[i]->dependencies_updating(args, dep);
       any_marked_output |= dep.any(args.values);
@@ -1534,7 +1534,7 @@ graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
   size_t i = 0;
   append_edges F(i, opstack.size(), keep_var, var2op, edges);
   for (; i < opstack.size(); i++) {
-    any_updating |= opstack[i]->info().test(op_info::updating);
+    any_updating |= opstack[i]->info().test(op_info::forward_updating);
     dep.clear();
     opstack[i]->dependencies(args, dep);
     F.start_iteration();
@@ -4456,88 +4456,26 @@ void SegmentRef::resize(ad_segment &pack, Index n) {
   p->size = n;
 }
 
-PackOp::PackOp(const Index n) : n(n) {}
-
-void PackOp::forward(ForwardArgs<Scalar> &args) {
-  SegmentRef *y = (SegmentRef *)args.y_ptr(0);
-  y[0] = SegmentRef(args.glob_ptr, args.input(0), n);
-}
-
-void PackOp::forward(ForwardArgs<Replay> &args) {
-  ad_segment x(args.x_ptr(0), n);
-  args.y_segment(0, K) = pack(x);
-}
-
-void PackOp::reverse(ReverseArgs<Scalar> &args) {
-  SegmentRef tmp(args.dy_ptr(0));
-  if (tmp.glob_ptr != NULL) {
-    Scalar *dx = SegmentRef(args.y_ptr(0)).deriv_ptr();
-    Scalar *dy = SegmentRef(args.dy_ptr(0)).deriv_ptr();
-    for (Index i = 0; i < n; i++) dx[i] += dy[i];
+ad_segment pack(const ad_segment &x, bool up) {
+  if (up) {
+    global::Complete<PackOp<true> > F(x.size());
+    return F(x);
+  } else {
+    global::Complete<PackOp<false> > F(x.size());
+    return F(x);
   }
-}
-
-void PackOp::reverse(ReverseArgs<Replay> &args) {
-  ad_segment dy_packed(args.dy_ptr(0), K);
-
-  if (SegmentRef(dy_packed).isNull()) {
-    SegmentRef().resize(dy_packed, n);
-  }
-  ad_segment dy = unpack(dy_packed);
-  ad_segment dx(args.dx_ptr(0), n, true);
-  dx += dy;
-  Replay *pdx = args.dx_ptr(0);
-  for (Index i = 0; i < n; i++) pdx[i] = dx[i];
-}
-
-const char *PackOp::op_name() { return "PackOp"; }
-
-void PackOp::dependencies(Args<> &args, Dependencies &dep) const {
-  dep.add_segment(args.input(0), n);
-}
-
-UnpkOp::UnpkOp(const Index n) : noutput(n) {}
-
-void UnpkOp::forward(ForwardArgs<Scalar> &args) {
-  Scalar *y = args.y_ptr(0);
-  SegmentRef srx(args.x_ptr(0));
-  if (srx.isNull()) {
-    for (Index i = 0; i < noutput; i++) y[i] = 0;
-    return;
-  }
-  Scalar *x = srx.value_ptr();
-  for (Index i = 0; i < noutput; i++) y[i] = x[i];
-
-  ((SegmentRef *)args.x_ptr(0))->glob_ptr = NULL;
-}
-
-void UnpkOp::reverse(ReverseArgs<Scalar> &args) {
-  SegmentRef *dx = (SegmentRef *)args.dx_ptr(0);
-  dx[0] = SegmentRef(args.glob_ptr, args.output(0), noutput);
-}
-
-void UnpkOp::reverse(ReverseArgs<Replay> &args) {
-  ad_segment dy(args.dy_ptr(0), noutput);
-  ad_segment dy_packed = pack(dy);
-  Replay *pdx = args.dx_ptr(0);
-  for (Index i = 0; i < dy_packed.size(); i++) pdx[i] = dy_packed[i];
-}
-
-const char *UnpkOp::op_name() { return "UnpkOp"; }
-
-void UnpkOp::dependencies(Args<> &args, Dependencies &dep) const {
-  dep.add_segment(args.input(0), K);
-}
-
-ad_segment pack(const ad_segment &x) {
-  global::Complete<PackOp> F(x.size());
-  return F(x);
 }
 
 ad_segment unpack(const ad_segment &x) {
   Index n = SegmentRef(x).size;
-  global::Complete<UnpkOp> op(n);
+  global::Complete<UnpkOp<false> > op(n);
   return op(x);
+}
+
+void unpack(const ad_segment &x, ad_segment &y) {
+  Index n = SegmentRef(x).size;
+  global::Complete<UnpkOp<true> > op(n);
+  op(x, y);
 }
 
 Scalar *unpack(const std::vector<Scalar> &x, Index j) {

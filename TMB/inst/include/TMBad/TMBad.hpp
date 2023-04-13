@@ -1177,7 +1177,7 @@ struct ADFun_packed {
   ADFun_packed() {}
   ad_segment operator()(const std::vector<ad_segment> &x) {
     std::vector<ad_segment> xp(x.size());
-    for (size_t i = 0; i < xp.size(); i++) xp[i] = pack(x[i]);
+    for (size_t i = 0; i < xp.size(); i++) xp[i] = pack(x[i], true);
     std::vector<ad_aug> yp = Fp(concat(xp));
     return unpack(yp, 0);
   }
@@ -1199,7 +1199,7 @@ ADFun_packed<> ADFun_retaping(Functor &F, const std::vector<ad_segment> &x,
       DTab;
   PackWrap<Functor> Fp(F);
   std::vector<ad_segment> xp(x.size());
-  for (size_t i = 0; i < xp.size(); i++) xp[i] = pack(x[i]);
+  for (size_t i = 0; i < xp.size(); i++) xp[i] = pack(x[i], true);
   std::vector<ad_aug> xp_ = concat(xp);
   PackWrap<Test> testp(test);
   global::Complete<AtomOp<DTab> > Op(Fp, xp_, testp);

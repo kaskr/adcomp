@@ -386,7 +386,7 @@ struct ForwardArgs<bool> : Args<> {
   /** \brief Helper */
   template <class Operator>
   void mark_all_output(const Operator &op) {
-    if (Operator::updating && op.output_size() == 0) {
+    if (Operator::forward_updating) {
       Dependencies dep;
       op.dependencies_updating(*this, dep);
 
@@ -435,7 +435,7 @@ struct ReverseArgs<bool> : Args<> {
   template <class Operator>
   bool any_marked_output(const Operator &op) {
     if (Operator::elimination_protected) return true;
-    if (Operator::updating && op.output_size() == 0) {
+    if (Operator::forward_updating) {
       Dependencies dep;
       op.dependencies_updating(*this, dep);
       return dep.any(values);
@@ -750,8 +750,10 @@ struct op_info {
     allow_remap,
     /** \copydoc global::Operator::elimination_protected */
     elimination_protected,
-    /** \copydoc global::Operator::updating */
-    updating,
+    /** \copydoc global::Operator::forward_updating */
+    forward_updating,
+    /** \copydoc global::Operator::reverse_updating */
+    reverse_updating,
     /** \brief Mark end of enum */
     op_flag_count
   };
@@ -766,7 +768,8 @@ struct op_info {
         (op.dependent_variable * (1 << dependent_variable)) |
         (op.allow_remap * (1 << allow_remap)) |
         (op.elimination_protected * (1 << elimination_protected)) |
-        (op.updating * (1 << updating));
+        (op.forward_updating * (1 << forward_updating)) |
+        (op.reverse_updating * (1 << reverse_updating));
   }
   op_info();
   op_info(op_flag f);
@@ -855,7 +858,7 @@ struct global {
     */
     virtual void dependencies(Args<> &args, Dependencies &dep) = 0;
     /** \brief Get the indices of variables updated by this operator.
-        \details Used only when `Operator::updating` flag is set.
+        \details Used only when `Operator::forward_updating` flag is set.
     */
     virtual void dependencies_updating(Args<> &args, Dependencies &dep) = 0;
     /** \brief Replay operation sequence. \copydoc forward */
@@ -1543,30 +1546,34 @@ struct global {
     static const bool elimination_protected = false;
     /** \brief This operator **may** update existing variables ?
 
-        \details An 'updating' operator is allowed to update
+        \details A 'forward_updating' operator is allowed to update
         (increment/decrement) *certain* ('updatable') variables
         already on the tape.  In general this property breaks basic
         principles of reverse mode AD unless the following extra
         requirement is satisfied:
 
-        - Once an updatable variable have been *read* it may no longer be
+        - Once an updatable variable has been *read* it may no longer be
        updated.
 
         This requrement always holds for the derivative variables during reverse
-       replay. We note that 'updating' operators are considered an extension to
-       the standard AD framework. In particular, a more complex dependency
-       anlysis is required:
+       replay. We note that 'forward_updating' operators are considered an
+       extension to the standard AD framework. In particular, a more complex
+        dependency anlysis is required:
 
-        - Updating operators **must** have `implicit_dependencies=true`.
-        - The `updating` flag **must** be inherited by derivatives.
-        - The `updating` flag signifies that necessary derivative
-          workspaces are added to the tape prior to any reverse
-          replay.
-        - An `updating` operator **must** implement the member
+        - A `forward_updating` operator **must** implement the member
           `dependencies_updating()` defining which variables are
           updated.
+        - Forward updating operators **must** have `implicit_dependencies=true`
+       (FIXME: not sure about this).
     */
-    static const bool updating = false;
+    static const bool forward_updating = false;
+    /** \brief The derivative of this operator is `forward_updating`
+
+        - The `reverse_updating` flag signifies that necessary
+          derivative workspaces are added to the tape prior to any
+          reverse replay.
+    */
+    static const bool reverse_updating = false;
     /** \brief Default implementation of `OperatorPure::dependencies_updating()`
      */
     void dependencies_updating(Args<> &args, Dependencies &dep) const {}
@@ -2339,7 +2346,7 @@ struct global {
   };
   /** \brief Add zero allocated workspace to the tape
 
-      Serves as a pre-allocated workspace for `Operator::updating`
+      Serves as a pre-allocated workspace for `Operator::forward_updating`
       operators. In particular
 
       - Operator outputs are not allowed to be remapped (ensured by 'dynamic')
