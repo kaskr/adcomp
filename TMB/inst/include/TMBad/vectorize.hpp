@@ -441,6 +441,8 @@ struct PackOp : global::DynamicOperator<1, ScalarPack<SegmentRef>::size> {
   /** \brief Unpack derivatives (replay) */
   void reverse(ReverseArgs<Replay> &args);
   const char *op_name();
+  /** \brief It is **not* safe to remap the inputs of this operator */
+  static const bool allow_remap = false;
   static const bool have_dependencies = true;
   static const bool implicit_dependencies = true;
   void dependencies(Args<> &args, Dependencies &dep) const;
@@ -471,6 +473,8 @@ struct UnpkOp : global::DynamicOperator<1, -1> {
   void reverse(ReverseArgs<Replay> &args);
   const char *op_name();
 
+  /** \brief It is **not* safe to remap the inputs of this operator */
+  static const bool allow_remap = false;
   static const bool have_dependencies = true;
   static const bool implicit_dependencies = true;
   void dependencies(Args<> &args, Dependencies &dep) const;
