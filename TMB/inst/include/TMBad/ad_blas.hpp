@@ -24,7 +24,7 @@ global::ad_segment contiguousBlock(const Matrix &x) {
   bool yes = true;
   Index j_previous = -1;
   for (size_t i = 0; i < (size_t)x.size(); i++) {
-    if (!x(i).ontape()) {
+    if (!x(i).on_some_tape()) {
       yes = false;
       break;
     }

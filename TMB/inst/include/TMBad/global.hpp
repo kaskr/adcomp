@@ -2563,7 +2563,7 @@ struct global {
     Index index;
     static const Index NA = (Index)-1;
     bool initialized() const;
-    bool ontape() const;
+    bool on_some_tape() const;
     /** \brief Compatibiltiy with ad_aug */
     void addToTape() const;
     /** \brief Get the tape of this ad_plain */
@@ -2791,6 +2791,7 @@ struct global {
         tape or might *not* satisfy the storage requirement. */
     ad_segment(Replay *x, size_t n, bool zero_check = false);
     bool identicalZero();
+    bool all_on_active_tape(Replay *x, size_t n);
     bool is_contiguous(Replay *x, size_t n);
     bool all_zero(Replay *x, size_t n);
     bool all_constant(Replay *x, size_t n);
@@ -2833,7 +2834,15 @@ struct global {
       mutable global *glob;
     }
     data;
+    /** \brief Is this object on *some* (not necessarily active) tape? */
+    bool on_some_tape() const;
+    /** \brief Is this object on the current active tape? */
+    bool on_active_tape() const;
+    /** \brief Alias for `on_some_tape()` (for backward compatibility only) */
     bool ontape() const;
+    /** \brief Is this object guarantied to be a constant?
+        \note If `false` the object *may* or *may not* be constant.
+    */
     bool constant() const;
     Index index() const;
     /** \brief Get the tape of this ad_aug
@@ -3031,7 +3040,7 @@ bool isContiguous(V &x) {
   bool ok = true;
   Index j_previous;
   for (size_t i = 0; i < (size_t)x.size(); i++) {
-    if (!x[i].ontape()) {
+    if (!x[i].on_some_tape()) {
       ok = false;
       break;
     }

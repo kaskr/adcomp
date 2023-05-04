@@ -1795,6 +1795,7 @@ void global::print(print_config cfg) {
     Rcout << setw(7) << i;
     int numvar = opstack[i]->output_size();
     for (int j = 0; j < numvar + (numvar == 0); j++) {
+      if (j > 0) Rcout << cfg.prefix;
       Rcout << setw((7 + 7) * (j > 0) + 13);
       if (numvar > 0)
         Rcout << values[v];
@@ -1942,12 +1943,12 @@ void global::add_to_opstack(OperatorPure *pOp) {
 
 bool global::ad_plain::initialized() const { return index != NA; }
 
-bool global::ad_plain::ontape() const { return initialized(); }
+bool global::ad_plain::on_some_tape() const { return initialized(); }
 
 void global::ad_plain::addToTape() const { TMBAD_ASSERT(initialized()); }
 
 global *global::ad_plain::glob() const {
-  return (ontape() ? get_glob() : NULL);
+  return (on_some_tape() ? get_glob() : NULL);
 }
 
 void global::ad_plain::override_by(const ad_plain &x) const {}
@@ -2107,15 +2108,30 @@ global::ad_segment::ad_segment(Replay *x, size_t n, bool zero_check)
     return;
   }
   if (!is_contiguous(x, n)) {
-    for (size_t i = 0; i < n; i++) x[i] = x[i].copy();
+    size_t before = get_glob()->values.size();
+    this->x = x[0].copy();
+    for (size_t i = 1; i < n; i++) x[i].copy();
+    size_t after = get_glob()->values.size();
+    TMBAD_ASSERT2(after - before == n,
+                  "Each invocation of copy() should construct a new variable");
+    return;
   }
   if (n > 0) this->x = x[0];
 }
 
 bool global::ad_segment::identicalZero() { return !x.initialized(); }
 
+bool global::ad_segment::all_on_active_tape(Replay *x, size_t n) {
+  global *cur_glob = get_glob();
+  for (size_t i = 0; i < n; i++) {
+    bool ok = x[i].on_some_tape() && (x[i].glob() == cur_glob);
+    if (!ok) return false;
+  }
+  return true;
+}
+
 bool global::ad_segment::is_contiguous(Replay *x, size_t n) {
-  if (n > 0 && !(*x).ontape()) return false;
+  if (!all_on_active_tape(x, n)) return false;
   for (size_t i = 1; i < n; i++) {
     if (x[i].index() != x[i - 1].index() + 1) return false;
   }
@@ -2152,16 +2168,24 @@ ad_plain global::ad_segment::offset() const { return x; }
 
 Index global::ad_segment::index() const { return x.index; }
 
-bool global::ad_aug::ontape() const { return taped_value.initialized(); }
+bool global::ad_aug::on_some_tape() const { return taped_value.initialized(); }
+
+bool global::ad_aug::on_active_tape() const {
+  return on_some_tape() && (this->glob() == get_glob());
+}
+
+bool global::ad_aug::ontape() const { return on_some_tape(); }
 
 bool global::ad_aug::constant() const { return !taped_value.initialized(); }
 
 Index global::ad_aug::index() const { return taped_value.index; }
 
-global *global::ad_aug::glob() const { return (ontape() ? data.glob : NULL); }
+global *global::ad_aug::glob() const {
+  return (on_some_tape() ? data.glob : NULL);
+}
 
 Scalar global::ad_aug::Value() const {
-  if (ontape())
+  if (on_some_tape())
     return taped_value.Value(this->data.glob);
   else
     return data.value;
@@ -2174,7 +2198,7 @@ global::ad_aug::ad_aug(Scalar x) { data.value = x; }
 global::ad_aug::ad_aug(ad_plain x) : taped_value(x) { data.glob = get_glob(); }
 
 void global::ad_aug::addToTape() const {
-  if (ontape()) {
+  if (on_some_tape()) {
     if (data.glob != get_glob()) {
       TMBAD_ASSERT2(in_context_stack(data.glob), "Variable not initialized?");
       global::OperatorPure *pOp =
@@ -2205,19 +2229,21 @@ bool global::ad_aug::in_context_stack(global *glob) const {
 }
 
 ad_aug global::ad_aug::copy() const {
-  if (ontape()) {
+  if (on_active_tape()) {
     return taped_value.copy();
   } else {
-    addToTape();
-    return *this;
+    ad_aug cpy = *this;
+    cpy.addToTape();
+    return cpy;
   }
 }
 
 ad_aug global::ad_aug::copy0() const {
-  if (!ontape()) {
-    addToTape();
+  ad_aug cpy = *this;
+  if (!cpy.on_active_tape()) {
+    cpy.addToTape();
   }
-  return taped_value.copy0();
+  return cpy.taped_value.copy0();
 }
 
 bool global::ad_aug::identicalZero() const {
@@ -2310,7 +2336,7 @@ void global::ad_aug::Independent() {
 }
 
 Scalar &global::ad_aug::Value() {
-  if (ontape())
+  if (on_some_tape())
 
     return taped_value.Value();
   else
@@ -2332,7 +2358,7 @@ std::ostream &operator<<(std::ostream &os, const global::ad_plain &x) {
 
 std::ostream &operator<<(std::ostream &os, const global::ad_aug &x) {
   os << "{";
-  if (x.ontape()) {
+  if (x.on_some_tape()) {
     os << "value=" << x.data.glob->values[x.taped_value.index] << ", ";
     os << "index=" << x.taped_value.index << ", ";
     os << "tape=" << x.data.glob;
@@ -3680,7 +3706,7 @@ void clique::get_stride(const clique &super, Index ind,
   for (size_t i = 0; i < xa_count; i++, ++mv) {
     mv.flip();
     for (size_t j = 0; j < xi_count; j++, ++mv) {
-      TMBAD_ASSERT(logsum[j].ontape());
+      TMBAD_ASSERT(logsum[j].on_some_tape());
       x[mv] = logsum[j];
     }
     mv.flip();

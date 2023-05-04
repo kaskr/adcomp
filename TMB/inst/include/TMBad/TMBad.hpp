@@ -442,7 +442,7 @@ struct ADFun {
     }
     global *cur_glob = get_glob();
     for (size_t i = 0; i < x.size(); i++) {
-      TMBAD_ASSERT(x[i].ontape());
+      TMBAD_ASSERT(x[i].on_some_tape());
       TMBAD_ASSERT(x[i].glob() == cur_glob);
     }
     global::replay replay(this->glob, *get_glob());
@@ -574,7 +574,7 @@ struct ADFun {
       x[i].addToTape();
     }
     for (size_t i = 0; i < x.size(); i++) {
-      TMBAD_ASSERT(x[i].ontape());
+      TMBAD_ASSERT(x[i].on_some_tape());
       TMBAD_ASSERT(x[i].glob() == cur_glob);
     }
 
@@ -583,7 +583,7 @@ struct ADFun {
       w[i].addToTape();
     }
     for (size_t i = 0; i < w.size(); i++) {
-      TMBAD_ASSERT(w[i].ontape());
+      TMBAD_ASSERT(w[i].on_some_tape());
       TMBAD_ASSERT(w[i].glob() == cur_glob);
     }
 

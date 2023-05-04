@@ -235,7 +235,8 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
   void print(global::print_config cfg) {
     Rcout << cfg.prefix;
     Rcout << "order=" << order << " ";
-    Rcout << "(*dtab).size()=" << (*dtab).size() << "\n";
+    Rcout << "(*dtab).size()=" << (*dtab).size() << " ";
+    Rcout << "dtab=" << &(*dtab) << "\n";
     (*dtab)[order].print(cfg);
   }
 };
