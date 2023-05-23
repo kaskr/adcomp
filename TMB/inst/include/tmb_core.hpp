@@ -1877,6 +1877,20 @@ SEXP TransformADFunObject(SEXP f, SEXP control)
   }
 #endif
 
+SEXP getSetGlobalPtr(SEXP ptr) {
+#ifdef TMBAD_FRAMEWORK
+  SEXP global_ptr_tag = Rf_install("global_ptr");
+  if (!Rf_isNull(ptr)) {
+    SEXP tag = R_ExternalPtrTag(ptr);
+    if (tag != global_ptr_tag) Rf_error("Invalid pointer type");
+    TMBad::global_ptr = (TMBad::global**) R_ExternalPtrAddr(ptr);
+  }
+  SEXP res = R_MakeExternalPtr( (void*) TMBad::global_ptr, global_ptr_tag, R_NilValue);
+  return res;
+#else
+  return R_NilValue;
+#endif
+}
 
   SEXP tmbad_print(SEXP f, SEXP control) {
 #ifdef TMBAD_FRAMEWORK
@@ -2713,6 +2727,7 @@ extern "C"
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control);
   SEXP usingAtomics();
   SEXP getFramework();
+  SEXP getSetGlobalPtr(SEXP ptr);
   SEXP TransformADFunObject(SEXP f, SEXP control);
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y);
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y);
@@ -2742,6 +2757,7 @@ extern "C"{
   {"MakeADHessObject2",   (DL_FUNC) &MakeADHessObject2,   4},   \
   {"usingAtomics",        (DL_FUNC) &usingAtomics,        0},   \
   {"getFramework",        (DL_FUNC) &getFramework,        0},   \
+  {"getSetGlobalPtr",     (DL_FUNC) &getSetGlobalPtr,     1},   \
   {"TMBconfig",           (DL_FUNC) &TMBconfig,           2}
   /* May be used as part of custom R_init function
      C-callable routines (PACKAGE is 'const char*') */
