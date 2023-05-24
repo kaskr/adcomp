@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.9.3</span>
+   &#160;<span id="projectnumber">v1.9.4</span>
    </div>
   </td>
  </tr>
@@ -204,6 +204,10 @@ static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a16252a03e121d31f8575c17547813465">independent_variable</a></td></tr>
 <tr class="memdesc:a16252a03e121d31f8575c17547813465 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is output of this operator an independent variable ? <br /></td></tr>
 <tr class="separator:a16252a03e121d31f8575c17547813465 inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68faada3d6cf2bd102b35d0fd12b38db inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memItemLeft" align="right" valign="top"><a id="a68faada3d6cf2bd102b35d0fd12b38db"></a>
+static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a68faada3d6cf2bd102b35d0fd12b38db">is_constant</a></td></tr>
+<tr class="memdesc:a68faada3d6cf2bd102b35d0fd12b38db inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this a constant operator ? <br /></td></tr>
+<tr class="separator:a68faada3d6cf2bd102b35d0fd12b38db inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa04ac97e7c374bfa9e9fda7a5f40de5d inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="memItemLeft" align="right" valign="top"><a id="aa04ac97e7c374bfa9e9fda7a5f40de5d"></a>
 static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#aa04ac97e7c374bfa9e9fda7a5f40de5d">is_linear</a></td></tr>
 <tr class="memdesc:aa04ac97e7c374bfa9e9fda7a5f40de5d inherit pub_static_attribs_structTMBad_1_1global_1_1Operator"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this a linear operator ? <br /></td></tr>
@@ -236,7 +240,7 @@ struct TMBad::global::RepCompress&lt; Operator1 &gt;</h3>
 <p>This operator is like <code><a class="el" href="structTMBad_1_1global_1_1Rep.html" title="Replicate an operator. ">global::Rep</a></code> except that it also represents input compression. Input compression means that the input indices of any given operator can be obtained by adding a constant vector to the inputs of the previous operator. </p><dl class="section note"><dt>Note</dt><dd>When replacing a batch of binary operators by <code><a class="el" href="structTMBad_1_1global_1_1RepCompress.html" title="Replicate an operator and apply input compression. ">RepCompress</a></code> the memory <em>reduction</em> is assymptotically <code>2/3</code> (ratio will in general depend on the configuration typedefs). </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>TO BE DEPRECATED. HAS IMPLICIT DEPENDENCIES. </dd></dl>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01952">1952</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01957">1957</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a9e706baa93e10bb093321b9b7c9a3aa7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9e706baa93e10bb093321b9b7c9a3aa7">&sect;&nbsp;</a></span>dependent_variable</h2>
@@ -262,7 +266,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Is output of this operator a dependent variable ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01956">1956</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01961">1961</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +294,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Have <code>forward_incr</code> and <code>reverse_incr</code> members been defined ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02073">2073</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l02078">2078</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +322,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Have <code>forward_mark</code> and <code>reverse_mark</code> members been defined ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02077">2077</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l02082">2082</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -346,7 +350,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Have <code>forward</code> and <code>reverse</code> members been defined ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l02075">2075</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l02080">2080</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -374,7 +378,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Have <code>input_size</code> and <code>output_size</code> members been defined ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01967">1967</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01972">1972</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +406,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Is output of this operator an independent variable ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01954">1954</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01959">1959</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -430,7 +434,7 @@ template&lt;class Operator1&gt; </div>
 
 <p>Is this a linear operator ? </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01958">1958</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01963">1963</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>

@@ -11,5 +11,6 @@ var searchData=
   ['inv_5findex',['inv_index',['../structTMBad_1_1global.html#a79f37158b8f5271c5313b45e36bc7d2c',1,'TMBad::global']]],
   ['inv_5fpos',['inv_pos',['../structTMBad_1_1ADFun.html#a705447d5939318791890cfae1dec2714',1,'TMBad::ADFun']]],
   ['inv_5fseed',['inv_seed',['../structTMBad_1_1global_1_1hash__config.html#a2af4600dc0577f10e4f5917aa82705ea',1,'TMBad::global::hash_config']]],
+  ['is_5fconstant',['is_constant',['../structTMBad_1_1global_1_1Operator.html#a68faada3d6cf2bd102b35d0fd12b38db',1,'TMBad::global::Operator']]],
   ['is_5flinear',['is_linear',['../structTMBad_1_1global_1_1Operator.html#aa04ac97e7c374bfa9e9fda7a5f40de5d',1,'TMBad::global::Operator::is_linear()'],['../structTMBad_1_1global_1_1Fused.html#a08f0e92f584cc7a5cf5ab4a4779b84e4',1,'TMBad::global::Fused::is_linear()'],['../structTMBad_1_1global_1_1Rep.html#a3a9f7c5517c744800d058ac3380345da',1,'TMBad::global::Rep::is_linear()'],['../structTMBad_1_1global_1_1RepCompress.html#a61289352180dae19ded143be4ea1903d',1,'TMBad::global::RepCompress::is_linear()']]]
 ];

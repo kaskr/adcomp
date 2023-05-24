@@ -25,6 +25,7 @@ var searchData=
   ['config_2ehpp',['config.hpp',['../config_8hpp.html',1,'']]],
   ['config_3c_20double_20_3e',['config&lt; double &gt;',['../structsparse__matrix__exponential_1_1config.html',1,'sparse_matrix_exponential']]],
   ['config_5fstruct',['config_struct',['../structconfig__struct.html',1,'']]],
+  ['constant',['constant',['../structTMBad_1_1global_1_1ad__aug.html#a83db200d2867edbd6d01166c0bc7fea6',1,'TMBad::global::ad_aug']]],
   ['contar2_5ft',['contAR2_t',['../classdensity_1_1contAR2__t.html',1,'density']]],
   ['contiguousblock',['contiguousBlock',['../namespaceTMBad.html#a02c930c5983988be2a3c57322b23ebde',1,'TMBad']]],
   ['control',['control',['../structTMBad_1_1control.html',1,'TMBad']]],

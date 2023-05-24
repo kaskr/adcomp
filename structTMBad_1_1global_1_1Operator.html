@@ -28,7 +28,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">TMB Documentation
-   &#160;<span id="projectnumber">v1.9.3</span>
+   &#160;<span id="projectnumber">v1.9.4</span>
    </div>
   </td>
  </tr>
@@ -162,6 +162,10 @@ static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a16252a03e121d31f8575c17547813465">independent_variable</a> = false</td></tr>
 <tr class="memdesc:a16252a03e121d31f8575c17547813465"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is output of this operator an independent variable ? <br /></td></tr>
 <tr class="separator:a16252a03e121d31f8575c17547813465"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68faada3d6cf2bd102b35d0fd12b38db"><td class="memItemLeft" align="right" valign="top"><a id="a68faada3d6cf2bd102b35d0fd12b38db"></a>
+static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#a68faada3d6cf2bd102b35d0fd12b38db">is_constant</a> = false</td></tr>
+<tr class="memdesc:a68faada3d6cf2bd102b35d0fd12b38db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this a constant operator ? <br /></td></tr>
+<tr class="separator:a68faada3d6cf2bd102b35d0fd12b38db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa04ac97e7c374bfa9e9fda7a5f40de5d"><td class="memItemLeft" align="right" valign="top"><a id="aa04ac97e7c374bfa9e9fda7a5f40de5d"></a>
 static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTMBad_1_1global_1_1Operator.html#aa04ac97e7c374bfa9e9fda7a5f40de5d">is_linear</a> = false</td></tr>
 <tr class="memdesc:aa04ac97e7c374bfa9e9fda7a5f40de5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this a linear operator ? <br /></td></tr>
@@ -192,7 +196,7 @@ struct TMBad::global::Operator&lt; ninput_, noutput_ &gt;</h3>
 
 <p><a class="el" href="structTMBad_1_1global_1_1Operator.html" title="Operator with input/output dimension known at compile time. ">Operator</a> with input/output dimension known at compile time. </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01488">1488</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01491">1491</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a805360f5e00d94f915a7b28e4a6a68a7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a805360f5e00d94f915a7b28e4a6a68a7">&sect;&nbsp;</a></span>allow_remap</h2>
@@ -219,7 +223,7 @@ template&lt;int ninput_, int noutput_ = 1&gt; </div>
 <p>Is it safe to remap the inputs of this operator? </p>
 <p>In general it is illegal to remap operators that assume a certain memory layout of its inputs, e.g. BLAS routines. Make sure to set to <code>false</code> for those cases. </p>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01516">1516</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01519">1519</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -252,7 +256,7 @@ template&lt;int ninput_, int noutput_ = 1&gt; </div>
 </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01527">1527</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01530">1530</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +295,7 @@ template&lt;int ninput_, int noutput_ = 1&gt; </div>
 <li>An <code>updating</code> operator <b>must</b> implement the member <code><a class="el" href="structTMBad_1_1global_1_1Operator.html#a40adcfb6719f3e08b308a976083ccd02" title="Default implementation of OperatorPure::dependencies_updating() ">dependencies_updating()</a></code> defining which variables are updated. </li>
 </ul>
 
-<p>Definition at line <a class="el" href="global_8hpp_source.html#l01569">1569</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
+<p>Definition at line <a class="el" href="global_8hpp_source.html#l01574">1574</a> of file <a class="el" href="global_8hpp_source.html">global.hpp</a>.</p>
 
 </div>
 </div>

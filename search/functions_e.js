@@ -1,5 +1,8 @@
 var searchData=
 [
+  ['on_5factive_5ftape',['on_active_tape',['../structTMBad_1_1global_1_1ad__aug.html#a0e12f85baf74458ae06b1d879db89cdf',1,'TMBad::global::ad_aug']]],
+  ['on_5fsome_5ftape',['on_some_tape',['../structTMBad_1_1global_1_1ad__aug.html#a428ccba52294b5600bcdec5fb632d2b9',1,'TMBad::global::ad_aug']]],
+  ['ontape',['ontape',['../structTMBad_1_1global_1_1ad__aug.html#a76916066b45d28a3a9cd691f30ec70ee',1,'TMBad::global::ad_aug']]],
   ['op2idx',['op2idx',['../structTMBad_1_1global.html#a463cc358b18ec2160cab32a0dcfab95c',1,'TMBad::global']]],
   ['op2var',['op2var',['../structTMBad_1_1global.html#a6ef36053bc61dce1beb5e02ef0a41538',1,'TMBad::global::op2var(const std::vector&lt; Index &gt; &amp;seq)'],['../structTMBad_1_1global.html#abf5a069954deba4d4e7d027ff5b9d3b0',1,'TMBad::global::op2var(const std::vector&lt; bool &gt; &amp;seq_mark)']]],
   ['op_5fname',['op_name',['../structTMBad_1_1global_1_1OperatorPure.html#a92bfebf8f84888138185c39df3de43d7',1,'TMBad::global::OperatorPure::op_name()'],['../structTMBad_1_1global_1_1Complete.html#a32e269d5338aaa67bdcb481aa456ec33',1,'TMBad::global::Complete::op_name()']]],

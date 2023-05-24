@@ -49,6 +49,7 @@ var searchData=
   ['invlogit',['invlogit',['../convenience_8hpp.html#a2dc0f0009cd46180a4d5ae56a6a45cfa',1,'convenience.hpp']]],
   ['invpd',['invpd',['../namespaceatomic.html#a60dc81e22f17e8319ad028d01840e048',1,'atomic']]],
   ['invperm',['invperm',['../namespaceTMBad.html#ad00aca64104fb2a72dcf504491f883cd',1,'TMBad']]],
+  ['is_5fconstant',['is_constant',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a6b682e6b37657c67697c6dcfbd31e820',1,'TMBad::op_info::is_constant()'],['../structTMBad_1_1global_1_1Operator.html#a68faada3d6cf2bd102b35d0fd12b38db',1,'TMBad::global::Operator::is_constant()']]],
   ['is_5flinear',['is_linear',['../structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a1e34a9d317bd09492342b869ae2afc2f',1,'TMBad::op_info::is_linear()'],['../structTMBad_1_1global_1_1Operator.html#aa04ac97e7c374bfa9e9fda7a5f40de5d',1,'TMBad::global::Operator::is_linear()'],['../structTMBad_1_1global_1_1Fused.html#a08f0e92f584cc7a5cf5ab4a4779b84e4',1,'TMBad::global::Fused::is_linear()'],['../structTMBad_1_1global_1_1Rep.html#a3a9f7c5517c744800d058ac3380345da',1,'TMBad::global::Rep::is_linear()'],['../structTMBad_1_1global_1_1RepCompress.html#a61289352180dae19ded143be4ea1903d',1,'TMBad::global::RepCompress::is_linear()']]],
   ['iscontiguous',['isContiguous',['../namespaceTMBad.html#a7adc1233300ab60b78c4e365565e0839',1,'TMBad']]],
   ['isstructuralzero',['isStructuralZero',['../namespacetmbutils.html#ace8c4ebfe135990db4a545c9522141b6',1,'tmbutils']]]

@@ -12,6 +12,7 @@ var searchData=
   ['compose',['compose',['../structTMBad_1_1ADFun.html#ae62f5ccb12d043cd5584ad8914dd7e2a',1,'TMBad::ADFun']]],
   ['compress',['compress',['../structTMBad_1_1global_1_1Rep.html#ae7238e694aa7111403ebb9e0bf14fb98',1,'TMBad::global::Rep']]],
   ['concat',['concat',['../namespacetmbutils.html#aaf07f283042e355ceeb654eb27cd1e5d',1,'tmbutils']]],
+  ['constant',['constant',['../structTMBad_1_1global_1_1ad__aug.html#a83db200d2867edbd6d01166c0bc7fea6',1,'TMBad::global::ad_aug']]],
   ['contiguousblock',['contiguousBlock',['../namespaceTMBad.html#a02c930c5983988be2a3c57322b23ebde',1,'TMBad']]],
   ['copy',['copy',['../structTMBad_1_1global_1_1OperatorPure.html#a9a1ba345e1da9bd94ebacf8c6228175c',1,'TMBad::global::OperatorPure::copy()'],['../structTMBad_1_1global_1_1Complete.html#a7f3bef91176e6d4d953731151bc28875',1,'TMBad::global::Complete::copy()'],['../structTMBad_1_1global_1_1ad__aug.html#a2b2cecc8cd3e3a41200534584373663a',1,'TMBad::global::ad_aug::copy()']]],
   ['copy0',['copy0',['../structTMBad_1_1global_1_1ad__aug.html#a553f6ad29c674c0ee02401bc1386060b',1,'TMBad::global::ad_aug']]],
