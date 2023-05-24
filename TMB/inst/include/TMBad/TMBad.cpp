@@ -682,7 +682,8 @@ void compress(global &glob, size_t max_period_size) {
 #include "global.hpp"
 namespace TMBad {
 
-global *global_ptr[TMBAD_MAX_NUM_THREADS] = {NULL};
+global *global_ptr_data[TMBAD_MAX_NUM_THREADS] = {NULL};
+global **global_ptr = global_ptr_data;
 std::ostream *Writer::cout = 0;
 bool global::fuse = 0;
 
@@ -4229,7 +4230,6 @@ std::vector<Index> remap_identical_sub_expressions(
 
   std::vector<Index> v2o = glob.var2op();
   std::vector<Index> dep;
-  global::OperatorPure *constant = glob.getOperator<global::ConstOp>();
   global::OperatorPure *invop = glob.getOperator<global::InvOp>();
   Dependencies dep1;
   Dependencies dep2;
@@ -4257,6 +4257,8 @@ std::vector<Index> remap_identical_sub_expressions(
       ok &= (CurOp->input_size() == RemOp->input_size());
       ok &= (CurOp->output_size() == RemOp->output_size());
 
+      op_info CurInfo = CurOp->info();
+
       if (ok && (nout > 1)) {
         for (size_t k = 1; k < nout; k++) {
           ok &= (remap[i + k] < i);
@@ -4271,7 +4273,7 @@ std::vector<Index> remap_identical_sub_expressions(
         ok = false;
       }
       if (ok) {
-        if (CurOp == constant) {
+        if (CurInfo.test(op_info::is_constant)) {
           if (glob.values[i] != glob.values[remap[i]]) {
             ok = false;
           }

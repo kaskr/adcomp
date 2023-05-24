@@ -742,6 +742,8 @@ struct op_info {
     smart_pointer,
     /** \copydoc global::Operator::is_linear */
     is_linear,
+    /** \copydoc global::Operator::is_constant */
+    is_constant,
     /** \copydoc global::Operator::independent_variable */
     independent_variable,
     /** \copydoc global::Operator::dependent_variable */
@@ -762,6 +764,7 @@ struct op_info {
         (op.dynamic * (1 << dynamic)) |
         (op.smart_pointer * (1 << smart_pointer)) |
         (op.is_linear * (1 << is_linear)) |
+        (op.is_constant * (1 << is_constant)) |
         (op.independent_variable * (1 << independent_variable)) |
         (op.dependent_variable * (1 << dependent_variable)) |
         (op.allow_remap * (1 << allow_remap)) |
@@ -1537,6 +1540,8 @@ struct global {
     static const int max_fuse_depth = 2;
     /** \brief Is this a linear operator ? */
     static const bool is_linear = false;
+    /** \brief Is this a constant operator ? */
+    static const bool is_constant = false;
     /** \brief Is this operator a 'smart pointer' (with reference counting) ? */
     static const bool smart_pointer = false;
     /** \brief Protect this operator from elimination by the tape optimizer ? */
@@ -2318,6 +2323,7 @@ struct global {
 
   struct ConstOp : Operator<0, 1> {
     static const bool is_linear = true;
+    static const bool is_constant = true;
     template <class Type>
     void forward(ForwardArgs<Type> &args) {}
     void forward(ForwardArgs<Replay> &args);
