@@ -195,3 +195,11 @@ template                                                                \
 CppAD::vector<TMBad::ad_aug>                                            \
 ATOMIC_NAME<>(const CppAD::vector<TMBad::ad_aug>& tx);                  \
 )
+// Helper to forward declare atomic
+TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(ATOMIC_NAME)         \
+template<class dummy=void>                              \
+CppAD::vector<TMBad::ad_aug>                            \
+ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x);    \
+template<class dummy=void>                              \
+CppAD::vector<double>                                   \
+ATOMIC_NAME (const CppAD::vector<double> &tx);
