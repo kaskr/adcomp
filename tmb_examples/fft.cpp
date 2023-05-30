@@ -4,7 +4,7 @@
 template<class T>
 vector<std::complex<T> > real2cplx(vector<T> x) {
   vector<std::complex<T> > xc(x.size());
-  for (int i=0; i<x.size(); i++) xc[i].real(x[i]);
+  for (int i=0; i<x.size(); i++) xc[i] = x[i];
   return xc;
 }
 template<class T>
