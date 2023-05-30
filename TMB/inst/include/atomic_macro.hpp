@@ -119,7 +119,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(                                             \
   ATOMIC_REVERSE                                                        \
 )
 // Helper to forward declare atomic
-TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(ATOMIC_NAME)                         \
+#define TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(ATOMIC_NAME)                 \
 template<class T>                                                       \
 CppAD::vector<AD<T> > ATOMIC_NAME(const CppAD::vector<AD<T> > &x);      \
 template<class Double>                                                  \
