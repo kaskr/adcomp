@@ -2824,6 +2824,25 @@ ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2) {
   return ad_adapt(pow(ad_aug(x1), ad_aug(x2)));
 }
 
+Writer atan2(const Writer &x1, const Writer &x2) {
+  return "atan2"
+         "(" +
+         x1 + "," + x2 + ")";
+}
+const char *Atan2::op_name() { return "Atan2"; }
+ad_plain atan2(const ad_plain &x1, const ad_plain &x2) {
+  return get_glob()->add_to_stack<Atan2>(x1, x2);
+}
+ad_aug atan2(const ad_aug &x1, const ad_aug &x2) {
+  if (x1.constant() && x2.constant())
+    return Scalar(atan2(x1.Value(), x2.Value()));
+  else
+    return atan2(ad_plain(x1), ad_plain(x2));
+}
+ad_adapt atan2(const ad_adapt &x1, const ad_adapt &x2) {
+  return ad_adapt(atan2(ad_aug(x1), ad_aug(x2)));
+}
+
 Writer max(const Writer &x1, const Writer &x2) {
   return "max"
          "(" +

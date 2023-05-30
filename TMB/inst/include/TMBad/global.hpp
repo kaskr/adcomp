@@ -3493,6 +3493,26 @@ struct PowOp : global::BinaryOperator {
 ad_plain pow(const ad_plain &x1, const ad_plain &x2);
 ad_aug pow(const ad_aug &x1, const ad_aug &x2);
 ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2);
+using std::atan2;
+Writer atan2(const Writer &x1, const Writer &x2);
+struct Atan2 : global::BinaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x1, Type x2) {
+    return atan2(x1, x2);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    args.dx(0) += args.dy(0) * args.x(1) /
+                  (args.x(0) * args.x(0) + args.x(1) * args.x(1));
+    args.dx(1) += args.dy(0) * -args.x(0) /
+                  (args.x(0) * args.x(0) + args.x(1) * args.x(1));
+  }
+  const char *op_name();
+};
+ad_plain atan2(const ad_plain &x1, const ad_plain &x2);
+ad_aug atan2(const ad_aug &x1, const ad_aug &x2);
+ad_adapt atan2(const ad_adapt &x1, const ad_adapt &x2);
 using std::max;
 Writer max(const Writer &x1, const Writer &x2);
 struct MaxOp : global::BinaryOperator {
