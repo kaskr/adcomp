@@ -3198,8 +3198,11 @@ using ::expm1;
 using ::fabs;
 using ::log1p;
 using std::acos;
+using std::acosh;
 using std::asin;
+using std::asinh;
 using std::atan;
+using std::atanh;
 using std::cos;
 using std::cosh;
 using std::exp;
@@ -3471,6 +3474,60 @@ struct AtanOp : global::UnaryOperator {
 ad_plain atan(const ad_plain &x);
 ad_aug atan(const ad_aug &x);
 ad_adapt atan(const ad_adapt &x);
+Writer asinh(const Writer &x);
+struct AsinhOp : global::UnaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x) {
+    return asinh(x);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    args.dx(0) +=
+        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) + Type(1.));
+  }
+  void reverse(ReverseArgs<Scalar> &args);
+  const char *op_name();
+};
+ad_plain asinh(const ad_plain &x);
+ad_aug asinh(const ad_aug &x);
+ad_adapt asinh(const ad_adapt &x);
+Writer acosh(const Writer &x);
+struct AcoshOp : global::UnaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x) {
+    return acosh(x);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    args.dx(0) +=
+        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) - Type(1.));
+  }
+  void reverse(ReverseArgs<Scalar> &args);
+  const char *op_name();
+};
+ad_plain acosh(const ad_plain &x);
+ad_aug acosh(const ad_aug &x);
+ad_adapt acosh(const ad_adapt &x);
+Writer atanh(const Writer &x);
+struct AtanhOp : global::UnaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x) {
+    return atanh(x);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    args.dx(0) += args.dy(0) * Type(1.) / (Type(1) - args.x(0) * args.x(0));
+  }
+  void reverse(ReverseArgs<Scalar> &args);
+  const char *op_name();
+};
+ad_plain atanh(const ad_plain &x);
+ad_aug atanh(const ad_aug &x);
+ad_adapt atanh(const ad_adapt &x);
+
 template <class T>
 T abs(const T &x) {
   return fabs(x);

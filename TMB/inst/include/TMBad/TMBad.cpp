@@ -2805,6 +2805,74 @@ ad_aug atan(const ad_aug &x) {
 }
 ad_adapt atan(const ad_adapt &x) { return ad_adapt(atan(ad_aug(x))); }
 
+Writer asinh(const Writer &x) {
+  return "asinh"
+         "(" +
+         x + ")";
+}
+void AsinhOp::reverse(ReverseArgs<Scalar> &args) {
+  typedef Scalar Type;
+  if (args.dy(0) != Type(0))
+    args.dx(0) +=
+        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) + Type(1.));
+}
+const char *AsinhOp::op_name() { return "AsinhOp"; }
+ad_plain asinh(const ad_plain &x) {
+  return get_glob()->add_to_stack<AsinhOp>(x);
+}
+ad_aug asinh(const ad_aug &x) {
+  if (x.constant())
+    return Scalar(asinh(x.Value()));
+  else
+    return asinh(ad_plain(x));
+}
+ad_adapt asinh(const ad_adapt &x) { return ad_adapt(asinh(ad_aug(x))); }
+
+Writer acosh(const Writer &x) {
+  return "acosh"
+         "(" +
+         x + ")";
+}
+void AcoshOp::reverse(ReverseArgs<Scalar> &args) {
+  typedef Scalar Type;
+  if (args.dy(0) != Type(0))
+    args.dx(0) +=
+        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) - Type(1.));
+}
+const char *AcoshOp::op_name() { return "AcoshOp"; }
+ad_plain acosh(const ad_plain &x) {
+  return get_glob()->add_to_stack<AcoshOp>(x);
+}
+ad_aug acosh(const ad_aug &x) {
+  if (x.constant())
+    return Scalar(acosh(x.Value()));
+  else
+    return acosh(ad_plain(x));
+}
+ad_adapt acosh(const ad_adapt &x) { return ad_adapt(acosh(ad_aug(x))); }
+
+Writer atanh(const Writer &x) {
+  return "atanh"
+         "(" +
+         x + ")";
+}
+void AtanhOp::reverse(ReverseArgs<Scalar> &args) {
+  typedef Scalar Type;
+  if (args.dy(0) != Type(0))
+    args.dx(0) += args.dy(0) * Type(1.) / (Type(1) - args.x(0) * args.x(0));
+}
+const char *AtanhOp::op_name() { return "AtanhOp"; }
+ad_plain atanh(const ad_plain &x) {
+  return get_glob()->add_to_stack<AtanhOp>(x);
+}
+ad_aug atanh(const ad_aug &x) {
+  if (x.constant())
+    return Scalar(atanh(x.Value()));
+  else
+    return atanh(ad_plain(x));
+}
+ad_adapt atanh(const ad_adapt &x) { return ad_adapt(atanh(ad_aug(x))); }
+
 Writer pow(const Writer &x1, const Writer &x2) {
   return "pow"
          "(" +
