@@ -1,6 +1,7 @@
 var searchData=
 [
   ['factor',['factor',['../namespaceradix.html#a4c066628e3dc89be1fd84d2dd5da9d2b',1,'radix']]],
+  ['fft',['fft',['../group__matrix__functions.html#ga8d87d7ad84cedf1ac6460de525a4dbc1',1,'atomic']]],
   ['fill',['fill',['../structdata__indicator.html#a58dba081c3cf4870fa92cfde3a373357',1,'data_indicator']]],
   ['find_5fbest_5fperiod',['find_best_period',['../structTMBad_1_1periodic.html#a712569133a91fd9cce7ca044ef3b0827',1,'TMBad::periodic']]],
   ['find_5fop_5fby_5fname',['find_op_by_name',['../namespaceTMBad.html#ae0d169a0032feb2e2473c47a00f6bfcb',1,'TMBad']]],
