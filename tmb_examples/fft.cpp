@@ -1,3 +1,4 @@
+// Multivariate normal distribution with circulant covariance
 #include <TMB.hpp>
 #include <fft.hpp> // atomic fft
 
