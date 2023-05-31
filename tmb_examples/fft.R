@@ -5,9 +5,16 @@ compile("fft.cpp")
 dyn.load(dynlib("fft"))
 
 ## Data and parameters
+n <- 100
+d <- 0:(n-1)
+d <- pmin(d, n-d)
+C <- exp(-.1*d)
+## x ~ MVNORM(0, C)
 set.seed(1)
-data <- list(x=0:99, y=rnorm(100))
-parameters <- list(rho=.1)
+u <- rnorm(n)
+x <- Re(fft(sqrt(fft(C)) * fft(u, TRUE)) / n)
+data <- list(d=d, x=x)
+parameters <- list(rho=1)
 
 ## Make a function object
 obj <- MakeADFun(data, parameters, DLL="fft")
