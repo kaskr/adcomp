@@ -23,7 +23,7 @@ TMB_ATOMIC_VECTOR_FUNCTION( fft, tx.size(), fft_work<0>(tx, ty), px = ifft(py))
 TMB_ATOMIC_VECTOR_FUNCTION(ifft, tx.size(), fft_work<1>(tx, ty), px =  fft(py))
 
 /** \brief FFT (unscaled)
-    \param Complex vector to be transformed
+    \param xc Complex vector to be transformed
     \param inverse Apply the (unscaled) inverse transform?
     This interface is identical to 'stats::fft' so does **not** perform inverse scaling.
     \ingroup matrix_functions
