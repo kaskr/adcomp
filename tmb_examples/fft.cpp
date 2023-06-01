@@ -15,10 +15,11 @@ vector<std::complex<T> > cplx(vector<T> x) {
 template<class Type>
 Type log_dmvnorm_fft(vector<Type> x, vector<Type> C) {
   vector<std::complex<Type> > sd = atomic::fft(cplx(C)).sqrt();
-  vector<std::complex<Type> > y = atomic::fft(cplx(x), true);
-  std::complex<Type> zero(0);
-  return
-    dnorm(y, zero, sd, true).sum().real() + .5*log((double)C.size());
+  vector<std::complex<Type> > y = atomic::fft(cplx(x));
+  y = (y * y.conjugate()).sqrt(); // modulus
+  y = y / sqrt((Type) y.size());
+  std::complex<Type> zero(0, 0);
+  return dnorm(y, zero, sd, true).sum().real();
 }
 
 template<class Type>
