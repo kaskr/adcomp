@@ -402,7 +402,7 @@ template&lt;class I &gt; </td></tr>
 <p>Split a computational graph by it's accumulation tree. </p>
 <p>This routine transforms a function object with univariate output into a function object with multiple outputs. Each new output represents a term of the original function, i.e. by summing all the terms one can recover the original function. </p><dl class="section note"><dt>Note</dt><dd>FIXME: Handle the case Range() &gt; 1. Select which component ? </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03545">3545</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03613">3613</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451">TMBad::ADFun&lt;&gt;::marginal_gk()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9">TMBad::ADFun&lt;&gt;::marginal_sr()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -553,7 +553,7 @@ template&lt;class Functor , class Test &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03585">3585</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03653">3653</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1autopar.html#ac5cb220e781af8a02e6a43ea0fd7a3b6">TMBad::autopar::extract()</a>, <a class="el" href="structTMBad_1_1ADFun.html#ad0192b09b65b16f46e0a69a35f34f451">TMBad::ADFun&lt;&gt;::marginal_gk()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a3aab8cd00fa96e30755e2b7488df13b9">TMBad::ADFun&lt;&gt;::marginal_sr()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -578,7 +578,7 @@ template&lt;class Functor , class Test &gt; </div>
 <p>Test if all operators in the stack allow input remapping. </p>
 <p>I.e. test if <code><a class="el" href="structTMBad_1_1op__info.html#af522ad98410a04a8fff4be06e85be3a7a93b52f3b482f43a7ec7b7db4cffc2066" title="Is it safe to remap the inputs of this operator? ">op_info.allow_remap</a> = true</code> for all operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04223">4223</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04291">4291</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ae59304fbd753dbe20f62eb5c83ab1bfe">reorder_graph()</a>.</p>
 
@@ -674,7 +674,7 @@ template&lt;class V &gt; </div>
 <p>Get node indices of the accumulation tree or its boundary. </p>
 <p>The tree is defined as the maximal <b>topologically closed</b> sub graph T, containing only linear operators. In other words, the nodes in the tree are not allowed to produce variables that are inputs to any non linear operators. </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03482">3482</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03550">3550</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342">accumulation_tree_split()</a>, and <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>.</p>
 
@@ -992,7 +992,7 @@ template&lt;class Integrand &gt; </div>
 <p>Allow / disallow comparison operators for <code>ad_aug</code> </p>
 <p>It is recommended to disable comparison for the non-retaping type <code>ad_aug</code>, i.e. not including this file! </p>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04424">4424</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04492">4492</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -1074,7 +1074,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04235">4235</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04303">4303</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 </div>
 </div>
@@ -1138,7 +1138,7 @@ template&lt;class T &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Nothing is done if <b>any operators with pointer inputs are detected on the tape</b>. (FIXME: Not optimal) </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04387">4387</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l04455">4455</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structTMBad_1_1ADFun.html#a91d9e0e63497857f84456660c8188b96">TMBad::ADFun&lt;&gt;::reorder()</a>.</p>
 
@@ -1290,7 +1290,7 @@ template&lt;class T &gt; </div>
 <p>substitute node index sequence by independent variables </p>
 <dl class="section note"><dt>Note</dt><dd>Currently all operators in sequence must be different from InvOp </dd></dl>
 
-<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03516">3516</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TMBad_8cpp_source.html#l03584">3584</a> of file <a class="el" href="TMBad_8cpp_source.html">TMBad.cpp</a>.</p>
 
 <p>Referenced by <a class="el" href="namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342">accumulation_tree_split()</a>, <a class="el" href="structTMBad_1_1ADFun.html#a7eaf97afbbf35a63d2895b12a18391ce">TMBad::ADFun&lt;&gt;::decompose()</a>, <a class="el" href="namespaceTMBad.html#af80f24adb336b948a33c5e945c14c42a">order()</a>, and <a class="el" href="namespaceTMBad.html#a61a789d6a042c96e48fedfa05f868f6a">substitute()</a>.</p>
 
