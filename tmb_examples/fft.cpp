@@ -14,12 +14,11 @@ vector<std::complex<T> > cplx(vector<T> x) {
 // dmvnorm for circulant covariance
 template<class Type>
 Type log_dmvnorm_fft(vector<Type> x, vector<Type> C) {
-  vector<std::complex<Type> > sd = atomic::fft(cplx(C)).sqrt();
-  vector<std::complex<Type> > y = atomic::fft(cplx(x));
-  y = (y * y.conjugate()).sqrt(); // modulus
+  vector<Type> sd = atomic::fft(cplx(C)).real().sqrt();
+  vector<std::complex<Type> > Fx = atomic::fft(cplx(x));
+  vector<Type> y = (Fx * Fx.conjugate()).real().sqrt(); // modulus
   y = y / sqrt((Type) y.size());
-  std::complex<Type> zero(0, 0);
-  return dnorm(y, zero, sd, true).sum().real();
+  return dnorm(y, Type(0), sd, true).sum();
 }
 
 template<class Type>
