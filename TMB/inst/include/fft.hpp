@@ -18,9 +18,10 @@ void fft_work(const CppAD::vector<double> &x,
     f.inv(Y, X, ncplx);
 }
 
+TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(fft)  // So can be used by ifft
 TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(ifft) // So can be used by fft
-TMB_ATOMIC_VECTOR_FUNCTION( fft, tx.size(), fft_work<0>(tx, ty), px = ifft(py))
-TMB_ATOMIC_VECTOR_FUNCTION(ifft, tx.size(), fft_work<1>(tx, ty), px =  fft(py))
+TMB_ATOMIC_VECTOR_FUNCTION_DEFINE( fft, tx.size(), fft_work<0>(tx, ty), px = ifft(py))
+TMB_ATOMIC_VECTOR_FUNCTION_DEFINE(ifft, tx.size(), fft_work<1>(tx, ty), px =  fft(py))
 
 /** \brief FFT (unscaled)
     \param xc Complex vector to be transformed
@@ -28,6 +29,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(ifft, tx.size(), fft_work<1>(tx, ty), px =  fft(py))
     This interface is identical to 'stats::fft' so does **not** perform inverse scaling.
     \ingroup matrix_functions
     \note To use this function the header must be manually included.
+    \note The default implementation is not the most efficient available. The more efficient FFTW library can be used by setting the preprocessor flag `EIGEN_FFTW_DEFAULT`.
 */
 template<class Type>
 vector<std::complex<Type> > fft(vector<std::complex<Type> > xc,

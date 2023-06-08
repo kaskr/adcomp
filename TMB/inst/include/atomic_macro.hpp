@@ -124,3 +124,12 @@ template<class T>                                                       \
 CppAD::vector<AD<T> > ATOMIC_NAME(const CppAD::vector<AD<T> > &x);      \
 template<class Double>                                                  \
 CppAD::vector<double> ATOMIC_NAME(const CppAD::vector<Double > &x);
+// Helper to forward define atomic
+#define TMB_ATOMIC_VECTOR_FUNCTION_DEFINE(ATOMIC_NAME,          \
+                                          OUTPUT_DIM,           \
+                                          ATOMIC_DOUBLE,        \
+                                          ATOMIC_REVERSE)       \
+TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,                         \
+                           OUTPUT_DIM,                          \
+                           ATOMIC_DOUBLE,                       \
+                           ATOMIC_REVERSE)

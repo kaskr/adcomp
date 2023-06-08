@@ -1,6 +1,7 @@
 library(TMB)
 
-## Compile and load the model
+## Using the faster 'FFTW' library may be as simple as:
+##   compile("fft.cpp", CPPFLAGS="-DEIGEN_FFTW_DEFAULT", PKG_LIBS="-lfftw3")
 compile("fft.cpp")
 dyn.load(dynlib("fft"))
 

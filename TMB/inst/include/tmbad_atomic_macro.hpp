@@ -1,15 +1,14 @@
 
 
-/** \brief Construct atomic vector function based on known derivatives */
-#define TMB_ATOMIC_VECTOR_FUNCTION(                                     \
+#define TMB_ATOMIC_VECTOR_FUNCTION_DEFINE(                              \
   ATOMIC_NAME, OUTPUT_DIM,                                              \
   ATOMIC_DOUBLE,                                                        \
   ATOMIC_REVERSE                                                        \
 )                                                                       \
-template<class dummy=void>                                              \
+template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug>                                            \
 ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x);                    \
-template<class dummy=void>                                              \
+template<class dummy>                                                   \
 CppAD::vector<double>                                                   \
 ATOMIC_NAME (const CppAD::vector<double> &tx) CSKIP({                   \
   CppAD::vector<double> ty(OUTPUT_DIM);                                 \
@@ -203,3 +202,26 @@ ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x);    \
 template<class dummy=void>                              \
 CppAD::vector<double>                                   \
 ATOMIC_NAME (const CppAD::vector<double> &tx);
+/** \brief Construct atomic vector function based on known derivatives
+
+    This macro is used internally to define most atomic functions, see
+    for example `atomic::matmul`. It works portably for both CppAD and
+    TMBad.
+
+    The macro is actually composed of two other lower-level
+    macros. One *declares* and another *defines* the atomic function.
+    If two atomic functions depend on one another, the lower-level
+    macros may be useful - see e.g the atomic `fft`.
+
+    \ingroup macros */
+#define TMB_ATOMIC_VECTOR_FUNCTION(             \
+  ATOMIC_NAME, OUTPUT_DIM,                      \
+  ATOMIC_DOUBLE,                                \
+  ATOMIC_REVERSE                                \
+)                                               \
+TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(ATOMIC_NAME) \
+TMB_ATOMIC_VECTOR_FUNCTION_DEFINE(              \
+  ATOMIC_NAME, OUTPUT_DIM,                      \
+  ATOMIC_DOUBLE,                                \
+  ATOMIC_REVERSE                                \
+)
