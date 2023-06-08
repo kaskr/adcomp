@@ -158,6 +158,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ga6c7c2eba6072ba55386fe72bc49604e2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga6c7c2eba6072ba55386fe72bc49604e2">SIMULATE</a>&#160;&#160;&#160;if(isDouble&lt;Type&gt;::value &amp;&amp; <a class="el" href="group__macros.html#ga50653183cdc71e3cb81b410768f23efb">TMB_OBJECTIVE_PTR</a> -&gt; do_simulate)</td></tr>
 <tr class="memdesc:ga6c7c2eba6072ba55386fe72bc49604e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark code that is only executed during simulation.  <a href="#ga6c7c2eba6072ba55386fe72bc49604e2">More...</a><br /></td></tr>
 <tr class="separator:ga6c7c2eba6072ba55386fe72bc49604e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga456208023a75e7f193b5af7eb0090781"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga456208023a75e7f193b5af7eb0090781">TMB_ATOMIC_VECTOR_FUNCTION</a>( ATOMIC_NAME,  OUTPUT_DIM,  ATOMIC_DOUBLE,  ATOMIC_REVERSE)</td></tr>
+<tr class="memdesc:ga456208023a75e7f193b5af7eb0090781"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct atomic vector function based on known derivatives.  <a href="#ga456208023a75e7f193b5af7eb0090781">More...</a><br /></td></tr>
+<tr class="separator:ga456208023a75e7f193b5af7eb0090781"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga50653183cdc71e3cb81b410768f23efb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__macros.html#ga50653183cdc71e3cb81b410768f23efb">TMB_OBJECTIVE_PTR</a>&#160;&#160;&#160;this</td></tr>
 <tr class="memdesc:ga50653183cdc71e3cb81b410768f23efb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to objective function used by DATA and PARAMETER macros.  <a href="#ga50653183cdc71e3cb81b410768f23efb">More...</a><br /></td></tr>
 <tr class="separator:ga50653183cdc71e3cb81b410768f23efb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -389,7 +392,7 @@ Levels: d e f g h i j
 </div><!-- fragment -->
 <p>Get data vector from R and declare it as vector&lt;Type&gt; </p>
 <dl class="section note"><dt>Note</dt><dd>If name is found in the parameter list it will be read as a parameter vector. </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="adaptive_integration_8cpp-example.html#a6">adaptive_integration.cpp</a>, <a class="el" href="ar1_4D_8cpp-example.html#a0">ar1_4D.cpp</a>, <a class="el" href="compois_8cpp-example.html#a0">compois.cpp</a>, <a class="el" href="fft_8cpp-example.html#a4">fft.cpp</a>, <a class="el" href="hmm_8cpp-example.html#a0">hmm.cpp</a>, <a class="el" href="laplace_8cpp-example.html#a7">laplace.cpp</a>, <a class="el" href="linreg_8cpp-example.html#a0">linreg.cpp</a>, <a class="el" href="linreg_parallel_8cpp-example.html#a0">linreg_parallel.cpp</a>, <a class="el" href="longlinreg_8cpp-example.html#a1">longlinreg.cpp</a>, <a class="el" href="lr_test_8cpp-example.html#a0">lr_test.cpp</a>, <a class="el" href="matern_8cpp-example.html#a0">matern.cpp</a>, <a class="el" href="matrix_arrays_8cpp-example.html#a0">matrix_arrays.cpp</a>, <a class="el" href="nmix_8cpp-example.html#a5">nmix.cpp</a>, <a class="el" href="orange_big_8cpp-example.html#a0">orange_big.cpp</a>, <a class="el" href="register_atomic_8cpp-example.html#a6">register_atomic.cpp</a>, <a class="el" href="register_atomic_parallel_8cpp-example.html#a6">register_atomic_parallel.cpp</a>, <a class="el" href="sam_8cpp-example.html#a0">sam.cpp</a>, <a class="el" href="sde_linear_8cpp-example.html#a0">sde_linear.cpp</a>, <a class="el" href="spatial_8cpp-example.html#a1">spatial.cpp</a>, <a class="el" href="spde_8cpp-example.html#a0">spde.cpp</a>, <a class="el" href="spde_aniso_8cpp-example.html#a0">spde_aniso.cpp</a>, <a class="el" href="spde_aniso_speedup_8cpp-example.html#a1">spde_aniso_speedup.cpp</a>, <a class="el" href="thetalog_8cpp-example.html#a0">thetalog.cpp</a>, <a class="el" href="TMBad_2interpol_8cpp-example.html#a3">TMBad/interpol.cpp</a>, <a class="el" href="TMBad_2sam_8cpp-example.html#a0">TMBad/sam.cpp</a>, <a class="el" href="TMBad_2spa_gauss_8cpp-example.html#a8">TMBad/spa_gauss.cpp</a>, <a class="el" href="TMBad_2spatial_8cpp-example.html#a1">TMBad/spatial.cpp</a>, <a class="el" href="TMBad_2spde_epsilon_8cpp-example.html#a0">TMBad/spde_epsilon.cpp</a>, <a class="el" href="TMBad_2thetalog_8cpp-example.html#a0">TMBad/thetalog.cpp</a>, <a class="el" href="transform_8cpp-example.html#a0">transform.cpp</a>, <a class="el" href="transform2_8cpp-example.html#a0">transform2.cpp</a>, <a class="el" href="transform_parallel_8cpp-example.html#a0">transform_parallel.cpp</a>, <a class="el" href="tweedie_8cpp-example.html#a0">tweedie.cpp</a>, <a class="el" href="validation_2randomwalkvalidation_8cpp-example.html#a0">validation/randomwalkvalidation.cpp</a>, and <a class="el" href="validation_2rickervalidation_8cpp-example.html#a0">validation/rickervalidation.cpp</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="adaptive_integration_8cpp-example.html#a6">adaptive_integration.cpp</a>, <a class="el" href="ar1_4D_8cpp-example.html#a0">ar1_4D.cpp</a>, <a class="el" href="compois_8cpp-example.html#a0">compois.cpp</a>, <a class="el" href="fft_8cpp-example.html#a3">fft.cpp</a>, <a class="el" href="hmm_8cpp-example.html#a0">hmm.cpp</a>, <a class="el" href="laplace_8cpp-example.html#a7">laplace.cpp</a>, <a class="el" href="linreg_8cpp-example.html#a0">linreg.cpp</a>, <a class="el" href="linreg_parallel_8cpp-example.html#a0">linreg_parallel.cpp</a>, <a class="el" href="longlinreg_8cpp-example.html#a1">longlinreg.cpp</a>, <a class="el" href="lr_test_8cpp-example.html#a0">lr_test.cpp</a>, <a class="el" href="matern_8cpp-example.html#a0">matern.cpp</a>, <a class="el" href="matrix_arrays_8cpp-example.html#a0">matrix_arrays.cpp</a>, <a class="el" href="nmix_8cpp-example.html#a5">nmix.cpp</a>, <a class="el" href="orange_big_8cpp-example.html#a0">orange_big.cpp</a>, <a class="el" href="register_atomic_8cpp-example.html#a6">register_atomic.cpp</a>, <a class="el" href="register_atomic_parallel_8cpp-example.html#a6">register_atomic_parallel.cpp</a>, <a class="el" href="sam_8cpp-example.html#a0">sam.cpp</a>, <a class="el" href="sde_linear_8cpp-example.html#a0">sde_linear.cpp</a>, <a class="el" href="spatial_8cpp-example.html#a1">spatial.cpp</a>, <a class="el" href="spde_8cpp-example.html#a0">spde.cpp</a>, <a class="el" href="spde_aniso_8cpp-example.html#a0">spde_aniso.cpp</a>, <a class="el" href="spde_aniso_speedup_8cpp-example.html#a1">spde_aniso_speedup.cpp</a>, <a class="el" href="thetalog_8cpp-example.html#a0">thetalog.cpp</a>, <a class="el" href="TMBad_2interpol_8cpp-example.html#a3">TMBad/interpol.cpp</a>, <a class="el" href="TMBad_2sam_8cpp-example.html#a0">TMBad/sam.cpp</a>, <a class="el" href="TMBad_2spa_gauss_8cpp-example.html#a8">TMBad/spa_gauss.cpp</a>, <a class="el" href="TMBad_2spatial_8cpp-example.html#a1">TMBad/spatial.cpp</a>, <a class="el" href="TMBad_2spde_epsilon_8cpp-example.html#a0">TMBad/spde_epsilon.cpp</a>, <a class="el" href="TMBad_2thetalog_8cpp-example.html#a0">TMBad/thetalog.cpp</a>, <a class="el" href="transform_8cpp-example.html#a0">transform.cpp</a>, <a class="el" href="transform2_8cpp-example.html#a0">transform2.cpp</a>, <a class="el" href="transform_parallel_8cpp-example.html#a0">transform_parallel.cpp</a>, <a class="el" href="tweedie_8cpp-example.html#a0">tweedie.cpp</a>, <a class="el" href="validation_2randomwalkvalidation_8cpp-example.html#a0">validation/randomwalkvalidation.cpp</a>, and <a class="el" href="validation_2rickervalidation_8cpp-example.html#a0">validation/rickervalidation.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00236">236</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
 
@@ -475,6 +478,52 @@ Levels: d e f g h i j
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="ar1_4D_8cpp-example.html#a4">ar1_4D.cpp</a>, <a class="el" href="sam_8cpp-example.html#a11">sam.cpp</a>, and <a class="el" href="TMBad_2sam_8cpp-example.html#a11">TMBad/sam.cpp</a>.</dd>
 </dl>
 <p>Definition at line <a class="el" href="tmb__core_8hpp_source.html#l00329">329</a> of file <a class="el" href="tmb__core_8hpp_source.html">tmb_core.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ga456208023a75e7f193b5af7eb0090781"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga456208023a75e7f193b5af7eb0090781">&sect;&nbsp;</a></span>TMB_ATOMIC_VECTOR_FUNCTION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TMB_ATOMIC_VECTOR_FUNCTION</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ATOMIC_NAME, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">OUTPUT_DIM, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ATOMIC_DOUBLE, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ATOMIC_REVERSE&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(ATOMIC_NAME) \</div><div class="line">TMB_ATOMIC_VECTOR_FUNCTION_DEFINE(              \</div><div class="line">  ATOMIC_NAME, OUTPUT_DIM,                      \</div><div class="line">  ATOMIC_DOUBLE,                                \</div><div class="line">  ATOMIC_REVERSE                                \</div><div class="line">)</div></div><!-- fragment -->
+<p>Construct atomic vector function based on known derivatives. </p>
+<p>This macro is used internally to define most atomic functions, see for example <code><a class="el" href="namespaceatomic.html#a1ea1a599dfa8b5b10af52c40be19210e" title="Atomic version of matrix multiply. Multiplies n1-by-n2 matrix with n2-by-n3 matrix. ">atomic::matmul</a></code>. It works portably for both CppAD and <a class="el" href="namespaceTMBad.html" title="Automatic differentiation library designed for TMB. ">TMBad</a>.</p>
+<p>The macro is actually composed of two other lower-level macros. One <em>declares</em> and another <em>defines</em> the atomic function. If two atomic functions depend on one another, the lower-level macros may be useful - see e.g the atomic <code>fft</code>. </p>
+
+<p>Definition at line <a class="el" href="tmbad__atomic__macro_8hpp_source.html#l00217">217</a> of file <a class="el" href="tmbad__atomic__macro_8hpp_source.html">tmbad_atomic_macro.hpp</a>.</p>
 
 </div>
 </div>

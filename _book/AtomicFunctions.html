@@ -299,8 +299,8 @@ div.csl-indent {
 <p>When coding reverse-mode derivatives we can assume that the function value <span class="math inline">\(W(x)\)</span> has already been computed during a forward pass. For efficiency reasons we should use this intermediate calculation rather than re-calculating <span class="math inline">\(W(x)\)</span> in the reverse pass.</p>
 <p>We’ll assume that a plain C++ function (taking double types as input/output) is available to calculate <span class="math inline">\(W(x)\)</span>. It doesn’t matter whether you have the source code of an implementation or just the header with linkage to an external library:</p>
 <div class="sourceCode" id="cb53"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb53-1"><a href="AtomicFunctions.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> LambertW(<span class="dt">double</span> <a class="code" href="../structradix_1_1radix.html#a386883ec22bc6f6d43b5633dd2bdab3f">x</a>);</span></code></pre></div>
-<p>The macro <code>TMB_ATOMIC_VECTOR_FUNCTION()</code> is used to declare our new primitive Lambert <span class="math inline">\(W\)</span> function:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb54-1"><a href="AtomicFunctions.html#cb54-1" aria-hidden="true" tabindex="-1"></a>TMB_ATOMIC_VECTOR_FUNCTION(</span>
+<p>The macro <code><a class="code" href="../group__macros.html#ga456208023a75e7f193b5af7eb0090781">TMB_ATOMIC_VECTOR_FUNCTION</a>()</code> is used to declare our new primitive Lambert <span class="math inline">\(W\)</span> function:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb54-1"><a href="AtomicFunctions.html#cb54-1" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#ga456208023a75e7f193b5af7eb0090781">TMB_ATOMIC_VECTOR_FUNCTION</a>(</span>
 <span id="cb54-2"><a href="AtomicFunctions.html#cb54-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ATOMIC_NAME</span></span>
 <span id="cb54-3"><a href="AtomicFunctions.html#cb54-3" aria-hidden="true" tabindex="-1"></a>    LambertW</span>
 <span id="cb54-4"><a href="AtomicFunctions.html#cb54-4" aria-hidden="true" tabindex="-1"></a>    ,</span>
@@ -353,7 +353,7 @@ but that doesn’t matter for this example):</p>
 <span id="cb56-14"><a href="AtomicFunctions.html#cb56-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> y;</span>
 <span id="cb56-15"><a href="AtomicFunctions.html#cb56-15" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb56-16"><a href="AtomicFunctions.html#cb56-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-17"><a href="AtomicFunctions.html#cb56-17" aria-hidden="true" tabindex="-1"></a>TMB_ATOMIC_VECTOR_FUNCTION(</span>
+<span id="cb56-17"><a href="AtomicFunctions.html#cb56-17" aria-hidden="true" tabindex="-1"></a><a class="code" href="../group__macros.html#ga456208023a75e7f193b5af7eb0090781">TMB_ATOMIC_VECTOR_FUNCTION</a>(</span>
 <span id="cb56-18"><a href="AtomicFunctions.html#cb56-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ATOMIC_NAME</span></span>
 <span id="cb56-19"><a href="AtomicFunctions.html#cb56-19" aria-hidden="true" tabindex="-1"></a>    LambertW</span>
 <span id="cb56-20"><a href="AtomicFunctions.html#cb56-20" aria-hidden="true" tabindex="-1"></a>    ,</span>

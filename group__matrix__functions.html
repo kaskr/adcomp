@@ -81,10 +81,6 @@ Functions</h2></td></tr>
 <tr class="memitem:gac09966696ad9685dc8047d6c582bc0ae"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae">atomic::expm</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
 <tr class="memdesc:gac09966696ad9685dc8047d6c582bc0ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix exponential.  <a href="group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae">More...</a><br /></td></tr>
 <tr class="separator:gac09966696ad9685dc8047d6c582bc0ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8d87d7ad84cedf1ac6460de525a4dbc1"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
-<tr class="memitem:ga8d87d7ad84cedf1ac6460de525a4dbc1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structvector.html">vector</a>&lt; std::complex&lt; Type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#ga8d87d7ad84cedf1ac6460de525a4dbc1">atomic::fft</a> (<a class="el" href="structvector.html">vector</a>&lt; std::complex&lt; Type &gt; &gt; xc, bool inverse=false)</td></tr>
-<tr class="memdesc:ga8d87d7ad84cedf1ac6460de525a4dbc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">FFT (unscaled)  <a href="group__matrix__functions.html#ga8d87d7ad84cedf1ac6460de525a4dbc1">More...</a><br /></td></tr>
-<tr class="separator:ga8d87d7ad84cedf1ac6460de525a4dbc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae5555ee5c905915a566d47d7f2830424"><td class="memTemplParams" colspan="2"><a id="gae5555ee5c905915a566d47d7f2830424"></a>
 template&lt;class Type &gt; </td></tr>
 <tr class="memitem:gae5555ee5c905915a566d47d7f2830424"><td class="memTemplItemLeft" align="right" valign="top">Type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#gae5555ee5c905915a566d47d7f2830424">atomic::logdet</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
@@ -131,49 +127,6 @@ template&lt;class Type &gt; </div>
 <p>Definition at line <a class="el" href="expm_8hpp_source.html#l00289">289</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae">atomic::expm()</a>.</p>
-
-</div>
-</div>
-<a id="ga8d87d7ad84cedf1ac6460de525a4dbc1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8d87d7ad84cedf1ac6460de525a4dbc1">&sect;&nbsp;</a></span>fft()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class Type &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structvector.html">vector</a>&lt;std::complex&lt;Type&gt; &gt; atomic::fft </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structvector.html">vector</a>&lt; std::complex&lt; Type &gt; &gt;&#160;</td>
-          <td class="paramname"><em>xc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>inverse</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>FFT (unscaled) </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">xc</td><td>Complex vector to be transformed </td></tr>
-    <tr><td class="paramname">inverse</td><td>Apply the (unscaled) inverse transform? This interface is identical to 'stats::fft' so does <b>not</b> perform inverse scaling.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>To use this function the header must be manually included. </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="fft_8cpp-example.html#a1">fft.cpp</a>.</dd>
-</dl>
-<p>Definition at line <a class="el" href="fft_8hpp_source.html#l00033">33</a> of file <a class="el" href="fft_8hpp_source.html">fft.hpp</a>.</p>
 
 </div>
 </div>
