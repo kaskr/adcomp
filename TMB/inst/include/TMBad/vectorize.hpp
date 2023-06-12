@@ -95,7 +95,7 @@ template <class dummy = void>
 ad_segment operator-(ad_segment x);
 template <class dummy = void>
 ad_segment &operator+=(ad_segment &x, ad_segment y) {
-  if (x.size() < y.size()) y = ad_segment(sum(y), 1);
+  if ((x.size() == 1) && (x.size() < y.size())) y = ad_segment(sum(y), 1);
   if (x.identicalZero())
     x = y;
   else
@@ -104,7 +104,7 @@ ad_segment &operator+=(ad_segment &x, ad_segment y) {
 }
 template <class dummy = void>
 ad_segment &operator-=(ad_segment &x, ad_segment y) {
-  if (x.size() < y.size()) y = ad_segment(sum(y), 1);
+  if ((x.size() == 1) && (x.size() < y.size())) y = ad_segment(sum(y), 1);
   if (x.identicalZero())
     x = -y;
   else
@@ -147,13 +147,14 @@ struct Vectorize : global::DynamicOperator<Operator::ninput, -1> {
     std::vector<ad_segment> v;
     std::vector<ad_segment> d;
     std::vector<Index> i;
+    ad_segment zero;
 
     v.push_back(ad_segment(args.x_ptr(0), (S0 ? n : 1)));
-    d.push_back(ad_segment(args.dx_ptr(0), (S0 ? n : 1), true));
+    d.push_back(zero);
     i.push_back(i.size());
     if (Operator::ninput > 1) {
       v.push_back(ad_segment(args.x_ptr(1), (S1 ? n : 1)));
-      d.push_back(ad_segment(args.dx_ptr(1), (S1 ? n : 1), true));
+      d.push_back(zero);
       i.push_back(i.size());
     }
 
@@ -167,11 +168,16 @@ struct Vectorize : global::DynamicOperator<Operator::ninput, -1> {
     typename global::CPL<Operator>::type Op;
     Op.reverse(vargs);
 
-    for (size_t i = 0; i < vargs.dx(0).size(); i++)
-      args.dx_ptr(0)[i] = vargs.dx(0)[i];
+    ad_segment dx_left(args.dx_ptr(0), (S0 ? n : 1), true);
+    dx_left += vargs.dx(0);
+
+    for (size_t i = 0; i < dx_left.size(); i++) args.dx_ptr(0)[i] = dx_left[i];
     if (Operator::ninput > 1) {
-      for (size_t i = 0; i < vargs.dx(1).size(); i++)
-        args.dx_ptr(1)[i] = vargs.dx(1)[i];
+      ad_segment dx_right(args.dx_ptr(1), (S1 ? n : 1), true);
+      dx_right += vargs.dx(1);
+
+      for (size_t i = 0; i < dx_right.size(); i++)
+        args.dx_ptr(1)[i] = dx_right[i];
     }
   }
 
