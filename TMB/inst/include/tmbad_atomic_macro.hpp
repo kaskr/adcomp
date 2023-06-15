@@ -211,7 +211,7 @@ ATOMIC_NAME (const CppAD::vector<double> &tx);
     The macro is actually composed of two other lower-level
     macros. One *declares* and another *defines* the atomic function.
     If two atomic functions depend on one another, the lower-level
-    macros may be useful - see e.g the atomic `fft`.
+    macros may be useful - see e.g the `atomic::fft`.
 
     \ingroup macros */
 #define TMB_ATOMIC_VECTOR_FUNCTION(             \
