@@ -42,6 +42,7 @@ inline double logDeterminant(const DEFAULT_SPARSE_FACTORIZATION &llt) {
   return 2. * llt.matrixL().nestedExpression().diagonal().array().log().sum();
 }
 #endif
+typedef Eigen::SimplicialLDLT< Eigen::SparseMatrix<TMBad::Scalar> > LDLT_SPARSE_FACTORIZATION;
 
 #include <memory>
 /** \brief Highly flexible atomic `Newton()` solver and `Laplace()` approximation
@@ -99,6 +100,46 @@ struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
     return a;
   }
 };
+
+/* Helper to get D for LDLT factorization a vector of ones otherwise */
+template<class LLTFac>
+inline vector<typename LLTFac::Scalar> getD(const LLTFac &F) {
+  size_t n = F.rows();
+  return vector<typename LLTFac::Scalar>::Constant(n, 1.);
+}
+template<class Type>
+inline vector<Type> getD(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > &F) {
+  return F.vectorD();
+}
+/* Helper to identify factorization kind */
+template<class LLTFac>
+inline bool isLDL(const LLTFac &F) {
+  return false;
+}
+template<class Type>
+inline bool isLDL(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > &F) {
+  return true;
+}
+
+/* Helper to get diagonal().minCoeff() */
+template<class MatrixType>
+inline typename MatrixType::value_type diagonal_min(const MatrixType &M) {
+  return M.diagonal_min();
+}
+template<class T>
+inline T diagonal_min(const matrix<T> &M) {
+  return M.diagonal().minCoeff();
+}
+template<class T>
+inline T diagonal_min(const Eigen::SparseMatrix<T> &M) {
+  return M.diagonal().minCoeff();
+}
+/* Helper to shorten sandwich like products:
+   AXAT(A1,A2,...,An) = A1*A2...*An*...*A2^T*A1^T */
+template<class T>
+T AXAT(T X) { return X; }
+template<class T, class... Args>
+T AXAT(T A, Args... X) { return A * AXAT(X...) * A.transpose(); }
 
 /** \brief Operator (H, x) -> solve(H, x)
 
@@ -241,6 +282,9 @@ struct jacobian_dense_t : TMBad::ADFun<> {
                   const vector<T> &x) {
     return HessianSolveVector<jacobian_dense_t>(ptr).solve(h, x);
   }
+  void print_info () {
+    Rcout << "Dense H n=" << n << "\n";
+  }
 };
 
 /* --- Sparse Hessian ----------------------------------------------------- */
@@ -343,6 +387,9 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
                   const vector<T> &h,
                   const vector<T> &x) {
     return HessianSolveVector<jacobian_sparse_t>(ptr).solve(h, x);
+  }
+  void print_info () {
+    Rcout << "Sparse H n=" << n << " nnz=" << Base::Range() << "\n";
   }
 };
 
@@ -453,10 +500,10 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
     det(H + G * H0 * G^T) = det(H) * det(H0M)
     ```
 */
-template<class dummy=void>
+template<class Fac=DEFAULT_SPARSE_FACTORIZATION>
 struct jacobian_sparse_plus_lowrank_t {
   // The three tapes
-  std::shared_ptr<jacobian_sparse_t<> > H;
+  std::shared_ptr<jacobian_sparse_t<Fac> > H;
   std::shared_ptr<TMBad::ADFun<> > G;
   std::shared_ptr<jacobian_dense_t<> > H0;
   // ADFun methods that should apply to each of the three tapes
@@ -493,9 +540,17 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<T> H0;
     // Optional: Store serialized representation of H
     vector<T> Hvec;
+    // 'fake' diagonal (H only)
     Eigen::Diagonal<Eigen::SparseMatrix<T> > diagonal() {
       return H.diagonal();
     }
+    // Real diagonal minimum
+    T diagonal_min() const {
+      vector<T> D2 = ((G * H0).array() * G.array()).rowwise().sum();
+      return (H.diagonal().array() + D2).minCoeff();
+    }
+    EIGEN_DEFAULT_DENSE_INDEX_TYPE rows() const { return H.rows(); }
+    typedef T value_type;
   };
   template<class T>
   struct MatrixResult {
@@ -513,7 +568,7 @@ struct jacobian_sparse_plus_lowrank_t {
     keep_rc.resize(F.Domain(), false);  // outer
     TMBad::Decomp3<TMBad::ADFun<TMBad::ad_aug> >
       F3 = F2.HesFun(keep_rc, true, false, false);
-    H = std::make_shared<jacobian_sparse_t<> >(F3.first, n);
+    H = std::make_shared<jacobian_sparse_t<Fac> >(F3.first, n);
     G = std::make_shared<TMBad::ADFun<> >(F3.second);
     H0 = std::make_shared<jacobian_dense_t<> >(F3.third, k);
   }
@@ -549,13 +604,88 @@ struct jacobian_sparse_plus_lowrank_t {
     return as_matrix(eval(x));
   }
   void llt_factorize(const sparse_plus_lowrank<TMBad::Scalar> &h) {
+    // Note: factorization can be LLT or LDLT
     H -> llt_factorize(h.H);
+    // Empty lowrank contribution?
+    if ( H0->Domain() == 0 ) {
+      // In both cases (LLT / LDLT) this gives the PD status:
+      factorize_info = H -> llt_info();
+      return;
+    }
+    // LLT case with non-trivial lowrank contribution *MUST* be PD
+    if (!isLDL(*(H->llt))) {
+      if ( (H -> llt_info()) != Eigen::Success) {
+        Rf_warning("Sparse+lowrank: Failed to determine PD status (consider setting LDL=TRUE)");
+        factorize_info = H -> llt_info();
+        return;
+      }
+    }
+    // Have H + G H0 GT, P H PT = L D LT.
+    // Must determine PD status.
+    // Rewrite to the form 'diag(D) + R H0 R^T'
+    vector<TMBad::Scalar> D = getD(*(H->llt));
+    matrix<double>
+      R = (*(H->llt)).permutationP() * h.G;
+    R = (*(H->llt)).matrixL().solve(R);
+    // Permute such that D = (D+, D-)
+    size_t n = D.size();
+    vector<bool> Dpos_bool = (D.array() > 0);
+    size_t npos = Dpos_bool.count();
+    vector<int> Dpos_index(n);
+    size_t k=0;
+    for (size_t i=0; i<n; i++) {
+      if (Dpos_bool[i]) Dpos_index[k++] = i;
+    }
+    for (size_t i=0; i<n; i++) {
+      if (!Dpos_bool[i]) Dpos_index[k++] = i;
+    }
+    Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(n);
+    perm.indices() = Dpos_index;
+    D = (perm.transpose() * D.matrix()).array();
+    R = perm.transpose() * R;
+    // Extract blocks
+    vector<double> Dpos = D.head(npos);
+    vector<double> Dneg = D.tail(n-npos);
+    matrix<double> Rpos = R.block(0,0,npos,R.cols());
+    matrix<double> Rneg = R.block(npos,0,n-npos,R.cols());
+    typedef Eigen::DiagonalMatrix< double, Eigen::Dynamic, Eigen::Dynamic > Diag;
+    // Test 1: (pos-by-pos block positive definite)
+    // Rewrite: I + Rtmp * H0 * Rtmp^T
+    Diag Dtmp(npos);
+    Dtmp.diagonal() = Dpos.sqrt().cwiseInverse().array();
+    matrix<double> Rtmp = Dtmp * Rpos;
+    matrix<double> LT;
+    if (Rtmp.rows() > Rtmp.cols()) {
+      LT = Eigen::MatrixXd( (Rtmp.transpose() * Rtmp).llt().matrixL().transpose() );
+    } else {
+      LT = Rtmp;
+    }
+    matrix<double> Test1 = LT * h.H0 * LT.transpose();
+    Test1.diagonal().array() = Test1.diagonal().array() + 1.;
+    Eigen::ComputationInfo info1 = Test1.llt().info();
+    if (info1 != Eigen::Success) {
+      factorize_info = info1;
+      return;
+    }
+    // Test 2: (Schur complement block positive definite)
+    Diag Dpos_inv(npos);
+    Dpos_inv.diagonal() = Dpos.cwiseInverse().array();
+    matrix<double> T = AXAT(Eigen::MatrixXd(Rpos.transpose()), Dpos_inv);
+    matrix<double> S2 = (h.H0.inverse()+T).inverse();
+    matrix<double> Test2 = AXAT(Rneg, h.H0) - AXAT(Rneg, h.H0, T) + AXAT(Rneg, h.H0, T, S2);
+    Test2.diagonal().array() = Test2.diagonal().array() + Dneg;
+    auto T2fac = Test2.ldlt();
+    Eigen::VectorXd vecD = T2fac.vectorD();
+    Eigen::MatrixXd matL = T2fac.matrixL();
+    bool ok = (vecD.array() > 0).all();
+    Eigen::ComputationInfo info2 = Eigen::ComputationInfo(!ok)  ;
+    factorize_info = info2;
+    return;
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
+  Eigen::ComputationInfo factorize_info;
   Eigen::ComputationInfo llt_info() {
-    // Note: As long as diagonal increments are only applied to H this
-    // is the relevant info:
-    return H -> llt_info();
+    return factorize_info;
   }
   /** \note Optional: This method allows the assumption that a prior
       call to `llt_factorize` has been performed for the same H */
@@ -565,18 +695,18 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<TMBad::Scalar> H0M = h.H0 * h.G.transpose() * W;
     H0M.diagonal().array() += TMBad::Scalar(1.);
     matrix<TMBad::Scalar> y1 = H -> llt_solve(h.H, x);
-    matrix<TMBad::Scalar> y2 = W * H0M.ldlt().solve(h.H0 * W.transpose() * x);
+    matrix<TMBad::Scalar> y2 = W * H0M.lu().solve(h.H0 * W.transpose() * x);
     return y1 - y2;
   }
   template<class T>
-  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
+  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
                   const vector<T> &hvec,
                   const vector<T> &xvec) {
     using atomic::matmul;
     using atomic::matinv;
     sparse_plus_lowrank<T> h = as_matrix(hvec);
     vector<T> s =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
+      HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H,
                                                h.G.cols()).
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
@@ -589,7 +719,7 @@ struct jacobian_sparse_plus_lowrank_t {
                     W));
     H0M.diagonal().array() += T(1.);
     vector<T> y1 =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H, 1).
+      HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H, 1).
       solve(h.Hvec, xvec);
     tmbutils::matrix<T> iH0M = matinv(H0M);
     tmbutils::matrix<T> Wt = W.transpose();
@@ -611,10 +741,10 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   // Helper to get determinant: det(H)*det(H0)*det(M)
   template<class T>
-  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
+  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
                              const sparse_plus_lowrank<T> &h) {
     vector<T> s =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
+      HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H,
                                                h.G.cols()).
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
@@ -624,6 +754,10 @@ struct jacobian_sparse_plus_lowrank_t {
     tmbutils::matrix<T> H0M = atomic::matmul(H0, atomic::matmul(Gt, W));
     H0M.diagonal().array() += T(1.);
     return H0M;
+  }
+  void print_info () {
+    H->print_info();
+    H0->print_info();
   }
 };
 
@@ -669,6 +803,8 @@ struct newton_config {
   bool sparse;
   /** \brief Detect an additional low rank contribution in sparse case? */
   bool lowrank;
+  /** \brief If `lowrank`, use LDL factorization for sparse Hessian term? */
+  bool LDL;
   bool decompose;
   /** \brief Detect and apply 'dead gradients' simplification */
   bool simplify;
@@ -700,6 +836,7 @@ struct newton_config {
     SET_DEFAULT(u0, 1e-04);
     SET_DEFAULT(sparse, false);
     SET_DEFAULT(lowrank, false);
+    SET_DEFAULT(LDL, false);
     SET_DEFAULT(decompose, true);
     SET_DEFAULT(simplify, true);
     SET_DEFAULT(on_failure_return_nan, true);
@@ -824,6 +961,9 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
     // Hessian
     hessian = std::make_shared<Hessian_Type>(function, gradient, n_inner);
     hessian -> optimize();
+    if (cfg.trace) {
+      hessian -> print_info();
+    }
   }
   // Helper to swap inner/outer
   void SwapInner() {
@@ -918,7 +1058,8 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
         H = (*hessian)(std::vector<Scalar>(x));
       vector<Scalar> diag_cpy = H.diagonal().array();
       // Quick ustep reduction based on Hessian diagonal
-      Scalar m = diag_cpy.minCoeff();
+      Scalar m = diagonal_min(H);
+      if (cfg.trace) std::cout << "m=" << m << " ";
       if (std::isfinite(m) && m < 0) {
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
@@ -1178,7 +1319,7 @@ Type log_determinant_simple(const Eigen::SparseMatrix<Type> &H) {
   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
   //return ldl.vectorD().log().sum();
   vector<Type> D = ldl.vectorD();
-  return D.log().sum();
+  return D.abs().log().sum();
 }
 template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H,
@@ -1216,16 +1357,22 @@ inline double log_determinant(const Eigen::SparseMatrix<double> &H,
   DEFAULT_SPARSE_FACTORIZATION llt(H);
   return logDeterminant(llt);
 }
+template<class Type>
+inline Type log_determinant(const Eigen::SparseMatrix<Type> &H,
+                            std::shared_ptr<jacobian_sparse_t<Eigen::SimplicialLDLT< Eigen::SparseMatrix<TMBad::Scalar> > > > ptr) {
+  // FIXME: Use ptr llt
+  return log_determinant_simple(H);
+}
 
 template<class Type, class PTR>
 Type log_determinant(const matrix<Type> &H, PTR ptr) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
-template<class Type>
-Type log_determinant(const jacobian_sparse_plus_lowrank_t<>::sparse_plus_lowrank<Type> &H,
-                     std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr) {
-  matrix<Type> H0M = (ptr -> getH0M(ptr, H)).array();
+template<class Arg1, class Factorization=DEFAULT_SPARSE_FACTORIZATION>
+typename Arg1::value_type log_determinant(const Arg1 &H,
+                     std::shared_ptr<jacobian_sparse_plus_lowrank_t<Factorization> > ptr) {
+  matrix<typename Arg1::value_type> H0M = (ptr -> getH0M(ptr, H)).array();
   return
     log_determinant(H.H, ptr->H) +
     log_determinant(H0M, NULL);
@@ -1341,6 +1488,18 @@ NewtonSolver<Functor,
   return ans;
 }
 
+template<class Functor, class Type>
+NewtonSolver<Functor,
+             Type,
+             jacobian_sparse_plus_lowrank_t<LDLT_SPARSE_FACTORIZATION> >
+NewtonSparsePlusLowrankLDLT(
+                            Functor &F,
+                            Eigen::Array<Type, Eigen::Dynamic, 1> start,
+                            newton_config cfg = newton_config() ) {
+  NewtonSolver<Functor, Type, jacobian_sparse_plus_lowrank_t<LDLT_SPARSE_FACTORIZATION> > ans(F, start, cfg);
+  return ans;
+}
+
 /** \brief Tape a functor and return solution
 
     Can be used anywhere in a template. Inner and outer parameters are
@@ -1359,8 +1518,13 @@ vector<Type> Newton(Functor &F,
   if (cfg.sparse) {
     if (! cfg.lowrank)
       return NewtonSparse(F, start, cfg);
-    else
-      return NewtonSparsePlusLowrank(F, start, cfg);
+    else {
+      if (!cfg.LDL) {
+        return NewtonSparsePlusLowrank(F, start, cfg);
+      } else {
+        return NewtonSparsePlusLowrankLDLT(F, start, cfg);
+      }
+    }
   }
   else
     return NewtonDense(F, start, cfg);
@@ -1390,9 +1554,15 @@ Type Laplace(Functor &F,
       start = opt.solution();
       return opt.Laplace();
     } else {
-      auto opt = NewtonSparsePlusLowrank(F, start, cfg);
-      start = opt.solution();
-      return opt.Laplace();
+      if (!cfg.LDL) {
+        auto opt = NewtonSparsePlusLowrank(F, start, cfg);
+        start = opt.solution();
+        return opt.Laplace();
+      } else {
+        auto opt = NewtonSparsePlusLowrankLDLT(F, start, cfg);
+        start = opt.solution();
+        return opt.Laplace();
+      }
     }
   } else {
     auto opt = NewtonDense(F, start, cfg);
