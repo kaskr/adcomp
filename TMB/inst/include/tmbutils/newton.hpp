@@ -453,10 +453,10 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
     det(H + G * H0 * G^T) = det(H) * det(H0M)
     ```
 */
-template<class dummy=void>
+template<class Fac=Eigen::SimplicialLDLT< Eigen::SparseMatrix<TMBad::Scalar> > >
 struct jacobian_sparse_plus_lowrank_t {
   // The three tapes
-  std::shared_ptr<jacobian_sparse_t<> > H;
+  std::shared_ptr<jacobian_sparse_t<Fac> > H;
   std::shared_ptr<TMBad::ADFun<> > G;
   std::shared_ptr<jacobian_dense_t<> > H0;
   // ADFun methods that should apply to each of the three tapes
@@ -513,7 +513,7 @@ struct jacobian_sparse_plus_lowrank_t {
     keep_rc.resize(F.Domain(), false);  // outer
     TMBad::Decomp3<TMBad::ADFun<TMBad::ad_aug> >
       F3 = F2.HesFun(keep_rc, true, false, false);
-    H = std::make_shared<jacobian_sparse_t<> >(F3.first, n);
+    H = std::make_shared<jacobian_sparse_t<Fac> >(F3.first, n);
     G = std::make_shared<TMBad::ADFun<> >(F3.second);
     H0 = std::make_shared<jacobian_dense_t<> >(F3.third, k);
   }
@@ -576,7 +576,7 @@ struct jacobian_sparse_plus_lowrank_t {
     using atomic::matinv;
     sparse_plus_lowrank<T> h = as_matrix(hvec);
     vector<T> s =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
+      HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H,
                                                h.G.cols()).
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
@@ -589,7 +589,7 @@ struct jacobian_sparse_plus_lowrank_t {
                     W));
     H0M.diagonal().array() += T(1.);
     vector<T> y1 =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H, 1).
+      HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H, 1).
       solve(h.Hvec, xvec);
     tmbutils::matrix<T> iH0M = matinv(H0M);
     tmbutils::matrix<T> Wt = W.transpose();
@@ -614,7 +614,7 @@ struct jacobian_sparse_plus_lowrank_t {
   tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
                              const sparse_plus_lowrank<T> &h) {
     vector<T> s =
-      HessianSolveVector<jacobian_sparse_t<> >(ptr -> H,
+      HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H,
                                                h.G.cols()).
       solve(h.Hvec, h.G.vec());
     tmbutils::matrix<T> W = s.matrix();
@@ -1215,6 +1215,12 @@ inline double log_determinant(const Eigen::SparseMatrix<double> &H,
   // FIXME: Use ptr llt
   DEFAULT_SPARSE_FACTORIZATION llt(H);
   return logDeterminant(llt);
+}
+template<class Type>
+inline Type log_determinant(const Eigen::SparseMatrix<Type> &H,
+                            std::shared_ptr<jacobian_sparse_t<Eigen::SimplicialLDLT< Eigen::SparseMatrix<TMBad::Scalar> > > > ptr) {
+  // FIXME: Use ptr llt
+  return log_determinant_simple(H);
 }
 
 template<class Type, class PTR>
