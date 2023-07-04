@@ -1175,7 +1175,7 @@ Type log_determinant_simple(const Eigen::SparseMatrix<Type> &H) {
   Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > ldl(H);
   //return ldl.vectorD().log().sum();
   vector<Type> D = ldl.vectorD();
-  return D.log().sum();
+  return D.abs().log().sum();
 }
 template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H,
