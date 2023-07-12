@@ -699,7 +699,7 @@ MakeADFun <- function(data, parameters, map=list(),
   h <- function(theta=par, order=0, hessian, L, ...) {
     if(order == 0) {
       ##logdetH <- determinant(hessian)$mod
-      logdetH <- 2*determinant(L)$mod
+      logdetH <- 2*determinant(L, sqrt=TRUE)$mod
       ans <- f(theta,order=0) + .5*logdetH - length(random)/2*log(2*pi)
       if(LaplaceNonZeroGradient){
         grad <- f(theta,order=1)[random]
@@ -965,7 +965,7 @@ MakeADFun <- function(data, parameters, map=list(),
     }
     M.5.log2pi <- -.5* log(2*pi) # = log(1/sqrt(2*pi))
     logdmvnorm <- function(u){
-        logdetH.5 <- determinant(L,logarithm=TRUE)$modulus # = log(det(L)) =  .5 * log(det(H))
+        logdetH.5 <- determinant(L, logarithm=TRUE, sqrt=TRUE)$modulus # = log(det(L)) =  .5 * log(det(H))
         nrow(h)*M.5.log2pi + logdetH.5 - .5*colSums(u*as.matrix(h %*% u))
     }
     eval.target <- function(u,order=0){
