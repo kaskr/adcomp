@@ -67,8 +67,9 @@
 ##' automatically becomes a copy of \code{x} filled with ones.
 ##'
 ##' Some extra parameters are essential for the method.
-##' Pay special attention to the integration domain which must be specified either via \code{range} (continuous case) or \code{discreteSupport} (discrete case).
-##' It may be useful to look at the one step predictive distributions on either log scale (\code{trace=2}) or natural scale (\code{trace=3}) to determine which alternative methods might be appropriate.
+##' Pay special attention to the integration domain which must be set either via \code{range} (continuous case) or \code{discreteSupport} (discrete case). Both of these can be set simultanously to specify a mixed continuous/discrete distribution. For example, a non-negative distribution with a point mass at zero (e.g. the Tweedie distribution) should have \code{range=c(0,Inf)} and \code{discreteSupport=0}.
+##' Several parameters control accuracy and appropriate settings are case specific. By default, a spline is fitted to the one-step density before integration (\code{splineApprox=TRUE}) to reduce the number of density evaluations. However, this setting may have negative impact on accuracy. The spline approximation can then either be disabled or improved by noting that \code{...} arguments are passed to \link{tmbprofile}: Pass e.g. \code{ystep=20, ytol=0.1}.
+##' Finally, it may be useful to look at the one step predictive distributions on either log scale (\code{trace=2}) or natural scale (\code{trace=3}) to determine which alternative methods might be appropriate.
 ##' }
 ##' \item{method="oneStepGaussian"}{
 ##' This is a special case of the generic method where the one step
@@ -109,13 +110,14 @@
 ##' @param method Method to calculate OSA (see details).
 ##' @param subset Index vector of observations that will be added one by one during OSA. By default \code{1:length(observations)} (with \code{conditional} subtracted).
 ##' @param conditional Index vector of observations that are fixed during OSA. By default the empty set.
-##' @param discrete Are observations discrete? (assumed FALSE by default)
-##' @param discreteSupport Possible outcomes of discrete distribution (\code{method="oneStepGeneric"} only).
-##' @param range Possible range of the observations. (\code{method="oneStepGeneric"} only).
+##' @param discrete Logical; Are observations discrete? (assumed FALSE by default).
+##' @param discreteSupport Possible outcomes of discrete part of the distribution (\code{method="oneStepGeneric"} and \code{method="cdf"} only).
+##' @param range Possible range of continuous part of the distribution (\code{method="oneStepGeneric"} only).
 ##' @param seed Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine (recommended for simulation studies).
 ##' @param parallel Run in parallel using the \code{parallel} package?
 ##' @param trace Logical; Trace progress? More options available for \code{method="oneStepGeneric"} - see details.
 ##' @param reverse Do calculations in opposite order to improve stability? (currently enabled by default for \code{oneStepGaussianOffMode} method only)
+##' @param splineApprox Represent one-step conditional distribution by a spline to reduce number of density evaluations? (\code{method="oneStepGeneric"} only).
 ##' @param ... Control parameters for OSA method
 ##' @return \code{data.frame} with OSA \emph{standardized} residuals
 ##' in column \code{residual}. In addition, depending on the method, the output
@@ -130,6 +132,7 @@
 ##' \item{nlcdf.upper}{Negative log of the upper CDF at current observation}
 ##' }
 ##' \emph{given past observations}.
+##' If column \code{randomize} is present, it indicates that randomization has been applied for the row.
 ##' @examples
 ##' ######################## Gaussian case
 ##' runExample("simple")
@@ -161,6 +164,7 @@ oneStepPredict <- function(obj,
                            parallel = FALSE,
                            trace = TRUE,
                            reverse = (method == "oneStepGaussianOffMode"),
+                           splineApprox = TRUE,
                            ...
                            ){
     if (missing(observation.name))
@@ -173,18 +177,28 @@ oneStepPredict <- function(obj,
             stop(paste0("method='",method,"' requires a 'data.term.indicator'"))
         }
     }
-    if (!missing(discreteSupport) && !missing(range))
-        stop("Cannot specify both 'discreteSupport' and 'range'")
+    ## if (!missing(discreteSupport) && !missing(range))
+    ##     stop("Cannot specify both 'discreteSupport' and 'range'")
     obs <- as.vector(obj$env$data[[observation.name]])
+    ## Argument 'discrete'
     if(is.null(discrete)){
-        ndup <- sum(duplicated(obs))
+        ndup <- sum(duplicated(setdiff(obs, discreteSupport)))
         if(ndup > 0){
             warning("Observations do not look continuous. Number of duplicates = ", ndup)
-            stop("Argument 'discrete' (TRUE/FALSE) must be specified.")
+            stop("Please specify 'discrete=TRUE' or 'discrete=FALSE'.")
         }
-        discrete <- FALSE
-    } else {
-        stopifnot(is.logical(discrete))
+        discrete <- FALSE ## Default
+    }
+    stopifnot(is.logical(discrete))
+    ## Handle partially discrete distributions
+    randomize <- NULL
+    partialDiscrete <- !discrete && !missing(discreteSupport)
+    if (partialDiscrete) {
+        if (! (method %in% c("cdf", "oneStepGeneric")) )
+            stop("Mixed discrete/continuous distributions are currently for 'cdf' and 'oneStepGeneric' methods only")
+        if (missing(range) && method == "oneStepGeneric")
+            stop("Mixed discrete/continuous distributions must specify 'range' of continuous part")
+        randomize <- obs %in% discreteSupport
     }
     ## Using wrong method for discrete data ?
     if (discrete){
@@ -343,7 +357,7 @@ oneStepPredict <- function(obj,
         pred$Fx <- 1 / ( 1 + exp(pred$nlcdf.lower - pred$nlcdf.upper) )
         pred$px <- 1 / ( exp(-pred$nlcdf.lower + pred$nll) +
                          exp(-pred$nlcdf.upper + pred$nll) )
-        if(discrete){
+        if(discrete || partialDiscrete){
             if(!is.null(seed)){
                 ## Restore RNG on exit:
                 Random.seed <- .GlobalEnv$.Random.seed
@@ -351,6 +365,10 @@ oneStepPredict <- function(obj,
                 set.seed(seed)
             }
             U <- runif(nrow(pred))
+            if (partialDiscrete) {
+                pred$randomize <- randomize[subset]
+                U <- U * pred$randomize
+            }
         } else {
             U <- 0
         }
@@ -431,7 +449,8 @@ oneStepPredict <- function(obj,
     }
 
     ## ######################### CASE: oneStepGeneric
-    if((method == "oneStepGeneric") && missing(discreteSupport)){
+    OSG_continuous <- missing(discreteSupport) || partialDiscrete
+    if((method == "oneStepGeneric") && OSG_continuous){
         p <- newobj$par
         newobj$fn(p) ## Test eval
         newobj$env$value.best <- -Inf ## <-- Never overwrite last.par.best
@@ -456,18 +475,33 @@ oneStepPredict <- function(obj,
                 }
                 nll <- f(obs[index]) ## Marginal negative log-likelihood
                 newobj$env$last.par.best <- newobj$env$last.par ## <-- used by tmbprofile
-                slice <- tmbprofile(newobj, k, slice=TRUE,
-                                    parm.range = range,...)
-                spline <- splinefun(slice[[1]], slice[[2]], ties=mean)
-                spline.range <- range(slice[[1]])
+                if (splineApprox) {
+                    slice <- tmbprofile(newobj, k, slice=TRUE,
+                                        parm.range = range,...)
+                    spline <- splinefun(slice[[1]], slice[[2]], ties=mean)
+                    spline.range <- range(slice[[1]])
+                    if (partialDiscrete) {
+                        ## Remove density evaluations of discrete part
+                        slice[[1]][slice[[1]] %in% discreteSupport] <- NA
+                    }
+                } else {
+                    spline <- Vectorize(f)
+                    spline.range <- range
+                    slice <- NULL
+                }
                 if(trace >= 2){
                     plotfun <- function(slice, spline){
-                        plot(slice, type="p", level=NULL)
-                        plot(spline, spline.range[1], spline.range[2], add=TRUE)
+                        plot.range <- spline.range
+                        if (!is.finite(plot.range[1])) plot.range[1] <- min(obs)
+                        if (!is.finite(plot.range[2])) plot.range[2] <- max(obs)
+                        if (!is.null(slice))
+                            plot(slice, type="p", level=NULL)
+                        plot(spline, plot.range[1], plot.range[2], add=!is.null(slice))
                         abline(v=obs[index], lty="dashed")
                     }
                     if(trace >= 3){
-                        slice$value <- exp( -(slice$value - nll) )
+                        if (!is.null(slice))
+                            slice$value <- exp( -(slice$value - nll) )
                         plotfun(slice, function(x)exp(-(spline(x) - nll)))
                     }
                     else
@@ -482,6 +516,19 @@ oneStepPredict <- function(obj,
                 mean <- integrate(function(x)exp(-(spline(x) - nll)) * x,
                                   spline.range[1],
                                   spline.range[2])$value / (F1 + F2)
+                ## Correction mean, F1 and F2
+                if (partialDiscrete) {
+                    ## Evaluate discrete part
+                    f.discrete <- sapply(discreteSupport, f)
+                    Pdis <- exp(-f.discrete + nll)
+                    ## mean correction
+                    mean <- mean * (F1 + F2) + sum(Pdis * discreteSupport)
+                    mean <- mean / (F1 + F2 + sum(Pdis))
+                    ## F1 and F2 correction
+                    left <- discreteSupport <= obs[index]
+                    F1 <- F1 + sum(Pdis[left])
+                    F2 <- F2 + sum(Pdis[!left])
+                }
                 ## Was:
                 ##  F1 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), -Inf, obs[index])$value
                 ##  F2 <- integrate(Vectorize( function(x)nan2zero( exp(-(f(x) - nll)) ) ), obs[index], Inf)$value
@@ -496,7 +543,7 @@ oneStepPredict <- function(obj,
     }
 
     ## ######################### CASE: oneStepDiscrete
-    if((method == "oneStepGeneric") && !missing(discreteSupport)){
+    if((method == "oneStepGeneric") && !OSG_continuous){
         p <- newobj$par
         newobj$fn(p) ## Test eval
         obs <- as.integer(round(obs))

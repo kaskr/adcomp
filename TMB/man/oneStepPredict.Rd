@@ -19,6 +19,7 @@ oneStepPredict(
   parallel = FALSE,
   trace = TRUE,
   reverse = (method == "oneStepGaussianOffMode"),
+  splineApprox = TRUE,
   ...
 )
 }
@@ -35,11 +36,11 @@ oneStepPredict(
 
 \item{conditional}{Index vector of observations that are fixed during OSA. By default the empty set.}
 
-\item{discrete}{Are observations discrete? (assumed FALSE by default)}
+\item{discrete}{Logical; Are observations discrete? (assumed FALSE by default).}
 
-\item{discreteSupport}{Possible outcomes of discrete distribution (\code{method="oneStepGeneric"} only).}
+\item{discreteSupport}{Possible outcomes of discrete part of the distribution (\code{method="oneStepGeneric"} and \code{method="cdf"} only).}
 
-\item{range}{Possible range of the observations. (\code{method="oneStepGeneric"} only).}
+\item{range}{Possible range of continuous part of the distribution (\code{method="oneStepGeneric"} only).}
 
 \item{seed}{Randomization seed (discrete case only). If \code{NULL} the RNG seed is untouched by this routine (recommended for simulation studies).}
 
@@ -48,6 +49,8 @@ oneStepPredict(
 \item{trace}{Logical; Trace progress? More options available for \code{method="oneStepGeneric"} - see details.}
 
 \item{reverse}{Do calculations in opposite order to improve stability? (currently enabled by default for \code{oneStepGaussianOffMode} method only)}
+
+\item{splineApprox}{Represent one-step conditional distribution by a spline to reduce number of density evaluations? (\code{method="oneStepGeneric"} only).}
 
 \item{...}{Control parameters for OSA method}
 }
@@ -65,6 +68,7 @@ includes selected characteristics of the predictive distribution (current row) g
 \item{nlcdf.upper}{Negative log of the upper CDF at current observation}
 }
 \emph{given past observations}.
+If column \code{randomize} is present, it indicates that randomization has been applied for the row.
 }
 \description{
 Calculate one-step-ahead (OSA) residuals for a latent variable
@@ -135,8 +139,9 @@ The new data vector (\code{keep}) need not be passed from \R. It
 automatically becomes a copy of \code{x} filled with ones.
 
 Some extra parameters are essential for the method.
-Pay special attention to the integration domain which must be specified either via \code{range} (continuous case) or \code{discreteSupport} (discrete case).
-It may be useful to look at the one step predictive distributions on either log scale (\code{trace=2}) or natural scale (\code{trace=3}) to determine which alternative methods might be appropriate.
+Pay special attention to the integration domain which must be set either via \code{range} (continuous case) or \code{discreteSupport} (discrete case). Both of these can be set simultanously to specify a mixed continuous/discrete distribution. For example, a non-negative distribution with a point mass at zero (e.g. the Tweedie distribution) should have \code{range=c(0,Inf)} and \code{discreteSupport=0}.
+Several parameters control accuracy and appropriate settings are case specific. By default, a spline is fitted to the one-step density before integration (\code{splineApprox=TRUE}) to reduce the number of density evaluations. However, this setting may have negative impact on accuracy. The spline approximation can then either be disabled or improved by noting that \code{...} arguments are passed to \link{tmbprofile}: Pass e.g. \code{ystep=20, ytol=0.1}.
+Finally, it may be useful to look at the one step predictive distributions on either log scale (\code{trace=2}) or natural scale (\code{trace=3}) to determine which alternative methods might be appropriate.
 }
 \item{method="oneStepGaussian"}{
 This is a special case of the generic method where the one step
