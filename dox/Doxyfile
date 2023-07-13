@@ -2052,6 +2052,7 @@ PREDEFINED             =        VECTORIZE1_t(f)=       \
                                 VECTORIZE3_tti(f)=     \
                                 VECTORIZE3_ttt(f)=     \
                                 VECTORIZE4_ttti(f)=    \
+                                VECTORIZE4_tttt(f)=    \
                                 VECTORIZE5_tttti(f)=   \
                                 VECTORIZE6_ttttti(f)=  \
                                 VECTORIZE1_n(f)=       \
