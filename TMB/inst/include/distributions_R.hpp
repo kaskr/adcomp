@@ -571,7 +571,55 @@ Type dtweedie(Type y, Type mu, Type phi, Type p, int give_log = 0) {
   return ( give_log ? ans : exp(ans) );
 }
 VECTORIZE5_tttti(dtweedie)
+/* Helpers to define ptweedie */
+namespace atomic {
+template<class Float>
+struct Tweedie_t {
+  typedef Float Scalar; // Required by integrate
+  Float q, mu, phi, p; // Parameters
+  Float ZeroProb() {
+    Float p2 = 2.0 - p;
+    Float ans = -pow(mu, p2) / (phi * p2); // log(prob(y=0))
+    return exp(ans);
+  }
+  // Evaluate density
+  Float operator() (Float y) {
+    Float p1 = p - 1.0, p2 = 2.0 - p;
+    Float ans = -pow(mu, p2) / (phi * p2); // log(prob(y=0))
+    ans += tweedie_utils::tweedie_logW(y, phi, p);
+    ans += -y / (phi * p1 * pow(mu, p1)) - log(y);
+    return exp(ans);
+  }
+  // Integrate density
+  Float cdf() {
+    using gauss_kronrod::integrate;
+    Float ans = ZeroProb();
+    if (q > 0)
+      ans += integrate(*this, 0, q);
+    return ans;
+  }
+};
+template<class Float>
+Float eval_ptweedie(Float q, Float mu, Float phi, Float p) {
+  Tweedie_t<Float> Tweedie = {q, mu, phi, p};
+  return Tweedie.cdf();
+}
+TMB_BIND_ATOMIC(ptweedie, 0111, eval_ptweedie(x[0], x[1], x[2], x[3]))
+}
+/** \brief Tweedie CDF.
 
+    This experimental implementation uses brute force numerical integration to calculate the Tweedie CDF. Output should be identical to that of ptweedie.series from R package 'tweedie' (however, note the different argument order).
+
+    \warning The derivative wrt. the y argument is disabled (zero).
+
+    \ingroup R_style_distribution
+*/
+template<class Type>
+Type ptweedie(Type q, Type mu, Type phi, Type p) {
+  vector<Type> args(5); // Last index reserved for derivative order
+  args << q, mu, phi, p, 0;
+  return atomic::ptweedie(CppAD::vector<Type>(args))[0];
+}
 
 /** \brief Conway-Maxwell-Poisson log normalizing constant.
 
