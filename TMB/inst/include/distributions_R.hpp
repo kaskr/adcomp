@@ -620,6 +620,7 @@ Type ptweedie(Type q, Type mu, Type phi, Type p) {
   args << q, mu, phi, p, 0;
   return atomic::ptweedie(CppAD::vector<Type>(args))[0];
 }
+VECTORIZE4_tttt(ptweedie)
 
 /** \brief Conway-Maxwell-Poisson log normalizing constant.
 
