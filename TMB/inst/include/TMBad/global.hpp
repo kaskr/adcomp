@@ -265,7 +265,7 @@ struct Args {
   Index input(Index j) const { return inputs[ptr.first + j]; }
   /** \brief Get variable index of j'th output of current operator */
   Index output(Index j) const { return ptr.second + j; }
-  Args(const IndexVector &inputs) : inputs(&inputs[0]) {
+  Args(const IndexVector &inputs) : inputs(inputs.data()) {
     ptr.first = 0;
     ptr.second = 0;
   }
@@ -299,7 +299,7 @@ struct ForwardArgs : Args<> {
   }
   ForwardArgs(const IndexVector &inputs, TypeVector &values,
               global *glob_ptr = NULL)
-      : Args<>(inputs), values(&values[0]), glob_ptr(glob_ptr) {}
+      : Args<>(inputs), values(values.data()), glob_ptr(glob_ptr) {}
 };
 /** \brief Access input/output values and derivatives during a reverse
     pass. Write access granted for the input derivative only.
@@ -351,8 +351,8 @@ struct ReverseArgs : Args<> {
   ReverseArgs(const IndexVector &inputs, TypeVector &values, TypeVector &derivs,
               global *glob_ptr = NULL)
       : Args<>(inputs),
-        values(&values[0]),
-        derivs(&derivs[0]),
+        values(values.data()),
+        derivs(derivs.data()),
         glob_ptr(glob_ptr) {
     ptr.first = (Index)inputs.size();
     ptr.second = (Index)values.size();

@@ -1004,7 +1004,7 @@ CONSTEXPR bool global::no_filter::operator[](size_t i) const { return true; }
 
 void global::forward(Position start) {
   if (forward_compiled != NULL) {
-    forward_compiled(&values[0]);
+    forward_compiled(values.data());
     return;
   }
   ForwardArgs<Scalar> args(inputs, values, this);
@@ -1014,7 +1014,7 @@ void global::forward(Position start) {
 
 void global::reverse(Position start) {
   if (reverse_compiled != NULL) {
-    reverse_compiled(&values[0], &derivs[0]);
+    reverse_compiled(values.data(), derivs.data());
     return;
   }
   ReverseArgs<Scalar> args(inputs, values, derivs, this);
