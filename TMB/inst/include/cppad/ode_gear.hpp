@@ -487,6 +487,7 @@ void OdeGear(
 
 	// LU factor (and overwrite) the matrix A
 	int sign;
+	CPPAD_UNUSED(sign);
 	CppAD::vector<size_t> ip(n) , jp(n);
 	sign = LuFactor(ip, jp, A);
 	CPPAD_ASSERT_KNOWN(

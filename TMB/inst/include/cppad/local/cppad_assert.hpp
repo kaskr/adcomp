@@ -2,6 +2,8 @@
 # ifndef CPPAD_CPPAD_ASSERT_INCLUDED
 # define CPPAD_CPPAD_ASSERT_INCLUDED
 
+# define CPPAD_UNUSED(x) ((void)(x))
+
 /* --------------------------------------------------------------------------
 CppAD: C++ Algorithmic Differentiation: Copyright (C) 2003-14 Bradley M. Bell
 

@@ -171,6 +171,7 @@ $end
 */
 
 # include <cppad/romberg_one.hpp>
+# include <cppad/local/cppad_assert.hpp>
 # include <cppad/check_numeric_type.hpp>
 # include <cppad/check_simple_vector.hpp>
 
@@ -275,6 +276,7 @@ public:
 		size_t i, j;
 		Float prod = 1;
 		size_t pow2 = 1;
+		CPPAD_UNUSED(pow2);
 		for(i = 0; i < m-1; i++)
 		{	prod *= (b[i] - a[i]);
 			for(j = 0; j < (n[i] - 1); j++)
