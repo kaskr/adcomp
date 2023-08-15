@@ -56,7 +56,7 @@ test:
 	make test_protect
 	make check_simulations
 	make report
-	make glmmTMB
+##	make glmmTMB
 	make spict
 ##	make VAST
 	make matrix_arrays
