@@ -4419,6 +4419,7 @@ std::vector<Index> remap_identical_sub_expressions(
     visited.apply(fb);
   }
   if (reject > 0) {
+    ((void)(total));
   }
 
   return remap;
