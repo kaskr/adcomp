@@ -4321,7 +4321,6 @@ std::vector<Index> remap_identical_sub_expressions(
   Dependencies dep1;
   Dependencies dep2;
   size_t reject = 0;
-  size_t total = 0;
   Args<> args(glob.inputs);
 
   for (size_t j = 0, i = 0, nout = 0; j < glob.opstack.size(); j++, i += nout) {
@@ -4335,7 +4334,6 @@ std::vector<Index> remap_identical_sub_expressions(
     }
     if (any_remap) {
       bool ok = true;
-      total += nout;
 
       global::OperatorPure *CurOp = glob.opstack[v2o[i]];
       global::OperatorPure *RemOp = glob.opstack[v2o[remap[i]]];
