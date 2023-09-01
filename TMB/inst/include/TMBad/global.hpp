@@ -1911,7 +1911,6 @@ struct global {
         `NULL`.
     */
     OperatorPure *compress() {
-      TMBAD_ASSERT(false);
       std::vector<Index> &inputs = get_glob()->inputs;
       size_t k = Op.input_size();
       size_t start = inputs.size() - k * n;
@@ -1935,8 +1934,15 @@ struct global {
     }
     OperatorPure *other_fuse(OperatorPure *self, OperatorPure *other) {
       OperatorPure *op1 = get_glob()->getOperator<Operator1>();
-      if (op1 == other) {
+      if ((op1 == other) && (this->n < TMBAD_COMPRESS_TOL)) {
         this->n++;
+        if (this->n == TMBAD_COMPRESS_TOL) {
+          OperatorPure *cOp = this->compress();
+          if (cOp != NULL) {
+            self->deallocate();
+            return cOp;
+          }
+        }
         return self;
       }
       return NULL;
@@ -1951,7 +1957,6 @@ struct global {
       \note When replacing a batch of binary operators by
       `RepCompress` the memory *reduction* is assymptotically `2/3`
       (ratio will in general depend on the configuration typedefs).
-      \warning TO BE DEPRECATED. HAS IMPLICIT DEPENDENCIES.
   */
   template <class Operator1>
   struct RepCompress : DynamicOperator<-1, -1> {
@@ -1978,9 +1983,11 @@ struct global {
       ForwardArgs<Type> args_cpy = args;
       args_cpy.inputs = &inputs[0];
       args_cpy.ptr.first = 0;
+      std::valarray<Index> ip = this->increment_pattern;
+      int ip_size = Op.input_size();
       for (size_t i = 0; i < (size_t)n; i++) {
         Op.forward(args_cpy);
-        inputs += this->increment_pattern;
+        for (int j = 0; j < ip_size; j++) inputs[j] += ip[j];
         args_cpy.ptr.second += Op.output_size();
       }
     }
@@ -1994,8 +2001,10 @@ struct global {
       args_cpy.inputs = &inputs[0];
       args_cpy.ptr.first = 0;
       args_cpy.ptr.second += n * Op.output_size();
+      std::valarray<Index> ip = this->increment_pattern;
+      int ip_size = Op.input_size();
       for (size_t i = 0; i < (size_t)n; i++) {
-        inputs -= this->increment_pattern;
+        for (int j = 0; j < ip_size; j++) inputs[j] -= ip[j];
         args_cpy.ptr.second -= Op.output_size();
         Op.reverse(args_cpy);
       }
