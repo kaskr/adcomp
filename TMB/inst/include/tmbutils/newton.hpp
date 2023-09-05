@@ -1129,10 +1129,20 @@ struct LogDetOperator : TMBad::global::DynamicOperator< -1, -1> {
       x = args.x_segment(0, n);
     Eigen::SparseMatrix<Scalar> h = pattern(hessian, x);
     llt->factorize(h);
+    // Get out if factorization went wrong
+    if (llt->info() != 0) {
+      args.y(0) = R_NaN;
+      return;
+    }
     args.y(0) = logDeterminant(*llt);
   }
   void reverse(TMBad::ReverseArgs<Scalar> &args) {
     size_t n = input_size();
+    // Get out if factorization went wrong
+    if (llt->info() != 0) {
+      for (size_t i=0; i<n; i++) args.dx(i) = R_NaN;
+      return;
+    }
     std::vector<Scalar> x = args.x_segment(0, n);
     Eigen::SparseMatrix<Scalar> ih = pattern(hessian, x);
     // Inverse subset
