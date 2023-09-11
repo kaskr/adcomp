@@ -2624,7 +2624,17 @@ extern "C"
     PROTECT(openmp_res);
     // Assemble
     Rf_setAttrib(ans, openmp_sym, openmp_res);
-    UNPROTECT(3);
+    UNPROTECT(2);
+    // Add more stuff
+#ifdef TMBAD_FRAMEWORK
+    SEXP index_size_sym = Rf_install("sizeof(Index)");
+    PROTECT(index_size_sym);
+    SEXP index_size = Rf_ScalarInteger(sizeof(TMBad::Index));
+    PROTECT(index_size);
+    Rf_setAttrib(ans, index_size_sym, index_size);
+    UNPROTECT(2);
+#endif
+    UNPROTECT(1); // ans
     return ans;
   }
 }
