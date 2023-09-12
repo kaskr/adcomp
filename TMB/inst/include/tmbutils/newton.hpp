@@ -497,6 +497,7 @@ struct jacobian_sparse_plus_lowrank_t {
     Eigen::Diagonal<Eigen::SparseMatrix<T> > diagonal() {
       return H.diagonal();
     }
+    typedef T value_type;
   };
   template<class T>
   struct MatrixResult {
@@ -1232,10 +1233,10 @@ Type log_determinant(const matrix<Type> &H, PTR ptr) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
-template<class Type, class Factorization=DEFAULT_SPARSE_FACTORIZATION>
-Type log_determinant(const jacobian_sparse_plus_lowrank_t<>::sparse_plus_lowrank<Type> &H,
+template<class Arg1, class Factorization=DEFAULT_SPARSE_FACTORIZATION>
+typename Arg1::value_type log_determinant(const Arg1 &H,
                      std::shared_ptr<jacobian_sparse_plus_lowrank_t<Factorization> > ptr) {
-  matrix<Type> H0M = (ptr -> getH0M(ptr, H)).array();
+  matrix<typename Arg1::value_type> H0M = (ptr -> getH0M(ptr, H)).array();
   return
     log_determinant(H.H, ptr->H) +
     log_determinant(H0M, NULL);
