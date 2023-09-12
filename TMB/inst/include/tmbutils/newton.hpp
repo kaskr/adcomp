@@ -42,6 +42,7 @@ inline double logDeterminant(const DEFAULT_SPARSE_FACTORIZATION &llt) {
   return 2. * llt.matrixL().nestedExpression().diagonal().array().log().sum();
 }
 #endif
+typedef Eigen::SimplicialLDLT< Eigen::SparseMatrix<TMBad::Scalar> > LDLT_SPARSE_FACTORIZATION;
 
 #include <memory>
 /** \brief Highly flexible atomic `Newton()` solver and `Laplace()` approximation
@@ -450,7 +451,7 @@ TMBad::Scalar Tag(const TMBad::Scalar &x) CSKIP( {
     det(H + G * H0 * G^T) = det(H) * det(H0M)
     ```
 */
-template<class Fac=Eigen::SimplicialLDLT< Eigen::SparseMatrix<TMBad::Scalar> > >
+template<class Fac=DEFAULT_SPARSE_FACTORIZATION>
 struct jacobian_sparse_plus_lowrank_t {
   // The three tapes
   std::shared_ptr<jacobian_sparse_t<Fac> > H;
@@ -666,6 +667,8 @@ struct newton_config {
   bool sparse;
   /** \brief Detect an additional low rank contribution in sparse case? */
   bool lowrank;
+  /** \brief If `lowrank`, use LDL factorization for sparse Hessian term? */
+  bool LDL;
   bool decompose;
   /** \brief Detect and apply 'dead gradients' simplification */
   bool simplify;
@@ -697,6 +700,7 @@ struct newton_config {
     SET_DEFAULT(u0, 1e-04);
     SET_DEFAULT(sparse, false);
     SET_DEFAULT(lowrank, false);
+    SET_DEFAULT(LDL, false);
     SET_DEFAULT(decompose, true);
     SET_DEFAULT(simplify, true);
     SET_DEFAULT(on_failure_return_nan, true);
@@ -1223,9 +1227,9 @@ Type log_determinant(const matrix<Type> &H, PTR ptr) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
-template<class Type>
-Type log_determinant(const jacobian_sparse_plus_lowrank_t<>::sparse_plus_lowrank<Type> &H,
-                     std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr) {
+template<class Type, class Factorization>
+Type log_determinant(const typename jacobian_sparse_plus_lowrank_t<Factorization>::template sparse_plus_lowrank<Type> &H,
+                     std::shared_ptr<jacobian_sparse_plus_lowrank_t<Factorization> > ptr) {
   matrix<Type> H0M = (ptr -> getH0M(ptr, H)).array();
   return
     log_determinant(H.H, ptr->H) +
@@ -1342,6 +1346,18 @@ NewtonSolver<Functor,
   return ans;
 }
 
+template<class Functor, class Type>
+NewtonSolver<Functor,
+             Type,
+             jacobian_sparse_plus_lowrank_t<LDLT_SPARSE_FACTORIZATION> >
+NewtonSparsePlusLowrankLDLT(
+                            Functor &F,
+                            Eigen::Array<Type, Eigen::Dynamic, 1> start,
+                            newton_config cfg = newton_config() ) {
+  NewtonSolver<Functor, Type, jacobian_sparse_plus_lowrank_t<LDLT_SPARSE_FACTORIZATION> > ans(F, start, cfg);
+  return ans;
+}
+
 /** \brief Tape a functor and return solution
 
     Can be used anywhere in a template. Inner and outer parameters are
@@ -1360,8 +1376,13 @@ vector<Type> Newton(Functor &F,
   if (cfg.sparse) {
     if (! cfg.lowrank)
       return NewtonSparse(F, start, cfg);
-    else
-      return NewtonSparsePlusLowrank(F, start, cfg);
+    else {
+      if (!cfg.LDL) {
+        return NewtonSparsePlusLowrank(F, start, cfg);
+      } else {
+        return NewtonSparsePlusLowrankLDLT(F, start, cfg);
+      }
+    }
   }
   else
     return NewtonDense(F, start, cfg);
@@ -1391,9 +1412,15 @@ Type Laplace(Functor &F,
       start = opt.solution();
       return opt.Laplace();
     } else {
-      auto opt = NewtonSparsePlusLowrank(F, start, cfg);
-      start = opt.solution();
-      return opt.Laplace();
+      if (!cfg.LDL) {
+        auto opt = NewtonSparsePlusLowrank(F, start, cfg);
+        start = opt.solution();
+        return opt.Laplace();
+      } else {
+        auto opt = NewtonSparsePlusLowrankLDLT(F, start, cfg);
+        start = opt.solution();
+        return opt.Laplace();
+      }
     }
   } else {
     auto opt = NewtonDense(F, start, cfg);
