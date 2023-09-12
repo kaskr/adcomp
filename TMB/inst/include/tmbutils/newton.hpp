@@ -570,7 +570,7 @@ struct jacobian_sparse_plus_lowrank_t {
     return y1 - y2;
   }
   template<class T>
-  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
+  vector<T> solve(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
                   const vector<T> &hvec,
                   const vector<T> &xvec) {
     using atomic::matmul;
@@ -612,7 +612,7 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   // Helper to get determinant: det(H)*det(H0)*det(M)
   template<class T>
-  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t<> > ptr,
+  tmbutils::matrix<T> getH0M(std::shared_ptr<jacobian_sparse_plus_lowrank_t> ptr,
                              const sparse_plus_lowrank<T> &h) {
     vector<T> s =
       HessianSolveVector<jacobian_sparse_t<Fac> >(ptr -> H,
@@ -1232,8 +1232,8 @@ Type log_determinant(const matrix<Type> &H, PTR ptr) {
   // FIXME: Depending on TMB atomic
   return atomic::logdet(tmbutils::matrix<Type>(H));
 }
-template<class Type, class Factorization>
-Type log_determinant(const typename jacobian_sparse_plus_lowrank_t<Factorization>::template sparse_plus_lowrank<Type> &H,
+template<class Type, class Factorization=DEFAULT_SPARSE_FACTORIZATION>
+Type log_determinant(const jacobian_sparse_plus_lowrank_t<>::sparse_plus_lowrank<Type> &H,
                      std::shared_ptr<jacobian_sparse_plus_lowrank_t<Factorization> > ptr) {
   matrix<Type> H0M = (ptr -> getH0M(ptr, H)).array();
   return
