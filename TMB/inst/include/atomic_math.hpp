@@ -496,7 +496,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   res = -matmul(Yt, tmp);             // -f(X)^T*W*f(X)^T
 			   )
 
-/** \brief Atomic version of log determinant of positive definite n-by-n matrix.
+/** \brief Atomic version of log absolute determinant of general invertible n-by-n matrix.
     \param x Input vector of length n*n.
     \return Vector of length 1.
 */
@@ -512,12 +512,14 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   matrix<double> X=vec2mat(tx,n,n);
 			   matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
 			   vector<double> LUdiag = LU.diagonal();
-			   double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
+			   double res=LUdiag.abs().log().sum();
 			   ty[0] = res;
 			   ,
-			   // ATOMIC_REVERSE  (X^-1*W[0])
-			   CppAD::vector<Type> invX = matinv(tx);
-			   for(size_t i=0; i<tx.size(); i++) px[i] = invX[i] * py[0];
+			   // ATOMIC_REVERSE  (X^-1^T*W[0])
+			   int n=sqrt((double)tx.size());
+			   matrix<Type> M = vec2mat(matinv(tx), n, n).transpose();
+			   CppAD::vector<Type> invXT = mat2vec(M);
+			   for(size_t i=0; i<tx.size(); i++) px[i] = invXT[i] * py[0];
 			   )
 
 /** \brief Atomic version of log determinant *and* inverse of positive definite n-by-n matrix.
