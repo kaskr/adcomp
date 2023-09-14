@@ -1387,6 +1387,15 @@ struct Decomp2 : std::pair<ADFun, ADFun> {
       ans.first = ans.first.JacFun(keep_rc, keep_rc);
     }
     ans.first.glob.eliminate();
+
+    std::vector<Index> nodes = find_op_by_name(ans.first.glob, "ValOp");
+    OperatorPure *copyop =
+        ans.first.glob.template getOperator<global::ad_plain::CopyOp>();
+    for (size_t i = 0; i < nodes.size(); i++) {
+      Index j = nodes[i];
+      ans.first.glob.opstack[j] = copyop;
+    }
+
     f.set_inner_outer(ans.first);
 
     if (sparse_2) {
