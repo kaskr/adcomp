@@ -494,9 +494,24 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<T> H0;
     // Optional: Store serialized representation of H
     vector<T> Hvec;
+    // 'fake' diagonal (H only)
     Eigen::Diagonal<Eigen::SparseMatrix<T> > diagonal() {
       return H.diagonal();
     }
+    // Matrix vector product
+    vector<T> operator*(const vector<T> &x) const {
+      return
+        (H * x.matrix()).array() + (G * (H0 * (G.transpose() * x.matrix()))).array();
+    }
+    // 'fake' abs (upper bound)
+    sparse_plus_lowrank abs() const {
+      sparse_plus_lowrank ans;
+      ans.H.coeffs() = ans.H.coeffs().abs();
+      ans.G. array() = ans.G. array().abs();
+      ans.H0.array() = ans.H0.array().abs();
+      return ans;
+    }
+    EIGEN_DEFAULT_DENSE_INDEX_TYPE rows() const { return H.rows(); }
     typedef T value_type;
   };
   template<class T>
@@ -552,12 +567,33 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   void llt_factorize(const sparse_plus_lowrank<TMBad::Scalar> &h) {
     H -> llt_factorize(h.H);
+    // Empty lowrank contribution?
+    if ( H0->Domain() == 0 ) {
+      factorize_info = H -> llt_info();
+      return;
+    }
+    // Vector of ones
+    vector<TMBad::Scalar> ones(h.rows());
+    ones.fill(1.);
+    // Initialize dominant eigen vector
+    if (eigvec.size() != h.rows()) {
+      eigvec = ones;
+    }
+    // Eigen value upper bound
+    sparse_plus_lowrank<TMBad::Scalar> h_abs = h.abs();
+    TMBad::Scalar M = (h_abs * ones).maxCoeff();
+    // Find smallest eigen value iteratively
+    for (int iter=0; iter<100; iter++) {
+      // (H+G H0 G^T) * x - M * x
+      eigvec = h * eigvec - M * eigvec;
+
+    }
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
+  Eigen::ComputationInfo factorize_info;
+  vector<TMBad::Scalar> eigvec;
   Eigen::ComputationInfo llt_info() {
-    // Note: As long as diagonal increments are only applied to H this
-    // is the relevant info:
-    return H -> llt_info();
+    return factorize_info;
   }
   /** \note Optional: This method allows the assumption that a prior
       call to `llt_factorize` has been performed for the same H */
