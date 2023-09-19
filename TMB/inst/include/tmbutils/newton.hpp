@@ -582,12 +582,26 @@ struct jacobian_sparse_plus_lowrank_t {
     // Eigen value upper bound
     sparse_plus_lowrank<TMBad::Scalar> h_abs = h.abs();
     TMBad::Scalar M = (h_abs * ones).maxCoeff();
+    TMBad::Scalar eigval, eigval_prev = 1e300;
+    int iter = 0, iter_max = 1e4;
     // Find smallest eigen value iteratively
-    for (int iter=0; iter<100; iter++) {
+    for (; iter < iter_max; iter++) {
       // (H+G H0 G^T) * x - M * x
       eigvec = h * eigvec - M * eigvec;
-
+      eigvec = eigvec / eigvec.sum();
+      eigval =
+        (eigvec * (h * eigvec.matrix()).array()).sum() /
+        (eigvec * eigvec).sum();
+      if (abs(eigval - eigval_prev) < 1e-6) break;
+      eigval_prev = eigval;
     }
+    eigval += M;
+    if (eigval > 0)
+      factorize_info = 0;
+    else
+      factorize_info = 1;
+    std::cout << "iter(eigval)=" << iter << " ";
+    std::cout << "eigval=" << eigval << " ";
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
   Eigen::ComputationInfo factorize_info;
