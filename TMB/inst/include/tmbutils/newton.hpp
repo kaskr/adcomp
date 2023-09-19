@@ -592,14 +592,14 @@ struct jacobian_sparse_plus_lowrank_t {
       eigval =
         (eigvec * (h * eigvec.matrix()).array()).sum() /
         (eigvec * eigvec).sum();
-      if (abs(eigval - eigval_prev) < 1e-6) break;
+      if (std::abs(eigval - eigval_prev) < 1e-6) break;
       eigval_prev = eigval;
     }
     eigval += M;
     if (eigval > 0)
-      factorize_info = 0;
+      factorize_info = Eigen::Success;
     else
-      factorize_info = 1;
+      factorize_info = Eigen::NumericalIssue;
     std::cout << "iter(eigval)=" << iter << " ";
     std::cout << "eigval=" << eigval << " ";
   }
@@ -974,7 +974,7 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       vector<Scalar> diag_cpy = H.diagonal().array();
       // Quick ustep reduction based on Hessian diagonal
       Scalar m = diag_cpy.minCoeff();
-      if (std::isfinite(m) && m < 0) {
+      if (!cfg.lowrank && std::isfinite(m) && m < 0) {
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
       }
