@@ -505,7 +505,7 @@ struct jacobian_sparse_plus_lowrank_t {
     }
     // 'fake' abs (upper bound)
     sparse_plus_lowrank abs() const {
-      sparse_plus_lowrank ans;
+      sparse_plus_lowrank ans(*this);
       ans.H.coeffs() = ans.H.coeffs().abs();
       ans.G. array() = ans.G. array().abs();
       ans.H0.array() = ans.H0.array().abs();
