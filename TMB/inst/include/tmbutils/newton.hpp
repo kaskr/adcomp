@@ -590,9 +590,9 @@ struct jacobian_sparse_plus_lowrank_t {
       eigvec = h * eigvec - M * eigvec;
       eigvec = eigvec / eigvec.sum();
       eigval =
-        (eigvec * (h * eigvec.matrix()).array()).sum() /
+        (eigvec * (h * eigvec.matrix() - M * eigvec).array()).sum() /
         (eigvec * eigvec).sum();
-      if (std::abs(eigval - eigval_prev) < 1e-6) break;
+      if (std::abs(eigval - eigval_prev) < 1e-8) break;
       eigval_prev = eigval;
     }
     eigval += M;
@@ -601,6 +601,7 @@ struct jacobian_sparse_plus_lowrank_t {
     else
       factorize_info = Eigen::NumericalIssue;
     std::cout << "iter(eigval)=" << iter << " ";
+    std::cout << "M=" << M << " ";
     std::cout << "eigval=" << eigval << " ";
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
