@@ -582,6 +582,18 @@ struct jacobian_sparse_plus_lowrank_t {
       factorize_info = H -> llt_info();
       return;
     }
+    // =========== Experimental info
+    vector<TMBad::Scalar> D = getD(*(H->llt));
+    std::cout << "min(D)=" << D.minCoeff() << " ";
+    matrix<TMBad::Scalar> LinvG = (*(H->llt)).matrixL().solve(h.G);
+    vector<TMBad::Scalar> D2 =
+      ((LinvG * h.H0).array() * LinvG.array()).rowwise().sum();
+    TMBad::Scalar D2Dmin = (D2 + D).minCoeff();
+    std::cout << "min(D2D)=" << D2Dmin << " ";
+    if (D2Dmin < 0) {
+      factorize_info = Eigen::NumericalIssue;
+      return;
+    }
     // Vector of ones
     vector<TMBad::Scalar> ones(h.rows());
     ones.fill(1.);
@@ -602,7 +614,7 @@ struct jacobian_sparse_plus_lowrank_t {
       eigval =
         (eigvec * (h * eigvec.matrix() - M * eigvec).array()).sum() /
         (eigvec * eigvec).sum();
-      if (std::abs(eigval - eigval_prev) < 1e-8) break;
+      if (std::abs(eigval - eigval_prev) < 1e-6) break;
       eigval_prev = eigval;
     }
     eigval += M;
