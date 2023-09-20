@@ -101,6 +101,16 @@ struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
   }
 };
 
+/* Helper to get D for LDLT factorization and empty vector otherwise */
+template<class LLTFac>
+inline vector<typename LLTFac::Scalar> getD(const LLTFac &F) {
+  return vector<typename LLTFac::Scalar>(0);
+}
+template<class Type>
+inline vector<Type> getD(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > &F) {
+  return F.vectorD();
+}
+
 /** \brief Operator (H, x) -> solve(H, x)
 
     Helper operator required to differentiate a newton solver. The
