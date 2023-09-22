@@ -602,9 +602,15 @@ struct jacobian_sparse_plus_lowrank_t {
       return;
     }
     // =========== Experimental info
+    matrix<double> GH0GT = h.G * h.H0 * h.G.transpose();
+    Eigen::SparseMatrix<double> S = h.H + GH0GT.sparseView();
+    DEFAULT_SPARSE_FACTORIZATION Sllt(S);
+    Sllt.factorize(S);
+    std::cout << "Sinfo=" << Sllt.info() << " ";
+    // =========== Experimental info
     vector<TMBad::Scalar> D = getD(*(H->llt));
     std::cout << "min(D)=" << D.minCoeff() << " ";
-    matrix<TMBad::Scalar> LinvG = (*(H->llt)).matrixL().solve(h.G);
+    matrix<TMBad::Scalar> LinvG = (*(H->llt)).matrixL().solve((*(H->llt)).permutationP() * h.G);
     vector<TMBad::Scalar> D2 =
       ((LinvG * h.H0).array() * LinvG.array()).rowwise().sum();
     TMBad::Scalar D2Dmin = (D2 + D).minCoeff();
@@ -1016,6 +1022,7 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       vector<Scalar> diag_cpy = H.diagonal().array();
       // Quick ustep reduction based on Hessian diagonal
       Scalar m = diagonal_min(H);
+      if (cfg.trace) std::cout << "m=" << m << " ";
       if (std::isfinite(m) && m < 0) {
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
