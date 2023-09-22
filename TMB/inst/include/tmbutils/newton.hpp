@@ -111,6 +111,20 @@ inline vector<Type> getD(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> 
   return F.vectorD();
 }
 
+/* Helper to get diagonal().minCoeff() */
+template<class MatrixType>
+inline typename MatrixType::value_type diagonal_min(const MatrixType &M) {
+  return M.diagonal_min();
+}
+template<class T>
+inline T diagonal_min(const matrix<T> &M) {
+  return M.diagonal().minCoeff();
+}
+template<class T>
+inline T diagonal_min(const Eigen::SparseMatrix<T> &M) {
+  return M.diagonal().minCoeff();
+}
+
 /** \brief Operator (H, x) -> solve(H, x)
 
     Helper operator required to differentiate a newton solver. The
@@ -507,6 +521,11 @@ struct jacobian_sparse_plus_lowrank_t {
     // 'fake' diagonal (H only)
     Eigen::Diagonal<Eigen::SparseMatrix<T> > diagonal() {
       return H.diagonal();
+    }
+    // Real diagonal minimum
+    T diagonal_min() const {
+      vector<T> D2 = ((G * H0).array() * G.array()).rowwise().sum();
+      return (H.diagonal().array() + D2).minCoeff();
     }
     // Matrix vector product
     vector<T> operator*(const vector<T> &x) const {
@@ -996,8 +1015,8 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
         H = (*hessian)(std::vector<Scalar>(x));
       vector<Scalar> diag_cpy = H.diagonal().array();
       // Quick ustep reduction based on Hessian diagonal
-      Scalar m = diag_cpy.minCoeff();
-      if (!cfg.lowrank && std::isfinite(m) && m < 0) {
+      Scalar m = diagonal_min(H);
+      if (std::isfinite(m) && m < 0) {
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
       }
