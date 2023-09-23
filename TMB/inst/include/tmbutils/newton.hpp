@@ -1040,8 +1040,10 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       }
       // We now have a PD hessian
       // Let's take a newton step and see if it improves...
-      vector<Scalar> x_new =
-        x - hessian -> llt_solve(H, g).array();
+      vector<Scalar> step = hessian->llt_solve(H, g).array();
+      vector<Scalar> err = (H * step.matrix()).array() - g;
+      if (cfg.trace) std::cout << "abserr=" << err.abs().maxCoeff() << " ";
+      vector<Scalar> x_new = x - step;
       Scalar f = function(x_new)[0];
       // Accept/Reject rules
       bool accept = std::isfinite(f);
