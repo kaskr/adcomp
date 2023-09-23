@@ -665,7 +665,7 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<TMBad::Scalar> H0M = h.H0 * h.G.transpose() * W;
     H0M.diagonal().array() += TMBad::Scalar(1.);
     matrix<TMBad::Scalar> y1 = H -> llt_solve(h.H, x);
-    matrix<TMBad::Scalar> y2 = W * H0M.ldlt().solve(h.H0 * W.transpose() * x);
+    matrix<TMBad::Scalar> y2 = W * H0M.lu().solve(h.H0 * W.transpose() * x);
     return y1 - y2;
   }
   template<class T>
