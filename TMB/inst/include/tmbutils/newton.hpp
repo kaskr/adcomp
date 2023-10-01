@@ -527,10 +527,10 @@ struct jacobian_sparse_plus_lowrank_t {
       vector<T> D2 = ((G * H0).array() * G.array()).rowwise().sum();
       return (H.diagonal().array() + D2).minCoeff();
     }
-    // Matrix vector product
-    vector<T> operator*(const vector<T> &x) const {
+    // Matrix-matrix product
+    matrix<T> operator*(const matrix<T> &x) const {
       return
-        (H * x.matrix()).array() + (G * (H0 * (G.transpose() * x.matrix()))).array();
+        (H * x).matrix() + (G * (H0 * (G.transpose() * x))).matrix();
     }
     // 'fake' abs (upper bound)
     sparse_plus_lowrank abs() const {
@@ -609,47 +609,86 @@ struct jacobian_sparse_plus_lowrank_t {
     std::cout << "Sinfo=" << Sllt.info() << " ";
     // =========== Experimental info
     vector<TMBad::Scalar> D = getD(*(H->llt));
-    std::cout << "min(D)=" << D.minCoeff() << " ";
-    matrix<TMBad::Scalar> LinvG = (*(H->llt)).matrixL().solve((*(H->llt)).permutationP() * h.G);
-    vector<TMBad::Scalar> D2 =
-      ((LinvG * h.H0).array() * LinvG.array()).rowwise().sum();
-    TMBad::Scalar D2Dmin = (D2 + D).minCoeff();
-    std::cout << "min(D2D)=" << D2Dmin << " ";
-    if (D2Dmin < 0) {
-      factorize_info = Eigen::NumericalIssue;
-      return;
+    // Have H + G H0 GT, P H PT = L D LT. Permute 'G'
+    
+    // Now have L D LT + G H0 GT.
+    auto H0fac = h.H0.ldlt();
+    //h.G = h.G * H0fac.matrixL();
+    vector<TMBad::Scalar> D0 = H0fac.vectorD();
+    // We must decide if 'L D LT + L0 D0 L0T' is PD.
+    // We gather the columns of the negative part (C) and project onto span(C).
+    // FIXME: In theory, some columns could be linearly dependent and we should remove redundant columns (ignore for now).
+    size_t rankC = (D.array() <= 0).count() + (D0.array() <= 0).count() ;
+    // FIXME: Quick exit if too big rankC
+    Eigen::Matrix<TMBad::Scalar, -1, -1> C((size_t) h.rows(), rankC);
+    size_t k = 0;
+    Eigen::SparseMatrix<TMBad::Scalar> L = (*(H->llt)).matrixL();
+    for (size_t i=0; i < (size_t) D.size(); i++) {
+      if (D[i] <= 0) C.col(k++) = L.col(i);
     }
+    Eigen::Matrix<TMBad::Scalar, -1, -1> L0 = H0fac.matrixL();
+    Eigen::Matrix<TMBad::Scalar, -1, -1> PGL0 = (*(H->llt)).permutationP() * h.G * L0;
+    for (size_t i=0; i < (size_t) D0.size(); i++) {
+      if (D0[i] <= 0) C.col(k++) = PGL0.col(i);
+    }
+    // Finally apply 'projection': C^T * (H+G*H0*GT) * C
+    C = (*(H->llt)).permutationPinv() * C; // Permute back
+    matrix<double> PD = C.transpose() * (h * C);
+    auto PDcheck = PD.llt();
+    std::cout << "PDcheck.info()=" << PDcheck.info() << " ";
+    factorize_info = PDcheck.info();
+    return;
+    
+    // New
+    // std::cout << "Dpos=" << (D.array()>0).count() << " ";
+    // std::cout << "Dneg=" << (D.array()<=0).count() << " ";
+    // vector<TMBad::Scalar> DH0 = h.H0.ldlt().vectorD();
+    // std::cout << "DH0pos=" << (DH0.array()>0).count() << " ";
+    // std::cout << "DH0neg=" << (DH0.array()<=0).count() << " ";
+    
+    
+    // std::cout << "min(D)=" << D.minCoeff() << " ";
+    // matrix<TMBad::Scalar> LinvG = (*(H->llt)).matrixL().solve((*(H->llt)).permutationP() * h.G);
+    // vector<TMBad::Scalar> D2 =
+    //   ((LinvG * h.H0).array() * LinvG.array()).rowwise().sum();
+    // TMBad::Scalar D2Dmin = (D2 + D).minCoeff();
+    // std::cout << "min(D2D)=" << D2Dmin << " ";
+    // if (D2Dmin < 0) {
+    //   factorize_info = Eigen::NumericalIssue;
+    //   return;
+    // }
+
     // Vector of ones
-    vector<TMBad::Scalar> ones(h.rows());
-    ones.fill(1.);
-    // Initialize dominant eigen vector
-    if (eigvec.size() != h.rows()) {
-      eigvec = ones;
-    }
+    // vector<TMBad::Scalar> ones(h.rows());
+    // ones.fill(1.);
+    // // Initialize dominant eigen vector
+    // if (eigvec.size() != h.rows()) {
+    //   eigvec = ones;
+    // }
     // Eigen value upper bound
-    sparse_plus_lowrank<TMBad::Scalar> h_abs = h.abs();
-    TMBad::Scalar M = (h_abs * ones).maxCoeff();
-    TMBad::Scalar eigval, eigval_prev = 1e300;
-    int iter = 0, iter_max = 1e4;
-    // Find smallest eigen value iteratively
-    for (; iter < iter_max; iter++) {
-      // (H+G H0 G^T) * x - M * x
-      eigvec = h * eigvec - M * eigvec;
-      eigvec = eigvec / eigvec.sum();
-      eigval =
-        (eigvec * (h * eigvec.matrix() - M * eigvec).array()).sum() /
-        (eigvec * eigvec).sum();
-      if (std::abs(eigval - eigval_prev) < 1e-6) break;
-      eigval_prev = eigval;
-    }
-    eigval += M;
-    if (eigval > 0)
-      factorize_info = Eigen::Success;
-    else
-      factorize_info = Eigen::NumericalIssue;
-    std::cout << "iter(eigval)=" << iter << " ";
-    std::cout << "M=" << M << " ";
-    std::cout << "eigval=" << eigval << " ";
+    // sparse_plus_lowrank<TMBad::Scalar> h_abs = h.abs();
+    // TMBad::Scalar M = (h_abs * ones).maxCoeff();
+    // TMBad::Scalar eigval, eigval_prev = 1e300;
+    // int iter = 0, iter_max = 1e4;
+    // // Find smallest eigen value iteratively
+    // for (; iter < iter_max; iter++) {
+    //   // (H+G H0 G^T) * x - M * x
+    //   eigvec = h * eigvec - M * eigvec;
+    //   eigvec = eigvec / eigvec.sum();
+    //   eigval =
+    //     (eigvec * (h * eigvec.matrix() - M * eigvec).array()).sum() /
+    //     (eigvec * eigvec).sum();
+    //   if (std::abs(eigval - eigval_prev) < 1e-6) break;
+    //   eigval_prev = eigval;
+    // }
+    // eigval += M;
+    // if (eigval > 0)
+    //   factorize_info = Eigen::Success;
+    // else
+    //   factorize_info = Eigen::NumericalIssue;
+    // std::cout << "iter(eigval)=" << iter << " ";
+    // std::cout << "M=" << M << " ";
+    // std::cout << "eigval=" << eigval << " ";
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
   Eigen::ComputationInfo factorize_info;
