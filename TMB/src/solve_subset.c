@@ -294,7 +294,7 @@ CHM_SP tmb_inv_super(CHM_FR Lfac, cholmod_common *c){
 SEXP tmb_invQ(SEXP Lfac){
   CHM_FR L=AS_CHM_FR(Lfac);
   CHM_SP iQ = tmb_inv_super(L, &c);
-  return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "", R_NilValue);
+  return M_chm_sparse_to_SEXP(iQ, 1 /* Free */ , 0, 0, "N" /* Not unit */, R_NilValue);
 }
 
 void half_diag(CHM_SP A){
