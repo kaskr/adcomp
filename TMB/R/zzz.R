@@ -5,7 +5,7 @@
 ##   library.dynam("TMB", pkg, lib)
 ## }
 
-checkMatrixPackageVersion <- function() {
+checkMatrixPackageVersion <- function(warn=TRUE) {
     ## It is unsafe to use the TMB package with versions of 'Matrix'
     ## other than the one TMB was originally built with.
     file <- paste0(system.file(package="TMB"),"/Matrix-version")
@@ -14,7 +14,7 @@ checkMatrixPackageVersion <- function() {
         writeLines(cur.Matrix.version, con = file)
     }
     TMB.Matrix.version <- readLines(file)
-    if(!identical(TMB.Matrix.version, cur.Matrix.version)) {
+    if(warn && !identical(TMB.Matrix.version, cur.Matrix.version)) {
         warning(
             "Package version inconsistency detected.\n",
             "TMB was built with Matrix version ",
@@ -31,7 +31,7 @@ checkMatrixPackageVersion <- function() {
 
 .onLoad <- function(lib, pkg) {
     library.dynam("TMB", pkg, lib)
-    checkMatrixPackageVersion()
+    checkMatrixPackageVersion(isTRUE(getOption("TMB.check.Matrix")))
     ## Select AD framework (CppAD or TMBad) used by TMB::compile
     tmb.ad.framework <- getOption("tmb.ad.framework", NULL)
     if (is.null(tmb.ad.framework))
