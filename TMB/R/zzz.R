@@ -5,6 +5,16 @@
 ##   library.dynam("TMB", pkg, lib)
 ## }
 
+## Matrix package versions that are likely to break ABI compatibility:
+MVI <- c("1.6-2", "1.7-0")
+## findInterval
+findMVI <- function(v) {
+    sum(MVI <= numeric_version(v))
+}
+sameMVI <- function(x, y) {
+    findMVI(x) == findMVI(y)
+}
+
 checkMatrixPackageVersion <- function(warn=TRUE) {
     ## It is unsafe to use the TMB package with versions of 'Matrix'
     ## other than the one TMB was originally built with.
@@ -14,7 +24,7 @@ checkMatrixPackageVersion <- function(warn=TRUE) {
         writeLines(cur.Matrix.version, con = file)
     }
     TMB.Matrix.version <- readLines(file)
-    if(warn && !identical(TMB.Matrix.version, cur.Matrix.version)) {
+    if(warn && !sameMVI(TMB.Matrix.version, cur.Matrix.version)) {
         warning(
             "Package version inconsistency detected.\n",
             "TMB was built with Matrix version ",
@@ -31,7 +41,7 @@ checkMatrixPackageVersion <- function(warn=TRUE) {
 
 .onLoad <- function(lib, pkg) {
     library.dynam("TMB", pkg, lib)
-    checkMatrixPackageVersion(!isFALSE(getOption("TMB.check.Matrix")))
+    checkMatrixPackageVersion(getOption("TMB.check.Matrix", TRUE))
     ## Select AD framework (CppAD or TMBad) used by TMB::compile
     tmb.ad.framework <- getOption("tmb.ad.framework", NULL)
     if (is.null(tmb.ad.framework))
