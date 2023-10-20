@@ -48,6 +48,7 @@ var searchData=
   ['split',['split',['../convenience_8hpp.html#a6f8b0640162d24d598e3f137ce43e2e8',1,'convenience.hpp']]],
   ['split_5fperiod',['split_period',['../namespaceTMBad.html#a7f273488d2199251bb0ffd0bc51e770c',1,'TMBad']]],
   ['spmat_2ehpp',['spmat.hpp',['../spmat_8hpp.html',1,'']]],
+  ['sqrtm',['sqrtm',['../group__matrix__functions.html#ga75943a50af77397c002b5d414de0e5d6',1,'atomic']]],
   ['squeeze',['squeeze',['../convenience_8hpp.html#a60881c3c25c4c417f502545879c32d5e',1,'convenience.hpp']]],
   ['sr_5fgrid',['sr_grid',['../structTMBad_1_1sr__grid.html',1,'TMBad']]],
   ['standard_5fderivative_5ftable',['standard_derivative_table',['../structTMBad_1_1standard__derivative__table.html#a36475037d06cbc5f453a9fbfea15c050',1,'TMBad::standard_derivative_table']]],

@@ -20,6 +20,7 @@ var searchData=
   ['splinefun',['splinefun',['../classtmbutils_1_1splinefun.html#a0160c4938443c8047df7d019e3dfe84a',1,'tmbutils::splinefun']]],
   ['split',['split',['../convenience_8hpp.html#a6f8b0640162d24d598e3f137ce43e2e8',1,'convenience.hpp']]],
   ['split_5fperiod',['split_period',['../namespaceTMBad.html#a7f273488d2199251bb0ffd0bc51e770c',1,'TMBad']]],
+  ['sqrtm',['sqrtm',['../group__matrix__functions.html#ga75943a50af77397c002b5d414de0e5d6',1,'atomic']]],
   ['squeeze',['squeeze',['../convenience_8hpp.html#a60881c3c25c4c417f502545879c32d5e',1,'convenience.hpp']]],
   ['standard_5fderivative_5ftable',['standard_derivative_table',['../structTMBad_1_1standard__derivative__table.html#a36475037d06cbc5f453a9fbfea15c050',1,'TMBad::standard_derivative_table']]],
   ['subgraph_5fcache_5fptr',['subgraph_cache_ptr',['../structTMBad_1_1global.html#af792c941af51a329f7c855c5a491909b',1,'TMBad::global']]],

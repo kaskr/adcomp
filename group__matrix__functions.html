@@ -102,6 +102,10 @@ template&lt;class Type &gt; </td></tr>
 <tr class="memitem:ga481538cdd18f419396ee65eaec62c0ba"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#ga481538cdd18f419396ee65eaec62c0ba">atomic::matmul</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x, <a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; y)</td></tr>
 <tr class="memdesc:ga481538cdd18f419396ee65eaec62c0ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix multiply.  <a href="group__matrix__functions.html#ga481538cdd18f419396ee65eaec62c0ba">More...</a><br /></td></tr>
 <tr class="separator:ga481538cdd18f419396ee65eaec62c0ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga75943a50af77397c002b5d414de0e5d6"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:ga75943a50af77397c002b5d414de0e5d6"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#ga75943a50af77397c002b5d414de0e5d6">atomic::sqrtm</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:ga75943a50af77397c002b5d414de0e5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix square root.  <a href="group__matrix__functions.html#ga75943a50af77397c002b5d414de0e5d6">More...</a><br /></td></tr>
+<tr class="separator:ga75943a50af77397c002b5d414de0e5d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Special matrix functions for which derivatives are implemented. </p>
@@ -128,9 +132,9 @@ template&lt;class Type &gt; </div>
 <p>Matrix exponential. </p>
 <p>Calculate the matrix exponential of a dense matrix. </p>
 
-<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00289">289</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
+<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00327">327</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae">atomic::expm()</a>.</p>
+<p>Referenced by <a class="el" href="group__matrix__functions.html#ga75943a50af77397c002b5d414de0e5d6">atomic::sqrtm()</a>.</p>
 
 </div>
 </div>
@@ -279,6 +283,31 @@ template&lt;class Type &gt; </div>
 <p>Definition at line <a class="el" href="atomic__math_8hpp_source.html#l00583">583</a> of file <a class="el" href="atomic__math_8hpp_source.html">atomic_math.hpp</a>.</p>
 
 <p>Referenced by <a class="el" href="structnewton_1_1jacobian__sparse__plus__lowrank__t.html#a8acd11aa174d7cc9ee8a89e8aa847fcf">newton::jacobian_sparse_plus_lowrank_t&lt; dummy &gt;::llt_solve()</a>.</p>
+
+</div>
+</div>
+<a id="ga75943a50af77397c002b5d414de0e5d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga75943a50af77397c002b5d414de0e5d6">&sect;&nbsp;</a></span>sqrtm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structmatrix.html">matrix</a>&lt;Type&gt; atomic::sqrtm </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Matrix square root. </p>
+<p>Calculate the matrix square root of a dense <b>symmetric positive definite</b> matrix (represented by its lower triangle). </p>
+
+<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00394">394</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
 
 </div>
 </div>
