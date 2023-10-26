@@ -42,7 +42,7 @@ namespace atomic{
     typedef Eigen::SelfAdjointEigenSolver<
       Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> > SAES_t;
     /* Solve *special case* of Sylvester equation: XA+AX=Y */
-    Block<Type> sylvester(Block<Type> Y) {
+    Block<Type> sylvester(Block<Type> Y, bool generalized=false) {
       SAES_t saes(A);
       matrix<Type> V = saes.eigenvectors();
       vector<Type> D = saes.eigenvalues();
@@ -52,6 +52,13 @@ namespace atomic{
       for (int i=0; i<Y_.rows(); i++)
         for (int j=0; j<Y_.cols(); j++)
           Y_(i, j) /= (D(i) + D(j));
+      // Generalized solution?
+      if (generalized) {
+        for (int i=0; i<Y_.rows(); i++)
+          for (int j=0; j<Y_.cols(); j++)
+            if (D(i) == Type(0) || D(j) == Type(0))
+              Y_(i, j) = 0;
+      }
       // Transform back
       matrix<Type> X = V * Y_ * V.transpose();
       return Block(X);
@@ -60,6 +67,13 @@ namespace atomic{
     Block<Type> sqrtm() {
       SAES_t saes(A);
       matrix<Type> X = saes.operatorSqrt();
+      return Block(X);
+    }
+    /* Operator absolute value (Symmetric case only) */
+    Block<Type> absm() {
+      SAES_t saes(A);
+      matrix<Type> V = saes.eigenvectors();
+      matrix<Type> X = V * saes.eigenvalues().cwiseAbs().asDiagonal() * V.transpose();
       return Block(X);
     }
   };
@@ -120,17 +134,24 @@ namespace atomic{
       return *this;
     }
     /* Methods for operator square root */
-    Triangle<BlockType> sylvester(Triangle<BlockType> Y) {
+    Triangle<BlockType> sylvester(Triangle<BlockType> Y, bool generalized=false) {
       Triangle<BlockType> X;
-      X.A = (*this).A.sylvester(Y.A);
+      X.A = (*this).A.sylvester(Y.A, generalized);
       Y.B -= (*this).B * X.A;
       Y.B -= X.A * (*this).B;
-      X.B = (*this).A.sylvester(Y.B);
+      X.B = (*this).A.sylvester(Y.B, generalized);
       return X;
     }
     Triangle<BlockType> sqrtm() {
       BlockType A = (*this).A.sqrtm();
       BlockType B = A.sylvester((*this).B);
+      return Triangle(A, B);
+    }
+    Triangle<BlockType> absm() {
+      BlockType A = (*this).A.absm();
+      BlockType Y = (*this).A * (*this).B;
+      Y += (*this).B * (*this).A;
+      BlockType B = A.sylvester(Y, true); // Generalized
       return Triangle(A, B);
     }
   };
@@ -400,6 +421,79 @@ namespace atomic{
     vector<matrix<Type> > args(1);
     args[0]=x;
     return vec2mat(sqrtm(args2vector(args)),n,n);
+  }
+
+  template<class matrix_pade>
+  matrix_pade absm(matrix_pade A){
+    return A.absm();
+  }
+
+  matrix<double> absm(vector<matrix<double> > args)CSKIP({
+    int nargs = args.size();
+    matrix<double> ans;
+    if      (nargs==1) ans=absm(nestedTriangle<0>(args)).bottomLeftCorner();
+    else if (nargs==2) ans=absm(nestedTriangle<1>(args)).bottomLeftCorner();
+    else if (nargs==3) ans=absm(nestedTriangle<2>(args)).bottomLeftCorner();
+    else if (nargs==4) ans=absm(nestedTriangle<3>(args)).bottomLeftCorner();
+    else Rf_error("absm: order not implemented.");
+    return ans;
+  })
+
+  TMB_ATOMIC_VECTOR_FUNCTION(
+			     // ATOMIC_NAME
+			     absm
+			     ,
+			     // OUTPUT_DIM
+			     (tx.size()-1)/CppAD::Integer(tx[0])
+			     ,
+			     // ATOMIC_DOUBLE
+			     int nargs=CppAD::Integer(tx[0]);
+			     int n=sqrt((double)(tx.size()-1)/nargs);
+			     vector<matrix<double> > args(nargs);
+			     for(int i=0;i<nargs;i++){
+			       args[i] = vec2mat(tx, n, n, 1 + i*n*n);
+			     }
+			     matrix<double> res = absm(args);
+			     for(int i=0;i<n*n;i++)ty[i] = res(i);
+			     ,
+			     // ATOMIC_REVERSE
+			     int nargs=CppAD::Integer(tx[0]);
+			     int n=sqrt((double)ty.size());
+			     vector<matrix<Type> > args(nargs+1);
+			     for(int i=0;i<nargs;i++){
+			       args[i] = vec2mat(tx, n, n, 1 + i*n*n).transpose();
+			     }
+			     args[nargs] = vec2mat(py,n,n);
+			     vector<CppAD::vector<Type> > res(nargs);
+			     res[0] = absm(args2vector(args));
+			     for(int i=1;i<nargs;i++){
+			       res[i] = absm(args2vector(args, i));
+			     }
+			     px[0] = Type(0);
+			     for(int j=0;j<res.size();j++){
+			       for(int i=0;i<n*n;i++){
+				 px[1 + i + j*n*n] = res[j][i];
+			       }
+			     }
+			     )
+
+  /** \brief Matrix absolute value
+
+      Calculate the absolute value matrix of a dense **symmetric** matrix (represented by its lower triangle).
+      The result will be **symmetric positive semi-definite**.
+      The matrix abs is defined as `absm(x)=sqrtm(matmul(x,x))`, but it is more numerically robust especially for singular `x`.
+      \ingroup matrix_functions
+  */
+  template<class Type>
+  matrix<Type> absm(matrix<Type> x) {
+    int n=x.rows();
+    // Copy lower triangle to upper
+    for (int i=0; i<n; i++)
+      for (int j=0; j<i; j++)
+        x(j, i) = x(i, j);
+    vector<matrix<Type> > args(1);
+    args[0]=x;
+    return vec2mat(absm(args2vector(args)),n,n);
   }
 
 } // end namespace atomic
