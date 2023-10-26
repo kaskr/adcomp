@@ -22,6 +22,7 @@
 ##' @param maxit Max number of iterations for adaptive algorithm.
 ##' @param slice Do slicing rather than profiling?
 ##' @param parm.range Valid parameter range.
+##' @param adaptive Logical; Use adaptive step size?
 ##' @param trace Trace progress? (TRUE, or a numeric value of 1,
 ##' gives basic tracing: numeric values > 1 give more information)
 ##' @param ... Unused
@@ -52,6 +53,7 @@ tmbprofile <- function(obj,
                        maxit=ceiling(5*ytol/ystep),
                        parm.range = c(-Inf, Inf),
                        slice=FALSE,
+                       adaptive=TRUE,
                        trace=TRUE,...){
     ## Cleanup 'obj' when we exit from this function:
     restore.on.exit <- c("last.par.best",
@@ -172,18 +174,19 @@ tmbprofile <- function(obj,
                                          ydiff,ytol))
                 break
             }
-            speedMax <- ystep
-            speedMin <-
-                if(ynext >= yinit) ystep/4     ## 'tail-part'
-                else               ystep/8     ## 'center-part' => slow down
-            if( abs(ynext-ycurrent) > speedMax ) {
-                h <- h / 2
-                if (trace>1) cat(sprintf("halve step size (to %f)\n",h))
-                
-            }
-            if( abs(ynext-ycurrent) < speedMin ) {
-                h <- h * 2
-                if (trace>1) cat(sprintf("double step size (to %f)\n",h))
+            if (adaptive) {
+                speedMax <- ystep
+                speedMin <-
+                    if(ynext >= yinit) ystep/4     ## 'tail-part'
+                    else               ystep/8     ## 'center-part' => slow down
+                if( abs(ynext-ycurrent) > speedMax ) {
+                    h <- h / 2
+                    if (trace>1) cat(sprintf("halve step size (to %f)\n",h))
+                }
+                if( abs(ynext-ycurrent) < speedMin ) {
+                    h <- h * 2
+                    if (trace>1) cat(sprintf("double step size (to %f)\n",h))
+                }
             }
         }
         ans <- data.frame(x=x+that, y=y)
