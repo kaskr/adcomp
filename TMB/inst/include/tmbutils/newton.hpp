@@ -287,12 +287,15 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
     init_llt();
   }
   // FIXME: Optimize sparsematrix CTOR by only doing 'setFromTriplets' once?
-  // FIXME: Diagonal must always be part of pattern - add check?
   template<class V>
   Eigen::SparseMatrix<typename V::value_type> as_matrix(const V &Hx) {
     typedef typename V::value_type T;
     typedef Eigen::Triplet<T> T3;
-    std::vector<T3> tripletList;
+    std::vector<T3> tripletList(n);
+    // Diagonal must always be part of pattern
+    for(size_t i=0; i<n; i++) {
+      tripletList[i] = T3(i, i, 0);
+    }
     size_t K = Hx.size();
     for(size_t k=0; k<K; k++) {
       tripletList.push_back( T3( Base::i[k],
