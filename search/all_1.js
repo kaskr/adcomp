@@ -1,6 +1,7 @@
 var searchData=
 [
   ['a_5fvalues',['A_values',['../structsparse__matrix__exponential_1_1expm__series.html#a74413a543ff57cb9837592750ee0b401',1,'sparse_matrix_exponential::expm_series']]],
+  ['absm',['absm',['../group__matrix__functions.html#gab7454227c1dc136610560e713d76fb08',1,'atomic']]],
   ['accessible_5fcholmodsupernodalllt',['Accessible_CholmodSupernodalLLT',['../structEigen_1_1Accessible__CholmodSupernodalLLT.html',1,'Eigen']]],
   ['accumulation_5ftree_5fsplit',['accumulation_tree_split',['../namespaceTMBad.html#ab170ef212115e6d82d5df72afc3d6342',1,'TMBad']]],
   ['activedomain',['activeDomain',['../structTMBad_1_1ADFun.html#a167b014b2dd4b054479793a34ec8f15a',1,'TMBad::ADFun']]],

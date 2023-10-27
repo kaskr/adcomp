@@ -109,7 +109,7 @@ struct newton::jacobian_sparse_plus_lowrank_t&lt; dummy &gt;</h3>
 <h2>Solve</h2>
 <div class="fragment"><div class="line">W &lt;- solve(H, G)</div><div class="line">H0M = I + H0 * t(G) * W</div><div class="line">solve(H + G * H0 * G^T) = solve(H) - W * solve(H0M) * H0 * t(W)</div></div><!-- fragment --><h2>Determinant</h2>
 <div class="fragment"><div class="line">det(H + G * H0 * G^T) = det(H) * det(H0M)</div></div><!-- fragment --> 
-<p>Definition at line <a class="el" href="newton_8hpp_source.html#l00454">454</a> of file <a class="el" href="newton_8hpp_source.html">newton.hpp</a>.</p>
+<p>Definition at line <a class="el" href="newton_8hpp_source.html#l00457">457</a> of file <a class="el" href="newton_8hpp_source.html">newton.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a8acd11aa174d7cc9ee8a89e8aa847fcf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8acd11aa174d7cc9ee8a89e8aa847fcf">&sect;&nbsp;</a></span>llt_solve()</h2>
@@ -148,7 +148,7 @@ template&lt;class dummy = void&gt; </div>
 </div><div class="memdoc">
 <dl class="section note"><dt>Note</dt><dd>Optional: This method allows the assumption that a prior call to <code>llt_factorize</code> has been performed for the same H </dd></dl>
 
-<p>Definition at line <a class="el" href="newton_8hpp_source.html#l00559">559</a> of file <a class="el" href="newton_8hpp_source.html">newton.hpp</a>.</p>
+<p>Definition at line <a class="el" href="newton_8hpp_source.html#l00562">562</a> of file <a class="el" href="newton_8hpp_source.html">newton.hpp</a>.</p>
 
 </div>
 </div>

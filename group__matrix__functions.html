@@ -77,6 +77,10 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:gab7454227c1dc136610560e713d76fb08"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
+<tr class="memitem:gab7454227c1dc136610560e713d76fb08"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#gab7454227c1dc136610560e713d76fb08">atomic::absm</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
+<tr class="memdesc:gab7454227c1dc136610560e713d76fb08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix absolute value.  <a href="group__matrix__functions.html#gab7454227c1dc136610560e713d76fb08">More...</a><br /></td></tr>
+<tr class="separator:gab7454227c1dc136610560e713d76fb08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac09966696ad9685dc8047d6c582bc0ae"><td class="memTemplParams" colspan="2">template&lt;class Type &gt; </td></tr>
 <tr class="memitem:gac09966696ad9685dc8047d6c582bc0ae"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae">atomic::expm</a> (<a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt; x)</td></tr>
 <tr class="memdesc:gac09966696ad9685dc8047d6c582bc0ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matrix exponential.  <a href="group__matrix__functions.html#gac09966696ad9685dc8047d6c582bc0ae">More...</a><br /></td></tr>
@@ -111,6 +115,31 @@ template&lt;class Type &gt; </td></tr>
 <p>Special matrix functions for which derivatives are implemented. </p>
 <p>These matrix operations are designed to work with automatic differentiation for large dense matrices. </p>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="gab7454227c1dc136610560e713d76fb08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab7454227c1dc136610560e713d76fb08">&sect;&nbsp;</a></span>absm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structmatrix.html">matrix</a>&lt;Type&gt; atomic::absm </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmatrix.html">matrix</a>&lt; Type &gt;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Matrix absolute value. </p>
+<p>Calculate the absolute value matrix of a dense <b>symmetric</b> matrix (represented by its lower triangle). The result will be <b>symmetric positive semi-definite</b>. The matrix abs is defined as <code>absm(x)=sqrtm(matmul(x,x))</code>, but it is more numerically robust especially for singular <code>x</code>. </p>
+
+<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00488">488</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
+
+</div>
+</div>
 <a id="gac09966696ad9685dc8047d6c582bc0ae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gac09966696ad9685dc8047d6c582bc0ae">&sect;&nbsp;</a></span>expm()</h2>
 
@@ -132,9 +161,9 @@ template&lt;class Type &gt; </div>
 <p>Matrix exponential. </p>
 <p>Calculate the matrix exponential of a dense matrix. </p>
 
-<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00327">327</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
+<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00348">348</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
 
-<p>Referenced by <a class="el" href="group__matrix__functions.html#ga75943a50af77397c002b5d414de0e5d6">atomic::sqrtm()</a>.</p>
+<p>Referenced by <a class="el" href="group__matrix__functions.html#gab7454227c1dc136610560e713d76fb08">atomic::absm()</a>.</p>
 
 </div>
 </div>
@@ -307,7 +336,7 @@ template&lt;class Type &gt; </div>
 <p>Matrix square root. </p>
 <p>Calculate the matrix square root of a dense <b>symmetric positive definite</b> matrix (represented by its lower triangle). </p>
 
-<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00394">394</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
+<p>Definition at line <a class="el" href="expm_8hpp_source.html#l00415">415</a> of file <a class="el" href="expm_8hpp_source.html">expm.hpp</a>.</p>
 
 </div>
 </div>
