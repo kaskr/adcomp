@@ -398,7 +398,7 @@ MakeADFun <- function(data, parameters, map=list(),
   tracemgc <- TRUE
 
   ## dummy assignments better than  "globalVariables(....)"
-  L.created.by.newton <- skipFixedEffects <- spHess <- NULL
+  L.created.by.newton <- skipFixedEffects <- spHess <- altHess <- NULL
 
   ## Disable all tracing information
   beSilent <- function(){
@@ -819,6 +819,13 @@ MakeADFun <- function(data, parameters, map=list(),
     par[random] <- opt$par
     par[-random] <- par.fixed
 
+    ## Use alternative Hessian for log determinant?
+    altHessFlag <- !is.null(altHess)
+    if (altHessFlag) {
+        altHess(TRUE) ## Enable alternative hessian
+        on.exit(altHess(FALSE))
+    }
+
     ## HERE! - update hessian and cholesky
     if(!skipFixedEffects){ ## old way
       hess <- spHess(par) ## Full hessian
@@ -861,7 +868,12 @@ MakeADFun <- function(data, parameters, map=list(),
       grad <- h(par,order=1,hessian=hessian,L=L)
       #res <- grad[-random] - t(grad[random])%*%solve(hess[random,random])%*%hess[random,-random]
       #res <- grad[-random] - t(grad[random])%*%solve(hess[random,])%*%t(hess[-random,])
-
+      if (altHessFlag) {
+          ## Restore original hessian and Cholesky
+          altHess(FALSE) ## Disable alternative hessian
+          hessian <- spHess(par, random=TRUE)
+          updateCholesky(L, hessian)
+      }
       ## Profile case correction. The remaining calculations must be
       ## done with the original hessian (which has been destroyed)
       if(!is.null(profile)){
