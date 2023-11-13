@@ -42,7 +42,7 @@ namespace atomic{
     typedef Eigen::SelfAdjointEigenSolver<
       Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> > SAES_t;
     /* Solve *special case* of Sylvester equation: XA+AX=Y */
-    Block<Type> sylvester(Block<Type> Y, bool generalized=false) {
+    Block<Type> sylvester(Block<Type> Y) {
       SAES_t saes(A);
       matrix<Type> V = saes.eigenvectors();
       vector<Type> D = saes.eigenvalues();
@@ -52,17 +52,30 @@ namespace atomic{
       for (int i=0; i<Y_.rows(); i++)
         for (int j=0; j<Y_.cols(); j++)
           Y_(i, j) /= (D(i) + D(j));
-      // Generalized solution?
-      if (generalized) {
-        for (int i=0; i<Y_.rows(); i++)
-          for (int j=0; j<Y_.cols(); j++)
-            if (D(i) == Type(0) || D(j) == Type(0))
-              Y_(i, j) = 0;
+      // Transform back
+      matrix<Type> X = V * Y_ * V.transpose();
+      return Block(X);
+    }
+    /* Solve *special case* of Sylvester equation: |A|X + X|A| = AY + YA */
+    Block<Type> sylvester2(Block<Type> Y) {
+      SAES_t saes(A);
+      matrix<Type> V = saes.eigenvectors();
+      vector<Type> D = saes.eigenvalues();
+      // Transform
+      matrix<Type> Y_ = V.transpose() * Y.A * V;
+      // Solve
+      for (int i=0; i<Y_.rows(); i++) {
+        for (int j=0; j<Y_.cols(); j++) {
+          Type denum = std::abs(D(i)) + std::abs(D(j));
+          if (denum == Type(0)) denum = 1;
+          Y_(i, j) *= (D(i) + D(j)) / denum;
+        }
       }
       // Transform back
       matrix<Type> X = V * Y_ * V.transpose();
       return Block(X);
     }
+
     /* Operator square root (PD case only) */
     Block<Type> sqrtm() {
       SAES_t saes(A);
@@ -134,12 +147,19 @@ namespace atomic{
       return *this;
     }
     /* Methods for operator square root */
-    Triangle<BlockType> sylvester(Triangle<BlockType> Y, bool generalized=false) {
+    Triangle<BlockType> sylvester(Triangle<BlockType> Y) {
       Triangle<BlockType> X;
-      X.A = (*this).A.sylvester(Y.A, generalized);
+      X.A = (*this).A.sylvester(Y.A);
       Y.B -= (*this).B * X.A;
       Y.B -= X.A * (*this).B;
-      X.B = (*this).A.sylvester(Y.B, generalized);
+      X.B = (*this).A.sylvester(Y.B);
+      return X;
+    }
+    /* Solve |A| X + X |A| = A Y + Y A */
+    Triangle<BlockType> sylvester2(Triangle<BlockType> Y) {
+      Triangle<BlockType> Y2 = (*this) * Y;
+      Y2 += Y * (*this);
+      Triangle<BlockType>  X = (*this).absm().sylvester(Y2);
       return X;
     }
     Triangle<BlockType> sqrtm() {
@@ -149,9 +169,7 @@ namespace atomic{
     }
     Triangle<BlockType> absm() {
       BlockType A = (*this).A.absm();
-      BlockType Y = (*this).A * (*this).B;
-      Y += (*this).B * (*this).A;
-      BlockType B = A.sylvester(Y, true); // Generalized
+      BlockType B = (*this).A.sylvester2((*this).B);
       return Triangle(A, B);
     }
   };
