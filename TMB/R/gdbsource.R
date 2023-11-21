@@ -27,17 +27,18 @@ gdbsource <- function(file,interactive=FALSE){
     return(.gdbsource.win(file,interactive))
   }
   gdbscript <- tempfile()
+  Rbin <- file.path(R.home('bin'), "R")
   if(interactive){
     gdbcmd <- c(paste("run --vanilla <",file),
                 "bt")
     gdbcmd <- paste(gdbcmd,"\n",collapse="")
     cat(gdbcmd,file=gdbscript)
-    cmd <- paste("R -d gdb --debugger-args=\"-x",gdbscript,"\"")
+    cmd <- paste(Rbin, "-d gdb --debugger-args=\"-x",gdbscript,"\"")
     system(cmd,intern=FALSE,ignore.stdout=FALSE,ignore.stderr=TRUE)
     return(NULL)
   } else {
     cat("run\nbt\nquit\n",file=gdbscript)
-    cmd <- paste("R --vanilla < ",file," -d gdb --debugger-args=\"-x",
+    cmd <- paste(Rbin, "--vanilla < ",file," -d gdb --debugger-args=\"-x",
                  gdbscript,"\"")
     txt <- system(cmd,intern=TRUE,ignore.stdout=FALSE,ignore.stderr=TRUE)
     attr(txt,"file") <- file
