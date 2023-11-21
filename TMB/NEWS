@@ -1,4 +1,16 @@
 ------------------------------------------------------------------------
+TMB 1.9.7 (2023-11-22)
+------------------------------------------------------------------------
+
+o Fixed tweedie integer overflow for extreme parameters.
+
+o Added new argument 'adaptive' to 'tmbprofile'.
+
+o Added new atomic matrix functions 'sqrtm' and 'absm'.
+
+o Avoid unnecessary warnings on 'Matrix package version inconsistency'.
+
+------------------------------------------------------------------------
 TMB 1.9.6 (2023-08-11)
 ------------------------------------------------------------------------
 
