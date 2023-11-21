@@ -14,6 +14,7 @@ tmbprofile(
   maxit = ceiling(5 * ytol/ystep),
   parm.range = c(-Inf, Inf),
   slice = FALSE,
+  adaptive = TRUE,
   trace = TRUE,
   ...
 )
@@ -37,6 +38,8 @@ profile. By default a unit vector corresponding to \code{name}.}
 \item{parm.range}{Valid parameter range.}
 
 \item{slice}{Do slicing rather than profiling?}
+
+\item{adaptive}{Logical; Use adaptive step size?}
 
 \item{trace}{Trace progress? (TRUE, or a numeric value of 1,
 gives basic tracing: numeric values > 1 give more information)}
