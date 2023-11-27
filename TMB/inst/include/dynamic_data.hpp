@@ -109,7 +109,7 @@ namespace dynamic_data {
                                Rf_error("Data update: "
                                         "number of items to replace (%i) "
                                         "does not match replacement length (%i)",
-                                        ty.size(), n);
+                                        (int) ty.size(), n);
                              double* pdata = REAL(data);
                              for (int i = 0; i<n; i++) ty[i] = pdata[i];
                              ,
