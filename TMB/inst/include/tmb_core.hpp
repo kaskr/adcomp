@@ -1960,7 +1960,7 @@ SEXP getSetGlobalPtr(SEXP ptr) {
       return ans;
     }
     else {
-      Rf_error("Unknown method: ", method.c_str());
+      Rf_error("Unknown method: %s", method.c_str());
     }
 #endif
     return R_NilValue;

@@ -163,7 +163,7 @@ namespace TMBad {
 #include <R.h>
 #include <Rinternals.h>
 #include "toggle_thread_safe_R.hpp"
-void eigen_REprintf(const char* x)CSKIP({REprintf(x);})
+void eigen_REprintf(const char* x)CSKIP({REprintf("%s",x);})
 
 #include "tmbutils/tmbutils.hpp"
 #include "tmbutils/vectorize.hpp"

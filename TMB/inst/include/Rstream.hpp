@@ -40,20 +40,26 @@ public:
 };
 
 template <> inline std::streamsize Rstreambuf<true>::xsputn(const char *s, std::streamsize num ) {
-  Rprintf( "%.*s", num, s ) ;
+  Rprintf( "%.*s", static_cast<int>(num), s ) ;
   return num ;
 }
 template <> inline std::streamsize Rstreambuf<false>::xsputn(const char *s, std::streamsize num ) {
-  REprintf( "%.*s", num, s ) ; 
+  REprintf( "%.*s", static_cast<int>(num), s ) ;
   return num ;
 }
-template <> inline int Rstreambuf<true>::overflow(int c ) {
-  if (c != EOF) Rprintf( "%.1s", &c ) ;
-  return c ;
+template <> inline int Rstreambuf<true>::overflow(int c) {
+  if (c != traits_type::eof()) {
+    char_type ch = traits_type::to_char_type(c);
+    return xsputn(&ch, 1) == 1 ? c : traits_type::eof();
+  }
+  return c;
 }
-template <> inline int Rstreambuf<false>::overflow(int c ) {
-  if (c != EOF) REprintf( "%.1s", &c ) ;
-  return c ;
+template <> inline int Rstreambuf<false>::overflow(int c) {
+  if (c != traits_type::eof()) {
+    char_type ch = traits_type::to_char_type(c);
+    return xsputn(&ch, 1) == 1 ? c : traits_type::eof();
+  }
+  return c;
 }
 template <> inline int Rstreambuf<true>::sync(){
   //::R_FlushConsole() ;

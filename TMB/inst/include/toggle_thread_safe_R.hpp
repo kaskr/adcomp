@@ -154,7 +154,7 @@ inline SEXP Ts_ENCLOS(SEXP x) {
 
 inline void Ts_warning(const char *x, ...) {
   if (omp_get_thread_num() == 0) {
-    Rf_warning(x);
+    Rf_warning("%s",x);
   }
 }
 
