@@ -494,7 +494,7 @@ public:
       for(l = 0; l < *nu; l++) {
 
 	/* WARNING - "fmod(AD<double>,AD<double>)" is not defined */
-	// v[l] = fmod(u[l]-x[0], dx);
+	v[l] = fmod(asDouble(u[l]-x[0]), asDouble(dx));
 	if(v[l] < 0.0) v[l] += dx;
 	v[l] += x[0];
       }
