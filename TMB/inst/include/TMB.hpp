@@ -30,6 +30,9 @@ struct isDouble<double>{
 #else
 #define IF_TMB_PRECOMPILE(...)
 #endif
+#ifndef CSKIP_ATOMIC
+#define CSKIP_ATOMIC CSKIP
+#endif
 
 /* Must come before Rinternals.h */
 #ifdef _OPENMP

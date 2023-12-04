@@ -10,7 +10,7 @@ CppAD::vector<TMBad::ad_aug>                                            \
 ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &x);                    \
 template<class dummy>                                                   \
 CppAD::vector<double>                                                   \
-ATOMIC_NAME (const CppAD::vector<double> &tx) CSKIP({                   \
+ATOMIC_NAME (const CppAD::vector<double> &tx) CSKIP_ATOMIC({            \
   CppAD::vector<double> ty(OUTPUT_DIM);                                 \
   ATOMIC_DOUBLE;                                                        \
   return ty;                                                            \
@@ -57,7 +57,7 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
 };                                                                      \
 template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug>                                            \
-ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) CSKIP({            \
+ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) CSKIP_ATOMIC({     \
   TMBad::Index n = tx.size();                                           \
   TMBad::Index m = OUTPUT_DIM;                                          \
   typedef ATOMIC_NAME ## Op <> OP;                                      \
@@ -106,7 +106,7 @@ CppAD::vector<TMBad::ad_aug> ATOMIC_NAME                                \
 (const CppAD::vector<TMBad::ad_aug> &x);                                \
 template<class dummy=void>                                              \
 CppAD::vector<double> ATOMIC_NAME                                       \
-(const CppAD::vector<double> &tx) CSKIP({                               \
+(const CppAD::vector<double> &tx) CSKIP_ATOMIC({                        \
   CppAD::vector<double> ty(1);                                          \
   ATOMIC_DOUBLE;                                                        \
   return ty;                                                            \
@@ -158,7 +158,7 @@ struct ATOMIC_NAME ## Op : TMBad::global::Operator<INPUT_SIZE, 1> {     \
 };                                                                      \
 template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug> ATOMIC_NAME                                \
-(const CppAD::vector<TMBad::ad_aug> &tx) CSKIP({                        \
+(const CppAD::vector<TMBad::ad_aug> &tx) CSKIP_ATOMIC({                 \
   TMBad::Index m = 1;                                                   \
   typedef ATOMIC_NAME ## Op <> OP;                                      \
   bool all_constant = true;                                             \
