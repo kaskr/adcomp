@@ -15,6 +15,7 @@ ATOMIC_NAME (const CppAD::vector<double> &tx) CSKIP({                   \
   ATOMIC_DOUBLE;                                                        \
   return ty;                                                            \
 })                                                                      \
+  namespace { \
 template<class dummy=void>                                              \
 struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
   typedef TMBad::global::DynamicInputOutputOperator Base;               \
@@ -55,6 +56,7 @@ struct ATOMIC_NAME ## Op : TMBad::global::DynamicInputOutputOperator {  \
   void reverse                                                          \
   (TMBad::ReverseArgs<TMBad::Writer> &args) { TMBAD_ASSERT(false); }    \
 };                                                                      \
+  } \
 template<class dummy>                                                   \
 CppAD::vector<TMBad::ad_aug>                                            \
 ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx) CSKIP({            \
