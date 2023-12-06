@@ -30,8 +30,10 @@ struct isDouble<double>{
 #else
 #define IF_TMB_PRECOMPILE_ATOMICS(...)
 #endif
-#ifndef CSKIP_ATOMIC
-#define CSKIP_ATOMIC CSKIP
+#ifdef HAVE_PRECOMPILED_ATOMICS
+#define CSKIP_ATOMIC(...) ;
+#else
+#define CSKIP_ATOMIC(...) __VA_ARGS__
 #endif
 
 /* Must come before Rinternals.h */

@@ -1444,6 +1444,7 @@ precompile <- function(all=TRUE, clean=FALSE, trace=TRUE, get.header=FALSE, ...)
           "#ifdef TMB_PRECOMPILE_ATOMICS",
           readLines(system.file(paste0("include/tmb_enable_precompile.hpp"), package="TMB")),
           "#else",
+          "#define HAVE_PRECOMPILED_ATOMICS",
           readLines(system.file(paste0("include/tmb_enable_header_only.hpp"), package="TMB")),
           "#endif",
           "#include <TMB.hpp>",
