@@ -25,10 +25,10 @@ struct isDouble<double>{
 #define CSKIP(...) __VA_ARGS__
 #define TMB_EXTERN
 #endif
-#ifdef TMB_PRECOMPILE
-#define IF_TMB_PRECOMPILE(...) __VA_ARGS__
+#ifdef TMB_PRECOMPILE_ATOMICS
+#define IF_TMB_PRECOMPILE_ATOMICS(...) __VA_ARGS__
 #else
-#define IF_TMB_PRECOMPILE(...)
+#define IF_TMB_PRECOMPILE_ATOMICS(...)
 #endif
 #ifndef CSKIP_ATOMIC
 #define CSKIP_ATOMIC CSKIP

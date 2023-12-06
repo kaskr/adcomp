@@ -301,7 +301,7 @@ NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP_ATOMIC({             \
   for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
   return y;                                                             \
 })                                                                      \
-IF_TMB_PRECOMPILE(                                                      \
+IF_TMB_PRECOMPILE_ATOMICS(                                                      \
 template                                                                \
 CppAD::vector<TMBad::ad_aug>                                            \
 NAME<> (const CppAD::vector<TMBad::ad_aug> &x);                         \

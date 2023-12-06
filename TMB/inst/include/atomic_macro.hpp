@@ -19,7 +19,7 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
     ATOMIC_NAME(tx, ty);                                                      \
     return ty;                                                                \
   })                                                                          \
-  IF_TMB_PRECOMPILE(                                                          \
+  IF_TMB_PRECOMPILE_ATOMICS(                                                          \
   template                                                                    \
   void ATOMIC_NAME<double>(const CppAD::vector<double>& tx,                   \
                            CppAD::vector<double>& ty);                        \
