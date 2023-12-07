@@ -14,12 +14,13 @@ TMB_EXTERN bool atomicFunctionGenerated CSKIP(= false;)
     ATOMIC_DOUBLE;                                                            \
   })                                                                          \
   template<class Double>                                                      \
-  CppAD::vector<double> ATOMIC_NAME(const CppAD::vector<Double>& tx) CSKIP_ATOMIC({  \
+  CppAD::vector<double>                                                       \
+  ATOMIC_NAME(const CppAD::vector<Double>& tx) CSKIP_ATOMIC({                 \
     CppAD::vector<double> ty(OUTPUT_DIM);                                     \
     ATOMIC_NAME(tx, ty);                                                      \
     return ty;                                                                \
   })                                                                          \
-  IF_TMB_PRECOMPILE_ATOMICS(                                                          \
+  IF_TMB_PRECOMPILE_ATOMICS(                                                  \
   template                                                                    \
   void ATOMIC_NAME<double>(const CppAD::vector<double>& tx,                   \
                            CppAD::vector<double>& ty);                        \
