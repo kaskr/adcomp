@@ -86,7 +86,7 @@ void ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx,               \
                   CppAD::vector<TMBad::ad_aug> &ty) {                   \
   ty = ATOMIC_NAME(tx);                                                 \
 }                                                                       \
-IF_TMB_PRECOMPILE_ATOMICS(                                                      \
+IF_TMB_PRECOMPILE_ATOMICS(                                              \
 template                                                                \
 CppAD::vector<double>                                                   \
 ATOMIC_NAME<> (const CppAD::vector<double>& tx);                        \
@@ -186,7 +186,7 @@ void ATOMIC_NAME (const CppAD::vector<TMBad::ad_aug> &tx,               \
                   CppAD::vector<TMBad::ad_aug> &ty) {                   \
   ty = ATOMIC_NAME(tx);                                                 \
 }                                                                       \
-IF_TMB_PRECOMPILE_ATOMICS(                                                      \
+IF_TMB_PRECOMPILE_ATOMICS(                                              \
 template                                                                \
 CppAD::vector<double>                                                   \
 ATOMIC_NAME<> (const CppAD::vector<double>& tx);                        \
