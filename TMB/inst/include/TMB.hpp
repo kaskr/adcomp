@@ -221,3 +221,5 @@ using Eigen::Array;
 // Nothing more to precompile
 #undef CSKIP
 #define CSKIP(...) __VA_ARGS__
+#undef CSKIP_ATOMIC
+#define CSKIP_ATOMIC(...) __VA_ARGS__
