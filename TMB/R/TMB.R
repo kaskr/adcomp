@@ -1441,9 +1441,10 @@ precompile <- function(all=TRUE, clean=FALSE, trace=TRUE, get.header=FALSE, ...)
       code <- c(
           "#ifndef TMB_H",
           "#define TMB_H",
-          "#ifdef TMB_PRECOMPILE",
+          "#ifdef TMB_PRECOMPILE_ATOMICS",
           readLines(system.file(paste0("include/tmb_enable_precompile.hpp"), package="TMB")),
           "#else",
+          "#define HAVE_PRECOMPILED_ATOMICS",
           readLines(system.file(paste0("include/tmb_enable_header_only.hpp"), package="TMB")),
           "#endif",
           "#include <TMB.hpp>",
@@ -1454,7 +1455,7 @@ precompile <- function(all=TRUE, clean=FALSE, trace=TRUE, get.header=FALSE, ...)
       ## TMB.cpp
       outfile <- paste(getwd(), "TMB.cpp", sep="/")
       code <- c(
-          "#define TMB_PRECOMPILE",
+          "#define TMB_PRECOMPILE_ATOMICS",
           '#include "TMB.h"'
       )
       writeLines(code, outfile)
@@ -1480,8 +1481,8 @@ precompile <- function(all=TRUE, clean=FALSE, trace=TRUE, get.header=FALSE, ...)
           "#undef  TMB_LIB_INIT",
           "#undef  LIB_UNLOAD",
           "#undef  WITH_LIBTMB",
-          "#undef  TMB_PRECOMPILE",
-          "#define TMB_PRECOMPILE 1",
+          "#undef  TMB_PRECOMPILE_ATOMICS",
+          "#define TMB_PRECOMPILE_ATOMICS 1",
           "#pragma message \"Running TMB precompilation...\""[trace],
           "#include <TMB.hpp>"
       )

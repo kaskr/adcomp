@@ -25,10 +25,15 @@ struct isDouble<double>{
 #define CSKIP(...) __VA_ARGS__
 #define TMB_EXTERN
 #endif
-#ifdef TMB_PRECOMPILE
-#define IF_TMB_PRECOMPILE(...) __VA_ARGS__
+#ifdef TMB_PRECOMPILE_ATOMICS
+#define IF_TMB_PRECOMPILE_ATOMICS(...) __VA_ARGS__
 #else
-#define IF_TMB_PRECOMPILE(...)
+#define IF_TMB_PRECOMPILE_ATOMICS(...)
+#endif
+#ifdef HAVE_PRECOMPILED_ATOMICS
+#define CSKIP_ATOMIC(...) ;
+#else
+#define CSKIP_ATOMIC(...) __VA_ARGS__
 #endif
 
 /* Must come before Rinternals.h */
@@ -216,3 +221,5 @@ using Eigen::Array;
 // Nothing more to precompile
 #undef CSKIP
 #define CSKIP(...) __VA_ARGS__
+#undef CSKIP_ATOMIC
+#define CSKIP_ATOMIC(...) __VA_ARGS__

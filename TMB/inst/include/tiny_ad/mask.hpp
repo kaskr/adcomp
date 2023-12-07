@@ -244,7 +244,7 @@ struct NAME ## Op<TMB_MAX_ORDER+1, ninput, noutput, mask> {             \
 };                                                                      \
 template<class dummy=void>                                              \
 CppAD::vector<double>                                                   \
-NAME (const CppAD::vector<double> &x) CSKIP({                           \
+NAME (const CppAD::vector<double> &x) CSKIP_ATOMIC({                    \
   int n = x.size() - 1;                                                 \
   int order = CppAD::Integer(x[n]);                                     \
   typedef NAME ## Op<0, NCHAR(MASK),    1, OCTAL(MASK)> Foo0;           \
@@ -267,7 +267,7 @@ NAME (const CppAD::vector<double> &x) CSKIP({                           \
 })                                                                      \
 template<class dummy=void>                                              \
 CppAD::vector<TMBad::ad_aug>                                            \
-NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP({                    \
+NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP_ATOMIC({             \
   bool all_constant = true;                                             \
   for (size_t i = 0; i<x.size(); i++)                                   \
     all_constant &= x[i].constant();                                    \
@@ -301,7 +301,7 @@ NAME (const CppAD::vector<TMBad::ad_aug> &x) CSKIP({                    \
   for (size_t i=0; i<y.size(); i++) y[i] = y_[i];                       \
   return y;                                                             \
 })                                                                      \
-IF_TMB_PRECOMPILE(                                                      \
+IF_TMB_PRECOMPILE_ATOMICS(                                              \
 template                                                                \
 CppAD::vector<TMBad::ad_aug>                                            \
 NAME<> (const CppAD::vector<TMBad::ad_aug> &x);                         \
