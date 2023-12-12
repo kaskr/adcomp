@@ -204,7 +204,9 @@ namespace CppAD{
 #include "lgamma.hpp"  // harmless
 #include "start_parallel.hpp"
 #include "tmbutils/newton.hpp" // Newton solver + Laplace used by TransformADFunObject
+#ifndef TMB_SKINNY
 #include "tmb_core.hpp"
+#endif
 #include "distributions_R.hpp"
 #include "convenience.hpp"    // Requires besselK
 #include "tmbutils/tmbutils_extra.hpp"
