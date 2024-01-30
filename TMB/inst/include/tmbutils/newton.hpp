@@ -660,7 +660,7 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<double> Rtmp = Dtmp * Rpos;
     matrix<double> LT;
     if (Rtmp.rows() > Rtmp.cols()) {
-      LT = Eigen::MatrixXd( (Rtmp.transpose() * Rtmp).llt().matrixL() );
+      LT = Eigen::MatrixXd( (Rtmp.transpose() * Rtmp).llt().matrixL().transpose() );
       //LT = (Rtmp.transpose() * Rtmp).llt().matrixL();
     } else {
       LT = Rtmp;
