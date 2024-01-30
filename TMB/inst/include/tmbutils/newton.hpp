@@ -124,6 +124,12 @@ template<class T>
 inline T diagonal_min(const Eigen::SparseMatrix<T> &M) {
   return M.diagonal().minCoeff();
 }
+/* Helper to shorten sandwich like products:
+   AXAT(A1,A2,...,An) = A1*A2...*An*...*A2^T*A1^T */
+template<class T>
+T AXAT(T X) { return X; }
+template<class T, class... Args>
+T AXAT(T A, Args... X) { return A * AXAT(X...) * A.transpose(); }
 
 /** \brief Operator (H, x) -> solve(H, x)
 
@@ -595,9 +601,11 @@ struct jacobian_sparse_plus_lowrank_t {
     return as_matrix(eval(x));
   }
   void llt_factorize(const sparse_plus_lowrank<TMBad::Scalar> &h) {
+    // Note: factorization can be LLT or LDLT
     H -> llt_factorize(h.H);
     // Empty lowrank contribution?
     if ( H0->Domain() == 0 ) {
+      // In both cases (LLT / LDLT) this gives the PD status:
       factorize_info = H -> llt_info();
       return;
     }
@@ -608,36 +616,103 @@ struct jacobian_sparse_plus_lowrank_t {
     Sllt.factorize(S);
     std::cout << "Sinfo=" << Sllt.info() << " ";
     // =========== Experimental info
+    // Have H + G H0 GT, P H PT = L D LT.
+    // Rewrite to the form 'diag(D) + R H0 R^T'
     vector<TMBad::Scalar> D = getD(*(H->llt));
-    // Have H + G H0 GT, P H PT = L D LT. Permute 'G'
-    
+    matrix<double>
+      R = (*(H->llt)).permutationP() * h.G;
+    R = (*(H->llt)).matrixL().solve(R);
+    // Permute such that D = (D+, D-)
+    size_t n = D.size();
+    vector<bool> Dpos_bool = (D.array() > 0);
+    size_t npos = Dpos_bool.count();
+    vector<int> Dpos_index(n);
+    size_t k=0;
+    for (size_t i=0; i<n; i++) {
+      if (Dpos_bool[i]) Dpos_index[k++] = i;
+    }
+    for (size_t i=0; i<n; i++) {
+      if (!Dpos_bool[i]) Dpos_index[k++] = i;
+    }
+    Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(n);
+    perm.indices() = Dpos_index;
+    // Apply perm
+    // if (true) {
+    //   // DEBUG
+    //   std::cout << (D).array() << "\n";
+    //   std::cout << (perm * D.matrix()).array() << "\n";
+    //   std::cout << (perm.transpose() * D.matrix()).array() << "\n";
+    //   Rf_error("STOP");
+    // }
+    D = (perm.transpose() * D.matrix()).array();
+    R = perm.transpose() * R;
+    // Extract blocks
+    vector<double> Dpos = D.head(npos);
+    vector<double> Dneg = D.tail(n-npos);
+    matrix<double> Rpos = R.block(0,0,npos,R.cols());
+    matrix<double> Rneg = R.block(npos,0,n-npos,R.cols());
+    //Eigen::MatrixXd Rneg = R.block(npos,0,n-npos,R.cols());
+    typedef Eigen::DiagonalMatrix< double, Eigen::Dynamic, Eigen::Dynamic > Diag;
+    // Test 1: (pos-by-pos block positive definite)
+    // Rewrite: I + Rtmp * H0 * Rtmp^T
+    Diag Dtmp(npos);
+    Dtmp.diagonal() = Dpos.sqrt().cwiseInverse().array();
+    matrix<double> Rtmp = Dtmp * Rpos;
+    matrix<double> LT;
+    if (Rtmp.rows() > Rtmp.cols()) {
+      LT = Eigen::MatrixXd( (Rtmp.transpose() * Rtmp).llt().matrixL() );
+      //LT = (Rtmp.transpose() * Rtmp).llt().matrixL();
+    } else {
+      LT = Rtmp;
+    }
+    matrix<double> Test1 = LT * h.H0 * LT.transpose();
+    Test1.diagonal().array() = Test1.diagonal().array() + 1.;
+    Eigen::ComputationInfo info1 = Test1.llt().info();
+    std::cout << "info1=" << info1 << " ";
+    if (info1 != Eigen::Success) {
+      factorize_info = info1;
+      TMBAD_ASSERT(info1 == Sllt.info());
+      return;
+    }
+    // Test 2: (Schur complement block positive definite)
+    Diag Dpos_inv(npos);
+    Dpos_inv.diagonal() = Dpos.cwiseInverse().array();
+    matrix<double> T = AXAT(Eigen::MatrixXd(Rpos.transpose()), Eigen::MatrixXd(Dpos_inv));
+    matrix<double> S2 = (h.H0.inverse()+T).inverse();
+    matrix<double> Test2 = AXAT(Rneg, h.H0) - AXAT(Rneg, h.H0, T) + AXAT(Rneg, h.H0, T, S2);
+    Test2.diagonal().array() = Test2.diagonal().array() + Dneg;
+    Eigen::ComputationInfo info2 = Test2.llt().info();
+    factorize_info = info2;
+    std::cout << "info2=" << info2 << " ";
+    TMBAD_ASSERT(info2 == Sllt.info());
+    return;  
     // Now have L D LT + G H0 GT.
-    auto H0fac = h.H0.ldlt();
+    //auto H0fac = h.H0.ldlt();
     //h.G = h.G * H0fac.matrixL();
-    vector<TMBad::Scalar> D0 = H0fac.vectorD();
+    //vector<TMBad::Scalar> D0 = H0fac.vectorD();
     // We must decide if 'L D LT + L0 D0 L0T' is PD.
     // We gather the columns of the negative part (C) and project onto span(C).
     // FIXME: In theory, some columns could be linearly dependent and we should remove redundant columns (ignore for now).
-    size_t rankC = (D.array() <= 0).count() + (D0.array() <= 0).count() ;
+    // size_t rankC = (D.array() <= 0).count() + (D0.array() <= 0).count() ;
     // FIXME: Quick exit if too big rankC
-    Eigen::Matrix<TMBad::Scalar, -1, -1> C((size_t) h.rows(), rankC);
-    size_t k = 0;
-    Eigen::SparseMatrix<TMBad::Scalar> L = (*(H->llt)).matrixL();
-    for (size_t i=0; i < (size_t) D.size(); i++) {
-      if (D[i] <= 0) C.col(k++) = L.col(i);
-    }
-    Eigen::Matrix<TMBad::Scalar, -1, -1> L0 = H0fac.matrixL();
-    Eigen::Matrix<TMBad::Scalar, -1, -1> PGL0 = (*(H->llt)).permutationP() * h.G * L0;
-    for (size_t i=0; i < (size_t) D0.size(); i++) {
-      if (D0[i] <= 0) C.col(k++) = PGL0.col(i);
-    }
+    // Eigen::Matrix<TMBad::Scalar, -1, -1> C((size_t) h.rows(), rankC);
+    // size_t k = 0;
+    // Eigen::SparseMatrix<TMBad::Scalar> L = (*(H->llt)).matrixL();
+    // for (size_t i=0; i < (size_t) D.size(); i++) {
+    //   if (D[i] <= 0) C.col(k++) = L.col(i);
+    // }
+    // Eigen::Matrix<TMBad::Scalar, -1, -1> L0 = H0fac.matrixL();
+    // Eigen::Matrix<TMBad::Scalar, -1, -1> PGL0 = (*(H->llt)).permutationP() * h.G * L0;
+    // for (size_t i=0; i < (size_t) D0.size(); i++) {
+    //   if (D0[i] <= 0) C.col(k++) = PGL0.col(i);
+    // }
     // Finally apply 'projection': C^T * (H+G*H0*GT) * C
-    C = (*(H->llt)).permutationPinv() * C; // Permute back
-    matrix<double> PD = C.transpose() * (h * C);
-    auto PDcheck = PD.llt();
-    std::cout << "PDcheck.info()=" << PDcheck.info() << " ";
-    factorize_info = PDcheck.info();
-    return;
+    // C = (*(H->llt)).permutationPinv() * C; // Permute back
+    // matrix<double> PD = C.transpose() * (h * C);
+    // auto PDcheck = PD.llt();
+    // std::cout << "PDcheck.info()=" << PDcheck.info() << " ";
+    // factorize_info = PDcheck.info();
+    // return;
     
     // New
     // std::cout << "Dpos=" << (D.array()>0).count() << " ";
