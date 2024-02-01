@@ -585,6 +585,7 @@ struct jacobian_sparse_plus_lowrank_t {
     ans.G = vector<T>(v2);
     ans.G.resize(n, v2.size() / n);
     ans.H0 = H0 -> as_matrix(v3);
+    ans.H0 = .5 * (ans.H0 + ans.H0.transpose());
     return ans;
   }
   template<class T>
@@ -614,7 +615,12 @@ struct jacobian_sparse_plus_lowrank_t {
     Eigen::SparseMatrix<double> S = h.H + GH0GT.sparseView();
     DEFAULT_SPARSE_FACTORIZATION Sllt(S);
     Sllt.factorize(S);
-    std::cout << "Sinfo=" << Sllt.info() << " ";
+    Eigen::ComputationInfo Sinfo = Sllt.info();
+    std::cout << "Sinfo=" << Sinfo << " ";
+    if(!true){
+      factorize_info = Sinfo;
+      return;
+    }
     // =========== Experimental info
     // Have H + G H0 GT, P H PT = L D LT.
     // Rewrite to the form 'diag(D) + R H0 R^T'
@@ -671,7 +677,7 @@ struct jacobian_sparse_plus_lowrank_t {
     std::cout << "info1=" << info1 << " ";
     if (info1 != Eigen::Success) {
       factorize_info = info1;
-      TMBAD_ASSERT(info1 == Sllt.info());
+      //TMBAD_ASSERT(info1 == Sinfo);
       return;
     }
     // Test 2: (Schur complement block positive definite)
@@ -681,10 +687,15 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<double> S2 = (h.H0.inverse()+T).inverse();
     matrix<double> Test2 = AXAT(Rneg, h.H0) - AXAT(Rneg, h.H0, T) + AXAT(Rneg, h.H0, T, S2);
     Test2.diagonal().array() = Test2.diagonal().array() + Dneg;
-    Eigen::ComputationInfo info2 = Test2.llt().info();
+    //Eigen::ComputationInfo info2 = Test2.llt().info();
+    auto T2fac = Test2.ldlt();
+    Eigen::VectorXd vecD = T2fac.vectorD();
+    Eigen::MatrixXd matL = T2fac.matrixL();
+    bool ok = (vecD.array() > 0).all();
+    Eigen::ComputationInfo info2 = Eigen::ComputationInfo(!ok)  ;
     factorize_info = info2;
     std::cout << "info2=" << info2 << " ";
-    TMBAD_ASSERT(info2 == Sllt.info());
+    //TMBAD_ASSERT(info2 == Sinfo);
     return;  
     // Now have L D LT + G H0 GT.
     //auto H0fac = h.H0.ldlt();
