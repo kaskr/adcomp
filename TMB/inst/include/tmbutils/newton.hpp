@@ -533,19 +533,6 @@ struct jacobian_sparse_plus_lowrank_t {
       vector<T> D2 = ((G * H0).array() * G.array()).rowwise().sum();
       return (H.diagonal().array() + D2).minCoeff();
     }
-    // Matrix-matrix product
-    matrix<T> operator*(const matrix<T> &x) const {
-      return
-        (H * x).matrix() + (G * (H0 * (G.transpose() * x))).matrix();
-    }
-    // 'fake' abs (upper bound)
-    sparse_plus_lowrank abs() const {
-      sparse_plus_lowrank ans(*this);
-      ans.H.coeffs() = ans.H.coeffs().abs();
-      ans.G. array() = ans.G. array().abs();
-      ans.H0.array() = ans.H0.array().abs();
-      return ans;
-    }
     EIGEN_DEFAULT_DENSE_INDEX_TYPE rows() const { return H.rows(); }
     typedef T value_type;
   };
@@ -1165,10 +1152,8 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       }
       // We now have a PD hessian
       // Let's take a newton step and see if it improves...
-      vector<Scalar> step = hessian->llt_solve(H, g).array();
-      vector<Scalar> err = (H * step.matrix()).array() - g;
-      if (cfg.trace) std::cout << "abserr=" << err.abs().maxCoeff() << " ";
-      vector<Scalar> x_new = x - step;
+      vector<Scalar> x_new =
+        x - hessian -> llt_solve(H, g).array();
       Scalar f = function(x_new)[0];
       // Accept/Reject rules
       bool accept = std::isfinite(f);
