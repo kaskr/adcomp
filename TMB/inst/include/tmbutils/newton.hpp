@@ -572,7 +572,6 @@ struct jacobian_sparse_plus_lowrank_t {
     ans.G = vector<T>(v2);
     ans.G.resize(n, v2.size() / n);
     ans.H0 = H0 -> as_matrix(v3);
-    ans.H0 = .5 * (ans.H0 + ans.H0.transpose());
     return ans;
   }
   template<class T>
