@@ -660,7 +660,6 @@ struct jacobian_sparse_plus_lowrank_t {
   }
   // FIXME: Diagonal increments should perhaps be applied to both H and H0.
   Eigen::ComputationInfo factorize_info;
-  vector<TMBad::Scalar> eigvec;
   Eigen::ComputationInfo llt_info() {
     return factorize_info;
   }
