@@ -596,19 +596,8 @@ struct jacobian_sparse_plus_lowrank_t {
       factorize_info = H -> llt_info();
       return;
     }
-    // =========== Experimental info
-    matrix<double> GH0GT = h.G * h.H0 * h.G.transpose();
-    Eigen::SparseMatrix<double> S = h.H + GH0GT.sparseView();
-    DEFAULT_SPARSE_FACTORIZATION Sllt(S);
-    Sllt.factorize(S);
-    Eigen::ComputationInfo Sinfo = Sllt.info();
-    std::cout << "Sinfo=" << Sinfo << " ";
-    if(!true){
-      factorize_info = Sinfo;
-      return;
-    }
-    // =========== Experimental info
     // Have H + G H0 GT, P H PT = L D LT.
+    // Must determine PD status.
     // Rewrite to the form 'diag(D) + R H0 R^T'
     vector<TMBad::Scalar> D = getD(*(H->llt));
     matrix<double>
@@ -628,14 +617,6 @@ struct jacobian_sparse_plus_lowrank_t {
     }
     Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> perm(n);
     perm.indices() = Dpos_index;
-    // Apply perm
-    // if (true) {
-    //   // DEBUG
-    //   std::cout << (D).array() << "\n";
-    //   std::cout << (perm * D.matrix()).array() << "\n";
-    //   std::cout << (perm.transpose() * D.matrix()).array() << "\n";
-    //   Rf_error("STOP");
-    // }
     D = (perm.transpose() * D.matrix()).array();
     R = perm.transpose() * R;
     // Extract blocks
@@ -643,7 +624,6 @@ struct jacobian_sparse_plus_lowrank_t {
     vector<double> Dneg = D.tail(n-npos);
     matrix<double> Rpos = R.block(0,0,npos,R.cols());
     matrix<double> Rneg = R.block(npos,0,n-npos,R.cols());
-    //Eigen::MatrixXd Rneg = R.block(npos,0,n-npos,R.cols());
     typedef Eigen::DiagonalMatrix< double, Eigen::Dynamic, Eigen::Dynamic > Diag;
     // Test 1: (pos-by-pos block positive definite)
     // Rewrite: I + Rtmp * H0 * Rtmp^T
@@ -653,17 +633,14 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<double> LT;
     if (Rtmp.rows() > Rtmp.cols()) {
       LT = Eigen::MatrixXd( (Rtmp.transpose() * Rtmp).llt().matrixL().transpose() );
-      //LT = (Rtmp.transpose() * Rtmp).llt().matrixL();
     } else {
       LT = Rtmp;
     }
     matrix<double> Test1 = LT * h.H0 * LT.transpose();
     Test1.diagonal().array() = Test1.diagonal().array() + 1.;
     Eigen::ComputationInfo info1 = Test1.llt().info();
-    std::cout << "info1=" << info1 << " ";
     if (info1 != Eigen::Success) {
       factorize_info = info1;
-      //TMBAD_ASSERT(info1 == Sinfo);
       return;
     }
     // Test 2: (Schur complement block positive definite)
@@ -673,7 +650,6 @@ struct jacobian_sparse_plus_lowrank_t {
     matrix<double> S2 = (h.H0.inverse()+T).inverse();
     matrix<double> Test2 = AXAT(Rneg, h.H0) - AXAT(Rneg, h.H0, T) + AXAT(Rneg, h.H0, T, S2);
     Test2.diagonal().array() = Test2.diagonal().array() + Dneg;
-    //Eigen::ComputationInfo info2 = Test2.llt().info();
     auto T2fac = Test2.ldlt();
     Eigen::VectorXd vecD = T2fac.vectorD();
     Eigen::MatrixXd matL = T2fac.matrixL();
