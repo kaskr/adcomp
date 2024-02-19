@@ -272,6 +272,9 @@ struct jacobian_dense_t : TMBad::ADFun<> {
                   const vector<T> &x) {
     return HessianSolveVector<jacobian_dense_t>(ptr).solve(h, x);
   }
+  void print_info () {
+    Rcout << "Dense H n=" << n << "\n";
+  }
 };
 
 /* --- Sparse Hessian ----------------------------------------------------- */
@@ -374,6 +377,9 @@ struct jacobian_sparse_t : TMBad::Sparse<TMBad::ADFun<> > {
                   const vector<T> &h,
                   const vector<T> &x) {
     return HessianSolveVector<jacobian_sparse_t>(ptr).solve(h, x);
+  }
+  void print_info () {
+    Rcout << "Sparse H n=" << n << " nnz=" << Base::Range() << "\n";
   }
 };
 
@@ -731,6 +737,10 @@ struct jacobian_sparse_plus_lowrank_t {
     H0M.diagonal().array() += T(1.);
     return H0M;
   }
+  void print_info () {
+    H->print_info();
+    H0->print_info();
+  }
 };
 
 /* ======================================================================== */
@@ -933,6 +943,9 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
     // Hessian
     hessian = std::make_shared<Hessian_Type>(function, gradient, n_inner);
     hessian -> optimize();
+    if (cfg.trace) {
+      hessian -> print_info();
+    }
   }
   // Helper to swap inner/outer
   void SwapInner() {
