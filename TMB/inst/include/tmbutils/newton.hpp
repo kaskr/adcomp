@@ -101,10 +101,11 @@ struct matrix : Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>
   }
 };
 
-/* Helper to get D for LDLT factorization and empty vector otherwise */
+/* Helper to get D for LDLT factorization a vector of ones otherwise */
 template<class LLTFac>
 inline vector<typename LLTFac::Scalar> getD(const LLTFac &F) {
-  return vector<typename LLTFac::Scalar>(0);
+  size_t n = F.rows();
+  return vector<typename LLTFac::Scalar>::Constant(n, 1.);
 }
 template<class Type>
 inline vector<Type> getD(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > &F) {
