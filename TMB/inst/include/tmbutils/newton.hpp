@@ -652,7 +652,7 @@ struct jacobian_sparse_plus_lowrank_t {
     // Test 2: (Schur complement block positive definite)
     Diag Dpos_inv(npos);
     Dpos_inv.diagonal() = Dpos.cwiseInverse().array();
-    matrix<double> T = AXAT(Eigen::MatrixXd(Rpos.transpose()), Eigen::MatrixXd(Dpos_inv));
+    matrix<double> T = AXAT(Eigen::MatrixXd(Rpos.transpose()), Dpos_inv);
     matrix<double> S2 = (h.H0.inverse()+T).inverse();
     matrix<double> Test2 = AXAT(Rneg, h.H0) - AXAT(Rneg, h.H0, T) + AXAT(Rneg, h.H0, T, S2);
     Test2.diagonal().array() = Test2.diagonal().array() + Dneg;
