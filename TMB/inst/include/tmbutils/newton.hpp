@@ -111,6 +111,15 @@ template<class Type>
 inline vector<Type> getD(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > &F) {
   return F.vectorD();
 }
+/* Helper to identify factorization kind */
+template<class LLTFac>
+inline bool isLDL(const LLTFac &F) {
+  return false;
+}
+template<class Type>
+inline bool isLDL(const Eigen::SimplicialLDLT< Eigen::SparseMatrix<Type> > &F) {
+  return true;
+}
 
 /* Helper to get diagonal().minCoeff() */
 template<class MatrixType>
@@ -602,6 +611,14 @@ struct jacobian_sparse_plus_lowrank_t {
       // In both cases (LLT / LDLT) this gives the PD status:
       factorize_info = H -> llt_info();
       return;
+    }
+    // LLT case with non-trivial lowrank contribution *MUST* be PD
+    if (!isLDL(*(H->llt))) {
+      if ( (H -> llt_info()) != Eigen::Success) {
+        Rf_warning("Sparse+lowrank: Failed to determine PD status (consider setting LDL=TRUE)");
+        factorize_info = H -> llt_info();
+        return;
+      }
     }
     // Have H + G H0 GT, P H PT = L D LT.
     // Must determine PD status.
