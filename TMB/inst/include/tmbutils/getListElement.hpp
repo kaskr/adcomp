@@ -15,6 +15,9 @@ void RObjectTestExpectedType(SEXP x, RObjectTester expectedtype, const char *nam
       if(Rf_isNull(x)){
 	Rf_warning("Expected object. Got NULL.");
       }
+      if(Rf_isNumeric(x) && !Rf_isReal(x)) {
+        Rf_warning("NOTE: 'storage.mode(%s)' must be 'double' when attribute 'check.passed' is set for 'data'.",nam);
+      }
       Rf_error("Error when reading the variable: '%s'. Please check data and parameters.",nam);
     }
   }
@@ -28,7 +31,7 @@ Rboolean isNumericScalar(SEXP x){
     Rf_warning("Expected scalar. Got length=%i",LENGTH(x));
     return FALSE;
   }
-  return Rf_isNumeric(x);
+  return Rf_isReal(x);
 }
 #endif
 

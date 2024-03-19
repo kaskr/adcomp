@@ -219,7 +219,7 @@ asMatrix<Type> ( TMB_OBJECTIVE_PTR -> getShape( #name, &Rf_isMatrix) ), \
     \ingroup macros*/
 #define PARAMETER_VECTOR(name)                                          \
 vector<Type> name(TMB_OBJECTIVE_PTR -> fillShape(                       \
-asVector<Type>(TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),    \
+asVector<Type>(TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   )),    \
 #name));
 
 /** \brief Get parameter scalar from R and declare it as Type
@@ -237,10 +237,10 @@ asVector<Type>(TMB_OBJECTIVE_PTR -> getShape(#name,&isNumericScalar)),  \
 vector<Type> name;                                                      \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name = TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(                 \
-         TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)), #name);  \
+         TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   )), #name);  \
 } else {                                                                \
   name = asVector<Type>(getListElement(                                 \
-         TMB_OBJECTIVE_PTR -> data,#name,&Rf_isNumeric));               \
+         TMB_OBJECTIVE_PTR -> data,#name,&Rf_isReal   ));               \
 }
 
 /** \brief Get data matrix from R and declare it as matrix<Type>
@@ -279,13 +279,13 @@ getListElement(TMB_OBJECTIVE_PTR -> data,                               \
     \endverbatim
     \ingroup macros */
 #define DATA_FACTOR(name) vector<int> name(asVector<int>(               \
-getListElement(TMB_OBJECTIVE_PTR -> data, #name, &Rf_isNumeric)));
+getListElement(TMB_OBJECTIVE_PTR -> data, #name, &Rf_isReal   )));
 
 /** \brief Get data vector of type "integer" from R and declare it
     vector<int>. (DATA_INTEGER() is for a scalar integer)
     \ingroup macros */
 #define DATA_IVECTOR(name) vector<int> name(asVector<int>(              \
-getListElement(TMB_OBJECTIVE_PTR -> data, #name, &Rf_isNumeric)));
+getListElement(TMB_OBJECTIVE_PTR -> data, #name, &Rf_isReal   )));
 
 /** \brief Get the number of levels of a data factor from R
     \ingroup macros */
@@ -519,10 +519,10 @@ struct data_indicator : VT{
 data_indicator<tmbutils::array<Type> > name(obs, true);                 \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
-             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
+             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   )),      \
                                            #name),                      \
              Rf_getAttrib(                                              \
-                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric),    \
+                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   ),    \
                 Rf_install("ord")) );                                   \
 }
 
@@ -535,10 +535,10 @@ if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
 data_indicator<tmbutils::vector<Type> > name(obs, true);                \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
   name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
-             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric)),      \
+             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   )),      \
                                            #name),                      \
              Rf_getAttrib(                                              \
-                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isNumeric),    \
+                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   ),    \
                 Rf_install("ord")) );                                   \
 }
 
