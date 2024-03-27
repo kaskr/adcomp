@@ -5,38 +5,33 @@
 ##   library.dynam("TMB", pkg, lib)
 ## }
 
-## Matrix package versions that are likely to break ABI compatibility:
-MVI <- c("1.6-2", "1.7-0")
-## findInterval
-findMVI <- function(v) {
-    sum(MVI <= numeric_version(v))
-}
-sameMVI <- function(x, y) {
-    findMVI(x) == findMVI(y)
+## https://github.com/lme4/lme4/issues/768
+## https://github.com/kaskr/adcomp/issues/387
+get_abi_version <- function() {
+    if (utils::packageVersion("Matrix") < "1.6-2") return(numeric_version("0"))
+    Matrix::Matrix.Version()[["abi"]]
 }
 
+.Matrix.abi.build.version <- get_abi_version()
+
 checkMatrixPackageVersion <- function(warn=TRUE) {
-    ## It is unsafe to use the TMB package with versions of 'Matrix'
-    ## other than the one TMB was originally built with.
-    file <- paste0(system.file(package="TMB"),"/Matrix-version")
-    cur.Matrix.version <- as.character(packageVersion("Matrix"))
-    if(!file.exists(file)) {
-        writeLines(cur.Matrix.version, con = file)
-    }
-    TMB.Matrix.version <- readLines(file)
-    if(warn && !sameMVI(TMB.Matrix.version, cur.Matrix.version)) {
+    cur_version <- get_abi_version()
+    built_version <- .Matrix.abi.build.version
+    result_ok <- cur_version == built_version
+    if (!result_ok) {
         warning(
             "Package version inconsistency detected.\n",
-            "TMB was built with Matrix version ",
-            TMB.Matrix.version,
+            "TMB was built with Matrix ABI version ",
+            built_version,
             "\n",
-            "Current Matrix version is ",
-            cur.Matrix.version,
+            "Current Matrix ABI version is ",
+            cur_version,
             "\n",
             "Please re-install 'TMB' from source using install.packages('TMB', type = 'source') ",
             "or ask CRAN for a binary version of 'TMB' matching CRAN's 'Matrix' package"
         )
     }
+    return(result_ok)
 }
 
 .onLoad <- function(lib, pkg) {
