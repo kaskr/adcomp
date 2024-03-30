@@ -85,6 +85,10 @@ if (!(x)) {                                                             \
 #endif
 #include "EigenWarnings/DisableStupidWarnings"
 #endif
+/* We cannot use Eigen's parallel matrix multiply for AD types (GH390). */
+#ifndef EIGEN_DONT_PARALLELIZE
+#define EIGEN_DONT_PARALLELIZE
+#endif
 #include <Eigen/Dense>
 
 // Default: Include Eigen/Sparse normally
