@@ -160,7 +160,8 @@ SEXP asSEXP(Eigen::SparseMatrix<Type> x){
   typedef typename Eigen::SparseMatrix<Type>::InnerIterator Iterator;
   // Allocate return object
   R_xlen_t nnz = x.nonZeros();
-  SEXP ans = PROTECT(R_do_new_object(R_do_MAKE_CLASS("dgTMatrix")));
+  SEXP cls = PROTECT(R_do_MAKE_CLASS("dgTMatrix"));
+  SEXP ans = PROTECT(R_do_new_object(cls));
   SEXP dim = PROTECT(Rf_allocVector(INTSXP, 2));
   SEXP dimnames = PROTECT(Rf_allocVector(VECSXP, 2));
   SEXP values = PROTECT(Rf_allocVector(REALSXP, nnz));
@@ -187,6 +188,6 @@ SEXP asSEXP(Eigen::SparseMatrix<Type> x){
 	  k++;
 	}
     }
-  UNPROTECT(7);
+  UNPROTECT(8);
   return ans;
 }
