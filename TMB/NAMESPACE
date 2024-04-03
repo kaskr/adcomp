@@ -58,7 +58,8 @@ export(benchmark,
        summary.sdreport,
        template,
        tmbprofile,
-       tmbroot)
+       tmbroot,
+       TMB.Version)
 
 ## Methods :
 S3method(confint, tmbprofile)
