@@ -13,6 +13,9 @@ all:
 	make install
 	make pdf
 
+abi-update:
+	./bin/abi_table.sh
+
 doc-update:
 	echo "library(roxygen2);roxygenize(\"$(PACKAGE)\",roclets = c(\"collate\", \"rd\"), load_code=load_source)" | $(R) --slave
 
