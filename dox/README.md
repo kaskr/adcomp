@@ -22,7 +22,7 @@ sudo apt-get install doxygen pandoc pandoc-citeproc graphviz librsvg2-dev
 #### R packages
 
 ```R
-install.packages(c("knitr", "bookdown", "rsvg"))
+install.packages(c("knitr", "bookdown", "rsvg", "stringr"))
 ```
 
 ## Export options
