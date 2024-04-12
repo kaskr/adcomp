@@ -45,6 +45,7 @@
 */
 #define USE_FC_LEN_T
 #include <R.h>
+#include <Rversion.h>
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 #ifndef FCONE
@@ -66,15 +67,12 @@
 
 extern cholmod_common c; // See init.c
 
-/* Temporary fix until 'AS_CHM_FR__' is part of Matrix API.
-   In future replace code below by something like:
+#if !defined(R_MATRIX_PACKAGE_VERSION) || R_MATRIX_PACKAGE_VERSION < R_Version(1, 7, 1)
 
-#ifdef AS_CHM_FR__
-#undef AS_CHM_FR
-#define AS_CHM_FR AS_CHM_FR__
-#endif
+/* In Matrix < 1.7-1, the registered routine underlying AS_CHM_FR         */
+/* called cholmod_check_factor unconditionally, requiring much overhead.  */
+/* Hence, when TMB is compiled linking old Matrix, we redefine AS_CHM_FR. */
 
-*/
 #undef AS_CHM_FR
 #define AS_CHM_FR(x) tmb_as_cholmod_factor3((CHM_FR)alloca(sizeof(cholmod_factor)), x, FALSE)
 CHM_FR tmb_as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
@@ -115,6 +113,8 @@ CHM_FR tmb_as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
   }
   return ans;
 }
+
+#endif /* !defined(R_MATRIX_PACKAGE_VERSION) || ... */
 
 SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult)
 {
