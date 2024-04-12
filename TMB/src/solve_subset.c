@@ -66,6 +66,56 @@
 
 extern cholmod_common c; // See init.c
 
+/* Temporary fix until 'AS_CHM_FR__' is part of Matrix API.
+   In future replace code below by something like:
+
+#ifdef AS_CHM_FR__
+#undef AS_CHM_FR
+#define AS_CHM_FR AS_CHM_FR__
+#endif
+
+*/
+#undef AS_CHM_FR
+#define AS_CHM_FR(x) tmb_as_cholmod_factor3((CHM_FR)alloca(sizeof(cholmod_factor)), x, FALSE)
+CHM_FR tmb_as_cholmod_factor3(CHM_FR ans, SEXP x, Rboolean do_check)
+{
+  int *type = INTEGER(GET_SLOT(x, install("type")));
+  SEXP tmp;
+  memset(ans, 0, sizeof(cholmod_factor)); /* zero the struct */
+  ans->itype = CHOLMOD_INT;	/* characteristics of the system */
+  ans->dtype = CHOLMOD_DOUBLE;
+  ans->z = (void *) NULL;
+  ans->xtype = CHOLMOD_REAL;
+  ans->ordering = type[0];	/* unravel the type */
+  ans->is_ll = (type[1] ? 1 : 0);
+  ans->is_super = (type[2] ? 1 : 0);
+  ans->is_monotonic = (type[3] ? 1 : 0);
+  SEXP Matrix_permSym = install("perm");
+  tmp = GET_SLOT(x, Matrix_permSym);
+  ans->minor = ans->n = LENGTH(tmp); ans->Perm = INTEGER(tmp);
+  ans->ColCount = INTEGER(GET_SLOT(x, install("colcount")));
+  ans->z = ans->x = (void *) NULL;
+  SEXP Matrix_xSym = install("x");
+  tmp = GET_SLOT(x, Matrix_xSym);
+  ans->x = REAL(tmp);
+  if (ans->is_super) {	/* supernodal factorization */
+    ans->xsize = LENGTH(tmp);
+    ans->maxcsize = type[4]; ans->maxesize = type[5];
+    ans->i = (int*)NULL;
+    tmp = GET_SLOT(x, install("super"));
+    ans->nsuper = LENGTH(tmp) - 1; ans->super = INTEGER(tmp);
+    tmp = GET_SLOT(x, install("pi"));
+    ans->pi = INTEGER(tmp);
+    tmp = GET_SLOT(x, install("px"));
+    ans->px = INTEGER(tmp);
+    tmp = GET_SLOT(x, install("s"));
+    ans->ssize = LENGTH(tmp); ans->s = INTEGER(tmp);
+  } else {
+    Rf_error("Unexpected");
+  }
+  return ans;
+}
+
 SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult)
 {
     CHM_FR f = AS_CHM_FR(L);
