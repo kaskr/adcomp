@@ -76,7 +76,7 @@ struct SpAxOp : TMBad::global::DynamicOperator< -1, -1> {
     const T* A = args.x_ptr(0);
     const T* x = args.x_ptr(1);
     T* y = args.y_ptr(0);
-    (*P).template f(A, x, y);
+    (*P).template f<T>(A, x, y);
   }
   template<class T>
   void reverse(TMBad::ReverseArgs<T> &args) {
@@ -86,7 +86,7 @@ struct SpAxOp : TMBad::global::DynamicOperator< -1, -1> {
     T* dA = args.dx_ptr(0);
     T* dx = args.dx_ptr(1);
     const T* dy = args.dy_ptr(0);
-    (*P).template df(A, x, y, dA, dx, dy);
+    (*P).template df<T>(A, x, y, dA, dx, dy);
   }
   // ---- Dependencies ---- (copied from ad_blas)
   // FIXME: Make general implementation for pointer based case
