@@ -853,8 +853,6 @@ struct ADFun {
 
       } else {
         if (atomic_jac_row.Domain() == 0) {
-          Rcout << "Warning: This is an experimental compression method\n";
-          Rcout << "Disable: 'config(tmbad.sparse_hessian_compress=0)'\n";
           atomic_jac_row = this->WgtJacFun(keep_x, keep_y);
           atomic_jac_row.optimize();
 
@@ -863,7 +861,6 @@ struct ADFun {
           atomic_jac_row = atomic_jac_row.atomic();
 
           replay.clear_deriv_sub();
-          Rcout << "done\n";
 
           TMBAD_ASSERT(atomic_jac_row.Domain() ==
                        this->Domain() + this->Range());
