@@ -31,5 +31,5 @@ SEXP setxslot(SEXP x, SEXP y){
 
 /* Is external pointer nil ? */
 SEXP isNullPointer(SEXP pointer) {
-  return ScalarLogical(!R_ExternalPtrAddr(pointer));
+  return ScalarLogical(TYPEOF(pointer) == EXTPTRSXP && !R_ExternalPtrAddr(pointer));
 }
