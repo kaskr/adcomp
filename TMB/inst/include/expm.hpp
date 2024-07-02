@@ -218,9 +218,9 @@ namespace atomic{
   template <>
   struct nestedTriangle<0> : Block<double>{
     typedef Block<double> Base;
-    nestedTriangle<0>(){}
-    nestedTriangle<0>(Base x) : Base(x){}
-    nestedTriangle<0>(vector<matrix<double> > args) : Block<double>(args[0]) {}
+    nestedTriangle(){}
+    nestedTriangle(Base x) : Base(x){}
+    nestedTriangle(vector<matrix<double> > args) : Block<double>(args[0]) {}
     matrix<double> bottomLeftCorner(){
       return this->A;
     }
