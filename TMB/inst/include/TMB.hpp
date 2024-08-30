@@ -163,6 +163,11 @@ namespace TMBad {
   using std::isnan;
   bool isnan(const TMBad::ad_aug &x)CSKIP({ return isnan(x.Value()); })
 }
+// Add missing numeric_limits specialization
+namespace std {
+template<>
+struct numeric_limits<TMBad::ad_aug> : numeric_limits<TMBad::Scalar> { };
+}
 #endif
 
 /* Include the R library _after_ Eigen and CppAD. Otherwise, the R
