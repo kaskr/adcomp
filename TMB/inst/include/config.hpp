@@ -77,6 +77,7 @@ struct config_struct{
     SET(tmbad.atomic_sparse_log_determinant,true);
     SET(autopar,false);
     SET(nthreads,1);
+    SET(tmbad_deterministic_hash,true);
   })
 #undef SET
   config_struct() CSKIP(
