@@ -540,7 +540,7 @@ void reorder_sub_expressions(global &glob) {
   cfg.strong_const = false;
   cfg.strong_output = false;
   cfg.reduce = false;
-  cfg.deterministic = false;
+  cfg.deterministic = TMBAD_DETERMINISTIC_HASH;
   std::vector<hash_t> h = glob.hash_sweep(cfg);
   std::vector<Index> remap = radix::first_occurance<Index>(h);
 
@@ -1740,7 +1740,7 @@ std::vector<hash_t> global::hash_sweep(bool weak) const {
   cfg.strong_const = true;
   cfg.strong_output = true;
   cfg.reduce = weak;
-  cfg.deterministic = false;
+  cfg.deterministic = TMBAD_DETERMINISTIC_HASH;
   return hash_sweep(cfg);
 }
 
@@ -4282,7 +4282,7 @@ std::vector<Index> get_likely_expression_duplicates(
   cfg.strong_const = true;
   cfg.strong_output = true;
   cfg.reduce = false;
-  cfg.deterministic = false;
+  cfg.deterministic = TMBAD_DETERMINISTIC_HASH;
   cfg.inv_seed = inv_remap;
   std::vector<hash_t> h = glob.hash_sweep(cfg);
   return radix::first_occurance<Index>(h);

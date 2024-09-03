@@ -27,6 +27,9 @@
 #ifndef TMBAD_HASH_TYPE
 #define TMBAD_HASH_TYPE unsigned int
 #endif
+#ifndef TMBAD_DETERMINISTIC_HASH
+#define TMBAD_DETERMINISTIC_HASH true
+#endif
 #ifndef TMBAD_UNION_OR_STRUCT
 #define TMBAD_UNION_OR_STRUCT union
 #endif
