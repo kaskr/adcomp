@@ -38,6 +38,19 @@ array<Type> asArray(SEXP x)
   return array<Type>(y,d);
 }
 
+template <>
+array<int> inline asArray(SEXP x)
+{
+  if(!Rf_isArray(x))Rf_error("NOT AN ARRAY!");
+  SEXP xi = PROTECT(Rf_coerceVector(x,INTSXP));
+  SEXP dim=Rf_getAttrib(xi,R_DimSymbol);
+  vector<int> d=asVector<int,int>(INTEGER(dim), LENGTH(dim));
+  vector<int> y=asVector<int,int>(INTEGER(xi), LENGTH(xi));
+  UNPROTECT(1);
+  return array<int>(y,d);
+}
+
+  
 #endif
 
 } // End namespace

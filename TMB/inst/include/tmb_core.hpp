@@ -257,9 +257,9 @@ Type name(asVector<Type>(getListElement(TMB_OBJECTIVE_PTR -> data,      \
 
 /** \brief Get data scalar from R and declare it as int
     \ingroup macros */
-#define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(      \
+#define DATA_INTEGER(name) int name(asVector<int>(      \
 getListElement(TMB_OBJECTIVE_PTR -> data,                               \
-#name, &isNumericScalar))[0]));
+#name, &isNumericScalar))[0]);
 
 /** \brief Get data vector of type "factor" from R and declare it as a
     zero-based integer vector.
