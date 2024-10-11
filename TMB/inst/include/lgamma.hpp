@@ -102,6 +102,8 @@ inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
 }
 VECTORIZE4_ttti(dnbinom2)
 
+template<class Type>
+Type logspace_add(Type logx, Type logy);
 /** \brief Negative binomial probability function.
 
     More robust parameterization through \f$log(\mu)\f$ and
@@ -115,12 +117,29 @@ inline Type dnbinom_robust(const Type &x,
                            const Type &log_var_minus_mu,
                            int give_log=0)
 {
-  CppAD::vector<Type> tx(4);
-  tx[0] = x;
-  tx[1] = log_mu;
-  tx[2] = log_var_minus_mu;
-  tx[3] = 0;
-  Type ans = atomic::log_dnbinom_robust(tx)[0];
+  Type ans;
+  if (CppAD::Variable(x)) {
+    // Non-constant x case (needed for OSA)
+    CppAD::vector<Type> tx(4);
+    tx[0] = x;
+    tx[1] = log_mu;
+    tx[2] = log_var_minus_mu;
+    tx[3] = 0;
+    ans = atomic::log_dnbinom_robust(tx)[0];
+  } else {
+    // Constant x case. Add all details to the tape to facilitate
+    // better optimization of higher order derivs (faster).
+    Type log_var = logspace_add( log_mu, log_var_minus_mu );
+    Type log_p   =     log_mu - log_var;
+    Type log_n   = 2 * log_mu - log_var_minus_mu;
+    Type n = exp(log_n);  // NB: exp(log_n) could over/underflow
+    Type logres = n * log_p;
+    if (x != 0) { // OK to branch here because x is constant
+      Type log_1mp = log_var_minus_mu - log_var;
+      logres += -lbeta(n, x) - log(x) + x * log_1mp;
+    }
+    ans = logres;
+  }
   return ( give_log ? ans : exp(ans) );
 }
 VECTORIZE4_ttti(dnbinom_robust)
