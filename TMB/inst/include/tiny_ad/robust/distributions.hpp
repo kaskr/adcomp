@@ -57,7 +57,9 @@ namespace robust_utils {
     Float logres = n * log_p;
     if (x != 0) {
       Float log_1mp = log_var_minus_mu - log_var;
-      logres += lgamma(x + n) - lgamma(n) - lgamma(x + 1.) + x * log_1mp;
+      // WAS:
+      //  logres += lgamma(x + n) - lgamma(n) - lgamma(x + 1.) + x * log_1mp;
+      logres += -lbeta(n, x) - log(x) + x * log_1mp;
     }
     return ( give_log ? logres : exp(logres) );
   }
