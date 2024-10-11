@@ -17,6 +17,16 @@ Type lgamma(Type x){
 }
 VECTORIZE1_t(lgamma)
 
+/** \brief Logarithm of beta function (following R argument convention).
+    \ingroup special_functions
+*/
+template<class Type>
+Type lbeta(Type x, Type y){
+  Type arg[2] = {x, y};
+  return atomic::lbeta(arg);
+}
+VECTORIZE2_tt(lbeta)
+
 /** \brief Logarithm of factorial function (following R argument convention).
     \ingroup special_functions
 */
