@@ -42,6 +42,9 @@ namespace robust_utils {
       log(1 - p) = log_var_minus_mu - logspace_add( log_mu, log_var_minus_mu )
       log( p )   = log_mu           - logspace_add( log_mu, log_var_minus_mu )
 
+      Transform:
+      log(1 - p) = - logspace_add( 0, log_mu - log_var_minus_mu )
+      log( p )   = - logspace_add( 0, log_var_minus_mu - log_mu )
   */
   template <class Float>
   inline Float dnbinom_robust(const Float &x,
@@ -50,13 +53,13 @@ namespace robust_utils {
                               int give_log = 0) {
     // Float p = mu / var;
     // Float n = mu * p / (1. - p);
-    Float log_var = logspace_add( log_mu, log_var_minus_mu );
-    Float log_p   =     log_mu - log_var;
-    Float log_n   = 2 * log_mu - log_var_minus_mu;
+    Float tmp = log_var_minus_mu - log_mu;
+    Float log_p = -logspace_add<Float>( 0, tmp );
+    Float log_n = log_mu - tmp;
     Float n = exp(log_n);  // NB: exp(log_n) could over/underflow
     Float logres = n * log_p;
     if (x != 0) {
-      Float log_1mp = log_var_minus_mu - log_var;
+      Float log_1mp = -logspace_add<Float>( 0, -tmp );
       // WAS:
       //  logres += lgamma(x + n) - lgamma(n) - lgamma(x + 1.) + x * log_1mp;
       logres += -lbeta(n, x) - log(x) + x * log_1mp;

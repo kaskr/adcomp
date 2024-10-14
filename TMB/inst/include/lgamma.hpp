@@ -129,13 +129,13 @@ inline Type dnbinom_robust(const Type &x,
   } else {
     // Constant x case. Add all details to the tape to facilitate
     // better optimization of higher order derivs (faster).
-    Type log_var = logspace_add( log_mu, log_var_minus_mu );
-    Type log_p   =     log_mu - log_var;
-    Type log_n   = 2 * log_mu - log_var_minus_mu;
+    Type tmp = log_var_minus_mu - log_mu;
+    Type log_p = -logspace_add( Type(0), tmp );
+    Type log_n = log_mu - tmp;
     Type n = exp(log_n);  // NB: exp(log_n) could over/underflow
     Type logres = n * log_p;
     if (x != 0) { // OK to branch here because x is constant
-      Type log_1mp = log_var_minus_mu - log_var;
+      Type log_1mp = -logspace_add( Type(0), -tmp );
       logres += -lbeta(n, x) - log(x) + x * log_1mp;
     }
     ans = logres;
