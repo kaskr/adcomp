@@ -51,8 +51,6 @@ namespace robust_utils {
                               const Float &log_mu,
                               const Float &log_var_minus_mu,
                               int give_log = 0) {
-    // Float p = mu / var;
-    // Float n = mu * p / (1. - p);
     Float logit_p = log_mu - log_var_minus_mu;
     Float log_p = -logspace_add<Float>( 0, -logit_p );
     Float log_n = log_mu + logit_p;
@@ -60,8 +58,6 @@ namespace robust_utils {
     Float logres = n * log_p;
     if (x != 0) {
       Float log_1mp = log_p - logit_p; // log(1-p)
-      // WAS:
-      //  logres += lgamma(x + n) - lgamma(n) - lgamma(x + 1.) + x * log_1mp;
       logres += -lbeta(n, x) - log(x) + x * log_1mp;
     }
     return ( give_log ? logres : exp(logres) );
