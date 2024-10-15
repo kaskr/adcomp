@@ -70,6 +70,24 @@ inline Type lgamma_approx(const Type &y)
   return term1 + (term2 - Type(7.0));
 }
 
+template<class Type>
+Type logspace_add(Type logx, Type logy);
+template<class Type>
+inline Type dnbinom_logit(const Type &x,
+                          const Type &size,
+                          const Type &logit_p,
+                          int give_log=0)
+{
+  Type log_p = -logspace_add( Type(0), -logit_p );
+  Type ans = size * log_p;
+  // OK to branch on x != 0 when x is constant
+  if (CppAD::Variable(x) || x != 0) {
+    Type log_1mp = log_p - logit_p; // log(1-p)
+    ans += -lbeta(size, x) - log(x) + x * log_1mp;
+  }
+  return ( give_log ? ans : exp(ans) );
+}
+
 /** \brief Negative binomial probability function.
   \ingroup R_style_distribution
 
@@ -102,8 +120,6 @@ inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
 }
 VECTORIZE4_ttti(dnbinom2)
 
-template<class Type>
-Type logspace_add(Type logx, Type logy);
 /** \brief Negative binomial probability function.
 
     More robust parameterization through \f$log(\mu)\f$ and
@@ -117,30 +133,9 @@ inline Type dnbinom_robust(const Type &x,
                            const Type &log_var_minus_mu,
                            int give_log=0)
 {
-  Type ans;
-  if (CppAD::Variable(x)) {
-    // Non-constant x case (needed for OSA)
-    CppAD::vector<Type> tx(4);
-    tx[0] = x;
-    tx[1] = log_mu;
-    tx[2] = log_var_minus_mu;
-    tx[3] = 0;
-    ans = atomic::log_dnbinom_robust(tx)[0];
-  } else {
-    // Constant x case. Add all details to the tape to facilitate
-    // better optimization of higher order derivs (faster).
     Type logit_p = log_mu - log_var_minus_mu;
-    Type log_p = -logspace_add( Type(0), -logit_p );
-    Type log_n = log_mu + logit_p;
-    Type n = exp(log_n);  // NB: exp(log_n) could over/underflow
-    Type logres = n * log_p;
-    if (x != 0) { // OK to branch here because x is constant
-      Type log_1mp = log_p - logit_p; // log(1-p)
-      logres += -lbeta(n, x) - log(x) + x * log_1mp;
-    }
-    ans = logres;
-  }
-  return ( give_log ? ans : exp(ans) );
+    Type size = exp(log_mu + logit_p);
+    return dnbinom_logit(x, size, logit_p, give_log);
 }
 VECTORIZE4_ttti(dnbinom_robust)
 
