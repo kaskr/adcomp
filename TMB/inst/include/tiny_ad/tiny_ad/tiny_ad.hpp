@@ -241,7 +241,6 @@ namespace tiny_ad {
     /* See 'R-API: entry points to C-code' (Writing R-extensions) */
     double	Rf_lgammafn(double);
     double	Rf_psigamma(double, double);
-    double	Rf_lbeta(double, double);
   }
   template<int deriv>
   double lgamma(const double &x) {
@@ -258,12 +257,6 @@ namespace tiny_ad {
   template<class T, class V>
   ad<T, V> lgamma (const ad<T, V> &x){
     return lgamma<0>(x);
-  }
-  double lbeta(const double &x, const double &y) CSKIP( {return Rf_lbeta(x, y);} )
-  template<class T, class V>
-  ad<T, V> lbeta (const ad<T, V> &x, const ad<T, V> &y){
-    return ad<T, V> (lbeta(x.value, y.value),
-                     lgamma(x).deriv + lgamma(y).deriv - lgamma(x+y).deriv);
   }
 #endif
   /* Print method */
