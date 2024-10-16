@@ -97,11 +97,8 @@ template<class Type>
 inline Type dnbinom(const Type &x, const Type &size, const Type &prob,
 		    int give_log=0)
 {
-  Type n=size;
-  Type p=prob;
-  Type logres = lgamma(x+n)-lgamma(n)-lgamma(x+Type(1))+
-    n*log(p)+x*log(Type(1)-p);
-  if (give_log) return logres; else return exp(logres);
+  Type logit_p = log(prob) - log(1. - prob);
+  return dnbinom_logit(x, size, logit_p, give_log);
 }
 VECTORIZE4_ttti(dnbinom)
 
