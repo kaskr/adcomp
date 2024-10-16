@@ -17,6 +17,16 @@ Type lgamma(Type x){
 }
 VECTORIZE1_t(lgamma)
 
+/** \brief Logarithm of beta function (following R argument convention).
+    \ingroup special_functions
+*/
+template<class Type>
+Type lbeta(Type x, Type y){
+  Type arg[2] = {x, y};
+  return atomic::lbeta(arg);
+}
+VECTORIZE2_tt(lbeta)
+
 /** \brief Logarithm of factorial function (following R argument convention).
     \ingroup special_functions
 */
@@ -60,6 +70,24 @@ inline Type lgamma_approx(const Type &y)
   return term1 + (term2 - Type(7.0));
 }
 
+template<class Type>
+Type logspace_add(Type logx, Type logy);
+template<class Type>
+inline Type dnbinom_logit(const Type &x,
+                          const Type &size,
+                          const Type &logit_p,
+                          int give_log=0)
+{
+  Type log_p = -logspace_add( Type(0), -logit_p );
+  Type ans = size * log_p;
+  // OK to branch on x != 0 when x is constant
+  if (CppAD::Variable(x) || x != 0) {
+    Type log_1mp = log_p - logit_p; // log(1-p)
+    ans += -lbeta(size, x+1) - log(size+x) + x * log_1mp;
+  }
+  return ( give_log ? ans : exp(ans) );
+}
+
 /** \brief Negative binomial probability function.
   \ingroup R_style_distribution
 
@@ -69,28 +97,10 @@ template<class Type>
 inline Type dnbinom(const Type &x, const Type &size, const Type &prob,
 		    int give_log=0)
 {
-  Type n=size;
-  Type p=prob;
-  Type logres = lgamma(x+n)-lgamma(n)-lgamma(x+Type(1))+
-    n*log(p)+x*log(Type(1)-p);
-  if (give_log) return logres; else return exp(logres);
+  Type logit_p = log(prob) - log(1. - prob);
+  return dnbinom_logit(x, size, logit_p, give_log);
 }
 VECTORIZE4_ttti(dnbinom)
-
-/** \brief Negative binomial probability function.
-  \ingroup R_style_distribution
-
-    Alternative parameterization through mean and variance parameters.
-*/
-template<class Type>
-inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
-		    int give_log=0)
-{
-  Type p=mu/var;
-  Type n=mu*p/(Type(1)-p);
-  return dnbinom(x,n,p,give_log);
-}
-VECTORIZE4_ttti(dnbinom2)
 
 /** \brief Negative binomial probability function.
 
@@ -105,15 +115,26 @@ inline Type dnbinom_robust(const Type &x,
                            const Type &log_var_minus_mu,
                            int give_log=0)
 {
-  CppAD::vector<Type> tx(4);
-  tx[0] = x;
-  tx[1] = log_mu;
-  tx[2] = log_var_minus_mu;
-  tx[3] = 0;
-  Type ans = atomic::log_dnbinom_robust(tx)[0];
-  return ( give_log ? ans : exp(ans) );
+    Type logit_p = log_mu - log_var_minus_mu;
+    Type size = exp(log_mu + logit_p);
+    return dnbinom_logit(x, size, logit_p, give_log);
 }
 VECTORIZE4_ttti(dnbinom_robust)
+
+/** \brief Negative binomial probability function.
+  \ingroup R_style_distribution
+
+    Alternative parameterization through mean and variance parameters.
+*/
+template<class Type>
+inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
+		    int give_log=0)
+{
+  Type log_mu = log(mu);
+  Type log_var_minus_mu = log(var - mu);
+  return dnbinom_robust(x, log_mu, log_var_minus_mu, give_log);
+}
+VECTORIZE4_ttti(dnbinom2)
 
 /** \brief Poisson probability function. 
   \ingroup R_style_distribution
