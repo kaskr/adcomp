@@ -106,21 +106,6 @@ inline Type dnbinom(const Type &x, const Type &size, const Type &prob,
 VECTORIZE4_ttti(dnbinom)
 
 /** \brief Negative binomial probability function.
-  \ingroup R_style_distribution
-
-    Alternative parameterization through mean and variance parameters.
-*/
-template<class Type>
-inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
-		    int give_log=0)
-{
-  Type p=mu/var;
-  Type n=mu*p/(Type(1)-p);
-  return dnbinom(x,n,p,give_log);
-}
-VECTORIZE4_ttti(dnbinom2)
-
-/** \brief Negative binomial probability function.
 
     More robust parameterization through \f$log(\mu)\f$ and
     \f$log(\sigma^2-\mu)\f$ parameters.
@@ -138,6 +123,21 @@ inline Type dnbinom_robust(const Type &x,
     return dnbinom_logit(x, size, logit_p, give_log);
 }
 VECTORIZE4_ttti(dnbinom_robust)
+
+/** \brief Negative binomial probability function.
+  \ingroup R_style_distribution
+
+    Alternative parameterization through mean and variance parameters.
+*/
+template<class Type>
+inline Type dnbinom2(const Type &x, const Type &mu, const Type &var,
+		    int give_log=0)
+{
+  Type log_mu = log(mu);
+  Type log_var_minus_mu = log(var - mu);
+  return dnbinom_robust(x, log_mu, log_var_minus_mu, give_log);
+}
+VECTORIZE4_ttti(dnbinom2)
 
 /** \brief Poisson probability function. 
   \ingroup R_style_distribution
