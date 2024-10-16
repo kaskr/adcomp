@@ -54,6 +54,8 @@ namespace Rmath {
     double	Rf_psigamma(double, double);
     double	Rf_fmin2(double, double);
     double	Rf_lbeta(double, double);
+    double	Rf_logspace_add(double, double);
+    double	Rf_logspace_sub(double, double);
     /* Selected headers from <R_ext/Applic.h> */
     typedef void integr_fn(double *x, int n, void *ex);
     void Rdqags(integr_fn f, void *ex, double *a, double *b,
@@ -354,6 +356,44 @@ TMB_ATOMIC_STATIC_FUNCTION(
                            Type tmp = D_lgamma(c);
                            px[0] = (D_lgamma(a) - tmp) * py[0];
                            px[1] = (D_lgamma(b) - tmp) * py[0];
+                           )
+
+/** \brief Atomic version of `logspace_add`
+    \param x Input vector of length 2.
+    \return Vector of length 1.
+*/
+TMB_ATOMIC_STATIC_FUNCTION(
+                           // ATOMIC_NAME
+                           logspace_add
+                           ,
+                           // INPUT_DIM
+                           2
+                           ,
+                           // ATOMIC_DOUBLE
+                           ty[0]=Rmath::Rf_logspace_add(tx[0],tx[1]);
+                           ,
+                           // ATOMIC_REVERSE
+                           px[0] = exp(tx[0] - ty[0]) * py[0];
+                           px[1] = exp(tx[1] - ty[0]) * py[0];
+                           )
+
+/** \brief Atomic version of `logspace_sub`
+    \param x Input vector of length 2.
+    \return Vector of length 1.
+*/
+TMB_ATOMIC_STATIC_FUNCTION(
+                           // ATOMIC_NAME
+                           logspace_sub
+                           ,
+                           // INPUT_DIM
+                           2
+                           ,
+                           // ATOMIC_DOUBLE
+                           ty[0]=Rmath::Rf_logspace_sub(tx[0],tx[1]);
+                           ,
+                           // ATOMIC_REVERSE
+                           px[0] =  exp(tx[0] - ty[0]) * py[0];
+                           px[1] = -exp(tx[1] - ty[0]) * py[0];
                            )
 
 /** \brief Atomic version of poisson cdf \f$ppois(n,\lambda)\f$.
