@@ -83,7 +83,7 @@ inline Type dnbinom_logit(const Type &x,
   // OK to branch on x != 0 when x is constant
   if (CppAD::Variable(x) || x != 0) {
     Type log_1mp = log_p - logit_p; // log(1-p)
-    ans += -lbeta(size, x) - log(x) + x * log_1mp;
+    ans += -lbeta(size, x+1) - log(size+x) + x * log_1mp;
   }
   return ( give_log ? ans : exp(ans) );
 }
