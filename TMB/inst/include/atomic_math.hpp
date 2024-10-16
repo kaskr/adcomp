@@ -338,29 +338,23 @@ TMB_ATOMIC_STATIC_FUNCTION(
     \return Vector of length 1.
 */
 TMB_ATOMIC_STATIC_FUNCTION(
-			   // ATOMIC_NAME
-			   lbeta
-			   ,
-			   // INPUT_DIM
-			   2
-			   ,
-			   // ATOMIC_DOUBLE
-			   ty[0]=Rmath::Rf_lbeta(tx[0],tx[1]);
-			   ,
-			   // ATOMIC_REVERSE
-			   Type a[2];
-                           a[0] = tx[0];
-                           a[1] = Type(1.0);
-                           Type b[2];
-                           b[0] = tx[1];
-                           b[1] = Type(1.0);
-                           Type c[2];
-                           c[0] = tx[0] + tx[1];
-                           c[1] = Type(1.0);
+                           // ATOMIC_NAME
+                           lbeta
+                           ,
+                           // INPUT_DIM
+                           2
+                           ,
+                           // ATOMIC_DOUBLE
+                           ty[0]=Rmath::Rf_lbeta(tx[0],tx[1]);
+                           ,
+                           // ATOMIC_REVERSE
+                           Type a[2]; a[0] = tx[0]; a[1] = 1;
+                           Type b[2]; b[0] = tx[1]; b[1] = 1;
+                           Type c[2]; c[0] = tx[0] + tx[1]; c[1] = 1;
                            Type tmp = D_lgamma(c);
                            px[0] = (D_lgamma(a) - tmp) * py[0];
                            px[1] = (D_lgamma(b) - tmp) * py[0];
-			   )
+                           )
 
 /** \brief Atomic version of poisson cdf \f$ppois(n,\lambda)\f$.
     Valid parameter range: \f$x =(n,\lambda) \in \mathbb{N}_0\times\mathbb{R}_+\f$.
