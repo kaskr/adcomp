@@ -255,7 +255,7 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               cov.fixed=Vtheta,pdHess=pdHess,
               gradient.fixed=gradient.fixed)
   ## ======== Calculate bias corrected random effects estimates if requested
-  if(bias.correct){
+  if(bias.correct && !is.null(r)) {
       epsilon <- rep(0,length(phi))
       names(epsilon) <- names(phi)
       parameters <- obj$env$parameters
@@ -329,6 +329,11 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
               }
           }
       }
+  }
+  ## ======== bias correct but no random effects => nothing to do
+  if(bias.correct && is.null(r)) {
+      ans$unbiased <- list(value=ans$value, sd=ans$sd, cov=ans$cov)
+      warning("'bias.correct' does nothing without random effects")
   }
   ## ======== Find marginal variances of all random effects i.e. phi(u,theta)=u
   if(!is.null(r)){
