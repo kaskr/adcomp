@@ -21,10 +21,12 @@ namespace TMBad {
 */
 template <class Matrix>
 global::ad_segment contiguousBlock(const Matrix &x) {
+  global *cur_glob = get_glob();
+
   bool yes = true;
   Index j_previous = -1;
   for (size_t i = 0; i < (size_t)x.size(); i++) {
-    if (!x(i).on_some_tape()) {
+    if (!(x(i).on_some_tape() && x(i).glob() == cur_glob)) {
       yes = false;
       break;
     }
