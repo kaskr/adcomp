@@ -206,7 +206,9 @@ struct MatMul : global::Operator<2 + UP, -1> {
   /** \brief It is **not* safe to remap the inputs of this operator */
   static const bool allow_remap = false;
   /** \brief This operator may update existing variables on the tape */
-  static const bool updating = true;
+  static const bool forward_updating = UP;
+  /** \brief This operator always becomes updating in reverse mode */
+  static const bool reverse_updating = true;
 
   void forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
   void reverse(ReverseArgs<Writer> &args) { TMBAD_ASSERT(false); }
