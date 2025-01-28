@@ -264,6 +264,7 @@ private:
   Type *d;
   Type *e;
 
+  bool constant_knots;
   /* Not used */
   //int errno, EDOM;
 
@@ -299,6 +300,7 @@ private:
       d[i] = fun.d[i];
       e[i] = fun.e[i];
     }
+    constant_knots = fun.constant_knots;
   }
 
 public:
@@ -329,16 +331,21 @@ public:
       3. Splines with end-conditions determined by fitting
          cubics in the start and end intervals (Forsythe et al).
    */
-  splinefun(const vector<Type> &x_,
-            const vector<Type> &y_,
+  splinefun(vector<Type> x_,
+            vector<Type> y_,
             int method_ = 3) {
     method[0] = method_;
     n[0] = x_.size();
     alloc( x_.size() );
+    // sort x_
+    vector<Type> ord = atomic::order(x_);
+    x_ = atomic::subset(x_, ord);
+    y_ = atomic::subset(y_, ord);
     for(int i=0; i < *n; i++) {
       x[i] = x_[i];
       y[i] = y_[i];
     }
+    constant_knots = !any_variable(x, *n);
     spline_coef(method, n, x, y, b, c, d, e);
   }
 
@@ -354,10 +361,13 @@ public:
     return v[0];
   }
   /** \brief Evaluate spline - vector argument case */
-  vector<Type> operator() (const vector<Type> &x) {
-    vector<Type> y(x.size());
-    for (int i=0; i<x.size(); i++) y[i] = (*this)(x[i]);
-    return y;
+  vector<Type> operator() (const vector<Type> &x_) {
+    vector<Type> u(x_); // input
+    vector<Type> v(x_.size()); // output
+    int nu[1]; *nu = x_.size();
+    spline_eval(method, nu, u.data(), v.data(),
+		n, x, y, b, c, d);
+    return v;
   }
 
   /* ------------------------------------------------------------------ 
@@ -673,6 +683,17 @@ public:
       fmm_spline(*n, x, y, b, c, d);	break;
     }
   }
+
+  bool any_variable(Type* x, int n) {
+    bool ans = false;
+    for (int i=0; i<n; i++) ans = ans || CppAD::Variable(x[i]);
+    return ans;
+  }
+  typedef Eigen::Map<Eigen::Array<Type, -1, 1> > VMap;
+  vector<Type> taped_subset(Type* x, vector<Type> i) {
+    vector<Type> x_(VMap(x, *n));
+    return atomic::subset(x_, i);
+  }
   
   void spline_eval(int *method, int *nu, Type *u, Type *v,
 		   int *n, Type *x, Type *y, Type *b, Type *c, Type *d)
@@ -687,18 +708,35 @@ public:
     if(*method == 1 && *n > 1) { /* periodic */
       dx = x[n_1] - x[0];
       for(l = 0; l < *nu; l++) {
-
-	/* WARNING - "fmod(AD<double>,AD<double>)" is not defined */
-	v[l] = fmod(asDouble(u[l]-x[0]), asDouble(dx));
-	if(v[l] < 0.0) v[l] += dx;
-	v[l] += x[0];
+        v[l] = atomic::fmod(u[l]-x[0], dx);
+        v[l] += CppAD::CondExpLt(v[l], Type(0), dx, Type(0));
+        v[l] += x[0];
       }
     }
     else {
       for(l = 0; l < *nu; l++)
 	v[l] = u[l];
     }
-    
+
+    if (any_variable(v, *nu) || !constant_knots) {
+      // Taped spline eval
+      vector<Type> v_(VMap(v, *nu));
+      vector<Type> x_(VMap(x, *n));
+      vector<Type> i_ = atomic::findInterval(v_, x_);
+      vector<Type> xi_ = taped_subset(x, i_);
+      vector<Type> yi_ = taped_subset(y, i_);
+      vector<Type> bi_ = taped_subset(b, i_);
+      vector<Type> ci_ = taped_subset(c, i_);
+      vector<Type> di_ = taped_subset(d, i_);
+      vector<Type> dxi_ = v_ - xi_;
+      if (*method == 2) {
+        for (l = 0; l<di_.size(); l++) {
+          di_[l] = CppAD::CondExpLt(v[l], x[0], Type(0), di_[l]);
+        }
+      }
+      VMap(v, *nu) = yi_ + dxi_ * (bi_ + dxi_ * (ci_ + dxi_ * di_));
+      return;
+    }
     i = 0;
     for(l = 0; l < *nu; l++) {
       ul = v[l];
