@@ -2,6 +2,201 @@
     \brief R's spline function wrapped into template class that can be used with TMB.
 */
 
+// Atomic functions required by splines
+namespace atomic {
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+                           // ATOMIC_NAME
+                           findInt
+                           ,
+                           // OUTPUT_DIM
+                           tx.size() - CppAD::Integer(tx[0]) - 1
+                           ,
+                           // ATOMIC_DOUBLE
+                           int nx = (int) tx[0];
+                           int nu = tx.size() - nx - 1;
+                           int n_1 = nx - 1;
+                           const double* x = &tx[1];
+                           const double* v = x + nx;
+                           int i = 0;
+                           for(int l = 0; l < nu; l++) {
+                             double ul = v[l];
+                             if(ul < x[i] || (i < n_1 && x[i+1] < ul)) {
+                               /* reset i  such that  x[i] <= ul <= x[i+1] : */
+                               i = 0;
+                               int j = nx;
+                               do {
+                                 int k = (i+j)/2;
+                                 if(ul < x[k]) j = k;
+                                 else i = k;
+                               }
+                               while(j > i+1);
+                             }
+                             ty[l] = i;
+                           }
+                           ,
+                           // ATOMIC_REVERSE
+                           for (size_t i=0; i<px.size(); i++) px[i] = 0;
+                           )
+
+template<class Type>
+vector<Type> findInterval(vector<Type> xt, vector<Type> x) {
+  CppAD::vector<Type> arg(1 + x.size() + xt.size());
+  arg[0] = x.size();
+  for(int i=0; i<x.size(); i++) { arg[1+i] = x(i); }
+  for(int i=0; i<xt.size(); i++){ arg[1+x.size()+i] = xt(i);}
+  return findInt(arg);
+}
+
+void order_work(const CppAD::vector<double> &tx,
+                CppAD::vector<double> &ty) CSKIP({
+  size_t n = tx.size();
+  std::vector<std::pair<double, size_t> > y(n);
+  for (size_t i=0; i<n; i++) {
+    y[i].first = tx[i];
+    y[i].second = i;
+  }
+  std::sort(y.begin(), y.end());
+  for (size_t i=0; i<n; i++) {
+    ty[i] = y[i].second;
+  }
+})
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+                           // ATOMIC_NAME
+                           order
+                           ,
+                           // OUTPUT_DIM
+                           tx.size()
+                           ,
+                           // ATOMIC_DOUBLE
+                           order_work(tx, ty);
+                           ,
+                           // ATOMIC_REVERSE
+                           for (size_t i=0; i<px.size(); i++) px[i] = 0;
+                           )
+
+template<class Type>
+vector<Type> order(vector<Type> x) {
+  CppAD::vector<Type> arg(x.size());
+  for(int i=0; i<x.size(); i++) { arg[i] = x(i); }
+  return order(arg);
+}
+
+// subset(x, i) := x[i]  (linear sparse operator y = A * x)
+// Y = subset(X, i) *OR* Y += X[i]
+template <bool adjoint=false>
+CppAD::vector<double> subset_work(const CppAD::vector<double> &X) {
+  int ni = (int) X[0];
+  int nx = (int) X[1];
+  int ny = (adjoint ? nx : ni);
+  CppAD::vector<double> Y(ny);
+  const double* v = &X[2];
+  const double* x = v + ni;
+  if (!adjoint) {
+    for (int i=0; i<ni; i++) {
+      int i_ = (int) v[i];
+      bool ok = (i_ >= 0) && (i_ < nx);
+      if (ok)
+        Y[i] = x[i_];
+      else
+        Y[i] = NA_REAL;
+    }
+  } else {
+    for (int i=0; i<nx; i++)
+      Y[i] = 0;
+    for (int i=0; i<ni; i++) {
+      int i_ = (int) v[i];
+      bool ok = (i_ >= 0) && (i_ < nx);
+      if (ok) Y[i_] += x[i];
+    }
+  }
+  return Y;
+}
+
+// subset:     c(length(i), length(x), i, x)   -> length(i)
+// subset_adj: c(length(i), length(x), i, py)  -> length(x)
+template<class Type>
+CppAD::vector<Type> arg_adj(const CppAD::vector<Type> &X, const CppAD::vector<Type> &Y) {
+  int ni = CppAD::Integer(X[0]);
+  int nkeep = 2 + ni;
+  int ny = Y.size();
+  CppAD::vector<Type> ans(nkeep + ny);
+  for (int i=0; i<nkeep; i++) ans[i] = X[i];
+  for (int i=0; i<ny; i++) ans[nkeep + i] = Y[i];
+  return ans;
+}
+
+template<class Type>
+void tail_set(CppAD::vector<Type> &x, const CppAD::vector<Type> &y) {
+  size_t offset = x.size() - y.size();
+  for (size_t i=0; i<offset; i++) {
+    x[i] = 0;
+  }
+  for (size_t i=0; i<y.size(); i++) {
+    x[offset + i] = y[i];
+  }
+}
+
+TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(subset)     // So can be used by subset_adj
+TMB_ATOMIC_VECTOR_FUNCTION_DECLARE(subset_adj) // So can be used by subset
+TMB_ATOMIC_VECTOR_FUNCTION_DEFINE( subset,     CppAD::Integer(tx[0]), ty = subset_work<0>(tx), tail_set(px, subset_adj(arg_adj(tx, py))))
+TMB_ATOMIC_VECTOR_FUNCTION_DEFINE( subset_adj, CppAD::Integer(tx[1]), ty = subset_work<1>(tx), tail_set(px, subset    (arg_adj(tx, py))))
+
+template<class Type>
+vector<Type> subset(vector<Type> x, vector<Type> i) {
+  bool i_constant = true;
+  for (int k = 0; k < i.size(); k++)
+    i_constant = i_constant && !CppAD::Variable(i[k]);
+  if (i_constant) {
+    vector<Type> ans(i.size());
+    for (int k = 0; k < i.size(); k++) {
+      int i_ = (int) asDouble(i[k]);
+      bool ok = (i_ >= 0) && (i_ < x.size());
+      if (ok)
+        ans[k] = x[i_];
+      else
+        ans[k] = NA_REAL;
+    }
+    return ans;
+  }
+  CppAD::vector<Type> arg(2 + x.size() + i.size());
+  arg[0] = i.size();
+  arg[1] = x.size();
+  for(int k=0; k<i.size(); k++) { arg[2+k] = i(k); }
+  for(int k=0; k<x.size(); k++) { arg[2+i.size()+k] = x(k); }
+  return subset(arg);
+}
+
+template<class Type>
+vector<Type> sort(vector<Type> x) {
+  return subset(x, order(x));
+}
+
+TMB_ATOMIC_STATIC_FUNCTION(
+                           // ATOMIC_NAME
+                           fmod
+                           ,
+                           // INPUT_DIM
+                           2
+                           ,
+                           // ATOMIC_DOUBLE
+                           ty[0] = std::fmod(tx[0], tx[1]);
+                           ,
+                           // ATOMIC_REVERSE
+                           px[0] = py[0];
+                           px[1] = ( (ty[0] - tx[0]) / tx[1] ) * py[0];
+                           )
+
+template<class Type>
+Type fmod(Type x, Type y) {
+  CppAD::vector<Type> arg(2);
+  arg[0] = x; arg[1] = y;
+  return fmod(arg)[0];
+}
+
+}
+
 namespace tmbutils {
 
 // Copyright (C) 2013-2015 Kasper Kristensen
