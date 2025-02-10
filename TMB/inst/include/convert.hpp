@@ -115,20 +115,6 @@ vector<Type> asVector(SEXP x)
    return y;
 }
 
-template <>
-vector<int> inline asVector(SEXP x)
-{
-   if(!Rf_isReal(x)) Rf_error("NOT A VECTOR!");
-   R_xlen_t n = XLENGTH(x);
-   SEXP xi = PROTECT(Rf_coerceVector(x,INTSXP));
-   typedef Eigen::Map<Eigen::Matrix<int,Eigen::Dynamic,1> > MapVector;
-   MapVector tmp(INTEGER(xi), n);
-   vector<int> y = tmp;
-   UNPROTECT(1);
-   return y;
-}
-
-
 /** \brief Vector <-> Matrix conversion (for row-major matrices) */
 template<class Type>
 matrix<Type> asMatrix(const vector<Type> &x, int nr, int nc)
@@ -153,24 +139,6 @@ matrix<Type> asMatrix(SEXP x)
        y(i, j) = Type(p[i + nr * j]);
    return y;
 }
-
-template <>
-matrix<int> inline asMatrix(SEXP x)
-{
-   if (!Rf_isMatrix(x))
-     Rf_error("x must be a matrix in 'asMatrix(x)'");
-   R_xlen_t nr = Rf_nrows(x); // nrows is int
-   R_xlen_t nc = Rf_ncols(x); // ncols is int
-   matrix<int> y(nr, nc);
-   SEXP xi = PROTECT(Rf_coerceVector(x,INTSXP));
-   int *p = INTEGER(xi);
-   for(R_xlen_t j=0; j<nc; j++)
-     for(R_xlen_t i=0; i<nr; i++)
-       y(i, j) = p[i + nr * j];
-   UNPROTECT(1);
-   return y;
-}
-
 
 template<class Type>
 SEXP asSEXP(const tmbutils::array<Type> &a)
