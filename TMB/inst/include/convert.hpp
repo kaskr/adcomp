@@ -191,3 +191,39 @@ SEXP asSEXP(Eigen::SparseMatrix<Type> x){
   UNPROTECT(8);
   return ans;
 }
+
+/** \brief Helper class to handle NA integers passed from R */
+struct Rint {
+  int i;
+  inline Rint () { }
+  inline Rint (double x) : i(IntegerFromReal(x)) { }
+  inline operator int() const { return i; }
+  // From src/main/coerce.c
+  inline int IntegerFromReal(double x) {
+    using std::isnan;
+    if (ISNAN(x))
+      return NA_INTEGER;
+    else if (x >= INT_MAX+1. || x <= INT_MIN ) {
+      return NA_INTEGER;
+    }
+    return (int) x;
+  }
+};
+
+template<>
+inline vector<int> asVector(SEXP x) {
+  return asVector<Rint>(x).cast<int>();
+}
+
+template<>
+inline matrix<int> asMatrix(SEXP x) {
+  return asMatrix<Rint>(x).cast<int>();
+}
+
+namespace tmbutils {
+template<>
+inline array<int> asArray(SEXP x) {
+  array<Rint> tmp = asArray<Rint>(x);
+  return array<int>(tmp.vectorcopy.cast<int>(), tmp.dim);
+}
+}
