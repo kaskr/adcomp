@@ -2642,17 +2642,18 @@ extern "C"
 extern "C"
 {
   void tmb_forward(SEXP f, const Eigen::VectorXd &x, Eigen::VectorXd &y) {
+    Eigen::Map<Eigen::VectorXd> y_map(y.data(), y.size());
 #ifdef CPPAD_FRAMEWORK
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
       pf = (ADFun<double>*) R_ExternalPtrAddr(f);
-      y = pf->Forward(0, x);
+      y_map = pf->Forward(0, x);
     } else
       if(tag == Rf_install("parallelADFun")) {
         parallelADFun<double>* pf;
         pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
-        y = pf->Forward(0, x);
+        y_map = pf->Forward(0, x);
       } else
         Rf_error("Unknown function pointer");
 #endif
@@ -2662,28 +2663,29 @@ extern "C"
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-      y = pf->forward(x);
+      y_map = pf->forward(x);
     } else
       if(tag == Rf_install("parallelADFun")) {
         parallelADFun<double>* pf;
         pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
-        y = pf->forward(x);
+        y_map = pf->forward(x);
       } else
         Rf_error("Unknown function pointer");
 #endif
   }
   void tmb_reverse(SEXP f, const Eigen::VectorXd &v, Eigen::VectorXd &y) {
+    Eigen::Map<Eigen::VectorXd> y_map(y.data(), y.size());
 #ifdef CPPAD_FRAMEWORK
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       ADFun<double>* pf;
       pf = (ADFun<double>*) R_ExternalPtrAddr(f);
-      y = pf->Reverse(1, v);
+      y_map = pf->Reverse(1, v);
     } else
       if(tag == Rf_install("parallelADFun")) {
         parallelADFun<double>* pf;
         pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
-        y = pf->Reverse(1, v);
+        y_map = pf->Reverse(1, v);
       } else
         Rf_error("Unknown function pointer");
 #endif
@@ -2693,12 +2695,12 @@ extern "C"
     SEXP tag=R_ExternalPtrTag(f);
     if(tag == Rf_install("ADFun")) {
       adfun* pf = (adfun*) R_ExternalPtrAddr(f);
-      y = pf->reverse(v);
+      y_map = pf->reverse(v);
     } else
       if(tag == Rf_install("parallelADFun")) {
         parallelADFun<double>* pf;
         pf = (parallelADFun<double>*) R_ExternalPtrAddr(f);
-        y = pf->reverse(v);
+        y_map = pf->reverse(v);
       } else
         Rf_error("Unknown function pointer");
 #endif
