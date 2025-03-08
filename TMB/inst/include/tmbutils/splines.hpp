@@ -247,8 +247,7 @@ namespace tmbutils {
 
      R's spline function wrapped into template class that can be used with TMB.
 
-     \warning Spline evaluation involves branching on the x-values and
-     may thus be problematic for parameter dependent inputs.
+     \note Spline evaluation involves parameter dependent branching on the x-values when these are not constant. The present implementation accounts for this, but for efficiency it's important to use vectorized evaluation.
 */
 template <class Type>
 class splinefun
@@ -349,7 +348,9 @@ public:
     spline_coef(method, n, x, y, b, c, d, e);
   }
 
-  /** \brief Evaluate spline - scalar argument case */
+  /** \brief Evaluate spline - scalar argument case
+      \note If `x` (or knots) are *variables* use vectorized evaluaton for autodiff efficiency
+  */
   Type operator()(const Type &x_) {
     Type u[1];
     Type v[1];
@@ -360,7 +361,9 @@ public:
 		n, x, y, b, c, d);
     return v[0];
   }
-  /** \brief Evaluate spline - vector argument case */
+  /** \brief Evaluate spline - vector argument case
+      \note If `x` (or knots) are *variables* use vectorized evaluaton for autodiff efficiency
+  */
   vector<Type> operator() (const vector<Type> &x_) {
     vector<Type> u(x_); // input
     vector<Type> v(x_.size()); // output
