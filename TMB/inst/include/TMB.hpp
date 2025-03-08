@@ -181,6 +181,12 @@ struct numeric_limits<TMBad::ad_aug> : numeric_limits<TMBad::Scalar> { };
    CppAD when compiling with '-std=c++11'. */
 #include <R.h>
 #include <Rinternals.h>
+/* See WRE manual */
+#include <Rversion.h>
+#if R_VERSION < R_Version(4, 5, 0)
+#define R_ParentEnv(x) ENCLOS(x)
+#endif
+
 #include "toggle_thread_safe_R.hpp"
 void eigen_REprintf(const char* x)CSKIP({REprintf("%s",x);})
 

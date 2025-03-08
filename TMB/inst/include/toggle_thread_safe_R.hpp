@@ -143,11 +143,11 @@ inline SEXP Ts_findVar(SEXP x, SEXP y) {
   return ans;
 }
 
-inline SEXP Ts_ENCLOS(SEXP x) {
+inline SEXP Ts_ParentEnv(SEXP x) {
   SEXP ans;
 #pragma omp critical
   {
-    ans = ENCLOS(x);
+    ans = R_ParentEnv(x);
   }
   return ans;
 }
@@ -174,7 +174,8 @@ inline void Ts_warning(const char *x, ...) {
 #define XLENGTH        Ts_XLENGTH
 #define Rf_install     Ts_install
 #define Rf_findVar     Ts_findVar
-#define ENCLOS         Ts_ENCLOS
+#undef  R_ParentEnv
+#define R_ParentEnv    Ts_ParentEnv
 #define Rf_warning     Ts_warning
 
 #else
@@ -195,7 +196,7 @@ inline void Ts_warning(const char *x, ...) {
 #undef XLENGTH
 #undef Rf_install
 #undef Rf_findVar
-#undef ENCLOS
+#undef R_ParentEnv
 #undef Rf_warning
 
 #endif // TMB_HAVE_THREAD_SAFE_R

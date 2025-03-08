@@ -769,7 +769,7 @@ public:
 
   /** \brief Syncronize user's data object. It could be changed between calls to e.g. EvalDoubleFunObject */
   void sync_data() {
-    SEXP env = ENCLOS(this->report);
+    SEXP env = R_ParentEnv(this->report);
     this->data = Rf_findVar(Rf_install("data"), env);
   }
 
