@@ -256,6 +256,7 @@ Type name(asVector<Type>(getListElement(TMB_OBJECTIVE_PTR -> data,      \
 #name,&isNumericScalar))[0]);
 
 /** \brief Get data scalar from R and declare it as int
+    \note `NA` integers are not supported
     \ingroup macros */
 #define DATA_INTEGER(name) int name(CppAD::Integer(asVector<Type>(      \
 getListElement(TMB_OBJECTIVE_PTR -> data,                               \
@@ -283,6 +284,7 @@ getListElement(TMB_OBJECTIVE_PTR -> data, #name, &Rf_isReal   )));
 
 /** \brief Get data vector of type "integer" from R and declare it
     vector<int>. (DATA_INTEGER() is for a scalar integer)
+    \note `NA` integers are not supported
     \ingroup macros */
 #define DATA_IVECTOR(name) vector<int> name(asVector<int>(              \
 getListElement(TMB_OBJECTIVE_PTR -> data, #name, &Rf_isReal   )));
@@ -367,12 +369,14 @@ tmbutils::asArray<Type>(TMB_OBJECTIVE_PTR -> getShape(                  \
 #name, &Rf_isArray)), #name));
 
 /** \brief Get data matrix from R and declare it as matrix<int>
+    \note `NA` integers are not supported
     \ingroup macros */
 #define DATA_IMATRIX(name)                                              \
 matrix<int> name(asMatrix<int>(                                         \
 getListElement(TMB_OBJECTIVE_PTR -> data,#name, &Rf_isMatrix)));
 
 /** \brief Get data array from R and declare it as array<int>
+    \note `NA` integers are not supported
     \ingroup macros */
 #define DATA_IARRAY(name)                                               \
 tmbutils::array<int> name(tmbutils::asArray<int>(                       \
