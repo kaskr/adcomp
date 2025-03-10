@@ -1,4 +1,19 @@
 ------------------------------------------------------------------------
+TMB 1.9.17 (2025-03-08)
+------------------------------------------------------------------------
+
+o splinefun fixes:
+  Now handles parameter dependent x values and knots correctly.
+
+o New atomic functions: findInterval, subset, order, sort, fmod.
+
+o Replace non-API 'ENCLOS' by 'R_ParentEnv' (GH #405).
+
+o Fix CRAN ASAN issues reported for the 'tmbstan' package.
+
+o NA integer handling has been postponed as it broke parallelization.
+
+------------------------------------------------------------------------
 TMB 1.9.16 (2025-01-08)
 ------------------------------------------------------------------------
 
