@@ -1143,7 +1143,7 @@ struct LogDetOperator : TMBad::global::DynamicOperator< -1, -1> {
     size_t n = input_size();
     // Get out if factorization went wrong
     if (llt->info() != 0) {
-      for (size_t i=0; i<n; i++) args.dx(i) = R_NaN;
+      for (size_t i=0; i<n; i++) args.dx(i) += R_NaN;
       return;
     }
     std::vector<Scalar> x = args.x_segment(0, n);
