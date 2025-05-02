@@ -60,8 +60,40 @@ updateCholesky <- function(L, H, t=0){
   .Call("tmb_destructive_CHM_update", L, H, t, PACKAGE="TMB")
 }
 
-solveCholesky <- function(L, x){
-  .Call("tmb_CHMfactor_solve", L, x, PACKAGE="TMB")
+## Solve H x = y using super nodal sparse Cholesky factor
+## Optionally refine solution iteratively (if H is not the exact Hessian)
+solveCholesky <- function(L, y, iterative.refinement=FALSE) {
+    x <- .Call("tmb_CHMfactor_solve", L, y, PACKAGE="TMB")
+    if (iterative.refinement &&
+        !is.null(iterative.refine <- attr(L, "iterative_refinement"))) {
+        x <- iterative.refine(L=L, x=x, y=y)
+    }
+    x
+}
+
+## Construct funtion to do iterative refinement
+iterativeRefine <- function(obj, maxit=50, abstol=1e-12, trace=!obj$env$silent) {
+    Hmult <- function(x) {
+        r <- rep(0, length(obj$env$par))
+        r[obj$env$random] <- x
+        obj$env$f(obj$env$last.par,
+                  order=1,
+                  type="ADGrad",
+                  rangeweight=r)[obj$env$random]
+    }
+    function(L, x, y) {
+        for (i in seq_len(maxit)) {
+            Hx <- as.numeric(Hmult(x)) ## H %*% x
+            error <- y - Hx
+            if (trace) print (max(abs(error)))
+            mgc <- max(abs(error))
+            if (mgc < abstol) break
+            x <- x + .Call("tmb_CHMfactor_solve", L, error, PACKAGE="TMB")
+        }
+        if (trace && i==maxit)
+            warning("Failed convergence with mgc=", mgc)
+        x
+    }
 }
 
 ## Test for invalid external pointer
@@ -396,6 +428,7 @@ MakeADFun <- function(data, parameters, map=list(),
   tracepar <- FALSE
   validpar <- function(x)TRUE
   tracemgc <- TRUE
+  iterative.refinement <- FALSE
 
   ## dummy assignments better than  "globalVariables(....)"
   L.created.by.newton <- skipFixedEffects <- spHess <- altHess <- NULL
@@ -863,6 +896,9 @@ MakeADFun <- function(data, parameters, map=list(),
       }
     }
     if(order==1){
+      if (iterative.refinement && is.null(attr(L, "iterative_refinement"))) {
+        attr(L, "iterative_refinement") <- iterativeRefine(list(env=env))
+      }
       #hess <- f(par,order=2,cols=random)
       #hess <- spHess(par)##[,random,drop=FALSE]
       grad <- h(par,order=1,hessian=hessian,L=L)
@@ -893,11 +929,11 @@ MakeADFun <- function(data, parameters, map=list(),
       if(!skipFixedEffects){
         ## Relies on "hess[-random,random]" !!!!!
         res <- grad[-random] -
-          hess[-random,random] %*% as.vector(solveCholesky(L,grad[random]))
+          hess[-random,random] %*% as.vector(solveCholesky(L,grad[random],iterative.refinement))
       } else {
         ## Smarter: Do a reverse sweep of ptrADGrad
         w <- rep(0,length(par))
-        w[random] <- as.vector(solveCholesky(L,grad[random]))
+        w[random] <- as.vector(solveCholesky(L,grad[random],iterative.refinement))
         res <- grad[-random] -
           f(par, order=1, type="ADGrad", rangeweight=w)[-random]
       }
