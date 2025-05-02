@@ -1530,7 +1530,8 @@ void global::append_edges::end_iteration() {
   for (size_t j = 0; j < n; j++) op_marks[edges[pos + j].first] = false;
 }
 
-graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
+graph global::build_graph(bool transpose, const std::vector<bool> &keep_var,
+                          bool deriv) {
   TMBAD_ASSERT(keep_var.size() == values.size());
 
   std::vector<Index> var2op = this->var2op();
@@ -1543,12 +1544,16 @@ graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
   size_t i = 0;
   append_edges F(i, opstack.size(), keep_var, var2op, edges);
   for (; i < opstack.size(); i++) {
-    any_updating |= opstack[i]->info().test(op_info::forward_updating);
-    dep.clear();
-    opstack[i]->dependencies(args, dep);
-    F.start_iteration();
-    dep.apply(F);
-    F.end_iteration();
+    op_info ifo = opstack[i]->info();
+    bool skip_node = deriv && ifo.test(op_info::is_zero_deriv);
+    any_updating |= ifo.test(op_info::forward_updating);
+    if (!skip_node) {
+      dep.clear();
+      opstack[i]->dependencies(args, dep);
+      F.start_iteration();
+      dep.apply(F);
+      F.end_iteration();
+    }
     opstack[i]->increment(args.ptr);
   }
   if (any_updating) {
@@ -1581,20 +1586,20 @@ graph global::build_graph(bool transpose, const std::vector<bool> &keep_var) {
   return G;
 }
 
-graph global::forward_graph(std::vector<bool> keep_var) {
+graph global::forward_graph(std::vector<bool> keep_var, bool deriv) {
   if (keep_var.size() == 0) {
     keep_var.resize(values.size(), true);
   }
   TMBAD_ASSERT(values.size() == keep_var.size());
-  return build_graph(false, keep_var);
+  return build_graph(false, keep_var, deriv);
 }
 
-graph global::reverse_graph(std::vector<bool> keep_var) {
+graph global::reverse_graph(std::vector<bool> keep_var, bool deriv) {
   if (keep_var.size() == 0) {
     keep_var.resize(values.size(), true);
   }
   TMBAD_ASSERT(values.size() == keep_var.size());
-  return build_graph(true, keep_var);
+  return build_graph(true, keep_var, deriv);
 }
 
 bool global::identical(const global &other) const {
@@ -2568,6 +2573,30 @@ ad_aug lt0(const ad_aug &x) {
   else
     return lt0(ad_plain(x));
 }
+
+Writer zeroDeriv(const Writer &x) {
+  return "zeroDeriv"
+         "(" +
+         x + ")";
+}
+const char *ZderivOp::op_name() { return "ZderivOp"; }
+ad_plain zeroDeriv(const ad_plain &x) {
+  return get_glob()->add_to_stack<ZderivOp>(x);
+}
+ad_aug zeroDeriv(const ad_aug &x) {
+  if (x.constant())
+    return Scalar(zeroDeriv(x.Value()));
+  else
+    return zeroDeriv(ad_plain(x));
+}
+
+const char *SderivOp::op_name() { return "SderivOp"; }
+
+ad_plain sparseDeriv(const ad_plain &x) {
+  return get_glob()->add_to_stack<SderivOp>(x);
+}
+
+double sparseDeriv(const double &x) { return x; }
 
 Writer fabs(const Writer &x) {
   return "fabs"

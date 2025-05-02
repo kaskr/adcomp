@@ -753,6 +753,8 @@ struct op_info {
     is_linear,
     /** \copydoc global::Operator::is_constant */
     is_constant,
+    /** \copydoc global::Operator::is_zero_deriv */
+    is_zero_deriv,
     /** \copydoc global::Operator::independent_variable */
     independent_variable,
     /** \copydoc global::Operator::dependent_variable */
@@ -776,6 +778,7 @@ struct op_info {
         (op.smart_pointer * (1 << smart_pointer)) |
         (op.is_linear * (1 << is_linear)) |
         (op.is_constant * (1 << is_constant)) |
+        (op.is_zero_deriv * (1 << is_zero_deriv)) |
         (op.independent_variable * (1 << independent_variable)) |
         (op.dependent_variable * (1 << dependent_variable)) |
         (op.allow_remap * (1 << allow_remap)) |
@@ -1354,17 +1357,21 @@ struct global {
       - A connection from Op1 to Op2 is present <==> there exists a *variable*
      which is input to Op2 and output from Op1 \param transpose Flag to reverse
      all edges. \param keep_var Boolean mask of *variables* to be considered as
-     potential edges.
+     potential edges. \param deriv Is the graph to be used for derivative
+     calculations only?
   */
-  graph build_graph(bool transpose, const std::vector<bool> &keep_var);
+  graph build_graph(bool transpose, const std::vector<bool> &keep_var,
+                    bool deriv = false);
   /** \brief Construct operator graph with forward connections
       \details See `build_graph()`
   */
-  graph forward_graph(std::vector<bool> keep_var = std::vector<bool>(0));
+  graph forward_graph(std::vector<bool> keep_var = std::vector<bool>(0),
+                      bool deriv = false);
   /** \brief Construct operator graph with reverse connections
       \details See `build_graph()`
   */
-  graph reverse_graph(std::vector<bool> keep_var = std::vector<bool>(0));
+  graph reverse_graph(std::vector<bool> keep_var = std::vector<bool>(0),
+                      bool deriv = false);
 
   /** \brief Test if two tapes are identical
       \details We say that two tapes are identical if the same input
@@ -1554,6 +1561,8 @@ struct global {
     static const bool is_linear = false;
     /** \brief Is this a constant operator ? */
     static const bool is_constant = false;
+    /** \brief Is this a zero-derivative operator (piecewise constant) ? */
+    static const bool is_zero_deriv = false;
     /** \brief Is this operator a 'smart pointer' (with reference counting) ? */
     static const bool smart_pointer = false;
     /** \brief Protect this operator from elimination by the tape optimizer ? */
@@ -3225,6 +3234,7 @@ using std::floor;
 Writer floor(const Writer &x);
 struct FloorOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return floor(x);
@@ -3238,6 +3248,7 @@ ad_aug floor(const ad_aug &x);
 Writer ceil(const Writer &x);
 struct CeilOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return ceil(x);
@@ -3251,6 +3262,7 @@ ad_aug ceil(const ad_aug &x);
 Writer trunc(const Writer &x);
 struct TruncOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return trunc(x);
@@ -3264,6 +3276,7 @@ ad_aug trunc(const ad_aug &x);
 Writer round(const Writer &x);
 struct RoundOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return round(x);
@@ -3279,6 +3292,7 @@ double sign(const double &x);
 Writer sign(const Writer &x);
 struct SignOp : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return sign(x);
@@ -3295,6 +3309,7 @@ double lt0(const double &x);
 Writer ge0(const Writer &x);
 struct Ge0Op : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return ge0(x);
@@ -3308,6 +3323,7 @@ ad_aug ge0(const ad_aug &x);
 Writer lt0(const Writer &x);
 struct Lt0Op : global::UnaryOperator {
   static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
   template <class Type>
   Type eval(Type x) {
     return lt0(x);
@@ -3318,6 +3334,32 @@ struct Lt0Op : global::UnaryOperator {
 };
 ad_plain lt0(const ad_plain &x);
 ad_aug lt0(const ad_aug &x);
+
+template <class T>
+T zeroDeriv(T x) {
+  return x;
+}
+Writer zeroDeriv(const Writer &x);
+struct ZderivOp : global::UnaryOperator {
+  static const bool have_eval = true;
+  static const bool is_zero_deriv = true;
+  template <class Type>
+  Type eval(Type x) {
+    return zeroDeriv(x);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {}
+  const char *op_name();
+};
+ad_plain zeroDeriv(const ad_plain &x);
+ad_aug zeroDeriv(const ad_aug &x);
+
+struct SderivOp : global::ad_plain::CopyOp {
+  static const bool is_zero_deriv = true;
+  const char *op_name();
+};
+ad_plain sparseDeriv(const ad_plain &x);
+double sparseDeriv(const double &x);
 using ::expm1;
 using ::fabs;
 using ::log1p;

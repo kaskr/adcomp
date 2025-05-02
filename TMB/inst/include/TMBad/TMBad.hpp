@@ -507,7 +507,7 @@ struct ADFun {
 
     std::vector<bool> keep_var = get_keep_var(keep_x, keep_y);
 
-    graph G = this->glob.reverse_graph(keep_var);
+    graph G = this->glob.reverse_graph(keep_var, true);
 
     std::vector<size_t> which_keep_x = which(keep_x);
     std::vector<size_t> which_keep_y = which(keep_y);
@@ -613,7 +613,7 @@ struct ADFun {
     std::vector<bool> keep = get_keep_var(keep_x, keep_y);
     graph G;
     if (!range_weight && Range() > 1) {
-      G = this->glob.reverse_graph(keep);
+      G = this->glob.reverse_graph(keep, true);
     }
     keep = glob.var2op(keep);
     global::replay replay(this->glob, ans.glob);
@@ -791,7 +791,7 @@ struct ADFun {
     size_t keep_x_count = std::count(keep_x.begin(), keep_x.end(), true);
     size_t keep_y_count = std::count(keep_y.begin(), keep_y.end(), true);
 
-    graph G = this->glob.reverse_graph(keep_var);
+    graph G = this->glob.reverse_graph(keep_var, true);
 
     global::replay replay(this->glob, ans.glob);
     replay.start();
