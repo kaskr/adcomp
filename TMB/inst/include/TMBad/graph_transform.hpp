@@ -4,6 +4,7 @@
 #include <cstring>
 #include <list>
 #include <map>
+
 #include "checkpoint.hpp"
 #include "global.hpp"
 #include "integrate.hpp"
@@ -879,9 +880,17 @@ void remap_identical_sub_expressions(global &glob);
 std::vector<Position> inv_positions(global &glob);
 
 /** \brief Reorder computational graph such that selected independent variables
-   come last \param inv_idx Sorted vector of independent variables. \note
-   Nothing is done if **any operators with pointer inputs are detected on the
-   tape**. (FIXME: Not optimal)
+   come last \param inv_idx Sorted vector of independent variables.
+
+    To be applied for models where 'inv_idx' corresponds to random
+    effects and all other invs are fixed effects.  Knowing that we
+    need to update random effects frequently for fixed values of
+    'fixed effects', the idea is to find all expressions that *only*
+    depend on fixed effects, and then move these up front in the
+    computational graph.
+
+    \note Nothing is done if **any operators with pointer inputs are
+    detected on the tape**. (FIXME: Not optimal)
 */
 void reorder_graph(global &glob, std::vector<Index> inv_idx);
 

@@ -353,8 +353,10 @@ compressed_input::compressed_input(std::vector<Index> &x, size_t offset,
   input_diff = inputs;
 }
 
-StackOp::StackOp(global *glob, period p, IndexPair ptr,
-                 size_t max_period_size) {
+StackOp::StackOp(global *glob, period p, IndexPair ptr, size_t max_period_size)
+    : shared(std::make_shared<shared_data>()) {
+  global::operation_stack &opstack(shared->opstack);
+  compressed_input &ci(shared->ci);
   opstack.resize(p.size);
   size_t n = 0, m = 0;
   for (size_t i = 0; i < p.size; i++) {
@@ -365,48 +367,43 @@ StackOp::StackOp(global *glob, period p, IndexPair ptr,
   ci = compressed_input(glob->inputs, ptr.first, n, m, p.rep, max_period_size);
 }
 
-StackOp::StackOp(const StackOp &x) : opstack(x.opstack), ci(x.ci) {}
-
 void StackOp::print(global::print_config cfg) {
+  global::operation_stack &opstack(shared->opstack);
+  compressed_input &ci(shared->ci);
   std::vector<const char *> tmp(opstack.size());
   for (size_t i = 0; i < opstack.size(); i++) tmp[i] = opstack[i]->op_name();
   Rcout << cfg.prefix << " opstack = " << tmp << "\n";
 
-  Rcout << cfg.prefix << " "
-        << "nrep"
-        << " = " << ci.nrep << "\n";
+  Rcout << cfg.prefix << " " << "nrep" << " = " << ci.nrep << "\n";
   ;
-  Rcout << cfg.prefix << " "
-        << "increment_pattern"
-        << " = " << ci.increment_pattern << "\n";
+  Rcout << cfg.prefix << " " << "increment_pattern" << " = "
+        << ci.increment_pattern << "\n";
   ;
   if (ci.which_periodic.size() > 0) {
-    Rcout << cfg.prefix << " "
-          << "which_periodic"
-          << " = " << ci.which_periodic << "\n";
+    Rcout << cfg.prefix << " " << "which_periodic" << " = " << ci.which_periodic
+          << "\n";
     ;
-    Rcout << cfg.prefix << " "
-          << "period_sizes"
-          << " = " << ci.period_sizes << "\n";
+    Rcout << cfg.prefix << " " << "period_sizes" << " = " << ci.period_sizes
+          << "\n";
     ;
-    Rcout << cfg.prefix << " "
-          << "period_offsets"
-          << " = " << ci.period_offsets << "\n";
+    Rcout << cfg.prefix << " " << "period_offsets" << " = " << ci.period_offsets
+          << "\n";
     ;
-    Rcout << cfg.prefix << " "
-          << "period_data"
-          << " = " << ci.period_data << "\n";
+    Rcout << cfg.prefix << " " << "period_data" << " = " << ci.period_data
+          << "\n";
     ;
   }
 
   Rcout << "\n";
 }
 
-Index StackOp::input_size() const { return ci.n; }
+Index StackOp::input_size() const { return shared->ci.n; }
 
-Index StackOp::output_size() const { return ci.m * ci.nrep; }
+Index StackOp::output_size() const { return shared->ci.m * shared->ci.nrep; }
 
 void StackOp::forward(ForwardArgs<Writer> &args) {
+  global::operation_stack &opstack(shared->opstack);
+  compressed_input &ci(shared->ci);
   size_t n = ci.n, m = ci.m, nrep = ci.nrep;
   std::vector<Index> inputs(n);
   for (size_t i = 0; i < (size_t)n; i++) inputs[i] = args.input(i);
@@ -417,17 +414,17 @@ void StackOp::forward(ForwardArgs<Writer> &args) {
   size_t sp = ci.period_data.size();
   w << "for (int count = 0, ";
   if (n > 0) {
-    w << "i[" << n << "]=" << inputs << ", "
-      << "ip[" << n << "]=" << ci.increment_pattern << ", ";
+    w << "i[" << n << "]=" << inputs << ", " << "ip[" << n
+      << "]=" << ci.increment_pattern << ", ";
   }
   if (np > 0) {
-    w << "wp[" << np << "]=" << ci.which_periodic << ", "
-      << "ps[" << np << "]=" << ci.period_sizes << ", "
-      << "po[" << np << "]=" << ci.period_offsets << ", "
-      << "pd[" << sp << "]=" << ci.period_data << ", ";
+    w << "wp[" << np << "]=" << ci.which_periodic << ", " << "ps[" << np
+      << "]=" << ci.period_sizes << ", " << "po[" << np
+      << "]=" << ci.period_offsets << ", " << "pd[" << sp
+      << "]=" << ci.period_data << ", ";
   }
-  w << "o[" << m << "]=" << outputs << "; "
-    << "count < " << nrep << "; count++) {\n";
+  w << "o[" << m << "]=" << outputs << "; " << "count < " << nrep
+    << "; count++) {\n";
 
   w << "    ";
   ForwardArgs<Writer> args_cpy = args;
@@ -458,6 +455,8 @@ void StackOp::forward(ForwardArgs<Writer> &args) {
 }
 
 void StackOp::reverse(ReverseArgs<Writer> &args) {
+  global::operation_stack &opstack(shared->opstack);
+  compressed_input &ci(shared->ci);
   size_t n = ci.n, m = ci.m, nrep = ci.nrep;
   std::vector<ptrdiff_t> inputs(input_size());
   for (size_t i = 0; i < inputs.size(); i++) {
@@ -477,17 +476,16 @@ void StackOp::reverse(ReverseArgs<Writer> &args) {
   size_t sp = ci.period_data.size();
   w << "for (int count = " << nrep << ", ";
   if (n > 0) {
-    w << "i[" << n << "]=" << inputs << ", "
-      << "ip[" << n << "]=" << ci.increment_pattern << ", ";
+    w << "i[" << n << "]=" << inputs << ", " << "ip[" << n
+      << "]=" << ci.increment_pattern << ", ";
   }
   if (np > 0) {
-    w << "wp[" << np << "]=" << ci.which_periodic << ", "
-      << "ps[" << np << "]=" << ci.period_sizes << ", "
-      << "po[" << np << "]=" << ci.period_offsets << ", "
-      << "pd[" << sp << "]=" << ci.period_data << ", ";
+    w << "wp[" << np << "]=" << ci.which_periodic << ", " << "ps[" << np
+      << "]=" << ci.period_sizes << ", " << "po[" << np
+      << "]=" << ci.period_offsets << ", " << "pd[" << sp
+      << "]=" << ci.period_data << ", ";
   }
-  w << "o[" << m << "]=" << outputs << "; "
-    << "count > 0 ; ) {\n";
+  w << "o[" << m << "]=" << outputs << "; " << "count > 0 ; ) {\n";
 
   w << "    ";
   w << "count--;\n";
@@ -524,6 +522,7 @@ void StackOp::reverse(ReverseArgs<Writer> &args) {
 }
 
 void StackOp::dependencies(Args<> args, Dependencies &dep) const {
+  compressed_input &ci(shared->ci);
   std::vector<Index> lower;
   std::vector<Index> upper;
   ci.dependencies_intervals(args, lower, upper);
@@ -1071,14 +1070,16 @@ void global::forward_dense(std::vector<bool> &marks) {
   }
 }
 
-intervals<Index> global::updating_intervals() const {
+intervals<Index> global::get_intervals(op_info::op_flag flag, bool reverse,
+                                       bool forward) const {
   Dependencies dep;
   intervals<Index> marked_intervals;
   Args<> args(inputs);
   for (size_t i = 0; i < opstack.size(); i++) {
-    if (opstack[i]->info().test(op_info::reverse_updating)) {
+    if (opstack[i]->info().test(flag)) {
       dep.clear();
-      opstack[i]->dependencies(args, dep);
+      if (reverse) opstack[i]->dependencies(args, dep);
+      if (forward) opstack[i]->dependencies_updating(args, dep);
 
       for (size_t i = 0; i < dep.I.size(); i++) {
         Index a = dep.I[i].first;
@@ -1091,7 +1092,12 @@ intervals<Index> global::updating_intervals() const {
   return marked_intervals;
 }
 
-intervals<Index> global::updating_intervals_sub() const {
+intervals<Index> global::updating_intervals() const {
+  return get_intervals(op_info::reverse_updating);
+}
+
+intervals<Index> global::get_intervals_sub(op_info::op_flag flag, bool reverse,
+                                           bool forward) const {
   Dependencies dep;
   intervals<Index> marked_intervals;
   Args<> args(inputs);
@@ -1099,9 +1105,10 @@ intervals<Index> global::updating_intervals_sub() const {
   for (size_t j = 0; j < subgraph_seq.size(); j++) {
     Index i = subgraph_seq[j];
     args.ptr = subgraph_ptr[i];
-    if (opstack[i]->info().test(op_info::reverse_updating)) {
+    if (opstack[i]->info().test(flag)) {
       dep.clear();
-      opstack[i]->dependencies(args, dep);
+      if (reverse) opstack[i]->dependencies(args, dep);
+      if (forward) opstack[i]->dependencies_updating(args, dep);
 
       for (size_t i = 0; i < dep.I.size(); i++) {
         Index a = dep.I[i].first;
@@ -1111,6 +1118,10 @@ intervals<Index> global::updating_intervals_sub() const {
     }
   }
   return marked_intervals;
+}
+
+intervals<Index> global::updating_intervals_sub() const {
+  return get_intervals_sub(op_info::reverse_updating);
 }
 
 Replay &global::replay::value_inv(Index i) { return values[orig.inv_index[i]]; }
@@ -1794,8 +1805,7 @@ void global::print(print_config cfg) {
   Rcout << setw(7) << "OpName:" << setw(7 + have_subgraph)
         << "Node:" << setw(13) << "Value:" << setw(13) << "Deriv:" << setw(13)
         << "Index:";
-  Rcout << "    "
-        << "Inputs:";
+  Rcout << "    " << "Inputs:";
   Rcout << endl;
   for (size_t i = 0; i < opstack.size(); i++) {
     Rcout << cfg.prefix;
@@ -4540,23 +4550,54 @@ std::vector<Position> inv_positions(global &glob) {
 }
 
 void reorder_graph(global &glob, std::vector<Index> inv_idx) {
-  if (!all_allow_remap(glob)) return;
   for (size_t i = 1; i < inv_idx.size(); i++) {
     TMBAD_ASSERT(inv_idx[i] > inv_idx[i - 1]);
   }
+
   std::vector<bool> marks(glob.values.size(), false);
   for (size_t i = 0; i < inv_idx.size(); i++)
     marks[glob.inv_index[inv_idx[i]]] = true;
   glob.forward_dense(marks);
+
+  intervals<Index> I = glob.get_intervals(op_info::dynamic, true, true);
+  if (I.x.size() > 0) {
+    struct {
+      std::vector<bool> &marks;
+      bool invalid;
+      void operator()(Index a, Index b) {
+        size_t cnt = std::count(marks.begin() + a, marks.begin() + b + 1, true);
+        bool ok = (cnt == 0) || (cnt == b - a + 1);
+        if (!ok) {
+          invalid = true;
+
+          std::fill(marks.begin() + a, marks.begin() + b + 1, true);
+        }
+      }
+    } F = {marks, false};
+
+    I.apply(F);
+    while (F.invalid) {
+      glob.forward_dense(marks);
+
+      F.invalid = false;
+      I.apply(F);
+    }
+  }
   if (false) {
     int c = std::count(marks.begin(), marks.end(), true);
     Rcout << "marked proportion:" << (double)c / (double)marks.size() << "\n";
   }
 
   marks.flip();
-  glob.set_subgraph(marks);
+
+  marks = glob.var2op(marks);
+
+  std::vector<Index> seq1 = which<Index>(marks);
   marks.flip();
-  glob.set_subgraph(marks, true);
+  std::vector<Index> seq2 = which<Index>(marks);
+  seq1.insert(seq1.end(), seq2.begin(), seq2.end());
+  glob.subgraph_seq = seq1;
+
   glob = glob.extract_sub();
 }
 }  // namespace TMBad

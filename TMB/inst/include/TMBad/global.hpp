@@ -11,6 +11,7 @@
 #include <sstream>
 #include <valarray>
 #include <vector>
+
 #include "config.hpp"
 #include "radix.hpp"
 
@@ -747,14 +748,12 @@ struct op_info {
   enum op_flag {
     /** \copydoc global::Operator::dynamic */
     dynamic,
-    /** \copydoc global::Operator::smart_pointer */
-    smart_pointer,
+    /** \copydoc global::Operator::is_zero_deriv */
+    is_zero_deriv,
     /** \copydoc global::Operator::is_linear */
     is_linear,
     /** \copydoc global::Operator::is_constant */
     is_constant,
-    /** \copydoc global::Operator::is_zero_deriv */
-    is_zero_deriv,
     /** \copydoc global::Operator::independent_variable */
     independent_variable,
     /** \copydoc global::Operator::dependent_variable */
@@ -775,10 +774,9 @@ struct op_info {
     return
 
         (op.dynamic * (1 << dynamic)) |
-        (op.smart_pointer * (1 << smart_pointer)) |
+        (op.is_zero_deriv * (1 << is_zero_deriv)) |
         (op.is_linear * (1 << is_linear)) |
         (op.is_constant * (1 << is_constant)) |
-        (op.is_zero_deriv * (1 << is_zero_deriv)) |
         (op.independent_variable * (1 << independent_variable)) |
         (op.dependent_variable * (1 << dependent_variable)) |
         (op.allow_remap * (1 << allow_remap)) |
@@ -1149,7 +1147,13 @@ struct global {
  */
   void forward_dense(std::vector<bool> &marks);
 
+  intervals<Index> get_intervals(op_info::op_flag flag, bool reverse = true,
+                                 bool forward = false) const;
+
   intervals<Index> updating_intervals() const;
+
+  intervals<Index> get_intervals_sub(op_info::op_flag flag, bool reverse = true,
+                                     bool forward = false) const;
 
   intervals<Index> updating_intervals_sub() const;
 
@@ -1563,8 +1567,6 @@ struct global {
     static const bool is_constant = false;
     /** \brief Is this a zero-derivative operator (piecewise constant) ? */
     static const bool is_zero_deriv = false;
-    /** \brief Is this operator a 'smart pointer' (with reference counting) ? */
-    static const bool smart_pointer = false;
     /** \brief Protect this operator from elimination by the tape optimizer ? */
     static const bool elimination_protected = false;
     /** \brief This operator **may** update existing variables ?
@@ -1646,21 +1648,6 @@ struct global {
     Index input_size() const;
     Index output_size() const;
     static const bool have_input_size_output_size = true;
-  };
-  struct UniqueDynamicOperator : Operator<-1, -1> {
-    /** \copydoc Operator::dynamic */
-    static const bool dynamic = true;
-    /** \copydoc Operator::max_fuse_depth */
-    static const int max_fuse_depth = 0;
-    /** \brief This is an `Operator::smart_pointer` */
-    static const bool smart_pointer = false;
-    /** \brief Must implement `Operator::input_size` and `Operator::output_size`
-     */
-    static const bool have_input_size_output_size = true;
-  };
-  struct SharedDynamicOperator : UniqueDynamicOperator {
-    /** \brief This is an `Operator::smart_pointer` */
-    static const bool smart_pointer = true;
   };
 
   /** \brief Add default implementation of mandatory members:
@@ -1784,22 +1771,6 @@ struct global {
     void forward(ForwardArgs<Type> &args) {
       args.y(0) = this->eval(args.x(0), args.x(1));
     }
-  };
-
-  /** \brief Reference counting */
-  template <bool flag, class dummy>
-  struct ReferenceCounter {
-    void increment() {}
-    void decrement() {}
-    size_t operator()() const { return 0; }
-  };
-  template <class dummy>
-  struct ReferenceCounter<true, dummy> {
-    size_t counter;
-    ReferenceCounter() : counter(0) {}
-    void increment() { counter++; }
-    void decrement() { counter--; }
-    size_t operator()() const { return counter; }
   };
 
   /** \brief Utility for member completion */
@@ -2046,11 +2017,9 @@ struct global {
       int ninp = Op.input_size();
       int nout = Op.output_size();
 
-      w << "for (int count = 0, "
-        << "i[" << ninp << "]=" << inputs << ", "
-        << "di[" << ninp << "]=" << increment_pattern << ", "
-        << "o[" << nout << "]=" << outputs << "; "
-        << "count < " << n << "; count++) {\n";
+      w << "for (int count = 0, " << "i[" << ninp << "]=" << inputs << ", "
+        << "di[" << ninp << "]=" << increment_pattern << ", " << "o[" << nout
+        << "]=" << outputs << "; " << "count < " << n << "; count++) {\n";
 
       w << "    ";
       ForwardArgs<Writer> args_cpy = args;
@@ -2079,11 +2048,9 @@ struct global {
       int ninp = Op.input_size();
       int nout = Op.output_size();
 
-      w << "for (int count = 0, "
-        << "i[" << ninp << "]=" << inputs << ", "
-        << "di[" << ninp << "]=" << increment_pattern << ", "
-        << "o[" << nout << "]=" << outputs << "; "
-        << "count < " << n << "; count++) {\n";
+      w << "for (int count = 0, " << "i[" << ninp << "]=" << inputs << ", "
+        << "di[" << ninp << "]=" << increment_pattern << ", " << "o[" << nout
+        << "]=" << outputs << "; " << "count < " << n << "; count++) {\n";
 
       w << "    ";
       w << "for (int k=0; k<" << ninp << "; k++) i[k] -= di[k];\n";
@@ -2197,24 +2164,18 @@ struct global {
       TMBAD_ASSERT2(OperatorBase::dynamic,
                     "Stack to heap copy only allowed for dynamic operators");
       Complete *pOp = new Complete(*this);
-      TMBAD_ASSERT2(pOp->ref_count() == 0, "Operator already on the heap");
-      pOp->ref_count.increment();
       return get_glob()->add_to_stack<OperatorBase>(pOp, x);
     }
     ad_segment operator()(const ad_segment &x) {
       TMBAD_ASSERT2(OperatorBase::dynamic,
                     "Stack to heap copy only allowed for dynamic operators");
       Complete *pOp = new Complete(*this);
-      TMBAD_ASSERT2(pOp->ref_count() == 0, "Operator already on the heap");
-      pOp->ref_count.increment();
       return get_glob()->add_to_stack<OperatorBase>(pOp, x);
     }
     ad_segment operator()(const ad_segment &x, const ad_segment &y) {
       TMBAD_ASSERT2(OperatorBase::dynamic,
                     "Stack to heap copy only allowed for dynamic operators");
       Complete *pOp = new Complete(*this);
-      TMBAD_ASSERT2(pOp->ref_count() == 0, "Operator already on the heap");
-      pOp->ref_count.increment();
       return get_glob()->add_to_stack<OperatorBase>(pOp, x, y);
     }
     template <class T>
@@ -2261,24 +2222,14 @@ struct global {
     OperatorPure *other_fuse(OperatorPure *other) {
       return Op.other_fuse(this, other);
     }
-    ReferenceCounter<OperatorBase::smart_pointer, void> ref_count;
     OperatorPure *copy() {
-      if (Op.smart_pointer) {
-        ref_count.increment();
-        return this;
-      } else if (Op.dynamic)
+      if (Op.dynamic)
         return new Complete(*this);
       else
         return this;
     }
     void deallocate() {
       if (!Op.dynamic) return;
-      if (Op.smart_pointer) {
-        if (ref_count() > 1) {
-          ref_count.decrement();
-          return;
-        }
-      }
       delete this;
     }
     op_info info() {
