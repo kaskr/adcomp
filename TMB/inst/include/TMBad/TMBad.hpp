@@ -776,9 +776,6 @@ struct ADFun {
   Sparse<ADFun> SpJacFun(std::vector<bool> keep_x = std::vector<bool>(0),
                          std::vector<bool> keep_y = std::vector<bool>(0),
                          SpJacFun_config config = SpJacFun_config()) {
-    ADFun atomic_jac_row;
-    std::vector<Index> rowcounts;
-
     Sparse<ADFun> ans;
 
     ans.m = Range();
@@ -792,6 +789,9 @@ struct ADFun {
     size_t keep_y_count = std::count(keep_y.begin(), keep_y.end(), true);
 
     graph G = this->glob.reverse_graph(keep_var, true);
+
+    bool do_compress = config.compress;
+    compress_helper cprs(this, keep_x, keep_y);
 
     global::replay replay(this->glob, ans.glob);
     replay.start();
@@ -809,20 +809,6 @@ struct ADFun {
       glob.subgraph_seq.resize(0);
       glob.subgraph_seq.push_back(G.dep2op[k]);
       G.search(glob.subgraph_seq);
-
-      bool do_compress = false;
-      if (config.compress) {
-        if (rowcounts.size() == 0) rowcounts = G.rowcounts();
-
-        size_t cost1 = 0;
-        for (size_t i = 0; i < glob.subgraph_seq.size(); i++) {
-          cost1 += rowcounts[glob.subgraph_seq[i]];
-        }
-
-        size_t cost2 = Domain() + Range() + Domain();
-
-        if (cost2 < cost1) do_compress = true;
-      }
 
       if (true) {
         glob.clear_array_subgraph(keep_var);
@@ -852,30 +838,9 @@ struct ADFun {
         replay.reverse_sub();
 
       } else {
-        if (atomic_jac_row.Domain() == 0) {
-          atomic_jac_row = this->WgtJacFun(keep_x, keep_y);
-          atomic_jac_row.optimize();
+        cprs.initialize(replay);
 
-          atomic_jac_row.set_inv_positions();
-
-          atomic_jac_row = atomic_jac_row.atomic();
-
-          replay.clear_deriv_sub();
-
-          TMBAD_ASSERT(atomic_jac_row.Domain() ==
-                       this->Domain() + this->Range());
-          TMBAD_ASSERT(atomic_jac_row.Range() == keep_x_count);
-        }
-        std::vector<Replay> vec(atomic_jac_row.Domain(), Replay(0));
-        for (size_t i = 0; i < this->Domain(); i++) {
-          vec[i] = replay.value_inv(i);
-        }
-        vec[this->Domain() + k] = 1.;
-        std::vector<Replay> r = atomic_jac_row(vec);
-        size_t r_idx = 0;
-        for (size_t i = 0; i < this->Domain(); i++) {
-          if (keep_x[i]) replay.deriv_inv(i) = r[r_idx++];
-        }
+        cprs.replay_row(replay, k, col_idx);
       }
       for (size_t l = 0; l < col_idx.size(); l++) {
         replay.deriv_inv(col_idx[l]).Dependent();
@@ -897,6 +862,75 @@ struct ADFun {
     set_inner_outer(ans);
     return ans;
   }
+  struct compress_helper {
+    ADFun *adf;
+    std::vector<bool> &keep_x;
+    std::vector<bool> &keep_y;
+    Index K;
+
+    ADFun atomic_jac_row;
+    std::vector<bool> keep_x_sub;
+    std::vector<bool> keep_y_sub;
+    std::vector<Replay> vec;
+    std::vector<Index> deriv_idx;
+    compress_helper(ADFun *adf, std::vector<bool> &keep_x,
+                    std::vector<bool> &keep_y)
+        : adf(adf), keep_x(keep_x), keep_y(keep_y), K(0) {}
+    void initialize(global::replay &replay) {
+      if (atomic_jac_row.Domain() == 0) {
+        replay.clear_deriv_sub();
+
+        vec = std::vector<Replay>(adf->Domain() + adf->Range(), Replay(0));
+        for (size_t i = 0; i < adf->Domain(); i++) {
+          vec[i] = replay.value_inv(i);
+        }
+      }
+    }
+    Index findNextIndex(size_t k, std::vector<Index> &col_idx) {
+      for (size_t i = 0; i < col_idx.size(); i++) {
+        Index j = col_idx[i];
+        TMBAD_ASSERT2((i == 0) || (j > col_idx[i - 1]),
+                      "col_idx must be sorted");
+        if (j == k + 1) k = j;
+      }
+      return k + 1;
+    }
+    void replay_row(global::replay &replay, size_t k,
+                    std::vector<Index> &col_idx) {
+      if (k == K) {
+        K = findNextIndex(k, col_idx);
+        if (!keep_y[k]) return;
+
+        keep_y_sub = keep_y;
+        for (size_t i = 0; i < keep_y_sub.size(); i++) {
+          if ((i < k) || (K <= i)) keep_y_sub[i] = false;
+        }
+        atomic_jac_row = adf->WgtJacFun(keep_x, keep_y_sub);
+        deriv_idx = which<Index>(keep_x);
+
+        keep_x_sub = atomic_jac_row.activeDomain();
+        atomic_jac_row.glob.inv_index =
+            subset(atomic_jac_row.glob.inv_index, keep_x_sub);
+
+        keep_y_sub = atomic_jac_row.activeRange();
+        atomic_jac_row.glob.dep_index =
+            subset(atomic_jac_row.glob.dep_index, keep_y_sub);
+        deriv_idx = subset(deriv_idx, keep_y_sub);
+
+        atomic_jac_row.eliminate();
+
+        atomic_jac_row.set_inv_positions();
+        atomic_jac_row = atomic_jac_row.atomic();
+      }
+      vec[adf->Domain() + k] = 1.;
+      std::vector<Replay> vec_sub = subset(vec, keep_x_sub);
+      vec[adf->Domain() + k] = 0.;
+      std::vector<Replay> r = atomic_jac_row(vec_sub);
+      for (size_t i = 0; i < atomic_jac_row.Range(); i++) {
+        replay.deriv_inv(deriv_idx[i]) = r[i];
+      }
+    }
+  };
   /** \brief Integrate as many univariate variables as possible
       \note Use `activeDomain()` to identify which variables have been
       integrated (integrated variables are no longer active).
