@@ -1194,6 +1194,8 @@ Type log_determinant(const Eigen::SparseMatrix<Type> &H,
 }
 template<class Type>
 Type log_determinant(const Eigen::SparseMatrix<Type> &H) {
+  if (!config.tmbad.atomic_sparse_log_determinant)
+    return log_determinant_simple(H);
   const Type* vptr = H.valuePtr();
   size_t n = H.nonZeros();
   std::vector<Type> x(vptr, vptr + n);
