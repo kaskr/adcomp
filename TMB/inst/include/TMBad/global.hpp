@@ -1311,11 +1311,15 @@ struct global {
   */
   std::vector<Index> var2op();
   /** \brief Select operators from a subset of variables
-      An operator is selected if it generates any of the selected variables.
-      This is the fast equivalent of
+      An operator is selected if it *generates* or optionally
+      *modifies* any of the selected variables.
+      In absence of 'updating operators', this is the fast equivalent of
       `ans[ var2op() [ which(values) ] ] <- true`
+      However, the code has been updated to also work for 'updating
+      operators' by setting `include_updating=true`.
   */
-  std::vector<bool> var2op(const std::vector<bool> &values);
+  std::vector<bool> var2op(const std::vector<bool> &values,
+                           bool include_updating = true);
   /** \brief Get variables produces by a node seqence */
   std::vector<Index> op2var(const std::vector<Index> &seq);
   /** \brief Get variables produced by a node seqence */

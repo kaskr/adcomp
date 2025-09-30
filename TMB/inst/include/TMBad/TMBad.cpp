@@ -1171,11 +1171,6 @@ void global::replay::add_updatable_derivs(const intervals<Index> &I) {
 void global::replay::clear_deriv() {
   derivs.resize(values.size());
   std::fill(derivs.begin(), derivs.end(), Replay(0));
-
-  if (orig.opstack.any.test(op_info::reverse_updating)) {
-    intervals<Index> I = orig.updating_intervals();
-    add_updatable_derivs(I);
-  }
 }
 
 void global::replay::forward(bool inv_tags, bool dep_tags, Position start,
@@ -1204,6 +1199,11 @@ void global::replay::reverse(bool dep_tags, bool inv_tags, Position start,
     for (size_t i = 0; i < orig.dep_index.size(); i++)
       deriv_dep(i).Independent();
   }
+
+  if (orig.opstack.any.test(op_info::reverse_updating)) {
+    intervals<Index> I = orig.updating_intervals();
+    add_updatable_derivs(I);
+  }
   ReverseArgs<Replay> args(orig.inputs, values, derivs);
   if (node_filter.size() > 0) {
     TMBAD_ASSERT(node_filter.size() == orig.opstack.size());
@@ -1224,18 +1224,15 @@ void global::replay::forward_sub() {
 }
 
 void global::replay::reverse_sub() {
-  ReverseArgs<Replay> args(orig.inputs, values, derivs);
-  orig.reverse_loop_subgraph(args);
-}
-
-void global::replay::clear_deriv_sub() {
-  orig.clear_array_subgraph(derivs);
-
   if (orig.opstack.any.test(op_info::reverse_updating)) {
     intervals<Index> I = orig.updating_intervals_sub();
     add_updatable_derivs(I);
   }
+  ReverseArgs<Replay> args(orig.inputs, values, derivs);
+  orig.reverse_loop_subgraph(args);
 }
+
+void global::replay::clear_deriv_sub() { orig.clear_array_subgraph(derivs); }
 
 void global::forward_replay(bool inv_tags, bool dep_tags) {
   global new_glob;
@@ -1438,11 +1435,20 @@ std::vector<Index> global::var2op() {
   return var2op;
 }
 
-std::vector<bool> global::var2op(const std::vector<bool> &values) {
+std::vector<bool> global::var2op(const std::vector<bool> &values,
+                                 bool include_updating) {
+  bool any_upd =
+      include_updating && opstack.any.test(op_info::forward_updating);
   std::vector<bool> ans(opstack.size(), false);
   Args<> args(inputs);
   size_t j = 0;
   for (size_t i = 0; i < opstack.size(); i++) {
+    if (any_upd && opstack[i]->info().test(op_info::forward_updating)) {
+      Dependencies dep;
+      opstack[i]->dependencies_updating(args, dep);
+      ans[i] = ans[i] || dep.any(values);
+    }
+
     opstack[i]->increment(args.ptr);
     for (; j < (size_t)args.ptr.second; j++) {
       ans[i] = ans[i] || values[j];
@@ -2332,7 +2338,11 @@ bool global::ad_aug::identical(const ad_aug &other) const {
 }
 
 void global::ad_aug::setUpdatable(bool flag) {
-  taped_value.index = flag ? (index() | updbit) : (index() & ~updbit);
+  if (on_some_tape()) {
+    taped_value.index = flag ? (index() | updbit) : (index() & ~updbit);
+  } else {
+    TMBAD_ASSERT2(!flag, "An untaped constant cannot be made 'updatable'");
+  }
 }
 
 bool global::ad_aug::updatable() const {
@@ -2398,6 +2408,7 @@ ad_aug &global::ad_aug::operator/=(const ad_aug &other) {
 }
 
 void global::ad_aug::Dependent() {
+  this->setUpdatable(false);
   this->addToTape();
   taped_value.Dependent();
 }
