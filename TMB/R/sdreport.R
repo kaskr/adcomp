@@ -353,8 +353,20 @@ sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FAL
           framework <- .Call("getFramework", PACKAGE=obj$env$DLL)
           if (framework != "TMBad")
               tmp <- sapply(nonr,reverse.sweep)
-          else
+          else {
+            ## TMBad case requires special attention because the
+            ## ADGrad object is 'lazy', i.e. it skips the theta
+            ## derivative from the ADGrad tape.
+            if (length(r) <= length(nonr)) {
               tmp <- f(par, order = 1, type = "ADGrad", keepx=nonr, keepy=r) ## TMBad only !!!
+            } else {
+              ## Common case. Could use the same code as above, but that is VERY inefficient!
+              ADGrad <- obj$env$ADGrad ## Backup
+              obj$env$retape_adgrad(lazy = FALSE)
+              tmp <- t( f(par, order = 1, type = "ADGrad", keepx=r, keepy=nonr) ) ## TMBad only !!!
+              obj$env$ADGrad <- ADGrad ## Restore
+            }
+          }
           if(!is.matrix(tmp)) ## Happens if length(r)==1
               tmp <- matrix(tmp, ncol=length(nonr) )
           A <- solve(hessian.random, tmp)

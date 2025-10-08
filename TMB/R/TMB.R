@@ -663,7 +663,10 @@ MakeADFun <- function(data, parameters, map=list(),
   retape_adgrad <- function(lazy = TRUE) {
       ## * Use already taped function value f = ADFun$ptr
       ## * In random effects case we only need the 'random' part of the gradient
-      if (!lazy) random <- NULL
+      if (!lazy) {
+        random <- NULL
+        EvalADFunObject(ADFun, par, set_tail=FALSE) ## Calls unset_tail()
+      }
       ADGrad <<- MakeADGradObject(data, parameters, reportenv,
                                   random=random, f=ADFun$ptr, DLL=DLL)
   }
