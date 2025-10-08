@@ -553,15 +553,18 @@ struct ADFun {
 
   IndirectAccessor<Scalar> Jacobian(
       const segment_ref<ReverseArgs<Scalar>, x_read> &x,
-      const segment_ref<ReverseArgs<Scalar>, dy_read> &w) {
+      const segment_ref<ReverseArgs<Scalar>, dy_read> &w,
+      bool clear_all = false, bool deriv_all = false) {
     TMBAD_ASSERT(x.size() == Domain());
     TMBAD_ASSERT(w.size() == Range());
     Position start = DomainVecSet(x);
+    Position root = Position(0, 0, 0);
     glob.forward(start);
-    glob.clear_deriv();
+    glob.clear_deriv(clear_all ? root : tail_start);
     for (size_t j = 0; j < Range(); j++) glob.deriv_dep(j) = w[j];
-    glob.reverse();
-    return IndirectAccessor<Scalar>(glob.derivs, glob.inv_index);
+    glob.reverse(deriv_all ? root : tail_start);
+    Index tail_var = deriv_all ? root.ptr.second : tail_start.ptr.second;
+    return IndirectAccessor<Scalar>(glob.derivs, glob.inv_index, tail_var);
   }
   std::vector<ad> Jacobian(const std::vector<ad> &x_,
                            const std::vector<ad> &w_) {
@@ -705,10 +708,12 @@ struct ADFun {
   }
   /** \brief Turn this operation sequence into an atomic operator */
   ADFun atomic() {
-    global::Complete<AtomOp<standard_derivative_table<ADFun> > > F(*this);
     std::vector<Scalar> x = DomainVec();
-    return ADFun(F, x);
+    return ADFun(atomic_raw(), x);
   }
+  typedef global::Complete<AtomOp<standard_derivative_table<ADFun> > > AtomOp_t;
+  /** \brief Internal use only */
+  AtomOp_t atomic_raw() { return *this; }
   /** \brief Parallel split this operation sequence
       Split function `f:R^n->R` by its accumulation tree. Then parallelize
       and accumulate each parallel component. Return a list of functions
@@ -868,7 +873,7 @@ struct ADFun {
     std::vector<bool> &keep_y;
     Index K;
 
-    ADFun atomic_jac_row;
+    AtomOp_t atomic_jac_row;
     std::vector<bool> keep_x_sub;
     std::vector<bool> keep_y_sub;
     std::vector<Replay> vec;
@@ -877,7 +882,7 @@ struct ADFun {
                     std::vector<bool> &keep_y)
         : adf(adf), keep_x(keep_x), keep_y(keep_y), K(0) {}
     void initialize(global::replay &replay) {
-      if (atomic_jac_row.Domain() == 0) {
+      if (K == 0) {
         replay.clear_deriv_sub();
 
         vec = std::vector<Replay>(adf->Domain() + adf->Range(), Replay(0));
@@ -897,6 +902,7 @@ struct ADFun {
     }
     void replay_row(global::replay &replay, size_t k,
                     std::vector<Index> &col_idx) {
+      bool first_instance = (k == K);
       if (k == K) {
         K = findNextIndex(k, col_idx);
         if (!keep_y[k]) return;
@@ -905,28 +911,39 @@ struct ADFun {
         for (size_t i = 0; i < keep_y_sub.size(); i++) {
           if ((i < k) || (K <= i)) keep_y_sub[i] = false;
         }
-        atomic_jac_row = adf->WgtJacFun(keep_x, keep_y_sub);
+        ADFun jac_row = adf->WgtJacFun(keep_x, keep_y_sub);
         deriv_idx = which<Index>(keep_x);
 
-        keep_x_sub = atomic_jac_row.activeDomain();
-        atomic_jac_row.glob.inv_index =
-            subset(atomic_jac_row.glob.inv_index, keep_x_sub);
+        keep_x_sub = jac_row.activeDomain();
+        jac_row.glob.inv_index = subset(jac_row.glob.inv_index, keep_x_sub);
 
-        keep_y_sub = atomic_jac_row.activeRange();
-        atomic_jac_row.glob.dep_index =
-            subset(atomic_jac_row.glob.dep_index, keep_y_sub);
+        keep_y_sub = jac_row.activeRange();
+        jac_row.glob.dep_index = subset(jac_row.glob.dep_index, keep_y_sub);
         deriv_idx = subset(deriv_idx, keep_y_sub);
 
-        atomic_jac_row.eliminate();
+        jac_row.eliminate();
 
-        atomic_jac_row.set_inv_positions();
-        atomic_jac_row = atomic_jac_row.atomic();
+        std::vector<bool> r(keep_x);
+        r.resize(keep_x_sub.size(), true);
+        r = subset(r, keep_x_sub);
+        std::vector<Index> wr = which<Index>(r);
+        jac_row.reorder(wr);
+
+        jac_row.set_inv_positions();
+
+        jac_row.set_tail(wr);
+
+        atomic_jac_row = jac_row.atomic_raw();
       }
+      bool last_instance = (k == K - 1);
+      atomic_jac_row.Op.ctrl.clear_all = last_instance;
+      atomic_jac_row.Op.ctrl.deriv_all = first_instance;
       vec[adf->Domain() + k] = 1.;
       std::vector<Replay> vec_sub = subset(vec, keep_x_sub);
       vec[adf->Domain() + k] = 0.;
       std::vector<Replay> r = atomic_jac_row(vec_sub);
-      for (size_t i = 0; i < atomic_jac_row.Range(); i++) {
+      size_t I = atomic_jac_row.output_size();
+      for (size_t i = 0; i < I; i++) {
         replay.deriv_inv(deriv_idx[i]) = r[i];
       }
     }

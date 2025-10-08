@@ -185,9 +185,11 @@ template <class T>
 struct IndirectAccessor {
   const std::vector<T> &x;
   const std::vector<Index> &i;
-  IndirectAccessor(const std::vector<T> &x, const std::vector<Index> &i)
-      : x(x), i(i) {}
-  T operator[](size_t j) const { return x[i[j]]; }
+  Index tail;
+  IndirectAccessor(const std::vector<T> &x, const std::vector<Index> &i,
+                   Index tail = 0)
+      : x(x), i(i), tail(tail) {}
+  T operator[](size_t j) const { return i[j] < tail ? 0 : x[i[j]]; }
   size_t size() const { return i.size(); }
   operator std::vector<T>() const {
     std::vector<T> ans(i.size());

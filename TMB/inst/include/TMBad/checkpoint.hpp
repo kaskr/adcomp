@@ -15,7 +15,12 @@ struct standard_derivative_table : std::vector<ADFun> {
   /** \brief Add derivatives up to this order. */
   void requireOrder(size_t n) {
     while ((*this).size() <= n) {
-      (*this).push_back((*this).back().WgtJacFun());
+      Position root;
+      std::swap((*this).back().tail_start, root);
+      ADFun deriv = (*this).back().WgtJacFun();
+      std::swap((*this).back().tail_start, root);
+
+      (*this).push_back(deriv);
     }
   }
   /** \brief Retaping this derivative table has no effect. */
@@ -173,6 +178,16 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
 
   int order;
 
+  struct control {
+    bool clear_all;
+    bool deriv_all;
+    control() : clear_all(true), deriv_all(true) {}
+
+    void swap() { std::swap(clear_all, deriv_all); }
+  } ctrl;
+
+  AtomOp() {}
+
   template <class T1>
   AtomOp(const T1 &F) : dtab(std::make_shared<DerivativeTable>(F)), order(0) {}
   template <class T1, class T2>
@@ -205,7 +220,8 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
     auto x = args.x_segment(0, n);
     auto w = args.dy_segment(0, m);
 
-    args.dx_segment(0, n) += (*dtab)[order].Jacobian(x, w);
+    args.dx_segment(0, n) +=
+        (*dtab)[order].Jacobian(x, w, ctrl.clear_all, ctrl.deriv_all);
   }
 
   void reverse(ReverseArgs<global::Replay> &args) {
@@ -222,6 +238,7 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
     (*dtab).requireOrder(order + 1);
     AtomOp cpy(*this);
     cpy.order++;
+    cpy.ctrl.swap();
     args.dx_segment(0, n) += global::Complete<AtomOp>(cpy)(xw);
   }
 
