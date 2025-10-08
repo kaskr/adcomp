@@ -161,7 +161,7 @@ if(example!=""){
   cat("\nAccuracy tests:\n---------------\n")
   print(all.passed)
   ## What not passed ?
-  if(!all(all.passed)) {
+  if(!all(all.passed, na.rm=TRUE)) {
     names(dimnames(tab)) <- c("Example", "Slot")
     df <- as.data.frame(t(tab), responseName="Error")
     df <- df[c("Example", "Slot", "Error")]
