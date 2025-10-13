@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+TMB 1.9.18 (2025-10-13)
+------------------------------------------------------------------------
+
+o This release adds changes related to the 'TMBad' autodiff component:
+
+  - Very slow `sdreport()` has been fixed.
+  - Flag `TMB::config(tmbad.atomic_sparse_log_determinant=TRUE)` is no
+    longer ignored by `GMRF_t`.
+  - `pow()` operator is now optimized to handle constant operand special
+    cases.
+  - The experimental Hessian compression algorithm has been improved
+    and can now fix many more cases of memory explosion caused by the
+    sparse Hessian tape.
+    (Enabled using `TMB::config(tmbad.sparse_hessian_compress=TRUE)`)
+
+------------------------------------------------------------------------
 TMB 1.9.17 (2025-03-08)
 ------------------------------------------------------------------------
 
