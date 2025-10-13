@@ -3655,24 +3655,6 @@ template <class T>
 T abs(const T &x) {
   return fabs(x);
 }
-using std::pow;
-Writer pow(const Writer &x1, const Writer &x2);
-struct PowOp : global::BinaryOperator {
-  static const bool have_eval = true;
-  template <class Type>
-  Type eval(Type x1, Type x2) {
-    return pow(x1, x2);
-  }
-  template <class Type>
-  void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * args.x(1) * pow(args.x(0), args.x(1) - Type(1.));
-    args.dx(1) += args.dy(0) * args.y(0) * log(args.x(0));
-  }
-  const char *op_name();
-};
-ad_plain pow(const ad_plain &x1, const ad_plain &x2);
-ad_aug pow(const ad_aug &x1, const ad_aug &x2);
-ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2);
 using std::atan2;
 Writer atan2(const Writer &x1, const Writer &x2);
 struct Atan2 : global::BinaryOperator {
@@ -3730,6 +3712,40 @@ struct MinOp : global::BinaryOperator {
 ad_plain min(const ad_plain &x1, const ad_plain &x2);
 ad_aug min(const ad_aug &x1, const ad_aug &x2);
 ad_adapt min(const ad_adapt &x1, const ad_adapt &x2);
+using std::pow;
+
+template <class T>
+T asConstant(T x) {
+  return x;
+}
+ad_aug asConstant(ad_aug x);
+Writer pow(const Writer &x1, const Writer &x2);
+template <bool left_var = true, bool right_var = true>
+struct PowOp : global::BinaryOperator {
+  static const bool have_eval = true;
+  template <class Type>
+  Type eval(Type x1, Type x2) {
+    if (!left_var) x1 = asConstant(x1);
+    if (!right_var) x2 = asConstant(x2);
+    return pow(x1, x2);
+  }
+  template <class Type>
+  void reverse(ReverseArgs<Type> &args) {
+    Type X1 = args.x(0);
+    Type X2 = args.x(1);
+    Type Y = args.y(0);
+    if (!left_var) X1 = asConstant(X1);
+    if (!right_var) X2 = asConstant(X2);
+    if (left_var) args.dx(0) += args.dy(0) * (X2 * pow(X1, X2 - Type(1.)));
+    if (right_var) args.dx(1) += args.dy(0) * (Y * log(X1));
+  }
+  const char *op_name() { return "PowOp"; }
+  ad_plain operator()(const ad_plain &x1, const ad_plain &x2) {
+    return get_glob()->add_to_stack<PowOp>(x1, x2);
+  }
+};
+ad_aug pow(const ad_aug &x1, const ad_aug &x2);
+ad_adapt F(const ad_adapt &x1, const ad_adapt &x2);
 Replay CondExpEq(const Replay &x0, const Replay &x1, const Replay &x2,
                  const Replay &x3);
 struct CondExpEqOp : global::Operator<4, 1> {

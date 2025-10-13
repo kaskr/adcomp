@@ -2980,25 +2980,6 @@ ad_aug atanh(const ad_aug &x) {
 }
 ad_adapt atanh(const ad_adapt &x) { return ad_adapt(atanh(ad_aug(x))); }
 
-Writer pow(const Writer &x1, const Writer &x2) {
-  return "pow"
-         "(" +
-         x1 + "," + x2 + ")";
-}
-const char *PowOp::op_name() { return "PowOp"; }
-ad_plain pow(const ad_plain &x1, const ad_plain &x2) {
-  return get_glob()->add_to_stack<PowOp>(x1, x2);
-}
-ad_aug pow(const ad_aug &x1, const ad_aug &x2) {
-  if (x1.constant() && x2.constant())
-    return Scalar(pow(x1.Value(), x2.Value()));
-  else
-    return pow(ad_plain(x1), ad_plain(x2));
-}
-ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2) {
-  return ad_adapt(pow(ad_aug(x1), ad_aug(x2)));
-}
-
 Writer atan2(const Writer &x1, const Writer &x2) {
   return "atan2"
          "(" +
@@ -3054,6 +3035,30 @@ ad_aug min(const ad_aug &x1, const ad_aug &x2) {
 }
 ad_adapt min(const ad_adapt &x1, const ad_adapt &x2) {
   return ad_adapt(min(ad_aug(x1), ad_aug(x2)));
+}
+
+ad_aug asConstant(ad_aug x) { return x.Value(); }
+
+Writer pow(const Writer &x1, const Writer &x2) {
+  return "pow(" + x1 + "," + x2 + ")";
+}
+
+ad_aug pow(const ad_aug &x1, const ad_aug &x2) {
+  if (x1.constant() && x2.constant())
+    return Scalar(pow(x1.Value(), x2.Value()));
+  else if (x2.constant()) {
+    if (x2.Value() == 0.) return 1.;
+    if (x2.Value() == 1.) return x1;
+    return PowOp<1, 0>()(ad_plain(x1), ad_plain(x2));
+  } else if (x1.constant()) {
+    if (x1.Value() == 1.) return 1.;
+    return PowOp<0, 1>()(ad_plain(x1), ad_plain(x2));
+  } else
+    return PowOp<1, 1>()(ad_plain(x1), ad_plain(x2));
+}
+
+ad_adapt F(const ad_adapt &x1, const ad_adapt &x2) {
+  return ad_adapt(F(ad_aug(x1), ad_aug(x2)));
 }
 void CondExpEqOp::forward(ForwardArgs<Scalar> &args) {
   if (args.x(0) == args.x(1)) {

@@ -11,6 +11,7 @@
 namespace TMBad {
 
 void compile(global &glob, code_config cfg = code_config());
+
 }
 #endif  // HAVE_COMPILE_HPP
 #endif

@@ -284,16 +284,16 @@ template <class dummy>
 ad_segment pow(ad_segment x, ad_segment y) {
   size_t n = std::max(x.size(), y.size());
   if (x.size() > 1 && y.size() > 1) {
-    global::Complete<Vectorize<PowOp, 1, 1> > F(n);
+    global::Complete<Vectorize<PowOp<>, 1, 1> > F(n);
     return F(x, y);
   } else if (x.size() > 1) {
-    global::Complete<Vectorize<PowOp, 1, 0> > F(n);
+    global::Complete<Vectorize<PowOp<>, 1, 0> > F(n);
     return F(x, y);
   } else if (y.size() > 1) {
-    global::Complete<Vectorize<PowOp, 0, 1> > F(n);
+    global::Complete<Vectorize<PowOp<>, 0, 1> > F(n);
     return F(x, y);
   } else {
-    global::Complete<Vectorize<PowOp, 0, 0> > F(n);
+    global::Complete<Vectorize<PowOp<>, 0, 0> > F(n);
     return F(x, y);
   }
   TMBAD_ASSERT(false);
