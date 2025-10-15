@@ -302,6 +302,22 @@ Type dt(Type x, Type df, int give_log)
 // Vectorize dt
 VECTORIZE3_tti(dt)
 
+/** 	\brief Probability density function of the Chi-Square distribution.
+	\ingroup R_style_distribution
+	\param df Degree of freedom.
+	\param give_log true if one wants the log-probability, false otherwise.
+	*/	
+template <class Type>
+Type dchisq(Type x, Type df, int give_log)
+{
+	Type logres = (-x - df * M_LN2 + (-2 + df) * log(x) - 2 * lgamma(df / 2)) / 2;
+	if(!give_log) return exp(logres);
+	else return logres;
+}
+
+// Vectorize dchisq
+VECTORIZE3_tti(dchisq)
+
 /** 	\brief Probability mass function of the multinomial distribution.
 	\ingroup R_style_distribution
 	\param x Vector of length K of integers.
@@ -780,6 +796,19 @@ Type rt(Type df)
 
 VECTORIZE1_t(rt)
 VECTORIZE1_n(rt)
+
+extern "C" {
+	double Rf_rchisq(double df);
+}
+/** \brief Simulate from a Chi-Square distribution */
+template<class Type>
+Type rchisq(Type df)
+{
+	return Rf_rchisq(asDouble(df));
+}
+
+VECTORIZE1_t(rchisq)
+VECTORIZE1_n(rchisq)
 
 extern "C" {
 	double Rf_rweibull(double shape, double scale);

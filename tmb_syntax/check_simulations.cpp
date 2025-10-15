@@ -83,6 +83,11 @@ Type objective_function<Type>::operator() ()
     vector<Type> x = rt(n, df);
     ans -= dt(x, df, true).sum();
   }
+  else if (distr == "chisq") {
+    PARAMETER(df);
+    vector<Type> x = rchisq(n, df);
+    ans -= dchisq(x, df, true).sum();
+  }
   else if (distr == "weibull") {
     PARAMETER(shape);
     PARAMETER(scale);
