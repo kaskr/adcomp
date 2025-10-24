@@ -242,7 +242,7 @@ arguments) as close as possible to that of R.
 - Scalar and `vector` arguments (in combination) are supported, but
   not `array` or `matrix` arguments.
 - The last argument (of type `int`) corresponds to the `log`
-  argument in R: 1=logaritm, 0=ordinary scale. `true` (logaritm) and
+  argument in R: 1=logarithm, 0=ordinary scale. `true` (logarithm) and
   `false` (ordinary scale) can also be used.
 - Vector arguments must all be of the same length (no recycling of
   elements). If vectors of different lengths are used an "out of
