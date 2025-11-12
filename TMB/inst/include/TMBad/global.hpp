@@ -768,6 +768,8 @@ struct op_info {
     forward_updating,
     /** \copydoc global::Operator::reverse_updating */
     reverse_updating,
+    /** \copydoc global::Operator::synchronize_on_copy */
+    synchronize_on_copy,
     /** \brief Mark end of enum */
     op_flag_count
   };
@@ -784,7 +786,8 @@ struct op_info {
         (op.allow_remap * (1 << allow_remap)) |
         (op.elimination_protected * (1 << elimination_protected)) |
         (op.forward_updating * (1 << forward_updating)) |
-        (op.reverse_updating * (1 << reverse_updating));
+        (op.reverse_updating * (1 << reverse_updating)) |
+        (op.synchronize_on_copy * (1 << synchronize_on_copy));
   }
   op_info();
   op_info(op_flag f);
@@ -910,6 +913,8 @@ struct global {
     virtual op_info info() = 0;
     /** \brief Optional operator_data */
     virtual void *operator_data() = 0;
+    /** \brief Update output values of this OperatorPure */
+    virtual void synchronize(ForwardArgs<Scalar> &args) = 0;
     /** \brief Operator identifier \details If two operators have
         equal identifier it can be assumed that they represent equal
         mappings, i.e. same input implies same output.
@@ -973,6 +978,10 @@ struct global {
   void (*reverse_compiled)(Scalar *, Scalar *);
 
   global();
+
+  void copy_from(const global &other);
+  global(const global &other);
+  global &operator=(const global &other);
   /** \brief Clear all workspace without actually freeing the workspace
       \note Intended use: **retaping** without re-allocating */
   void clear();
@@ -1122,6 +1131,8 @@ struct global {
   void forward_sub();
   /** \brief Reverse sweep along a subgraph. */
   void reverse_sub();
+  /** \brief Forward synchronization sweep. */
+  void forward_synchronize();
 
   /** \brief Full forward dependency sweep through the operation stack. */
   void forward(std::vector<bool> &marks);
@@ -1605,6 +1616,9 @@ struct global {
           reverse replay.
     */
     static const bool reverse_updating = false;
+    /** \brief This operator must run `synchronize()` when its encapsulating
+     * tape is copied. */
+    static const bool synchronize_on_copy = false;
     /** \brief Default implementation of `OperatorPure::dependencies_updating()`
      */
     void dependencies_updating(Args<> &args, Dependencies &dep) const {}
@@ -1614,6 +1628,8 @@ struct global {
     }
     /** \brief Return operator specific dynamic information (optional) */
     void *operator_data() { return NULL; }
+    /** \brief Default implementation of `OperatorPure::synchronize()` */
+    void synchronize(ForwardArgs<Scalar> &args) const {}
     /** \brief Print this operator (optional) */
     void print(print_config cfg) {}
   };
@@ -2250,6 +2266,7 @@ struct global {
         return (void *)this;
     }
     void *operator_data() { return Op.operator_data(); }
+    void synchronize(ForwardArgs<Scalar> &args) { Op.synchronize(args); }
     void *incomplete() { return &Op; }
   };
 
@@ -2335,12 +2352,9 @@ struct global {
   */
   struct AllocOp : DynamicOutputOperator<0> {
     typedef DynamicOutputOperator<0> Base;
-    static const bool add_forward_replay_copy = true;
     AllocOp(Index n);
-    template <class Type>
-    void forward(ForwardArgs<Type> &args) {
-      for (Index i = 0; i < Base::noutput; i++) args.y(i) = Type(0);
-    }
+    void forward(ForwardArgs<Scalar> &args);
+    void forward(ForwardArgs<Replay> &args);
     template <class Type>
     void reverse(ReverseArgs<Type> &args) {}
     const char *op_name();
@@ -2984,13 +2998,15 @@ struct AccOp : global::Operator<2, 0> {
   void forward(ForwardArgs<T> &args) {
     T *x = args.x_ptr(0);
     T *y = args.x_ptr(1);
-    accumulate ? x[0] += y[0] : x[0] -= y[0];
+    accumulate ? UpdatingAccess<T>(x[0]) += y[0]
+               : UpdatingAccess<T>(x[0]) -= y[0];
   }
   template <class T>
   void reverse(ReverseArgs<T> &args) {
     T *dx = args.dx_ptr(0);
     T *dy = args.dx_ptr(1);
-    accumulate ? dy[0] += dx[0] : dy[0] -= dx[0];
+    accumulate ? UpdatingAccess<T>(dy[0]) += dx[0]
+               : UpdatingAccess<T>(dy[0]) -= dx[0];
   }
   void forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
   void reverse(ReverseArgs<Writer> &args) { TMBAD_ASSERT(false); }
@@ -3020,7 +3036,7 @@ struct AccOp : global::Operator<2, 0> {
 
 template <>
 inline ad_aug &UpdatingAccess<ad_aug>::operator+=(const ad_aug &other) {
-  if (this->x.updatable()) {
+  if (this->x.updatable() && !other.identicalZero()) {
     AccOp<true>()(this->x, global::ad_plain(other));
   } else {
     this->x += other;
@@ -3029,7 +3045,7 @@ inline ad_aug &UpdatingAccess<ad_aug>::operator+=(const ad_aug &other) {
 }
 template <>
 inline ad_aug &UpdatingAccess<ad_aug>::operator-=(const ad_aug &other) {
-  if (this->x.updatable()) {
+  if (this->x.updatable() && !other.identicalZero()) {
     AccOp<false>()(this->x, global::ad_plain(other));
   } else {
     this->x -= other;

@@ -442,6 +442,12 @@ struct PackOp : global::DynamicOperator<1, ScalarPack<SegmentRef>::size> {
   /** \brief Unpacked size */
   Index n;
   PackOp(const Index n) : n(n) {}
+
+  static const bool synchronize_on_copy = true;
+  void synchronize(ForwardArgs<Scalar> &args) {
+    SegmentRef *y = (SegmentRef *)args.y_ptr(0);
+    y->glob_ptr = args.glob_ptr;
+  }
   /** \brief Pack values */
   void forward(ForwardArgs<Scalar> &args) {
     SegmentRef *y = (SegmentRef *)args.y_ptr(0);

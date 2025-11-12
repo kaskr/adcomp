@@ -958,6 +958,33 @@ global::global()
       parent_glob(NULL),
       in_use(false) {}
 
+void global::copy_from(const global &other) {
+  opstack = other.opstack;
+  values = other.values;
+  derivs = other.derivs;
+  inputs = other.inputs;
+  inv_index = other.inv_index;
+  dep_index = other.dep_index;
+  subgraph_ptr = other.subgraph_ptr;
+  subgraph_seq = other.subgraph_seq;
+  forward_compiled = other.forward_compiled;
+  reverse_compiled = other.reverse_compiled;
+  parent_glob = other.parent_glob;
+  in_use = other.in_use;
+  if (opstack.any.test(op_info::synchronize_on_copy)) {
+    forward_synchronize();
+  }
+}
+
+global::global(const global &other) { copy_from(other); }
+
+global &global::operator=(const global &other) {
+  if (this != &other) {
+    copy_from(other);
+  }
+  return *this;
+}
+
 void global::clear() {
   values.resize(0);
   derivs.resize(0);
@@ -1028,6 +1055,14 @@ void global::forward_sub() {
 void global::reverse_sub() {
   ReverseArgs<Scalar> args(inputs, values, derivs, this);
   reverse_loop_subgraph(args);
+}
+
+void global::forward_synchronize() {
+  ForwardArgs<Scalar> args(inputs, values, this);
+  for (size_t i = 0; i < opstack.size(); i++) {
+    opstack[i]->synchronize(args);
+    opstack[i]->increment(args.ptr);
+  }
 }
 
 void global::forward(std::vector<bool> &marks) {
@@ -1901,6 +1936,16 @@ const char *global::DataOp::op_name() { return "DataOp"; }
 void global::DataOp::forward(ForwardArgs<Writer> &args) { TMBAD_ASSERT(false); }
 
 global::AllocOp::AllocOp(Index n) { Base::noutput = n; }
+
+void global::AllocOp::forward(ForwardArgs<Scalar> &args) {
+  Scalar *y = args.y_ptr(0);
+  std::fill(y, y + Base::noutput, Scalar(0));
+}
+
+void global::AllocOp::forward(ForwardArgs<Replay> &args) {
+  Complete<AllocOp>(Base::noutput).forward_replay_copy(args);
+  for (Index i = 0; i < Base::noutput; i++) args.y(i).setUpdatable(true);
+}
 
 const char *global::AllocOp::op_name() { return "AllocOp"; }
 
@@ -4716,6 +4761,8 @@ void SegmentRef::resize(ad_segment &pack, Index n) {
 }
 
 ad_segment pack(const ad_segment &x, bool up) {
+  TMBAD_ASSERT2(x.index() < get_glob()->values.size(),
+                "Packing invalid ad_segment");
   if (up) {
     global::Complete<PackOp<true> > F(x.size());
     return F(x);
