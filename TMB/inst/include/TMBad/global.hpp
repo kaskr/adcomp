@@ -1570,6 +1570,11 @@ struct global {
     static const bool implicit_dependencies = false;
     /** \brief Should this operator have a static identifier ? */
     static const bool add_static_identifier = false;
+    /** \brief Does this operator have a custom identifier ?
+        Intended for cases that can't be handled by adding a static identifier
+       (e.g. `RefOp`). \warning Internal use only.
+    */
+    static const bool have_custom_identifier = false;
     /** \brief Should this operator replay it self by invoking the copy CTOR ?
      */
     static const bool add_forward_replay_copy = false;
@@ -1630,6 +1635,8 @@ struct global {
     void *operator_data() { return NULL; }
     /** \brief Default implementation of `OperatorPure::synchronize()` */
     void synchronize(ForwardArgs<Scalar> &args) const {}
+    /** \brief Return custom identifier (optional) */
+    void *custom_identifier() { return NULL; }
     /** \brief Print this operator (optional) */
     void print(print_config cfg) {}
   };
@@ -2259,7 +2266,9 @@ struct global {
       return info;
     }
     void *identifier() {
-      if (Op.add_static_identifier) {
+      if (Op.have_custom_identifier) {
+        return Op.custom_identifier();
+      } else if (Op.add_static_identifier) {
         static void *id = new char();
         return id;
       } else
@@ -2447,6 +2456,8 @@ struct global {
     }
     /** \brief Reverse mode updates are allowed in replay mode */
     void reverse(ReverseArgs<Replay> &args);
+    static const bool have_custom_identifier = true;
+    void *custom_identifier();
     const char *op_name();
   };
 

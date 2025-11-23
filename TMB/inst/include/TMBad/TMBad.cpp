@@ -2031,6 +2031,8 @@ void global::RefOp::reverse(ReverseArgs<Replay> &args) {
   }
 }
 
+void *global::RefOp::custom_identifier() { return &(glob->values[i]); }
+
 const char *global::RefOp::op_name() { return "RefOp"; }
 
 OperatorPure *global::Fuse(OperatorPure *Op1, OperatorPure *Op2) {
