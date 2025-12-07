@@ -24,7 +24,8 @@ struct standard_derivative_table : std::vector<ADFun> {
     }
   }
   /** \brief Retaping this derivative table has no effect. */
-  void retape(ForwardArgs<Scalar> &args) {}
+  template <class ARGS>
+  void retape(ARGS &args) {}
   /** \brief Set zero order function of this derivative table. */
   standard_derivative_table(const ADFun &F) : std::vector<ADFun>(1, F) {}
 };
@@ -48,7 +49,8 @@ struct retaping_derivative_table : standard_derivative_table<ADFun, packed_> {
   Test test;
   /** \brief Retape the zero derivative and remove all higher orders
       from the table. */
-  void retape(ForwardArgs<Scalar> &args) {
+  template <class ARGS>
+  void retape(ARGS &args) {
     size_t n = (*this)[0].Domain();
     std::vector<Scalar> x = args.x_segment(0, n);
     bool change = test(x);
@@ -214,6 +216,10 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
   }
 
   void reverse(ReverseArgs<Scalar> &args) {
+    (*dtab).retape(args);
+
+    (*dtab).requireOrder(order);
+
     size_t n = input_size();
     size_t m = output_size();
 
@@ -247,6 +253,9 @@ struct AtomOp : global::DynamicOperator<-1, -1> {
     TMBAD_ASSERT(false);
   }
   void reverse(ReverseArgs<Writer> &args) { TMBAD_ASSERT(false); }
+
+  static const bool have_custom_identifier = true;
+  void *custom_identifier() { return &(*dtab); }
 
   const char *op_name() { return "AtomOp"; }
 
