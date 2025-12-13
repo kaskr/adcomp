@@ -592,7 +592,7 @@ void reorder_temporaries(global &glob) {
 }
 
 void reorder_depth_first(global &glob) {
-  std::vector<bool> visited(glob.opstack.size(), false);
+  std::vector<bool> done(glob.opstack.size(), false);
   std::vector<Index> v2o = glob.var2op();
   std::vector<Index> stack;
   std::vector<Index> result;
@@ -603,18 +603,21 @@ void reorder_depth_first(global &glob) {
     Index i = v2o[dep_var];
 
     stack.push_back(i);
-    visited[i] = true;
     while (stack.size() > 0) {
       Index i = stack.back();
       args.ptr = glob.subgraph_ptr[i];
       Dependencies dep;
       glob.opstack[i]->dependencies(args, dep);
-      dfs_add_to_stack<Index> add_to_stack(stack, visited, v2o);
+      dfs_add_to_stack<Index> add_to_stack(stack, done, v2o);
       size_t before = stack.size();
       dep.apply(add_to_stack);
       size_t after = stack.size();
+
       if (before == after) {
-        result.push_back(i);
+        if (!done[i]) {
+          result.push_back(i);
+          done[i] = true;
+        }
         stack.pop_back();
       }
     }
@@ -2673,7 +2676,7 @@ Writer fabs(const Writer &x) {
 }
 void AbsOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * sign(args.x(0));
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (sign(args.x(0)));
 }
 const char *AbsOp::op_name() { return "AbsOp"; }
 ad_plain fabs(const ad_plain &x) { return get_glob()->add_to_stack<AbsOp>(x); }
@@ -2692,7 +2695,7 @@ Writer sin(const Writer &x) {
 }
 void SinOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * cos(args.x(0));
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (cos(args.x(0)));
 }
 const char *SinOp::op_name() { return "SinOp"; }
 ad_plain sin(const ad_plain &x) { return get_glob()->add_to_stack<SinOp>(x); }
@@ -2711,7 +2714,7 @@ Writer cos(const Writer &x) {
 }
 void CosOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * -sin(args.x(0));
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (-sin(args.x(0)));
 }
 const char *CosOp::op_name() { return "CosOp"; }
 ad_plain cos(const ad_plain &x) { return get_glob()->add_to_stack<CosOp>(x); }
@@ -2730,7 +2733,7 @@ Writer exp(const Writer &x) {
 }
 void ExpOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * args.y(0);
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (args.y(0));
 }
 const char *ExpOp::op_name() { return "ExpOp"; }
 ad_plain exp(const ad_plain &x) { return get_glob()->add_to_stack<ExpOp>(x); }
@@ -2749,7 +2752,7 @@ Writer log(const Writer &x) {
 }
 void LogOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * Type(1.) / args.x(0);
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (Type(1.) / args.x(0));
 }
 const char *LogOp::op_name() { return "LogOp"; }
 ad_plain log(const ad_plain &x) { return get_glob()->add_to_stack<LogOp>(x); }
@@ -2768,7 +2771,7 @@ Writer sqrt(const Writer &x) {
 }
 void SqrtOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * Type(0.5) / args.y(0);
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (Type(0.5) / args.y(0));
 }
 const char *SqrtOp::op_name() { return "SqrtOp"; }
 ad_plain sqrt(const ad_plain &x) { return get_glob()->add_to_stack<SqrtOp>(x); }
@@ -2788,7 +2791,7 @@ Writer tan(const Writer &x) {
 void TanOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
-    args.dx(0) += args.dy(0) * Type(1.) / (cos(args.x(0)) * cos(args.x(0)));
+    args.dx(0) += args.dy(0) * (Type(1.) / (cos(args.x(0)) * cos(args.x(0))));
 }
 const char *TanOp::op_name() { return "TanOp"; }
 ad_plain tan(const ad_plain &x) { return get_glob()->add_to_stack<TanOp>(x); }
@@ -2807,7 +2810,7 @@ Writer sinh(const Writer &x) {
 }
 void SinhOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * cosh(args.x(0));
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (cosh(args.x(0)));
 }
 const char *SinhOp::op_name() { return "SinhOp"; }
 ad_plain sinh(const ad_plain &x) { return get_glob()->add_to_stack<SinhOp>(x); }
@@ -2826,7 +2829,7 @@ Writer cosh(const Writer &x) {
 }
 void CoshOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * sinh(args.x(0));
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (sinh(args.x(0)));
 }
 const char *CoshOp::op_name() { return "CoshOp"; }
 ad_plain cosh(const ad_plain &x) { return get_glob()->add_to_stack<CoshOp>(x); }
@@ -2846,7 +2849,7 @@ Writer tanh(const Writer &x) {
 void TanhOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
-    args.dx(0) += args.dy(0) * Type(1.) / (cosh(args.x(0)) * cosh(args.x(0)));
+    args.dx(0) += args.dy(0) * (Type(1.) / (cosh(args.x(0)) * cosh(args.x(0))));
 }
 const char *TanhOp::op_name() { return "TanhOp"; }
 ad_plain tanh(const ad_plain &x) { return get_glob()->add_to_stack<TanhOp>(x); }
@@ -2865,7 +2868,7 @@ Writer expm1(const Writer &x) {
 }
 void Expm1::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
-  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * args.y(0) + Type(1.);
+  if (args.dy(0) != Type(0)) args.dx(0) += args.dy(0) * (args.y(0) + Type(1.));
 }
 const char *Expm1::op_name() { return "Expm1"; }
 ad_plain expm1(const ad_plain &x) { return get_glob()->add_to_stack<Expm1>(x); }
@@ -2885,7 +2888,7 @@ Writer log1p(const Writer &x) {
 void Log1p::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
-    args.dx(0) += args.dy(0) * Type(1.) / (args.x(0) + Type(1.));
+    args.dx(0) += args.dy(0) * (Type(1.) / (args.x(0) + Type(1.)));
 }
 const char *Log1p::op_name() { return "Log1p"; }
 ad_plain log1p(const ad_plain &x) { return get_glob()->add_to_stack<Log1p>(x); }
@@ -2906,7 +2909,7 @@ void AsinOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
     args.dx(0) +=
-        args.dy(0) * Type(1.) / sqrt(Type(1.) - args.x(0) * args.x(0));
+        args.dy(0) * (Type(1.) / sqrt(Type(1.) - args.x(0) * args.x(0)));
 }
 const char *AsinOp::op_name() { return "AsinOp"; }
 ad_plain asin(const ad_plain &x) { return get_glob()->add_to_stack<AsinOp>(x); }
@@ -2927,7 +2930,7 @@ void AcosOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
     args.dx(0) +=
-        args.dy(0) * Type(-1.) / sqrt(Type(1.) - args.x(0) * args.x(0));
+        args.dy(0) * (Type(-1.) / sqrt(Type(1.) - args.x(0) * args.x(0)));
 }
 const char *AcosOp::op_name() { return "AcosOp"; }
 ad_plain acos(const ad_plain &x) { return get_glob()->add_to_stack<AcosOp>(x); }
@@ -2947,7 +2950,7 @@ Writer atan(const Writer &x) {
 void AtanOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
-    args.dx(0) += args.dy(0) * Type(1.) / (Type(1.) + args.x(0) * args.x(0));
+    args.dx(0) += args.dy(0) * (Type(1.) / (Type(1.) + args.x(0) * args.x(0)));
 }
 const char *AtanOp::op_name() { return "AtanOp"; }
 ad_plain atan(const ad_plain &x) { return get_glob()->add_to_stack<AtanOp>(x); }
@@ -2968,7 +2971,7 @@ void AsinhOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
     args.dx(0) +=
-        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) + Type(1.));
+        args.dy(0) * (Type(1.) / sqrt(args.x(0) * args.x(0) + Type(1.)));
 }
 const char *AsinhOp::op_name() { return "AsinhOp"; }
 ad_plain asinh(const ad_plain &x) {
@@ -2991,7 +2994,7 @@ void AcoshOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
     args.dx(0) +=
-        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) - Type(1.));
+        args.dy(0) * (Type(1.) / sqrt(args.x(0) * args.x(0) - Type(1.)));
 }
 const char *AcoshOp::op_name() { return "AcoshOp"; }
 ad_plain acosh(const ad_plain &x) {
@@ -3013,7 +3016,7 @@ Writer atanh(const Writer &x) {
 void AtanhOp::reverse(ReverseArgs<Scalar> &args) {
   typedef Scalar Type;
   if (args.dy(0) != Type(0))
-    args.dx(0) += args.dy(0) * Type(1.) / (Type(1) - args.x(0) * args.x(0));
+    args.dx(0) += args.dy(0) * (Type(1.) / (Type(1) - args.x(0) * args.x(0)));
 }
 const char *AtanhOp::op_name() { return "AtanhOp"; }
 ad_plain atanh(const ad_plain &x) {

@@ -3372,7 +3372,7 @@ struct AbsOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * sign(args.x(0));
+    args.dx(0) += args.dy(0) * (sign(args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3391,7 +3391,7 @@ struct SinOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * cos(args.x(0));
+    args.dx(0) += args.dy(0) * (cos(args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3408,7 +3408,7 @@ struct CosOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * -sin(args.x(0));
+    args.dx(0) += args.dy(0) * (-sin(args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3425,7 +3425,7 @@ struct ExpOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * args.y(0);
+    args.dx(0) += args.dy(0) * (args.y(0));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3442,7 +3442,7 @@ struct LogOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(1.) / args.x(0);
+    args.dx(0) += args.dy(0) * (Type(1.) / args.x(0));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3459,7 +3459,7 @@ struct SqrtOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(0.5) / args.y(0);
+    args.dx(0) += args.dy(0) * (Type(0.5) / args.y(0));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3476,7 +3476,7 @@ struct TanOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(1.) / (cos(args.x(0)) * cos(args.x(0)));
+    args.dx(0) += args.dy(0) * (Type(1.) / (cos(args.x(0)) * cos(args.x(0))));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3495,7 +3495,7 @@ struct SinhOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * cosh(args.x(0));
+    args.dx(0) += args.dy(0) * (cosh(args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3512,7 +3512,7 @@ struct CoshOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * sinh(args.x(0));
+    args.dx(0) += args.dy(0) * (sinh(args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3529,7 +3529,7 @@ struct TanhOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(1.) / (cosh(args.x(0)) * cosh(args.x(0)));
+    args.dx(0) += args.dy(0) * (Type(1.) / (cosh(args.x(0)) * cosh(args.x(0))));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3546,7 +3546,7 @@ struct Expm1 : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * args.y(0) + Type(1.);
+    args.dx(0) += args.dy(0) * (args.y(0) + Type(1.));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3563,7 +3563,7 @@ struct Log1p : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(1.) / (args.x(0) + Type(1.));
+    args.dx(0) += args.dy(0) * (Type(1.) / (args.x(0) + Type(1.)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3581,7 +3581,7 @@ struct AsinOp : global::UnaryOperator {
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     args.dx(0) +=
-        args.dy(0) * Type(1.) / sqrt(Type(1.) - args.x(0) * args.x(0));
+        args.dy(0) * (Type(1.) / sqrt(Type(1.) - args.x(0) * args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3599,7 +3599,7 @@ struct AcosOp : global::UnaryOperator {
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     args.dx(0) +=
-        args.dy(0) * Type(-1.) / sqrt(Type(1.) - args.x(0) * args.x(0));
+        args.dy(0) * (Type(-1.) / sqrt(Type(1.) - args.x(0) * args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3616,7 +3616,7 @@ struct AtanOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(1.) / (Type(1.) + args.x(0) * args.x(0));
+    args.dx(0) += args.dy(0) * (Type(1.) / (Type(1.) + args.x(0) * args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3634,7 +3634,7 @@ struct AsinhOp : global::UnaryOperator {
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     args.dx(0) +=
-        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) + Type(1.));
+        args.dy(0) * (Type(1.) / sqrt(args.x(0) * args.x(0) + Type(1.)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3652,7 +3652,7 @@ struct AcoshOp : global::UnaryOperator {
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
     args.dx(0) +=
-        args.dy(0) * Type(1.) / sqrt(args.x(0) * args.x(0) - Type(1.));
+        args.dy(0) * (Type(1.) / sqrt(args.x(0) * args.x(0) - Type(1.)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3669,7 +3669,7 @@ struct AtanhOp : global::UnaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * Type(1.) / (Type(1) - args.x(0) * args.x(0));
+    args.dx(0) += args.dy(0) * (Type(1.) / (Type(1) - args.x(0) * args.x(0)));
   }
   void reverse(ReverseArgs<Scalar> &args);
   const char *op_name();
@@ -3692,10 +3692,11 @@ struct Atan2 : global::BinaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * args.x(1) /
-                  (args.x(0) * args.x(0) + args.x(1) * args.x(1));
-    args.dx(1) += args.dy(0) * -args.x(0) /
-                  (args.x(0) * args.x(0) + args.x(1) * args.x(1));
+    args.dx(0) += args.dy(0) *
+                  (args.x(1) / (args.x(0) * args.x(0) + args.x(1) * args.x(1)));
+    args.dx(1) +=
+        args.dy(0) *
+        (-args.x(0) / (args.x(0) * args.x(0) + args.x(1) * args.x(1)));
   }
   const char *op_name();
 };
@@ -3712,8 +3713,8 @@ struct MaxOp : global::BinaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * ge0(args.x(0) - args.x(1));
-    args.dx(1) += args.dy(0) * lt0(args.x(0) - args.x(1));
+    args.dx(0) += args.dy(0) * (ge0(args.x(0) - args.x(1)));
+    args.dx(1) += args.dy(0) * (lt0(args.x(0) - args.x(1)));
   }
   const char *op_name();
 };
@@ -3731,8 +3732,8 @@ struct MinOp : global::BinaryOperator {
   }
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
-    args.dx(0) += args.dy(0) * ge0(args.x(1) - args.x(0));
-    args.dx(1) += args.dy(0) * lt0(args.x(1) - args.x(0));
+    args.dx(0) += args.dy(0) * (ge0(args.x(1) - args.x(0)));
+    args.dx(1) += args.dy(0) * (lt0(args.x(1) - args.x(0)));
   }
   const char *op_name();
 };

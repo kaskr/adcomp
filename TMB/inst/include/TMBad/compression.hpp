@@ -341,22 +341,23 @@ void reorder_temporaries(global &glob);
 template <class T>
 struct dfs_add_to_stack {
   std::vector<T> &stack;
-  std::vector<bool> &visited;
+  std::vector<bool> &done;
   std::vector<T> &v2o;
-  dfs_add_to_stack(std::vector<T> &stack, std::vector<bool> &visited,
+  dfs_add_to_stack(std::vector<T> &stack, std::vector<bool> &done,
                    std::vector<T> &v2o)
-      : stack(stack), visited(visited), v2o(v2o) {}
+      : stack(stack), done(done), v2o(v2o) {}
   void operator()(T var) {
     Index op = v2o[var];
-    if (!visited[op]) {
-      stack.push_back(op);
-      visited[op] = true;
-    }
+    if (!done[op]) stack.push_back(op);
   }
 };
 
 /** \brief Depth-first reordering of computational graph
     \details Application: Register optimization for GPU
+    \note This code does not handle pointer inputs (interval
+    dependendencies) correctly. And no consideration was given to
+    'forward updating' operators either. We could guard for misuse via
+    opstack flags.
 */
 void reorder_depth_first(global &glob);
 

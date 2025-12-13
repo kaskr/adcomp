@@ -278,6 +278,10 @@ ad_segment operator-(ad_segment x, ad_segment y) {
   TMBAD_ASSERT(false);
   return ad_segment();
 }
+template <bool S0, bool S1>
+double log(Vectorized<double, S0, S1> &x) {
+  return std::log((double)x);
+}
 template <class dummy = void>
 ad_segment pow(ad_segment x, ad_segment y);
 template <class dummy>
