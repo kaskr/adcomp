@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+TMB 1.9.19 (2025-12-15)
+------------------------------------------------------------------------
+
+o This release adds changes related to the 'TMBad' autodiff component:
+
+- Sparse plus low-rank Hessian now has an 'LDL' option to handle cases
+  where the sparse contribution is not positive definite.
+- Tape optimizer can now recognize identical checkpoint operators as
+  well as identical references to outer contexts.
+- Adaptive dynamically retaping checkpoint operators can now safely
+  share their derivative table.
+- A bug in the 'expm1' operator has been fixed.
+
+------------------------------------------------------------------------
 TMB 1.9.18 (2025-10-13)
 ------------------------------------------------------------------------
 
