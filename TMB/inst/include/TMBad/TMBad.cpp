@@ -3107,8 +3107,8 @@ ad_aug pow(const ad_aug &x1, const ad_aug &x2) {
     return PowOp<1, 1>()(ad_plain(x1), ad_plain(x2));
 }
 
-ad_adapt F(const ad_adapt &x1, const ad_adapt &x2) {
-  return ad_adapt(F(ad_aug(x1), ad_aug(x2)));
+ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2) {
+  return ad_adapt(pow(ad_aug(x1), ad_aug(x2)));
 }
 void CondExpEqOp::forward(ForwardArgs<Scalar> &args) {
   if (args.x(0) == args.x(1)) {

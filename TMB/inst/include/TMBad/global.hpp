@@ -3773,7 +3773,7 @@ struct PowOp : global::BinaryOperator {
   }
 };
 ad_aug pow(const ad_aug &x1, const ad_aug &x2);
-ad_adapt F(const ad_adapt &x1, const ad_adapt &x2);
+ad_adapt pow(const ad_adapt &x1, const ad_adapt &x2);
 Replay CondExpEq(const Replay &x0, const Replay &x1, const Replay &x2,
                  const Replay &x3);
 struct CondExpEqOp : global::Operator<4, 1> {
