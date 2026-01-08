@@ -529,7 +529,7 @@ sdreport_intern <- function(obj,
         ## FIXME: partial copy-paste from 'sdreport'
         epsilon <- rep(0, ADPhi$Range)
         par.full <- EvalADFunObject(ADParAug, par.fixed)
-        parameters <- obj$env$parList(par = par.full)
+        parameters <- obj$env$parList(par.fixed)
         ## FIXME: partial copy-paste from validation.R
         names.random <- obj$env$.random
         names.all <- names(parameters)
