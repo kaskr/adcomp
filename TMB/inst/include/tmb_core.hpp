@@ -1003,7 +1003,8 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   PROTECT(theta=Rf_coerceVector(theta,REALSXP));
   int n=pf->Domain();
   int m=pf->Range();
-  if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
+  if (LENGTH(theta) != n)
+    Rf_error("Wrong parameter length (%i) expected (%i).", LENGTH(theta), n);
   //R-index -> C-index
   int rangecomponent = getListInteger(control, "rangecomponent", 1) - 1;
   if(!((0<=rangecomponent)&(rangecomponent<=m-1)))
@@ -1155,7 +1156,8 @@ SEXP EvalADFunObjectTemplate(SEXP f, SEXP theta, SEXP control)
   PROTECT(theta=Rf_coerceVector(theta,REALSXP));
   int n=pf->Domain();
   int m=pf->Range();
-  if(LENGTH(theta)!=n)Rf_error("Wrong parameter length.");
+  if (LENGTH(theta) != n)
+    Rf_error("Wrong parameter length (%i) expected (%i).", LENGTH(theta), n);
   // Do forwardsweep ?
   int doforward = getListInteger(control, "doforward", 1);
   //R-index -> C-index
@@ -2074,7 +2076,8 @@ extern "C"
       pf -> sync_data();
       PROTECT( theta=Rf_coerceVector(theta,REALSXP) );
       int n = pf->theta.size();
-      if (LENGTH(theta)!=n) Rf_error("Wrong parameter length.");
+      if (LENGTH(theta) != n)
+        Rf_error("Wrong parameter length (%i) expected (%i).", LENGTH(theta), n);
       vector<double> x(n);
       for(int i=0;i<n;i++) x[i] = REAL(theta)[i];
       pf->theta=x;
