@@ -18,6 +18,12 @@ SEXP have_tmb_symbolic(void);
 SEXP tmb_symbolic(SEXP Qp);
 SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult);
 SEXP tmb_CHMfactor_solve(SEXP L_, SEXP y_);
+// Incomplete Cholesky
+SEXP tmb_isolve(SEXP X, SEXP Y);
+SEXP tmb_ichol(SEXP X, SEXP tol);
+SEXP tmb_ichol_update(SEXP X, SEXP Y);
+SEXP tmb_ldl_update(SEXP X, SEXP Y);
+SEXP tmb_ldl_deriv(SEXP L);
 
 static R_CallMethodDef CallEntries[] = {
     CALLDEF(omp_num_threads, 1),
@@ -32,6 +38,11 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(tmb_symbolic, 1),
     CALLDEF(tmb_destructive_CHM_update, 3),
     CALLDEF(tmb_CHMfactor_solve, 2),
+    CALLDEF(tmb_isolve, 2),
+    CALLDEF(tmb_ichol, 2),
+    CALLDEF(tmb_ichol_update, 2),
+    CALLDEF(tmb_ldl_update, 2),
+    CALLDEF(tmb_ldl_deriv, 1),
     {NULL, NULL, 0}
 };
 

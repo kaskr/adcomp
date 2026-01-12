@@ -481,7 +481,7 @@ cs r2cs(SEXP X) {
   return A;
 }
 extern "C"
-SEXP cs_solve(SEXP X, SEXP Y) {
+SEXP tmb_isolve(SEXP X, SEXP Y) {
   cs A = r2cs(X);
   if (A.m != A.n || A.m != LENGTH(Y))
     Rf_error("Non-conformable arguments");
@@ -492,7 +492,7 @@ SEXP cs_solve(SEXP X, SEXP Y) {
   return ans;
 }
 extern "C"
-SEXP cs_ichol(SEXP X, SEXP tol) {
+SEXP tmb_ichol(SEXP X, SEXP tol) {
   cs A = r2cs(X);
   double chol_tol = REAL(tol)[0];
   cs* L = cs_ichol(&A, chol_tol);
@@ -505,7 +505,7 @@ SEXP cs_ichol(SEXP X, SEXP tol) {
 }
 // Update incomplete Cholesky factor L
 extern "C"
-SEXP cs_ichol_update(SEXP X, SEXP Y) {
+SEXP tmb_ichol_update(SEXP X, SEXP Y) {
   cs A = r2cs(X);
   cs L = r2cs(Y);
   cs_ichol_update(&A, &L);
@@ -513,14 +513,14 @@ SEXP cs_ichol_update(SEXP X, SEXP Y) {
 }
 // Update incomplete LDL Cholesky factor L
 extern "C"
-SEXP cs_ldl_update(SEXP X, SEXP Y) {
+SEXP tmb_ldl_update(SEXP X, SEXP Y) {
   cs A = r2cs(X);
   cs L = r2cs(Y);
   cs_chol_right(&A, &L);
   return Y;
 }
 extern "C"
-SEXP cs_ldl_deriv(SEXP L) {
+SEXP tmb_ldl_deriv(SEXP L) {
   SEXP X = PROTECT(Rf_duplicate(L));
   cs A = r2cs(X);
   cs_dchol_right(&A);
