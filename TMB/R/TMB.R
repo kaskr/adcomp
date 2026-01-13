@@ -57,18 +57,44 @@ getUserDLL <- function(){
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
-  .Call("tmb_destructive_CHM_update", L, H, t, PACKAGE="TMB")
+  if (inherits(L,"dCHMsuper")) {
+    .Call("tmb_destructive_CHM_update", L, H, t, PACKAGE="TMB")
+  } else {
+    attr(L, "methods")$updateCholesky(L, H, t)
+  }
 }
 
 ## Solve H x = y using super nodal sparse Cholesky factor
 ## Optionally refine solution iteratively (if H is not the exact Hessian)
 solveCholesky <- function(L, y, iterative.refinement=FALSE) {
+  if (inherits(L,"dCHMsuper")) {
     x <- .Call("tmb_CHMfactor_solve", L, y, PACKAGE="TMB")
     if (iterative.refinement &&
         !is.null(iterative.refine <- attr(L, "iterative_refinement"))) {
         x <- iterative.refine(L=L, x=x, y=y)
     }
     x
+  } else {
+    attr(L, "methods")$solveCholesky(L, y)
+  }
+}
+
+## Get determinant
+determinant <- function(L, ...) {
+  if (inherits(L,"dCHMsuper")) {
+    Matrix::determinant(L, ...)
+  } else {
+    attr(L, "methods")$logdet(L, ...)
+  }
+}
+
+## Get determinant derivatives
+solveSubset2 <- function(L) {
+  if (inherits(L,"dCHMsuper")) {
+    .Call("tmb_invQ_tril_halfdiag", L, PACKAGE="TMB")
+  } else {
+    attr(L, "methods")$logdetHalfDeriv(L)
+  }
 }
 
 ## Construct funtion to do iterative refinement
@@ -748,7 +774,6 @@ MakeADFun <- function(data, parameters, map=list(),
       ##browser()
       e <- environment(spHess)
       solveSubset <- function(L).Call("tmb_invQ",L,PACKAGE="TMB")
-      solveSubset2 <- function(L).Call("tmb_invQ_tril_halfdiag",L,PACKAGE="TMB")
       ## FIXME: The following two lines are not efficient:
       ## 1. ihessian <- tril(solveSubset(L))
       ## 2. diag(ihessian) <- .5*diag(ihessian)
@@ -879,7 +904,7 @@ MakeADFun <- function(data, parameters, map=list(),
         hessian <- .Call("tmb_sparse_izamd", hessian, profile, 1.0, PACKAGE="TMB")
     }
     ## Update Cholesky:
-    if(inherits(env$L.created.by.newton,"dCHMsuper")){
+    if(!is.null(env$L.created.by.newton)){
       L <- env$L.created.by.newton
       ##.Call("destructive_CHM_update",L,hessian,as.double(0),PACKAGE="Matrix")
       updateCholesky(L,hessian)
