@@ -1955,16 +1955,83 @@ checkSparseHessian <- function(obj,par=obj$env$last.par,
 ##' @title Run symbolic analysis on sparse Hessian
 ##' @param obj Output from \code{MakeADFun}
 ##' @return NULL
-runSymbolicAnalysis <- function(obj){
-  ok <- .Call("have_tmb_symbolic",PACKAGE="TMB")
-  if(!ok){
+runSymbolicAnalysis <- function(obj,
+                                method=c("CHOLMOD", "incomplete"),
+                                ...) {
+  method <- match.arg(method)
+  if (method == "CHOLMOD")    return ( runSymbolicAnalysis1(obj, ...) )
+  if (method == "incomplete") return ( runSymbolicAnalysis2(obj, ...) )
+  stop("Unknown method: ", method)
+}
+runSymbolicAnalysis1 <- function(obj, ...) {
+  ok <- .Call("have_tmb_symbolic", PACKAGE="TMB")
+  if(!ok) {
     cat("note: tmb_symbolic not installed\n")
     return(NULL)
   }
   h <- obj$env$spHess(random=TRUE)
   h@x[] <- 0
   diag(h) <- 1
-  L <- .Call("tmb_symbolic",h,PACKAGE="TMB")
+  L <- .Call("tmb_symbolic", h, PACKAGE="TMB")
+  obj$env$L.created.by.newton <- L
+  NULL
+}
+## Incomplete analysis
+runSymbolicAnalysis2 <- function(obj, ...) {
+  ## Override defaults
+  config <- list(tol=1e-4, maxit=50, abstol=1e-10, trace=FALSE)
+  args <- list(...)
+  config[names(args)] <- args
+  ## Evaluate hessian
+  par <- obj$env$last.par.best %||% obj$env$last.par %||% obj$env$par
+  h <- obj$env$spHess(par,random=TRUE)
+  ## Pattern will change => clear matched pattern
+  environment(obj$env$spHess)$ind1 <- NULL
+  ## Run incomplete analysis
+  L <- .Call("tmb_ichol", Matrix::t(h), config[["tol"]], PACKAGE="TMB")
+  ## Flopcount
+  flopcount <- function(L) {
+    cc <- diff(L@p)
+    rc <- diff(Matrix::t(L)@p)
+    sum(cc*rc)
+  }
+  if (config[["trace"]]) {
+    cat(sprintf("nnz(L)=%f\n",length(L@x)))
+    cat(sprintf("Flopcount=%f\n",flopcount(L)))
+  }
+  ## Set methods and other attributes
+  attr(L, "H") <- h
+  attr(L, "perm") <- seq_len(nrow(h)) - 1L
+  attr(L, "methods") <- list(
+    updateCholesky = function(L, H, t=0) {
+      HT <- Matrix::t(H)
+      diag(HT) <- diag(HT) + t
+      .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
+      all(diag(L) > 0)
+    },
+    solveCholesky = function(L, y) {
+      H <- attr(L,"H")
+      x <- .Call("tmb_isolve", L, y, PACKAGE="TMB")
+      for (i in seq_len(config[["maxit"]])) {
+        Hx <- as.numeric(H %*% x) ## H %*% x
+        error <- y - Hx
+        mgc <- max(abs(error))
+        if (config[["trace"]]) print (mgc)
+        if (is.finite(mgc) && mgc < config[["abstol"]]) break
+        if (!is.finite(mgc)) {
+          stop("Must redo symbolic analysis")
+        }
+        x <- x + .Call("tmb_isolve", L, error, PACKAGE="TMB")
+      }
+      if (config[["trace"]] && i==config[["maxit"]]) {
+        warning("Failed convergence with mgc=", mgc)
+      }
+      x
+    },
+    logdet = function(L,...) list(modulus=.5*sum(log(diag(L)))),
+    logdetHalfDeriv = function(L) .5 * .Call("tmb_ldl_deriv", L, PACKAGE="TMB")
+  )
+  ## Set Cholesky inside model object
   obj$env$L.created.by.newton <- L
   NULL
 }
