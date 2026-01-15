@@ -4,14 +4,30 @@
 \alias{runSymbolicAnalysis}
 \title{Run symbolic analysis on sparse Hessian}
 \usage{
-runSymbolicAnalysis(obj)
+runSymbolicAnalysis(obj, method = c("CHOLMOD", "incomplete"), ...)
 }
 \arguments{
 \item{obj}{Output from \code{MakeADFun}}
+
+\item{method}{Which method to use; see details.}
+
+\item{...}{Extra paramters depending on the method.}
 }
 \description{
+Provide alternative methods to handle the sparse linear algebra required by TMB.
+}
+\details{
+\code{method="CHOLMOD"}
 Aggressively tries to reduce fill-in of sparse Cholesky factor by
 running a full suite of ordering algorithms. NOTE: requires a
 specialized installation of the package. More information is
-available at the package URL.
+available at the package URL. This method is mainly for backward compatibility and dates back to before the Matrix package included the mentioned ordering algorithms.
+
+\code{method="incomplete"}
+This experimental method determines an approximate factorization of the form \eqn{H=L D L^T} where small elements of L are dropped. It supports a number of extra arguments:
+\itemize{
+  \item \code{tol} Drop elements with \code{abs(L)<tol}
+  \item \code{abstol}, \code{maxit} Linear systems \eqn{H x = y} are solved using iterative refinement with absolute error tolerance \code{abstol} and maximum number of iterations \code{maxit}.
+  \item \code{trace} Method specific output can be enabled by \code{trace=TRUE}.
+}
 }
