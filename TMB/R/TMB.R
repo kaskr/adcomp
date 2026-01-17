@@ -2016,8 +2016,10 @@ runSymbolicAnalysis2 <- function(obj, ...) {
   attr(L, "perm") <- seq_len(nrow(h)) - 1L
   attr(L, "methods") <- list(
     updateCholesky = function(L, H, t=0) {
+      if (t != 0)
+        diag(H) <- diag(H) + t
+      L <- .Call("setslot", L, "H", H)
       HT <- Matrix::t(H)
-      diag(HT) <- diag(HT) + t
       .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
       all(diag(L) > 0)
     },
@@ -2035,8 +2037,8 @@ runSymbolicAnalysis2 <- function(obj, ...) {
         }
         x <- x + .Call("tmb_isolve", L, error, PACKAGE="TMB")
       }
-      if (config[["trace"]] && i==config[["maxit"]]) {
-        warning("Failed convergence with mgc=", mgc)
+      if (i==config[["maxit"]]) {
+        stop("Failed convergence with mgc=", mgc)
       }
       x
     },
