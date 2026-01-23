@@ -2035,7 +2035,12 @@ runSymbolicAnalysis2 <- function(obj, ...) {
         if (!is.finite(mgc)) {
           stop("Must redo symbolic analysis")
         }
-        x <- x + .Call("tmb_isolve", L, error, PACKAGE="TMB")
+        step <- .Call("tmb_isolve", L, error, PACKAGE="TMB")
+        if (TRUE) { ## Tune step size
+          t <- sum(error * step) / sum(step*(H%*%step))
+          step <- t * step
+        }
+        x <- x + step
       }
       if (i==config[["maxit"]]) {
         stop("Failed convergence with mgc=", mgc)
