@@ -1991,7 +1991,7 @@ runSymbolicAnalysis1 <- function(obj, ...) {
 ## Incomplete analysis
 runSymbolicAnalysis2 <- function(obj, ...) {
   ## Override defaults
-  config <- list(tol=1e-4, maxit=50, abstol=1e-10, trace=FALSE)
+  config <- list(tol=1e-4, maxit=50, abstol=1e-10, posdef=FALSE, trace=FALSE)
   args <- list(...)
   config[names(args)] <- args
   ## Evaluate hessian
@@ -2021,6 +2021,7 @@ runSymbolicAnalysis2 <- function(obj, ...) {
       L <- .Call("setslot", L, "H", H)
       HT <- Matrix::t(H)
       .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
+      if (config[["posdef"]]) return(TRUE)
       all(diag(L) > 0)
     },
     solveCholesky = function(L, y) {
