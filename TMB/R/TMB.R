@@ -1991,7 +1991,7 @@ runSymbolicAnalysis1 <- function(obj, ...) {
 ## Incomplete analysis
 runSymbolicAnalysis2 <- function(obj, ...) {
   ## Override defaults
-  config <- list(tol=1e-4, maxit=50, abstol=1e-10, posdef=FALSE, trace=FALSE)
+  config <- list(tol=1e-4, maxit=50, abstol=1e-10, adaptive=FALSE, posdef=FALSE, trace=FALSE)
   args <- list(...)
   config[names(args)] <- args
   ## Evaluate hessian
@@ -2001,6 +2001,19 @@ runSymbolicAnalysis2 <- function(obj, ...) {
   environment(obj$env$spHess)$ind1 <- NULL
   ## Run incomplete analysis
   L <- .Call("tmb_ichol", Matrix::t(h), config[["tol"]], PACKAGE="TMB")
+  ## Re-do incomplete analysis
+  reanalyze <- function(HT, L) {
+    environment(obj$env$spHess)$ind1 <- NULL ## pattern will change
+    Lnew <- .Call("tmb_ichol", HT, config[["tol"]], PACKAGE="TMB")
+    L <- .Call("setslot", L, "i", Lnew@i)
+    L <- .Call("setslot", L, "p", Lnew@p)
+    L <- .Call("setslot", L, "x", Lnew@x)
+    if (config[["trace"]]) {
+      cat(sprintf("nnz(L)=%f\n",length(L@x)))
+      cat(sprintf("Flopcount=%f\n",flopcount(L)))
+    }
+    NULL
+  }
   ## Flopcount
   flopcount <- function(L) {
     cc <- diff(L@p)
@@ -2020,7 +2033,10 @@ runSymbolicAnalysis2 <- function(obj, ...) {
         diag(H) <- diag(H) + t
       L <- .Call("setslot", L, "H", H)
       HT <- Matrix::t(H)
-      .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
+      if (!config[["adaptive"]])
+        .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
+      else
+        reanalyze(HT, L)
       if (config[["posdef"]]) return(TRUE)
       all(diag(L) > 0)
     },
