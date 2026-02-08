@@ -1,4 +1,3 @@
-#include <iostream>
 #include <set>
 #include <vector>
 #include <cstdlib>
@@ -161,7 +160,7 @@ cs* cs_ichol (const cs *C, double tol)
      precomputed, but for now we skip this optimization and calculate
      R via cs_transpose inside the function.
 */
-void cs_ichol_update (const cs *A, cs *L)
+bool cs_ichol_update (const cs *A, cs *L, double* err = NULL, double tol = R_PosInf)
 {
     double d, lki, *Lx, *x, *Cx ;
     csi top, i, p, k, n, *Li, *Lp, *Ri, *Rp, *c, *Cp, *Ci ;
@@ -174,8 +173,8 @@ void cs_ichol_update (const cs *A, cs *L)
     Lp = L->p ; Li = L->i ; Lx = L->x ;
     cs* R = cs_transpose(L, 0); // Pattern only
     Rp = R->p ; Ri = R->i ;
+    #define FREE_ALL cs_spfree(R);cs_free(c);cs_free(x);
     for (k = 0 ; k < n ; k++) c [k] = Lp [k];
-    double M = 0;
     for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
     {
         /* --- Nonzero pattern of L(k,:) ------------------------------------ */
@@ -204,17 +203,25 @@ void cs_ichol_update (const cs *A, cs *L)
             Lx [p] = lki ;
         }
         // Clear just the row pattern
-        for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
-          x[Ri[top]] = 0;
+        if (err != NULL) {
+          for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
+            x[Ri[top]] = 0;
+          }
         }
         // Now clear entire column union while recording the max
         for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
           i = Ri [top] ;
           for (p = Lp [i] + 1 ; p < c [i] ; p++)
             {
-              double tmp = x[Li [p]];
-              if (tmp != 0) {
-                M = std::max(M, std::abs(tmp / d));
+              if (err != NULL) {
+                double tmp = x[Li [p]];
+                if (tmp != 0) {
+                  *err = std::max(*err, std::abs(tmp / d));
+                  if (*err > tol) {
+                    FREE_ALL;
+                    return false;
+                  }
+                }
               }
               x [Li [p]] = 0;
             }
@@ -225,11 +232,9 @@ void cs_ichol_update (const cs *A, cs *L)
         Li [p] = k ;                /* store L(k,k) = sqrt (d) in column k */
         Lx [p] = d ;
     }
-    std::cout << "M = " << M << "\n";
     //Lp [n] = cp [n] ;               /* finalize L */
-    cs_spfree(R);
-    cs_free(c);
-    cs_free(x);
+    FREE_ALL;
+    return true;
 }
 
 /* Right-looking incomplete Cholesky factorization
@@ -519,7 +524,11 @@ extern "C"
 SEXP tmb_ichol_update(SEXP X, SEXP Y) {
   cs A = r2cs(X);
   cs L = r2cs(Y);
-  cs_ichol_update(&A, &L);
+  double err = 0;
+  cs_ichol_update(&A, &L, &err);
+  SEXP error = PROTECT(Rf_ScalarReal(err));
+  Rf_setAttrib(Y, Rf_install("error"), error);
+  UNPROTECT(1);
   return Y;
 }
 // Update incomplete LDL Cholesky factor L
