@@ -1,3 +1,4 @@
+#include <iostream>
 #include <set>
 #include <vector>
 #include <cstdlib>
@@ -174,6 +175,7 @@ void cs_ichol_update (const cs *A, cs *L)
     cs* R = cs_transpose(L, 0); // Pattern only
     Rp = R->p ; Ri = R->i ;
     for (k = 0 ; k < n ; k++) c [k] = Lp [k];
+    double M = 0;
     for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
     {
         /* --- Nonzero pattern of L(k,:) ------------------------------------ */
@@ -201,11 +203,19 @@ void cs_ichol_update (const cs *A, cs *L)
             Li [p] = k ;                /* store L(k,i) in column i */
             Lx [p] = lki ;
         }
-        // Clear => must repeat loop
+        // Clear just the row pattern
+        for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
+          x[Ri[top]] = 0;
+        }
+        // Now clear entire column union while recording the max
         for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
           i = Ri [top] ;
           for (p = Lp [i] + 1 ; p < c [i] ; p++)
             {
+              double tmp = x[Li [p]];
+              if (tmp != 0) {
+                M = std::max(M, std::abs(tmp / d));
+              }
               x [Li [p]] = 0;
             }
         }
@@ -215,6 +225,7 @@ void cs_ichol_update (const cs *A, cs *L)
         Li [p] = k ;                /* store L(k,k) = sqrt (d) in column k */
         Lx [p] = d ;
     }
+    std::cout << "M = " << M << "\n";
     //Lp [n] = cp [n] ;               /* finalize L */
     cs_spfree(R);
     cs_free(c);
