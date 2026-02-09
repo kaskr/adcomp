@@ -1991,7 +1991,7 @@ runSymbolicAnalysis1 <- function(obj, ...) {
 ## Incomplete analysis
 runSymbolicAnalysis2 <- function(obj, ...) {
   ## Override defaults
-  config <- list(tol=1e-4, maxit=50, abstol=1e-10, adaptive=FALSE, posdef=FALSE, trace=FALSE)
+  config <- list(tol=1e-4, maxit=50, abstol=1e-10, relax=10, adaptive=TRUE, posdef=FALSE, trace=FALSE)
   args <- list(...)
   config[names(args)] <- args
   ## Evaluate hessian
@@ -2008,6 +2008,7 @@ runSymbolicAnalysis2 <- function(obj, ...) {
     L <- .Call("setslot", L, "i", Lnew@i)
     L <- .Call("setslot", L, "p", Lnew@p)
     L <- .Call("setslot", L, "x", Lnew@x)
+    L <- .Call("setslot", L, "error", NULL)
     if (config[["trace"]]) {
       cat(sprintf("nnz(L)=%f\n",length(L@x)))
       cat(sprintf("Flopcount=%f\n",flopcount(L)))
@@ -2033,10 +2034,7 @@ runSymbolicAnalysis2 <- function(obj, ...) {
         diag(H) <- diag(H) + t
       L <- .Call("setslot", L, "H", H)
       HT <- Matrix::t(H)
-      if (!config[["adaptive"]])
-        .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
-      else
-        reanalyze(HT, L)
+      .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
       if (config[["posdef"]]) return(TRUE)
       all(diag(L) > 0)
     },
@@ -2064,8 +2062,20 @@ runSymbolicAnalysis2 <- function(obj, ...) {
       }
       x
     },
-    logdet = function(L,...) list(modulus=.5*sum(log(diag(L)))),
-    logdetHalfDeriv = function(L) .5 * .Call("tmb_ldl_deriv", L, PACKAGE="TMB")
+    logdet = function(L,...) {
+      if (config[["adaptive"]]) {
+        error <- attr(L, "error") %||% 0
+        cat("error="); print(error)
+        if (error > config[["relax"]] * config[["tol"]]) {
+          HT <- Matrix::t(attr(L, "H"))
+          reanalyze(HT, L)
+        }
+      }
+      list(modulus=.5*sum(log(diag(L))))
+    },
+    logdetHalfDeriv = function(L) {
+      .5 * .Call("tmb_ldl_deriv", L, PACKAGE="TMB")
+    }
   )
   ## Set Cholesky inside model object
   obj$env$L.created.by.newton <- L
