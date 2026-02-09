@@ -101,6 +101,7 @@ cs* cs_ichol (const cs *C, double tol)
         }
         d = x [k] ;                     /* d = C(k,k) */
         x.erase(k);
+        must_keep[k] = false; // clear
         /* --- Triangular solve --------------------------------------------- */
         while (!x.empty())          /* solve L(0:k-1,0:k-1) * x = C(:,k) */
         {
