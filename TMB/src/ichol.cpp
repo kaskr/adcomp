@@ -217,7 +217,7 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL, double tol = R_Pos
               if (err != NULL) {
                 double tmp = x[Li [p]];
                 if (tmp != 0) {
-                  *err = std::max(*err, std::abs(tmp / d));
+                  *err = std::max(*err, std::abs(tmp / Lx[Lp[Li[p]]] ));
                   if (*err > tol) {
                     FREE_ALL;
                     return false;
