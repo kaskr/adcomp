@@ -161,7 +161,7 @@ cs* cs_ichol (const cs *C, double tol)
      precomputed, but for now we skip this optimization and calculate
      R via cs_transpose inside the function.
 */
-bool cs_ichol_update (const cs *A, cs *L, double* err = NULL, double tol = R_PosInf)
+bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
 {
     double d, lki, *Lx, *x, *Cx ;
     csi top, i, p, k, n, *Li, *Lp, *Ri, *Rp, *c, *Cp, *Ci ;
@@ -174,7 +174,6 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL, double tol = R_Pos
     Lp = L->p ; Li = L->i ; Lx = L->x ;
     cs* R = cs_transpose(L, 0); // Pattern only
     Rp = R->p ; Ri = R->i ;
-    #define FREE_ALL cs_spfree(R);cs_free(c);cs_free(x);
     for (k = 0 ; k < n ; k++) c [k] = Lp [k];
     for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
     {
@@ -218,10 +217,6 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL, double tol = R_Pos
                 double tmp = x[Li [p]];
                 if (tmp != 0) {
                   *err = std::max(*err, std::abs(tmp / Lx[Lp[Li[p]]] ));
-                  if (*err > tol) {
-                    FREE_ALL;
-                    return false;
-                  }
                 }
               }
               x [Li [p]] = 0;
@@ -234,7 +229,9 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL, double tol = R_Pos
         Lx [p] = d ;
     }
     //Lp [n] = cp [n] ;               /* finalize L */
-    FREE_ALL;
+    cs_spfree(R);
+    cs_free(c);
+    cs_free(x);
     return true;
 }
 
