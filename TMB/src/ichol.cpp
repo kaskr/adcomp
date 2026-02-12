@@ -222,6 +222,7 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
     Lp = L->p ; Li = L->i ; Lx = L->x ;
     cs* R = cs_transpose(L, 0); // Pattern only
     Rp = R->p ; Ri = R->i ;
+    std::vector<int> mark(n, 0);
     for (k = 0 ; k < n ; k++) c [k] = Lp [k];
     for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
     {
@@ -235,6 +236,7 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
         x [k] = 0 ;                     /* clear x for k+1st iteration */
         /* --- Triangular solve --------------------------------------------- */
         /* solve L(0:k-1,0:k-1) * x = C(:,k) */
+        for ( top=Rp[k]; top<Rp[k+1]; top++) mark[Ri[top]] = true;
         for ( top=Rp[k]; top<Rp[k+1]-1; top++)
         {
             i = Ri [top] ;               /* s [top..n-1] is pattern of L(k,:) */
@@ -243,33 +245,36 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
             lki = xi / Lx [Lp [i]] ;
             for (p = Lp [i] + 1 ; p < c [i] ; p++)
             {
-                x [Li [p]] -= Lx [p] * xi ;
+              //if (mark[Li[p]]) x [Li [p]] -= Lx [p] * xi ;
+              x [Li [p]] -= Lx [p] * xi * mark[Li[p]];
+              //x [Li [p]] -= mark[Li[p]] ? Lx [p] * xi : 0 ;
             }
             d -= lki * lki * Lx [Lp [i]] ;            /* d = d - L(k,i)*L(k,i) */
             p = c [i]++ ;
             Li [p] = k ;                /* store L(k,i) in column i */
             Lx [p] = lki ;
         }
-        // Clear just the row pattern
-        if (err != NULL) {
-          for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
-            x[Ri[top]] = 0;
-          }
-        }
-        // Now clear entire column union while recording the max
-        for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
-          i = Ri [top] ;
-          for (p = Lp [i] + 1 ; p < c [i] ; p++)
-            {
-              if (err != NULL) {
-                double tmp = x[Li [p]];
-                if (tmp != 0) {
-                  *err = std::max(*err, std::abs(tmp / Lx[Lp[Li[p]]] ));
-                }
-              }
-              x [Li [p]] = 0;
-            }
-        }
+        for ( top=Rp[k]; top<Rp[k+1]; top++) mark[Ri[top]] = false;
+        // // Clear just the row pattern
+        // if (err != NULL) {
+        //   for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
+        //     x[Ri[top]] = 0;
+        //   }
+        // }
+        // // Now clear entire column union while recording the max
+        // for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
+        //   i = Ri [top] ;
+        //   for (p = Lp [i] + 1 ; p < c [i] ; p++)
+        //     {
+        //       if (err != NULL) {
+        //         double tmp = x[Li [p]];
+        //         if (tmp != 0) {
+        //           *err = std::max(*err, std::abs(tmp / Lx[Lp[Li[p]]] ));
+        //         }
+        //       }
+        //       x [Li [p]] = 0;
+        //     }
+        // }
         /* --- Compute L(k,k) ----------------------------------------------- */
         //if (d <= 0) return (cs_ndone (N, E, c, x, 0)) ; /* not pos def */
         p = c [k]++ ;
