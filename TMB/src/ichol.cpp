@@ -91,17 +91,13 @@ cs* cs_ichol (const cs *C, double tol)
     for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
     {
         /* --- Nonzero pattern of L(k,:) ------------------------------------ */
-        x.erase(k) ;                                /* x (0:k) is now zero */
-        for (p = Cp [k] ; p < Cp [k+1] ; p++)       /* x = full(triu(C(:,k))) */
+        for (p = Cp [k] ; Ci [p] < k ; p++)       /* x = full(triu(C(:,k))) */
         {
-            if (Ci [p] <= k) {
-                x [Ci [p]] = Cx [p] ;
-                must_keep[Ci[p]] = true;
-            }
+          x [Ci [p]] = Cx [p] ;
+          must_keep[Ci[p]] = true;
         }
-        d = x [k] ;                     /* d = C(k,k) */
-        x.erase(k);
-        must_keep[k] = false; // clear
+        if (Ci[p] != k) Rf_error("ichol: rows must be sorted with diagonal present");
+        d = Cx [p] ;                     /* d = C(k,k) */
         /* --- Triangular solve --------------------------------------------- */
         while (!x.empty())          /* solve L(0:k-1,0:k-1) * x = C(:,k) */
         {
