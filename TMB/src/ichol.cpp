@@ -45,20 +45,79 @@ void *cs_free (void *p)
 #define CS_DALLOC(...) cs_dalloc ( __VA_ARGS__ )
 #define CS_REALLOC(X1,X2,type,X3) (type*) cs_realloc (X1, X2, sizeof(type), X3)
 
+struct sorted_ints {
+  int beg, prv_insert;
+  std::vector<int> nxt;
+  sorted_ints() {}
+  sorted_ints(size_t n) : beg(n), prv_insert(n), nxt(n, -1) {}
+  // Search using existing element as offset
+  int find_from(int find, int from) {
+    for ( ; nxt[from] <= find; from = nxt[from] );
+    return from;
+  }
+  void insert_after(int elt, int from) {
+    nxt[elt] = nxt[from];
+    nxt[from] = elt;
+  }
+  void insert(int elt) {
+    // Element already inserted
+    if (nxt[elt] != -1) return;
+    // New initial element?
+    if (elt < beg) {
+      nxt[elt] = beg;
+      beg = elt;
+      return;
+    }
+    // Find element to search from
+    int i = (elt > prv_insert && nxt[prv_insert] != -1 ?
+             prv_insert : beg);
+    // Find element
+    i = find_from(elt, i);
+    // Insert
+    insert_after(elt, i);
+  }
+  const int* begin() { return &beg; }
+  // erase: only first element!
+  void erase(int i) {
+    if ( i == beg ) {
+      int tmp = nxt[beg];
+      nxt[beg] = -1;
+      beg = tmp;
+    }
+  }
+  bool empty() { return (beg == nxt.size()); }
+};
+
+// struct row_pattern {
+//   std::set<int> s;
+//   std::vector<bool> mark;
+//   std::vector<double> x; // Numerical values
+//   row_pattern(int n) { mark.resize(n, false); x.resize(n, 0); }
+//   bool empty() { return s.empty(); }
+//   int top() { return *s.begin(); }
+//   // Element access
+//   double& operator[](int i) { insert_pattern(i); return x[i]; }
+//   void erase(int i) { erase_pattern(i); x[i] = 0; }
+//   // Private
+//   void insert_pattern(int i) { if (!mark[i]) { s.insert(i); mark[i] = true; } }
+//   void erase_pattern (int i) { if (mark[i]) { s.erase(i); mark[i] = false; } }
+// };
+
 struct row_pattern {
-  std::set<int> s;
-  std::vector<bool> mark;
+  sorted_ints s;
   std::vector<double> x; // Numerical values
-  row_pattern(int n) { mark.resize(n, false); x.resize(n, 0); }
+  row_pattern(int n) : s(n) { x.resize(n, 0); }
   bool empty() { return s.empty(); }
   int top() { return *s.begin(); }
   // Element access
   double& operator[](int i) { insert_pattern(i); return x[i]; }
   void erase(int i) { erase_pattern(i); x[i] = 0; }
   // Private
-  void insert_pattern(int i) { if (!mark[i]) { s.insert(i); mark[i] = true; } }
-  void erase_pattern (int i) { if (mark[i]) { s.erase(i); mark[i] = false; } }
+  void insert_pattern(int i) { s.insert(i); }
+  void erase_pattern (int i) { s.erase(i); }
 };
+
+
 struct entry {
   int index;
   double value;
