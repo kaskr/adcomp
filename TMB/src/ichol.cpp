@@ -558,7 +558,7 @@ SEXP tmb_ichol(SEXP X, SEXP tol) {
   cs A = r2cs(X);
   double chol_tol = REAL(tol)[0];
   cs* L = cs_ichol(&A, chol_tol);
-  SEXP claes = PROTECT(R_do_MAKE_CLASS("dgCMatrix"));  // OR dgTMatrix ?
+  SEXP claes = PROTECT(R_do_MAKE_CLASS("dgCMatrix"));  // OR dtCMatrix ?
   SEXP ans = PROTECT(R_do_new_object(claes));
   cs2r(ans, L);
   cs_spfree(L);
