@@ -61,7 +61,10 @@ struct sorted_ints {
   }
   void insert(int elt) {
     // Element already inserted
-    if (nxt[elt] != -1) return;
+    if (nxt[elt] != -1) {
+      prv_insert = elt;
+      return;
+    }
     // New initial element?
     if (elt < beg) {
       nxt[elt] = beg;
