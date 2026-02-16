@@ -75,6 +75,8 @@ struct sorted_ints {
     i = find_from(elt, i);
     // Insert
     insert_after(elt, i);
+    // Update
+    prv_insert = elt;
   }
   const int* begin() { return &beg; }
   // erase: only first element!
