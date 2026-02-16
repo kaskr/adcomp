@@ -45,6 +45,11 @@ void *cs_free (void *p)
 #define CS_DALLOC(...) cs_dalloc ( __VA_ARGS__ )
 #define CS_REALLOC(X1,X2,type,X3) (type*) cs_realloc (X1, X2, sizeof(type), X3)
 
+/* Custum container to hold a sorted sequence of integers, optimized
+   for insertions where new elements are very likely:
+   - In the sequence already or
+   - Close to previously inserted element
+*/
 struct sorted_ints {
   int beg, prv_insert;
   std::vector<int> nxt;
@@ -71,10 +76,10 @@ struct sorted_ints {
       beg = elt;
       return;
     }
-    // Find element to search from
+    // Use previous insert as offset if possible
     int i = (elt > prv_insert && nxt[prv_insert] != -1 ?
              prv_insert : beg);
-    // Find element
+    // Find element starting from offset
     i = find_from(elt, i);
     // Insert
     insert_after(elt, i);
@@ -90,38 +95,19 @@ struct sorted_ints {
       beg = tmp;
     }
   }
-  bool empty() { return (beg == nxt.size()); }
+  bool empty() { return (beg == (int) nxt.size()); }
 };
 
-// struct row_pattern {
-//   std::set<int> s;
-//   std::vector<bool> mark;
-//   std::vector<double> x; // Numerical values
-//   row_pattern(int n) { mark.resize(n, false); x.resize(n, 0); }
-//   bool empty() { return s.empty(); }
-//   int top() { return *s.begin(); }
-//   // Element access
-//   double& operator[](int i) { insert_pattern(i); return x[i]; }
-//   void erase(int i) { erase_pattern(i); x[i] = 0; }
-//   // Private
-//   void insert_pattern(int i) { if (!mark[i]) { s.insert(i); mark[i] = true; } }
-//   void erase_pattern (int i) { if (mark[i]) { s.erase(i); mark[i] = false; } }
-// };
-
 struct row_pattern {
-  sorted_ints s;
+  sorted_ints s; // Pattern
   std::vector<double> x; // Numerical values
-  row_pattern(int n) : s(n) { x.resize(n, 0); }
+  row_pattern(int n) : s(n), x(n, 0) { }
   bool empty() { return s.empty(); }
   int top() { return *s.begin(); }
   // Element access
-  double& operator[](int i) { insert_pattern(i); return x[i]; }
-  void erase(int i) { erase_pattern(i); x[i] = 0; }
-  // Private
-  void insert_pattern(int i) { s.insert(i); }
-  void erase_pattern (int i) { s.erase(i); }
+  double& operator[](int i) { s.insert(i); return x[i]; }
+  void erase(int i) { s.erase(i); x[i] = 0; }
 };
-
 
 struct entry {
   int index;
