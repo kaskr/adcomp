@@ -48,13 +48,15 @@ void *cs_free (void *p)
 /* Custum container to hold a sorted sequence of integers, optimized
    for insertions where new elements are very likely:
    - In the sequence already or
-   - Close to previously inserted element
+   - Greater than, and close to, previously inserted element
 */
 struct sorted_ints {
+  static const int NA = -1;
   int beg, prv_insert;
+  // i in sequence <=> nxt[i] != NA
   std::vector<int> nxt;
   sorted_ints() {}
-  sorted_ints(size_t n) : beg(n), prv_insert(n), nxt(n, -1) {}
+  sorted_ints(size_t n) : beg(n), prv_insert(n), nxt(n, NA) {}
   // Search using existing element as offset
   int find_from(int find, int from) {
     for ( ; nxt[from] <= find; from = nxt[from] );
@@ -66,7 +68,7 @@ struct sorted_ints {
   }
   void insert(int elt) {
     // Element already inserted
-    if (nxt[elt] != -1) {
+    if (nxt[elt] != NA) {
       prv_insert = elt;
       return;
     }
@@ -77,7 +79,7 @@ struct sorted_ints {
       return;
     }
     // Use previous insert as offset if possible
-    int i = (elt > prv_insert && nxt[prv_insert] != -1 ?
+    int i = (elt > prv_insert && nxt[prv_insert] != NA ?
              prv_insert : beg);
     // Find element starting from offset
     i = find_from(elt, i);
@@ -91,7 +93,7 @@ struct sorted_ints {
   void erase(int i) {
     if ( i == beg ) {
       int tmp = nxt[beg];
-      nxt[beg] = -1;
+      nxt[beg] = NA;
       beg = tmp;
     }
   }
