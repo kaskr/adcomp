@@ -223,6 +223,7 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
     cs* R = cs_transpose(L, 0); // Pattern only
     Rp = R->p ; Ri = R->i ;
     std::vector<int> mark(n, 0);
+    std::vector<int> resid;
     for (k = 0 ; k < n ; k++) c [k] = Lp [k];
     for (k = 0 ; k < n ; k++)       /* compute L(k,:) for L*L' = C */
     {
@@ -245,9 +246,11 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
             lki = xi / Lx [Lp [i]] ;
             for (p = Lp [i] + 1 ; p < c [i] ; p++)
             {
-              //if (mark[Li[p]]) x [Li [p]] -= Lx [p] * xi ;
-              x [Li [p]] -= Lx [p] * xi * mark[Li[p]];
-              //x [Li [p]] -= mark[Li[p]] ? Lx [p] * xi : 0 ;
+              x [Li [p]] -= Lx [p] * xi;
+              if (!mark[Li[p]]) {
+                resid.push_back(Li[p]);
+                mark[Li[p]] = true;
+              }
             }
             d -= lki * lki * Lx [Lp [i]] ;            /* d = d - L(k,i)*L(k,i) */
             p = c [i]++ ;
@@ -255,6 +258,12 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
             Lx [p] = lki ;
         }
         for ( top=Rp[k]; top<Rp[k+1]; top++) mark[Ri[top]] = false;
+        for (size_t i=0; i<resid.size(); i++) {
+          *err = std::max(*err, std::abs( x[resid[i]]  / Lx[Lp[resid[i]]] ));
+          x[resid[i]] = 0;
+          mark[resid[i]] = false;
+        }
+        resid.resize(0);
         // // Clear just the row pattern
         // if (err != NULL) {
         //   for ( top=Rp[k]; top<Rp[k+1]-1; top++) {
