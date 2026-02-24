@@ -2034,7 +2034,8 @@ runSymbolicAnalysis2 <- function(obj, ...) {
         diag(H) <- diag(H) + t
       L <- .Call("setslot", L, "H", H)
       HT <- Matrix::t(H)
-      .Call("tmb_ichol_update", HT, L, PACKAGE="TMB")
+      get_error <- as.logical(config[["adaptive"]])
+      .Call("tmb_ichol_update", HT, L, get_error, PACKAGE="TMB")
       if (config[["posdef"]]) return(TRUE)
       all(diag(L) > 0)
     },
