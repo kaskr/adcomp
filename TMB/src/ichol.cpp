@@ -244,12 +244,18 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
             double xi = x[i];
             x [i] = 0 ;                 /* clear x for k+1st iteration */
             lki = xi / Lx [Lp [i]] ;
-            for (p = Lp [i] + 1 ; p < c [i] ; p++)
-            {
-              x [Li [p]] -= Lx [p] * xi;
-              if (!mark[Li[p]]) {
-                resid.push_back(Li[p]);
-                mark[Li[p]] = true;
+            if (err) {
+              for (p = Lp [i] + 1 ; p < c [i] ; p++)
+                {
+                  x [Li [p]] -= Lx [p] * xi;
+                  if (!mark[Li[p]]) {
+                    resid.push_back(Li[p]);
+                    mark[Li[p]] = true;
+                  }
+                }
+            } else {
+              for (p = Lp [i] + 1 ; p < c [i] ; p++) {
+                x [Li [p]] -= Lx [p] * xi * mark[Li[p]];
               }
             }
             d -= lki * lki * Lx [Lp [i]] ;            /* d = d - L(k,i)*L(k,i) */
@@ -258,12 +264,14 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
             Lx [p] = lki ;
         }
         for ( top=Rp[k]; top<Rp[k+1]; top++) mark[Ri[top]] = false;
-        for (size_t i=0; i<resid.size(); i++) {
-          *err = std::max(*err, std::abs( x[resid[i]]  / Lx[Lp[resid[i]]] ));
-          x[resid[i]] = 0;
-          mark[resid[i]] = false;
+        if (err) {
+          for (size_t i=0; i<resid.size(); i++) {
+            *err = std::max(*err, std::abs( x[resid[i]]  / Lx[Lp[resid[i]]] ));
+            x[resid[i]] = 0;
+            mark[resid[i]] = false;
+          }
+          resid.resize(0);
         }
-        resid.resize(0);
         /* --- Compute L(k,k) ----------------------------------------------- */
         //if (d <= 0) return (cs_ndone (N, E, c, x, 0)) ; /* not pos def */
         p = c [k]++ ;
@@ -561,11 +569,12 @@ SEXP tmb_ichol(SEXP X, SEXP tol) {
 }
 // Update incomplete Cholesky factor L
 extern "C"
-SEXP tmb_ichol_update(SEXP X, SEXP Y) {
+SEXP tmb_ichol_update(SEXP X, SEXP Y, SEXP get_error) {
+  bool get_err = INTEGER(get_error)[0];
   cs A = r2cs(X);
   cs L = r2cs(Y);
   double err = 0;
-  cs_ichol_update(&A, &L, &err);
+  cs_ichol_update(&A, &L, get_err ? &err : NULL);
   SEXP error = PROTECT(Rf_ScalarReal(err));
   Rf_setAttrib(Y, Rf_install("error"), error);
   UNPROTECT(1);
