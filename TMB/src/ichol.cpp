@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <R.h>
 #include <Rinternals.h>
+#include <iostream>
 /* --- primary CSparse routines and data structures ------------------------- */
 #define csi int
 typedef struct cs_sparse    /* matrix in compressed-column or triplet form */
@@ -283,6 +284,80 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
     cs_free(c);
     cs_free(x);
     return true;
+}
+
+/*
+  L : On input the LDL factor. On output derivative of
+  f : A -> L(A) -> log(det(L(A)))
+  
+  - We loop over rows in reverse k=n-1,...,0
+  - The A matrix adjoint is updated without using A itself.
+  - One-by-one rows of L(A) are replaced by A adjoints.
+*/
+std::vector<double> cs_dchol_update (cs *L) {
+  double *Lx, *Cx ;
+  csi top, i, p, k, n, *Li, *Lp, *Ri, *Rp, *Cp, *Ci ;
+  cs *C;
+  n = L->n ;
+  std::vector<int> c(n);
+  std::vector<double> x(n);
+  // Adjoints
+  std::vector<double> dx(n);
+  std::vector<double> dL(L->nzmax); // pattern as L
+  std::vector<double> dA(L->nzmax); // pattern as R
+  Lp = L->p ; Li = L->i ; Lx = L->x ;
+  cs* R = cs_transpose(L, 0); // Pattern only
+  Rp = R->p ; Ri = R->i ;
+  std::vector<int> mark(n, 0);
+  for (k = 0 ; k < n ; k++) c [k] = Lp [k+1];
+  // Seed adjoint (derivative of log(.))
+  for (k = 0 ; k < n ; k++) {
+    dL[Lp[k]] += 1. / Lx[Lp[k]];
+  }
+  // LDL adjoint
+  for (k = n ; k > 0 ; ) {
+    k--; c[k]--; p = c[k];
+    // 'd' and its adjoint
+    double d = Lx[p]; double dd = dL[p];
+    for (top = Rp[k]; top < Rp[k+1]; top++)
+      mark[Ri[top]] = true;
+    for (auto qw: dx) std::cout << qw << ' '; std::cout << "\n";
+    for (top = Rp[k+1]-1; top > Rp[k]; ) {
+      top--;
+      i = Ri [top] ;
+      c[i]--; p = c[i];
+      /* adjoint of:
+         d -= lki * lki * Lx [Lp [i]]
+         where d=Lx[p] has adjoint dL[p]
+      */
+      double lki = Lx[p];
+      double dlki = -2. * lki * Lx [Lp [i]] * dd; // lki adjoint
+      dL[Lp[i]] -= 2. * lki * lki * dd; // Lx [Lp [i]] adjoint
+      double xi = lki * Lx[Lp[i]]; // restore
+      double dxi = 0;
+      for (p = c [i]; p > Lp [i] + 1 ; ) {
+        p--;
+        /* x [Li [p]] -= Lx [p] * xi * mark[Li[p]]; */
+        //x[Li[p]] += Lx[p] * xi * mark[Li[p]]; // restore (needed?)
+        dxi -= Lx[p] * dx[Li[p]] * mark[Li[p]];
+        dL[p] -= dx[Li[p]] * xi * mark[Li[p]];          
+      }
+      // lki = xi / Lx [Lp [i]] ;
+      dxi += dlki / Lx [Lp [i]] ;
+      dL[Lp[i]] -= dlki * xi / (Lx [Lp [i]]*Lx [Lp [i]]);
+      // double xi = x[i];
+      dx[i] += dxi;
+    }
+    for ( top=Rp[k]; top<Rp[k+1]; top++) mark[Ri[top]] = false;
+    // d = x[k]
+    dx[k] += dd;
+    for (p = Rp [k] ; p < Rp [k+1] ; p++) {
+      // FIXME: We could use the c[] pointers to access dA transposed
+      if (Ri [p] <= k) dA [p] += dx [Ri [p]] ;
+      dx[Ri[p]] = 0; // clear
+    }
+  }
+  return dA;
 }
 
 /* Right-looking incomplete Cholesky factorization
@@ -579,6 +654,16 @@ SEXP tmb_ichol_update(SEXP X, SEXP Y, SEXP get_error) {
   Rf_setAttrib(Y, Rf_install("error"), error);
   UNPROTECT(1);
   return Y;
+}
+// derivatives
+extern "C"
+SEXP tmb_dchol_update(SEXP X) {
+  cs L = r2cs(X);
+  std::vector<double> d = cs_dchol_update(&L);
+  SEXP ans = PROTECT(allocVector(REALSXP, d.size()));
+  Memcpy(REAL(ans), (double*)(d.data()), d.size());
+  UNPROTECT(1);
+  return ans;
 }
 // Update incomplete LDL Cholesky factor L
 extern "C"
