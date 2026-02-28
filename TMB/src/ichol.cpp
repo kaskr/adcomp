@@ -332,7 +332,7 @@ std::vector<double> cs_dchol_update (cs *L) {
       */
       double lki = Lx[p];
       double dlki = -2. * lki * Lx [Lp [i]] * dd; // lki adjoint
-      dL[Lp[i]] -= 2. * lki * lki * dd; // Lx [Lp [i]] adjoint
+      dL[Lp[i]] -= lki * lki * dd; // Lx [Lp [i]] adjoint
       double xi = lki * Lx[Lp[i]]; // restore
       double dxi = 0;
       for (p = c [i]; p > Lp [i] + 1 ; ) {
