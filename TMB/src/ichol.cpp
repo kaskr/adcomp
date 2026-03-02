@@ -300,7 +300,7 @@ std::vector<double> cs_dchol_update (cs *L) {
   cs *C;
   n = L->n ;
   std::vector<int> c(n);
-  std::vector<double> x(n);
+  //std::vector<double> x(n);
   // Adjoints
   std::vector<double> dx(n);
   std::vector<double> dL(L->nzmax); // pattern as L
@@ -321,7 +321,6 @@ std::vector<double> cs_dchol_update (cs *L) {
     double d = Lx[p]; double dd = dL[p];
     for (top = Rp[k]; top < Rp[k+1]; top++)
       mark[Ri[top]] = true;
-    for (auto qw: dx) std::cout << qw << ' '; std::cout << "\n";
     for (top = Rp[k+1]-1; top > Rp[k]; ) {
       top--;
       i = Ri [top] ;
@@ -330,8 +329,8 @@ std::vector<double> cs_dchol_update (cs *L) {
          d -= lki * lki * Lx [Lp [i]]
          where d=Lx[p] has adjoint dL[p]
       */
-      double lki = Lx[p];
-      double dlki = -2. * lki * Lx [Lp [i]] * dd; // lki adjoint
+      double lki = Lx[p]; double& dlki = dL[p];
+      dlki += -2. * lki * Lx [Lp [i]] * dd; // lki adjoint
       dL[Lp[i]] -= lki * lki * dd; // Lx [Lp [i]] adjoint
       double xi = lki * Lx[Lp[i]]; // restore
       double dxi = 0;
@@ -342,6 +341,7 @@ std::vector<double> cs_dchol_update (cs *L) {
         dxi -= Lx[p] * dx[Li[p]] * mark[Li[p]];
         dL[p] -= dx[Li[p]] * xi * mark[Li[p]];          
       }
+
       // lki = xi / Lx [Lp [i]] ;
       dxi += dlki / Lx [Lp [i]] ;
       dL[Lp[i]] -= dlki * xi / (Lx [Lp [i]]*Lx [Lp [i]]);
