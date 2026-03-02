@@ -294,7 +294,7 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
   - The A matrix adjoint is updated without using A itself.
   - One-by-one rows of L(A) are replaced by A adjoints.
 */
-std::vector<double> cs_dchol_update (cs *L) {
+void cs_dchol_update (cs *L) {
   double *Lx, *Cx ;
   csi top, i, p, k, n, *Li, *Lp, *Ri, *Rp, *Cp, *Ci ;
   cs *C;
@@ -304,7 +304,6 @@ std::vector<double> cs_dchol_update (cs *L) {
   // Adjoints
   std::vector<double> dx(n);
   std::vector<double> dL(L->nzmax); // pattern as L
-  std::vector<double> dA(L->nzmax); // pattern as R
   Lp = L->p ; Li = L->i ; Lx = L->x ;
   cs* R = cs_transpose(L, 0); // Pattern only
   Rp = R->p ; Ri = R->i ;
@@ -352,12 +351,15 @@ std::vector<double> cs_dchol_update (cs *L) {
     // d = x[k]
     dx[k] += dd;
     for (p = Rp [k] ; p < Rp [k+1] ; p++) {
-      // FIXME: We could use the c[] pointers to access dA transposed
-      if (Ri [p] <= k) dA [p] += dx [Ri [p]] ;
-      dx[Ri[p]] = 0; // clear
+      // dA adjoint: store in k'th row af dL which is not needed anymore
+      int i = Ri[p];
+      if (i <= k) {
+        dL[c[i]] = dx[i] ;
+      }
+      dx[i] = 0; // clear
     }
   }
-  return dA;
+  Memcpy(L->x, (double*)(dL.data()), dL.size());
 }
 
 /* Right-looking incomplete Cholesky factorization
@@ -657,13 +659,12 @@ SEXP tmb_ichol_update(SEXP X, SEXP Y, SEXP get_error) {
 }
 // derivatives
 extern "C"
-SEXP tmb_dchol_update(SEXP X) {
-  cs L = r2cs(X);
-  std::vector<double> d = cs_dchol_update(&L);
-  SEXP ans = PROTECT(allocVector(REALSXP, d.size()));
-  Memcpy(REAL(ans), (double*)(d.data()), d.size());
+SEXP tmb_dchol_update(SEXP L) {
+  SEXP X = PROTECT(Rf_duplicate(L));
+  cs A = r2cs(X);
+  cs_dchol_update(&A);
   UNPROTECT(1);
-  return ans;
+  return X;
 }
 // Update incomplete LDL Cholesky factor L
 extern "C"
