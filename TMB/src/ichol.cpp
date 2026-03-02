@@ -433,6 +433,7 @@ void cs_dchol_right(cs* L) {
   double *w = buf.data();
   std::vector<double> dbuf(nc);
   double *dw = dbuf.data();
+  std::vector<int> mark(nc, 0);
   for (int col = nc; col > 0; ) {
     col--;
     // Get d
@@ -441,13 +442,14 @@ void cs_dchol_right(cs* L) {
     // scatter this off-diagonal column
     for (int p = Lp[col] + 1; p < Lp[col+1]; p++) {
       w[Li[p]] = Lx[p];
+      mark[Li[p]] = true;
     }
     // Loop through target subset (non-zeros of relevant columns)
     for (int p = Lp[col] + 1; p < Lp[col+1]; p++) {
       int tcol = Li[p]; // target column
       for (int tp = Lp[tcol]; tp < Lp[tcol+1]; tp++) {
         int trow = Li[tp]; // target row
-        if (w[trow] != 0 && w[tcol] != 0) {
+        if (mark[trow] && mark[tcol]) {
           dw[trow] -= Lx[tp] * w[tcol];
           dw[tcol] -= Lx[tp] * w[trow];
           dw[col] += Lx[tp] * w[trow] * w[tcol];
@@ -463,6 +465,7 @@ void cs_dchol_right(cs* L) {
     for (int p = Lp[col] ; p < Lp[col+1]; p++) {
       w[Li[p]] = 0;
       dw[Li[p]] = 0;
+      mark[Li[p]] = false;
     }
   }
 }
