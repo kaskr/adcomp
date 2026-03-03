@@ -212,12 +212,12 @@ cs* cs_ichol (const cs *C, double tol)
 */
 bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
 {
-    double d, lki, *Lx, *x, *Cx ;
-    csi top, i, p, k, n, *Li, *Lp, *Ri, *Rp, *c, *Cp, *Ci ;
+    double d, lki, *Lx, *Cx ;
+    csi top, i, p, k, n, *Li, *Lp, *Ri, *Rp, *Cp, *Ci ;
     cs *C;
     n = A->n ;
-    c = CS_MALLOC (2*n, SIZEOF (csi)) ;     /* get csi workspace */
-    x = CS_MALLOC (n, SIZEOF (double)) ;    /* get double workspace */
+    std::vector<csi> c(n);
+    std::vector<double> x(n);
     C = (cs*) A;
     Cp = C->p ; Ci = C->i ; Cx = C->x ;
     Lp = L->p ; Li = L->i ; Lx = L->x ;
@@ -281,8 +281,6 @@ bool cs_ichol_update (const cs *A, cs *L, double* err = NULL)
     }
     //Lp [n] = cp [n] ;               /* finalize L */
     cs_spfree(R);
-    cs_free(c);
-    cs_free(x);
     return true;
 }
 
