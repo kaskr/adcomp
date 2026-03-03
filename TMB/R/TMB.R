@@ -2075,7 +2075,8 @@ runSymbolicAnalysis2 <- function(obj, ...) {
       list(modulus=.5*sum(log(diag(L))))
     },
     logdetHalfDeriv = function(L) {
-      .5 * .Call("tmb_ldl_deriv", L, PACKAGE="TMB")
+      ##.5 * .Call("tmb_ldl_deriv", L, PACKAGE="TMB")
+      .5 * .Call("tmb_dchol_update", L, PACKAGE="TMB")
     }
   )
   ## Set Cholesky inside model object
