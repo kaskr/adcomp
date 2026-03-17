@@ -1,8 +1,8 @@
 Package: TMB
 Type: Package
 Title: Template Model Builder: A General Random Effect Tool Inspired by 'ADMB'
-Version: 1.9.19
-Date: 2025-12-15
+Version: 1.9.20
+Date: 2026-03-17
 Authors@R: c(person("Kasper","Kristensen",role=c("aut","cre","cph"),email="kaskr@dtu.dk"),
              person("Brad","Bell",role="cph"),
              person("Hans","Skaug",role="ctb"),
