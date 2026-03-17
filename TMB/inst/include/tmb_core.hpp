@@ -774,7 +774,7 @@ public:
   /** \brief Syncronize user's data object. It could be changed between calls to e.g. EvalDoubleFunObject */
   void sync_data() {
     SEXP env = R_ParentEnv(this->report);
-    this->data = Rf_findVar(Rf_install("data"), env);
+    this->data = tmb_getVar(Rf_install("data"), env);
   }
 
   /** \brief Extract theta vector from objetive function object */

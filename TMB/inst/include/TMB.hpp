@@ -187,6 +187,13 @@ struct numeric_limits<TMBad::ad_aug> : numeric_limits<TMBad::Scalar> { };
 #define R_ParentEnv(x) ENCLOS(x)
 #endif
 
+#if R_VERSION < R_Version(4, 5, 0)
+// Implicit inherits=TRUE (not really what we want)
+inline SEXP tmb_getVar(SEXP x, SEXP y) { return Rf_findVar(x, y); }
+#else
+inline SEXP tmb_getVar(SEXP x, SEXP y) { return R_getVar(x, y, /*inherits=*/ FALSE); }
+#endif
+
 #include "toggle_thread_safe_R.hpp"
 void eigen_REprintf(const char* x)CSKIP({REprintf("%s",x);})
 

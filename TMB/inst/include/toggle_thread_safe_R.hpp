@@ -134,11 +134,11 @@ inline SEXP Ts_install(const char *x) {
   return ans;
 }
 
-inline SEXP Ts_findVar(SEXP x, SEXP y) {
+inline SEXP Ts_getVar(SEXP x, SEXP y) {
   SEXP ans;
 #pragma omp critical
   {
-    ans = Rf_findVar(x, y);
+    ans = tmb_getVar(x, y);
   }
   return ans;
 }
@@ -173,7 +173,7 @@ inline void Ts_warning(const char *x, ...) {
 #define LENGTH         Ts_LENGTH
 #define XLENGTH        Ts_XLENGTH
 #define Rf_install     Ts_install
-#define Rf_findVar     Ts_findVar
+#define tmb_getVar     Ts_getVar
 #undef  R_ParentEnv
 #define R_ParentEnv    Ts_ParentEnv
 #define Rf_warning     Ts_warning
@@ -195,7 +195,7 @@ inline void Ts_warning(const char *x, ...) {
 #undef LENGTH
 #undef XLENGTH
 #undef Rf_install
-#undef Rf_findVar
+#undef tmb_getVar
 #undef R_ParentEnv
 #undef Rf_warning
 

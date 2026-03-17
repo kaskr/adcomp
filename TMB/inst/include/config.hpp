@@ -61,7 +61,7 @@ struct config_struct{
     SEXP name_symbol = Rf_install(name);
     if (cmd==0) var = default_value;
     if (cmd==1) Rf_defineVar(name_symbol, asSEXP(var), envir);
-    if (cmd==2) var = INTEGER(Rf_findVar(name_symbol, envir))[0];
+    if (cmd==2) var = INTEGER(tmb_getVar(name_symbol, envir))[0];
   }
 #define SET(name,value)set(#name,name,value);
   void set() CSKIP(
