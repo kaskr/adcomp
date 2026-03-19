@@ -57,7 +57,7 @@ template<class T> int isnan(T x) { return std::isnan(asDouble(x)); }
 #define ML_NEGINF	R_NegInf
 #define ML_NAN		R_NaN
 #define M_SQRT_2dPI	0.797884560802865355879892119869	/* sqrt(2/pi) */
-#define ISNAN(x) (isnan(x)!=0)
+#define ISNAN(x) (std::isnan(asDouble(x))!=0)
 
 /* I got crashes with Eigen if not setting this: */
 #define MATHLIB_STANDALONE 1
