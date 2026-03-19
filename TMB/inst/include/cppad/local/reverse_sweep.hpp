@@ -234,7 +234,7 @@ void ReverseSweep(
 	play->reverse_start(op, arg, i_op, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == EndOp );
 # if CPPAD_REVERSE_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 # endif
 	bool more_operators = true;
 	while(more_operators)
@@ -273,7 +273,7 @@ void ReverseSweep(
 		const Base*  Z_tmp  = Taylor + i_var * J;
 		const Base*  pZ_tmp = Partial + i_var * K;
 		printOp(
-			std::cout,
+			Rcout,
 			play,
 			i_op,
 			i_tmp,
@@ -281,13 +281,13 @@ void ReverseSweep(
 			arg
 		);
 		if( NumRes(op) > 0 && op != BeginOp ) printOpResult(
-			std::cout,
+			Rcout,
 			d + 1,
 			Z_tmp,
 			d + 1,
 			pZ_tmp
 		);
-		std::cout << std::endl;
+		Rcout << std::endl;
 # endif
 		switch( op )
 		{
@@ -747,7 +747,7 @@ void ReverseSweep(
 		}
 	}
 # if CPPAD_REVERSE_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 # endif
 	// values corresponding to BeginOp
 	CPPAD_ASSERT_UNKNOWN( i_op == 0 );
@@ -792,14 +792,14 @@ void myReverseSweep(
     Update: It seems to be easier to maintain a vector of _argument_ dependencies rather than
     _operator_ dependencies.
    */
-  //std::cout << "myReverseSweep" << dep_var_taddr << "\n";
+  //Rcout << "myReverseSweep" << dep_var_taddr << "\n";
   
   
   //vector<size_t> relevant(Rec->num_var_rec());
   
   /* use dep_var_taddr as mark to avoid resetting workspace */
   //pf->op_mark_[pf->var2op_[dep_var_taddr]]=dep_var_taddr;
-  //std::cout << relevant << "\n";
+  //Rcout << relevant << "\n";
     pf->prepare_reverse_sweep(dep_var_index);
     std::vector<size_t>::reverse_iterator it;
 
@@ -855,7 +855,7 @@ void myReverseSweep(
 
 	CPPAD_ASSERT_UNKNOWN( op == EndOp );
 # if CPPAD_REVERSE_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 # endif
 	//while(op != BeginOp )
 	for(it=pf->op_mark_index_.rbegin();it!=pf->op_mark_index_.rend();it++)
@@ -884,7 +884,7 @@ void myReverseSweep(
 		const Base*  pZ_tmp = Partial + i_var * K;
 
 		printOp(
-			std::cout, 
+			Rcout, 
 			Rec,
 			i_tmp,
 			op, 
@@ -1342,7 +1342,7 @@ void myReverseSweep(
 		}
 	}
 # if CPPAD_REVERSE_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 # endif
 	// values corresponding to BeginOp
 	CPPAD_ASSERT_UNKNOWN( i_op == 0 );

@@ -23,7 +23,7 @@ $spell
 	namespace
 	std
 	const
-	cout
+	Rcout
 	ctime
 	ifdef
 	const
@@ -196,7 +196,7 @@ $spell
 	namespace
 	std
 	const
-	cout
+	Rcout
 	ctime
 	ifdef
 	const
@@ -220,7 +220,7 @@ $codei%SpeedTest(%Test%, %first%, %inc%, %last%)%$$
 $head Purpose$$
 The $code SpeedTest$$ function executes a speed test
 for various sized problems
-and reports the results on standard output; i.e. $code std::cout$$.
+and reports the results on standard output; i.e. $code Rcout$$.
 The size of each test problem is included in its report
 (unless $icode first$$ is equal to $icode last$$).
 
@@ -271,7 +271,7 @@ The $icode Test$$ result $icode name$$ has prototype
 $codei%
 	std::string %name%
 %$$
-The results for this test are reported on $code std::cout$$
+The results for this test are reported on $code Rcout$$
 with $icode name$$ as an identifier for the test.
 It is assumed that,
 for the duration of this call to $code SpeedTest$$,
@@ -315,7 +315,7 @@ $latex \[
 \] $$
 
 $head rate$$
-The value displayed in the $code rate$$ column on $code std::cout$$
+The value displayed in the $code rate$$ column on $code Rcout$$
 is defined as the value of $icode repeat$$ divided by the 
 corresponding elapsed execution time in seconds.
 The elapsed execution time is measured by the difference in
@@ -370,7 +370,6 @@ inline void SpeedTest(
 )
 {
 
-	using std::cout;
 	using std::endl;
 
 	size_t    size;
@@ -427,22 +426,22 @@ inline void SpeedTest(
 		
 
 		if( size == first && name != "" )
-			cout << name << endl;
+			Rcout << name << endl;
 
 		if( first != last )
 		{
 			// convert int(size_t) to avoid warning on _MSC_VER sys
-			std::cout << "size = "  << int(size);
+			Rcout << "size = "  << int(size);
 
 			SpeedTestNdigit(size, ndigit, pow10);
 			while( ndigit < maxSizeDigit )
-			{	cout << " ";
+			{	Rcout << " ";
 				ndigit++;
 			}
-			cout << " ";
+			Rcout << " ";
 		}
 
-		cout << "rate = ";
+		Rcout << "rate = ";
 		SpeedTestNdigit(rate, ndigit, pow10);
 		while( ndigit > 0 )
 		{
@@ -450,15 +449,15 @@ inline void SpeedTest(
 			digit  = rate / pow10;
 
 			// convert int(size_t) to avoid warning on _MSC_VER sys
-			std::cout << int(digit);
+			Rcout << int(digit);
 
 			rate    = rate % pow10;
 			ndigit -= 1;
 
 			if( (ndigit > 0) && (ndigit % 3 == 0) )
-				cout << ",";
+				Rcout << ",";
 		}
-		cout << endl;
+		Rcout << endl;
 
 		// next size
 		if( ((int) size) + inc > 0 )

@@ -167,16 +167,16 @@ void optimizeTape(ADFunPointer pf){
 #pragma omp critical
 #endif
     { /* Avoid multiple tape optimizations at the same time (to reduce memory) */
-      if(config.trace.optimize)std::cout << "Optimizing tape... ";
+      if(config.trace.optimize)Rcout << "Optimizing tape... ";
       pf->optimize();
-      if(config.trace.optimize)std::cout << "Done\n";
+      if(config.trace.optimize)Rcout << "Done\n";
     }
   }
   else
     { /* Allow multiple tape optimizations at the same time */
-      if(config.trace.optimize)std::cout << "Optimizing tape... ";
+      if(config.trace.optimize)Rcout << "Optimizing tape... ";
       pf->optimize();
-      if(config.trace.optimize)std::cout << "Done\n";
+      if(config.trace.optimize)Rcout << "Done\n";
     }
 }
 
@@ -1380,7 +1380,7 @@ extern "C"
     if(_openmp && !returnReport){ // Parallel mode
 #ifdef _OPENMP
       if(config.trace.parallel)
-        std::cout << n << " regions found.\n";
+        Rcout << n << " regions found.\n";
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* FIXME: NOT NEEDED */
       vector< adfun* > pfvec(n);
@@ -1465,7 +1465,7 @@ extern "C"
     if(_openmp && !returnReport){ // Parallel mode
 #ifdef _OPENMP
       if(config.trace.parallel)
-	std::cout << n << " regions found.\n";
+	Rcout << n << " regions found.\n";
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
@@ -2157,7 +2157,7 @@ extern "C"
     if(_openmp){ // Parallel mode
 #ifdef _OPENMP
       if(config.trace.parallel)
-	std::cout << n << " regions found.\n";
+	Rcout << n << " regions found.\n";
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< adfun* > pfvec(n);
@@ -2229,7 +2229,7 @@ extern "C"
     if(_openmp){ // Parallel mode
 #ifdef _OPENMP
       if(config.trace.parallel)
-	std::cout << n << " regions found.\n";
+	Rcout << n << " regions found.\n";
       if (n==0) n++; // No explicit parallel accumulation
       start_parallel(); /* Start threads */
       vector< ADFun<double>* > pfvec(n);
@@ -2457,14 +2457,14 @@ extern "C"
     typedef TMBad::ADFun<ad> adfun;
     typedef sphess_t<adfun> sphess;
     if(config.trace.parallel)
-      std::cout << "Count num parallel regions\n";
+      Rcout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
     SEXP gf = getListElement(control, "gf");
     int n = get_num_tapes(gf);
     if (n==0) // No tapes? Count!
       n = F.count_parallel_regions(); // Evaluates user template
     if(config.trace.parallel)
-      std::cout << n << " regions found.\n";
+      Rcout << n << " regions found.\n";
     if (n==0) n++; // No explicit parallel accumulation
     start_parallel(); /* FIXME: not needed */
     /* parallel test */
@@ -2520,11 +2520,11 @@ extern "C"
 #ifdef _OPENMP
   SEXP MakeADHessObject2(SEXP data, SEXP parameters, SEXP report, SEXP control){
     if(config.trace.parallel)
-      std::cout << "Count num parallel regions\n";
+      Rcout << "Count num parallel regions\n";
     objective_function< double > F(data,parameters,report);
     int n=F.count_parallel_regions();
     if(config.trace.parallel)
-      std::cout << n << " regions found.\n";
+      Rcout << n << " regions found.\n";
     if (n==0) n++; // No explicit parallel accumulation
 
     start_parallel(); /* Start threads */

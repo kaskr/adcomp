@@ -24,7 +24,7 @@ void start_parallel(){
 #endif // CPPAD_FRAMEWORK
   int nthreads=config.nthreads;
   if(config.trace.parallel)
-    std::cout << "Using " << nthreads <<  " threads\n";
+    Rcout << "Using " << nthreads <<  " threads\n";
 #ifdef CPPAD_FRAMEWORK
   CppAD::thread_alloc::parallel_setup(nthreads,in_parallel,thread_num);
   CppAD::parallel_ad<AD<AD<AD<double> > > >();
@@ -142,9 +142,9 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
     veci.resize(kmax);vecj.resize(kmax);
     vector<int> pos(n); /* keep track of positions in individual index vectors */
     for(int i=0;i<n;i++){pos(i)=0;};
-    if(config.trace.parallel) std::cout << "Hessian number of non-zeros:\n";
+    if(config.trace.parallel) Rcout << "Hessian number of non-zeros:\n";
     for(int i=0;i<n;i++){
-      if(config.trace.parallel) std::cout << "nnz = " << vecind(i).size() << "\n";
+      if(config.trace.parallel) Rcout << "nnz = " << vecind(i).size() << "\n";
     };
     vector<size_t> value(n); /* value corresponding to pos */
     int k=0; /* Incremented for each unique value */
@@ -174,7 +174,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   };
   /* Destructor */
   ~parallelADFun(){
-    if(config.trace.parallel) std::cout << "Free parallelADFun object.\n";
+    if(config.trace.parallel) Rcout << "Free parallelADFun object.\n";
     for(int i=0;i<vecpf.size();i++){
       delete vecpf[i];
     }
@@ -213,7 +213,7 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
      =====> output = vector of length m (m=range dim)
    */
   template <typename VectorBase>
-  VectorBase Forward(size_t p, const VectorBase& x, std::ostream& s = std::cout){
+  VectorBase Forward(size_t p, const VectorBase& x, std::ostream& s = Rcout){
     vector<VectorBase> ans(ntapes);
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(config.nthreads)
@@ -266,12 +266,12 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   }
   /* optimize ADFun object */
   void optimize(){
-    if(config.trace.optimize)std::cout << "Optimizing parallel tape... ";
+    if(config.trace.optimize)Rcout << "Optimizing parallel tape... ";
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(config.nthreads) if (config.optimize.parallel)
 #endif
     for(int i=0;i<ntapes;i++)vecpf(i)->optimize();
-    if(config.trace.optimize)std::cout << "Done\n";
+    if(config.trace.optimize)Rcout << "Done\n";
   }
 #endif // CPPAD_FRAMEWORK
 

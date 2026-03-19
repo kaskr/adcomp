@@ -21,7 +21,7 @@ $spell
 	cppad.hpp
 	Bool
 	resize
-	cout
+	Rcout
 	endl
 	std
 	Cpp
@@ -307,7 +307,7 @@ $codep
 	size_t i;
 	for(i = 0; i < 3; i++)
 		x[i] = 4. - i;
-	std::cout << "x = " << x << std::endl;
+	Rcout << "x = " << x << std::endl;
 $$
 
 $end

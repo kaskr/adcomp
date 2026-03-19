@@ -45,7 +45,9 @@ side. Three events can reduce the list:
 }
 
 \examples{
+\dontrun{
 runExample("simple", thisR = TRUE)          ## Create 'obj'
 FreeADFun(obj)                              ## Free external pointers
 obj$fn()                                    ## Re-allocate external pointers
+}
 }

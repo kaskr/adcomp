@@ -15,7 +15,7 @@ struct isDouble<double>{
 */
 /* To be removed */
 #define TMB_DEBUG 0
-#define TMB_PRINT(x)std::cout << #x << ": " << x << "\n"; std::cout.flush();
+#define TMB_PRINT(x)Rcout << #x << ": " << x << "\n"; Rcout.flush();
 
 /* Conditionally skip compilation */
 #ifdef WITH_LIBTMB

@@ -267,7 +267,7 @@ void forward0sweep(
 	play->forward_start(op, arg, i_op, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == BeginOp );
 # if CPPAD_FORWARD0SWEEP_TRACE
-	IF_TRACE std::cout << std::endl;
+	IF_TRACE Rcout << std::endl;
 # endif
 	bool more_operators = true;
 	while(more_operators)
@@ -854,7 +854,7 @@ void forward0sweep(
 			for(size_t i = 0; i < user_m; i++) if( user_iy[i] > 0 )
 			{	size_t i_tmp   = (i_op + i) - user_m;
 				IF_TRACE printOp(
-					std::cout, 
+					Rcout, 
 					play,
 					i_tmp,
 					user_iy[i],
@@ -863,13 +863,13 @@ void forward0sweep(
 				);
 				Base* Z_tmp = taylor + user_iy[i] * J;
 				IF_TRACE printOpResult(
-					std::cout, 
+					Rcout, 
 					d + 1, 
 					Z_tmp,
 					0, 
 					(Base *) CPPAD_NULL
 				);
-				IF_TRACE std::cout << std::endl;
+				IF_TRACE Rcout << std::endl;
 			}
 		}
 		Base*           Z_tmp   = taylor + i_var * J;
@@ -881,7 +881,7 @@ void forward0sweep(
 		if( op != UsrrvOp )
 		{
 			IF_TRACE printOp(
-				std::cout, 
+				Rcout, 
 				play,
 				i_op,
 				i_var,
@@ -889,16 +889,16 @@ void forward0sweep(
 				arg_tmp
 			);
 			if( NumRes(op) > 0 ) IF_TRACE printOpResult(
-				std::cout, 
+				Rcout, 
 				d + 1, 
 				Z_tmp, 
 				0, 
 				(Base *) CPPAD_NULL
 			);
-			IF_TRACE std::cout << std::endl;
+			IF_TRACE Rcout << std::endl;
 		}
 	}
-	IF_TRACE std::cout << std::endl;
+	IF_TRACE Rcout << std::endl;
 # else
 	}
 # endif

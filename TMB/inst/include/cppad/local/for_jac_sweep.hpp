@@ -179,7 +179,7 @@ void ForJacSweep(
 	// --------------------------------------------------------------
 
 # if CPPAD_FOR_JAC_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 	CppAD::vectorBool z_value(limit);
 # endif
 
@@ -728,7 +728,7 @@ void ForJacSweep(
 			j = var_sparsity.next_element();
 		}
 		printOp(
-			std::cout,
+			Rcout,
 			play,
 			i_op,
 			i_var,
@@ -736,15 +736,15 @@ void ForJacSweep(
 			arg_tmp
 		);
 		if( NumRes(op) > 0 ) printOpResult(
-			std::cout,
+			Rcout,
 			1,
 			&z_value,
 			0,
 			(CppAD::vectorBool *) CPPAD_NULL
 		);
-		std::cout << std::endl;
+		Rcout << std::endl;
 	}
-	std::cout << std::endl;
+	Rcout << std::endl;
 # else
 	}
 # endif

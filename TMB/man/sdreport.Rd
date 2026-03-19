@@ -137,7 +137,7 @@ correcting a large number of variables.
 \examples{
 \dontrun{
 runExample("linreg_parallel", thisR = TRUE) ## Non-random effect example
-sdreport(obj) }
+sdreport(obj)
 
 runExample("simple", thisR = TRUE)          ## Random effect example
 rep <- sdreport(obj)
@@ -147,7 +147,7 @@ summary(rep, "report")                      ## Only report
 
 ## Bias correction
 rep <- sdreport(obj, bias.correct = TRUE)
-summary(rep, "report")                      ## Include bias correction
+summary(rep, "report") }                    ## Include bias correction
 }
 \seealso{
 \code{\link{summary.sdreport}}, \code{\link{print.sdreport}}, \code{\link{as.list.sdreport}}

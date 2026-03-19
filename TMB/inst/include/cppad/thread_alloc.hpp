@@ -827,7 +827,6 @@ $end
 		);
 
 		size_t num_cap = capacity_info()->number;
-		using std::cout;
 		using std::endl;
 
 		// determine the capacity for this request
@@ -849,9 +848,9 @@ $end
 		static bool first_trace = true;
 		if(	cap_bytes == CPPAD_TRACE_CAPACITY && 
 		     thread    ==  CPPAD_TRACE_THREAD  && first_trace )
-		{	cout << endl;	
-			cout << "thread_alloc: Trace for Thread = " << thread;
-			cout << " and capacity = " << cap_bytes << endl;
+		{	Rcout << endl;	
+			Rcout << "thread_alloc: Trace for Thread = " << thread;
+			Rcout << " and capacity = " << cap_bytes << endl;
 			if( first_trace )
 				first_trace = false;
 		}
@@ -881,7 +880,7 @@ $end
 			// trace allocation
 			if(	cap_bytes == CPPAD_TRACE_CAPACITY && 
 			     thread    ==  CPPAD_TRACE_THREAD   )
-			{	cout << "get_memory:    v_ptr = " << v_ptr << endl; } 
+			{	Rcout << "get_memory:    v_ptr = " << v_ptr << endl; } 
 # endif
 
 			// adjust counts
@@ -908,7 +907,7 @@ $end
 		// trace allocation
 		if( cap_bytes == CPPAD_TRACE_CAPACITY && 
 		    thread    == CPPAD_TRACE_THREAD    )
-		{	cout << "get_memory:    v_ptr = " << v_ptr << endl; }
+		{	Rcout << "get_memory:    v_ptr = " << v_ptr << endl; }
 # endif
 
 		// adjust counts
@@ -1024,7 +1023,7 @@ $end
 
 		// trace option
 		if( capacity==CPPAD_TRACE_CAPACITY && thread==CPPAD_TRACE_THREAD )
-		{	std::cout << "return_memory: v_ptr = " << v_ptr << std::endl; }
+		{	Rcout << "return_memory: v_ptr = " << v_ptr << std::endl; }
 
 		// remove v_ptr from inuse list
 		previous->next_  = node->next_;

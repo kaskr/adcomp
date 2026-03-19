@@ -191,7 +191,7 @@ void RevJacSweep(
 	play->reverse_start(op, arg, i_op, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == EndOp );
 # if CPPAD_REV_JAC_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 	CppAD::vectorBool z_value(limit);
 # endif
 	bool more_operators = true;
@@ -730,7 +730,7 @@ void RevJacSweep(
 			j          = var_sparsity.next_element();
 		}
 		printOp(
-			std::cout,
+			Rcout,
 			play,
 			i_op,
 			i_var,
@@ -738,15 +738,15 @@ void RevJacSweep(
 			arg
 		);
 		if( NumRes(op) > 0 && op != BeginOp ) printOpResult(
-			std::cout,
+			Rcout,
 			0,
 			(CppAD::vectorBool *) CPPAD_NULL,
 			1,
 			&z_value
 		);
-		std::cout << std::endl;
+		Rcout << std::endl;
 	}
-	std::cout << std::endl;
+	Rcout << std::endl;
 # else
 	}
 # endif

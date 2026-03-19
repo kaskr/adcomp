@@ -24,15 +24,15 @@ CppAD::vector<bool> constant_tape_point_; /* Vector of same length as tp_ (tape_
 /* Helper function to print std::vector */
 template<typename T>
 void vprint(const std::vector<T>& v) {
-    std::cout << "[";
+    Rcout << "[";
     size_t last = v.size() - 1;
     for(size_t i = 0; i < v.size(); ++i) {
-        std::cout << v[i];
+        Rcout << v[i];
         if (i != last)
-            std::cout << ", ";
+            Rcout << ", ";
     }
-    std::cout << "]";
-    std::cout << "\n";
+    Rcout << "]";
+    Rcout << "\n";
 }
 /* Helper function for markArgs */
 void markOpField(
@@ -282,11 +282,11 @@ void markArgs(tape_point &tp)
 	// if( NumRes(op) > 0 && (op != BeginOp) )
 	// { 
 	// 	for(k = 0; k < nfz; k++)
-	// 		std::cout << "| fz[" << k << "]=" << fz[k];
+	// 		Rcout << "| fz[" << k << "]=" << fz[k];
 	// 	for(k = 0; k < nrz; k++)
-	// 		std::cout << "| rz[" << k << "]=" << rz[k];
+	// 		Rcout << "| rz[" << k << "]=" << rz[k];
 	// }
-	// std::cout << std::endl;
+	// Rcout << std::endl;
 }
 
 void my_next_reverse(
@@ -370,7 +370,7 @@ void mark_tape_point_args_index(size_t index, size_t mark){
   }
 }
 void prepare_reverse_sweep(int col){ /* input: range component */
-  //std::cout << "col: " << col << " "; std::cout.flush();
+  //Rcout << "col: " << col << " "; Rcout.flush();
   OpCode op; 
   const addr_t* op_arg;
   size_t op_index;
@@ -426,13 +426,13 @@ void printTP(tape_point tp){
   const Base*  Z_tmp  =dummy;//= Taylor + i_var * J;
   const Base*  pZ_tmp =dummy;//  Partial + i_var * K;
   printOp(
-	  std::cout,
+	  Rcout,
 	  &play_,
 	  tp.op_index,
 	  tp.var_index,
 	  op,
 	  arg);
-  std::cout << "\n";
+  Rcout << "\n";
 }
 
 bool is_tape_point_constant(size_t index){
@@ -520,12 +520,12 @@ void my_init(vector<bool> keepcol){
       constant_tape_point_[i] = is_tape_point_constant(i);
     }
 
-    //std::cout << constant_tape_point_[i] << " "; printTP(tp_[i]);
+    //Rcout << constant_tape_point_[i] << " "; printTP(tp_[i]);
 
   }
-  // std::cout << "Total:   " << constant_tape_point_.size() << "\n";
+  // Rcout << "Total:   " << constant_tape_point_.size() << "\n";
   // int sum=0; for(int i=0;i<constant_tape_point_.size();i++)sum+=constant_tape_point_[i];
-  // std::cout << "Constant:" << sum << "\n";
+  // Rcout << "Constant:" << sum << "\n";
 
 
   // Calculate pattern

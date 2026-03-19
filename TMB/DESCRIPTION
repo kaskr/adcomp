@@ -47,8 +47,8 @@ Imports:
     stats,
     utils,
     Matrix (>= 1.0-12)
-LinkingTo: Matrix
+LinkingTo: Matrix, RcppEigen
 Suggests:
     numDeriv,
     parallel
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3

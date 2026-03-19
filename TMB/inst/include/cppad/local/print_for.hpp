@@ -20,7 +20,7 @@ $spell
 	var
 	VecAD
 	std
-	cout
+	Rcout
 	const
 $$
 
@@ -75,7 +75,7 @@ The argument $icode before$$ has prototype
 $codei%
 	const char* %before%
 %$$
-This text is written to $code std::cout$$ before $icode var$$. 
+This text is written to $code Rcout$$ before $icode var$$. 
 
 $head var$$
 The argument $icode var$$ has one of the following prototypes
@@ -84,7 +84,7 @@ $codei%
 	const VecAD<%Base%>::reference& %var%
 %$$
 The value of $icode var$$, that corresponds to $icode x$$,
-is written to $code std::cout$$ during the execution of 
+is written to $code Rcout$$ during the execution of 
 $codei%
 	%f%.Forward(0, %x%)
 %$$
@@ -99,7 +99,7 @@ The argument $icode after$$ has prototype
 $codei%
 	const char* %after%
 %$$
-This text is written to $code std::cout$$ after $icode var$$. 
+This text is written to $code Rcout$$ after $icode var$$. 
 	
 $head Discussion$$
 This is helpful for understanding why tape evaluations
@@ -119,7 +119,7 @@ $children%
 	example/print_for.cpp
 %$$
 The program
-$cref print_for_cout.cpp$$
+$cref print_for_Rcout.cpp$$
 is an example and test that prints to standard output.
 The output of this program
 states the conditions for passing and failing the test.

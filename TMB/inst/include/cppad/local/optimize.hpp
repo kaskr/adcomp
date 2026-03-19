@@ -220,12 +220,12 @@ private:
 	{	CPPAD_ASSERT_UNKNOWN( ptr_ == CPPAD_NULL );
 		ptr_ = new std::set<class_cexp_pair>;
 		CPPAD_ASSERT_UNKNOWN( ptr_ != CPPAD_NULL );
-		// std::cout << "new ptr_ = " << ptr_ << std::endl;
+		// Rcout << "new ptr_ = " << ptr_ << std::endl;
 	}
 
 	void delete_ptr(void)
 	{	if( ptr_ != CPPAD_NULL )
-		{	// std::cout << "delete ptr_ = " << ptr_ << std::endl;
+		{	// Rcout << "delete ptr_ = " << ptr_ << std::endl;
 			delete ptr_;
 		}
 		ptr_ = CPPAD_NULL;
@@ -242,18 +242,18 @@ public:
 
 	void print(void)
 	{	if( ptr_ == CPPAD_NULL )
-		{	std::cout << "{ }";
+		{	Rcout << "{ }";
 			return;
 		}
 		CPPAD_ASSERT_UNKNOWN( ! empty() );
 		const char* sep = "{ ";
 		std::set<class_cexp_pair>::const_iterator itr;
 		for(itr = ptr_->begin(); itr != ptr_->end(); itr++)
-		{	std::cout << sep;
-			std::cout << "(" << itr->compare() << "," << itr->index() << ")";
+		{	Rcout << sep;
+			Rcout << "(" << itr->compare() << "," << itr->index() << ")";
 			sep = ", ";
 		}
-		std::cout << "}";
+		Rcout << "}";
 	}
 
 	/// assignment operator

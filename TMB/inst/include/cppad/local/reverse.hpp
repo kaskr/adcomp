@@ -338,7 +338,7 @@ void ADFun<Base>::myReverse(size_t p, const VectorBase &w, size_t dep_var_index,
       for(int j = 0; j < p; j++)
 	countnnz += (Partial[i * p + j] != zero);
     if(countnnz>0){
-      std::cout << "Partials not correctly cleared. Nonzeros: " << countnnz << "\n";
+      Rcout << "Partials not correctly cleared. Nonzeros: " << countnnz << "\n";
     }
 #endif
 

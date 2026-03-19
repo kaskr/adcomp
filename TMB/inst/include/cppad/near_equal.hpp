@@ -18,7 +18,7 @@ $begin NearEqual$$
 $spell
 	cppad.hpp
 	sqrt
-	cout
+	Rcout
 	endl
 	Microsoft
 	std
@@ -131,7 +131,6 @@ $index exercise, NearEqual$$
 Create and run a program that contains the following code:
 $codep
 	using std::complex;
-	using std::cout;
 	using std::endl;
 
 	complex<double> one(1., 0), i(0., 1);
@@ -141,8 +140,8 @@ $codep
 	double          a = 0;
 	bool           ok = CppAD::NearEqual(x, y, r, a);
 	if( ok )
-		cout << "Ok"    << endl;
-	else	cout << "Error" << endl;
+		Rcout << "Ok"    << endl;
+	else	Rcout << "Error" << endl;
 $$
 
 $end

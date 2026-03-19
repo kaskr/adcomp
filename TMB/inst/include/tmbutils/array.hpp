@@ -172,12 +172,12 @@ struct array:Map< Array<Type,Dynamic,1> >{
   }
 
   void print(){
-    std::cout << "Array dim: ";
-    for(int i=0;i<dim.size();i++)std::cout << dim[i] << " ";
-    std::cout << "\n";
-    std::cout << "Array val: ";
-    for(int i=0;i<this->MapBase::size();i++)std::cout << this->MapBase::operator[](i) << " ";
-    std::cout << "\n";
+    Rcout << "Array dim: ";
+    for(int i=0;i<dim.size();i++)Rcout << dim[i] << " ";
+    Rcout << "\n";
+    Rcout << "Array val: ";
+    for(int i=0;i<this->MapBase::size();i++)Rcout << this->MapBase::operator[](i) << " ";
+    Rcout << "\n";
   };
 
   /** \brief Number of outer-most dimensions

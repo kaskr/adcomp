@@ -42,7 +42,7 @@ int  getListInteger(SEXP list, const char *str, int default_value = 0);
 #else
 SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
 {
-  if(config.debug.getListElement)std::cout << "getListElement: " << str << " ";
+  if(config.debug.getListElement)Rcout << "getListElement: " << str << " ";
   SEXP elmt = R_NilValue, names = Rf_getAttrib(list, R_NamesSymbol);
   int i; 
   for (i = 0; i < Rf_length(list); i++)
@@ -51,8 +51,8 @@ SEXP getListElement(SEXP list, const char *str, RObjectTester expectedtype=NULL)
 	elmt = VECTOR_ELT(list, i); 
 	break; 
       }
-  if(config.debug.getListElement)std::cout << "Length: " << LENGTH(elmt) << " ";
-  if(config.debug.getListElement)std::cout << "\n";
+  if(config.debug.getListElement)Rcout << "Length: " << LENGTH(elmt) << " ";
+  if(config.debug.getListElement)Rcout << "\n";
   RObjectTestExpectedType(elmt, expectedtype, str);
   return elmt; 
 }

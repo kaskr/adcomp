@@ -201,7 +201,7 @@ void RevHesSweep(
 	play->reverse_start(op, arg, i_op, i_var);
 	CPPAD_ASSERT_UNKNOWN( op == EndOp );
 # if CPPAD_REV_HES_SWEEP_TRACE
-	std::cout << std::endl;
+	Rcout << std::endl;
 	CppAD::vectorBool zf_value(limit);
 	CppAD::vectorBool zh_value(limit);
 # endif
@@ -804,7 +804,7 @@ void RevHesSweep(
 			j = rev_hes_sparse.next_element();
 		}
 		printOp(
-			std::cout, 
+			Rcout, 
 			play,
 			i_op,
 			i_var,
@@ -814,15 +814,15 @@ void RevHesSweep(
 		// should also print RevJac[i_var], but printOpResult does not
 		// yet allow for this
 		if( NumRes(op) > 0 && op != BeginOp ) printOpResult(
-			std::cout, 
+			Rcout, 
 			1, 
 			&zf_value, 
 			1, 
 			&zh_value
 		);
-		std::cout << std::endl;
+		Rcout << std::endl;
 	}
-	std::cout << std::endl;
+	Rcout << std::endl;
 # else
 	}
 # endif

@@ -945,8 +945,8 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       for (size_t i=0; i<n_inner; i++) active[i] = true; // just in case ...
       size_t num_inactive = std::count(active.begin(), active.end(), false);
       if (cfg.trace) {
-	std::cout << "Dead gradient args to 'simplify': ";
-	std::cout << num_inactive << "\n";
+	Rcout << "Dead gradient args to 'simplify': ";
+	Rcout << num_inactive << "\n";
       }
       if (num_inactive > 0) {
 	function.DomainReduce(active);
@@ -1031,7 +1031,7 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       }
     }
     Scalar f_previous = f_x;
-    if (cfg.trace) std::cout << "f_start=" << f_x << "\n";
+    if (cfg.trace) Rcout << "f_start=" << f_x << "\n";
     for (int i=0; i < cfg.maxit; i++) {
       vector<Scalar> g = gradient(x);
       Scalar mgc = g.abs().maxCoeff();
@@ -1048,10 +1048,10 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
         if (max(abs(g)) < grad.tol)
             return(par)
       */
-      if (cfg.trace) std::cout << "mgc=" << mgc << " ";
+      if (cfg.trace) Rcout << "mgc=" << mgc << " ";
       if (mgc < cfg.grad_tol) {
         x_start = x;
-        if (cfg.trace) std::cout << "\n";
+        if (cfg.trace) Rcout << "\n";
         return msg;
       }
       typename Hessian_Type::template MatrixResult<TMBad::Scalar>::type
@@ -1059,12 +1059,12 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
       vector<Scalar> diag_cpy = H.diagonal().array();
       // Quick ustep reduction based on Hessian diagonal
       Scalar m = diagonal_min(H);
-      if (cfg.trace) std::cout << "m=" << m << " ";
+      if (cfg.trace) Rcout << "m=" << m << " ";
       if (std::isfinite(m) && m < 0) {
         Scalar ustep_max = invphi(-m);
         cfg.ustep = std::min(cfg.ustep, ustep_max);
       }
-      if (cfg.trace) std::cout << "ustep=" << cfg.ustep << " ";
+      if (cfg.trace) Rcout << "ustep=" << cfg.ustep << " ";
       while (true) { // FIXME: Infinite loop
         // H := H + phi * I
         H.diagonal().array() = diag_cpy;
@@ -1119,16 +1119,16 @@ struct NewtonOperator : TMBad::global::DynamicOperator< -1, -1> {
 	  // Try to factorize
 	  hessian -> llt_factorize(H);
 	  bool PD = (hessian -> llt_info() == 0);
-	  if (cfg.trace) std::cout << "Trying early exit - PD Hess? " << PD << "\n";
+	  if (cfg.trace) Rcout << "Trying early exit - PD Hess? " << PD << "\n";
 	  if (PD) return msg;
 	}
 	return
 	  convergence_fail("Max number of rejections exceeded", x);
       }
       // Tracing info
-      if (cfg.trace) std::cout << "f=" << f << " ";
-      if (cfg.trace) std::cout << "reject=" << reject_counter << " ";
-      if (cfg.trace) std::cout << "\n";
+      if (cfg.trace) Rcout << "f=" << f << " ";
+      if (cfg.trace) Rcout << "reject=" << reject_counter << " ";
+      if (cfg.trace) Rcout << "\n";
     }
     return
       convergence_fail("Iteration limit exceeded", x);

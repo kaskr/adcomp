@@ -134,12 +134,12 @@
 ##' \emph{given past observations}.
 ##' If column \code{randomize} is present, it indicates that randomization has been applied for the row.
 ##' @examples
+##' \dontrun{
 ##' ######################## Gaussian case
 ##' runExample("simple")
 ##' osa.simple <- oneStepPredict(obj, observation.name = "x", method="fullGaussian")
 ##' qqnorm(osa.simple$residual); abline(0,1)
 ##'
-##' \dontrun{
 ##' ######################## Poisson case (First 100 observations)
 ##' runExample("ar1xar1")
 ##' osa.ar1xar1 <- oneStepPredict(obj, "N", "keep", method="cdf", discrete=TRUE, subset=1:100)

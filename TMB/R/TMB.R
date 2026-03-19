@@ -1176,9 +1176,11 @@ MakeADFun <- function(data, parameters, map=list(),
 ##' @param obj Object returned by \code{MakeADFun}
 ##' @return NULL
 ##' @examples
+##' \dontrun{
 ##' runExample("simple", thisR = TRUE)          ## Create 'obj'
 ##' FreeADFun(obj)                              ## Free external pointers
 ##' obj$fn()                                    ## Re-allocate external pointers
+##' }
 FreeADFun <- function(obj) {
     free <- function(ADFun) {
         if (! is.null(ADFun) ) {

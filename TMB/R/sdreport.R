@@ -110,7 +110,7 @@
 ##' @examples
 ##' \dontrun{
 ##' runExample("linreg_parallel", thisR = TRUE) ## Non-random effect example
-##' sdreport(obj) }
+##' sdreport(obj)
 ##'
 ##' runExample("simple", thisR = TRUE)          ## Random effect example
 ##' rep <- sdreport(obj)
@@ -120,7 +120,7 @@
 ##'
 ##' ## Bias correction
 ##' rep <- sdreport(obj, bias.correct = TRUE)
-##' summary(rep, "report")                      ## Include bias correction
+##' summary(rep, "report") }                    ## Include bias correction
 sdreport <- function(obj,par.fixed=NULL,hessian.fixed=NULL,getJointPrecision=FALSE,bias.correct=FALSE,
                      bias.correct.control=list(sd=FALSE, split=NULL, nsplit=NULL), ignore.parm.uncertainty = FALSE,
                      getReportCovariance=TRUE, skip.delta.method=FALSE){
