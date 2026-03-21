@@ -1,0 +1,160 @@
+* using log directory ‘/data/gannet/ripley/R/packages/tests-gcc-SAN/TMB.Rcheck’
+* using R Under development (unstable) (2026-03-17 r89645)
+* using platform: x86_64-pc-linux-gnu
+* R was compiled by
+    gcc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)
+    GNU Fortran (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)
+* running under: Fedora Linux 42 (Workstation Edition)
+* using session charset: UTF-8
+* current time: 2026-03-18 03:08:15 UTC
+* using option ‘--no-stop-on-test-error’
+* checking for file ‘TMB/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘TMB’ version ‘1.9.20’
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking whether package ‘TMB’ can be installed ... [502s/116s] OK
+* used C compiler: ‘gcc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)’
+* used C++ compiler: ‘g++ (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)’
+* checking package directory ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking compiled code ... OK
+* checking examples ... ERROR
+Running examples in ‘TMB-Ex.R’ failed
+The error most likely occurred in:
+
+> ### Name: FreeADFun
+> ### Title: Free memory allocated on the C++ side by 'MakeADFun'.
+> ### Aliases: FreeADFun
+> 
+> ### ** Examples
+> 
+> runExample("simple", thisR = TRUE)          ## Create 'obj'
+Running example simple 
+
+> require(TMB)
+
+> dyn.load(dynlib("simple"))
+
+> set.seed(123)
+
+> y <- rep(1900:2010, each = 2)
+
+> year <- factor(y)
+
+> quarter <- factor(rep(1:4, length.out = length(year)))
+
+> period <- factor((y > mean(y)) + 1)
+
+> B <- model.matrix(~year + quarter - 1)
+
+> A <- model.matrix(~period - 1)
+
+> B <- as(B, "TsparseMatrix")
+
+> A <- as(A, "TsparseMatrix")
+
+> u <- rnorm(ncol(B))
+
+> beta <- rnorm(ncol(A)) * 100
+
+> eps <- rnorm(nrow(B), sd = 1)
+
+> x <- as.numeric(A %*% beta + B %*% u + eps)
+
+> obj <- MakeADFun(data = list(x = x, B = B, A = A), 
++     parameters = list(u = u * 0, beta = beta * 0, logsdu = 1, 
++         logsd0 = 1), random = .... [TRUNCATED] 
+=================================================================
+==3748416==ERROR: AddressSanitizer: global-buffer-overflow on address 0x7bf5c2446634 at pc 0x7ff5db8e4937 bp 0x7fffb20f85b0 sp 0x7fffb20f7d70
+READ of size 154707 at 0x7bf5c2446634 thread T0
+    #0 0x7ff5db8e4936 in memcpy (/lib64/libasan.so.8+0xe4936) (BuildId: d3cb6206dff19da52969c009f4cd93611901c478)
+    #1 0x7bf5c162bc96 in std::char_traits<char>::copy(char*, char const*, unsigned long) /usr/include/c++/15/bits/char_traits.h:429
+    #2 0x7bf5c162bc96 in std::char_traits<char>::copy(char*, char const*, unsigned long) /usr/include/c++/15/bits/char_traits.h:421
+    #3 0x7bf5c162bc96 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_S_copy(char*, char const*, unsigned long) /usr/include/c++/15/bits/basic_string.h:453
+    #4 0x7bf5c162bc96 in void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_S_copy_chars<char const*>(char*, char const*, char const*) /usr/include/c++/15/bits/basic_string.h:489
+    #5 0x7bf5c162bc96 in void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [clone .constprop.0] /usr/include/c++/15/bits/basic_string.tcc:253
+    #6 0x7bf5c1661a72 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string<std::allocator<char> >(char const*, std::allocator<char> const&) /usr/include/c++/15/bits/basic_string.h:714
+    #7 0x7bf5c1661a72 in MakeADFunObject /data/gannet/ripley/R/packages/tests-gcc-SAN/TMB.Rcheck/00LOCK-TMB/00new/TMB/include/cppad/local/ad_fun.hpp:534
+    #8 0x000000751256 in R_doDotCall /data/gannet/ripley/R/svn/R-devel/src/main/dotcode.c:763
+    #9 0x000000755ada in do_dotcall /data/gannet/ripley/R/svn/R-devel/src/main/dotcode.c:1437
+    #10 0x0000008d5732 in bcEval_loop /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:8132
+    #11 0x0000008c2983 in bcEval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:7515
+    #12 0x0000008619d2 in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1167
+    #13 0x000000879f4a in R_execClosure /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:2389
+    #14 0x00000087df3a in applyClosure_core /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:2302
+    #15 0x000000862073 in Rf_applyClosure /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:2324
+    #16 0x000000862073 in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1280
+    #17 0x0000008943de in do_set /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:3581
+    #18 0x000000862496 in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1232
+    #19 0x00000089cd13 in do_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:3973
+    #20 0x0000008d5732 in bcEval_loop /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:8132
+    #21 0x0000008c2983 in bcEval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:7515
+    #22 0x0000008619d2 in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1167
+    #23 0x00000092a011 in forcePromise.part.0.lto_priv.0 /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:976
+    #24 0x00000086302c in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1187
+    #25 0x00000089eb43 in do_withVisible /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:3998
+    #26 0x000000a9a936 in do_internal /data/gannet/ripley/R/svn/R-devel/src/main/names.c:1419
+    #27 0x0000008e2941 in bcEval_loop /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:8152
+    #28 0x0000008c2983 in bcEval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:7515
+    #29 0x0000008619d2 in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1167
+    #30 0x000000879f4a in R_execClosure /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:2389
+    #31 0x00000087df3a in applyClosure_core /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:2302
+    #32 0x000000862073 in Rf_applyClosure /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:2324
+    #33 0x000000862073 in Rf_eval /data/gannet/ripley/R/svn/R-devel/src/main/eval.c:1280
+    #34 0x000000a07f88 in Rf_ReplIteration /data/gannet/ripley/R/svn/R-devel/src/main/main.c:264
+    #35 0x000000a07f88 in R_ReplConsole /data/gannet/ripley/R/svn/R-devel/src/main/main.c:317
+    #36 0x000000a162fa in run_Rmainloop /data/gannet/ripley/R/svn/R-devel/src/main/main.c:1235
+    #37 0x000000a16392 in Rf_mainloop /data/gannet/ripley/R/svn/R-devel/src/main/main.c:1242
+    #38 0x000000412fdf in main /data/gannet/ripley/R/svn/R-devel/src/main/Rmain.c:29
+    #39 0x7ff5da012574 in __libc_start_call_main (/lib64/libc.so.6+0x3574) (BuildId: 92b5376d35bb29c098175948cf3e7cbcae3aeae1)
+    #40 0x7ff5da012627 in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x3627) (BuildId: 92b5376d35bb29c098175948cf3e7cbcae3aeae1)
+    #41 0x0000004139c4 in _start (/data/gannet/ripley/R/gcc-SAN3/bin/exec/R+0x4139c4) (BuildId: b6f4dcaa8a27b2d4150f1b316e95823ec1c3057c)
+
+0x7bf5c2446634 is located 44 bytes before global variable '*.LC13' defined in './simple.so.ltrans0.ltrans' (0x7bf5c2446660) of size 24
+  '*.LC13' is ascii string 'basic_string::_M_create'
+0x7bf5c2446634 is located 0 bytes after global variable '*.LC12' defined in './simple.so.ltrans0.ltrans' (0x7bf5c2446620) of size 20
+  '*.LC12' is ascii string 'no_conditional_skip'
+SUMMARY: AddressSanitizer: global-buffer-overflow /data/gannet/ripley/R/packages/tests-gcc-SAN/TMB.Rcheck/00LOCK-TMB/00new/TMB/include/cppad/local/ad_fun.hpp:534 in MakeADFunObject
+Shadow bytes around the buggy address:
+  0x7bf5c2446380: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7bf5c2446400: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7bf5c2446480: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7bf5c2446500: 05 f9 f9 f9 f9 f9 f9 f9 00 02 f9 f9 f9 f9 f9 f9
+  0x7bf5c2446580: 00 00 00 00 00 05 f9 f9 f9 f9 f9 f9 00 00 00 07
+=>0x7bf5c2446600: f9 f9 f9 f9 00 00[04]f9 f9 f9 f9 f9 00 00 00 f9
+  0x7bf5c2446680: f9 f9 f9 f9 03 f9 f9 f9 f9 f9 f9 f9 00 07 f9 f9
+  0x7bf5c2446700: f9 f9 f9 f9 00 07 f9 f9 f9 f9 f9 f9 00 05 f9 f9
+  0x7bf5c2446780: f9 f9 f9 f9 00 00 05 f9 f9 f9 f9 f9 00 00 03 f9
+  0x7bf5c2446800: f9 f9 f9 f9 00 00 02 f9 f9 f9 f9 f9 00 06 f9 f9
+  0x7bf5c2446880: f9 f9 f9 f9 00 00 00 06 f9 f9 f9 f9 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==3748416==ABORTING
+* DONE
+Status: 1 ERROR
