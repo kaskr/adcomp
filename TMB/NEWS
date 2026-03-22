@@ -1,4 +1,13 @@
 ------------------------------------------------------------------------
+TMB 1.9.21 (2026-03-22)
+------------------------------------------------------------------------
+
+o Package restructure:
+  - Github version == CRAN version [no more patching for CRAN]
+  - 'Eigen' + 'unsupported' removed [we now completely rely on RcppEigen]
+  - All examples wrapped in 'dontrun' [we no longer ship the 'simple' build]
+
+------------------------------------------------------------------------
 TMB 1.9.20 (2026-03-17)
 ------------------------------------------------------------------------
 
