@@ -57,18 +57,44 @@ getUserDLL <- function(){
 ## Update cholesky factorization ( of H+t*I ) avoiding copy overhead
 ## by writing directly to L(!).
 updateCholesky <- function(L, H, t=0){
-  .Call("tmb_destructive_CHM_update", L, H, t, PACKAGE="TMB")
+  if (inherits(L,"dCHMsuper")) {
+    .Call("tmb_destructive_CHM_update", L, H, t, PACKAGE="TMB")
+  } else {
+    attr(L, "methods")$updateCholesky(L, H, t)
+  }
 }
 
 ## Solve H x = y using super nodal sparse Cholesky factor
 ## Optionally refine solution iteratively (if H is not the exact Hessian)
 solveCholesky <- function(L, y, iterative.refinement=FALSE) {
+  if (inherits(L,"dCHMsuper")) {
     x <- .Call("tmb_CHMfactor_solve", L, y, PACKAGE="TMB")
     if (iterative.refinement &&
         !is.null(iterative.refine <- attr(L, "iterative_refinement"))) {
         x <- iterative.refine(L=L, x=x, y=y)
     }
     x
+  } else {
+    attr(L, "methods")$solveCholesky(L, y)
+  }
+}
+
+## Get determinant
+determinant <- function(L, ...) {
+  if (inherits(L,"dCHMsuper")) {
+    Matrix::determinant(L, ...)
+  } else {
+    attr(L, "methods")$logdet(L, ...)
+  }
+}
+
+## Get determinant derivatives
+solveSubset2 <- function(L) {
+  if (inherits(L,"dCHMsuper")) {
+    .Call("tmb_invQ_tril_halfdiag", L, PACKAGE="TMB")
+  } else {
+    attr(L, "methods")$logdetHalfDeriv(L)
+  }
 }
 
 ## Construct funtion to do iterative refinement
@@ -748,7 +774,6 @@ MakeADFun <- function(data, parameters, map=list(),
       ##browser()
       e <- environment(spHess)
       solveSubset <- function(L).Call("tmb_invQ",L,PACKAGE="TMB")
-      solveSubset2 <- function(L).Call("tmb_invQ_tril_halfdiag",L,PACKAGE="TMB")
       ## FIXME: The following two lines are not efficient:
       ## 1. ihessian <- tril(solveSubset(L))
       ## 2. diag(ihessian) <- .5*diag(ihessian)
@@ -879,7 +904,7 @@ MakeADFun <- function(data, parameters, map=list(),
         hessian <- .Call("tmb_sparse_izamd", hessian, profile, 1.0, PACKAGE="TMB")
     }
     ## Update Cholesky:
-    if(inherits(env$L.created.by.newton,"dCHMsuper")){
+    if(!is.null(env$L.created.by.newton)){
       L <- env$L.created.by.newton
       ##.Call("destructive_CHM_update",L,hessian,as.double(0),PACKAGE="Matrix")
       updateCholesky(L,hessian)
@@ -1924,24 +1949,171 @@ checkSparseHessian <- function(obj,par=obj$env$last.par,
   invisible(res)
 }
 
+##' Provide alternative methods to handle the sparse linear algebra required by TMB.
+##'
+##' \code{method="CHOLMOD"}
 ##' Aggressively tries to reduce fill-in of sparse Cholesky factor by
 ##' running a full suite of ordering algorithms. NOTE: requires a
 ##' specialized installation of the package. More information is
-##' available at the package URL.
+##' available at the package URL. This method is mainly for backward compatibility and dates back to before the Matrix package included the mentioned ordering algorithms.
 ##'
+##' \code{method="incomplete"}
+##' This experimental method determines an approximate factorization of the form \eqn{H=L D L^T} where small elements of L are dropped. It supports a number of extra arguments:
+##' \itemize{
+##'   \item \code{tol} Drop elements with \code{abs(L)<tol}
+##'   \item \code{abstol}, \code{maxit} Linear systems \eqn{H x = y} are solved using iterative refinement with absolute error tolerance \code{abstol} and maximum number of iterations \code{maxit}.
+##'   \item \code{trace} Method specific output can be enabled by \code{trace=TRUE}.
+##' }
 ##' @title Run symbolic analysis on sparse Hessian
 ##' @param obj Output from \code{MakeADFun}
+##' @param method Which method to use; see details.
+##' @param ... Extra paramters depending on the method.
 ##' @return NULL
-runSymbolicAnalysis <- function(obj){
-  ok <- .Call("have_tmb_symbolic",PACKAGE="TMB")
-  if(!ok){
+runSymbolicAnalysis <- function(obj,
+                                method=c("CHOLMOD", "incomplete"),
+                                ...) {
+  method <- match.arg(method)
+  if (method == "CHOLMOD")    return ( runSymbolicAnalysis1(obj, ...) )
+  if (method == "incomplete") return ( runSymbolicAnalysis2(obj, ...) )
+  stop("Unknown method: ", method)
+}
+runSymbolicAnalysis1 <- function(obj, ...) {
+  ok <- .Call("have_tmb_symbolic", PACKAGE="TMB")
+  if(!ok) {
     cat("note: tmb_symbolic not installed\n")
     return(NULL)
   }
   h <- obj$env$spHess(random=TRUE)
   h@x[] <- 0
   diag(h) <- 1
-  L <- .Call("tmb_symbolic",h,PACKAGE="TMB")
+  L <- .Call("tmb_symbolic", h, PACKAGE="TMB")
+  obj$env$L.created.by.newton <- L
+  NULL
+}
+## Incomplete analysis
+runSymbolicAnalysis2 <- function(obj, ...) {
+  ## Override defaults
+  config <- list(tol=1e-4, maxit=50, abstol=1e-10, relax=10, adaptive=TRUE, posdef=FALSE, trace=FALSE, perm=NULL)
+  args <- list(...)
+  config[names(args)] <- args
+  ## Evaluate hessian
+  par <- obj$env$last.par.best %||% obj$env$last.par %||% obj$env$par
+  h <- obj$env$spHess(par,random=TRUE)
+  ## Pattern will change => clear matched pattern
+  environment(obj$env$spHess)$ind1 <- NULL
+  ## Permutation ?
+  checkPerm <- function(perm) {
+    perm <- as.integer(perm)
+    if (min(perm) == 0) perm <- perm + 1L
+    if (length(perm) != nrow(h))
+      stop("Wrong length 'perm'")
+    valid <- rep(FALSE, length(perm))
+    valid[perm] <- TRUE
+    if (!all(valid)) stop("'perm' must be a permutation")
+    perm
+  }
+  perm <- config[["perm"]]
+  iperm <- NULL
+  if (!is.null(perm)) {
+    perm <- checkPerm(perm)
+    iperm <- invPerm(perm)
+  }
+  Permute <- function(h) {
+    if (!is.null(perm)) {
+      h <- h[perm, perm, drop=FALSE]
+    }
+    if (h@uplo == "L")
+      h <- Matrix::t(h)
+    h
+  }
+  ## Run incomplete analysis
+  L <- .Call("tmb_ichol", Permute(h), config[["tol"]], PACKAGE="TMB")
+  ## Re-do incomplete analysis
+  reanalyze <- function(HT, L) {
+    environment(obj$env$spHess)$ind1 <- NULL ## pattern will change
+    Lnew <- .Call("tmb_ichol", HT, config[["tol"]], PACKAGE="TMB")
+    L <- .Call("setslot", L, "i", Lnew@i)
+    L <- .Call("setslot", L, "p", Lnew@p)
+    L <- .Call("setslot", L, "x", Lnew@x)
+    L <- .Call("setslot", L, "error", NULL)
+    if (config[["trace"]]) {
+      cat(sprintf("nnz(L)=%f\n",length(L@x)))
+      cat(sprintf("Flopcount=%f\n",flopcount(L)))
+    }
+    NULL
+  }
+  ## Flopcount
+  flopcount <- function(L) {
+    cc <- diff(L@p)
+    rc <- diff(Matrix::t(L)@p)
+    sum(cc*rc)
+  }
+  if (config[["trace"]]) {
+    cat(sprintf("nnz(L)=%f\n",length(L@x)))
+    cat(sprintf("Flopcount=%f\n",flopcount(L)))
+  }
+  ## Set methods and other attributes
+  attr(L, "H") <- h
+  attr(L, "perm") <- (perm %||% seq_len(nrow(h))) - 1L
+  attr(L, "methods") <- list(
+    updateCholesky = function(L, H, t=0) {
+      if (t != 0)
+        diag(H) <- diag(H) + t
+      L <- .Call("setslot", L, "H", H)
+      Hp <- Permute(H)
+      get_error <- as.logical(config[["adaptive"]])
+      .Call("tmb_ichol_update", Hp, L, get_error, PACKAGE="TMB")
+      if (config[["posdef"]]) return(TRUE)
+      all(diag(L) > 0)
+    },
+    solveCholesky = function(L, y) {
+      H <- attr(L,"H")
+      if (!is.null(perm)) {
+        H <- Permute(H)
+        y <- y[perm]
+      }
+      x <- .Call("tmb_isolve", L, y, PACKAGE="TMB")
+      for (i in seq_len(config[["maxit"]])) {
+        Hx <- as.numeric(H %*% x) ## H %*% x
+        error <- y - Hx
+        mgc <- max(abs(error))
+        if (config[["trace"]]) print (mgc)
+        if (is.finite(mgc) && mgc < config[["abstol"]]) break
+        if (!is.finite(mgc)) {
+          stop("Must redo symbolic analysis")
+        }
+        step <- .Call("tmb_isolve", L, error, PACKAGE="TMB")
+        if (TRUE) { ## Tune step size
+          t <- sum(error * step) / sum(step*(H%*%step))
+          step <- t * step
+        }
+        x <- x + step
+      }
+      if (i==config[["maxit"]]) {
+        stop("Failed convergence with mgc=", mgc)
+      }
+      if (!is.null(perm)) {
+        x <- x[iperm]
+      }
+      x
+    },
+    logdet = function(L,...) {
+      if (config[["adaptive"]]) {
+        error <- attr(L, "error") %||% 0
+        cat("error="); print(error)
+        if (error > config[["relax"]] * config[["tol"]]) {
+          Hp <- Permute(attr(L, "H"))
+          reanalyze(Hp, L)
+        }
+      }
+      list(modulus=.5*sum(log(diag(L))))
+    },
+    logdetHalfDeriv = function(L) {
+      ##.5 * .Call("tmb_ldl_deriv", L, PACKAGE="TMB")
+      .5 * .Call("tmb_ichol_adjoint_update", L, PACKAGE="TMB")
+    }
+  )
+  ## Set Cholesky inside model object
   obj$env$L.created.by.newton <- L
   NULL
 }

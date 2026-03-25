@@ -28,6 +28,12 @@ SEXP setxslot(SEXP x, SEXP y){
   setAttrib(x,install("x"),y);
   return x;
 }
+/* Set slots inplace */
+SEXP setslot(SEXP x, SEXP nm, SEXP y) {
+  SEXP symb = Rf_installChar(STRING_ELT(nm, 0));
+  Rf_setAttrib(x, symb, y);
+  return x;
+}
 
 /* Is external pointer nil ? */
 SEXP isNullPointer(SEXP pointer) {
