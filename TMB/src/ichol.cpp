@@ -5,6 +5,11 @@
 #include <memory>
 # ifdef _OPENMP
 #include <omp.h>
+#define TMB_GET_THREAD_NUM omp_get_thread_num()
+#define TMB_GET_MAX_THREADS omp_get_max_threads()
+# else
+#define TMB_GET_THREAD_NUM 0
+#define TMB_GET_MAX_THREADS 1
 # endif
 #include <R.h>
 #include <Rinternals.h>
@@ -526,11 +531,11 @@ bool cs_ichol_update_omp (const cs *A, cs *L, cs *S, double* err = NULL)
     Sp = S->p ; Si = S->i ;
     for (k = 0 ; k < n ; k++) c [k] = Lp [k];
     // Thread private data
-    std::vector<thread_data> tdat(omp_get_max_threads());
+    std::vector<thread_data> tdat(TMB_GET_MAX_THREADS);
 #pragma omp parallel
     {
       // Initialize thread data in parallel (first touch)
-      tdat[omp_get_thread_num()] = thread_data(n);
+      tdat[TMB_GET_THREAD_NUM] = thread_data(n);
     }
     for (int batch = 0; batch < S->n; batch++) {
 #pragma omp parallel for
@@ -538,11 +543,11 @@ bool cs_ichol_update_omp (const cs *A, cs *L, cs *S, double* err = NULL)
         int k1 = Si[p];
         bool last_p = (p == Sp[S->n] - 1);
         int k2 = ( last_p ? n : Si[p+1]);
-        cs_ichol_update_omp_wrk (A, L, err ? &(tdat[omp_get_thread_num()].err) : NULL,
+        cs_ichol_update_omp_wrk (A, L, err ? &(tdat[TMB_GET_THREAD_NUM].err) : NULL,
                                  R.get(),
                                  k1, k2-k1,
                                  c,
-                                 tdat[omp_get_thread_num()]);
+                                 tdat[TMB_GET_THREAD_NUM]);
       }
     }
     if (err) {
@@ -634,11 +639,11 @@ void cs_ichol_adjoint_update_omp (cs *L, cs *S) {
     dL[Lp[k]] += 1. / Lx[Lp[k]];
   }
   // Thread private data
-  std::vector<thread_data_adjoint> tdat(omp_get_max_threads());
+  std::vector<thread_data_adjoint> tdat(TMB_GET_MAX_THREADS);
 #pragma omp parallel
     {
       // Initialize thread data in parallel (first touch)
-      tdat[omp_get_thread_num()] = thread_data_adjoint(n);
+      tdat[TMB_GET_THREAD_NUM] = thread_data_adjoint(n);
     }
     for (int batch = S->n; batch > 0; ) {
       batch--;
@@ -652,7 +657,7 @@ void cs_ichol_adjoint_update_omp (cs *L, cs *S) {
                                          k1, k2-k1,
                                          c,
                                          dL,
-                                         tdat[omp_get_thread_num()]);
+                                         tdat[TMB_GET_THREAD_NUM]);
       }
     }
     Memcpy(L->x, (double*)(dL.data()), dL.size());
