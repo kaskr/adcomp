@@ -9,6 +9,7 @@ cholmod_common c;
 SEXP omp_num_threads(SEXP x);
 SEXP isNullPointer(SEXP pointer);
 SEXP setxslot(SEXP x, SEXP y);
+SEXP setslot(SEXP x, SEXP nm, SEXP y);
 SEXP tmb_invQ(SEXP Lfac);
 SEXP tmb_invQ_tril_halfdiag(SEXP Lfac);
 SEXP match_pattern(SEXP A_, SEXP B_);
@@ -18,11 +19,20 @@ SEXP have_tmb_symbolic(void);
 SEXP tmb_symbolic(SEXP Qp);
 SEXP tmb_destructive_CHM_update(SEXP L, SEXP H, SEXP mult);
 SEXP tmb_CHMfactor_solve(SEXP L_, SEXP y_);
+// Incomplete Cholesky
+SEXP tmb_isolve(SEXP X, SEXP Y);
+SEXP tmb_ichol(SEXP X, SEXP tol);
+SEXP tmb_parallel_schedule(SEXP X);
+SEXP tmb_ichol_update(SEXP X, SEXP Y, SEXP get_error);
+SEXP tmb_ichol_adjoint_update(SEXP X);
+SEXP tmb_ldl_update(SEXP X, SEXP Y);
+SEXP tmb_ldl_deriv(SEXP L);
 
 static R_CallMethodDef CallEntries[] = {
     CALLDEF(omp_num_threads, 1),
     CALLDEF(isNullPointer, 1),
     CALLDEF(setxslot, 2),
+    CALLDEF(setslot, 3),
     CALLDEF(tmb_invQ, 1),
     CALLDEF(tmb_invQ_tril_halfdiag, 1),
     CALLDEF(match_pattern, 2),
@@ -32,6 +42,13 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(tmb_symbolic, 1),
     CALLDEF(tmb_destructive_CHM_update, 3),
     CALLDEF(tmb_CHMfactor_solve, 2),
+    CALLDEF(tmb_isolve, 2),
+    CALLDEF(tmb_ichol, 2),
+    CALLDEF(tmb_parallel_schedule, 1),
+    CALLDEF(tmb_ichol_update, 3),
+    CALLDEF(tmb_ichol_adjoint_update, 1),
+    CALLDEF(tmb_ldl_update, 2),
+    CALLDEF(tmb_ldl_deriv, 1),
     {NULL, NULL, 0}
 };
 
