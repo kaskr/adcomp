@@ -21,7 +21,7 @@
    cs_ichol_adjoint_update : Adjoint code
 
    cs_ichol_update_omp()         : Parallel version
-   cs_ichol_adjoint_update_omp() : Parallel version (not done yet)
+   cs_ichol_adjoint_update_omp() : Parallel version
 */
 
 /* --- primary CSparse routines and data structures ------------------------- */
@@ -61,12 +61,13 @@ struct cs_sparse_alloc : cs {
     sync();
   }
 };
-// Replacement of 'cs*' with managed data. Note: get() member returns 'cs*'.
+// Replacement of 'cs*' with managed data.
 struct cs_ptr : std::unique_ptr<cs_sparse_alloc> {
   typedef std::unique_ptr<cs_sparse_alloc> Base;
   cs_ptr(csi m, csi n, csi nzmax, csi values, csi triplet) :
     Base(std::make_unique<cs_sparse_alloc> (m,n,nzmax,values,triplet))
   { }
+  operator cs* () { return Base::get(); }
 };
 
 cs_ptr cs_transpose (const cs *A, csi values) ;
@@ -544,7 +545,7 @@ bool cs_ichol_update_omp (const cs *A, cs *L, cs *S, double* err = NULL)
         bool last_p = (p == Sp[S->n] - 1);
         int k2 = ( last_p ? n : Si[p+1]);
         cs_ichol_update_omp_wrk (A, L, err ? &(tdat[TMB_GET_THREAD_NUM].err) : NULL,
-                                 R.get(),
+                                 R,
                                  k1, k2-k1,
                                  c,
                                  tdat[TMB_GET_THREAD_NUM]);
@@ -653,7 +654,7 @@ void cs_ichol_adjoint_update_omp (cs *L, cs *S) {
         bool last_p = (p == Sp[S->n] - 1);
         int k2 = ( last_p ? n : Si[p+1]);
         cs_ichol_adjoint_update_omp_wrk (L,
-                                         R.get(),
+                                         R,
                                          k1, k2-k1,
                                          c,
                                          dL,
@@ -913,7 +914,7 @@ SEXP tmb_ichol(SEXP X, SEXP tol) {
   cs_ptr L = cs_ichol(&A, chol_tol);
   SEXP claes = PROTECT(R_do_MAKE_CLASS("dgCMatrix"));  // OR dtCMatrix ?
   SEXP ans = PROTECT(R_do_new_object(claes));
-  cs2r(ans, L.get());
+  cs2r(ans, L);
   UNPROTECT(2);
   return ans;
 }
@@ -924,7 +925,7 @@ SEXP tmb_parallel_schedule(SEXP L) {
   cs_ptr S = cs_parallel_schedule(&A);
   SEXP claes = PROTECT(R_do_MAKE_CLASS("ngCMatrix"));
   SEXP ans = PROTECT(R_do_new_object(claes));
-  cs2r(ans, S.get());
+  cs2r(ans, S);
   UNPROTECT(2);
   return ans;
 }

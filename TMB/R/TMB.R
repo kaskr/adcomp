@@ -1996,7 +1996,7 @@ runSymbolicAnalysis1 <- function(obj, ...) {
 ## Incomplete analysis
 runSymbolicAnalysis2 <- function(obj, ...) {
   ## Override defaults
-  config <- list(tol=1e-4, maxit=50, abstol=1e-10, relax=10, adaptive=TRUE, posdef=FALSE, trace=FALSE, perm=NULL, parallel=FALSE)
+  config <- list(tol=1e-4, maxit=50, abstol=1e-10, relax=10, adaptive=TRUE, posdef=FALSE, trace=FALSE, perm=NULL, parallel=FALSE, stop.on.error=TRUE)
   args <- list(...)
   config[names(args)] <- args
   ## Evaluate hessian
@@ -2043,7 +2043,7 @@ runSymbolicAnalysis2 <- function(obj, ...) {
     L <- .Call("setslot", L, "x", Lnew@x, PACKAGE="TMB")
     L <- .Call("setslot", L, "error", NULL, PACKAGE="TMB")
     if (config[["parallel"]])
-      .Call("setslot", L, "tmb_parallel_schedule",
+      .Call("setslot", L, "parallel_schedule",
             .Call("tmb_parallel_schedule", L, PACKAGE="TMB"), PACKAGE="TMB")
     if (config[["trace"]]) {
       cat(sprintf("nnz(L)=%f\n",length(L@x)))
@@ -2099,7 +2099,8 @@ runSymbolicAnalysis2 <- function(obj, ...) {
         x <- x + step
       }
       if (i==config[["maxit"]]) {
-        stop("Failed convergence with mgc=", mgc)
+        if (config[["stop.on.error"]])
+          stop("Failed convergence with mgc=", mgc)
       }
       if (!is.null(perm)) {
         x <- x[iperm]
