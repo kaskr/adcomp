@@ -4464,12 +4464,14 @@ bool all_allow_remap(const global &glob) {
 
 std::vector<Index> remap_identical_sub_expressions(
     global &glob, std::vector<Index> inv_remap) {
+  bool have_inv_remap = (inv_remap.size() != 0);
+
   std::vector<Index> remap = get_likely_expression_duplicates(glob, inv_remap);
 
   for (size_t i = 0; i < glob.inv_index.size(); i++) {
     bool accept = false;
     Index var_i = glob.inv_index[i];
-    if (inv_remap.size() > 0) {
+    if (have_inv_remap) {
       Index j = inv_remap[i];
       Index var_j = glob.inv_index[j];
       accept = remap[var_i] == remap[var_j];
@@ -4518,7 +4520,7 @@ std::vector<Index> remap_identical_sub_expressions(
         }
       }
 
-      if (CurOp == invop) {
+      if (CurOp == invop && !have_inv_remap) {
         ok = false;
       }
       if (ok) {

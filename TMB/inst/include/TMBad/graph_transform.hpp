@@ -870,7 +870,8 @@ struct forbid_remap {
     `remap[a:b] := a:b` for invalid remappings.
 
     \param glob Function object to be modified
-    \param all_allow_remap Skip extra check
+    \param inv_remap If non-empty, this is a user specified remapping of
+   independent variables. Otherwise, remapping of InvOps are forbidden.
 */
 std::vector<Index> remap_identical_sub_expressions(
     global &glob, std::vector<Index> inv_remap);
