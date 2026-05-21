@@ -92,6 +92,18 @@ TMB_BIND_ATOMIC(compois_calc_loglambda,
                 compois_utils::calc_loglambda(x[0], x[1]) )
 
 /********************************************************************
+ * Adding Conway-Maxwell-Binomial distribution
+ ********************************************************************/
+#include "compois/compbinom.hpp"
+TMB_BIND_ATOMIC(compbinom_calc_logZ,
+                110,
+                compbinom_utils::calc_logZ(x[0], x[1], (int)asDouble(x[2])) )
+
+TMB_BIND_ATOMIC(compbinom_calc_logitp,
+                110,
+                compbinom_utils::calc_logitp(x[0], x[1], (int)asDouble(x[2])) )
+
+/********************************************************************
  * Adding 'qbeta'
  ********************************************************************/
 extern "C" double Rf_qbeta(double, double, double, int, int);
