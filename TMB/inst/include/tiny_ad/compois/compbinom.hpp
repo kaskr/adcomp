@@ -16,7 +16,7 @@ namespace compbinom_utils {
 template<class Type>
 Type calc_logZ(Type Psi, Type nu, int n) {
   using atomic::tiny_ad::isfinite;
-  bool ok = (n >= 0 && 0 < nu && isfinite(Psi) && isfinite(nu));
+  bool ok = (n >= 0 && isfinite(Psi) && isfinite(nu));
   if (!ok) return NAN;
   using atomic::robust_utils::logspace_add;
   Type logZ = Type(-INFINITY);
@@ -51,7 +51,7 @@ Type calc_mean(Type Psi, Type nu, int n) {
 template<class Type>
 Type calc_logitp(Type log_mean, Type nu, int n) {
   using atomic::tiny_ad::isfinite;
-  bool ok = (n >= 0 && 0 < nu && isfinite(log_mean) && isfinite(nu));
+  bool ok = (n >= 0 && isfinite(log_mean) && isfinite(nu));
   if (!ok) return NAN;
   int iter_max = 200;
   double reltol = 1e-12;
