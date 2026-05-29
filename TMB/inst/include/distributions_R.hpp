@@ -665,6 +665,7 @@ Type combinom_calc_logZ(Type logitp, Type nu, Type n) {
   tx[3] = 0;
   return atomic::combinom_calc_logZ(tx)[0];
 }
+VECTORIZE3_ttt(combinom_calc_logZ)
 
 /** \brief Conway-Maxwell-Binomial. Calculate logit(p) from log(mean). */
 template<class Type>
@@ -676,6 +677,7 @@ Type combinom_calc_logitp(Type log_mean, Type nu, Type n) {
   tx[3] = 0;
   return atomic::combinom_calc_logitp(tx)[0];
 }
+VECTORIZE3_ttt(combinom_calc_logitp)
 
 /** \brief Conway-Maxwell-Binomial. Density via classical parameterization. */
 template<class T1, class T2, class T3, class T4>
