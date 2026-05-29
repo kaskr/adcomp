@@ -1,22 +1,22 @@
-namespace compbinom_utils {
+namespace combinom_utils {
 
 /** \brief Conway-Maxwell-Binomial. Calculate log-normalizing constant.
  *
- *  logZ(Psi, nu, n) = log sum_{k=0}^n C(n,k)^nu * exp(k*Psi)
+ *  logZ(logitp, nu, n) = log sum_{k=0}^n C(n,k)^nu * exp(k*logitp)
  *
  *  Direct summation over n+1 terms in log space. No truncation needed
  *  since the support is finite. log C(n,k) is built incrementally via
  *  the standard binomial-coefficient recursion for numerical stability.
  *
- *  \param Psi  log(p/(1-p)), the natural (logit) parameter
+ *  \param logitp  log(p/(1-p)), the natural (logit) parameter
  *  \param nu   dispersion parameter (>0)
  *  \param n    number of trials (treated as constant, never differentiated)
  *  \return     log Z
  */
 template<class Type>
-Type calc_logZ(Type Psi, Type nu, int n) {
+Type calc_logZ(Type logitp, Type nu, int n) {
   using atomic::tiny_ad::isfinite;
-  bool ok = (n >= 0 && isfinite(Psi) && isfinite(nu));
+  bool ok = (n >= 0 && isfinite(logitp) && isfinite(nu));
   if (!ok) return NAN;
   using atomic::robust_utils::logspace_add;
   Type logZ = Type(-INFINITY);
@@ -26,7 +26,7 @@ Type calc_logZ(Type Psi, Type nu, int n) {
       // log C(n, k) = log C(n, k-1) + log(n-k+1) - log(k)
       log_choose_k += log((double)(n - k + 1)) - log((double)k);
     }
-    Type log_term = nu * log_choose_k + (double)k * Psi;
+    Type log_term = nu * log_choose_k + (double)k * logitp;
     logZ = logspace_add(logZ, log_term);
   }
   return logZ;
@@ -34,19 +34,19 @@ Type calc_logZ(Type Psi, Type nu, int n) {
 
 /** \brief Conway-Maxwell-Binomial. Calculate mean from natural parameter. */
 template<class Type>
-Type calc_mean(Type Psi, Type nu, int n) {
+Type calc_mean(Type logitp, Type nu, int n) {
   typedef atomic::tiny_ad::variable<1, 1, Type> ADType;
-  ADType Psi_(Psi, 0);
-  ADType ans = calc_logZ<ADType>(Psi_, nu, n);
+  ADType logitp_(logitp, 0);
+  ADType ans = calc_logZ<ADType>(logitp_, nu, n);
   return ans.getDeriv()[0];
 }
 
 /** \brief Conway-Maxwell-Binomial. Calculate logit(p) from log(mean).
  *
- *  Inverts E[Y | n, Psi, nu] = exp(log_mean) for Psi using safeguarded
+ *  Inverts E[Y | n, logitp, nu] = exp(log_mean) for logitp using safeguarded
  *  Newton iteration with bisection backstop. Pure Newton oscillates at
  *  strong overdispersion (nu << 1); the bracket-based variant falls back
- *  to bisection when the Newton step lands outside [Psi_lo, Psi_hi].
+ *  to bisection when the Newton step lands outside [logitp_lo, logitp_hi].
  */
 template<class Type>
 Type calc_logitp(Type log_mean, Type nu, int n) {
@@ -58,8 +58,8 @@ Type calc_logitp(Type log_mean, Type nu, int n) {
   double abstol = 1e-14;
   typedef atomic::tiny_ad::variable<1, 1, Type> ADType;
   Type mu = exp(log_mean);
-  Type Psi_lo = Type(-30.0);
-  Type Psi_hi = Type(+30.0);
+  Type logitp_lo = Type(-30.0);
+  Type logitp_hi = Type(+30.0);
   ADType x(log(mu / (Type(n) - mu)), 0);
   int i;
   for (i = 0; i < iter_max; i++) {
@@ -67,9 +67,9 @@ Type calc_logitp(Type log_mean, Type nu, int n) {
     ADType y = calc_mean<ADType>(x, nu, n);
     Type residual = y.value - mu;
     if (residual > Type(0)) {
-      Psi_hi = x.value;
+      logitp_hi = x.value;
     } else {
-      Psi_lo = x.value;
+      logitp_lo = x.value;
     }
     if (fabs(residual) <= reltol * fabs(mu)) break;
     if (fabs(residual) <= abstol) break;
@@ -77,20 +77,20 @@ Type calc_logitp(Type log_mean, Type nu, int n) {
     if (y.deriv[0] > Type(1e-300)) {
       step = -residual / y.deriv[0];
     } else {
-      step = (Psi_lo + Psi_hi) / Type(2) - x.value;
+      step = (logitp_lo + logitp_hi) / Type(2) - x.value;
     }
     Type x_next = x.value + step;
-    if (x_next > Psi_lo && x_next < Psi_hi) {
+    if (x_next > logitp_lo && x_next < logitp_hi) {
       x.value = x_next;
     } else {
-      x.value = (Psi_lo + Psi_hi) / Type(2);
+      x.value = (logitp_lo + logitp_hi) / Type(2);
     }
-    if ((Psi_hi - Psi_lo) < Type(abstol)) break;
+    if ((logitp_hi - logitp_lo) < Type(abstol)) break;
   }
   if (i == iter_max) {
-    Rf_warning("compbinom_utils::calc_logitp: Maximum number of iterations exceeded");
+    Rf_warning("combinom_utils::calc_logitp: Maximum number of iterations exceeded");
   }
   return x.value;
 }
 
-} // namespace compbinom_utils
+} // namespace combinom_utils
