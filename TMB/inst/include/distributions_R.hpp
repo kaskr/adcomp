@@ -667,11 +667,11 @@ Type combinom_calc_logZ(Type logitp, Type nu, Type n) {
 }
 VECTORIZE3_ttt(combinom_calc_logZ)
 
-/** \brief Conway-Maxwell-Binomial. Calculate logit(p) from log(mean). */
+/** \brief Conway-Maxwell-Binomial. Calculate logit(p) from mean. */
 template<class Type>
-Type combinom_calc_logitp(Type log_mean, Type nu, Type n) {
+Type combinom_calc_logitp(Type mean, Type nu, Type n) {
   CppAD::vector<Type> tx(4);
-  tx[0] = log_mean;
+  tx[0] = mean;
   tx[1] = nu;
   tx[2] = n;
   tx[3] = 0;
@@ -682,7 +682,7 @@ VECTORIZE3_ttt(combinom_calc_logitp)
 /** \brief Conway-Maxwell-Binomial. Density via classical parameterization. */
 template<class T1, class T2, class T3, class T4>
 T1 dcombinom(T1 y, T2 n, T3 logitp, T4 nu, int give_log = 0) {
-  T1 logC = lgamma(T1(n + 1)) - lgamma(y + T1(1)) - lgamma(T1(n) - y + T1(1));
+  T1 logC = lfactorial(n) - lfactorial(y) - lfactorial(T1(n-y));
   T1 ans = nu * logC + y * logitp - combinom_calc_logZ(logitp, nu, n);
   return ( give_log ? ans : exp(ans) );
 }
@@ -690,9 +690,8 @@ T1 dcombinom(T1 y, T2 n, T3 logitp, T4 nu, int give_log = 0) {
 /** \brief Conway-Maxwell-Binomial. Density via the mean parameterization. */
 template<class T1, class T2, class T3, class T4>
 T1 dcombinom2(T1 y, T2 n, T3 mean, T4 nu, int give_log = 0) {
-  T3 logmean = log(mean);
-  T3 logitp = combinom_calc_logitp(logmean, nu, n);
-  T1 logC = lgamma(T1(n + 1)) - lgamma(y + T1(1)) - lgamma(T1(n) - y + T1(1));
+  T3 logitp = combinom_calc_logitp(mean, nu, n);
+  T1 logC = lfactorial(n) - lfactorial(y) - lfactorial(T1(n-y));
   T1 ans = nu * logC + y * logitp - combinom_calc_logZ(logitp, nu, n);
   return ( give_log ? ans : exp(ans) );
 }

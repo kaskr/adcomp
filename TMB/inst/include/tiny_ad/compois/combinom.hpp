@@ -43,21 +43,21 @@ Type calc_mean(Type logitp, Type nu, int n) {
 
 /** \brief Conway-Maxwell-Binomial. Calculate logit(p) from log(mean).
  *
- *  Inverts E[Y | n, logitp, nu] = exp(log_mean) for logitp using safeguarded
+ *  Inverts E[Y | n, logitp, nu] = exp(mean) for logitp using safeguarded
  *  Newton iteration with bisection backstop. Pure Newton oscillates at
  *  strong overdispersion (nu << 1); the bracket-based variant falls back
  *  to bisection when the Newton step lands outside [logitp_lo, logitp_hi].
  */
 template<class Type>
-Type calc_logitp(Type log_mean, Type nu, int n) {
+Type calc_logitp(Type mean, Type nu, int n) {
   using atomic::tiny_ad::isfinite;
-  bool ok = (n >= 0 && isfinite(log_mean) && isfinite(nu));
+  bool ok = (n >= 0 && isfinite(mean) && isfinite(nu));
   if (!ok) return NAN;
   int iter_max = 200;
   double reltol = 1e-12;
   double abstol = 1e-14;
   typedef atomic::tiny_ad::variable<1, 1, Type> ADType;
-  Type mu = exp(log_mean);
+  Type mu = mean;
   Type logitp_lo = Type(-30.0);
   Type logitp_hi = Type(+30.0);
   ADType x(log(mu / (Type(n) - mu)), 0);
