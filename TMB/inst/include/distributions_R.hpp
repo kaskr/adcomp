@@ -691,9 +691,7 @@ T1 dcombinom(T1 y, T2 n, T3 logitp, T4 nu, int give_log = 0) {
 template<class T1, class T2, class T3, class T4>
 T1 dcombinom2(T1 y, T2 n, T3 mean, T4 nu, int give_log = 0) {
   T3 logitp = combinom_calc_logitp(mean, nu, n);
-  T1 logC = lfactorial(n) - lfactorial(y) - lfactorial(T1(n-y));
-  T1 ans = nu * logC + y * logitp - combinom_calc_logZ(logitp, nu, n);
-  return ( give_log ? ans : exp(ans) );
+  return dcombinom(y, n, logitp, nu, give_log);
 }
 
 /********************************************************************/
