@@ -652,6 +652,48 @@ T1 dcompois2(T1 x, T2 mean, T3 nu, int give_log = 0) {
   return ( give_log ? ans : exp(ans) );
 }
 
+/** \brief Conway-Maxwell-Binomial. Calculate log-normalizing constant.
+
+    \f[ Z(\Psi, \nu, n) = \sum_{k=0}^n \binom{n}{k}^\nu \exp(k\Psi) \f]
+*/
+template<class Type>
+Type combinom_calc_logZ(Type logitp, Type nu, Type size) {
+  CppAD::vector<Type> tx(4);
+  tx[0] = logitp;
+  tx[1] = nu;
+  tx[2] = size;
+  tx[3] = 0;
+  return atomic::combinom_calc_logZ(tx)[0];
+}
+VECTORIZE3_ttt(combinom_calc_logZ)
+
+/** \brief Conway-Maxwell-Binomial. Calculate logit(p) from mean. */
+template<class Type>
+Type combinom_calc_logitp(Type mean, Type nu, Type size) {
+  CppAD::vector<Type> tx(4);
+  tx[0] = mean;
+  tx[1] = nu;
+  tx[2] = size;
+  tx[3] = 0;
+  return atomic::combinom_calc_logitp(tx)[0];
+}
+VECTORIZE3_ttt(combinom_calc_logitp)
+
+/** \brief Conway-Maxwell-Binomial. Density via classical parameterization. */
+template<class T1, class T2, class T3, class T4>
+T1 dcombinom(T1 y, T2 size, T3 logitp, T4 nu, int give_log = 0) {
+  T1 logC = lfactorial(size) - lfactorial(y) - lfactorial(T1(size-y));
+  T1 ans = nu * logC + y * logitp - combinom_calc_logZ(logitp, nu, size);
+  return ( give_log ? ans : exp(ans) );
+}
+
+/** \brief Conway-Maxwell-Binomial. Density via the mean parameterization. */
+template<class T1, class T2, class T3, class T4>
+T1 dcombinom2(T1 y, T2 size, T3 mean, T4 nu, int give_log = 0) {
+  T3 logitp = combinom_calc_logitp(mean, nu, size);
+  return dcombinom(y, size, logitp, nu, give_log);
+}
+
 /********************************************************************/
 /* SIMULATON CODE                                                   */
 /********************************************************************/
