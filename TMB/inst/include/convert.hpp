@@ -110,7 +110,8 @@ vector<Type> asVector(SEXP x)
    if(!Rf_isReal(x)) Rf_error("NOT A VECTOR!");
    R_xlen_t n = XLENGTH(x);
    typedef Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,1> > MapVector;
-   MapVector tmp(REAL(x), n);
+   double* ptr = (n==0 ? NULL : REAL(x));
+   MapVector tmp(ptr, n);
    vector<Type> y = tmp.cast<Type>();
    return y;
 }
