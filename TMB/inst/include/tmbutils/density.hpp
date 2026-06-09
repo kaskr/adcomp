@@ -209,7 +209,7 @@ MVNORM_t<scalartype> MVNORM(matrix<scalartype> Sigma, bool use_atomic = true){
   return MVNORM_t<scalartype>(Sigma, use_atomic);
 }
 
-/** \brief Multivariate normal distribution with unstructered correlation matrix
+/** \brief Multivariate normal distribution with unstructured correlation matrix
 
    Class to evaluate the negative log density of a multivariate Gaussian 
    variable with \b unstructured symmetric positive definite correlation matrix (*Sigma*). The
@@ -264,7 +264,7 @@ class UNSTRUCTURED_CORR_t : public MVNORM_t<scalartype_>{
     // (n*n-n)/2=nx  ==>  n*n-n-2*nx=0 ==> n=(1+sqrt(1+8*nx))/2
     int nx=x.size();
     int n=int((1.0+sqrt(1.0+8*nx))/2.0);
-    if((n*n-n)/2!=nx)Rcout << "vector does not specify an UNSTRUCTERED_CORR\n";
+    if((n*n-n)/2!=nx)Rcout << "vector does not specify an UNSTRUCTURED_CORR\n";
     matrixtype L(n,n);
     L.setIdentity();
     int i,j,k=0;
@@ -547,7 +547,7 @@ public:
     for(int i=0;i<k;i++)logdetQ0+=scalartype(2)*log(L0(i,i));
   }
   /** \brief Covariance extractor. 
-      Run Youle-Walker recursions and return a vector of length n representing
+      Run Yule-Walker recursions and return a vector of length n representing
       the auto-covariance function.
   */
   vectortype cov(int n){
@@ -555,7 +555,7 @@ public:
     for(int i=0;i<n;i++){
       if(i==0){rho(0)=scalartype(1);}
       else if(i<=k){rho(i)=gamma(i-1);}
-      else { /* youle walker */
+      else { /* yule walker */
 	scalartype tmp=0;
 	for(int j=0;j<k;j++)tmp+=phi[j]*rho[i-1-j];
 	rho(i)=tmp;
@@ -797,7 +797,7 @@ contAR2_t<scalartype> contAR2(scalartype shape_, scalartype scale_=1){
     constructed like this:
     First order Gaussian Markov Random Field on (subset of) d-dim grid.
     Grid is specified through the first array argument to constructor, 
-    with individual nodes determined by the outdermost dimension 
+    with individual nodes determined by the outermost dimension 
     e.g. x= 1 1 2 2
             1 2 1 2
     corresponding to a 2x2 lattice with 4 nodes and d=2.
@@ -1059,7 +1059,7 @@ VECSCALE_t<distribution> VECSCALE(distribution f_, vectortype scale_){
 }
 
 
-/** \brief Separable extension of two densitites
+/** \brief Separable extension of two densities
 
     Take two densities f and g, and construct the density of their separable
     extension, defined as the multivariate Gaussian distribution
@@ -1255,7 +1255,7 @@ SEPARABLE_t<distribution1,distribution2> SEPARABLE(distribution1 f_, distributio
     \verbatim
     Given a gaussian density f:R^n -> R.
     Given an integer vector "proj" with elements in 1,...,n.
-    Construct the mariginal density of "x[proj]".
+    Construct the marginal density of "x[proj]".
    
     Details:
     --------
