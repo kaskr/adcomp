@@ -211,6 +211,31 @@ struct array:Map< Array<Type,Dynamic,1> >{
     return array(p,newdim);
   }
 
+  /** \brief Extract sub-array with write access
+      Index i refers to the inner-most (i.e. first) dimension.
+   */
+  array<Type> row(int i){
+    int nsize = this->MapBase::size()/this->rows();
+    int nslice = this->rows();
+
+    vector<int> newdim;
+    if(dim.size() > 1){
+      newdim = dim.tail(dim.size()-1);
+    } else {
+      newdim.resize(1);
+      newdim << 1;
+    }
+
+    vector<Type> x(nsize);
+    array<Type> ans(x, newdim); /* Create new array with nsize dimension */
+
+    for(int j=0; j < ans.size(); j++){ /* Loop through values of old array */
+      ans[j] = (*this)[j*nslice + i];
+    }
+
+    return ans;
+  }
+
   /** \brief Elementwise subsetting 1D array.
       Also allowed in general to access the underlying vector of n-dim array. */
   Type& operator()(int i1){
@@ -315,9 +340,5 @@ struct array:Map< Array<Type,Dynamic,1> >{
 
   /** \brief Convert TMB array to vector */
   tmbutils::vector<Type> vec() { return *this; }
-
-  /* Methods this class should *not* inherit (generate compile time error if used) */
-  private:
-  using MapBase::row;
 };
 
