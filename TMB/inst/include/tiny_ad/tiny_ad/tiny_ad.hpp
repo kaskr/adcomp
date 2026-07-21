@@ -57,10 +57,12 @@ namespace tiny_ad {
 		other.value );
     }
     /* Comparison operators */
-#define COMPARISON_OPERATOR(OP)			\
-    template<class other>			\
-    bool operator OP (const other &x) const{	\
-      return (value OP x);			\
+#define COMPARISON_OPERATOR(OP)                 \
+    bool operator OP (const ad &x) const {      \
+      return (value OP x.value);                \
+    }                                           \
+    bool operator OP (const double &x) const {  \
+      return (value OP x);                      \
     }
     COMPARISON_OPERATOR(<)
     COMPARISON_OPERATOR(>)
