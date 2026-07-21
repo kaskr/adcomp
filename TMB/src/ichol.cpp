@@ -980,3 +980,18 @@ SEXP tmb_ldl_deriv(SEXP L) {
   UNPROTECT(1);
   return X;
 }
+
+/* openmp controller (FIXME: placement not ideal) */
+extern "C"
+SEXP omp_num_threads(SEXP x) {
+#ifdef _OPENMP
+  if( !Rf_isNull(x) ){
+    int n = INTEGER(x)[0];
+    omp_set_num_threads( n );
+  }
+  return ScalarInteger( omp_get_max_threads() );
+#else
+  Rf_warning("OpenMP not supported.");
+  return ScalarInteger( 0 );
+#endif
+}
