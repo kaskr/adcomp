@@ -1,4 +1,16 @@
 ------------------------------------------------------------------------
+TMB 1.9.22 (2026-07-21)
+------------------------------------------------------------------------
+
+o Fix clang-14 -std=c++20 RTMB build.
+
+o Add partial Eigen 5.0.0 compatibility.
+
+o Add Conway-Maxwell-Binomial distribution (thanks to Julius Bogomolovas).
+
+o runSymbolicAnalysis() now supports an 'incomplete' Cholesky factorization.
+
+------------------------------------------------------------------------
 TMB 1.9.21 (2026-03-22)
 ------------------------------------------------------------------------
 
