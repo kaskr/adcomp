@@ -77,8 +77,8 @@ cs_ptr cs_transpose (const cs *A, csi values) ;
    - In the sequence already or
    - Greater than, and close to, previously inserted element
 */
+static const int NA = -1;
 struct sorted_ints {
-  static const int NA = -1;
   int beg, prv_insert;
   // i in sequence <=> nxt[i] != NA
   std::vector<int> nxt;
