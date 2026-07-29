@@ -2479,6 +2479,8 @@ Scalar &global::ad_aug::Value() {
 
 Scalar &global::ad_aug::Deriv() { return taped_value.Deriv(); }
 
+global::ad_aug::~ad_aug() {}
+
 void global::Independent(std::vector<ad_aug> &x) {
   for (size_t i = 0; i < x.size(); i++) {
     x[i].Independent();

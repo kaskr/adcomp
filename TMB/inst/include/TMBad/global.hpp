@@ -2981,6 +2981,8 @@ struct global {
     void Independent();
     Scalar &Value();
     Scalar &Deriv();
+
+    ~ad_aug();
   };
   void Independent(std::vector<ad_aug> &x);
 };
