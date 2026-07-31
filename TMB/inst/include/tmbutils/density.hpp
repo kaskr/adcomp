@@ -12,14 +12,13 @@
    \details For use of the namespace see \ref Densities
 */
 namespace density {
-using namespace tmbutils;
 
-#define TYPEDEFS(scalartype_)			\
-public:						\
-typedef scalartype_ scalartype;			\
-typedef vector<scalartype> vectortype;		\
-typedef matrix<scalartype> matrixtype;		\
-typedef tmbutils::array<scalartype> arraytype
+#define TYPEDEFS(scalartype_)                           \
+  public:                                               \
+  typedef scalartype_ scalartype;                       \
+  typedef tmbutils::vector<scalartype> vectortype;      \
+  typedef tmbutils::matrix<scalartype> matrixtype;      \
+  typedef tmbutils::array<scalartype> arraytype
 
 #define VARIANCE_NOT_YET_IMPLEMENTED            \
 private:                                        \
@@ -142,7 +141,7 @@ public:
     } else {
       matrixtype I(Sigma.rows(),Sigma.cols());
       I.setIdentity();
-      Eigen::LDLT<Eigen::Matrix<scalartype,Dynamic,Dynamic> > ldlt(Sigma);
+      Eigen::LDLT<Eigen::Matrix<scalartype,Eigen::Dynamic,Eigen::Dynamic> > ldlt(Sigma);
       Q = ldlt.solve(I);
       vectortype D = ldlt.vectorD();
       logdetS = D.log().sum();
@@ -182,7 +181,7 @@ public:
   VARIANCE_NOT_YET_IMPLEMENTED
   vectortype sqrt_cov_scale(vectortype u) {
     if(L_Sigma.rows() == 0) {
-      Eigen::LLT<Eigen::Matrix<scalartype,Dynamic,Dynamic> > llt(Sigma);
+      Eigen::LLT<Eigen::Matrix<scalartype,Eigen::Dynamic,Eigen::Dynamic> > llt(Sigma);
       L_Sigma = llt.matrixL();
     }
     vectortype ans = L_Sigma * u;
@@ -669,15 +668,15 @@ template <class scalartype_>
 class contAR2_t{
   TYPEDEFS(scalartype_);
 private:
-  typedef Matrix<scalartype,2,2> matrix2x2;
-  typedef Matrix<scalartype,2,1> matrix2x1;
-  typedef Matrix<scalartype,4,4> matrix4x4;
-  typedef Matrix<scalartype,4,1> matrix4x1;
+  typedef Eigen::Matrix<scalartype,2,2> matrix2x2;
+  typedef Eigen::Matrix<scalartype,2,1> matrix2x1;
+  typedef Eigen::Matrix<scalartype,4,4> matrix4x4;
+  typedef Eigen::Matrix<scalartype,4,1> matrix4x1;
   scalartype shape,scale,c0,c1;
   vectortype grid;
   matrix2x2 A, V0, I;
   matrix4x4 B, iB; /* B=A %x% I + I %x% A  */
-  matexp<scalartype,2> expA;
+  tmbutils::matexp<scalartype,2> expA;
   matrix4x1 vecSigma,iBvecSigma;
   vector<MVNORM_t<scalartype> > neglogdmvnorm; /* Cache the 2-dim increments */
   vector<matrix2x2 > expAdt; /* Cache matrix exponential for grid increments */
@@ -908,7 +907,7 @@ public:
   }
   /* Simulation */
   Eigen::SparseMatrix<scalartype> L;
-  Eigen::PermutationMatrix<Dynamic,Dynamic> Pinv;
+  Eigen::PermutationMatrix<Eigen::Dynamic,Eigen::Dynamic> Pinv;
   vectortype sqrt_cov_scale(vectortype u) {
     if(L.rows() == 0) {
       Eigen::SimplicialLLT<Eigen::SparseMatrix<scalartype> > solver(Q);

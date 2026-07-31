@@ -5,7 +5,6 @@
    \brief Defines TMB vectors 
 */
 
-using namespace Eigen;
 
 /** \brief Vector class used by TMB.
 
@@ -14,10 +13,10 @@ using namespace Eigen;
     from the Eigen library.
 */
 template <class Type>
-struct vector : Array<Type,Dynamic,1>
+struct vector : Eigen::Array<Type,Eigen::Dynamic,1>
 {
   typedef Type value_type;
-  typedef Array<Type,Dynamic,1> Base;
+  typedef Eigen::Array<Type,Eigen::Dynamic,1> Base;
   vector(void):Base() {}
 
   template<class T1>
@@ -98,9 +97,9 @@ struct vector : Array<Type,Dynamic,1>
     from the Eigen library.
 */
 template <class Type>
-struct matrix : Matrix<Type,Dynamic,Dynamic>
+struct matrix : Eigen::Matrix<Type,Eigen::Dynamic,Eigen::Dynamic>
 {
-  typedef Matrix<Type,Dynamic,Dynamic> Base;
+  typedef Eigen::Matrix<Type,Eigen::Dynamic,Eigen::Dynamic> Base;
   matrix(void):Base() {}
   template<class T1>
   matrix(T1 x):Base(x) {}
@@ -118,7 +117,7 @@ struct matrix : Matrix<Type,Dynamic,Dynamic>
      The vec operator stacks the matrix columns into a single vector.
   */
   vector<Type> vec(){
-    Array<Type,Dynamic,Dynamic> a = this->array();
+    Eigen::Array<Type,Eigen::Dynamic,Eigen::Dynamic> a = this->array();
     a.resize(a.size(), 1);
     return a;
   }

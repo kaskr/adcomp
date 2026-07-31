@@ -14,15 +14,18 @@ Requires RINLA package to build stuff. Q built this way can be used in \ref GMRF
 */
 
 namespace R_inla {
-using namespace Eigen;
-using namespace tmbutils;
+using Eigen::SparseMatrix;
+using tmbutils::asSparseMatrix;
+using tmbutils::vector;
+using tmbutils::matrix;
+using tmbutils::array;
 
 /** \brief Object containing all elements of an SPDE object, i.e. eqn (10) in Lindgren et al. */	
 template<class Type>
-struct spde_t{  
-  SparseMatrix<Type> M0;	// G0 eqn (10) in Lindgren 
-  SparseMatrix<Type> M1;	// G1 eqn (10) in Lindgren 
-  SparseMatrix<Type> M2;	// G2 eqn (10) in Lindgren 
+struct spde_t {
+  SparseMatrix<Type> M0;	// G0 eqn (10) in Lindgren
+  SparseMatrix<Type> M1;	// G1 eqn (10) in Lindgren
+  SparseMatrix<Type> M2;	// G2 eqn (10) in Lindgren
   spde_t(SEXP x){  /* x = List passed from R */
   M0 = asSparseMatrix<Type>(getListElement(x,"M0"));
   M1 = asSparseMatrix<Type>(getListElement(x,"M1"));
@@ -86,8 +89,8 @@ template<class Type>
 	  	  
   //Type H_trace = H(0,0)+H(1,1);
   //Type H_det = H(0,0)*H(1,1)-H(0,1)*H(1,0);
-  SparseMatrix<Type> G1_aniso(n_s,n_s); 
-  SparseMatrix<Type> G2_aniso(n_s,n_s); 
+  SparseMatrix<Type> G1_aniso(n_s,n_s);
+  SparseMatrix<Type> G2_aniso(n_s,n_s);
   // Calculate adjugate of H
   matrix<Type> adj_H(2,2);
   adj_H(0,0) = H(1,1);
@@ -97,7 +100,7 @@ template<class Type>
   // Calculate new SPDE matrices
 
   // Calculate G1 - pt. 1
-  tmbutils::array<Type> Gtmp(n_tri,3,3);
+  array<Type> Gtmp(n_tri,3,3);
   for(i=0; i<n_tri; i++){    
     // 1st line: E0(i,) %*% adjH %*% t(E0(i,)), etc.    
     Gtmp(i,0,0) = (E0(i,0)*(E0(i,0)*adj_H(0,0)+E0(i,1)*adj_H(1,0)) + E0(i,1)*(E0(i,0)*adj_H(0,1)+E0(i,1)*adj_H(1,1))) / (4*Tri_Area(i));  
@@ -119,7 +122,7 @@ template<class Type>
     G1_aniso.coeffRef(TV(i,1),TV(i,1)) = G1_aniso.coeffRef(TV(i,1),TV(i,1)) + (Gtmp(i,1,1));  
     G1_aniso.coeffRef(TV(i,2),TV(i,2)) = G1_aniso.coeffRef(TV(i,2),TV(i,2)) + (Gtmp(i,2,2));  
   }
-  G2_aniso = G1_aniso * G0_inv * G1_aniso; 
+  G2_aniso = G1_aniso * G0_inv * G1_aniso;
 
   return kappa_pow4*G0 + Type(2.0)*kappa_pow2*G1_aniso + G2_aniso;
 }

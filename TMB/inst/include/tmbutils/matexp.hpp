@@ -11,13 +11,13 @@ namespace tmbutils {
 /** \brief Matrix exponential: matrix of arbitrary dimension. */
 template <class scalartype, int dim>
 struct matexp{
-  typedef Matrix<scalartype,dim,dim> matrix;
-  typedef Matrix<std::complex<scalartype> ,dim,dim> cmatrix;
-  typedef Matrix<std::complex<scalartype> ,dim,1> cvector;
+  typedef Eigen::Matrix<scalartype,dim,dim> matrix;
+  typedef Eigen::Matrix<std::complex<scalartype> ,dim,dim> cmatrix;
+  typedef Eigen::Matrix<std::complex<scalartype> ,dim,1> cvector;
   cmatrix V;
   cmatrix iV;
   cvector lambda;
-  EigenSolver< matrix > eigensolver;
+  Eigen::EigenSolver< matrix > eigensolver;
   matexp(){};
   matexp(matrix A_){
     eigensolver.compute(A_);
@@ -45,9 +45,9 @@ struct matexp{
 template <class scalartype>
 struct matexp<scalartype,2>{
   typedef std::complex<scalartype> complex;
-  typedef Matrix<scalartype,2,2> matrix;
-  typedef Matrix<complex ,2,2> cmatrix;
-  typedef Matrix<complex ,2,1> cvector;
+  typedef Eigen::Matrix<scalartype,2,2> matrix;
+  typedef Eigen::Matrix<complex ,2,2> cmatrix;
+  typedef Eigen::Matrix<complex ,2,1> cvector;
   cmatrix V;
   cmatrix iV;
   cvector lambda;

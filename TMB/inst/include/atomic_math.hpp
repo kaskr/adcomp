@@ -560,7 +560,6 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   ,
 			   // ATOMIC_DOUBLE
 			   typedef TypeDefs<double>::LDLT LDLT_t;
-			   using namespace Eigen;
 			   int n=sqrt((double)tx.size());
 			   matrix<double> X=vec2mat(tx,n,n);
 			   matrix<double> I(X.rows(),X.cols());

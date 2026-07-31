@@ -19,10 +19,10 @@
     array methods.
 */
 template<class Type>
-struct array:Map< Array<Type,Dynamic,1> >{
+struct array : Eigen::Map< Eigen::Array<Type,Eigen::Dynamic,1> >{
 
-  typedef Array<Type,Dynamic,1> Base;
-  typedef Map< Base > MapBase;
+  typedef Eigen::Array<Type,Eigen::Dynamic,1> Base;
+  typedef Eigen::Map< Base > MapBase;
 
   vector<int> dim;
 
@@ -166,7 +166,7 @@ struct array:Map< Array<Type,Dynamic,1> >{
   */
   template <class T>
   array<Type> operator=(T y){
-    Array<Type, Dynamic, Dynamic> a = y;
+    Eigen::Array<Type, Eigen::Dynamic, Eigen::Dynamic> a = y;
     a.resize(a.size(),1);
     return array(MapBase::operator=(a), dim);
   }

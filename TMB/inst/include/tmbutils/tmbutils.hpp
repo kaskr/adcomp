@@ -16,7 +16,6 @@ Included automatically so you \b should \b NOT include it via
 */
 namespace tmbutils{
 // Utilities used by the core
-using namespace Eigen;
 #include "vector.hpp"
 #include "array.hpp"
 
