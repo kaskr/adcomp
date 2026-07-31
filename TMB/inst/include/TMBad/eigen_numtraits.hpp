@@ -12,6 +12,20 @@ struct NumTraits<TMBad::ad_aug> : NumTraits<TMBad::Scalar> {
   typedef TMBad::ad_aug Real;
   typedef TMBad::ad_aug NonInteger;
   typedef TMBad::ad_aug Nested;
+  enum {
+
+    IsComplex = 0,
+
+    IsInteger = 0,
+
+    IsSigned = 1,
+
+    RequireInitialization = 1,
+
+    ReadCost = 1,
+    AddCost = 2,
+    MulCost = 2
+  };
 };
 
 template <>
@@ -19,6 +33,20 @@ struct NumTraits<TMBad::ad_adapt> : NumTraits<TMBad::Scalar> {
   typedef TMBad::ad_adapt Real;
   typedef TMBad::ad_adapt NonInteger;
   typedef TMBad::ad_adapt Nested;
+  enum {
+
+    IsComplex = 0,
+
+    IsInteger = 0,
+
+    IsSigned = 1,
+
+    RequireInitialization = 1,
+
+    ReadCost = 1,
+    AddCost = 2,
+    MulCost = 2
+  };
 };
 
 template <typename BinOp>
