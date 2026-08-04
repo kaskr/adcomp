@@ -212,8 +212,8 @@ this
     \ingroup macros */
 #define PARAMETER_MATRIX(name)                                  \
 tmbutils::matrix<Type> name(TMB_OBJECTIVE_PTR -> fillShape(     \
-// PROTECT/UNPROTECT not necessary;
-// it's included to suppress a false-positive error from CRAN's rchk tests
+/* PROTECT/UNPROTECT not necessary; included to suppress a  */ \
+/* false-positive error from CRAN's rchk tests               */ \
 asMatrix<Type> ( PROTECT(                                       \
 TMB_OBJECTIVE_PTR -> getShape( #name, &Rf_isMatrix) ) ),        \
 #name) );                                                       \
@@ -543,9 +543,9 @@ if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
 #define DATA_VECTOR_INDICATOR(name, obs)                                \
 data_indicator<tmbutils::vector<Type> > name(obs, true);                \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
-  // PROTECT/UNPROTECT wrapper is not really necessary;
-  //  it's included to suppress a false-positive error from CRAN's rchk tests
-  // getShape() doesn't really allocate memory
+  /* PROTECT/UNPROTECT wrapper is not really necessary; included to  */ \
+  /* suppress a false-positive error from CRAN's rchk tests --       */ \
+  /* getShape() doesn't really allocate memory                       */ \
   SEXP _TMB_shape_sexp_;                                                \
   PROTECT(_TMB_shape_sexp_ =                                            \
             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal));          \
