@@ -210,10 +210,14 @@ this
 
 /** \brief Get parameter matrix from R and declare it as matrix<Type>
     \ingroup macros */
-#define PARAMETER_MATRIX(name)                                          \
-tmbutils::matrix<Type> name(TMB_OBJECTIVE_PTR -> fillShape(             \
-asMatrix<Type> ( TMB_OBJECTIVE_PTR -> getShape( #name, &Rf_isMatrix) ), \
-#name) );
+#define PARAMETER_MATRIX(name)                                  \
+tmbutils::matrix<Type> name(TMB_OBJECTIVE_PTR -> fillShape(     \
+// PROTECT/UNPROTECT not necessary;
+// it's included to suppress a false-positive error from CRAN's rchk tests
+asMatrix<Type> ( PROTECT(                                       \
+TMB_OBJECTIVE_PTR -> getShape( #name, &Rf_isMatrix) ) ),        \
+#name) );                                                       \
+UNPROTECT(1);
 
 /** \brief Get parameter vector from R and declare it as vector<Type> 
     \ingroup macros*/
