@@ -6,14 +6,14 @@
 */
 
 /*
-  Call to external C++ code can potentially result in exeptions that
+  Call to external C++ code can potentially result in exceptions that
   will crash R. However, we do not want R to crash on failed memory
   allocations. Therefore:
 
   * All interface functions (those called with .Call from R) must have
     TMB_TRY wrapped around CppAD/Eigen code that allocates memory.
 
-  * Special attention must be payed to parallel code, as each thread
+  * Special attention must be paid to parallel code, as each thread
     is responsible for catching its own exceptions.
 */
 
