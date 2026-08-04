@@ -522,12 +522,13 @@ struct data_indicator : VT{
 #define DATA_ARRAY_INDICATOR(name, obs)                                 \
 data_indicator<tmbutils::array<Type> > name(obs, true);                 \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
-  name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
-             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   )),      \
-                                           #name),                      \
-             Rf_getAttrib(                                              \
-                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   ),    \
-                Rf_install("ord")) );                                   \
+  SEXP _TMB_shape_sexp_;                                                \
+  PROTECT(_TMB_shape_sexp_ =                                            \
+            TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal));          \
+  name.fill( TMB_OBJECTIVE_PTR -> fillShape(                            \
+               asVector<Type>(_TMB_shape_sexp_), #name),                \
+             Rf_getAttrib(_TMB_shape_sexp_, Rf_install("ord")) );       \
+  UNPROTECT(1);                                                         \
 }
 
 /** \brief Declare an indicator vector 'name' of same shape as 'obs'. By default, the indicator vector is filled with ones indicating that all observations are enabled.
@@ -538,12 +539,16 @@ if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
 #define DATA_VECTOR_INDICATOR(name, obs)                                \
 data_indicator<tmbutils::vector<Type> > name(obs, true);                \
 if (!Rf_isNull(getListElement(TMB_OBJECTIVE_PTR -> parameters,#name))){ \
-  name.fill( TMB_OBJECTIVE_PTR -> fillShape(asVector<Type>(             \
-             TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   )),      \
-                                           #name),                      \
-             Rf_getAttrib(                                              \
-                TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal   ),    \
-                Rf_install("ord")) );                                   \
+  // PROTECT/UNPROTECT wrapper is not really necessary;
+  //  it's included to suppress a false-positive error from CRAN's rchk tests
+  // getShape() doesn't really allocate memory
+  SEXP _TMB_shape_sexp_;                                                \
+  PROTECT(_TMB_shape_sexp_ =                                            \
+            TMB_OBJECTIVE_PTR -> getShape(#name, &Rf_isReal));          \
+  name.fill( TMB_OBJECTIVE_PTR -> fillShape(                            \
+               asVector<Type>(_TMB_shape_sexp_), #name),                \
+             Rf_getAttrib(_TMB_shape_sexp_, Rf_install("ord")) );       \
+  UNPROTECT(1);                                                         \
 }
 
 // kasper: Not sure used anywhere
