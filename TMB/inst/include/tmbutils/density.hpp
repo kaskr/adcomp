@@ -691,7 +691,7 @@ public:
     I.setIdentity();
     B=kronecker(I,A)+kronecker(A,I);
     iB=B.inverse();
-    expA=matexp<scalartype,2>(A);
+    expA=tmbutils::matexp<scalartype,2>(A);
     vecSigma << 0,0,0,scalartype(-2)*c1*V0(1,1);
     iBvecSigma=iB*vecSigma;
     /* cache increment distribution N(0,V(dt)) - one for each grid point */
