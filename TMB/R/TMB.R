@@ -114,7 +114,12 @@ iterativeRefine <- function(obj, maxit=50, abstol=1e-12, trace=!obj$env$silent) 
             if (trace) print (max(abs(error)))
             mgc <- max(abs(error))
             if (mgc < abstol) break
-            x <- x + .Call("tmb_CHMfactor_solve", L, error, PACKAGE="TMB")
+            step <- .Call("tmb_CHMfactor_solve", L, error, PACKAGE="TMB")
+            if (TRUE) { ## Tune step size
+              t <- sum(error * step) / sum(step*(Hmult(step)))
+              step <- t * step
+            }
+            x <- x + step
         }
         if (trace && i==maxit)
             warning("Failed convergence with mgc=", mgc)
