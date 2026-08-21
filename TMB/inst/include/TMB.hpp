@@ -245,6 +245,16 @@ using tmbutils::array;
 using Eigen::Matrix;
 using Eigen::Array;
 
+// FIXME: Namespace workarounds for packages:
+//        BayesGP, dsem, tinyVAST
+namespace tmbutils {
+using Eigen::SparseMatrix;
+}
+namespace density {
+using Eigen::SparseMatrix;
+using tmbutils::invertSparseMatrix;
+}
+
 /* Cleanup  */
 
 // Nothing more to precompile
