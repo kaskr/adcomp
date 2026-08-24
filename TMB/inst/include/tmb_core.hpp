@@ -1614,7 +1614,22 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
                                     INTEGER(random2grid) + LENGTH(random2grid));
       for (size_t i=0; i<r2g.size(); i++)
         r2g[i] -= 1 ; // R index -> C index
-      *pf = pf -> marginal_sr(random, grids, r2g, true);
+      // *pf = pf -> marginal_sr(random, grids, r2g, true);
+
+      SEXP debug = getListElement(VECTOR_ELT(grid, 0), "debug");
+      bool dbg = (debug != R_NilValue);
+      TMBad::ADFun<> ans;
+      TMBad::old_state os(pf->glob);    // Save state
+      TMBad::aggregate(pf->glob, -1 ); // Change sign
+      TMBad::global glob_split = accumulation_tree_split(pf->glob);
+      os.restore(); // Restore old state
+      TMBad::sequential_reduction SR(glob_split, random, grids, r2g, true);
+      using TMBad::operator<<;
+      if (dbg) Rcout << SR.random << "\n";
+      ans.glob = SR.marginal();
+      aggregate(ans.glob, -1 );   // Sum up and change sign
+      *pf = ans;
+
     }
     else if (method == "parallelize")
       *pf = pf -> parallelize(2);
