@@ -154,7 +154,8 @@ registerFinalizer <- function(ADFun, DLL) {
 ##' \code{integrate} to \code{MakeADFun}.
 ##' @param x Breaks defining the domain of integration
 ##' @param discrete Boolean defining integration wrt Lebesgue measure (\code{discrete=FALSE}) or counting measure \code{discrete=TRUE}.
-SR <- function(x, discrete=FALSE) {
+##' @param ... Not used
+SR <- function(x, discrete=FALSE, ...) {
     if (is(x, "SR")) return (x)
     x <- as.numeric(x)
     if (is.unsorted(x)) stop("'x' must be sorted")
@@ -164,7 +165,7 @@ SR <- function(x, discrete=FALSE) {
         w <- diff(x)
         x <- head(x, -1) + w / 2
     }
-    structure(list(x=x, w=w, method="marginal_sr"), class="SR")
+    structure(list(x=x, w=w, method="marginal_sr",...), class="SR")
 }
 
 ##' Gauss Kronrod configuration

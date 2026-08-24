@@ -1614,7 +1614,11 @@ SEXP TransformADFunObjectTemplate(TMBad::ADFun<TMBad::ad_aug>* pf, SEXP control)
                                     INTEGER(random2grid) + LENGTH(random2grid));
       for (size_t i=0; i<r2g.size(); i++)
         r2g[i] -= 1 ; // R index -> C index
-      *pf = pf -> marginal_sr(random, grids, r2g, true);
+      SEXP control_debug = getListElement(VECTOR_ELT(grid, 0), "debug");
+      SEXP control_perm = getListElement(VECTOR_ELT(grid, 0), "perm");
+      bool debug = (control_debug != R_NilValue) && INTEGER(control_debug)[0];
+      bool perm = (control_perm == R_NilValue) || INTEGER(control_perm)[0];
+      *pf = pf -> marginal_sr(random, grids, r2g, perm, debug);
     }
     else if (method == "parallelize")
       *pf = pf -> parallelize(2);

@@ -4,12 +4,14 @@
 \alias{SR}
 \title{Sequential reduction configuration}
 \usage{
-SR(x, discrete = FALSE)
+SR(x, discrete = FALSE, ...)
 }
 \arguments{
 \item{x}{Breaks defining the domain of integration}
 
 \item{discrete}{Boolean defining integration wrt Lebesgue measure (\code{discrete=FALSE}) or counting measure \code{discrete=TRUE}.}
+
+\item{...}{Not used}
 }
 \description{
 Helper function to specify an integration grid used by the
