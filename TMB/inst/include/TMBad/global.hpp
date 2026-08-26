@@ -4034,6 +4034,8 @@ struct LogSpaceSumStrideOp : global::DynamicOperator<-1, 1> {
   void forward(ForwardArgs<Replay> &args);
   template <class Type>
   void reverse(ReverseArgs<Type> &args) {
+    if (Value(args.y(0)) == -INFINITY) return;
+
     size_t m = stride.size();
     std::vector<Type *> wrk1(m);
     std::vector<Type *> wrk2(m);

@@ -3589,6 +3589,10 @@ void LogSpaceSumStrideOp::forward(ForwardArgs<Scalar> &args) {
     Scalar s = rowsum(px, i);
     if (Max < s) Max = s;
   }
+  if (Max == -INFINITY) {
+    args.y(0) = Max;
+    return;
+  }
 
   args.y(0) = 0;
   for (size_t i = 0; i < n; i++) {
