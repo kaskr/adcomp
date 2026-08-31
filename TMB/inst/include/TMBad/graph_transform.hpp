@@ -597,6 +597,7 @@ struct sequential_reduction {
   std::vector<bool> terms_done;
   term_info tinfo;
   std::map<size_t, std::vector<ad_aug> > cache;
+  bool debug;
   /** \brief CTOR of sequential reduction object
       \details The optimal order is not found by this routine. In
       general a good choice is the fill-reducing permutation of the
@@ -617,7 +618,7 @@ struct sequential_reduction {
                        std::vector<sr_grid> grid =
                            std::vector<sr_grid>(1, sr_grid(-20, 20, 200)),
                        std::vector<Index> random2grid = std::vector<Index>(0),
-                       bool perm = true);
+                       bool perm = true, bool debug = false);
   /** \brief Re-order random effects
 
      Two random effects are *connected* if they both affect the same

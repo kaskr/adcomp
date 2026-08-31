@@ -4012,12 +4012,13 @@ sequential_reduction::sequential_reduction(global &glob,
                                            std::vector<Index> random,
                                            std::vector<sr_grid> grid,
                                            std::vector<Index> random2grid,
-                                           bool perm)
+                                           bool perm, bool debug)
     : grid(grid),
       glob(glob),
       random(random),
       replay(glob, new_glob),
-      tinfo(glob, false) {
+      tinfo(glob, false),
+      debug(debug) {
   inv2grid.resize(glob.inv_index.size(), 0);
   for (size_t i = 0; i < random2grid.size(); i++) {
     inv2grid[random[i]] = random2grid[i];
@@ -4232,13 +4233,19 @@ void sequential_reduction::show_cliques() {
   Rcout << "Cliques: ";
   std::list<clique>::iterator it;
   for (it = cliques.begin(); it != cliques.end(); ++it) {
-    Rcout << it->indices << " ";
+    if (!it->empty()) Rcout << it->indices << " ";
   }
   Rcout << "\n";
 }
 
 void sequential_reduction::update_all() {
-  for (size_t i = 0; i < random.size(); i++) update(random[i]);
+  for (size_t i = 0; i < random.size(); i++) {
+    update(random[i]);
+    if (debug) {
+      Rcout << "Eliminating: " << random[i] << " => ";
+      show_cliques();
+    }
+  }
 }
 
 ad_aug sequential_reduction::get_result() {
