@@ -189,7 +189,8 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   VectorBase subset(const VectorBase& x, size_t tapeid, int p=1){
     VectorBase y;
     y.resize(vecind(tapeid).size()*p);
-    for(int i=0;i<(int)y.size()/p;i++)
+    int ni = (p != 0 ? y.size()/p : 0);
+    for(int i=0;i<ni;i++)
       for(int j=0;j<p;j++)
 	{y[i*p+j]=x[vecind(tapeid)[i]*p+j];}
     return y;
@@ -197,7 +198,8 @@ struct parallelADFun : ADFUN { /* Inheritance just so that compiler wont complai
   /* Inverse operation of the subset above */
   template <typename VectorBase>
   void addinsert(VectorBase& x, const VectorBase& y, size_t tapeid, int p=1){
-    for(int i=0;i<(int)y.size()/p;i++)
+    int ni = (p != 0 ? y.size()/p : 0);
+    for(int i=0;i<ni;i++)
       for(int j=0;j<p;j++)
 	{x[vecind(tapeid)[i]*p+j]+=y[i*p+j];}
   }
