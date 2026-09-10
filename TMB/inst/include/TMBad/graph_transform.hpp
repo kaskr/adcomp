@@ -96,7 +96,16 @@ std::vector<T> invperm(const std::vector<T> &perm) {
 /** \brief Match x vector in y vector */
 template <class T>
 std::vector<size_t> match(const std::vector<T> &x, const std::vector<T> &y) {
-  return which(lmatch(x, y));
+  std::vector<size_t> ans(x.size(), -1);
+  for (size_t i = 0; i < x.size(); i++) {
+    for (size_t j = 0; j < y.size(); j++) {
+      if (x[i] == y[j]) {
+        ans[i] = j;
+        break;
+      }
+    }
+  }
+  return ans;
 }
 
 /** \brief Integer product function */
@@ -187,10 +196,15 @@ std::vector<Index> remap_identical_sub_expressions(
     global &glob, std::vector<Index> inv_remap);
 struct term_info {
   global &glob;
+  graph &reverse_graph;
+  std::vector<Index> &op2inv_idx;
+  const static Index NA = -1;
+
   std::vector<Index> id;
   std::vector<size_t> count;
-  term_info(global &glob, bool do_init = true);
-  void initialize(std::vector<Index> inv_remap = std::vector<Index>(0));
+  term_info(global &glob, graph &reverse_graph, std::vector<Index> &op2inv_idx);
+  void set_subgraph(Index dep_idx);
+  void analyze();
 };
 
 struct gk_config {
@@ -492,10 +506,10 @@ struct clique {
   bool empty() const;
   bool contains(Index i);
   /** \brief Determine array offsets and stride of this clique
-      \details Recall that `indices` are the sorted indices of this
+      \details Recall that `indices` are the indices of this
       clique and `logsum` is the value array of this clique. Also,
-      recall that the value array is stored with the smallest index
-      fastest running and largest index slowest running.
+      recall that the value array is stored with the first index
+      fastest running and last index slowest running.
       Assume that `super` is a larger clique than this one, so that
       this clique can be embedded into the super clique. Also, assume
       that both cliques contain a common index `i` to be integrated.
@@ -642,6 +656,8 @@ struct sequential_reduction {
       different grids).
   */
   std::vector<ad_aug> tabulate(std::vector<Index> inv_index, Index dep_index);
+
+  void union_append(std::vector<Index> &x, const std::vector<Index> &y);
 
   /** \brief Merge all cliques that contain a given independent variable
       \param i Index to remove

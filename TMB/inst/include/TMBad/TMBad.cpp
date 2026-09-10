@@ -3806,11 +3806,11 @@ global accumulation_tree_split(global glob, bool sum_) {
   std::vector<ad_aug_index> res(vars.begin(), vars.end());
   for (size_t i = 0; i < vars.size(); i++) {
     res[i] = res[i] * J[i];
-    if (i == 0) res[i] += V;
     if (!sum_) res[i].Dependent();
   }
+  if (!sum_) ad_aug(V).Dependent();
   if (sum_) {
-    ad_aug sum_res = sum(res);
+    ad_aug sum_res = V + sum(res);
     sum_res.Dependent();
   }
   glob.ad_stop();
@@ -3847,17 +3847,44 @@ void old_state::restore() {
   }
 }
 
-term_info::term_info(global &glob, bool do_init) : glob(glob) {
-  if (do_init) initialize();
+term_info::term_info(global &glob, graph &reverse_graph,
+                     std::vector<Index> &op2inv_idx)
+    : glob(glob), reverse_graph(reverse_graph), op2inv_idx(op2inv_idx) {}
+
+void term_info::set_subgraph(Index dep_idx) {
+  std::vector<Index> &subgraph = glob.subgraph_seq;
+  subgraph.resize(0);
+  subgraph.push_back(reverse_graph.dep2op[dep_idx]);
+  reverse_graph.search(subgraph);
 }
 
-void term_info::initialize(std::vector<Index> inv_remap) {
-  if (inv_remap.size() == 0) inv_remap.resize(glob.inv_index.size(), 0);
-  inv_remap = radix::factor<Index>(inv_remap);
-  std::vector<Index> remap = remap_identical_sub_expressions(glob, inv_remap);
-  std::vector<Index> term_ids = subset(remap, glob.dep_index);
+void term_info::analyze() {
+  std::vector<Index> inv_remap(glob.inv_index.size());
+  for (size_t i = 0; i < inv_remap.size(); i++) inv_remap[i] = -(i + 1);
+  global new_glob;
+  global::replay replay(this->glob, new_glob);
+  replay.start();
+  replay.forward(true, false);
+  for (size_t i = 0; i < glob.dep_index.size(); i++) {
+    set_subgraph(i);
+    Index l = 0;
+    for (Index j : glob.subgraph_seq) {
+      Index k = op2inv_idx[j];
+      if (k != NA) {
+        replay.value_inv(k).Independent();
+        inv_remap.push_back(l++);
+      }
+    }
+    replay.forward_sub();
+    replay.value_dep(i).Dependent();
+  }
+  replay.stop();
+  inv_remap = radix::first_occurance<Index>(inv_remap);
+  std::vector<Index> remap =
+      remap_identical_sub_expressions(new_glob, inv_remap);
+  std::vector<Index> term_ids = subset(remap, new_glob.dep_index);
   id = radix::factor<Index>(term_ids);
-  Index max_id = *std::max_element(id.begin(), id.end());
+  Index max_id = (id.size() ? *std::max_element(id.begin(), id.end()) : -1);
   count.resize(max_id + 1, 0);
   for (size_t i = 0; i < id.size(); i++) {
     count[id[i]]++;
@@ -3944,39 +3971,27 @@ bool clique::contains(Index i) {
 void clique::get_stride(const clique &super, Index ind,
                         std::vector<ad_plain> &offset, Index &stride) {
   stride = 1;
-  for (size_t k = 0; (k < clique_size()) && (indices[k] < ind); k++) {
+  for (size_t k = 0; (k < clique_size()) && (indices[k] != ind); k++) {
     stride *= dim[k];
   }
 
+  std::vector<size_t> p = match(this->indices, super.indices);
+
   multivariate_index mv(super.dim);
-  size_t nx = mv.count();
-  std::vector<bool> mask = lmatch(super.indices, this->indices);
+  std::vector<bool> mask = lmatch(super.indices, std::vector<Index>(1, ind));
   mask.flip();
   mv.set_mask(mask);
-  std::vector<ad_plain> x(nx);
+
   size_t xa_count = mv.count();
-  mv.flip();
-  size_t xi_count = mv.count();
-  mv.flip();
-  TMBAD_ASSERT(x.size() == xa_count * xi_count);
-  for (size_t i = 0; i < xa_count; i++, ++mv) {
-    mv.flip();
-    for (size_t j = 0; j < xi_count; j++, ++mv) {
-      TMBAD_ASSERT(logsum[j].on_some_tape());
-      x[mv] = logsum[j];
-    }
-    mv.flip();
-  }
-
-  mv = multivariate_index(super.dim);
-  mask = lmatch(super.indices, std::vector<Index>(1, ind));
-  mask.flip();
-  mv.set_mask(mask);
-
-  xa_count = mv.count();
   offset.resize(xa_count);
   for (size_t i = 0; i < xa_count; i++, ++mv) {
-    offset[i] = x[mv];
+    size_t d = 1, j = 0;
+    for (size_t k = 0; k < p.size(); k++) {
+      j += mv.index(p[k]) * d;
+      d *= dim[k];
+    }
+    TMBAD_ASSERT(logsum[j].on_some_tape());
+    offset[i] = logsum[j];
   }
 }
 
@@ -4017,7 +4032,7 @@ sequential_reduction::sequential_reduction(global &glob,
       glob(glob),
       random(random),
       replay(glob, new_glob),
-      tinfo(glob, false),
+      tinfo(glob, reverse_graph, op2inv_idx),
       debug(debug) {
   inv2grid.resize(glob.inv_index.size(), 0);
   for (size_t i = 0; i < random2grid.size(); i++) {
@@ -4048,7 +4063,11 @@ sequential_reduction::sequential_reduction(global &glob,
   for (size_t i = 0; i < random.size(); i++)
     inv_remap[random[i]] = inv2grid[random[i]];
   inv_remap = radix::factor<Index>(inv_remap);
-  tinfo.initialize(inv_remap);
+  tinfo.analyze();
+  if (debug) {
+    Rcout << "terms=" << tinfo.id.size() << " unique=" << tinfo.count.size()
+          << "\n";
+  }
 }
 
 void sequential_reduction::reorder_random() {
@@ -4132,17 +4151,24 @@ std::vector<ad_aug> sequential_reduction::tabulate(std::vector<Index> inv_index,
   return ans;
 }
 
+void sequential_reduction::union_append(std::vector<Index> &x,
+                                        const std::vector<Index> &y) {
+  std::vector<bool> mask = lmatch(y, x);
+  mask.flip();
+  std::vector<Index> ys = subset(y, mask);
+  x.insert(x.end(), ys.begin(), ys.end());
+}
+
 void sequential_reduction::merge(Index i) {
   std::vector<Index> super;
   size_t c = 0;
   for (std::list<clique>::iterator it = cliques.begin(); it != cliques.end();
        ++it) {
     if ((*it).contains(i)) {
-      super.insert(super.end(), (*it).indices.begin(), (*it).indices.end());
+      union_append(super, (*it).indices);
       c++;
     }
   }
-  sort_unique_inplace(super);
 
   std::vector<std::vector<ad_plain> > offset_by_clique(c);
   std::vector<Index> stride_by_clique(c);
@@ -4208,13 +4234,14 @@ void sequential_reduction::update(Index i) {
     subgraph.resize(0);
     subgraph.push_back(subgraph_terms[k]);
 
-    reverse_graph.search(subgraph);
+    reverse_graph.search(subgraph, false, false);
 
     std::vector<Index> inv_clique;
     for (size_t l = 0; l < subgraph.size(); l++) {
       Index tmp = op2inv_idx[subgraph[l]];
       if (tmp != NA) inv_clique.push_back(tmp);
     }
+    sort_unique_inplace(subgraph);
 
     glob.subgraph_seq = subgraph;
 
