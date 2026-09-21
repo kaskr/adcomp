@@ -41,38 +41,85 @@ Type calc_mean(Type logitp, Type nu, int n) {
   return ans.getDeriv()[0];
 }
 
-/** \brief Conway-Maxwell-Binomial. Calculate logit(p) from log(mean).
+/** \brief Conway-Maxwell-Binomial. Calculate logit(p) from mean.
  *
- *  Inverts E[Y | n, logitp, nu] = exp(mean) for logitp using safeguarded
+ *  Inverts E[Y | n, logitp, nu] = mean for logitp using safeguarded
  *  Newton iteration with bisection backstop. Pure Newton oscillates at
  *  strong overdispersion (nu << 1); the bracket-based variant falls back
  *  to bisection when the Newton step lands outside [logitp_lo, logitp_hi].
  */
 template<class Type>
-Type calc_logitp(Type mean, Type nu, int n) {
+Type calc_logitp(Type mean, Type nu, int n);
+
+template<>
+inline double calc_logitp(double mean, double nu, int n) {
+  typedef double Type;
   using atomic::tiny_ad::isfinite;
   bool ok = (n >= 0 && isfinite(mean) && isfinite(nu));
   if (!ok) return NAN;
   int iter_max = 200;
+  int expand_max = 200;
   double reltol = 1e-12;
   double abstol = 1e-14;
   typedef atomic::tiny_ad::variable<1, 1, Type> ADType;
   Type mu = mean;
-  Type logitp_lo = Type(-30.0);
-  Type logitp_hi = Type(+30.0);
-  ADType x(log(mu / (Type(n) - mu)), 0);
+  /* Scaled starting value. At nu = 1 the CMB is binomial and the root is
+     exactly logit(mu/n). For nu > 1 it scales roughly as nu * logit(mu/n);
+     for nu < 0 it compresses by roughly n. */
+  Type logit0 = log(mu / (Type(n) - mu));
+  Type x0;
+  if (nu >= Type(1)) {
+    x0 = nu * logit0;
+  } else if (nu > Type(0)) {
+    x0 = logit0;
+  } else {
+    x0 = logit0 / Type(n);
+  }
+  /* Establish the bracket by outward expansion and verify it before
+     iterating. E[Y | logitp] is strictly increasing with limits 0 and n,
+     so a root exists for every 0 < mu < n and the expansion terminates. */
+  Type logitp_lo = x0;
+  Type logitp_hi = x0;
+  Type h = fabs(x0);
+  if (h < Type(1)) h = Type(1);
+  Type m = calc_mean<Type>(x0, nu, n);
+  int e = 0;
+  bool bracketed = true;
+  if (m > mu) {
+    while (m > mu && e < expand_max) {
+      logitp_lo -= h;
+      h *= Type(2);
+      e++;
+      m = calc_mean<Type>(logitp_lo, nu, n);
+    }
+    bracketed = (m <= mu);
+  } else if (m < mu) {
+    while (m < mu && e < expand_max) {
+      logitp_hi += h;
+      h *= Type(2);
+      e++;
+      m = calc_mean<Type>(logitp_hi, nu, n);
+    }
+    bracketed = (m >= mu);
+  }
+  if (!bracketed) {
+    Rf_warning("combinom_utils::calc_logitp: failed to bracket the root");
+    return NAN;
+  }
+  ADType x(x0, 0);
   int i;
   for (i = 0; i < iter_max; i++) {
     x.deriv[0] = Type(1.0);
     ADType y = calc_mean<ADType>(x, nu, n);
     Type residual = y.value - mu;
+    if (fabs(residual) <= reltol * fabs(mu) || fabs(residual) <= abstol) {
+      break;
+    }
     if (residual > Type(0)) {
       logitp_hi = x.value;
     } else {
       logitp_lo = x.value;
     }
-    if (fabs(residual) <= reltol * fabs(mu)) break;
-    if (fabs(residual) <= abstol) break;
     Type step;
     if (y.deriv[0] > Type(1e-300)) {
       step = -residual / y.deriv[0];
@@ -85,12 +132,43 @@ Type calc_logitp(Type mean, Type nu, int n) {
     } else {
       x.value = (logitp_lo + logitp_hi) / Type(2);
     }
-    if ((logitp_hi - logitp_lo) < Type(abstol)) break;
   }
   if (i == iter_max) {
     Rf_warning("combinom_utils::calc_logitp: Maximum number of iterations exceeded");
   }
   return x.value;
+}
+
+constexpr int getOrder(double x) { return 0; }
+template<class T, class V>
+constexpr int getOrder(atomic::tiny_ad::ad<T, V> x) {
+  return 1 + getOrder(x.value);
+}
+
+template<class Type>
+Type calc_logitp(Type mean, Type nu, int n) {
+  using atomic::tiny_ad::asDouble;
+  using atomic::tiny_ad::isfinite;
+  double nu0 = asDouble(nu);
+  double root = calc_logitp<double>(asDouble(mean), nu0, n);
+  if (!isfinite(root)) return Type(root);
+  typedef atomic::tiny_ad::variable<1, 1> ADType;
+  ADType x0(root, 0);
+  double slope = calc_mean<ADType>(x0, nu0, n).deriv[0];
+  if (!(slope > 1e-300) || !isfinite(slope)) {
+    Rf_warning("combinom_utils::calc_logitp: invalid slope at the root");
+    return NAN;
+  }
+  /* Recover implicit derivatives with one partial Newton step per order,
+     holding the slope fixed at its numerical value at the converged root.
+     Bell and Kristensen (2018), Theorem 4.1 and Corollary 4.1,
+     doi:10.1080/10556788.2017.1406936. */
+  Type x = root;
+  int ord = getOrder(mean);
+  for (int i = 0; i < ord; i++) {
+    x -= (calc_mean<Type>(x, nu, n) - mean) / slope;
+  }
+  return x;
 }
 
 } // namespace combinom_utils
