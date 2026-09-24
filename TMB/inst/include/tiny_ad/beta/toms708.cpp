@@ -338,7 +338,7 @@ L140:
     n = (int) trunc(b0);
     b0 -= n;
     if (b0 == 0.) {
-	--n; b0 = 1.;
+	--n; b0 += 1.;
     }
 
     *w = bup(b0, a0, y0, x0, n, eps, FALSE);
