@@ -1920,9 +1920,7 @@ const char *global::InvOp::op_name() { return "InvOp"; }
 
 const char *global::DepOp::op_name() { return "DepOp"; }
 
-void global::ConstOp::forward(ForwardArgs<Replay> &args) {
-  args.y(0).addToTape();
-}
+void global::ConstOp::forward(ForwardArgs<Replay> &args) {}
 
 const char *global::ConstOp::op_name() { return "ConstOp"; }
 
