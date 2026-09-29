@@ -2038,6 +2038,14 @@ void *global::RefOp::custom_identifier() { return &(glob->values[i]); }
 
 const char *global::RefOp::op_name() { return "RefOp"; }
 
+global::MCopyOp::MCopyOp(size_t n) : n(n) {}
+
+Index global::MCopyOp::input_size() const { return n; }
+
+Index global::MCopyOp::output_size() const { return n; }
+
+const char *global::MCopyOp::op_name() { return "MCopyOp"; }
+
 OperatorPure *global::Fuse(OperatorPure *Op1, OperatorPure *Op2) {
   if (Op1 == Op2)
     return Op1->self_fuse();
@@ -2516,6 +2524,17 @@ ad_aug_index::ad_aug_index(const ad_aug &x) : ad_aug(x) {}
 ad_aug_index::ad_aug_index(const ad_plain &x) : ad_aug(x) {}
 
 Scalar Value(Scalar x) { return x; }
+
+std::vector<ad_plain> mcopy(const std::vector<ad_plain> &x) {
+  global::Complete<global::MCopyOp> op(x.size());
+  return op(x);
+}
+
+std::vector<ad_aug> mcopy(const std::vector<ad_aug> &x) {
+  std::vector<ad_plain> x_(x.begin(), x.end());
+  std::vector<ad_plain> y_ = mcopy(x_);
+  return std::vector<ad_aug>(y_.begin(), y_.end());
+}
 
 ad_aug operator+(const double &x, const ad_aug &y) { return ad_aug(x) + y; }
 
@@ -4018,7 +4037,8 @@ ad_plain sr_grid::logw_offset() {
   if (logw.size() != w.size()) {
     logw.resize(w.size());
     for (size_t i = 0; i < w.size(); i++) logw[i] = log(w[i]);
-    forceContiguous(logw);
+
+    logw = mcopy(logw);
   }
   return logw[0];
 }
@@ -4144,7 +4164,7 @@ std::vector<ad_aug> sequential_reduction::tabulate(std::vector<Index> inv_index,
     ans[i] = replay.value_dep(dep_index);
   }
 
-  forceContiguous(ans);
+  ans = mcopy(ans);
   if (do_cache) {
     cache[id] = ans;
   }

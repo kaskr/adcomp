@@ -2461,6 +2461,31 @@ struct global {
     const char *op_name();
   };
 
+  /** \brief Multivairate Copy operation */
+  struct MCopyOp : DynamicOperator<-1, -1> {
+    static const bool is_linear = true;
+    static const bool have_input_size_output_size = true;
+    static const bool add_forward_replay_copy = true;
+    static const bool add_static_identifier = true;
+    size_t n;
+    MCopyOp(size_t n);
+    Index input_size() const;
+    Index output_size() const;
+    template <class Type>
+    void forward(ForwardArgs<Type> &args) {
+      for (size_t i = 0; i < n; i++) {
+        args.y(i) = args.x(i);
+      }
+    }
+    template <class Type>
+    void reverse(ReverseArgs<Type> &args) {
+      for (size_t i = 0; i < n; i++) {
+        args.dx(i) += args.dy(i);
+      }
+    }
+    const char *op_name();
+  };
+
   typedef Operator<1> UnaryOperator;
   typedef Operator<2> BinaryOperator;
 
@@ -3197,11 +3222,27 @@ V getContiguous(const V &x) {
     - ad_plain
     - ad_aug
     - ad_adapt
+
+    When an operator ('op') requires a contiguous layout of its
+    inputs, it can call this function while being taped (e.g. during
+    forward AD replay). In general it must be assumed that the layout
+    of variables on the tape may change due to optimization
+    side-effects, and it is always the responsibility of 'op' to test
+    that the consecutive layout is retained during replay.
+
+    A simpler alternative is to use the `mcopy()`, which simply copies
+    the full vector using a single operator on the tape. This will
+    provide an even stronger guarantee of contiguity, which is
+    automatically retained during forward replay (i.e. 'op' need not
+    test layout assumptions during replay if its inputs are part of an
+    'mcopied' workspace).
 */
 template <class V>
 void forceContiguous(V &x) {
   if (!isContiguous(x)) x = getContiguous(x);
 }
+std::vector<ad_plain> mcopy(const std::vector<ad_plain> &x);
+std::vector<ad_aug> mcopy(const std::vector<ad_aug> &x);
 ad_aug operator+(const double &x, const ad_aug &y);
 ad_aug operator-(const double &x, const ad_aug &y);
 ad_aug operator*(const double &x, const ad_aug &y);
