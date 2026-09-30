@@ -169,8 +169,9 @@ struct expm_series {
               Rf_warning("expm: N terms reduced to Nmax (%i)", (int) cfg.Nmax);
           }
           bool change = (Nold != N);
-          if (cfg.trace && change) {
-            Rcout << "Retaping:" << " Nold=" << Nold << " Nnew=" << N << "\n";
+          if (change) {
+            if (cfg.trace)
+              Rcout << "Retaping:" << " Nold=" << Nold << " Nnew=" << N << "\n";
             Nold = N;
           }
           return change;
