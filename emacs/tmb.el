@@ -1,12 +1,12 @@
-;;; tmb.el --- Major mode for creating statistical models with TMB
+;;; tmb.el --- Major mode for TMB statistical models  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2015-2018 Arni Magnusson
+;; Copyright (C) 2015-2026 Arni Magnusson
 
 ;; Author:   Arni Magnusson
 ;; Keywords: languages
 ;; URL:      https://github.com/kaskr/adcomp/blob/master/emacs
 
-(defconst tmb-mode-version "3.51" "TMB Mode version number.")
+(defconst tmb-mode-version "3.6" "TMB Mode version number.")
 
 ;;; Commentary:
 ;;
@@ -192,14 +192,14 @@ The secondary window shows compilation and model runs, among other things."
            '("dim" "FE_DIVBYZERO" "FE_INVALID" "FE_OVERFLOW" "FE_UNDERFLOW"))
           (WARNINGS '("error")))
       (list
-       (cons (regexp-opt TYPE 'words) font-lock-type-face)
+       (cons (regexp-opt TYPE 'words) 'font-lock-type-face)
        (cons (regexp-opt DATA 'words) 'tmb-data-face)
        (cons (regexp-opt PARAMETERS 'words) 'tmb-parameter-face)
        (cons (regexp-opt REPORT 'words) 'tmb-report-face)
        (cons (regexp-opt BLOCK 'words) 'tmb-block-face)
-       (cons (regexp-opt FUNCTIONS 'words) font-lock-keyword-face)
-       (cons (regexp-opt CONSTANTS 'words) font-lock-constant-face)
-       (cons (regexp-opt WARNINGS 'words) font-lock-warning-face)))))
+       (cons (regexp-opt FUNCTIONS 'words) 'font-lock-keyword-face)
+       (cons (regexp-opt CONSTANTS 'words) 'font-lock-constant-face)
+       (cons (regexp-opt WARNINGS 'words) 'font-lock-warning-face)))))
 (nconc tmb-font-lock-keywords c++-font-lock-keywords)
 (defvar tmb-menu
   '("TMB"
@@ -369,7 +369,7 @@ visible."
 (defun tmb-show-r ()
   "Show R interactive buffer." (interactive)
   (if (null (get-buffer "*R*"))(error "*R* interactive buffer not found")
-    (tmb-split-window)(ess-show-buffer "*R*")))
+    (tmb-split-window)(set-window-buffer (next-window) "*R*")))
 (defun tmb-template-mini (model)
   "Create minimal TMB files (*.cpp, *.R) in current directory.\n
 The user variable `tmb-compile-args' is passed to the compile() function."
