@@ -140,6 +140,7 @@ extern "C" {
   double Rf_runif(double a, double b);
   double Rf_qgeom(double p, double prob, int lower_tail, int log_p);
   double Rf_rgeom(double p);
+  double Rf_logspace_add(double, double);
 }
 
 /** \brief Conway-Maxwell-Poisson. Rejection sampler using a Piecewise
@@ -175,8 +176,8 @@ double simulate(double loglambda, double nu) {
   double mu0 = (mu > 1 ? floor(jhat) : 0); // Left offset
   double mu1 = mu0 + 1;                    // right offset
   double p0 = Rf_pgeom(mu0, prob0, 1, 0); // Left tail is truncated
-  double w0 = p0 * exp(logf0(mu0)) / prob0; // Mass of left tail proposal
-  double w1 = 1  * exp(logf1(mu1)) / prob1; // Mass of right tail proposal
+  double logw0 = log(p0) + logf0(mu0) - log(prob0); // Log Mass of left tail proposal
+  double logw1 = logf1(mu1) - log(prob1);           // Log Mass of right tail proposal
   double samp = NAN;
   if(false) { // Debug
     // Calculate accept probs
@@ -191,7 +192,8 @@ double simulate(double loglambda, double nu) {
   int i=0, iter_max = 1e4;
   for ( ; i < iter_max; i++ ) {
     // Draw proposal sample
-    if( Rf_runif(0, 1) < w0 / (w0 + w1) ) {
+    double ratio = exp( logw0 - Rf_logspace_add(logw0, logw1) ); // w0 / (w0 + w1)
+    if( Rf_runif(0, 1) < ratio ) {
       samp = mu0 - Rf_qgeom(Rf_runif(0, p0), prob0, 1, 0);
     } else {
       samp = mu1 + Rf_rgeom(prob1);
