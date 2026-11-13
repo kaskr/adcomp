@@ -43,6 +43,8 @@ struct config_struct{
   struct {
     /** \brief Reduce memory of sparse hessian even if reducing speed ? */
     bool sparse_hessian_compress;
+    /** \brief Opt-in compressed Hessian batching (0, 2, 4, 8); may increase memory. */
+    int sparse_hessian_batch_width;
     /** \brief Use atomic sparse log determinant (faster but limited order) ? */
     bool atomic_sparse_log_determinant;
   } tmbad;
@@ -74,6 +76,7 @@ struct config_struct{
     SET(optimize.parallel,false);
     SET(tape.parallel,true);
     SET(tmbad.sparse_hessian_compress,false);
+    SET(tmbad.sparse_hessian_batch_width,0);
     SET(tmbad.atomic_sparse_log_determinant,true);
     SET(autopar,false);
     SET(nthreads,1);

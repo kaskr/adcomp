@@ -2302,6 +2302,9 @@ extern "C"
 #ifdef TMBAD_FRAMEWORK
 sphess_t< TMBad::ADFun< TMBad::ad_aug > > MakeADHessObject2_(SEXP data, SEXP parameters, SEXP report, SEXP control, int parallel_region=-1)
 {
+  int batch_width = config.tmbad.sparse_hessian_batch_width;
+  if (batch_width != 0 && batch_width != 2 && batch_width != 4 && batch_width != 8)
+    Rf_error("tmbad.sparse_hessian_batch_width must be 0, 2, 4, or 8");
   typedef TMBad::ad_aug ad;
   typedef TMBad::ADFun<ad> adfun;
   typedef sphess_t<adfun> sphess;
@@ -2327,6 +2330,7 @@ sphess_t< TMBad::ADFun< TMBad::ad_aug > > MakeADHessObject2_(SEXP data, SEXP par
   TMBad::SpJacFun_config spjacfun_cfg;
   spjacfun_cfg.index_remap = false;
   spjacfun_cfg.compress    = config.tmbad.sparse_hessian_compress;
+  spjacfun_cfg.batch_width = batch_width;
   TMBad::Sparse<adfun> h = pgf->SpJacFun(keepcol, keepcol, spjacfun_cfg);
   if (allocate_new_pgf) delete pgf;
   // NB: Lower triangle, column major =
