@@ -75,6 +75,9 @@ EvalADFunObject <- function(ADFun, theta,
                             keepx=NULL,
                             keepy=NULL,
                             data_changed=FALSE) {
+    if (isNullPointer(ADFun$ptr)) {
+        stop("Freed or loaded model object not fully functional. Please call 'obj$fn()' to restore internal state.")
+    }
     if (!is.null(rangeweight))
         rangeweight <- as.double(rangeweight)
     control <- list(order=as.integer(order),
