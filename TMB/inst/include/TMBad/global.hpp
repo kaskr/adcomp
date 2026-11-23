@@ -20,6 +20,9 @@
 */
 namespace TMBad {
 
+template <class OP>
+void *self_fuse_vectorize();
+
 typedef TMBAD_HASH_TYPE hash_t;
 typedef TMBAD_INDEX_TYPE Index;
 typedef TMBAD_SCALAR_TYPE Scalar;
@@ -693,7 +696,6 @@ struct graph {
   graph(size_t num_nodes, const std::vector<IndexPair> &edges);
 };
 
-namespace {
 template <class CompleteOperator, bool dynamic>
 struct constructOperator {};
 template <class CompleteOperator>
@@ -735,7 +737,6 @@ struct constructOperator<CompleteOperator, true> {
     return pOp;
   }
 };
-}  // namespace
 
 /** \brief Bitwise collection of selected operator flags
     \details These flags are available for any operator in the
@@ -1800,6 +1801,15 @@ struct global {
     void forward(ForwardArgs<Type> &args) {
       args.y(0) = this->eval(args.x(0), args.x(1));
     }
+
+    void forward(ForwardArgs<Replay> &args) {
+      if (global::fuse) {
+        args.y(0) = get_glob()->add_to_stack<OperatorBase>((ad_plain)args.x(0),
+                                                           (ad_plain)args.x(1));
+      } else {
+        args.y(0) = this->eval(args.x(0), args.x(1));
+      }
+    }
   };
 
   /** \brief Utility for member completion */
@@ -2246,6 +2256,8 @@ struct global {
       OperatorPure *operator()() { return NULL; }
     };
     OperatorPure *self_fuse() {
+      OperatorPure *test = (OperatorPure *)self_fuse_vectorize<OperatorBase>();
+      if (test) return test;
       return SelfFuse<OperatorBase, OperatorBase::max_fuse_depth>()();
     }
     OperatorPure *other_fuse(OperatorPure *other) {

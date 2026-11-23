@@ -75,7 +75,7 @@ struct StdWrap {
 
 /** \brief Configuration parameters for SpJacFun() */
 struct SpJacFun_config {
-  SpJacFun_config();
+  SpJacFun_config() : compress(false), index_remap(true) {}
   bool compress;
   bool index_remap;
 };

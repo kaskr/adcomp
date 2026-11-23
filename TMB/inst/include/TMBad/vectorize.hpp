@@ -201,6 +201,27 @@ struct Vectorize : global::DynamicOperator<Operator::ninput, -1> {
   }
   Vectorize(const ad_segment &x, const ad_segment &y)
       : n(std::max(x.size(), y.size())) {}
+  OperatorPure *other_fuse(OperatorPure *self, OperatorPure *other) {
+    OperatorPure *op = get_glob()->getOperator<Operator>();
+    if (op == other) {
+      std::vector<Index> &inputs = get_glob()->inputs;
+      size_t last = inputs.size() - 1;
+      bool ok = false;
+      if (Operator::ninput == 1) {
+        ok = inputs[last - 1] + this->n * S0 == inputs[last];
+      }
+      if (Operator::ninput == 2) {
+        ok = inputs[last - 3] + this->n * S0 == inputs[last - 1];
+        ok &= inputs[last - 2] + this->n * S1 == inputs[last];
+      }
+      if (ok) {
+        this->n++;
+        inputs.resize(inputs.size() - Operator::ninput);
+        return self;
+      }
+    }
+    return NULL;
+  }
 };
 template <class dummy>
 ad_segment operator/(ad_segment x, ad_segment y) {
@@ -400,6 +421,92 @@ ad_segment atan(ad_segment x) {
   global::Complete<Vectorize<AtanOp, 1, 0> > F(n);
   return F(x);
 }
+
+template <bool dynamic, class OP, bool S0, bool S1>
+struct self_fuse_vectorize_t;
+template <class OP, bool S0, bool S1>
+struct self_fuse_vectorize_t<true, OP, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <class OP, bool S0, bool S1>
+struct self_fuse_vectorize_t<false, OP, S0, S1> {
+  OperatorPure *ctor() {
+    return get_glob()->getOperator<Vectorize<OP, S0, S1> >(2);
+  }
+};
+
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, AccOp<true>, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, AccOp<false>, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, AbsOp, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, SignOp, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, Lt0Op, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, Ge0Op, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, MaxOp, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+template <bool S0, bool S1>
+struct self_fuse_vectorize_t<false, MinOp, S0, S1> {
+  OperatorPure *ctor() { return NULL; }
+};
+
+template <class OP>
+void *self_fuse_vectorize() {
+  OperatorPure *op = get_glob()->opstack.back();
+  if (op->input_size() == 1) {
+    std::vector<Index> &inputs = get_glob()->inputs;
+    int n = inputs.size();
+    Index d = inputs[n - 1] - inputs[n - 2];
+    OperatorPure *ans = NULL;
+    if (d == 1)
+      ans = self_fuse_vectorize_t < OP::dynamic || OP::add_forward_replay_copy,
+      OP, 1, 0 > ().ctor();
+    if (ans) {
+      inputs.resize(n - 1);
+      return ans;
+    }
+  }
+  if (op->input_size() == 2) {
+    std::vector<Index> &inputs = get_glob()->inputs;
+    int n = inputs.size();
+    Index d1 = inputs[n - 2] - inputs[n - 4];
+    Index d2 = inputs[n - 1] - inputs[n - 3];
+    OperatorPure *ans = NULL;
+    if (d1 == 1 && d2 == 1)
+      ans = self_fuse_vectorize_t < OP::dynamic || OP::add_forward_replay_copy,
+      OP, 1, 1 > ().ctor();
+    if (d1 == 0 && d2 == 1)
+      ans = self_fuse_vectorize_t < OP::dynamic || OP::add_forward_replay_copy,
+      OP, 0, 1 > ().ctor();
+    if (d1 == 1 && d2 == 0)
+      ans = self_fuse_vectorize_t < OP::dynamic || OP::add_forward_replay_copy,
+      OP, 1, 0 > ().ctor();
+    if (ans) {
+      inputs.resize(n - 2);
+      return ans;
+    }
+  }
+  return NULL;
+}
+
 template <class T>
 struct ScalarPack {
   static const int size = (sizeof(T) - 1) / sizeof(Scalar) + 1;
